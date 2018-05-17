@@ -22,11 +22,9 @@ ray_files_generated = [
     "ray/core/src/local_scheduler/local_scheduler",
     "ray/core/src/local_scheduler/liblocal_scheduler_library.so",
     "ray/core/src/global_scheduler/global_scheduler",
-    "ray/core/src/ray/raylet/raylet_monitor", "ray/core/src/ray/raylet/raylet",
+    "ray/core/src/ray/raylet/raylet_monitor", "ray/core/src/ray/raylet/raylet"
 ]
-ray_files = [
-    "ray/WebUI.ipynb"
-]
+ray_files = ["ray/WebUI.ipynb"]
 
 optional_ray_files = []
 optional_ray_files_generated = []

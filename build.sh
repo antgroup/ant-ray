@@ -28,7 +28,11 @@ else
 fi
 
 # Now we build everything.
-pushd "$ROOT_DIR/python/ray/core"
+BUILD_DIR="$ROOT_DIR/build/ray/core"
+if [ ! -d "${BUILD_DIR}" ]; then
+  mkdir -p ${BUILD_DIR}
+fi
+pushd "$BUILD_DIR"
   # We use these variables to set PKG_CONFIG_PATH, which is important so that
   # in cmake, pkg-config can find plasma.
   TP_PKG_DIR=$ROOT_DIR/thirdparty/pkg
@@ -53,4 +57,4 @@ pushd "$ROOT_DIR/python/ray/core"
 popd
 
 # Move stuff from Arrow to Ray.
-cp $ROOT_DIR/thirdparty/pkg/arrow/cpp/build/cpp-install/bin/plasma_store $ROOT_DIR/python/ray/core/src/plasma/
+cp $ROOT_DIR/thirdparty/pkg/arrow/cpp/build/cpp-install/bin/plasma_store $ROOT_DIR/build/ray/core/src/plasma/

@@ -34,11 +34,11 @@ if [[ "${RAY_USE_NEW_GCS}" = "on" ]]; then
         make -j
       popd
 
-      mkdir -p $ROOT_DIR/python/ray/core/src/credis/redis/src/
-      cp redis/src/redis-server $ROOT_DIR/python/ray/core/src/credis/redis/src/redis-server
-      mkdir -p $ROOT_DIR/python/ray/core/src/credis/build/src/
-      cp build/src/libmaster.so $ROOT_DIR/python/ray/core/src/credis/build/src/libmaster.so
-      cp build/src/libmember.so $ROOT_DIR/python/ray/core/src/credis/build/src/libmember.so
+      mkdir -p $ROOT_DIR/build/ray/core/src/credis/redis/src/
+      cp redis/src/redis-server $ROOT_DIR/build/ray/core/src/credis/redis/src/redis-server
+      mkdir -p $ROOT_DIR/build/ray/core/src/credis/build/src/
+      cp build/src/libmaster.so $ROOT_DIR/build/ray/core/src/credis/build/src/libmaster.so
+      cp build/src/libmember.so $ROOT_DIR/build/ray/core/src/credis/build/src/libmember.so
     popd
   fi
 fi

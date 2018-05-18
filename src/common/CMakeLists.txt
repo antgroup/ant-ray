@@ -32,7 +32,7 @@ add_custom_command(
 add_custom_target(gen_common_fbs DEPENDS ${COMMON_FBS_OUTPUT_FILES})
 
 # Generate Python bindings for the flatbuffers objects.
-set(PYTHON_OUTPUT_DIR ${CMAKE_BINARY_DIR}/generated/)
+set(PYTHON_OUTPUT_DIR ${CMAKE_CURRENT_LIST_DIR}/../../python/ray/core/generated/)
 add_custom_command(
   TARGET gen_common_fbs
   COMMAND ${FLATBUFFERS_COMPILER} -p -o ${PYTHON_OUTPUT_DIR} ${COMMON_FBS_SRC}

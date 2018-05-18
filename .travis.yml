@@ -57,7 +57,7 @@ matrix:
         - ./.travis/install-ray.sh
 
       script:
-        - cd python/ray/core
+        - cd build/ray/core
         - bash ../../../src/common/test/run_valgrind.sh
         - bash ../../../src/plasma/test/run_valgrind.sh
         - bash ../../../src/local_scheduler/test/run_valgrind.sh
@@ -155,7 +155,7 @@ install:
   - ./.travis/install-ray.sh
   - ./.travis/install-cython-examples.sh
 
-  - cd python/ray/core
+  - cd build/ray/core
   - bash ../../../src/ray/test/run_gcs_tests.sh
   # Raylet tests.
   - bash ../../../src/ray/test/run_object_manager_tests.sh

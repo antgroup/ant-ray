@@ -91,10 +91,11 @@ class ConnectionPool {
  private:
   /// A container type that maps ClientID to a connection type.
   using SenderMapType =
-      std::unordered_map<ray::ClientID, std::vector<std::shared_ptr<SenderConnection>>>;
+      std::unordered_map<ray::ClientID,
+                         std::unordered_set<std::shared_ptr<SenderConnection>>>;
   using ReceiverMapType =
       std::unordered_map<ray::ClientID,
-                         std::vector<std::shared_ptr<TcpClientConnection>>>;
+                         std::unordered_set<std::shared_ptr<TcpClientConnection>>>;
 
   /// Adds a receiver for ClientID to the given map.
   void Add(ReceiverMapType &conn_map, const ClientID &client_id,

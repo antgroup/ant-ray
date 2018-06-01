@@ -17,7 +17,7 @@ void ObjectDirectory::RegisterBackend() {
       return;
     }
     // Update entries for this object.
-    auto client_id_set = entry->second.client_ids;
+    auto &client_id_set = entry->second.client_ids;
     for (auto &object_table_data : data) {
       ClientID client_id = ClientID::from_binary(object_table_data.manager);
       if (!object_table_data.is_eviction) {

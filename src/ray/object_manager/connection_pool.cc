@@ -64,12 +64,12 @@ ray::Status ConnectionPool::ReleaseSender(ConnectionType type,
 
 void ConnectionPool::Add(ReceiverMapType &conn_map, const ClientID &client_id,
                          std::shared_ptr<TcpClientConnection> conn) {
-  conn_map[client_id].push_back(std::move(conn));
+  conn_map[client_id].emplace(std::move(conn));
 }
 
 void ConnectionPool::Add(SenderMapType &conn_map, const ClientID &client_id,
                          std::shared_ptr<SenderConnection> conn) {
-  conn_map[client_id].push_back(std::move(conn));
+  conn_map[client_id].emplace(std::move(conn));
 }
 
 void ConnectionPool::Remove(ReceiverMapType &conn_map, const ClientID &client_id,
@@ -79,12 +79,7 @@ void ConnectionPool::Remove(ReceiverMapType &conn_map, const ClientID &client_id
     return;
   }
   auto &connections = it->second;
-  int64_t pos =
-      std::find(connections.begin(), connections.end(), conn) - connections.begin();
-  if (pos >= (int64_t)connections.size()) {
-    return;
-  }
-  connections.erase(connections.begin() + pos);
+  connections.erase(conn);
 }
 
 uint64_t ConnectionPool::Count(SenderMapType &conn_map, const ClientID &client_id) {
@@ -97,15 +92,16 @@ uint64_t ConnectionPool::Count(SenderMapType &conn_map, const ClientID &client_i
 
 std::shared_ptr<SenderConnection> ConnectionPool::Borrow(SenderMapType &conn_map,
                                                          const ClientID &client_id) {
-  std::shared_ptr<SenderConnection> conn = std::move(conn_map[client_id].back());
-  conn_map[client_id].pop_back();
+  auto front = conn_map[client_id].begin();
+  std::shared_ptr<SenderConnection> conn = std::move(*front);
+  conn_map[client_id].erase(front);
   RAY_LOG(DEBUG) << "Borrow " << client_id << " " << conn_map[client_id].size();
   return conn;
 }
 
 void ConnectionPool::Return(SenderMapType &conn_map, const ClientID &client_id,
                             std::shared_ptr<SenderConnection> conn) {
-  conn_map[client_id].push_back(std::move(conn));
+  conn_map[client_id].emplace(std::move(conn));
   RAY_LOG(DEBUG) << "Return " << client_id << " " << conn_map[client_id].size();
 }
 

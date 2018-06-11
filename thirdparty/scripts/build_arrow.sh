@@ -61,11 +61,6 @@ if [[ ! -d $TP_DIR/../python/ray/pyarrow_files/pyarrow ]]; then
     fi
     cd build
 
-    BUILD_ARROW_PLASMA_JAVA_CLIENT=off
-    if [[ "$LANGUAGE" == "java" ]]; then
-      BUILD_ARROW_PLASMA_JAVA_CLIENT=on
-    fi
-
     ARROW_HOME=$TP_DIR/pkg/arrow/cpp/build/cpp-install
     BOOST_ROOT=$TP_DIR/pkg/boost \
     FLATBUFFERS_HOME=$FLATBUFFERS_HOME \
@@ -85,7 +80,7 @@ if [[ ! -d $TP_DIR/../python/ray/pyarrow_files/pyarrow ]]; then
         -DARROW_WITH_LZ4=off \
         -DARROW_WITH_ZLIB=off \
         -DARROW_WITH_ZSTD=off \
-        -DARROW_PLASMA_JAVA_CLIENT=$BUILD_ARROW_PLASMA_JAVA_CLIENT \
+        -DARROW_PLASMA_JAVA_CLIENT=on \
         ..
     make VERBOSE=1 -j$PARALLEL
     make install

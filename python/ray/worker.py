@@ -29,7 +29,12 @@ import ray.signature
 import ray.local_scheduler
 import ray.plasma
 import ray.ray_constants as ray_constants
-from ray.utils import random_string, binary_to_hex, is_cython
+from ray.utils import (
+    binary_to_hex,
+    is_cython,
+    random_string,
+    thread_safe_client,
+)
 
 # Import flatbuffer bindings.
 from ray.core.generated.ClientTableData import ClientTableData
@@ -198,6 +203,7 @@ class Worker(object):
             that connect has been called already.
         cached_functions_to_run (List): A list of functions to run on all of
             the workers that should be exported as soon as connect is called.
+        reconstruction_lock (Lock): A lock object used to guard object reconstruction.
     """
 
     def __init__(self):
@@ -233,6 +239,7 @@ class Worker(object):
         # When the worker is constructed. Record the original value of the
         # CUDA_VISIBLE_DEVICES environment variable.
         self.original_gpu_ids = ray.utils.get_cuda_visible_devices()
+        self.reconstruction_lock = threading.Lock()
 
     def check_connected(self):
         """Check if the worker is connected.
@@ -462,51 +469,52 @@ class Worker(object):
             for (i, val) in enumerate(final_results)
             if val is plasma.ObjectNotAvailable
         }
-        was_blocked = (len(unready_ids) > 0)
-        # Try reconstructing any objects we haven't gotten yet. Try to get them
-        # until at least get_timeout_milliseconds milliseconds passes, then
-        # repeat.
-        while len(unready_ids) > 0:
-            for unready_id in unready_ids:
-                self.local_scheduler_client.reconstruct_objects(
-                    [ray.ObjectID(unready_id)], False)
-            # Do another fetch for objects that aren't available locally yet,
-            # in case they were evicted since the last fetch. We divide the
-            # fetch into smaller fetches so as to not block the manager for a
-            # prolonged period of time in a single call.
-            object_ids_to_fetch = list(
-                map(plasma.ObjectID, unready_ids.keys()))
-            ray_object_ids_to_fetch = list(
-                map(ray.ObjectID, unready_ids.keys()))
-            for i in range(0, len(object_ids_to_fetch),
-                           ray._config.worker_fetch_request_size()):
-                if not self.use_raylet:
-                    self.plasma_client.fetch(object_ids_to_fetch[i:(
-                        i + ray._config.worker_fetch_request_size())])
-                else:
-                    self.local_scheduler_client.reconstruct_objects(
-                        ray_object_ids_to_fetch[i:(
-                            i + ray._config.worker_fetch_request_size())],
-                        True)
-            results = self.retrieve_and_deserialize(
-                object_ids_to_fetch,
-                max([
-                    ray._config.get_timeout_milliseconds(),
-                    int(0.01 * len(unready_ids))
-                ]))
-            # Remove any entries for objects we received during this iteration
-            # so we don't retrieve the same object twice.
-            for i, val in enumerate(results):
-                if val is not plasma.ObjectNotAvailable:
-                    object_id = object_ids_to_fetch[i].binary()
-                    index = unready_ids[object_id]
-                    final_results[index] = val
-                    unready_ids.pop(object_id)
 
-        # If there were objects that we weren't able to get locally, let the
-        # local scheduler know that we're now unblocked.
-        if was_blocked:
-            self.local_scheduler_client.notify_unblocked()
+        if len(unready_ids) > 0:
+            with self.reconstruction_lock:
+                # Try reconstructing any objects we haven't gotten yet. Try to get them
+                # until at least get_timeout_milliseconds milliseconds passes, then
+                # repeat.
+                while len(unready_ids) > 0:
+                    for unready_id in unready_ids:
+                        self.local_scheduler_client.reconstruct_objects(
+                            [ray.ObjectID(unready_id)], False)
+                    # Do another fetch for objects that aren't available locally yet,
+                    # in case they were evicted since the last fetch. We divide the
+                    # fetch into smaller fetches so as to not block the manager for a
+                    # prolonged period of time in a single call.
+                    object_ids_to_fetch = list(
+                        map(plasma.ObjectID, unready_ids.keys()))
+                    ray_object_ids_to_fetch = list(
+                        map(ray.ObjectID, unready_ids.keys()))
+                    for i in range(0, len(object_ids_to_fetch),
+                                   ray._config.worker_fetch_request_size()):
+                        if not self.use_raylet:
+                            self.plasma_client.fetch(object_ids_to_fetch[i:(
+                                i + ray._config.worker_fetch_request_size())])
+                        else:
+                            self.local_scheduler_client.reconstruct_objects(
+                                ray_object_ids_to_fetch[i:(
+                                    i + ray._config.worker_fetch_request_size())],
+                                True)
+                    results = self.retrieve_and_deserialize(
+                        object_ids_to_fetch,
+                        max([
+                            ray._config.get_timeout_milliseconds(),
+                            int(0.01 * len(unready_ids))
+                        ]))
+                    # Remove any entries for objects we received during this iteration
+                    # so we don't retrieve the same object twice.
+                    for i, val in enumerate(results):
+                        if val is not plasma.ObjectNotAvailable:
+                            object_id = object_ids_to_fetch[i].binary()
+                            index = unready_ids[object_id]
+                            final_results[index] = val
+                            unready_ids.pop(object_id)
+
+                # If there were objects that we weren't able to get locally, let the
+                # local scheduler know that we're now unblocked.
+                self.local_scheduler_client.notify_unblocked()
 
         assert len(final_results) == len(object_ids)
         return final_results
@@ -558,7 +566,6 @@ class Worker(object):
             The return object IDs for this task.
         """
         with log_span("ray:submit_task", worker=self):
-            check_main_thread()
             if actor_id is None:
                 assert actor_handle_id is None
                 actor_id = ray.ObjectID(NIL_ACTOR_ID)
@@ -630,7 +637,6 @@ class Worker(object):
             decorated_function: The decorated function (this is used to enable
                 the remote function to recursively call itself).
         """
-        check_main_thread()
         if self.mode not in [SCRIPT_MODE, SILENT_MODE]:
             raise Exception("export_remote_function can only be called on a "
                             "driver.")
@@ -692,7 +698,6 @@ class Worker(object):
                 should not take any arguments. If it returns anything, its
                 return values will not be used.
         """
-        check_main_thread()
         # If ray.init has not been called yet, then cache the function and
         # export it when connect is called. Otherwise, run the function on all
         # workers.
@@ -1051,7 +1056,6 @@ class Worker(object):
 
         signal.signal(signal.SIGTERM, exit)
 
-        check_main_thread()
         while True:
             task = self._get_next_task_from_local_scheduler()
             self._wait_for_and_process_task(task)
@@ -1151,20 +1155,6 @@ class RayConnectionError(Exception):
     pass
 
 
-def check_main_thread():
-    """Check that we are currently on the main thread.
-
-    Raises:
-        Exception: An exception is raised if this is called on a thread other
-            than the main thread.
-    """
-    if threading.current_thread().getName() != "MainThread":
-        raise Exception("The Ray methods are not thread safe and must be "
-                        "called from the main thread. This method was called "
-                        "from thread {}."
-                        .format(threading.current_thread().getName()))
-
-
 def print_failed_task(task_status):
     """Print information about failed tasks.
 
@@ -1199,7 +1189,6 @@ def error_applies_to_driver(error_key, worker=global_worker):
 def error_info(worker=global_worker):
     """Return information about failed tasks."""
     worker.check_connected()
-    check_main_thread()
     error_keys = worker.redis_client.lrange("ErrorKeys", 0, -1)
     errors = []
     for error_key in error_keys:
@@ -1524,7 +1513,6 @@ def _init(address_info=None,
         Exception: An exception is raised if an inappropriate combination of
             arguments is passed in.
     """
-    check_main_thread()
     if driver_mode not in [SCRIPT_MODE, PYTHON_MODE, SILENT_MODE]:
         raise Exception("Driver_mode must be in [ray.SCRIPT_MODE, "
                         "ray.PYTHON_MODE, ray.SILENT_MODE].")
@@ -2054,7 +2042,6 @@ def connect(info,
         use_raylet: True if the new raylet code path should be used. This is
             not supported yet.
     """
-    check_main_thread()
     # Do some basic checking to make sure we didn't call ray.init twice.
     error_message = "Perhaps you called ray.init twice by accident?"
     assert not worker.connected, error_message
@@ -2092,8 +2079,9 @@ def connect(info,
 
     # Create a Redis client.
     redis_ip_address, redis_port = info["redis_address"].split(":")
-    worker.redis_client = redis.StrictRedis(
-        host=redis_ip_address, port=int(redis_port))
+    worker.redis_client = thread_safe_client(
+        redis.StrictRedis(host=redis_ip_address, port=int(redis_port))
+    )
 
     # For driver's check that the version information matches the version
     # information that the Ray cluster was started with.
@@ -2172,19 +2160,23 @@ def connect(info,
 
     # Create an object store client.
     if not worker.use_raylet:
-        worker.plasma_client = plasma.connect(info["store_socket_name"],
-                                              info["manager_socket_name"], 64)
+        worker.plasma_client = thread_safe_client(
+            plasma.connect(info["store_socket_name"], info["manager_socket_name"], 64)
+        )
     else:
-        worker.plasma_client = plasma.connect(info["store_socket_name"], "",
-                                              64)
+        worker.plasma_client = thread_safe_client(
+            plasma.connect(info["store_socket_name"], "", 64)
+        )
 
     if not worker.use_raylet:
         local_scheduler_socket = info["local_scheduler_socket_name"]
     else:
         local_scheduler_socket = info["raylet_socket_name"]
 
-    worker.local_scheduler_client = ray.local_scheduler.LocalSchedulerClient(
-        local_scheduler_socket, worker.worker_id, is_worker, worker.use_raylet)
+    worker.local_scheduler_client = thread_safe_client(
+        ray.local_scheduler.LocalSchedulerClient(
+            local_scheduler_socket, worker.worker_id, is_worker, worker.use_raylet)
+    )
 
     # If this is a driver, set the current task ID, the task driver ID, and set
     # the task index to 0.
@@ -2550,7 +2542,6 @@ def get(object_ids, worker=global_worker):
     """
     worker.check_connected()
     with log_span("ray:get", worker=worker):
-        check_main_thread()
 
         if worker.mode == PYTHON_MODE:
             # In PYTHON_MODE, ray.get is the identity operation (the input will
@@ -2583,8 +2574,6 @@ def put(value, worker=global_worker):
     """
     worker.check_connected()
     with log_span("ray:put", worker=worker):
-        check_main_thread()
-
         if worker.mode == PYTHON_MODE:
             # In PYTHON_MODE, ray.put is the identity operation.
             return value
@@ -2641,8 +2630,6 @@ def wait(object_ids, num_returns=1, timeout=None, worker=global_worker):
 
     worker.check_connected()
     with log_span("ray:wait", worker=worker):
-        check_main_thread()
-
         # When Ray is run in PYTHON_MODE, all functions are run immediately,
         # so all objects in object_id are ready.
         if worker.mode == PYTHON_MODE:

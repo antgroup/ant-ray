@@ -72,7 +72,7 @@ void local_scheduler_submit(LocalSchedulerConnection *conn,
 void local_scheduler_submit_raylet(
     LocalSchedulerConnection *conn,
     const std::vector<ObjectID> &execution_dependencies,
-    ray::raylet::TaskSpecification task_spec);
+    ray::raylet::TaskSpecification &task_spec);
 
 /**
  * Notify the local scheduler that this client is disconnecting gracefully. This

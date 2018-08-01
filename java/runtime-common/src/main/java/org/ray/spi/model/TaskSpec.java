@@ -76,7 +76,7 @@ public class TaskSpec {
     StringBuilder builder = new StringBuilder();
     builder.append("{");
 
-    int count = 0;
+    int count = 1;
     for (Map.Entry<String, Double> entry : resources.entrySet()) {
       builder.append(entry.getKey()).append(":").append(entry.getValue());
 

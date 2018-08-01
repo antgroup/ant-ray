@@ -222,14 +222,14 @@ public class DefaultLocalSchedulerClient implements LocalSchedulerLink {
     // The required_resources vector indicates the quantities of the different
     // resources required by this task. The index in this vector corresponds to
     // the resource type defined in the ResourceIndex enum. For example,
-    final String cpuLiteral = "CPU";
-    if (!task.resources.containsKey(cpuLiteral)) {
-      task.resources.put(cpuLiteral, 0.0);
+    final String CPULiteral = "CPU";
+    if (!task.resources.containsKey(CPULiteral)) {
+      task.resources.put(CPULiteral, 0.0);
     }
 
-    final String gpuLiteral = "GPU";
-    if (!task.resources.containsKey(gpuLiteral)) {
-      task.resources.put(gpuLiteral, 0.0);
+    final String GPULiteral = "GPU";
+    if (!task.resources.containsKey(GPULiteral)) {
+      task.resources.put(GPULiteral, 0.0);
     }
 
 

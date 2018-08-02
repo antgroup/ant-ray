@@ -183,7 +183,7 @@ public class RayCli {
     RayLog.rapp.debug("registerApp " + appId + " for resouorce " + resourceId + " done");
   
     // Unzip the package file.
-    String appDir = "/tmp/" + cmdSubmit.className;
+    String appDir = params.working_directory + "/" + cmdSubmit.className;
     String extPath = appDir + "/" + packageName;
     if (!FileUtil.createDir(extPath, false)) {
       throw new RuntimeException("create dir " + extPath + " failed ");

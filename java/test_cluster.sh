@@ -61,11 +61,11 @@ function run_test() {
     # Check the result
     start_process_log=$(cat "./local_deploy/cli.log")
     [[ ${start_process_log} =~ "Started Ray head node" ]] || exit 1
-    echo "Check: Ray all process started."
+    echo "Check: Ray all processes started."
 
     execution_log=$(cat "./local_deploy/ray/run/org.ray.exercise.Exercise02/0.out.txt")
     [[ ${execution_log} =~ "hello,world!" ]] || exit 1
-    echo "Check: The test ran successfully."
+    echo "Check: The tests ran successfully."
 }
 
 run_test non-raylet

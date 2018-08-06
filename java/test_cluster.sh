@@ -16,7 +16,7 @@ function run_test() {
     ./prepare.sh -t local_deploy
     pushd local_deploy
     local_ips=`ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|tr -d "addr:"`
-    local_ip=$(echo $local_ips|cut -d" " -f1)
+    local_ip=$(echo $local_ips | awk -F " " '{print $NF}')
     echo "use local_ip" $local_ip
 
     OVERWRITE="ray.java.start.redis_port=34222;ray.java.start.node_ip_address=$local_ip;ray.java.start.deploy=true;ray.java.start.run_mode=CLUSTER;ray.java.start.raylet_port=35567;"

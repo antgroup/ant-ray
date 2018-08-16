@@ -25,7 +25,8 @@ struct NodeManagerConfig {
   ResourceSet resource_config;
   int num_initial_workers;
   int num_workers_per_process;
-  std::vector<std::string> worker_command;
+  std::vector<std::string> java_worker_command;
+  std::vector<std::string> python_worker_command;
   uint64_t heartbeat_period_ms;
   uint64_t max_lineage_size;
   /// The store socket name.

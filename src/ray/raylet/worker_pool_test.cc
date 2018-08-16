@@ -12,7 +12,7 @@ int NUM_WORKERS_PER_PROCESS = 3;
 
 class WorkerPoolMock : public WorkerPool {
  public:
-  WorkerPoolMock() : WorkerPool(0, NUM_WORKERS_PER_PROCESS, 0, {}) {}
+  WorkerPoolMock() : WorkerPool(0, NUM_WORKERS_PER_PROCESS, 0, {}, {}) {}
 
   void StartWorkerProcess(pid_t pid, bool force_start = false) {
     if (starting_worker_processes_.size() > 0 && !force_start) {

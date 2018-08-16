@@ -42,10 +42,12 @@ namespace raylet {
 /// A constructor that initializes a worker pool with
 /// (num_worker_processes * num_workers_per_process) workers
 WorkerPool::WorkerPool(int num_worker_processes, int num_workers_per_process,
-                       int num_cpus, const std::vector<std::string> &worker_command)
+                       int num_cpus, const std::vector<std::string> &java_worker_command,
+                       const std::vector<std::string> &python_worker_command)
     : num_workers_per_process_(num_workers_per_process),
       num_cpus_(num_cpus),
-      worker_command_(worker_command) {
+      java_worker_command_(java_worker_command),
+      python_worker_command_(python_worker_command) {
   RAY_CHECK(num_workers_per_process > 0) << "num_workers_per_process must be positive.";
   // Ignore SIGCHLD signals. If we don't do this, then worker processes will
   // become zombies instead of dying gracefully.
@@ -82,7 +84,22 @@ uint32_t WorkerPool::Size() const {
 }
 
 void WorkerPool::StartWorkerProcess(bool force_start) {
-  RAY_CHECK(!worker_command_.empty()) << "No worker command provided";
+  std::vector<std::string> worker_command;
+
+  if (!java_worker_command_.empty()) {
+    StartWorkerProcessWithCommand(java_worker_command_, force_start);
+    return ;
+  }
+
+  if (!python_worker_command_.empty()) {
+    StartWorkerProcessWithCommand(python_worker_command_, force_start);
+    return ;
+  }
+}
+
+void WorkerPool::StartWorkerProcessWithCommand(const std::vector<std::string> &worker_command,
+                                               bool force_start) {
+  RAY_CHECK(!worker_command.empty()) << "No worker command provided";
   // The first condition makes sure that we are always starting up to
   // num_cpus_ number of processes in parallel.
   if (static_cast<int>(starting_worker_processes_.size()) >= num_cpus_ && !force_start) {
@@ -108,7 +125,7 @@ void WorkerPool::StartWorkerProcess(bool force_start) {
 
   // Extract pointers from the worker command to pass into execvp.
   std::vector<const char *> worker_command_args;
-  for (auto const &token : worker_command_) {
+  for (auto const &token : worker_command) {
     worker_command_args.push_back(token.c_str());
   }
   worker_command_args.push_back(nullptr);

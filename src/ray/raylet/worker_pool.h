@@ -30,17 +30,14 @@ class WorkerPool {
   /// \param num_workers_per_process The number of workers per process.
   /// \param worker_command The command used to start the worker process.
   WorkerPool(int num_worker_processes, int num_workers_per_process, int num_cpus,
-             const std::vector<std::string> &worker_command);
+             const std::vector<std::string> &java_worker_command,
+             const std::vector<std::string> &python_worker_command);
 
   /// Destructor responsible for freeing a set of workers owned by this class.
   virtual ~WorkerPool();
 
-  /// Asynchronously start a new worker process. Once the worker process has
-  /// registered with an external server, the process should create and
-  /// register num_workers_per_process_ workers, then add them to the pool.
-  /// Failure to start the worker process is a fatal error.
-  /// This function will start up to num_cpus many workers in parallel
-  /// if it is called multiple times.
+  /// Asynchronously start a new worker process.
+  /// This is the wrapper function for `StartWorkerProcessWithCommand`.
   ///
   /// \param force_start Controls whether to force starting a worker regardless of any
   /// workers that have already been started but not yet registered.
@@ -111,10 +108,27 @@ class WorkerPool {
   int num_workers_per_process_;
 
  private:
+  /// Asynchronously start a new worker process. Once the worker process has
+  /// registered with an external server, the process should create and
+  /// register num_workers_per_process_ workers, then add them to the pool.
+  /// Failure to start the worker process is a fatal error.
+  /// This function will start up to num_cpus many workers in parallel
+  /// if it is called multiple times.
+  ///
+  /// \param worker_command The command that we start a worker process.
+  /// \param force_start Controls whether to force starting a worker regardless of any
+  /// workers that have already been started but not yet registered.
+  void StartWorkerProcessWithCommand(const std::vector<std::string> &worker_command,
+                                     bool force_start);
+
+private:
   /// The number of CPUs this Raylet has available.
   int num_cpus_;
-  /// The command and arguments used to start the worker.
-  std::vector<std::string> worker_command_;
+  /// The command and arguments used to start the java worker.
+  std::vector<std::string> java_worker_command_;
+  /// The command and arguments used to start the python worker.
+  std::vector<std::string> python_worker_command_;
+
   /// The pool of idle workers.
   std::list<std::shared_ptr<Worker>> pool_;
   /// The pool of idle actor workers.

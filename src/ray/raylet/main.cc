@@ -6,7 +6,7 @@
 
 #ifndef RAYLET_TEST
 int main(int argc, char *argv[]) {
-  RAY_CHECK(argc == 9);
+  RAY_CHECK(argc == 10);
 
   const std::string raylet_socket_name = std::string(argv[1]);
   const std::string store_socket_name = std::string(argv[2]);
@@ -14,8 +14,12 @@ int main(int argc, char *argv[]) {
   const std::string redis_address = std::string(argv[4]);
   int redis_port = std::stoi(argv[5]);
   int num_initial_workers = std::stoi(argv[6]);
-  const std::string worker_command = std::string(argv[7]);
-  const std::string static_resource_list = std::string(argv[8]);
+  const std::string static_resource_list = std::string(argv[7]);
+
+  // If you want to pass one worker command,
+  // the other one should be passed by a empty string.
+  const std::string java_worker_command = std::string(argv[8]);
+  const std::string python_worker_command = std::string(argv[9]);
 
   // Configuration for the node manager.
   ray::raylet::NodeManagerConfig node_manager_config;
@@ -39,10 +43,25 @@ int main(int argc, char *argv[]) {
       RayConfig::instance().num_workers_per_process();
   // Use a default worker that can execute empty tasks with dependencies.
 
-  std::istringstream iss(worker_command);
-  std::vector<std::string> results(std::istream_iterator<std::string>{iss},
-                                   std::istream_iterator<std::string>());
-  node_manager_config.worker_command.swap(results);
+  // TODO(qingw): Extract this 2 pieces of code to a common helper function.
+  {
+    if (!java_worker_command.empty()) {
+      std::istringstream iss(java_worker_command);
+      std::vector<std::string> results(std::istream_iterator<std::string>{iss},
+                                       std::istream_iterator<std::string>());
+      node_manager_config.java_worker_command.swap(results);
+    }
+  }
+
+  {
+    if (!python_worker_command.empty()) {
+      std::istringstream iss(python_worker_command);
+      std::vector<std::string> results(std::istream_iterator<std::string>{iss},
+                                       std::istream_iterator<std::string>());
+      node_manager_config.python_worker_command.swap(results);
+    }
+  }
+
 
   node_manager_config.heartbeat_period_ms =
       RayConfig::instance().heartbeat_timeout_milliseconds();

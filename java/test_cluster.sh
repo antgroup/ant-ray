@@ -6,9 +6,9 @@
 function run_test() {
     use_raylet="false"
     if [ "$1" == "raylet" ]; then
-        sed -i 's/^use_raylet.*$/use_raylet = true/g' ray.config.ini
+        sed -i 'x' 's/^use_raylet.*$/use_raylet = true/g' ray.config.ini
     else
-        sed -i 's/^use_raylet.*$/use_raylet = false/g' ray.config.ini
+        sed -i 'x' 's/^use_raylet.*$/use_raylet = false/g' ray.config.ini
     fi
 
     sh cleanup.sh
@@ -45,7 +45,7 @@ function run_test() {
     # run with cluster mode
     pushd local_deploy
     export RAY_CONFIG=ray/ray.config.ini
-    ARGS=" --package ../example/app1.zip --class org.ray.test.example.HelloExample --args=test1,test2  --redis-address=$local_ip:34222"
+    ARGS=" --package ../example/app1.zip --class org.ray.api.example.HelloExample --args=test1,test2  --redis-address=$local_ip:34222"
     ../local_deploy/run.sh submit $ARGS
     popd
 
@@ -63,7 +63,7 @@ function run_test() {
     [[ ${start_process_log} =~ "Started Ray head node" ]] || exit 1
     echo "Check: Ray all processes started."
 
-    execution_log=$(cat "./local_deploy/ray/run/org.ray.test.example.HelloExample/0.out.txt")
+    execution_log=$(cat "./local_deploy/ray/run/org.ray.api.example.HelloExample/0.out.txt")
     [[ ${execution_log} =~ "hello,world!" ]] || exit 1
     echo "Check: The tests ran successfully."
 }

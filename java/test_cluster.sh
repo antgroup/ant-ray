@@ -6,9 +6,9 @@
 function run_test() {
     use_raylet="false"
     if [ "$1" == "raylet" ]; then
-        sed -i 'x' 's/^use_raylet.*$/use_raylet = true/g' ray.config.ini
+        sed -i 's/^use_raylet.*$/use_raylet = true/g' ray.config.ini
     else
-        sed -i 'x' 's/^use_raylet.*$/use_raylet = false/g' ray.config.ini
+        sed -i 's/^use_raylet.*$/use_raylet = false/g' ray.config.ini
     fi
 
     sh cleanup.sh

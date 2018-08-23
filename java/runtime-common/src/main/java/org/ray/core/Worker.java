@@ -82,7 +82,7 @@ public class Worker {
 
   public RayObject submit(RayFunc func, Object[] args) {
     MethodId methodId = methodIdOf(func);
-    taskId = scheduler.generateTaskId(WorkerContext.currentTask().driverId,
+    UniqueID taskId = scheduler.generateTaskId(WorkerContext.currentTask().driverId,
         WorkerContext.currentTask().taskId,
         WorkerContext.nextCallIndex());
         

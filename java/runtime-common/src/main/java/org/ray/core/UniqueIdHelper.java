@@ -1,5 +1,6 @@
 package org.ray.core;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -79,11 +80,7 @@ public class UniqueIdHelper {
   public static UniqueID taskIdFromObjectId(UniqueID objectId) {
     byte[] taskId = new byte[20];
     System.arraycopy(objectId.getBytes(), 0, taskId, 0, 20);
-    taskId[0] = 0;
-    taskId[1] = 0;
-    taskId[2] = 0;
-    taskId[3] = 0;
-
+    Arrays.fill(taskId, 0, 3, (byte) 0);
     UniqueID retId = new UniqueID(taskId);
     return retId;
   }

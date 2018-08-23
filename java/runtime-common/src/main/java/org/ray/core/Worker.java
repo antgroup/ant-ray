@@ -80,7 +80,7 @@ public class Worker {
       int returnCount,
       boolean multiReturn,
       Object[] args) {
-    RayInvocation ri = createRemoteInvocation(methodId, args, RayActor.nil);
+    RayInvocation ri = createRemoteInvocation(methodId, args, RayActor.NIL);
     return scheduler.submit(taskId, ri, returnCount, multiReturn);
   }
 
@@ -123,7 +123,7 @@ public class Worker {
       Class<?> funcCls, RayFunc lambda, int returnCount, Object[] args) {
     Preconditions.checkNotNull(taskId);
     MethodId mid = methodIdOf(lambda);
-    RayInvocation ri = createRemoteInvocation(mid, args, RayActor.nil);
+    RayInvocation ri = createRemoteInvocation(mid, args, RayActor.NIL);
     return scheduler.submit(taskId, createActorId, ri, returnCount, false);
   }
 
@@ -134,7 +134,7 @@ public class Worker {
     if (taskId == null) {
       taskId = UniqueIdHelper.nextTaskId(-1);
     }
-    RayInvocation ri = createRemoteInvocation(mid, args, RayActor.nil);
+    RayInvocation ri = createRemoteInvocation(mid, args, RayActor.NIL);
     return scheduler.submit(taskId, ri, returnids);
   }
 

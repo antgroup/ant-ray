@@ -37,7 +37,7 @@ public class LocalSchedulerProxy {
   public RayObjects submit(UniqueID taskId, RayInvocation invocation, int returnCount,
                            boolean multiReturn) {
     UniqueID[] returnIds = buildReturnIds(taskId, returnCount, multiReturn);
-    this.doSubmit(invocation, taskId, returnIds, UniqueID.nil);
+    this.doSubmit(invocation, taskId, returnIds, UniqueID.NIL);
     return new RayObjects(returnIds);
   }
 
@@ -79,7 +79,7 @@ public class LocalSchedulerProxy {
       System.arraycopy(args, 0, newargs, 1, args.length);
     }
     invocation.setArgs(newargs);
-    this.doSubmit(invocation, taskId, returnIds, UniqueID.nil);
+    this.doSubmit(invocation, taskId, returnIds, UniqueID.NIL);
     return ret;
   }
 

@@ -3,6 +3,7 @@
 #include "common/state/ray_config.h"
 #include "ray/raylet/raylet.h"
 #include "ray/status.h"
+#include "ray/util/signal_handler.h"
 
 #ifndef RAYLET_TEST
 
@@ -15,8 +16,12 @@ static std::vector<std::string> parse_worker_command(std::string worker_command)
 }
 
 int main(int argc, char *argv[]) {
-  RayLog::StartRayLog(argv[0], RAY_INFO);
-  RAY_CHECK(argc == 10);
+  DefaultInitShutdown ray_log_shutdown_wrapper(
+      RayLog::StartRayLog, RayLog::ShutDownRayLog, argv[0], RAY_INFO, "");
+  DefaultInitShutdown signal_handler_uninstall_wrapper(
+      SignalHandlers::InstallSignalHandler, SignalHandlers::UninstallSignalHandler,
+      argv[0], true);
+  RAY_CHECK(argc == 11);
 
   const std::string raylet_socket_name = std::string(argv[1]);
   const std::string store_socket_name = std::string(argv[2]);
@@ -24,9 +29,10 @@ int main(int argc, char *argv[]) {
   const std::string redis_address = std::string(argv[4]);
   int redis_port = std::stoi(argv[5]);
   int num_initial_workers = std::stoi(argv[6]);
-  const std::string static_resource_list = std::string(argv[7]);
-  const std::string python_worker_command = std::string(argv[8]);
-  const std::string java_worker_command = std::string(argv[9]);
+  int maximum_startup_concurrency = std::stoi(argv[7]);
+  const std::string static_resource_list = std::string(argv[8]);
+  const std::string python_worker_command = std::string(argv[9]);
+  const std::string java_worker_command = std::string(argv[10]);
 
   // Configuration for the node manager.
   ray::raylet::NodeManagerConfig node_manager_config;
@@ -48,6 +54,7 @@ int main(int argc, char *argv[]) {
   node_manager_config.num_initial_workers = num_initial_workers;
   node_manager_config.num_workers_per_process =
       RayConfig::instance().num_workers_per_process();
+  node_manager_config.maximum_startup_concurrency = maximum_startup_concurrency;
 
   if (!python_worker_command.empty()) {
     node_manager_config.worker_commands.emplace(
@@ -111,6 +118,5 @@ int main(int argc, char *argv[]) {
   signals.async_wait(handler);
 
   main_service.run();
-  RayLog::ShutDownRayLog();
 }
 #endif

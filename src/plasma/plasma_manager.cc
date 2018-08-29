@@ -36,6 +36,8 @@
 #include "plasma/events.h"
 #include "plasma_manager.h"
 #include "ray/gcs/client.h"
+#include "ray/util/signal_handler.h"
+#include "ray/util/util.h"
 #include "state/db.h"
 #include "state/db_client_table.h"
 #include "state/error_table.h"
@@ -1633,6 +1635,11 @@ void signal_handler(int signal) {
  * suite has its own declaration of main. */
 #ifndef PLASMA_TEST
 int main(int argc, char *argv[]) {
+  DefaultInitShutdown ray_log_shutdown_wrapper(
+      RayLog::StartRayLog, RayLog::ShutDownRayLog, argv[0], RAY_INFO, "");
+  DefaultInitShutdown signal_handler_uninstall_wrapper(
+      SignalHandlers::InstallSignalHandler,
+      SignalHandlers::UninstallSignalHandler, argv[0], false);
   signal(SIGTERM, signal_handler);
   /* Socket name of the plasma store this manager is connected to. */
   char *store_socket_name = NULL;

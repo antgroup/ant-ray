@@ -130,12 +130,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
     functions = new LocalFunctionManager(remoteLoader);
     localSchedulerClient = slink;
-
-    if (!params.use_raylet) {
-      objectStoreProxy = new ObjectStoreProxy(plink);
-    } else {
-      objectStoreProxy = new ObjectStoreProxy(plink, slink);
-    }
+    objectStoreProxy = new ObjectStoreProxy(plink, slink);
     
     worker = new Worker(localSchedulerClient, functions);
   }
@@ -190,6 +185,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     return params;
   }
 
+  @Override
   public abstract void shutdown();
 
 
@@ -203,9 +199,6 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   public <T> void put(UniqueId objectId, T obj) {
     UniqueId taskId = getCurrentTaskId();
     RayLog.core.info("Putting object {}, for task {} ", objectId, taskId);
-    if (!params.use_raylet) {
-      localSchedulerClient.markTaskPutDependency(taskId, objectId);
-    }
     objectStoreProxy.put(objectId, obj, null);
   }
 
@@ -242,11 +235,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       List<List<UniqueId>> fetchBatches =
           splitIntoBatches(objectIds, params.worker_fetch_request_size);
       for (List<UniqueId> batch : fetchBatches) {
-        if (!params.use_raylet) {
-          objectStoreProxy.fetch(batch);
-        } else {
-          localSchedulerClient.reconstructObjects(batch, true);
-        }
+        localSchedulerClient.reconstructObjects(batch, true);
       }
 
       // Get the objects. We initially try to get the objects immediately.
@@ -271,16 +260,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
             splitIntoBatches(unreadyList, params.worker_fetch_request_size);
 
         for (List<UniqueId> batch : reconstructBatches) {
-          if (!params.use_raylet) {
-            for (UniqueId objectId : batch) {
-              localSchedulerClient.reconstructObject(objectId, false);
-            }
-            // Do another fetch for objects that aren't available locally yet, in case
-            // they were evicted since the last fetch.
-            objectStoreProxy.fetch(batch);
-          } else {
-            localSchedulerClient.reconstructObjects(batch, false);
-          }
+          localSchedulerClient.reconstructObjects(batch, false);
         }
 
         List<Pair<T, GetStatus>> results = objectStoreProxy

@@ -101,6 +101,10 @@ public class LocalSchedulerProxy {
     scheduler.notifyUnblocked();
   }
 
+  public void freePlasmaObjects(List<UniqueID> objectIds, boolean localOnly) {
+    scheduler.freePlasmaObjects(getIdBytes(objectIds), localOnly);
+  }
+
   private static byte[][] getIdBytes(List<UniqueID> objectIds) {
     int size = objectIds.size();
     byte[][] ids = new byte[size][];

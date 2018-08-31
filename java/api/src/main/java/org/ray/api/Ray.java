@@ -73,6 +73,16 @@ public final class Ray extends Rpc {
   }
 
   /**
+   * free a list of objects from Plasma Store.
+   *
+   * @param objectIds           object ids to free
+   * @param localOnly           only free objects for local object or not
+   */
+  public static void free(List<UniqueID> objectIds, boolean localOnly) {
+    impl.free(objectIds, localOnly);
+  }
+
+  /**
    * create actor object.
    */
   public static <T> RayActor<T> create(Class<T> cls) {

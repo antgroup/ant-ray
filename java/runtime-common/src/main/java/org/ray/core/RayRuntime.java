@@ -265,6 +265,11 @@ public abstract class RayRuntime implements RayApi {
     return worker.submit(func, args);
   }
 
+  @Override
+  public void free(List<UniqueID> objectIds, boolean localOnly) {
+    localSchedulerProxy.freePlasmaObjects(objectIds, localOnly);
+  }
+
   private <T> List<T> doGet(List<UniqueID> objectIds, boolean isMetadata)
       throws TaskExecutionException {
     boolean wasBlocked = false;

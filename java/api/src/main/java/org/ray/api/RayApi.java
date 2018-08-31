@@ -57,4 +57,12 @@ public interface RayApi {
    */
   RayObject call(RayFunc func, Object... args);
 
+  /**
+   * Free a list of objects from Plasma Store.
+   *
+   * @param objectIds the object ids to free from Plasma Store.
+   * @param localOnly only do the free operation in local Plasma Store or to all stores.
+   */
+  void free(List<UniqueID> objectIds, boolean localOnly);
+
 }

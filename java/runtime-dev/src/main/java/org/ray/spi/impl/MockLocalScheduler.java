@@ -98,4 +98,9 @@ public class MockLocalScheduler implements LocalSchedulerLink {
   public List<byte[]> wait(byte[][] objectIds, int timeoutMs, int numReturns) {
     return store.wait(objectIds, timeoutMs, numReturns);
   }
+
+  @Override
+  public void freePlasmaObjects(byte[][] objectIds, boolean localOnly) {
+    return;
+  }
 }

@@ -15,7 +15,7 @@ static std::vector<std::string> parse_worker_command(std::string worker_command)
 }
 
 int main(int argc, char *argv[]) {
-  RayLog::StartRayLog(argv[0], RAY_INFO);
+  RayLog::StartRayLog(argv[0], ray::RayLogLevel::INFO);
   RAY_CHECK(argc == 11);
 
   const std::string raylet_socket_name = std::string(argv[1]);

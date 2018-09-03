@@ -49,22 +49,23 @@ TEST(PrintLogTest, LogTestWithInit) {
 TEST(PrintLogTest, ReadEnvLogLevelTest) {
   ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::INVALID);
   char putenv_string[128] = {0};
-  sprintf(putenv_string, "%s=DEBUG", RayLog::env_variable_name_);
+  const char *evn_variable_name = RayLog::GetEnvVarName();
+  sprintf(putenv_string, "%s=DEBUG", evn_variable_name);
   ASSERT_EQ(putenv(putenv_string), 0);
   ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::DEBUG);
-  sprintf(putenv_string, "%s=INFO", RayLog::env_variable_name_);
+  sprintf(putenv_string, "%s=INFO", evn_variable_name);
   ASSERT_EQ(putenv(putenv_string), 0);
   ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::INFO);
-  sprintf(putenv_string, "%s=WARNING", RayLog::env_variable_name_);
+  sprintf(putenv_string, "%s=WARNING", evn_variable_name);
   ASSERT_EQ(putenv(putenv_string), 0);
   ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::WARNING);
-  sprintf(putenv_string, "%s=ERROR", RayLog::env_variable_name_);
+  sprintf(putenv_string, "%s=ERROR", evn_variable_name);
   ASSERT_EQ(putenv(putenv_string), 0);
   ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::ERROR);
-  sprintf(putenv_string, "%s=FATAL", RayLog::env_variable_name_);
+  sprintf(putenv_string, "%s=FATAL", evn_variable_name);
   ASSERT_EQ(putenv(putenv_string), 0);
   ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::FATAL);
-  sprintf(putenv_string, "%s=12345", RayLog::env_variable_name_);
+  sprintf(putenv_string, "%s=12345", evn_variable_name);
   ASSERT_EQ(putenv(putenv_string), 0);
   ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::INVALID);
 }

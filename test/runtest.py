@@ -1287,7 +1287,7 @@ class APITest(unittest.TestCase):
 
 
 @unittest.skipIf(
-    os.environ.get('RAY_USE_NEW_GCS', False),
+    os.environ.get("RAY_USE_NEW_GCS", False),
     "For now, RAY_USE_NEW_GCS supports 1 shard, and credis "
     "supports 1-node chain for that shard only.")
 class APITestSharded(APITest):
@@ -1295,11 +1295,7 @@ class APITestSharded(APITest):
         if kwargs is None:
             kwargs = {}
         kwargs["start_ray_local"] = True
-        if os.environ.get("RAY_USE_XRAY") == "1":
-            print("XRAY currently supports only a single Redis shard.")
-            kwargs["num_redis_shards"] = 1
-        else:
-            kwargs["num_redis_shards"] = 20
+        kwargs["num_redis_shards"] = 20
         kwargs["redirect_output"] = True
         ray.worker._init(**kwargs)
 
@@ -2187,7 +2183,7 @@ def wait_for_num_objects(num_objects, timeout=10):
 
 
 @unittest.skipIf(
-    os.environ.get('RAY_USE_NEW_GCS', False),
+    os.environ.get("RAY_USE_NEW_GCS", False),
     "New GCS API doesn't have a Python API yet.")
 class GlobalStateAPI(unittest.TestCase):
     def tearDown(self):

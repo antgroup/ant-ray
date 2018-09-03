@@ -41,14 +41,38 @@ TEST(PrintLogTest, LogTestWithoutInit) {
 
 TEST(PrintLogTest, LogTestWithInit) {
   // Test empty app name.
-  RayLog::StartRayLog("", RAY_DEBUG);
+  RayLog::StartRayLog("", RayLogLevel::DEBUG);
   PrintLog();
   RayLog::ShutDownRayLog();
 }
 
+TEST(PrintLogTest, ReadEnvLogLevelTest) {
+  ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::INVALID);
+  char putenv_string[128] = {0};
+  const char *evn_variable_name = RayLog::GetEnvVarName();
+  sprintf(putenv_string, "%s=DEBUG", evn_variable_name);
+  ASSERT_EQ(putenv(putenv_string), 0);
+  ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::DEBUG);
+  sprintf(putenv_string, "%s=INFO", evn_variable_name);
+  ASSERT_EQ(putenv(putenv_string), 0);
+  ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::INFO);
+  sprintf(putenv_string, "%s=WARNING", evn_variable_name);
+  ASSERT_EQ(putenv(putenv_string), 0);
+  ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::WARNING);
+  sprintf(putenv_string, "%s=ERROR", evn_variable_name);
+  ASSERT_EQ(putenv(putenv_string), 0);
+  ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::ERROR);
+  sprintf(putenv_string, "%s=FATAL", evn_variable_name);
+  ASSERT_EQ(putenv(putenv_string), 0);
+  ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::FATAL);
+  sprintf(putenv_string, "%s=12345", evn_variable_name);
+  ASSERT_EQ(putenv(putenv_string), 0);
+  ASSERT_EQ(RayLog::GetLogLevelFromEnv(), RayLogLevel::INVALID);
+}
+
 // This test will output large amount of logs to stderr, should be disabled in travis.
 TEST(LogPerfTest, PerfTest) {
-  RayLog::StartRayLog("/fake/path/to/appdire/LogPerfTest", RAY_ERROR, "/tmp/");
+  RayLog::StartRayLog("/fake/path/to/appdire/LogPerfTest", RayLogLevel::ERROR, "/tmp/");
   int rounds = 100000;
 
   int64_t start_time = current_time_ms();

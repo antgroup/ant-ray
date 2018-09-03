@@ -3,7 +3,14 @@
 #include "common_extension.h"
 #include "config_extension.h"
 #include "local_scheduler_client.h"
+#include "ray/util/util.h"
 #include "task.h"
+
+InitShutdownRAII ray_log_shutdown_raii(ray::RayLog::StartRayLog,
+                                       ray::RayLog::ShutDownRayLog,
+                                       "local_scheduler_python.so",
+                                       ray::RayLogLevel::INFO,
+                                       /*log_dir=*/"");
 
 PyObject *LocalSchedulerError;
 

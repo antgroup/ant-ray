@@ -1,7 +1,4 @@
-package org.ray.runtime.config;
-
-import org.ray.runtime.util.config.AConfig;
-import org.ray.runtime.util.config.ConfigReader;
+package org.ray.api.config;
 
 /**
  * Path related configurations.

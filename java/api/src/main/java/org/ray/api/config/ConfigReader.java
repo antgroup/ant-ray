@@ -1,4 +1,4 @@
-package org.ray.runtime.util.config;
+package org.ray.api.config;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -12,8 +12,8 @@ import org.ini4j.Config;
 import org.ini4j.Ini;
 import org.ini4j.Profile;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.util.ObjectUtil;
-import org.ray.runtime.util.StringUtil;
+import org.ray.api.util.ObjectUtil;
+import org.ray.api.util.StringUtil;
 
 /**
  * Loads configurations from a file.

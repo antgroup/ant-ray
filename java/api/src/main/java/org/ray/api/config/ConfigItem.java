@@ -1,4 +1,4 @@
-package org.ray.runtime.util.config;
+package org.ray.api.config;
 
 /**
  * A ray configuration item of type {@code T}.

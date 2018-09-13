@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Map;
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.apache.commons.lang3.tuple.Pair;
-import org.ray.api.Ray;
 import org.ray.api.RayActor;
 import org.ray.api.RayObject;
 import org.ray.api.WaitResult;
+import org.ray.api.config.PathConfig;
+import org.ray.api.config.RayConfig;
+import org.ray.api.config.RayParameters;
 import org.ray.api.function.RayFunc;
 import org.ray.api.id.UniqueId;
 import org.ray.api.runtime.RayRuntime;
-import org.ray.runtime.config.PathConfig;
-import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.functionmanager.LocalFunctionManager;
 import org.ray.runtime.functionmanager.RayMethod;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
@@ -28,24 +28,25 @@ import org.ray.runtime.task.TaskSpec;
 import org.ray.runtime.util.MethodId;
 import org.ray.runtime.util.ResourceUtil;
 import org.ray.runtime.util.UniqueIdHelper;
-import org.ray.runtime.util.config.ConfigReader;
 import org.ray.runtime.util.exception.TaskExecutionException;
 import org.ray.runtime.util.logger.RayLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Core functionality to implement Ray APIs.
  */
 public abstract class AbstractRayRuntime implements RayRuntime {
 
-  public static ConfigReader configReader;
-  protected static AbstractRayRuntime ins = null;
-  protected static RayParameters params = null;
-  private static boolean fromRayInit = false;
+  private Logger logger = LoggerFactory.getLogger(AbstractRayRuntime.class);
+
   protected Worker worker;
   protected RayletClient rayletClient;
   protected ObjectStoreProxy objectStoreProxy;
   protected LocalFunctionManager functions;
   protected RemoteFunctionManager remoteFunctionManager;
+
+  protected RayParameters params;
   protected PathConfig pathConfig;
 
   /**
@@ -53,69 +54,16 @@ public abstract class AbstractRayRuntime implements RayRuntime {
    */
   Map<UniqueId, Object> localActors = new HashMap<>();
 
-  // app level Ray.init()
-  // make it private so there is no direct usage but only from Ray.init
-  private static AbstractRayRuntime init() {
-    if (ins == null) {
-      try {
-        fromRayInit = true;
-        AbstractRayRuntime.init(null, null);
-        fromRayInit = false;
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw new RuntimeException("Ray.init failed", e);
-      }
-    }
-    return ins;
-  }
+  // we keep to use params and pathConfig, to keep compatible with old config
+  // todo:: remove params, pathConfig in the future
+  public void init(RayConfig initConfig) {
+    params = initConfig.getParams();
+    pathConfig = initConfig.getPathConfig();
 
-  // engine level AbstractRayRuntime.init(xx, xx)
-  // updateConfigStr is sth like section1.k1=v1;section2.k2=v2
-  public static AbstractRayRuntime init(String configPath, String updateConfigStr)
-      throws Exception {
-    if (ins == null) {
-      if (configPath == null) {
-        configPath = System.getenv("RAY_CONFIG");
-        if (configPath == null) {
-          configPath = System.getProperty("ray.config");
-        }
-        if (configPath == null) {
-          throw new Exception(
-              "Please set config file path in env RAY_CONFIG or property ray.config");
-        }
-      }
-      configReader = new ConfigReader(configPath, updateConfigStr);
-      AbstractRayRuntime.params = new RayParameters(configReader);
+    RayLog.init(params.log_dir);
+    assert RayLog.core != null;
 
-      RayLog.init(params.log_dir);
-      assert RayLog.core != null;
-
-      ins = instantiate(params);
-      assert (ins != null);
-
-      if (!fromRayInit) {
-        Ray.init(); // assign Ray._impl
-      }
-    }
-    return ins;
-  }
-
-  // init with command line args
-  // --config=ray.config.ini --overwrite=updateConfigStr
-  public static AbstractRayRuntime init(String[] args) throws Exception {
-    String config = null;
-    String updateConfig = null;
-    for (String arg : args) {
-      if (arg.startsWith("--config=")) {
-        config = arg.substring("--config=".length());
-      } else if (arg.startsWith("--overwrite=")) {
-        updateConfig = arg.substring("--overwrite=".length());
-      } else {
-        throw new RuntimeException("Input argument " + arg
-            + " is not recognized, please use --overwrite to merge it into config file");
-      }
-    }
-    return init(config, updateConfig);
+    instantiate(initConfig);
   }
 
   protected void init(
@@ -134,38 +82,21 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     worker = new Worker(this);
   }
 
-  private static AbstractRayRuntime instantiate(RayParameters params) {
-    AbstractRayRuntime runtime;
-    if (params.run_mode.isNativeRuntime()) {
-      runtime = new RayNativeRuntime();
-    } else {
-      runtime = new RayDevRuntime();
-    }
-
-    RayLog.core
-        .info("Start " + runtime.getClass().getName() + " with " + params.run_mode.toString());
+  private AbstractRayRuntime instantiate(RayConfig initConfig) {
     try {
-      runtime.start(params);
+      start(initConfig);
     } catch (Exception e) {
-      RayLog.core.error("Failed to init RayRuntime", e);
+      logger.error("Failed to init RayRuntime", e);
       System.exit(-1);
     }
 
-    return runtime;
+    return this;
   }
 
   /**
    * start runtime.
    */
-  public abstract void start(RayParameters params) throws Exception;
-
-  public static AbstractRayRuntime getInstance() {
-    return ins;
-  }
-
-  public static RayParameters getParams() {
-    return params;
-  }
+  public abstract void start(RayConfig initConfig) throws Exception;
 
   @Override
   public abstract void shutdown();
@@ -306,7 +237,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     if (!(actor instanceof RayActorImpl)) {
       throw new IllegalArgumentException("Unsupported actor type: " + actor.getClass().getName());
     }
-    RayActorImpl actorImpl = (RayActorImpl)actor;
+    RayActorImpl actorImpl = (RayActorImpl) actor;
     TaskSpec spec = createTaskSpec(func, actorImpl, args, false);
     actorImpl.setTaskCursor(spec.returnIds[1]);
     rayletClient.submitTask(spec);
@@ -337,6 +268,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
   /**
    * Create the task specification.
+   *
    * @param func The target remote function.
    * @param actor The actor handle. If the task is not an actor task, actor id must be NIL.
    * @param args The arguments for the remote function.

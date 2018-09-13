@@ -9,8 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.ray.api.id.UniqueId;
+import org.ray.api.util.NetworkUtil;
 import org.ray.runtime.generated.ClientTableData;
-import org.ray.runtime.util.NetworkUtil;
 import org.ray.runtime.util.logger.RayLog;
 
 /**
@@ -50,7 +50,7 @@ public class StateStoreProxyImpl implements StateStoreProxy {
     Set<String> distinctIpAddress = new HashSet<String>(ipAddressPorts);
     if (distinctIpAddress.size() != numRedisShards) {
       es = String.format("Expected %d Redis shard addresses, found2 %d.", numRedisShards,
-              distinctIpAddress.size());
+          distinctIpAddress.size());
       throw new Exception(es);
     }
 
@@ -79,8 +79,8 @@ public class StateStoreProxyImpl implements StateStoreProxy {
 
   @Override
   public List<AddressInfo> getAddressInfo(final String nodeIpAddress,
-                                          final String redisAddress,
-                                          int numRetries) {
+      final String redisAddress,
+      int numRetries) {
     int count = 0;
     while (count < numRetries) {
       try {
@@ -88,7 +88,7 @@ public class StateStoreProxyImpl implements StateStoreProxy {
       } catch (Exception e) {
         try {
           RayLog.core.warn("Error occurred in StateStoreProxyImpl getAddressInfo, "
-                  + (numRetries - count) + " retries remaining", e);
+              + (numRetries - count) + " retries remaining", e);
           TimeUnit.MILLISECONDS.sleep(1000);
         } catch (InterruptedException ie) {
           RayLog.core.error("error at StateStoreProxyImpl getAddressInfo", e);
@@ -101,8 +101,8 @@ public class StateStoreProxyImpl implements StateStoreProxy {
   }
 
   /**
-   * Get address info of one node from primary redis.
-   * This method only tries to get address info once, without any retry.
+   * Get address info of one node from primary redis. This method only tries to get address info
+   * once, without any retry.
    *
    * @param nodeIpAddress Usually local ip address.
    * @param redisAddress The primary redis address.
@@ -110,7 +110,7 @@ public class StateStoreProxyImpl implements StateStoreProxy {
    * @throws Exception No redis client exception.
    */
   public List<AddressInfo> doGetAddressInfo(final String nodeIpAddress,
-                                            final String redisAddress) throws Exception {
+      final String redisAddress) throws Exception {
     if (this.rayKvStore == null) {
       throw new Exception("no redis client when use doGetAddressInfo");
     }
@@ -133,7 +133,7 @@ public class StateStoreProxyImpl implements StateStoreProxy {
       String redisIpAddress = redisAddress.substring(0, redisAddress.indexOf(':'));
 
       boolean headNodeAddress = "127.0.0.1".equals(clientNodeIpAddress)
-              && Objects.equals(redisIpAddress, localIpAddress);
+          && Objects.equals(redisIpAddress, localIpAddress);
       boolean notHeadNodeAddress = Objects.equals(clientNodeIpAddress, nodeIpAddress);
 
       if (headNodeAddress || notHeadNodeAddress) {

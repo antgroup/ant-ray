@@ -5,9 +5,10 @@ import java.util.List;
 import java.util.Map;
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.apache.arrow.plasma.PlasmaClient;
-import org.ray.runtime.config.PathConfig;
-import org.ray.runtime.config.RayParameters;
-import org.ray.runtime.config.WorkerMode;
+import org.ray.api.config.PathConfig;
+import org.ray.api.config.RayConfig;
+import org.ray.api.config.RayParameters;
+import org.ray.api.config.WorkerMode;
 import org.ray.runtime.functionmanager.NativeRemoteFunctionManager;
 import org.ray.runtime.functionmanager.NopRemoteFunctionManager;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
@@ -40,16 +41,15 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
   }
 
   @Override
-  public void start(RayParameters params) throws Exception {
+  public void start(RayConfig initConfig) throws Exception {
     boolean isWorker = (params.worker_mode == WorkerMode.WORKER);
-    PathConfig pathConfig = new PathConfig(configReader);
 
     // initialize params
     if (params.redis_address.length() == 0) {
       if (isWorker) {
         throw new Error("Redis address must be configured under Worker mode.");
       }
-      startOnebox(params, pathConfig);
+      startOnebox(initConfig);
       initStateStore(params.redis_address);
     } else {
       initStateStore(params.redis_address);
@@ -71,6 +71,8 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       // recheck carefully
       WorkerContext.workerID = params.driver_id;
     }
+
+
     WorkerContext.init(params);
 
     if (params.onebox_delay_seconds_before_run_app_logic > 0) {
@@ -84,9 +86,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
     if (params.worker_mode != WorkerMode.NONE) {
       // initialize the links
-      int releaseDelay = AbstractRayRuntime.configReader
-          .getIntegerValue("ray", "plasma_default_release_delay", 0,
-              "how many release requests should be delayed in plasma client");
+      int releaseDelay = initConfig.getInt("ray.plasma_default_release_delay", 0);
 
       ObjectStoreLink plink = new PlasmaClient(params.object_store_name, "", releaseDelay);
       RayletClient rayletClient = new RayletClientImpl(
@@ -115,9 +115,9 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     }
   }
 
-  private void startOnebox(RayParameters params, PathConfig paths) throws Exception {
+  private void startOnebox(RayConfig initConfig) throws Exception {
     params.cleanup = true;
-    manager = new RunManager(params, paths, AbstractRayRuntime.configReader);
+    manager = new RunManager(initConfig);
     manager.startRayHead();
 
     params.redis_address = manager.info().redisAddress;

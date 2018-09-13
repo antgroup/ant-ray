@@ -12,7 +12,7 @@ public class CommandStart {
   @Parameter(names = "--head", description = "start the head node")
   public boolean head;
 
-  @Parameter(names = "--config", description = "the config file of ray")
+  @Parameter(names = "--config", description = "the config file of ray in classpath")
   public String config = "";
 
   @Parameter(names = "--overwrite", description = "the overwrite items of config")

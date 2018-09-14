@@ -1,4 +1,4 @@
-package org.ray.runtime.util.config;
+package org.ray.api.config;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

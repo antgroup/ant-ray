@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import org.ray.api.config.PathConfig;
+import org.ray.api.config.RayConfig;
+import org.ray.api.config.RayParameters;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.config.PathConfig;
-import org.ray.runtime.config.RayParameters;
+import org.ray.api.util.StringUtil;
 import org.ray.runtime.gcs.AddressInfo;
 import org.ray.runtime.runner.RunInfo.ProcessType;
 import org.ray.runtime.util.ResourceUtil;
-import org.ray.runtime.util.StringUtil;
-import org.ray.runtime.util.config.ConfigReader;
 import org.ray.runtime.util.logger.RayLog;
 import redis.clients.jedis.Jedis;
 
@@ -30,21 +30,20 @@ public class RunManager {
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("Y-m-d_H-M-S");
 
+  private String rayConfigFile;
   private RayParameters params;
 
   private PathConfig paths;
-
-  private ConfigReader configReader;
 
   private RunInfo runInfo = new RunInfo();
 
   private Random random = new Random();
 
 
-  public RunManager(RayParameters params, PathConfig paths, ConfigReader configReader) {
-    this.params = params;
-    this.paths = paths;
-    this.configReader = configReader;
+  public RunManager(RayConfig initConfig) {
+    this.params = initConfig.getParams();
+    this.paths = initConfig.getPathConfig();
+    this.rayConfigFile = initConfig.getRayConfigFile();
   }
 
   private static boolean killProcess(Process p) {
@@ -150,7 +149,7 @@ public class RunManager {
     cmd += " " + mainClass;
 
     String section = "ray.java.start.";
-    cmd += " --config=" + configReader.filePath();
+    cmd += " --config=" + this.rayConfigFile;
     cmd += " --overwrite="
         + section + "node_ip_address=" + ip + ";"
         + section + "redis_address=" + redisAddr + ";"
@@ -273,15 +272,15 @@ public class RunManager {
     String storeName = "/tmp/plasma_store" + rpcPort;
 
     startObjectStore(0, info,
-            params.redis_address, params.node_ip_address, params.redirect, params.cleanup);
+        params.redis_address, params.node_ip_address, params.redirect, params.cleanup);
 
     Map<String, Double> staticResources =
-            ResourceUtil.getResourcesMapFromString(params.static_resources);
+        ResourceUtil.getResourcesMapFromString(params.static_resources);
 
     //Start raylet
     startRaylet(storeName, info, params.num_workers,
-            params.redis_address,
-            params.node_ip_address, params.redirect, staticResources, params.cleanup);
+        params.redis_address,
+        params.node_ip_address, params.redirect, staticResources, params.cleanup);
 
     runInfo.localStores.add(info);
 
@@ -434,7 +433,7 @@ public class RunManager {
 
     int hardwareConcurrency = Runtime.getRuntime().availableProcessors();
     int maximumStartupConcurrency = Math.max(1, Math.min(staticResources.get("CPU").intValue(),
-                                                         hardwareConcurrency));
+        hardwareConcurrency));
 
     // The second-last arugment is the worker command for Python, not needed for Java.
     String[] cmds = new String[]{filePath, rayletSocketName, storeName, ip, gcsIp,

@@ -1,4 +1,4 @@
-package org.ray.runtime.config;
+package org.ray.api.config;
 
 public enum RunMode {
   SINGLE_PROCESS(true, false), // dev path, dev runtime

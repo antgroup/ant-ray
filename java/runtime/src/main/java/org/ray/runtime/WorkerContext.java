@@ -1,14 +1,13 @@
 package org.ray.runtime;
 
+import org.ray.api.config.RayParameters;
+import org.ray.api.config.WorkerMode;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.config.RayParameters;
-import org.ray.runtime.config.WorkerMode;
 import org.ray.runtime.task.TaskSpec;
 
 public class WorkerContext {
 
-  private static final ThreadLocal<WorkerContext> currentWorkerCtx =
-      ThreadLocal.withInitial(() -> init(AbstractRayRuntime.getParams()));
+  private static final ThreadLocal<WorkerContext> currentWorkerCtx = new ThreadLocal<>();
   /**
    * id of worker.
    */

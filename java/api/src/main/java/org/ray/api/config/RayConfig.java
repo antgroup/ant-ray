@@ -77,7 +77,7 @@ public class RayConfig {
       iniConfigFile = this.getClass().getResource(RAY_CONFIG_INI_DEFAULT).getFile();
       reader = new ConfigReader(iniConfigFile, ow);
     } catch (Exception e) {
-      logger.error("failed to parse iniConfigFile: {}", iniConfigFile, e);
+      logger.error("Failed to parse iniConfigFile: {}", iniConfigFile, e);
       throw new RuntimeException(e);
     }
     params = new RayParameters(reader);

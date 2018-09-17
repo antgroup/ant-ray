@@ -6,8 +6,8 @@ public class RayInitConfig {
   private int redisPort;
   private String nodeIpAddr;
   private int nodePort;
-  private RunMode runMode;
-  private WorkerMode workerMode;
+  private RunMode runMode = RunMode.SINGLE_BOX;
+  private WorkerMode workerMode = WorkerMode.NONE;
 
   public void setRedisIpAddr(String redisIpAddr) {
     this.redisIpAddr = redisIpAddr;

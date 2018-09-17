@@ -84,10 +84,11 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
     if (params.worker_mode != WorkerMode.NONE) {
       // initialize the links
-      int releaseDelay = AbstractRayRuntime.configReader
-          .getIntegerValue("ray", "plasma_default_release_delay", 0,
-              "how many release requests should be delayed in plasma client");
-
+      //TODO(qwang): We should use releaseDelay as a config item.
+      //int releaseDelay = AbstractRayRuntime.configReader
+      //    .getIntegerValue("ray", "plasma_default_release_delay", 0,
+      //        "how many release requests should be delayed in plasma client");
+      int releaseDelay = 0;
       ObjectStoreLink plink = new PlasmaClient(params.object_store_name, "", releaseDelay);
       RayletClient rayletClient = new RayletClientImpl(
               params.raylet_socket_name,

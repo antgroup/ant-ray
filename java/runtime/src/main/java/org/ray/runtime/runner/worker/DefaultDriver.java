@@ -1,5 +1,7 @@
 package org.ray.runtime.runner.worker;
 
+import org.ray.api.Ray;
+import org.ray.api.RayInitConfig;
 import org.ray.api.WorkerMode;
 import org.ray.runtime.AbstractRayRuntime;
 
@@ -15,7 +17,9 @@ public class DefaultDriver {
   //
   public static void main(String[] args) {
     try {
-      AbstractRayRuntime.init(args);
+      //TODO(qwang): We should use `Ray.init`, not `AbstractRayRuntime.init`.
+      RayInitConfig initConfig = new RayInitConfig(args);
+      Ray.init(initConfig);
       //assert AbstractRayRuntime.getParams().worker_mode == WorkerMode.DRIVER;
 
       String driverClass = AbstractRayRuntime.configReader

@@ -91,24 +91,6 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     return ins;
   }
 
-  // init with command line args
-  // --config=ray.config.ini --overwrite=updateConfigStr
-  public static AbstractRayRuntime init(String[] args) throws Exception {
-    String config = null;
-    String updateConfig = null;
-    for (String arg : args) {
-      if (arg.startsWith("--config=")) {
-        config = arg.substring("--config=".length());
-      } else if (arg.startsWith("--overwrite=")) {
-        updateConfig = arg.substring("--overwrite=".length());
-      } else {
-        throw new RuntimeException("Input argument " + arg
-            + " is not recognized, please use --overwrite to merge it into config file");
-      }
-    }
-    return init(config, updateConfig);
-  }
-
   protected void init(
       RayletClient slink,
       ObjectStoreLink plink,

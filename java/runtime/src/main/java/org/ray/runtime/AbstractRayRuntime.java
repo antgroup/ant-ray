@@ -8,10 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.apache.commons.lang3.tuple.Pair;
-import org.ray.api.Ray;
-import org.ray.api.RayActor;
-import org.ray.api.RayObject;
-import org.ray.api.WaitResult;
+import org.ray.api.*;
 import org.ray.api.function.RayFunc;
 import org.ray.api.id.UniqueId;
 import org.ray.api.runtime.RayRuntime;
@@ -53,7 +50,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
   // app level Ray.init()
   // make it private so there is no direct usage but only from Ray.init
-  public static AbstractRayRuntime init() {
+  public static AbstractRayRuntime init(RayInitConfig initConfig) {
     if (ins == null) {
       try {
         fromRayInit = true;

@@ -1,5 +1,7 @@
 package org.ray.api.runtime;
 
+import org.ray.api.RayInitConfig;
+
 import java.lang.reflect.Method;
 
 /**
@@ -8,11 +10,11 @@ import java.lang.reflect.Method;
 public class DefaultRayRuntimeFactory implements RayRuntimeFactory {
 
   @Override
-  public RayRuntime createRayRuntime() {
+  public RayRuntime createRayRuntime(RayInitConfig initConfig) {
     try {
-      Method m = Class.forName("org.ray.runtime.AbstractRayRuntime").getDeclaredMethod("init");
+      Method m = Class.forName("org.ray.runtime.AbstractRayRuntime").getDeclaredMethod("init", RayInitConfig.class);
       m.setAccessible(true);
-      RayRuntime runtime = (RayRuntime) m.invoke(null);
+      RayRuntime runtime = (RayRuntime) m.invoke(null, initConfig);
       m.setAccessible(false);
       return runtime;
     } catch (Exception e) {

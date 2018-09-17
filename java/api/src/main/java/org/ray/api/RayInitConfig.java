@@ -11,14 +11,18 @@ public class RayInitConfig {
   private RunMode runMode = RunMode.SINGLE_BOX;
   private WorkerMode workerMode = WorkerMode.NONE;
 
+  private String configPath;
   private String overWrite;
 
+
+  public RayInitConfig() {
+
+  }
+
   public RayInitConfig(String[] args) {
-    String config = null;
-    String overWrite = null;
     for (String arg : args) {
       if (arg.startsWith("--config=")) {
-        config = arg.substring("--config=".length());
+        configPath = arg.substring("--config=".length());
       } else if (arg.startsWith("--overwrite=")) {
         overWrite = arg.substring("--overwrite=".length());
       } else {
@@ -50,6 +54,10 @@ public class RayInitConfig {
 
   public void setWorkerMode(WorkerMode workerMode) {
     this.workerMode = workerMode;
+  }
+
+  public String getConfigPath() {
+    return configPath;
   }
 
   public String getOverWrite() {

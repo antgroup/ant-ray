@@ -15,7 +15,6 @@ import org.ray.api.WaitResult;
 import org.ray.api.function.RayFunc;
 import org.ray.api.id.UniqueId;
 import org.ray.api.runtime.RayRuntime;
-import org.ray.runtime.config.PathConfig;
 import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.functionmanager.LocalFunctionManager;
 import org.ray.runtime.functionmanager.RayMethod;
@@ -46,7 +45,6 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   protected ObjectStoreProxy objectStoreProxy;
   protected LocalFunctionManager functions;
   protected RemoteFunctionManager remoteFunctionManager;
-  protected PathConfig pathConfig;
 
   /**
    * Actor ID -> local actor instance.
@@ -121,11 +119,9 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   protected void init(
       RayletClient slink,
       ObjectStoreLink plink,
-      RemoteFunctionManager remoteLoader,
-      PathConfig pathManager
+      RemoteFunctionManager remoteLoader
   ) {
     remoteFunctionManager = remoteLoader;
-    pathConfig = pathManager;
 
     functions = new LocalFunctionManager(remoteLoader);
     rayletClient = slink;

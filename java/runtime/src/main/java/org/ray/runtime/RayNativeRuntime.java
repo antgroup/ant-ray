@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.apache.arrow.plasma.PlasmaClient;
 import org.ray.api.WorkerMode;
-import org.ray.runtime.config.PathConfig;
 import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.functionmanager.NativeRemoteFunctionManager;
 import org.ray.runtime.functionmanager.NopRemoteFunctionManager;
@@ -42,14 +41,13 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
   @Override
   public void start(RayParameters params) throws Exception {
     boolean isWorker = (params.worker_mode == WorkerMode.WORKER);
-    PathConfig pathConfig = new PathConfig(configReader);
 
     // initialize params
     if (params.redis_address.length() == 0) {
       if (isWorker) {
         throw new Error("Redis address must be configured under Worker mode.");
       }
-      startOnebox(params, pathConfig);
+      startOnebox(params);
       initStateStore(params.redis_address);
     } else {
       initStateStore(params.redis_address);
@@ -97,7 +95,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
               WorkerContext.currentTask().taskId
       );
 
-      init(rayletClient, plink, funcMgr, pathConfig);
+      init(rayletClient, plink, funcMgr);
 
       // register
       registerWorker(isWorker, params.node_ip_address, params.object_store_name,
@@ -116,9 +114,9 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     }
   }
 
-  private void startOnebox(RayParameters params, PathConfig paths) throws Exception {
+  private void startOnebox(RayParameters params) throws Exception {
     params.cleanup = true;
-    manager = new RunManager(params, paths, AbstractRayRuntime.configReader);
+    manager = new RunManager(params, AbstractRayRuntime.configReader);
     manager.startRayHead();
 
     params.redis_address = manager.info().redisAddress;

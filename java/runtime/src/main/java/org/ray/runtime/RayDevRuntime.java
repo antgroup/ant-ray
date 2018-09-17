@@ -1,6 +1,5 @@
 package org.ray.runtime;
 
-import org.ray.runtime.config.PathConfig;
 import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.functionmanager.NopRemoteFunctionManager;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
@@ -11,11 +10,10 @@ public class RayDevRuntime extends AbstractRayRuntime {
 
   @Override
   public void start(RayParameters params) {
-    PathConfig pathConfig = new PathConfig(configReader);
     RemoteFunctionManager rfm = new NopRemoteFunctionManager(params.driver_id);
     MockObjectStore store = new MockObjectStore();
     MockRayletClient scheduler = new MockRayletClient(this, store);
-    init(scheduler, store, rfm, pathConfig);
+    init(scheduler, store, rfm);
     scheduler.setLocalFunctionManager(this.functions);
   }
 

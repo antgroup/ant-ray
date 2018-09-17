@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.config.PathConfig;
 import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.gcs.AddressInfo;
 import org.ray.runtime.runner.RunInfo.ProcessType;
@@ -32,8 +31,6 @@ public class RunManager {
 
   private RayParameters params;
 
-  private PathConfig paths;
-
   private ConfigReader configReader;
 
   private RunInfo runInfo = new RunInfo();
@@ -41,9 +38,8 @@ public class RunManager {
   private Random random = new Random();
 
 
-  public RunManager(RayParameters params, PathConfig paths, ConfigReader configReader) {
+  public RunManager(RayParameters params, ConfigReader configReader) {
     this.params = params;
-    this.paths = paths;
     this.configReader = configReader;
   }
 

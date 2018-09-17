@@ -130,10 +130,6 @@ public abstract class AbstractRayRuntime implements RayRuntime {
    */
   public abstract void start(RayParameters params) throws Exception;
 
-  public static AbstractRayRuntime getInstance() {
-    return ins;
-  }
-
   @Override
   public abstract void shutdown();
 

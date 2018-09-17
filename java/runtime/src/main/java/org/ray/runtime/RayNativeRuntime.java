@@ -122,7 +122,6 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     params.redis_address = manager.info().redisAddress;
     params.object_store_name = manager.info().localStores.get(0).storeName;
     params.raylet_socket_name = manager.info().localStores.get(0).rayletSocketName;
-    //params.node_ip_address = NetworkUtil.getIpAddress();
   }
 
   private void initStateStore(String redisAddress) throws Exception {

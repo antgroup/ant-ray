@@ -20,10 +20,7 @@ public class DefaultWorker {
       RayInitConfig initConfig = new RayInitConfig(args);
 
       Ray.init(initConfig);
-      //((AbstractRayRuntime)Ray.internal()).loop();
-      //AbstractRayRuntime.init(args);
-      //assert AbstractRayRuntime.getParams().worker_mode == WorkerMode.WORKER;
-      AbstractRayRuntime.getInstance().loop();
+      ((AbstractRayRuntime)Ray.internal()).loop();
       throw new RuntimeException("Control flow should never reach here");
 
     } catch (Throwable e) {

@@ -64,4 +64,7 @@ public class RayInitConfig {
     return overWrite;
   }
 
+  public RunMode getRunMode() {
+    return runMode;
+  }
 }

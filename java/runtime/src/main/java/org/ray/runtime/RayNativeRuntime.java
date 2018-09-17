@@ -39,7 +39,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
   }
 
   @Override
-  public void start(RayParameters params) throws Exception {
+  public void start() throws Exception {
     boolean isWorker = (params.worker_mode == WorkerMode.WORKER);
 
     // initialize params
@@ -82,12 +82,13 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
     if (params.worker_mode != WorkerMode.NONE) {
       // initialize the links
-      //TODO(qwang): We should use releaseDelay as a config item.
+      //TODO(qwang): We should use `releaseDelay` as a config item.
       //int releaseDelay = AbstractRayRuntime.configReader
       //    .getIntegerValue("ray", "plasma_default_release_delay", 0,
       //        "how many release requests should be delayed in plasma client");
       int releaseDelay = 0;
       ObjectStoreLink plink = new PlasmaClient(params.object_store_name, "", releaseDelay);
+
       RayletClient rayletClient = new RayletClientImpl(
               params.raylet_socket_name,
               WorkerContext.currentWorkerId(),
@@ -116,7 +117,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
   private void startOnebox(RayParameters params) throws Exception {
     params.cleanup = true;
-    manager = new RunManager(params, AbstractRayRuntime.configReader);
+    manager = new RunManager(params, configReader);
     manager.startRayHead();
 
     params.redis_address = manager.info().redisAddress;

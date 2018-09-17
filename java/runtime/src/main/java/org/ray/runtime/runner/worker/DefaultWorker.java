@@ -2,6 +2,8 @@ package org.ray.runtime.runner.worker;
 
 import org.ray.api.Ray;
 import org.ray.api.RayInitConfig;
+import org.ray.api.RunMode;
+import org.ray.api.WorkerMode;
 import org.ray.runtime.AbstractRayRuntime;
 
 /**
@@ -18,6 +20,8 @@ public class DefaultWorker {
   public static void main(String[] args) {
     try {
       RayInitConfig initConfig = new RayInitConfig(args);
+      initConfig.setRunMode(RunMode.SINGLE_BOX);
+      initConfig.setWorkerMode(WorkerMode.WORKER);
 
       Ray.init(initConfig);
       ((AbstractRayRuntime)Ray.internal()).loop();

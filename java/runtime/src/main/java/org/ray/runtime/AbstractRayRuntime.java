@@ -33,9 +33,8 @@ import org.ray.runtime.util.logger.RayLog;
  */
 public abstract class AbstractRayRuntime implements RayRuntime {
 
-  public static ConfigReader configReader;
-  protected static AbstractRayRuntime ins = null;
-  protected static RayParameters params = null;
+  protected ConfigReader configReader;
+  protected RayParameters params = null;
   protected Worker worker;
   protected RayletClient rayletClient;
   protected ObjectStoreProxy objectStoreProxy;
@@ -49,25 +48,21 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
   // app level Ray.init()
   // make it private so there is no direct usage but only from Ray.init
-  private static AbstractRayRuntime init(RayInitConfig initConfig) {
-    if (ins == null) {
-      try {
-        String configPath = initConfig.getConfigPath();
-        String overWrite = initConfig.getOverWrite();
-        AbstractRayRuntime.init(configPath, overWrite);
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw new RuntimeException("Ray.init failed", e);
-      }
+  public void init(RayInitConfig initConfig) {
+    try {
+      String configPath = initConfig.getConfigPath();
+      String overWrite = initConfig.getOverWrite();
+      init(configPath, overWrite);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException("Ray.init failed", e);
     }
-    return ins;
   }
 
   // engine level AbstractRayRuntime.init(xx, xx)
   // updateConfigStr is sth like section1.k1=v1;section2.k2=v2
-  public static AbstractRayRuntime init(String configPath, String updateConfigStr)
+  public void init(String configPath, String updateConfigStr)
       throws Exception {
-    if (ins == null) {
       if (configPath == null) {
         configPath = System.getenv("RAY_CONFIG");
         if (configPath == null) {
@@ -79,16 +74,15 @@ public abstract class AbstractRayRuntime implements RayRuntime {
         }
       }
       configReader = new ConfigReader(configPath, updateConfigStr);
-      AbstractRayRuntime.params = new RayParameters(configReader);
+      params = new RayParameters(configReader);
 
       RayLog.init(params.log_dir);
-      assert RayLog.core != null;
-
-      ins = instantiate(params);
-      assert (ins != null);
-
-    }
-    return ins;
+      try {
+        start();
+      } catch (Exception e) {
+        RayLog.core.error("Failed to init RayRuntime", e);
+        System.exit(-1);
+      }
   }
 
   protected void init(
@@ -105,30 +99,10 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     worker = new Worker(this);
   }
 
-  private static AbstractRayRuntime instantiate(RayParameters params) {
-    AbstractRayRuntime runtime;
-    if (params.run_mode.isNativeRuntime()) {
-      runtime = new RayNativeRuntime();
-    } else {
-      runtime = new RayDevRuntime();
-    }
-
-    RayLog.core
-        .info("Start " + runtime.getClass().getName() + " with " + params.run_mode.toString());
-    try {
-      runtime.start(params);
-    } catch (Exception e) {
-      RayLog.core.error("Failed to init RayRuntime", e);
-      System.exit(-1);
-    }
-
-    return runtime;
-  }
-
   /**
    * start runtime.
    */
-  public abstract void start(RayParameters params) throws Exception;
+  public abstract void start() throws Exception;
 
   @Override
   public abstract void shutdown();

@@ -36,7 +36,6 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   public static ConfigReader configReader;
   protected static AbstractRayRuntime ins = null;
   protected static RayParameters params = null;
-  private static boolean fromRayInit = false;
   protected Worker worker;
   protected RayletClient rayletClient;
   protected ObjectStoreProxy objectStoreProxy;
@@ -50,12 +49,12 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
   // app level Ray.init()
   // make it private so there is no direct usage but only from Ray.init
-  public static AbstractRayRuntime init(RayInitConfig initConfig) {
+  private static AbstractRayRuntime init(RayInitConfig initConfig) {
     if (ins == null) {
       try {
-        fromRayInit = true;
-        AbstractRayRuntime.init(null, null);
-        fromRayInit = false;
+        String configPath = initConfig.getConfigPath();
+        String overWrite = initConfig.getOverWrite();
+        AbstractRayRuntime.init(configPath, overWrite);
       } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException("Ray.init failed", e);
@@ -88,9 +87,6 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       ins = instantiate(params);
       assert (ins != null);
 
-      if (!fromRayInit) {
-        Ray.init(); // assign Ray._impl
-      }
     }
     return ins;
   }

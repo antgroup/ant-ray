@@ -20,6 +20,10 @@ public final class Ray extends RayCall {
     init(new DefaultRayRuntimeFactory(), new RayInitConfig());
   }
 
+  public static void init(RayInitConfig initConfig) {
+    init(new DefaultRayRuntimeFactory(), initConfig);
+  }
+
   /**
    * Initialize Ray runtime with a custom runtime implementation.
    *

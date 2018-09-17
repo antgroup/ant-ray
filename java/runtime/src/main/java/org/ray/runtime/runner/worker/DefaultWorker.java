@@ -1,5 +1,6 @@
 package org.ray.runtime.runner.worker;
 
+import org.ray.api.Ray;
 import org.ray.api.RayInitConfig;
 import org.ray.runtime.AbstractRayRuntime;
 
@@ -18,8 +19,9 @@ public class DefaultWorker {
     try {
       RayInitConfig initConfig = new RayInitConfig(args);
 
-
-      AbstractRayRuntime.init(args);
+      Ray.init(initConfig);
+      //((AbstractRayRuntime)Ray.internal()).loop();
+      //AbstractRayRuntime.init(args);
       //assert AbstractRayRuntime.getParams().worker_mode == WorkerMode.WORKER;
       AbstractRayRuntime.getInstance().loop();
       throw new RuntimeException("Control flow should never reach here");

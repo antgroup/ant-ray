@@ -1,6 +1,6 @@
 package org.ray.runtime.runner.worker;
 
-import org.ray.api.WorkerMode;
+import org.ray.api.RayInitConfig;
 import org.ray.runtime.AbstractRayRuntime;
 
 /**
@@ -16,6 +16,9 @@ public class DefaultWorker {
   //
   public static void main(String[] args) {
     try {
+      RayInitConfig initConfig = new RayInitConfig(args);
+
+
       AbstractRayRuntime.init(args);
       //assert AbstractRayRuntime.getParams().worker_mode == WorkerMode.WORKER;
       AbstractRayRuntime.getInstance().loop();

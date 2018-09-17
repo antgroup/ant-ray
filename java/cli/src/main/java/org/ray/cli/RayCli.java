@@ -9,7 +9,7 @@ import net.lingala.zip4j.core.ZipFile;
 import org.ray.api.id.UniqueId;
 import org.ray.runtime.config.PathConfig;
 import org.ray.runtime.config.RayParameters;
-import org.ray.runtime.config.RunMode;
+import org.ray.api.RunMode;
 import org.ray.runtime.functionmanager.NativeRemoteFunctionManager;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
 import org.ray.runtime.gcs.KeyValueStoreLink;

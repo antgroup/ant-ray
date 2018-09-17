@@ -1,5 +1,7 @@
 package org.ray.runtime.config;
 
+import org.ray.api.RunMode;
+import org.ray.api.WorkerMode;
 import org.ray.api.id.UniqueId;
 import org.ray.runtime.util.NetworkUtil;
 import org.ray.runtime.util.config.AConfig;
@@ -55,9 +57,6 @@ public class RayParameters {
   @AConfig(comment = "whether this is a deployment in cluster")
   public boolean deploy = false;
 
-  @AConfig(comment = "whether this is for python deployment")
-  public boolean py = false;
-
   @AConfig(comment = "the max bytes of the buffer for task submit")
   public int max_submit_task_buffer_size_bytes = 2 * 1024 * 1024;
 
@@ -72,12 +71,6 @@ public class RayParameters {
 
   @AConfig(comment = "set the occupied memory(MB) size of object store")
   public int object_store_occupied_memory_MB = 1000;
-
-  @AConfig(comment = "whether to use supreme failover strategy")
-  public boolean supremeFO = false;
-
-  @AConfig(comment = "whether to disable process failover")
-  public boolean disable_process_failover = false;
 
   @AConfig(comment = "delay seconds under onebox before app logic for debugging")
   public int onebox_delay_seconds_before_run_app_logic = 0;

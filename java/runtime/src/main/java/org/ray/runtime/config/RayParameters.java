@@ -84,6 +84,37 @@ public class RayParameters {
   @AConfig(comment = "static resource list of this node")
   public String static_resources = "CPU:4,GPU:0";
 
+
+
+  //TODO(qwang): Write the default vaule.
+  @AConfig(comment = "Additional class path for JAVA")
+  public String[] java_class_paths = {"/Users/wangqing/Workspace/source/refactor/ray/java/api/target/classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/api/target/test-classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/runtime/target/classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/runtime/target/test-classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/tutorial/target/classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/test/target/classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/test/target/test-classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/test/lib/*",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/conf"};
+  @AConfig(comment = "Additional JNI library paths for JAVA")
+  public String[] java_jnilib_paths = {
+      "/Users/wangqing/Workspace/source/refactor/ray/build/src/plasma",
+      "/Users/wangqing/Workspace/source/refactor/ray/build/src/local_scheduler"};
+  @AConfig(comment = "Path to redis-server")
+  public String redis_server_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/common/thirdparty/redis/src/redis-server";
+  @AConfig(comment = "Path to redis module")
+  public String redis_module_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/common/redis_module/libray_redis_module.so";
+  @AConfig(comment = "Path to plasma storage")
+  public String plasma_store_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/plasma/plasma_store_server";
+  @AConfig(comment = "Path to raylet")
+  public String raylet_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/ray/raylet/raylet";
+
+
+
+
+
+  //TODO(qwang): We should change the section key.
   public RayParameters(ConfigReader config) {
     if (null != config) {
       String networkInterface = config.getStringValue("ray.java", "network_interface", null,

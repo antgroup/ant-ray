@@ -20,6 +20,7 @@ public class DefaultWorker {
   public static void main(String[] args) {
     try {
       RayInitConfig initConfig = new RayInitConfig(args);
+      // TODO(qwang): We should specify RunMode in code.
       initConfig.setRunMode(RunMode.SINGLE_BOX);
       initConfig.setWorkerMode(WorkerMode.WORKER);
 

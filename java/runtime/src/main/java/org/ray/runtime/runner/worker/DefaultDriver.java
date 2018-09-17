@@ -2,6 +2,7 @@ package org.ray.runtime.runner.worker;
 
 import org.ray.api.Ray;
 import org.ray.api.RayInitConfig;
+import org.ray.api.RunMode;
 import org.ray.api.WorkerMode;
 import org.ray.runtime.AbstractRayRuntime;
 
@@ -17,8 +18,10 @@ public class DefaultDriver {
   //
   public static void main(String[] args) {
     try {
-      //TODO(qwang): We should use `Ray.init`, not `AbstractRayRuntime.init`.
       RayInitConfig initConfig = new RayInitConfig(args);
+      //TODO(qwang): We shouldn't specify RUnMode in code.
+      initConfig.setRunMode(RunMode.SINGLE_BOX);
+      initConfig.setWorkerMode(WorkerMode.DRIVER);
       Ray.init(initConfig);
 
       //TODO(qwang): We should get dirver class and driver_args from args.

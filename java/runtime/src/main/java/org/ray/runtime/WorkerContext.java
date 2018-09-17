@@ -7,8 +7,7 @@ import org.ray.runtime.task.TaskSpec;
 
 public class WorkerContext {
 
-  private static final ThreadLocal<WorkerContext> currentWorkerCtx =
-      ThreadLocal.withInitial(() -> init(AbstractRayRuntime.getParams()));
+  private static final ThreadLocal<WorkerContext> currentWorkerCtx = new ThreadLocal<>();
   /**
    * id of worker.
    */

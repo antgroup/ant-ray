@@ -16,7 +16,7 @@ public class DefaultDriver {
   public static void main(String[] args) {
     try {
       AbstractRayRuntime.init(args);
-      assert AbstractRayRuntime.getParams().worker_mode == WorkerMode.DRIVER;
+      //assert AbstractRayRuntime.getParams().worker_mode == WorkerMode.DRIVER;
 
       String driverClass = AbstractRayRuntime.configReader
           .getStringValue("ray.java.start", "driver_class", "",

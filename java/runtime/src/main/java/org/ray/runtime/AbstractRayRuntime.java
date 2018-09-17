@@ -53,7 +53,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
   // app level Ray.init()
   // make it private so there is no direct usage but only from Ray.init
-  private static AbstractRayRuntime init() {
+  public static AbstractRayRuntime init() {
     if (ins == null) {
       try {
         fromRayInit = true;
@@ -157,10 +157,6 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
   public static AbstractRayRuntime getInstance() {
     return ins;
-  }
-
-  public static RayParameters getParams() {
-    return params;
   }
 
   @Override

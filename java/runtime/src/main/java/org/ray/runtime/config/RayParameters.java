@@ -84,11 +84,10 @@ public class RayParameters {
   @AConfig(comment = "static resource list of this node")
   public String static_resources = "CPU:4,GPU:0";
 
-
-
   //TODO(qwang): Write the default vaule.
   @AConfig(comment = "Additional class path for JAVA")
-  public String[] java_class_paths = {"/Users/wangqing/Workspace/source/refactor/ray/java/api/target/classes",
+  public String[] java_class_paths = {
+      "/Users/wangqing/Workspace/source/refactor/ray/java/api/target/classes",
       "/Users/wangqing/Workspace/source/refactor/ray/java/api/target/test-classes",
       "/Users/wangqing/Workspace/source/refactor/ray/java/runtime/target/classes",
       "/Users/wangqing/Workspace/source/refactor/ray/java/runtime/target/test-classes",
@@ -109,10 +108,6 @@ public class RayParameters {
   public String plasma_store_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/plasma/plasma_store_server";
   @AConfig(comment = "Path to raylet")
   public String raylet_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/ray/raylet/raylet";
-
-
-
-
 
   //TODO(qwang): We should change the section key.
   public RayParameters(ConfigReader config) {

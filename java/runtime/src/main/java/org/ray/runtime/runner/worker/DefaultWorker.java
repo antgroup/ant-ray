@@ -17,7 +17,7 @@ public class DefaultWorker {
   public static void main(String[] args) {
     try {
       AbstractRayRuntime.init(args);
-      assert AbstractRayRuntime.getParams().worker_mode == WorkerMode.WORKER;
+      //assert AbstractRayRuntime.getParams().worker_mode == WorkerMode.WORKER;
       AbstractRayRuntime.getInstance().loop();
       throw new RuntimeException("Control flow should never reach here");
 

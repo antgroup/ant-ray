@@ -1,7 +1,8 @@
 package org.ray.api;
 
+//TODO(qwang): We should remove `NONE`.
 public enum WorkerMode {
-  NONE,   // not set
-  DRIVER, // driver
-  WORKER  // worker
+  NONE,
+  DRIVER,
+  WORKER
 }

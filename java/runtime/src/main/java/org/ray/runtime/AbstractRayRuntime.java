@@ -89,7 +89,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       configReader = new ConfigReader(configPath, updateConfigStr);
       params = new RayParameters(configReader);
 
-      RayLog.init(params.log_dir);
+      RayLog.init(rayConfig.logDir);
       try {
         start();
       } catch (Exception e) {

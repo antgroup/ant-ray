@@ -66,10 +66,7 @@ public class RunManager {
     if (params.num_redis_shards <= 0) {
       params.num_redis_shards = 1;
     }
-
-    params.start_redis_shards = true;
-
-    startRayProcesses(rayConfig);
+    startRayProcesses(rayConfig, true);
   }
 
   public void startRayNode() throws Exception {
@@ -79,10 +76,7 @@ public class RunManager {
     if (params.num_redis_shards != 0) {
       throw new Exception("Number of redis shards should be zero in non-head node.");
     }
-
-    params.start_redis_shards = false;
-
-    startRayProcesses(rayConfig);
+    startRayProcesses(rayConfig, false);
   }
 
   public Process startDriver(String mainClass, String redisAddress, UniqueId driverId,
@@ -138,6 +132,7 @@ public class RunManager {
     cmd += " -Djava.library.path=" + StringUtil.mergeArray(rayConfig.javaJnilibPaths, ":");
     cmd += " -Dray.run-mode=" + rayConfig.runMode;
     cmd += " -Dray.node-ip=" + ip;
+    cmd += " -Dray.log-dir=" + rayConfig.logDir;
     cmd += " -classpath " + StringUtil.mergeArray(rayConfig.javaClasspaths, ":");
 
     if (additionalClassPaths.length() > 0) {
@@ -152,8 +147,9 @@ public class RunManager {
 
     String section = "ray.java.start.";
     cmd += " --config=" + configReader.filePath();
-    cmd += " --overwrite="
-        + section + "log_dir=" + params.log_dir;
+    //TODO(qwang): We should remove rhis overwrite.
+    cmd += " --overwrite=";
+    //    + section + "log_dir=" + rayConfig.logDir;
 
     if (additionalConfigs.length() > 0) {
       cmd += ";" + additionalConfigs;
@@ -173,8 +169,8 @@ public class RunManager {
     if (redirect) {
       int logId = random.nextInt(10000);
       String date = DATE_TIME_FORMATTER.format(LocalDateTime.now());
-      String stdout = String.format("%s/%s-%s-%05d.out", params.log_dir, name, date, logId);
-      String stderr = String.format("%s/%s-%s-%05d.err", params.log_dir, name, date, logId);
+      String stdout = String.format("%s/%s-%s-%05d.out", rayConfig.logDir, name, date, logId);
+      String stderr = String.format("%s/%s-%s-%05d.err", rayConfig.logDir, name, date, logId);
       builder.redirectOutput(new File(stdout));
       builder.redirectError(new File(stderr));
       recordLogFilesInRedis(redisAddress, ip, ImmutableList.of(stdout, stderr));
@@ -226,7 +222,7 @@ public class RunManager {
     }
   }
 
-  private void startRayProcesses(RayConfig rayConfig) {
+  private void startRayProcesses(RayConfig rayConfig, boolean startRedisShards) {
     Jedis redisClient = null;
 
     RayLog.core.info("start ray processes @ " + rayConfig.nodeIp + " ...");
@@ -234,7 +230,7 @@ public class RunManager {
     // start primary redis
     if (rayConfig.redisAddress.length() == 0) {
       List<String> primaryShards = startRedis(
-          rayConfig.nodeIp, params.redis_port, 1, params.redirect, params.cleanup);
+          rayConfig.nodeIp, rayConfig.headRedisPort, 1, rayConfig.redirectOutput, rayConfig.cleanup);
       rayConfig.redisAddress = primaryShards.get(0);
 
       String[] args = rayConfig.redisAddress.split(":");
@@ -250,11 +246,11 @@ public class RunManager {
     runInfo.redisAddress = rayConfig.redisAddress;
 
     // start redis shards
-    if (params.start_redis_shards) {
+    if (startRedisShards) {
       runInfo.redisShards = startRedis(
-          rayConfig.nodeIp, params.redis_port + 1, params.num_redis_shards,
-          params.redirect,
-          params.cleanup);
+          rayConfig.nodeIp, rayConfig.headRedisPort + 1, params.num_redis_shards,
+          rayConfig.redirectOutput,
+          rayConfig.cleanup);
 
       // Store redis shard information in the primary redis shard.
       for (int i = 0; i < runInfo.redisShards.size(); i++) {
@@ -271,15 +267,15 @@ public class RunManager {
     String storeName = "/tmp/plasma_store" + rpcPort;
 
     startObjectStore(0, info,
-        rayConfig.redisAddress, rayConfig.nodeIp, params.redirect, params.cleanup);
+        rayConfig.redisAddress, rayConfig.nodeIp, rayConfig.redirectOutput, rayConfig.cleanup);
 
     Map<String, Double> staticResources =
             ResourceUtil.getResourcesMapFromString(params.static_resources);
 
     //Start raylet
-    startRaylet(storeName, info, params.num_workers,
+    startRaylet(storeName, info, 0,
         rayConfig.redisAddress,
-        rayConfig.nodeIp, params.redirect, staticResources, params.cleanup);
+        rayConfig.nodeIp, rayConfig.redirectOutput, staticResources, rayConfig.cleanup);
 
     runInfo.localStores.add(info);
 
@@ -473,7 +469,7 @@ public class RunManager {
     }
 
     String jvmArgs = "";
-    jvmArgs += " -Dlogging.path=" + params.log_dir;
+    jvmArgs += " -Dlogging.path=" + rayConfig.logDir;
     jvmArgs += " -Dray.redis.address=" + rayConfig.redisAddress;
     jvmArgs += " -Dlogging.file.name=core-*pid_suffix*";
     jvmArgs += " -Dray.object-store.name=" + storeName;

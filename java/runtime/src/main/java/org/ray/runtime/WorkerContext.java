@@ -42,7 +42,7 @@ public class WorkerContext {
       dummy.taskId = UniqueId.NIL;
     }
     dummy.actorId = UniqueId.NIL;
-    dummy.driverId = params.driver_id;
+    dummy.driverId = rayConfig.driverId;
     prepare(dummy, null);
 
     return ctx;

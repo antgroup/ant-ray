@@ -26,7 +26,7 @@ public class RayConfig {
   public final UniqueId driverId;
   public final String logDir;
   public final boolean redirectOutput;
-  public final boolean cleanup;
+  public boolean cleanup;
   public final int numberRedisShards;
   public final int defaultFirstCheckTimeoutMs;
   public final int defaultGetCheckIntervalMs;
@@ -44,7 +44,7 @@ public class RayConfig {
   public final String redisModulePath;
   public final String plasmaStorePath;
   public final String rayletPath;
-
+  public final int headRedisPort;
   ////
   public final int objectStoreNameIndex;
   public String objectStoreName;
@@ -87,6 +87,8 @@ public class RayConfig {
       dir = "/tmp/raylogs";
     }
     logDir = dir;
+
+    headRedisPort = config.getInt("ray.head.redis.port");
     objectStoreNameIndex = config.getInt("ray.object-store.name-index");
     redirectOutput = config.getBoolean("ray.redirect-output");
     cleanup = config.getBoolean("ray.cleanup");

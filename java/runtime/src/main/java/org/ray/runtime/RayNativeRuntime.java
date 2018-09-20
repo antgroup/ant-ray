@@ -61,13 +61,13 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
     // initialize remote function manager
     RemoteFunctionManager funcMgr = rayConfig.runMode.isDevPathManager()
-        ? new NopRemoteFunctionManager(params.driver_id) : new NativeRemoteFunctionManager(kvStore);
+        ? new NopRemoteFunctionManager(rayConfig.driverId) : new NativeRemoteFunctionManager(kvStore);
 
     // initialize worker context
     if (rayConfig.workerMode == WorkerMode.DRIVER) {
       // TODO: The relationship between workerID, driver_id and dummy_task.driver_id should be
       // recheck carefully
-      WorkerContext.workerID = params.driver_id;
+      WorkerContext.workerID = rayConfig.driverId;
     }
     WorkerContext.init(rayConfig, params);
 
@@ -116,7 +116,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
   }
 
   private void startOnebox(RayParameters params) throws Exception {
-    params.cleanup = true;
+    rayConfig.cleanup = true;
     manager = new RunManager(rayConfig, params, configReader);
     manager.startRayHead(rayConfig);
 

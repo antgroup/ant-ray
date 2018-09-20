@@ -74,7 +74,7 @@ public class RayCli {
     RayParameters params = new RayParameters(configReader);
 
     // Init RayLog before using it.
-    RayLog.init(params.log_dir);
+    RayLog.init(rayConfig.logDir);
 
     RayLog.core.info("Using IP address {} for this node.", rayConfig.nodeIp);
     RunManager manager;
@@ -181,12 +181,12 @@ public class RayCli {
     UniqueId resourceId = functionManager.registerResource(zip);
 
     // Init RayLog before using it.
-    RayLog.init(params.log_dir);
+    RayLog.init(rayConfig.logDir);
 
     RayLog.rapp.debug(
         "registerResource " + resourceId + " for package " + packageName + " done");
 
-    UniqueId appId = params.driver_id;
+    UniqueId appId = rayConfig.driverId;
     functionManager.registerApp(appId, resourceId);
     RayLog.rapp.debug("registerApp " + appId + " for resouorce " + resourceId + " done");
   

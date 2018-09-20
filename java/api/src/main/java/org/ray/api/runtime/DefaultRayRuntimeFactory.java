@@ -19,9 +19,9 @@ public class DefaultRayRuntimeFactory implements RayRuntimeFactory {
       }
 
       RayRuntime runtime = (RayRuntime) clz.newInstance();
-      Method init = clz.getMethod("init", RayInitConfig.class);
+      Method init = clz.getMethod("init");
       init.setAccessible(true);
-      init.invoke(runtime, initConfig);
+      init.invoke(runtime);
       init.setAccessible(false);
 
       return runtime;

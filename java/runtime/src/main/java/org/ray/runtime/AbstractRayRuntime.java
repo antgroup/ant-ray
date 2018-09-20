@@ -48,45 +48,25 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
   // app level Ray.init()
   // make it private so there is no direct usage but only from Ray.init
-  public void init(RayInitConfig initConfig) {
+  public void init() {
     try {
-      String configPath = initConfig.getConfigPath();
-      String overWrite = initConfig.getOverWrite();
-      init(configPath, overWrite);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException("Ray.init failed", e);
-    }
-  }
-
-  // engine level AbstractRayRuntime.init(xx, xx)
-  // updateConfigStr is sth like section1.k1=v1;section2.k2=v2
-  public void init(String configPath, String updateConfigStr)
-      throws Exception {
-      if (configPath == null) {
-        configPath = System.getenv("RAY_CONFIG");
-        if (configPath == null) {
-          configPath = System.getProperty("ray.config");
-        }
-        if (configPath == null) {
-          throw new Exception(
-              "Please set config file path in env RAY_CONFIG or property ray.config");
-        }
-      }
-
       final String DEFAULT_CONFIG_FILE = "ray.default.conf";
       final String CUSTOM_CONFIG_FILE = "ray.conf";
       Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
-                        .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
+                          .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
       rayConfig = new RayConfig(config);
-
       RayLog.init(rayConfig.logDir);
+
       try {
         start();
       } catch (Exception e) {
         RayLog.core.error("Failed to init RayRuntime", e);
         System.exit(-1);
       }
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException("Ray.init failed", e);
+    }
   }
 
   protected void init(

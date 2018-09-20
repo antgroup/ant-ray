@@ -17,7 +17,7 @@ import org.ray.runtime.gcs.StateStoreProxyImpl;
 import org.ray.runtime.raylet.RayletClient;
 import org.ray.runtime.raylet.RayletClientImpl;
 import org.ray.runtime.runner.RunManager;
-import org.ray.runtime.util.logger.RayLog;
+import org.ray.api.util.RayLog;
 
 /**
  * native runtime for local box and cluster run.

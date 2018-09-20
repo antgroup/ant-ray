@@ -10,8 +10,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.ray.api.id.UniqueId;
 import org.ray.runtime.generated.ClientTableData;
-import org.ray.runtime.util.NetworkUtil;
-import org.ray.runtime.util.logger.RayLog;
+import org.ray.api.util.NetworkUtil;
+import org.ray.api.util.RayLog;
 
 /**
  * A class used to interface with the Ray control state.

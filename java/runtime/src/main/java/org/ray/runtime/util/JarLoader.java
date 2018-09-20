@@ -14,7 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.ray.runtime.util.logger.RayLog;
+import org.ray.api.util.RayLog;
 
 /**
  * load and unload jars from a dir.

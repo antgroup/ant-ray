@@ -1,4 +1,4 @@
-package org.ray.runtime.config;
+package org.ray.api.config;
 
 
 import com.typesafe.config.Config;
@@ -6,12 +6,9 @@ import com.typesafe.config.ConfigException;
 import org.ray.api.RunMode;
 import org.ray.api.WorkerMode;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.util.NetworkUtil;
+import org.ray.api.util.NetworkUtil;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RayConfig {
   private Logger logger = LoggerFactory.getLogger(RayConfig.class);
@@ -34,7 +31,6 @@ public class RayConfig {
   public final Long ObjectStoreOccupiedSize;
   public final int rayletPort;
   public final int workerFetchRequestSize;
-  //TODO(qwang): This field can be a map.
   public final String staticResources;
 
   public final String rayHome;

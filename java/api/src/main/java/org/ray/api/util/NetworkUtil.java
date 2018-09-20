@@ -1,4 +1,4 @@
-package org.ray.runtime.util;
+package org.ray.api.util;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -7,7 +7,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.util.Enumeration;
-import org.ray.runtime.util.logger.RayLog;
 
 public class NetworkUtil {
 

@@ -1,7 +1,5 @@
 package org.ray.api.runtime;
 
-import org.ray.api.RayInitConfig;
-
 /**
  * A factory that produces a RayRuntime instance.
  */

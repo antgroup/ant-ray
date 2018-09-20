@@ -7,7 +7,7 @@ import org.ray.api.RayInitConfig;
 import org.ray.api.RunMode;
 import org.ray.api.WorkerMode;
 import org.ray.runtime.AbstractRayRuntime;
-import org.ray.runtime.config.RayConfig;
+import org.ray.api.config.RayConfig;
 
 /**
  * default worker implementation.

@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.WeakHashMap;
 import org.objectweb.asm.Type;
-import org.ray.runtime.util.logger.RayLog;
+import org.ray.api.util.StringUtil;
+import org.ray.api.util.RayLog;
 
 
 /**

@@ -92,7 +92,6 @@ public class RunManager {
         RunInfo.ProcessType.PT_DRIVER,
         mainClass,
         additonalClassPaths,
-        additionalConfigs,
         "",
         ip,
         redisAddress,
@@ -103,19 +102,17 @@ public class RunManager {
   }
 
   private Process startJavaProcess(RunInfo.ProcessType pt, String mainClass,
-      String additonalClassPaths, String additionalConfigs,
-      String additionalJvmArgs, String ip, String
+      String additonalClassPaths, String additionalJvmArgs, String ip, String
       redisAddr, boolean redirect,
       boolean cleanup, String agentlibAddr) {
 
-    String cmd = buildJavaProcessCommand(pt, mainClass, additonalClassPaths, additionalConfigs,
+    String cmd = buildJavaProcessCommand(pt, mainClass, additonalClassPaths,
         additionalJvmArgs, ip, redisAddr, agentlibAddr);
     return startProcess(cmd.split(" "), null, pt, "", redisAddr, ip, redirect, cleanup);
   }
 
   private String buildJavaProcessCommand(
       RunInfo.ProcessType pt, String mainClass, String additionalClassPaths,
-      String additionalConfigs,
       String additionalJvmArgs, String ip, String redisAddr, String agentlibAddr) {
     String cmd = "java -ea -noverify " + rayConfig.jvmParamters + " ";
     if (agentlibAddr != null && !agentlibAddr.equals("")) {
@@ -137,15 +134,6 @@ public class RunManager {
     }
 
     cmd += " " + mainClass;
-
-    //TODO(qwang): We should remove this configReader.
-    cmd += " --config=" + "TODO(qwang)";
-    //TODO(qwang): We should remove rhis overwrite.
-    cmd += " --overwrite=";
-
-    if (additionalConfigs.length() > 0) {
-      cmd += ";" + additionalConfigs;
-    }
 
     return cmd;
   }
@@ -408,8 +396,7 @@ public class RunManager {
     String filePath = rayConfig.rayletPath;
 
     //Create the worker command that the raylet will use to start workers.
-    String workerCommand = buildWorkerCommandRaylet(info.storeName, rayletSocketName,
-        UniqueId.NIL, "", ip, redisAddress);
+    String workerCommand = buildWorkerCommandRaylet(info.storeName, rayletSocketName, ip, redisAddress);
 
     int sep = redisAddress.indexOf(':');
     assert (sep != -1);
@@ -449,17 +436,10 @@ public class RunManager {
   }
 
   private String buildWorkerCommandRaylet(String storeName, String rayletSocketName,
-      UniqueId actorId, String actorClass,
       String ip, String redisAddress) {
     //TODO(qwang): We should remove this code once we get rid of `ConfigReader`.
     String workerConfigs = "ray.java.start.raylet_socket_name=" + rayletSocketName;
 
-    if (!actorId.equals(UniqueId.NIL)) {
-      workerConfigs += ";ray.java.start.actor_id=" + actorId;
-    }
-    if (!actorClass.equals("")) {
-      workerConfigs += ";ray.java.start.driver_class=" + actorClass;
-    }
 
     String jvmArgs = "";
     jvmArgs += " -Dlogging.file.name=core-*pid_suffix*";
@@ -471,7 +451,6 @@ public class RunManager {
     return buildJavaProcessCommand(
         RunInfo.ProcessType.PT_WORKER,
         "org.ray.runtime.runner.worker.DefaultWorker",
-        "",
         workerConfigs,
         jvmArgs,
         ip,

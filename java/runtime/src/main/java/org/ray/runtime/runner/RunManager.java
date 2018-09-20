@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.config.PathConfig;
 import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.gcs.AddressInfo;
 import org.ray.runtime.runner.RunInfo.ProcessType;
@@ -32,8 +31,6 @@ public class RunManager {
 
   private RayParameters params;
 
-  private PathConfig paths;
-
   private ConfigReader configReader;
 
   private RunInfo runInfo = new RunInfo();
@@ -41,9 +38,8 @@ public class RunManager {
   private Random random = new Random();
 
 
-  public RunManager(RayParameters params, PathConfig paths, ConfigReader configReader) {
+  public RunManager(RayParameters params, ConfigReader configReader) {
     this.params = params;
-    this.paths = paths;
     this.configReader = configReader;
   }
 
@@ -136,8 +132,8 @@ public class RunManager {
       cmd += " -agentlib:jdwp=transport=dt_socket,address=" + agentlibAddr + ",server=y,suspend=n";
     }
 
-    cmd += " -Djava.library.path=" + StringUtil.mergeArray(paths.java_jnilib_paths, ":");
-    cmd += " -classpath " + StringUtil.mergeArray(paths.java_class_paths, ":");
+    cmd += " -Djava.library.path=" + StringUtil.mergeArray(params.java_jnilib_paths, ":");
+    cmd += " -classpath " + StringUtil.mergeArray(params.java_class_paths, ":");
 
     if (additionalClassPaths.length() > 0) {
       cmd += ":" + additionalClassPaths;
@@ -377,8 +373,8 @@ public class RunManager {
   //
   private String startRedisInstance(String ip, int port,
       boolean redirect, boolean cleanup) {
-    String redisFilePath = paths.redis_server;
-    String redisModule = paths.redis_module;
+    String redisFilePath = params.redis_server_path;
+    String redisModule = params.redis_module_path;
 
     assert (new File(redisFilePath).exists()) : "file don't exsits : " + redisFilePath;
     assert (new File(redisModule).exists()) : "file don't exsits : " + redisModule;
@@ -419,7 +415,7 @@ public class RunManager {
     int rpcPort = params.raylet_port;
     String rayletSocketName = "/tmp/raylet" + rpcPort;
 
-    String filePath = paths.raylet;
+    String filePath = params.raylet_path;
 
     //Create the worker command that the raylet will use to start workers.
     String workerCommand = buildWorkerCommandRaylet(info.storeName, rayletSocketName,
@@ -496,7 +492,7 @@ public class RunManager {
       String ip, boolean redirect, boolean cleanup) {
     int occupiedMemoryMb = params.object_store_occupied_memory_MB;
     long memoryBytes = occupiedMemoryMb * 1000000;
-    String filePath = paths.store;
+    String filePath = params.plasma_store_path;
     int rpcPort = params.object_store_rpc_port + index;
     String name = "/tmp/plasma_store" + rpcPort;
     String rpcAddr = "";

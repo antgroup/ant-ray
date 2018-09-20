@@ -1,5 +1,6 @@
 package org.ray.api.runtime;
 
+import org.ray.api.RayInitConfig;
 import java.lang.reflect.Method;
 
 /**
@@ -8,12 +9,21 @@ import java.lang.reflect.Method;
 public class DefaultRayRuntimeFactory implements RayRuntimeFactory {
 
   @Override
-  public RayRuntime createRayRuntime() {
+  public RayRuntime createRayRuntime(RayInitConfig initConfig) {
     try {
-      Method m = Class.forName("org.ray.runtime.AbstractRayRuntime").getDeclaredMethod("init");
-      m.setAccessible(true);
-      RayRuntime runtime = (RayRuntime) m.invoke(null);
-      m.setAccessible(false);
+      Class clz;
+      if (initConfig.getRunMode().isNativeRuntime()) {
+        clz = Class.forName("org.ray.runtime.RayNativeRuntime");
+      } else {
+        clz = Class.forName("org.ray.runtime.RayDevRuntime");
+      }
+
+      RayRuntime runtime = (RayRuntime) clz.newInstance();
+      Method init = clz.getMethod("init", RayInitConfig.class);
+      init.setAccessible(true);
+      init.invoke(runtime, initConfig);
+      init.setAccessible(false);
+
       return runtime;
     } catch (Exception e) {
       throw new RuntimeException("Failed to initialize ray runtime", e);

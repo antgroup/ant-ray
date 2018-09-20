@@ -1,5 +1,7 @@
 package org.ray.runtime.config;
 
+import org.ray.api.RunMode;
+import org.ray.api.WorkerMode;
 import org.ray.api.id.UniqueId;
 import org.ray.runtime.util.NetworkUtil;
 import org.ray.runtime.util.config.AConfig;
@@ -14,7 +16,7 @@ public class RayParameters {
   public WorkerMode worker_mode = WorkerMode.DRIVER;
 
   @AConfig(comment = "run mode for this app SINGLE_PROCESS | SINGLE_BOX | CLUSTER")
-  public RunMode run_mode = RunMode.SINGLE_PROCESS;
+  public RunMode run_mode = RunMode.SINGLE_BOX;
 
   @AConfig(comment = "local node ip")
   public String node_ip_address = NetworkUtil.getIpAddress(null);
@@ -29,16 +31,16 @@ public class RayParameters {
   public int object_store_rpc_port = 32567;
 
   @AConfig(comment = "driver ID when the worker is served as a driver")
-  public UniqueId driver_id = UniqueId.NIL;
+  public UniqueId driver_id = UniqueId.fromHexString("0123456789abcdef0123456789abcdef01234567");
 
   @AConfig(comment = "logging directory")
   public String log_dir = "/tmp/raylogs";
 
   @AConfig(comment = "primary redis port")
-  public int redis_port = 34222;
+  public int redis_port = 34111;
 
   @AConfig(comment = "number of workers started initially")
-  public int num_workers = 1;
+  public int num_workers = 2;
 
   @AConfig(comment = "redirect err and stdout to files for newly created processes")
   public boolean redirect = true;
@@ -55,12 +57,6 @@ public class RayParameters {
   @AConfig(comment = "whether this is a deployment in cluster")
   public boolean deploy = false;
 
-  @AConfig(comment = "whether this is for python deployment")
-  public boolean py = false;
-
-  @AConfig(comment = "the max bytes of the buffer for task submit")
-  public int max_submit_task_buffer_size_bytes = 2 * 1024 * 1024;
-
   @AConfig(comment = "default first check timeout(ms)")
   public int default_first_check_timeout_ms = 1000;
 
@@ -73,12 +69,6 @@ public class RayParameters {
   @AConfig(comment = "set the occupied memory(MB) size of object store")
   public int object_store_occupied_memory_MB = 1000;
 
-  @AConfig(comment = "whether to use supreme failover strategy")
-  public boolean supremeFO = false;
-
-  @AConfig(comment = "whether to disable process failover")
-  public boolean disable_process_failover = false;
-
   @AConfig(comment = "delay seconds under onebox before app logic for debugging")
   public int onebox_delay_seconds_before_run_app_logic = 0;
 
@@ -89,11 +79,37 @@ public class RayParameters {
   public int raylet_port = 35567;
 
   @AConfig(comment = "worker fetch request size")
-  public int worker_fetch_request_size = 10000;
+  public int worker_fetch_request_size = 1000;
 
   @AConfig(comment = "static resource list of this node")
-  public String static_resources = "";
+  public String static_resources = "CPU:4,GPU:0";
 
+  //TODO(qwang): Write the default vaule.
+  @AConfig(comment = "Additional class path for JAVA")
+  public String[] java_class_paths = {
+      "/Users/wangqing/Workspace/source/refactor/ray/java/api/target/classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/api/target/test-classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/runtime/target/classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/runtime/target/test-classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/tutorial/target/classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/test/target/classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/test/target/test-classes",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/test/lib/*",
+      "/Users/wangqing/Workspace/source/refactor/ray/java/conf"};
+  @AConfig(comment = "Additional JNI library paths for JAVA")
+  public String[] java_jnilib_paths = {
+      "/Users/wangqing/Workspace/source/refactor/ray/build/src/plasma",
+      "/Users/wangqing/Workspace/source/refactor/ray/build/src/local_scheduler"};
+  @AConfig(comment = "Path to redis-server")
+  public String redis_server_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/common/thirdparty/redis/src/redis-server";
+  @AConfig(comment = "Path to redis module")
+  public String redis_module_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/common/redis_module/libray_redis_module.so";
+  @AConfig(comment = "Path to plasma storage")
+  public String plasma_store_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/plasma/plasma_store_server";
+  @AConfig(comment = "Path to raylet")
+  public String raylet_path = "/Users/wangqing/Workspace/source/refactor/ray/build/src/ray/raylet/raylet";
+
+  //TODO(qwang): We should change the section key.
   public RayParameters(ConfigReader config) {
     if (null != config) {
       String networkInterface = config.getStringValue("ray.java", "network_interface", null,

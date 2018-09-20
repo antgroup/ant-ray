@@ -106,7 +106,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
   private void startOnebox() throws Exception {
     rayConfig.cleanup = true;
-    manager = new RunManager(rayConfig, configReader);
+    manager = new RunManager(rayConfig);
     manager.startRayHead(rayConfig);
 
     rayConfig.redisAddress = manager.info().redisAddress;

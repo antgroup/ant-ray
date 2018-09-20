@@ -13,12 +13,10 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.ray.api.id.UniqueId;
 import org.ray.runtime.config.RayConfig;
-import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.gcs.AddressInfo;
 import org.ray.runtime.runner.RunInfo.ProcessType;
 import org.ray.runtime.util.ResourceUtil;
 import org.ray.runtime.util.StringUtil;
-import org.ray.runtime.util.config.ConfigReader;
 import org.ray.runtime.util.logger.RayLog;
 import redis.clients.jedis.Jedis;
 
@@ -32,16 +30,13 @@ public class RunManager {
 
   private RayConfig rayConfig;
 
-  private ConfigReader configReader;
-
   private RunInfo runInfo = new RunInfo();
 
   private Random random = new Random();
 
 
-  public RunManager(RayConfig rayConfig, ConfigReader configReader) {
+  public RunManager(RayConfig rayConfig) {
     this.rayConfig = rayConfig;
-    this.configReader = configReader;
   }
 
   private static boolean killProcess(Process p) {
@@ -144,7 +139,7 @@ public class RunManager {
     cmd += " " + mainClass;
 
     //TODO(qwang): We should remove this configReader.
-    cmd += " --config=" + configReader.filePath();
+    cmd += " --config=" + "TODO(qwang)";
     //TODO(qwang): We should remove rhis overwrite.
     cmd += " --overwrite=";
 

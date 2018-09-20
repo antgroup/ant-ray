@@ -11,7 +11,6 @@ import com.typesafe.config.ConfigFactory;
 import net.lingala.zip4j.core.ZipFile;
 import org.ray.api.id.UniqueId;
 import org.ray.runtime.config.RayConfig;
-import org.ray.runtime.config.RayParameters;
 import org.ray.api.RunMode;
 import org.ray.runtime.functionmanager.NativeRemoteFunctionManager;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
@@ -22,7 +21,6 @@ import org.ray.runtime.gcs.StateStoreProxyImpl;
 import org.ray.runtime.runner.RunManager;
 import org.ray.runtime.runner.worker.DefaultDriver;
 import org.ray.runtime.util.FileUtil;
-import org.ray.runtime.util.config.ConfigReader;
 import org.ray.runtime.util.logger.RayLog;
 
 
@@ -33,14 +31,14 @@ public class RayCli {
 
   private static RayCliArgs rayArgs = new RayCliArgs();
 
-  private static RunManager startRayHead(ConfigReader configReader) {
+  private static RunManager startRayHead() {
     final String DEFAULT_CONFIG_FILE = "ray.default.conf";
     final String CUSTOM_CONFIG_FILE = "ray.conf";
     Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
                         .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
     RayConfig rayConfig = new RayConfig(config);
 
-    RunManager manager = new RunManager(rayConfig, configReader);
+    RunManager manager = new RunManager(rayConfig);
 
     try {
       manager.startRayHead(rayConfig);
@@ -54,8 +52,8 @@ public class RayCli {
     return manager;
   }
 
-  private static RunManager startRayNode(RayConfig rayConfig, ConfigReader configReader) {
-    RunManager manager = new RunManager(rayConfig, configReader);
+  private static RunManager startRayNode(RayConfig rayConfig) {
+    RunManager manager = new RunManager(rayConfig);
 
     try {
       manager.startRayNode();
@@ -69,7 +67,7 @@ public class RayCli {
     return manager;
   }
 
-  private static RunManager startProcess(RayConfig rayConfig, CommandStart cmdStart, ConfigReader configReader) {
+  private static RunManager startProcess(RayConfig rayConfig, CommandStart cmdStart) {
 
     // Init RayLog before using it.
     RayLog.init(rayConfig.logDir);
@@ -77,21 +75,21 @@ public class RayCli {
     RayLog.core.info("Using IP address {} for this node.", rayConfig.nodeIp);
     RunManager manager;
     if (cmdStart.head) {
-      manager = startRayHead(configReader);
+      manager = startRayHead();
     } else {
-      manager = startRayNode(rayConfig, configReader);
+      manager = startRayNode(rayConfig);
     }
     return manager;
   }
 
-  private static void start(CommandStart cmdStart, ConfigReader reader) {
+  private static void start(CommandStart cmdStart) {
     final String DEFAULT_CONFIG_FILE = "ray.default.conf";
     final String CUSTOM_CONFIG_FILE = "ray.conf";
     Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
                         .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
     RayConfig rayConfig = new RayConfig(config);
 
-    startProcess(rayConfig, cmdStart, reader);
+    startProcess(rayConfig, cmdStart);
   }
 
   private static void stop(CommandStop cmdStop) {
@@ -155,8 +153,6 @@ public class RayCli {
                         .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
     RayConfig rayConfig = new RayConfig(config);
 
-    ConfigReader configReader = new ConfigReader(configPath, "");
-
     rayConfig.redisAddress = cmdSubmit.redisAddress;
     rayConfig.runMode = RunMode.CLUSTER;
 
@@ -216,7 +212,7 @@ public class RayCli {
     RayLog.rapp.debug("Find app class path  " + additionalClassPath);
 
     // Start driver process.
-    RunManager runManager = new RunManager(rayConfig, configReader);
+    RunManager runManager = new RunManager(rayConfig);
     Process proc = runManager.startDriver(
         DefaultDriver.class.getName(),
         cmdSubmit.redisAddress,
@@ -284,8 +280,7 @@ public class RayCli {
     switch (cmd) {
       case "start": {
         configPath = getConfigPath(cmdStart.config);
-        ConfigReader config = new ConfigReader(configPath, cmdStart.overwrite);
-        start(cmdStart, config);
+        start(cmdStart);
       }
       break;
       case "stop":

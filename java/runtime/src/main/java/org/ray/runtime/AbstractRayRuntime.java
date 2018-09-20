@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.arrow.plasma.ObjectStoreLink;
@@ -16,7 +15,6 @@ import org.ray.api.function.RayFunc;
 import org.ray.api.id.UniqueId;
 import org.ray.api.runtime.RayRuntime;
 import org.ray.runtime.config.RayConfig;
-import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.functionmanager.LocalFunctionManager;
 import org.ray.runtime.functionmanager.RayMethod;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
@@ -28,7 +26,6 @@ import org.ray.runtime.task.TaskSpec;
 import org.ray.runtime.util.MethodId;
 import org.ray.runtime.util.ResourceUtil;
 import org.ray.runtime.util.UniqueIdHelper;
-import org.ray.runtime.util.config.ConfigReader;
 import org.ray.runtime.util.exception.TaskExecutionException;
 import org.ray.runtime.util.logger.RayLog;
 
@@ -38,9 +35,6 @@ import org.ray.runtime.util.logger.RayLog;
 public abstract class AbstractRayRuntime implements RayRuntime {
 
   protected RayConfig rayConfig;
-
-  protected ConfigReader configReader;
-  protected RayParameters params;
   protected Worker worker;
   protected RayletClient rayletClient;
   protected ObjectStoreProxy objectStoreProxy;
@@ -85,9 +79,6 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
                         .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
       rayConfig = new RayConfig(config);
-
-      configReader = new ConfigReader(configPath, updateConfigStr);
-      params = new RayParameters(configReader);
 
       RayLog.init(rayConfig.logDir);
       try {

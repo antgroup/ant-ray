@@ -7,5 +7,5 @@ import org.ray.api.RayInitConfig;
  */
 public interface RayRuntimeFactory {
 
-  RayRuntime createRayRuntime(RayInitConfig initConfig);
+  RayRuntime createRayRuntime();
 }

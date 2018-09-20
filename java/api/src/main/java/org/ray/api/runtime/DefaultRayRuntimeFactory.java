@@ -8,11 +8,17 @@ import java.lang.reflect.Method;
  */
 public class DefaultRayRuntimeFactory implements RayRuntimeFactory {
 
+  private RayInitConfig rayInitConfig;
+
+  public DefaultRayRuntimeFactory(RayInitConfig rayInitConfig) {
+    this.rayInitConfig = rayInitConfig;
+  }
+
   @Override
-  public RayRuntime createRayRuntime(RayInitConfig initConfig) {
+  public RayRuntime createRayRuntime() {
     try {
       Class clz;
-      if (initConfig.getRunMode().isNativeRuntime()) {
+      if (rayInitConfig.getRunMode().isNativeRuntime()) {
         clz = Class.forName("org.ray.runtime.RayNativeRuntime");
       } else {
         clz = Class.forName("org.ray.runtime.RayDevRuntime");

@@ -17,11 +17,11 @@ public final class Ray extends RayCall {
    * Initialize Ray runtime with the default runtime implementation.
    */
   public static void init() {
-    init(new DefaultRayRuntimeFactory(), new RayInitConfig());
+    init(new DefaultRayRuntimeFactory(new RayInitConfig()));
   }
 
   public static void init(RayInitConfig initConfig) {
-    init(new DefaultRayRuntimeFactory(), initConfig);
+    init(new DefaultRayRuntimeFactory(initConfig));
   }
 
   /**
@@ -29,9 +29,9 @@ public final class Ray extends RayCall {
    *
    * @param factory A factory that produces the runtime instance.
    */
-  public static synchronized void init(RayRuntimeFactory factory, RayInitConfig initConfig) {
+  public static synchronized void init(RayRuntimeFactory factory) {
     if (runtime == null) {
-      runtime = factory.createRayRuntime(initConfig);
+      runtime = factory.createRayRuntime();
     }
   }
 

@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.apache.arrow.plasma.PlasmaClient;
 import org.ray.api.WorkerMode;
-import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.functionmanager.NativeRemoteFunctionManager;
 import org.ray.runtime.functionmanager.NopRemoteFunctionManager;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
@@ -42,12 +41,11 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
   public void start() throws Exception {
     boolean isWorker = (rayConfig.workerMode == WorkerMode.WORKER);
 
-    // initialize params
     if (rayConfig.redisAddress.length() == 0) {
       if (isWorker) {
         throw new Error("Redis address must be configured under Worker mode.");
       }
-      startOnebox(params);
+      startOnebox();
       initStateStore(rayConfig.redisAddress);
     } else {
       initStateStore(rayConfig.redisAddress);
@@ -55,7 +53,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
         List<AddressInfo> nodes = stateStoreProxy.getAddressInfo(
                             rayConfig.nodeIp, rayConfig.redisAddress, 5);
         rayConfig.objectStoreName = nodes.get(0).storeName;
-        params.raylet_socket_name = nodes.get(0).rayletSocketName;
+        rayConfig.rayletSocketName = nodes.get(0).rayletSocketName;
       }
     }
 
@@ -69,16 +67,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       // recheck carefully
       WorkerContext.workerID = rayConfig.driverId;
     }
-    WorkerContext.init(rayConfig, params);
-
-    if (params.onebox_delay_seconds_before_run_app_logic > 0) {
-      for (int i = 0; i < params.onebox_delay_seconds_before_run_app_logic; ++i) {
-        System.err.println("Pause for debugger, "
-            + (params.onebox_delay_seconds_before_run_app_logic - i)
-            + " seconds left ...");
-        Thread.sleep(1000);
-      }
-    }
+    WorkerContext.init(rayConfig);
 
     if (rayConfig.workerMode != WorkerMode.NONE) {
       // initialize the links
@@ -90,7 +79,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       ObjectStoreLink plink = new PlasmaClient(rayConfig.objectStoreName, "", releaseDelay);
 
       RayletClient rayletClient = new RayletClientImpl(
-              params.raylet_socket_name,
+              rayConfig.rayletSocketName,
               WorkerContext.currentWorkerId(),
               isWorker,
               WorkerContext.currentTask().taskId
@@ -100,12 +89,12 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
       // register
       registerWorker(isWorker, rayConfig.nodeIp, rayConfig.objectStoreName,
-              params.raylet_socket_name);
+          rayConfig.rayletSocketName);
 
     }
 
     RayLog.core.info("RayNativeRuntime started with store {}, raylet {}",
-        rayConfig.objectStoreName, params.raylet_socket_name);
+        rayConfig.objectStoreName, rayConfig.rayletSocketName);
   }
 
   @Override
@@ -115,14 +104,14 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     }
   }
 
-  private void startOnebox(RayParameters params) throws Exception {
+  private void startOnebox() throws Exception {
     rayConfig.cleanup = true;
-    manager = new RunManager(rayConfig, params, configReader);
+    manager = new RunManager(rayConfig, configReader);
     manager.startRayHead(rayConfig);
 
     rayConfig.redisAddress = manager.info().redisAddress;
     rayConfig.objectStoreName = manager.info().localStores.get(0).storeName;
-    params.raylet_socket_name = manager.info().localStores.get(0).rayletSocketName;
+    rayConfig.rayletSocketName = manager.info().localStores.get(0).rayletSocketName;
   }
 
   private void initStateStore(String redisAddress) throws Exception {

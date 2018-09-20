@@ -40,7 +40,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   protected RayConfig rayConfig;
 
   protected ConfigReader configReader;
-  protected RayParameters params = null;
+  protected RayParameters params;
   protected Worker worker;
   protected RayletClient rayletClient;
   protected ObjectStoreProxy objectStoreProxy;
@@ -151,14 +151,14 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
       // Do an initial fetch for remote objects.
       List<List<UniqueId>> fetchBatches =
-          splitIntoBatches(objectIds, params.worker_fetch_request_size);
+          splitIntoBatches(objectIds, rayConfig.workerFetchRequestSize);
       for (List<UniqueId> batch : fetchBatches) {
         rayletClient.reconstructObjects(batch, true);
       }
 
       // Get the objects. We initially try to get the objects immediately.
       List<Pair<T, GetStatus>> ret = objectStoreProxy
-          .get(objectIds, params.default_first_check_timeout_ms, false);
+          .get(objectIds, rayConfig.defaultFirstCheckTimeoutMs, false);
       assert ret.size() == numObjectIds;
 
       // Mapping the object IDs that we haven't gotten yet to their original index in objectIds.
@@ -175,14 +175,14 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       while (unreadys.size() > 0) {
         List<UniqueId> unreadyList = new ArrayList<>(unreadys.keySet());
         List<List<UniqueId>> reconstructBatches =
-            splitIntoBatches(unreadyList, params.worker_fetch_request_size);
+            splitIntoBatches(unreadyList, rayConfig.workerFetchRequestSize);
 
         for (List<UniqueId> batch : reconstructBatches) {
           rayletClient.reconstructObjects(batch, false);
         }
 
         List<Pair<T, GetStatus>> results = objectStoreProxy
-            .get(unreadyList, params.default_get_check_interval_ms, false);
+            .get(unreadyList, rayConfig.defaultGetCheckIntervalMs, false);
 
         // Remove any entries for objects we received during this iteration so we
         // don't retrieve the same object twice.

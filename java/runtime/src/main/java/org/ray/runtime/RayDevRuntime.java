@@ -1,6 +1,5 @@
 package org.ray.runtime;
 
-import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.functionmanager.NopRemoteFunctionManager;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
 import org.ray.runtime.objectstore.MockObjectStore;

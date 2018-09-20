@@ -33,15 +33,14 @@ public class RayCli {
 
   private static RayCliArgs rayArgs = new RayCliArgs();
 
-  private static RunManager startRayHead(RayParameters params,
-      ConfigReader configReader) {
+  private static RunManager startRayHead(ConfigReader configReader) {
     final String DEFAULT_CONFIG_FILE = "ray.default.conf";
     final String CUSTOM_CONFIG_FILE = "ray.conf";
     Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
                         .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
     RayConfig rayConfig = new RayConfig(config);
 
-    RunManager manager = new RunManager(rayConfig, params, configReader);
+    RunManager manager = new RunManager(rayConfig, configReader);
 
     try {
       manager.startRayHead(rayConfig);
@@ -55,8 +54,8 @@ public class RayCli {
     return manager;
   }
 
-  private static RunManager startRayNode(RayConfig rayConfig, RayParameters params, ConfigReader configReader) {
-    RunManager manager = new RunManager(rayConfig, params, configReader);
+  private static RunManager startRayNode(RayConfig rayConfig, ConfigReader configReader) {
+    RunManager manager = new RunManager(rayConfig, configReader);
 
     try {
       manager.startRayNode();
@@ -71,7 +70,6 @@ public class RayCli {
   }
 
   private static RunManager startProcess(RayConfig rayConfig, CommandStart cmdStart, ConfigReader configReader) {
-    RayParameters params = new RayParameters(configReader);
 
     // Init RayLog before using it.
     RayLog.init(rayConfig.logDir);
@@ -79,9 +77,9 @@ public class RayCli {
     RayLog.core.info("Using IP address {} for this node.", rayConfig.nodeIp);
     RunManager manager;
     if (cmdStart.head) {
-      manager = startRayHead(params, configReader);
+      manager = startRayHead(configReader);
     } else {
-      manager = startRayNode(rayConfig, params, configReader);
+      manager = startRayNode(rayConfig, configReader);
     }
     return manager;
   }
@@ -157,8 +155,7 @@ public class RayCli {
                         .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
     RayConfig rayConfig = new RayConfig(config);
 
-    ConfigReader configReader = new ConfigReader(configPath, "ray.java.start.deploy=true");
-    RayParameters params = new RayParameters(configReader);
+    ConfigReader configReader = new ConfigReader(configPath, "");
 
     rayConfig.redisAddress = cmdSubmit.redisAddress;
     rayConfig.runMode = RunMode.CLUSTER;
@@ -219,7 +216,7 @@ public class RayCli {
     RayLog.rapp.debug("Find app class path  " + additionalClassPath);
 
     // Start driver process.
-    RunManager runManager = new RunManager(rayConfig, params, configReader);
+    RunManager runManager = new RunManager(rayConfig, configReader);
     Process proc = runManager.startDriver(
         DefaultDriver.class.getName(),
         cmdSubmit.redisAddress,

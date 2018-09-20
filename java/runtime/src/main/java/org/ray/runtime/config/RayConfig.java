@@ -27,7 +27,7 @@ public class RayConfig {
   public final String logDir;
   public final boolean redirectOutput;
   public boolean cleanup;
-  public final int numberRedisShards;
+  public int numberRedisShards;
   public final int defaultFirstCheckTimeoutMs;
   public final int defaultGetCheckIntervalMs;
   public final String jvmParamters;

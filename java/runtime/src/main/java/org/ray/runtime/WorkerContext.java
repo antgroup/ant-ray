@@ -30,7 +30,7 @@ public class WorkerContext {
    */
   private int currentTaskCallCount;
 
-  public static WorkerContext init(RayConfig rayConfig, RayParameters params) {
+  public static WorkerContext init(RayConfig rayConfig) {
     WorkerContext ctx = new WorkerContext();
     currentWorkerCtx.set(ctx);
 

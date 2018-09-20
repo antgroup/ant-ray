@@ -76,7 +76,7 @@ public class RayCli {
     // Init RayLog before using it.
     RayLog.init(params.log_dir);
 
-    RayLog.core.info("Using IP address {} for this node.", params.node_ip_address);
+    RayLog.core.info("Using IP address {} for this node.", rayConfig.nodeIp);
     RunManager manager;
     if (cmdStart.head) {
       manager = startRayHead(params, configReader);
@@ -225,7 +225,7 @@ public class RayCli {
         cmdSubmit.redisAddress,
         appId,
         appDir,
-        params.node_ip_address,
+        rayConfig.nodeIp,
         cmdSubmit.className,
         cmdSubmit.classArgs,
         additionalClassPath,

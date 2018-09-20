@@ -137,6 +137,7 @@ public class RunManager {
 
     cmd += " -Djava.library.path=" + StringUtil.mergeArray(rayConfig.javaJnilibPaths, ":");
     cmd += " -Dray.run-mode=" + rayConfig.runMode;
+    cmd += " -Dray.node-ip=" + ip;
     cmd += " -classpath " + StringUtil.mergeArray(rayConfig.javaClasspaths, ":");
 
     if (additionalClassPaths.length() > 0) {
@@ -152,7 +153,6 @@ public class RunManager {
     String section = "ray.java.start.";
     cmd += " --config=" + configReader.filePath();
     cmd += " --overwrite="
-        + section + "node_ip_address=" + ip + ";"
         + section + "redis_address=" + redisAddr + ";"
         + section + "log_dir=" + params.log_dir;
 
@@ -230,12 +230,12 @@ public class RunManager {
   private void startRayProcesses(RayConfig rayConfig) {
     Jedis redisClient = null;
 
-    RayLog.core.info("start ray processes @ " + params.node_ip_address + " ...");
+    RayLog.core.info("start ray processes @ " + rayConfig.nodeIp + " ...");
 
     // start primary redis
     if (params.redis_address.length() == 0) {
       List<String> primaryShards = startRedis(
-          params.node_ip_address, params.redis_port, 1, params.redirect, params.cleanup);
+          rayConfig.nodeIp, params.redis_port, 1, params.redirect, params.cleanup);
       params.redis_address = primaryShards.get(0);
 
       String[] args = params.redis_address.split(":");
@@ -253,7 +253,7 @@ public class RunManager {
     // start redis shards
     if (params.start_redis_shards) {
       runInfo.redisShards = startRedis(
-          params.node_ip_address, params.redis_port + 1, params.num_redis_shards,
+          rayConfig.nodeIp, params.redis_port + 1, params.num_redis_shards,
           params.redirect,
           params.cleanup);
 
@@ -272,7 +272,7 @@ public class RunManager {
     String storeName = "/tmp/plasma_store" + rpcPort;
 
     startObjectStore(0, info,
-            params.redis_address, params.node_ip_address, params.redirect, params.cleanup);
+            params.redis_address, rayConfig.nodeIp, params.redirect, params.cleanup);
 
     Map<String, Double> staticResources =
             ResourceUtil.getResourcesMapFromString(params.static_resources);
@@ -280,7 +280,7 @@ public class RunManager {
     //Start raylet
     startRaylet(storeName, info, params.num_workers,
             params.redis_address,
-            params.node_ip_address, params.redirect, staticResources, params.cleanup);
+            rayConfig.nodeIp, params.redirect, staticResources, params.cleanup);
 
     runInfo.localStores.add(info);
 
@@ -399,7 +399,7 @@ public class RunManager {
       e.printStackTrace();
     }
 
-    Jedis client = new Jedis(params.node_ip_address, port);
+    Jedis client = new Jedis(rayConfig.nodeIp, port);
 
     // Configure Redis to only generate notifications for the export keys.
     client.configSet("notify-keyspace-events", "Kl");

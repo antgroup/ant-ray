@@ -53,7 +53,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       initStateStore(params.redis_address);
       if (!isWorker) {
         List<AddressInfo> nodes = stateStoreProxy.getAddressInfo(
-                            params.node_ip_address, params.redis_address, 5);
+                            rayConfig.nodeIp, params.redis_address, 5);
         params.object_store_name = nodes.get(0).storeName;
         params.raylet_socket_name = nodes.get(0).rayletSocketName;
       }
@@ -99,7 +99,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       init(rayletClient, plink, funcMgr);
 
       // register
-      registerWorker(isWorker, params.node_ip_address, params.object_store_name,
+      registerWorker(isWorker, rayConfig.nodeIp, params.object_store_name,
               params.raylet_socket_name);
 
     }

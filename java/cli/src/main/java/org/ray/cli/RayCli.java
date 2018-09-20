@@ -160,7 +160,7 @@ public class RayCli {
     ConfigReader configReader = new ConfigReader(configPath, "ray.java.start.deploy=true");
     RayParameters params = new RayParameters(configReader);
 
-    params.redis_address = cmdSubmit.redisAddress;
+    rayConfig.redisAddress = cmdSubmit.redisAddress;
     rayConfig.runMode = RunMode.CLUSTER;
 
 

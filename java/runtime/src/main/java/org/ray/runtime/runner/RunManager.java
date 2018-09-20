@@ -60,7 +60,7 @@ public class RunManager {
   }
 
   public void startRayHead(RayConfig rayConfig) throws Exception {
-    if (params.redis_address.length() != 0) {
+    if (rayConfig.redisAddress.length() != 0) {
       throw new Exception("Redis address must be empty in head node.");
     }
     if (params.num_redis_shards <= 0) {
@@ -73,7 +73,7 @@ public class RunManager {
   }
 
   public void startRayNode() throws Exception {
-    if (params.redis_address.length() == 0) {
+    if (rayConfig.redisAddress.length() == 0) {
       throw new Exception("Redis address cannot be empty in non-head node.");
     }
     if (params.num_redis_shards != 0) {
@@ -153,7 +153,6 @@ public class RunManager {
     String section = "ray.java.start.";
     cmd += " --config=" + configReader.filePath();
     cmd += " --overwrite="
-        + section + "redis_address=" + redisAddr + ";"
         + section + "log_dir=" + params.log_dir;
 
     if (additionalConfigs.length() > 0) {
@@ -233,22 +232,22 @@ public class RunManager {
     RayLog.core.info("start ray processes @ " + rayConfig.nodeIp + " ...");
 
     // start primary redis
-    if (params.redis_address.length() == 0) {
+    if (rayConfig.redisAddress.length() == 0) {
       List<String> primaryShards = startRedis(
           rayConfig.nodeIp, params.redis_port, 1, params.redirect, params.cleanup);
-      params.redis_address = primaryShards.get(0);
+      rayConfig.redisAddress = primaryShards.get(0);
 
-      String[] args = params.redis_address.split(":");
+      String[] args = rayConfig.redisAddress.split(":");
       redisClient = new Jedis(args[0], Integer.parseInt(args[1]));
 
       // Register the number of Redis shards in the primary shard, so that clients
       // know how many redis shards to expect under RedisShards.
       redisClient.set("NumRedisShards", Integer.toString(params.num_redis_shards));
     } else {
-      String[] args = params.redis_address.split(":");
+      String[] args = rayConfig.redisAddress.split(":");
       redisClient = new Jedis(args[0], Integer.parseInt(args[1]));
     }
-    runInfo.redisAddress = params.redis_address;
+    runInfo.redisAddress = rayConfig.redisAddress;
 
     // start redis shards
     if (params.start_redis_shards) {
@@ -272,15 +271,15 @@ public class RunManager {
     String storeName = "/tmp/plasma_store" + rpcPort;
 
     startObjectStore(0, info,
-            params.redis_address, rayConfig.nodeIp, params.redirect, params.cleanup);
+        rayConfig.redisAddress, rayConfig.nodeIp, params.redirect, params.cleanup);
 
     Map<String, Double> staticResources =
             ResourceUtil.getResourcesMapFromString(params.static_resources);
 
     //Start raylet
     startRaylet(storeName, info, params.num_workers,
-            params.redis_address,
-            rayConfig.nodeIp, params.redirect, staticResources, params.cleanup);
+        rayConfig.redisAddress,
+        rayConfig.nodeIp, params.redirect, staticResources, params.cleanup);
 
     runInfo.localStores.add(info);
 
@@ -477,6 +476,7 @@ public class RunManager {
 
     String jvmArgs = "";
     jvmArgs += " -Dlogging.path=" + params.log_dir;
+    jvmArgs += " -Dray.redis.address=" + rayConfig.redisAddress;
     jvmArgs += " -Dlogging.file.name=core-*pid_suffix*";
     //jvmArgs += " -Dray.worker.mode=WORKER";
 

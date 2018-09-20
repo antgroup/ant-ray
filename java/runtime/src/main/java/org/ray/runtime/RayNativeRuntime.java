@@ -43,17 +43,17 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     boolean isWorker = (rayConfig.workerMode == WorkerMode.WORKER);
 
     // initialize params
-    if (params.redis_address.length() == 0) {
+    if (rayConfig.redisAddress.length() == 0) {
       if (isWorker) {
         throw new Error("Redis address must be configured under Worker mode.");
       }
       startOnebox(params);
-      initStateStore(params.redis_address);
+      initStateStore(rayConfig.redisAddress);
     } else {
-      initStateStore(params.redis_address);
+      initStateStore(rayConfig.redisAddress);
       if (!isWorker) {
         List<AddressInfo> nodes = stateStoreProxy.getAddressInfo(
-                            rayConfig.nodeIp, params.redis_address, 5);
+                            rayConfig.nodeIp, rayConfig.redisAddress, 5);
         params.object_store_name = nodes.get(0).storeName;
         params.raylet_socket_name = nodes.get(0).rayletSocketName;
       }
@@ -120,7 +120,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     manager = new RunManager(rayConfig, params, configReader);
     manager.startRayHead(rayConfig);
 
-    params.redis_address = manager.info().redisAddress;
+    rayConfig.redisAddress = manager.info().redisAddress;
     params.object_store_name = manager.info().localStores.get(0).storeName;
     params.raylet_socket_name = manager.info().localStores.get(0).rayletSocketName;
   }

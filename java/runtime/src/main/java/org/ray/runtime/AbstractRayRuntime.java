@@ -6,12 +6,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ray.api.*;
 import org.ray.api.function.RayFunc;
 import org.ray.api.id.UniqueId;
 import org.ray.api.runtime.RayRuntime;
+import org.ray.runtime.config.RayConfig;
 import org.ray.runtime.config.RayParameters;
 import org.ray.runtime.functionmanager.LocalFunctionManager;
 import org.ray.runtime.functionmanager.RayMethod;
@@ -32,6 +36,8 @@ import org.ray.runtime.util.logger.RayLog;
  * Core functionality to implement Ray APIs.
  */
 public abstract class AbstractRayRuntime implements RayRuntime {
+
+  protected RayConfig rayConfig;
 
   protected ConfigReader configReader;
   protected RayParameters params = null;
@@ -73,6 +79,13 @@ public abstract class AbstractRayRuntime implements RayRuntime {
               "Please set config file path in env RAY_CONFIG or property ray.config");
         }
       }
+
+      final String DEFAULT_CONFIG_FILE = "ray.default.conf";
+      final String CUSTOM_CONFIG_FILE = "ray.conf";
+      Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
+                        .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
+      rayConfig = new RayConfig(config);
+
       configReader = new ConfigReader(configPath, updateConfigStr);
       params = new RayParameters(configReader);
 

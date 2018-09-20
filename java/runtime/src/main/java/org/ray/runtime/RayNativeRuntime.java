@@ -117,8 +117,8 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
   private void startOnebox(RayParameters params) throws Exception {
     params.cleanup = true;
-    manager = new RunManager(params, configReader);
-    manager.startRayHead();
+    manager = new RunManager(rayConfig, params, configReader);
+    manager.startRayHead(rayConfig);
 
     params.redis_address = manager.info().redisAddress;
     params.object_store_name = manager.info().localStores.get(0).storeName;

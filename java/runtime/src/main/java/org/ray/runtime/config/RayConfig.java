@@ -38,7 +38,8 @@ public class RayConfig {
   public final String staticResources;
 
   public final String rayHome;
-  public final List<String> javaJnilibPaths;
+  public final String[] javaClasspaths;
+  public final String[] javaJnilibPaths;
   public final String redisServerPath;
   public final String redisModulePath;
   public final String plasmaStorePath;
@@ -100,10 +101,17 @@ public class RayConfig {
 
 
     //TODO(qwang): We should delete the lastest '/'.
-    javaJnilibPaths = new ArrayList<>();
-    redisServerPath = rayHome + "/bin/redis-server";
-    redisModulePath = rayHome + "/bin/redis-module";
-    plasmaStorePath = rayHome + "/bin/plasmastore";
-    rayletPath = rayHome + "/bin/raylet";
+    javaClasspaths = new String[2];
+    javaClasspaths[0] = rayHome + "/java/test/target/classes";
+    javaClasspaths[1] = rayHome + "/java/test/lib/*";
+
+    javaJnilibPaths = new String[2];
+    javaJnilibPaths[0] = rayHome + "/build/src/plasma";
+    javaJnilibPaths[1] = rayHome + "/build/src/local_scheduler";
+
+    redisServerPath = rayHome + "/build/src/common/thirdparty/redis/src/redis-server";
+    redisModulePath = rayHome + "/build/src/common/redis_module/libray_redis_module.so";
+    plasmaStorePath = rayHome + "/build/src/plasma/plasma_store_server";
+    rayletPath = rayHome + "/build/src/ray/raylet/raylet";
   }
 }

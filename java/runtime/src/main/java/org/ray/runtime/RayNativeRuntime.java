@@ -40,7 +40,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
   @Override
   public void start() throws Exception {
-    boolean isWorker = (params.worker_mode == WorkerMode.WORKER);
+    boolean isWorker = (rayConfig.workerMode == WorkerMode.WORKER);
 
     // initialize params
     if (params.redis_address.length() == 0) {
@@ -64,12 +64,12 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
         ? new NopRemoteFunctionManager(params.driver_id) : new NativeRemoteFunctionManager(kvStore);
 
     // initialize worker context
-    if (params.worker_mode == WorkerMode.DRIVER) {
+    if (rayConfig.workerMode == WorkerMode.DRIVER) {
       // TODO: The relationship between workerID, driver_id and dummy_task.driver_id should be
       // recheck carefully
       WorkerContext.workerID = params.driver_id;
     }
-    WorkerContext.init(params);
+    WorkerContext.init(rayConfig, params);
 
     if (params.onebox_delay_seconds_before_run_app_logic > 0) {
       for (int i = 0; i < params.onebox_delay_seconds_before_run_app_logic; ++i) {
@@ -80,7 +80,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       }
     }
 
-    if (params.worker_mode != WorkerMode.NONE) {
+    if (rayConfig.workerMode != WorkerMode.NONE) {
       // initialize the links
       //TODO(qwang): We should use `releaseDelay` as a config item.
       //int releaseDelay = AbstractRayRuntime.configReader

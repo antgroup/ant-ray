@@ -18,6 +18,8 @@ public class DefaultDriver {
   //
   public static void main(String[] args) {
     try {
+      System.setProperty("ray.worker.mode", "DRIVER");
+
       RayInitConfig initConfig = new RayInitConfig(args);
       //TODO(qwang): We shouldn't specify RUnMode in code.
       initConfig.setRunMode(RunMode.SINGLE_BOX);

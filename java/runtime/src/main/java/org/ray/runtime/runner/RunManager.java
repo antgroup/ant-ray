@@ -465,8 +465,8 @@ public class RunManager {
       UniqueId actorId, String actorClass,
       String ip, String redisAddress) {
     String workerConfigs = "ray.java.start.object_store_name=" + storeName
-        + ";ray.java.start.raylet_socket_name=" + rayletSocketName
-        + ";ray.java.start.worker_mode=WORKER";
+        + ";ray.java.start.raylet_socket_name=" + rayletSocketName;
+        //+ ";ray.java.start.worker_mode=WORKER";
     workerConfigs += ";ray.java.start.deploy=" + params.deploy;
     if (!actorId.equals(UniqueId.NIL)) {
       workerConfigs += ";ray.java.start.actor_id=" + actorId;
@@ -478,6 +478,7 @@ public class RunManager {
     String jvmArgs = "";
     jvmArgs += " -Dlogging.path=" + params.log_dir;
     jvmArgs += " -Dlogging.file.name=core-*pid_suffix*";
+    //jvmArgs += " -Dray.worker.mode=WORKER";
 
     return buildJavaProcessCommand(
         RunInfo.ProcessType.PT_WORKER,

@@ -48,24 +48,16 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
   // app level Ray.init()
   // make it private so there is no direct usage but only from Ray.init
-  public void init() {
-    try {
-      final String DEFAULT_CONFIG_FILE = "ray.default.conf";
-      final String CUSTOM_CONFIG_FILE = "ray.conf";
-      Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
-                          .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
-      rayConfig = new RayConfig(config);
-      RayLog.init(rayConfig.logDir);
+  public void init(RayConfig rayConfig) {
+    this.rayConfig = rayConfig;
+    RayLog.init(rayConfig.logDir);
 
-      try {
-        start();
-      } catch (Exception e) {
-        RayLog.core.error("Failed to init RayRuntime", e);
-        System.exit(-1);
-      }
+    try {
+      start();
     } catch (Exception e) {
       e.printStackTrace();
-      throw new RuntimeException("Ray.init failed", e);
+      RayLog.core.error("Failed to init RayRuntime", e);
+      System.exit(-1);
     }
   }
 

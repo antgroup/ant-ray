@@ -17,8 +17,6 @@ public class RayConfig {
   public final WorkerMode workerMode;
   public RunMode runMode;
   public final String nodeIp;
-  ///public final String redisIp;
-  ///public final int redisPort;
   public String redisAddress;
   public final UniqueId driverId;
   public final String logDir;
@@ -59,13 +57,6 @@ public class RayConfig {
     }
     nodeIp = ip;
     redisAddress = config.getString("ray.redis.address");
-    ///String[] tp = redisAddress.split(":");
-    ///if (tp.length != 2) {
-    ///  throw new RuntimeException("The configuration of redis-address is not correct.");
-    ///}
-    ///redisIp = tp[0];
-    ///redisPort = Integer.valueOf(tp[1]);
-
     objectStoreName = config.getString("ray.object-store.name");
 
     UniqueId uniqueId = null;

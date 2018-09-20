@@ -54,7 +54,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       if (!isWorker) {
         List<AddressInfo> nodes = stateStoreProxy.getAddressInfo(
                             rayConfig.nodeIp, rayConfig.redisAddress, 5);
-        params.object_store_name = nodes.get(0).storeName;
+        rayConfig.objectStoreName = nodes.get(0).storeName;
         params.raylet_socket_name = nodes.get(0).rayletSocketName;
       }
     }
@@ -87,7 +87,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       //    .getIntegerValue("ray", "plasma_default_release_delay", 0,
       //        "how many release requests should be delayed in plasma client");
       int releaseDelay = 0;
-      ObjectStoreLink plink = new PlasmaClient(params.object_store_name, "", releaseDelay);
+      ObjectStoreLink plink = new PlasmaClient(rayConfig.objectStoreName, "", releaseDelay);
 
       RayletClient rayletClient = new RayletClientImpl(
               params.raylet_socket_name,
@@ -99,13 +99,13 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       init(rayletClient, plink, funcMgr);
 
       // register
-      registerWorker(isWorker, rayConfig.nodeIp, params.object_store_name,
+      registerWorker(isWorker, rayConfig.nodeIp, rayConfig.objectStoreName,
               params.raylet_socket_name);
 
     }
 
     RayLog.core.info("RayNativeRuntime started with store {}, raylet {}",
-        params.object_store_name, params.raylet_socket_name);
+        rayConfig.objectStoreName, params.raylet_socket_name);
   }
 
   @Override
@@ -121,7 +121,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     manager.startRayHead(rayConfig);
 
     rayConfig.redisAddress = manager.info().redisAddress;
-    params.object_store_name = manager.info().localStores.get(0).storeName;
+    rayConfig.objectStoreName = manager.info().localStores.get(0).storeName;
     params.raylet_socket_name = manager.info().localStores.get(0).rayletSocketName;
   }
 

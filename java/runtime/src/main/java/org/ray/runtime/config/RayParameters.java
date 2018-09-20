@@ -87,15 +87,15 @@ public class RayParameters {
   //TODO(qwang): Write the default vaule.
   @AConfig(comment = "Additional class path for JAVA")
   public String[] java_class_paths = {
-      "/Users/wangqing/Workspace/source/refactor/ray/java/api/target/classes",
-      "/Users/wangqing/Workspace/source/refactor/ray/java/api/target/test-classes",
-      "/Users/wangqing/Workspace/source/refactor/ray/java/runtime/target/classes",
-      "/Users/wangqing/Workspace/source/refactor/ray/java/runtime/target/test-classes",
-      "/Users/wangqing/Workspace/source/refactor/ray/java/tutorial/target/classes",
-      "/Users/wangqing/Workspace/source/refactor/ray/java/test/target/classes",
-      "/Users/wangqing/Workspace/source/refactor/ray/java/test/target/test-classes",
-      "/Users/wangqing/Workspace/source/refactor/ray/java/test/lib/*",
-      "/Users/wangqing/Workspace/source/refactor/ray/java/conf"};
+      "/Users/wangqing/Workspace/source/batch_timeout/ray/java/api/target/classes",
+      "/Users/wangqing/Workspace/source/batch_timeout/ray/java/api/target/test-classes",
+      "/Users/wangqing/Workspace/source/batch_timeout/ray/java/runtime/target/classes",
+      "/Users/wangqing/Workspace/source/batch_timeout/ray/java/runtime/target/test-classes",
+      "/Users/wangqing/Workspace/source/batch_timeout/ray/java/tutorial/target/classes",
+      "/Users/wangqing/Workspace/source/batch_timeout/ray/java/test/target/classes",
+      "/Users/wangqing/Workspace/source/batch_timeout/ray/java/test/target/test-classes",
+      "/Users/wangqing/Workspace/source/batch_timeout/ray/java/test/lib/*",
+      "/Users/wangqing/Workspace/source/batch_timeout/ray/java/conf"};
   @AConfig(comment = "Additional JNI library paths for JAVA")
   public String[] java_jnilib_paths = {
       "/Users/wangqing/Workspace/source/refactor/ray/build/src/plasma",

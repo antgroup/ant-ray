@@ -161,7 +161,7 @@ public class RayCli {
     RayParameters params = new RayParameters(configReader);
 
     params.redis_address = cmdSubmit.redisAddress;
-    params.run_mode = RunMode.CLUSTER;
+    rayConfig.runMode = RunMode.CLUSTER;
 
 
     KeyValueStoreLink kvStore = new RedisClient();

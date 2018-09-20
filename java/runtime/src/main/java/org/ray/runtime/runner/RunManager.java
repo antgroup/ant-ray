@@ -136,6 +136,7 @@ public class RunManager {
     }
 
     cmd += " -Djava.library.path=" + StringUtil.mergeArray(rayConfig.javaJnilibPaths, ":");
+    cmd += " -Dray.run-mode=" + rayConfig.runMode;
     cmd += " -classpath " + StringUtil.mergeArray(rayConfig.javaClasspaths, ":");
 
     if (additionalClassPaths.length() > 0) {
@@ -153,8 +154,7 @@ public class RunManager {
     cmd += " --overwrite="
         + section + "node_ip_address=" + ip + ";"
         + section + "redis_address=" + redisAddr + ";"
-        + section + "log_dir=" + params.log_dir + ";"
-        + section + "run_mode=" + params.run_mode;
+        + section + "log_dir=" + params.log_dir;
 
     if (additionalConfigs.length() > 0) {
       cmd += ";" + additionalConfigs;

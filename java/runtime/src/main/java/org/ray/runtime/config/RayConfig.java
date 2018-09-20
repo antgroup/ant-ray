@@ -18,7 +18,7 @@ public class RayConfig {
 
   // Configuration fields.
   public final WorkerMode workerMode;
-  public final RunMode runMode;
+  public RunMode runMode;
   public final String nodeIp;
   public final String redisIp;
   public final int redisPort;

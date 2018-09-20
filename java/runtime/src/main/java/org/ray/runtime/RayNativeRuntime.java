@@ -60,7 +60,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     }
 
     // initialize remote function manager
-    RemoteFunctionManager funcMgr = params.run_mode.isDevPathManager()
+    RemoteFunctionManager funcMgr = rayConfig.runMode.isDevPathManager()
         ? new NopRemoteFunctionManager(params.driver_id) : new NativeRemoteFunctionManager(kvStore);
 
     // initialize worker context

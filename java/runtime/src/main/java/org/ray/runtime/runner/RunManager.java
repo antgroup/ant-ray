@@ -267,7 +267,7 @@ public class RunManager {
     AddressInfo info = new AddressInfo();
 
     // Start object store
-    int rpcPort = params.object_store_rpc_port;
+    int rpcPort = rayConfig.objectStoreNameIndex;
     String storeName = "/tmp/plasma_store" + rpcPort;
 
     startObjectStore(0, info,
@@ -496,7 +496,7 @@ public class RunManager {
     int occupiedMemoryMb = params.object_store_occupied_memory_MB;
     long memoryBytes = occupiedMemoryMb * 1000000;
     String filePath = rayConfig.plasmaStorePath;
-    int rpcPort = params.object_store_rpc_port + index;
+    int rpcPort = rayConfig.objectStoreNameIndex + index;
     String name = "/tmp/plasma_store" + rpcPort;
     String rpcAddr = "";
     String cmd = filePath + " -s " + name + " -m " + memoryBytes;

@@ -46,6 +46,7 @@ public class RayConfig {
   public final String rayletPath;
 
   ////
+  public final int objectStoreNameIndex;
   public String objectStoreName;
   public String rayletSocketName;
 
@@ -86,7 +87,7 @@ public class RayConfig {
       dir = "/tmp/raylogs";
     }
     logDir = dir;
-
+    objectStoreNameIndex = config.getInt("ray.object-store.name-index");
     redirectOutput = config.getBoolean("ray.redirect-output");
     cleanup = config.getBoolean("ray.cleanup");
     numberRedisShards = config.getInt("ray.number-redis-shards");

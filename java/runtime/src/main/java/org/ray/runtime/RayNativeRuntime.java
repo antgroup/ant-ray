@@ -85,7 +85,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
               WorkerContext.currentTask().taskId
       );
 
-      init(rayletClient, plink, funcMgr);
+      initMembers(rayletClient, plink, funcMgr);
 
       // register
       registerWorker(isWorker, rayConfig.nodeIp, rayConfig.objectStoreName,
@@ -95,6 +95,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
     RayLog.core.info("RayNativeRuntime started with store {}, raylet {}",
         rayConfig.objectStoreName, rayConfig.rayletSocketName);
+
   }
 
   @Override

@@ -69,7 +69,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     }
   }
 
-  protected void init(
+  protected void initMembers(
       RayletClient slink,
       ObjectStoreLink plink,
       RemoteFunctionManager remoteLoader

@@ -12,7 +12,7 @@ public class RayDevRuntime extends AbstractRayRuntime {
     RemoteFunctionManager rfm = new NopRemoteFunctionManager(rayConfig.driverId);
     MockObjectStore store = new MockObjectStore();
     MockRayletClient scheduler = new MockRayletClient(this, store);
-    init(scheduler, store, rfm);
+    initMembers(scheduler, store, rfm);
     scheduler.setLocalFunctionManager(this.functions);
   }
 

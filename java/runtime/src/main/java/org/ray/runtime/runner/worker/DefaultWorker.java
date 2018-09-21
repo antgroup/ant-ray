@@ -1,7 +1,7 @@
 package org.ray.runtime.runner.worker;
 
+import org.ray.api.Ray;
 import org.ray.runtime.AbstractRayRuntime;
-import org.ray.runtime.config.WorkerMode;
 
 /**
  * default worker implementation.
@@ -16,9 +16,9 @@ public class DefaultWorker {
   //
   public static void main(String[] args) {
     try {
-      AbstractRayRuntime.init(args);
-      assert AbstractRayRuntime.getParams().worker_mode == WorkerMode.WORKER;
-      AbstractRayRuntime.getInstance().loop();
+      System.setProperty("ray.worker.mode", "WORKER");
+      Ray.init();
+      ((AbstractRayRuntime)Ray.internal()).loop();
       throw new RuntimeException("Control flow should never reach here");
 
     } catch (Throwable e) {

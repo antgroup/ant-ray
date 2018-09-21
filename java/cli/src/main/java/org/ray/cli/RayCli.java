@@ -1,15 +1,13 @@
 package org.ray.cli;
 
 import com.beust.jcommander.JCommander;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import net.lingala.zip4j.core.ZipFile;
+import org.ray.api.RunMode;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.config.PathConfig;
-import org.ray.runtime.config.RayParameters;
-import org.ray.runtime.config.RunMode;
+import org.ray.runtime.config.RayConfig;
 import org.ray.runtime.functionmanager.NativeRemoteFunctionManager;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
 import org.ray.runtime.gcs.KeyValueStoreLink;
@@ -19,8 +17,7 @@ import org.ray.runtime.gcs.StateStoreProxyImpl;
 import org.ray.runtime.runner.RunManager;
 import org.ray.runtime.runner.worker.DefaultDriver;
 import org.ray.runtime.util.FileUtil;
-import org.ray.runtime.util.config.ConfigReader;
-import org.ray.runtime.util.logger.RayLog;
+import org.ray.runtime.util.RayLog;
 
 
 /**
@@ -30,9 +27,10 @@ public class RayCli {
 
   private static RayCliArgs rayArgs = new RayCliArgs();
 
-  private static RunManager startRayHead(RayParameters params, PathConfig paths,
-      ConfigReader configReader) {
-    RunManager manager = new RunManager(params, paths, configReader);
+  private static RayConfig rayConfig = new RayConfig();
+
+  private static RunManager startRayHead() {
+    RunManager manager = new RunManager(rayConfig);
 
     try {
       manager.startRayHead();
@@ -46,10 +44,8 @@ public class RayCli {
     return manager;
   }
 
-  private static RunManager startRayNode(RayParameters params, PathConfig paths,
-      ConfigReader configReader) {
-    RunManager manager = new RunManager(params, paths, configReader);
-
+  private static RunManager startRayNode() {
+    RunManager manager = new RunManager(rayConfig);
     try {
       manager.startRayNode();
     } catch (Exception e) {
@@ -62,25 +58,23 @@ public class RayCli {
     return manager;
   }
 
-  private static RunManager startProcess(CommandStart cmdStart, ConfigReader config) {
-    PathConfig paths = new PathConfig(config);
-    RayParameters params = new RayParameters(config);
+  private static RunManager startProcess(CommandStart cmdStart) {
 
     // Init RayLog before using it.
-    RayLog.init(params.log_dir);
+    RayLog.init(rayConfig.logDir);
 
-    RayLog.core.info("Using IP address {} for this node.", params.node_ip_address);
+    RayLog.core.info("Using IP address {} for this node.", rayConfig.nodeIp);
     RunManager manager;
     if (cmdStart.head) {
-      manager = startRayHead(params, paths, config);
+      manager = startRayHead();
     } else {
-      manager = startRayNode(params, paths, config);
+      manager = startRayNode();
     }
     return manager;
   }
 
-  private static void start(CommandStart cmdStart, ConfigReader reader) {
-    startProcess(cmdStart, reader);
+  private static void start(CommandStart cmdStart) {
+    startProcess(cmdStart);
   }
 
   private static void stop(CommandStop cmdStop) {
@@ -109,41 +103,11 @@ public class RayCli {
       RayLog.core.warn("exception in killing ray processes");
     }
   }
-
-  private static String[] buildRayRuntimeArgs(CommandSubmit cmdSubmit) {
-
-    if (cmdSubmit.redisAddress == null) {
-      throw new RuntimeException(
-          "--redis-address must be specified to submit a job");      
-    }
-
-    List<String> argList = new ArrayList<String>();
-    String section = "ray.java.start.";
-    String overwrite = "--overwrite="
-        + section + "redis_address=" + cmdSubmit.redisAddress + ";"
-        + section + "run_mode=" + "CLUSTER";
-
-    argList.add(overwrite);
-
-    if (cmdSubmit.config != null) {
-      String config = "--config=" + cmdSubmit.config;
-      argList.add(config);
-    }
-
-    String[] args = new String[argList.size()];
-    argList.toArray(args);
-
-    return args;
-  }
  
-  private static void submit(CommandSubmit cmdSubmit, String configPath) throws Exception {
-    ConfigReader config = new ConfigReader(configPath, "ray.java.start.deploy=true");
-    PathConfig paths = new PathConfig(config);
-    RayParameters params = new RayParameters(config);
+  private static void submit(CommandSubmit cmdSubmit) throws Exception {
 
-    params.redis_address = cmdSubmit.redisAddress;
-    params.run_mode = RunMode.CLUSTER;
-
+    rayConfig.redisAddress = cmdSubmit.redisAddress;
+    rayConfig.runMode = RunMode.CLUSTER;
 
     KeyValueStoreLink kvStore = new RedisClient();
     kvStore.setAddr(cmdSubmit.redisAddress);
@@ -162,12 +126,12 @@ public class RayCli {
     UniqueId resourceId = functionManager.registerResource(zip);
 
     // Init RayLog before using it.
-    RayLog.init(params.log_dir);
+    RayLog.init(rayConfig.logDir);
 
     RayLog.rapp.debug(
         "registerResource " + resourceId + " for package " + packageName + " done");
 
-    UniqueId appId = params.driver_id;
+    UniqueId appId = rayConfig.driverId;
     functionManager.registerApp(appId, resourceId);
     RayLog.rapp.debug("registerApp " + appId + " for resouorce " + resourceId + " done");
   
@@ -200,13 +164,13 @@ public class RayCli {
     RayLog.rapp.debug("Find app class path  " + additionalClassPath);
 
     // Start driver process.
-    RunManager runManager = new RunManager(params, paths, config);
+    RunManager runManager = new RunManager(rayConfig);
     Process proc = runManager.startDriver(
         DefaultDriver.class.getName(),
         cmdSubmit.redisAddress,
         appId,
         appDir,
-        params.node_ip_address,
+        rayConfig.nodeIp,
         cmdSubmit.className,
         cmdSubmit.classArgs,
         additionalClassPath,
@@ -221,24 +185,6 @@ public class RayCli {
 
     RayLog.rapp
     .info("Create app " + appDir + " for package " + packageName + " succeeded");
-  }
-
-  private static String getConfigPath(String config) {
-    String configPath;
-
-    if (config != null && !config.equals("")) {
-      configPath = config;
-    } else {
-      configPath = System.getenv("RAY_CONFIG");
-      if (configPath == null) {
-        configPath = System.getProperty("ray.config");
-      }
-      if (configPath == null) {
-        throw new RuntimeException(
-            "Please set config file path in env RAY_CONFIG or property ray.config");
-      }
-    }
-    return configPath;
   }
 
   public static void main(String[] args) throws Exception {
@@ -264,20 +210,16 @@ public class RayCli {
       System.exit(0);
     }
 
-    String configPath;
     switch (cmd) {
       case "start": {
-        configPath = getConfigPath(cmdStart.config);
-        ConfigReader config = new ConfigReader(configPath, cmdStart.overwrite);
-        start(cmdStart, config);
+        start(cmdStart);
       }
       break;
       case "stop":
         stop(cmdStop);
         break;
       case "submit":
-        configPath = getConfigPath(cmdSubmit.config);
-        submit(cmdSubmit, configPath);
+        submit(cmdSubmit);
         break;
       default:
         rayCommander.usage();

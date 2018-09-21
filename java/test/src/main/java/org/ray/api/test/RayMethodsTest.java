@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.ray.api.Ray;
 import org.ray.api.RayObject;
 import org.ray.api.WaitResult;
-import org.ray.runtime.util.logger.RayLog;
+import org.ray.runtime.util.RayLog;
 
 /**
  * Integration test for Ray.*

@@ -3,7 +3,6 @@ package org.ray.runtime.util;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.concurrent.locks.ReentrantLock;
-import org.ray.runtime.util.logger.RayLog;
 
 /**
  * some utilities for system process.

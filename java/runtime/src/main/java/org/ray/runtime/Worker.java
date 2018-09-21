@@ -6,7 +6,7 @@ import org.ray.api.id.UniqueId;
 import org.ray.runtime.functionmanager.RayMethod;
 import org.ray.runtime.task.ArgumentsBuilder;
 import org.ray.runtime.task.TaskSpec;
-import org.ray.runtime.util.logger.RayLog;
+import org.ray.runtime.util.RayLog;
 
 /**
  * The worker, which pulls tasks from {@code org.ray.spi.LocalSchedulerProxy} and executes them
@@ -41,8 +41,11 @@ public class Worker {
           spec.driverId, spec.actorId, spec.functionId, spec.args);
       ClassLoader classLoader = pair.getLeft();
       RayMethod method = pair.getRight();
-      // Set context
-      WorkerContext.prepare(spec, classLoader);
+
+      // Set worker context.
+      runtime.workerContext.setCurrentTask(spec);
+      runtime.workerContext.setCurrentClassLoader(classLoader);
+
       Thread.currentThread().setContextClassLoader(classLoader);
       // Get local actor object and arguments.
       Object actor = spec.isActorTask() ? runtime.localActors.get(spec.actorId) : null;

@@ -1,18 +1,21 @@
 package org.ray.runtime;
 
+import org.ray.api.WorkerMode;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.config.RayParameters;
-import org.ray.runtime.config.WorkerMode;
 import org.ray.runtime.task.TaskSpec;
 
 public class WorkerContext {
 
-  private static final ThreadLocal<WorkerContext> currentWorkerCtx =
-      ThreadLocal.withInitial(() -> init(AbstractRayRuntime.getParams()));
+  /**
+   * The mode of this worker.
+   */
+  private final WorkerMode workerMode;
+
   /**
    * id of worker.
    */
-  public static UniqueId workerID = UniqueId.randomId();
+  private UniqueId workerId = UniqueId.randomId();
+
   /**
    * current doing task.
    */
@@ -30,53 +33,60 @@ public class WorkerContext {
    */
   private int currentTaskCallCount;
 
-  public static WorkerContext init(RayParameters params) {
-    WorkerContext ctx = new WorkerContext();
-    currentWorkerCtx.set(ctx);
+  public WorkerContext(WorkerMode workerMode, UniqueId driverId) {
 
+    this.workerMode = workerMode;
+
+    // Initialize some member variables.
+    currentTask = createDummyTask(driverId);
+    currentTaskPutCount = 0;
+    currentTaskCallCount = 0;
+    currentClassLoader = null;
+  }
+
+  public void setWorkerId(UniqueId workerId) {
+    this.workerId = workerId;
+  }
+
+  public TaskSpec getCurrentTask() {
+    return currentTask;
+  }
+
+  public int nextPutIndex() {
+    return ++currentTaskPutCount;
+  }
+
+  public int nextCallIndex() {
+    return ++currentTaskCallCount;
+  }
+
+  public UniqueId getCurrentWorkerId() {
+    return workerId;
+  }
+
+  public ClassLoader getCurrentClassLoader() {
+    return currentClassLoader;
+  }
+
+  public void setCurrentTask(TaskSpec currentTask) {
+    this.currentTask = currentTask;
+  }
+
+  public void setCurrentClassLoader(ClassLoader currentClassLoader) {
+    this.currentClassLoader = currentClassLoader;
+  }
+
+  private TaskSpec createDummyTask(UniqueId driverId) {
     TaskSpec dummy = new TaskSpec();
     dummy.parentTaskId = UniqueId.NIL;
-    if (params.worker_mode == WorkerMode.DRIVER) {
+    if (workerMode == WorkerMode.DRIVER) {
       dummy.taskId = UniqueId.randomId();
     } else {
       dummy.taskId = UniqueId.NIL;
     }
     dummy.actorId = UniqueId.NIL;
-    dummy.driverId = params.driver_id;
-    prepare(dummy, null);
+    dummy.driverId = driverId;
 
-    return ctx;
-  }
-
-  public static void prepare(TaskSpec task, ClassLoader classLoader) {
-    WorkerContext wc = get();
-    wc.currentTask = task;
-    wc.currentTaskPutCount = 0;
-    wc.currentTaskCallCount = 0;
-    wc.currentClassLoader = classLoader;
-  }
-
-  public static WorkerContext get() {
-    return currentWorkerCtx.get();
-  }
-
-  public static TaskSpec currentTask() {
-    return get().currentTask;
-  }
-
-  public static int nextPutIndex() {
-    return ++get().currentTaskPutCount;
-  }
-
-  public static int nextCallIndex() {
-    return ++get().currentTaskCallCount;
-  }
-
-  public static UniqueId currentWorkerId() {
-    return WorkerContext.workerID;
-  }
-
-  public static ClassLoader currentClassLoader() {
-    return get().currentClassLoader;
+    return dummy;
   }
 }

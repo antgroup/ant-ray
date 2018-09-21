@@ -12,14 +12,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.config.PathConfig;
-import org.ray.runtime.config.RayParameters;
+import org.ray.runtime.config.RayConfig;
 import org.ray.runtime.gcs.AddressInfo;
 import org.ray.runtime.runner.RunInfo.ProcessType;
+import org.ray.runtime.util.RayLog;
 import org.ray.runtime.util.ResourceUtil;
 import org.ray.runtime.util.StringUtil;
-import org.ray.runtime.util.config.ConfigReader;
-import org.ray.runtime.util.logger.RayLog;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -30,21 +28,15 @@ public class RunManager {
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("Y-m-d_H-M-S");
 
-  private RayParameters params;
-
-  private PathConfig paths;
-
-  private ConfigReader configReader;
+  private RayConfig rayConfig;
 
   private RunInfo runInfo = new RunInfo();
 
   private Random random = new Random();
 
 
-  public RunManager(RayParameters params, PathConfig paths, ConfigReader configReader) {
-    this.params = params;
-    this.paths = paths;
-    this.configReader = configReader;
+  public RunManager(RayConfig rayConfig) {
+    this.rayConfig = rayConfig;
   }
 
   private static boolean killProcess(Process p) {
@@ -61,29 +53,23 @@ public class RunManager {
   }
 
   public void startRayHead() throws Exception {
-    if (params.redis_address.length() != 0) {
+    if (rayConfig.redisAddress.length() != 0) {
       throw new Exception("Redis address must be empty in head node.");
     }
-    if (params.num_redis_shards <= 0) {
-      params.num_redis_shards = 1;
+    if (rayConfig.numberRedisShards <= 0) {
+      rayConfig.numberRedisShards = 1;
     }
-
-    params.start_redis_shards = true;
-
-    startRayProcesses();
+    startRayProcesses(true);
   }
 
   public void startRayNode() throws Exception {
-    if (params.redis_address.length() == 0) {
+    if (rayConfig.redisAddress.length() == 0) {
       throw new Exception("Redis address cannot be empty in non-head node.");
     }
-    if (params.num_redis_shards != 0) {
+    if (rayConfig.numberRedisShards != 0) {
       throw new Exception("Number of redis shards should be zero in non-head node.");
     }
-
-    params.start_redis_shards = false;
-
-    startRayProcesses();
+    startRayProcesses(false);
   }
 
   public Process startDriver(String mainClass, String redisAddress, UniqueId driverId,
@@ -106,7 +92,6 @@ public class RunManager {
         RunInfo.ProcessType.PT_DRIVER,
         mainClass,
         additonalClassPaths,
-        additionalConfigs,
         "",
         ip,
         redisAddress,
@@ -117,27 +102,28 @@ public class RunManager {
   }
 
   private Process startJavaProcess(RunInfo.ProcessType pt, String mainClass,
-      String additonalClassPaths, String additionalConfigs,
-      String additionalJvmArgs, String ip, String
+      String additonalClassPaths, String additionalJvmArgs, String ip, String
       redisAddr, boolean redirect,
       boolean cleanup, String agentlibAddr) {
 
-    String cmd = buildJavaProcessCommand(pt, mainClass, additonalClassPaths, additionalConfigs,
-        additionalJvmArgs, ip, redisAddr, agentlibAddr);
+    String cmd = buildJavaProcessCommand(pt, mainClass, additonalClassPaths,
+        additionalJvmArgs, ip, agentlibAddr);
     return startProcess(cmd.split(" "), null, pt, "", redisAddr, ip, redirect, cleanup);
   }
 
   private String buildJavaProcessCommand(
       RunInfo.ProcessType pt, String mainClass, String additionalClassPaths,
-      String additionalConfigs,
-      String additionalJvmArgs, String ip, String redisAddr, String agentlibAddr) {
-    String cmd = "java -ea -noverify " + params.jvm_parameters + " ";
+      String additionalJvmArgs, String ip, String agentlibAddr) {
+    String cmd = "java -ea -noverify " + rayConfig.jvmParamters + " ";
     if (agentlibAddr != null && !agentlibAddr.equals("")) {
       cmd += " -agentlib:jdwp=transport=dt_socket,address=" + agentlibAddr + ",server=y,suspend=n";
     }
 
-    cmd += " -Djava.library.path=" + StringUtil.mergeArray(paths.java_jnilib_paths, ":");
-    cmd += " -classpath " + StringUtil.mergeArray(paths.java_class_paths, ":");
+    cmd += " -Djava.library.path=" + StringUtil.mergeArray(rayConfig.javaJnilibPaths, ":");
+    cmd += " -Dray.run-mode=" + rayConfig.runMode;
+    cmd += " -Dray.node-ip=" + ip;
+    cmd += " -Dray.log-dir=" + rayConfig.logDir;
+    cmd += " -classpath " + StringUtil.mergeArray(rayConfig.javaClasspaths, ":");
 
     if (additionalClassPaths.length() > 0) {
       cmd += ":" + additionalClassPaths;
@@ -148,18 +134,6 @@ public class RunManager {
     }
 
     cmd += " " + mainClass;
-
-    String section = "ray.java.start.";
-    cmd += " --config=" + configReader.filePath();
-    cmd += " --overwrite="
-        + section + "node_ip_address=" + ip + ";"
-        + section + "redis_address=" + redisAddr + ";"
-        + section + "log_dir=" + params.log_dir + ";"
-        + section + "run_mode=" + params.run_mode;
-
-    if (additionalConfigs.length() > 0) {
-      cmd += ";" + additionalConfigs;
-    }
 
     return cmd;
   }
@@ -175,8 +149,8 @@ public class RunManager {
     if (redirect) {
       int logId = random.nextInt(10000);
       String date = DATE_TIME_FORMATTER.format(LocalDateTime.now());
-      String stdout = String.format("%s/%s-%s-%05d.out", params.log_dir, name, date, logId);
-      String stderr = String.format("%s/%s-%s-%05d.err", params.log_dir, name, date, logId);
+      String stdout = String.format("%s/%s-%s-%05d.out", rayConfig.logDir, name, date, logId);
+      String stderr = String.format("%s/%s-%s-%05d.err", rayConfig.logDir, name, date, logId);
       builder.redirectOutput(new File(stdout));
       builder.redirectError(new File(stderr));
       recordLogFilesInRedis(redisAddress, ip, ImmutableList.of(stdout, stderr));
@@ -228,35 +202,33 @@ public class RunManager {
     }
   }
 
-  private void startRayProcesses() {
+  private void startRayProcesses(boolean startRedisShards) {
     Jedis redisClient = null;
 
-    RayLog.core.info("start ray processes @ " + params.node_ip_address + " ...");
+    RayLog.core.info("start ray processes @ " + rayConfig.nodeIp + " ...");
 
     // start primary redis
-    if (params.redis_address.length() == 0) {
+    if (rayConfig.redisAddress.length() == 0) {
       List<String> primaryShards = startRedis(
-          params.node_ip_address, params.redis_port, 1, params.redirect, params.cleanup);
-      params.redis_address = primaryShards.get(0);
+          rayConfig.nodeIp, rayConfig.headRedisPort, 1);
+      rayConfig.redisAddress = primaryShards.get(0);
 
-      String[] args = params.redis_address.split(":");
+      String[] args = rayConfig.redisAddress.split(":");
       redisClient = new Jedis(args[0], Integer.parseInt(args[1]));
 
       // Register the number of Redis shards in the primary shard, so that clients
       // know how many redis shards to expect under RedisShards.
-      redisClient.set("NumRedisShards", Integer.toString(params.num_redis_shards));
+      redisClient.set("NumRedisShards", Integer.toString(rayConfig.numberRedisShards));
     } else {
-      String[] args = params.redis_address.split(":");
+      String[] args = rayConfig.redisAddress.split(":");
       redisClient = new Jedis(args[0], Integer.parseInt(args[1]));
     }
-    runInfo.redisAddress = params.redis_address;
+    runInfo.redisAddress = rayConfig.redisAddress;
 
     // start redis shards
-    if (params.start_redis_shards) {
+    if (startRedisShards) {
       runInfo.redisShards = startRedis(
-          params.node_ip_address, params.redis_port + 1, params.num_redis_shards,
-          params.redirect,
-          params.cleanup);
+          rayConfig.nodeIp, rayConfig.headRedisPort + 1, rayConfig.numberRedisShards);
 
       // Store redis shard information in the primary redis shard.
       for (int i = 0; i < runInfo.redisShards.size(); i++) {
@@ -269,19 +241,18 @@ public class RunManager {
     AddressInfo info = new AddressInfo();
 
     // Start object store
-    int rpcPort = params.object_store_rpc_port;
+    int rpcPort = rayConfig.objectStoreNameIndex;
     String storeName = "/tmp/plasma_store" + rpcPort;
 
-    startObjectStore(0, info,
-            params.redis_address, params.node_ip_address, params.redirect, params.cleanup);
+    startObjectStore(0, info);
 
     Map<String, Double> staticResources =
-            ResourceUtil.getResourcesMapFromString(params.static_resources);
+            ResourceUtil.getResourcesMapFromString(rayConfig.staticResources);
 
     //Start raylet
-    startRaylet(storeName, info, params.num_workers,
-            params.redis_address,
-            params.node_ip_address, params.redirect, staticResources, params.cleanup);
+    startRaylet(storeName, info, 0,
+        rayConfig.redisAddress,
+        rayConfig.nodeIp, staticResources);
 
     runInfo.localStores.add(info);
 
@@ -347,15 +318,14 @@ public class RunManager {
   // when the worker exits
   // @return primary redis shard address
   //
-  private List<String> startRedis(String ip, int port, int numOfShards,
-      boolean redirect, boolean cleanup) {
+  private List<String> startRedis(String ip, int port, int numOfShards) {
     ArrayList<String> shards = new ArrayList<>();
     String addr;
     for (int i = 0; i < numOfShards; i++) {
-      addr = startRedisInstance(ip, port + i, redirect, cleanup);
+      addr = startRedisInstance(ip, port + i, rayConfig.redirectOutput, rayConfig.cleanup);
 
       if (addr.length() == 0) {
-        cleanup(cleanup);
+        cleanup(rayConfig.cleanup);
         shards.clear();
         return shards;
       } else {
@@ -377,8 +347,8 @@ public class RunManager {
   //
   private String startRedisInstance(String ip, int port,
       boolean redirect, boolean cleanup) {
-    String redisFilePath = paths.redis_server;
-    String redisModule = paths.redis_module;
+    String redisFilePath = rayConfig.redisServerPath;
+    String redisModule = rayConfig.redisModulePath;
 
     assert (new File(redisFilePath).exists()) : "file don't exsits : " + redisFilePath;
     assert (new File(redisModule).exists()) : "file don't exsits : " + redisModule;
@@ -400,7 +370,7 @@ public class RunManager {
       e.printStackTrace();
     }
 
-    Jedis client = new Jedis(params.node_ip_address, port);
+    Jedis client = new Jedis(rayConfig.nodeIp, port);
 
     // Configure Redis to only generate notifications for the export keys.
     client.configSet("notify-keyspace-events", "Kl");
@@ -413,17 +383,15 @@ public class RunManager {
   }
 
   private void startRaylet(String storeName, AddressInfo info, int numWorkers,
-      String redisAddress, String ip, boolean redirect,
-      Map<String, Double> staticResources, boolean cleanup) {
+      String redisAddress, String ip, Map<String, Double> staticResources) {
 
-    int rpcPort = params.raylet_port;
+    int rpcPort = rayConfig.rayletPort;
     String rayletSocketName = "/tmp/raylet" + rpcPort;
 
-    String filePath = paths.raylet;
+    String filePath = rayConfig.rayletPath;
 
-    //Create the worker command that the raylet will use to start workers.
-    String workerCommand = buildWorkerCommandRaylet(info.storeName, rayletSocketName,
-        UniqueId.NIL, "", ip, redisAddress);
+    // Create the worker command that the raylet will use to start workers.
+    String workerCommand = buildWorkerCommandRaylet(info.storeName, rayletSocketName, ip);
 
     int sep = redisAddress.indexOf(':');
     assert (sep != -1);
@@ -442,7 +410,7 @@ public class RunManager {
         resourceArgument, "", workerCommand};
 
     Process p = startProcess(cmds, null, RunInfo.ProcessType.PT_RAYLET,
-        "raylet", redisAddress, ip, redirect, cleanup);
+        "raylet", redisAddress, ip, rayConfig.redirectOutput, rayConfig.cleanup);
 
     if (p != null && p.isAlive()) {
       try {
@@ -462,49 +430,38 @@ public class RunManager {
     }
   }
 
-  private String buildWorkerCommandRaylet(String storeName, String rayletSocketName,
-      UniqueId actorId, String actorClass,
-      String ip, String redisAddress) {
-    String workerConfigs = "ray.java.start.object_store_name=" + storeName
-        + ";ray.java.start.raylet_socket_name=" + rayletSocketName
-        + ";ray.java.start.worker_mode=WORKER";
-    workerConfigs += ";ray.java.start.deploy=" + params.deploy;
-    if (!actorId.equals(UniqueId.NIL)) {
-      workerConfigs += ";ray.java.start.actor_id=" + actorId;
-    }
-    if (!actorClass.equals("")) {
-      workerConfigs += ";ray.java.start.driver_class=" + actorClass;
-    }
+  private String buildWorkerCommandRaylet(String storeName,
+      String rayletSocketName, String ip) {
 
     String jvmArgs = "";
-    jvmArgs += " -Dlogging.path=" + params.log_dir;
     jvmArgs += " -Dlogging.file.name=core-*pid_suffix*";
+    jvmArgs += " -Dlogging.path=" + rayConfig.logDir;
+    jvmArgs += " -Dray.redis.address=" + rayConfig.redisAddress;
+    jvmArgs += " -Dray.object-store.name=" + storeName;
+    jvmArgs += " -Dray.raylet.socket-name=" + rayletSocketName;
 
     return buildJavaProcessCommand(
         RunInfo.ProcessType.PT_WORKER,
         "org.ray.runtime.runner.worker.DefaultWorker",
         "",
-        workerConfigs,
         jvmArgs,
         ip,
-        redisAddress,
         null
     );
   }
 
-  private void startObjectStore(int index, AddressInfo info, String redisAddress,
-      String ip, boolean redirect, boolean cleanup) {
-    int occupiedMemoryMb = params.object_store_occupied_memory_MB;
-    long memoryBytes = occupiedMemoryMb * 1000000;
-    String filePath = paths.store;
-    int rpcPort = params.object_store_rpc_port + index;
+  private void startObjectStore(int index, AddressInfo info) {
+    long memoryBytes = rayConfig.objectStoreOccupiedSize;
+    String filePath = rayConfig.plasmaStorePath;
+    int rpcPort = rayConfig.objectStoreNameIndex + index;
     String name = "/tmp/plasma_store" + rpcPort;
     String rpcAddr = "";
     String cmd = filePath + " -s " + name + " -m " + memoryBytes;
 
     Map<String, String> env = null;
     Process p = startProcess(cmd.split(" "), env, RunInfo.ProcessType.PT_PLASMA_STORE,
-        "plasma_store", redisAddress, ip, redirect, cleanup);
+        "plasma_store", rayConfig.redisAddress, rayConfig.nodeIp,
+        rayConfig.redirectOutput, rayConfig.cleanup);
 
     if (p != null && p.isAlive()) {
       try {

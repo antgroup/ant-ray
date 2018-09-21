@@ -17,9 +17,11 @@ public class ObjectStoreProxy {
 
   private final ObjectStoreLink store;
   private final int getTimeoutMs = 1000;
+  private final ClassLoader currentClassLoader;
 
-  public ObjectStoreProxy(ObjectStoreLink store) {
+  public ObjectStoreProxy(ObjectStoreLink store, ClassLoader currentClassLoader) {
     this.store = store;
+    this.currentClassLoader = currentClassLoader;
   } 
 
   public <T> Pair<T, GetStatus> get(UniqueId objectId, boolean isMetadata)
@@ -31,7 +33,7 @@ public class ObjectStoreProxy {
       throws TaskExecutionException {
     byte[] obj = store.get(id.getBytes(), timeoutMs, isMetadata);
     if (obj != null) {
-      T t = Serializer.decode(obj, WorkerContext.currentClassLoader());
+      T t = Serializer.decode(obj, currentClassLoader);
       store.release(id.getBytes());
       if (t instanceof TaskExecutionException) {
         throw (TaskExecutionException) t;
@@ -54,7 +56,7 @@ public class ObjectStoreProxy {
     for (int i = 0; i < objs.size(); i++) {
       byte[] obj = objs.get(i);
       if (obj != null) {
-        T t = Serializer.decode(obj, WorkerContext.currentClassLoader());
+        T t = Serializer.decode(obj, currentClassLoader);
         store.release(ids.get(i).getBytes());
         if (t instanceof TaskExecutionException) {
           throw (TaskExecutionException) t;

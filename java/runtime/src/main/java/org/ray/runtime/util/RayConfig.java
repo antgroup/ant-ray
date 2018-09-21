@@ -1,4 +1,4 @@
-package org.ray.api.config;
+package org.ray.runtime.util;
 
 
 import com.typesafe.config.Config;
@@ -6,7 +6,6 @@ import com.typesafe.config.ConfigException;
 import org.ray.api.RunMode;
 import org.ray.api.WorkerMode;
 import org.ray.api.id.UniqueId;
-import org.ray.api.util.NetworkUtil;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 

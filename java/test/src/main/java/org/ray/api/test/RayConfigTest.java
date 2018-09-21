@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ray.api.RunMode;
 import org.ray.api.WorkerMode;
-import org.ray.api.config.RayConfig;
+import org.ray.runtime.util.RayConfig;
 
 @RunWith(MyRunner.class)
 public class RayConfigTest {

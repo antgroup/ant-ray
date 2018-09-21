@@ -6,7 +6,7 @@ import java.io.IOException;
 import com.typesafe.config.ConfigFactory;
 import net.lingala.zip4j.core.ZipFile;
 import org.ray.api.id.UniqueId;
-import org.ray.api.config.RayConfig;
+import org.ray.runtime.util.RayConfig;
 import org.ray.api.RunMode;
 import org.ray.runtime.functionmanager.NativeRemoteFunctionManager;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
@@ -17,7 +17,7 @@ import org.ray.runtime.gcs.StateStoreProxyImpl;
 import org.ray.runtime.runner.RunManager;
 import org.ray.runtime.runner.worker.DefaultDriver;
 import org.ray.runtime.util.FileUtil;
-import org.ray.api.util.RayLog;
+import org.ray.runtime.util.RayLog;
 
 
 /**

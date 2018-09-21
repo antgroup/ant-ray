@@ -6,15 +6,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ray.api.*;
 import org.ray.api.function.RayFunc;
 import org.ray.api.id.UniqueId;
 import org.ray.api.runtime.RayRuntime;
-import org.ray.api.config.RayConfig;
+import org.ray.runtime.util.RayConfig;
 import org.ray.runtime.functionmanager.LocalFunctionManager;
 import org.ray.runtime.functionmanager.RayMethod;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
@@ -27,7 +26,7 @@ import org.ray.runtime.util.MethodId;
 import org.ray.runtime.util.ResourceUtil;
 import org.ray.runtime.util.UniqueIdHelper;
 import org.ray.runtime.util.exception.TaskExecutionException;
-import org.ray.api.util.RayLog;
+import org.ray.runtime.util.RayLog;
 
 /**
  * Core functionality to implement Ray APIs.

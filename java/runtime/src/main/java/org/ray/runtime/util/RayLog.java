@@ -1,4 +1,4 @@
-package org.ray.api.util;
+package org.ray.runtime.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

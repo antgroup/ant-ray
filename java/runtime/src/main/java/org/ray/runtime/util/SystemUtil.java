@@ -1,9 +1,8 @@
-package org.ray.api.util;
+package org.ray.runtime.util;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.concurrent.locks.ReentrantLock;
-import org.ray.api.util.RayLog;
 
 /**
  * some utilities for system process.

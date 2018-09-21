@@ -1,9 +1,10 @@
-package org.ray.api.runtime;
+package org.ray.runtime;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.ray.api.config.RayConfig;
-
+import org.ray.api.runtime.RayRuntime;
+import org.ray.api.runtime.RayRuntimeFactory;
+import org.ray.runtime.util.RayConfig;
 import java.lang.reflect.Method;
 
 /**
@@ -38,4 +39,5 @@ public class DefaultRayRuntimeFactory implements RayRuntimeFactory {
       throw new RuntimeException("Failed to initialize ray runtime", e);
     }
   }
+
 }

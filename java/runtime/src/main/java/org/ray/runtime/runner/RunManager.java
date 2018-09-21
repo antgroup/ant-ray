@@ -12,12 +12,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.ray.api.id.UniqueId;
-import org.ray.api.config.RayConfig;
+import org.ray.runtime.util.RayConfig;
 import org.ray.runtime.gcs.AddressInfo;
 import org.ray.runtime.runner.RunInfo.ProcessType;
 import org.ray.runtime.util.ResourceUtil;
-import org.ray.api.util.StringUtil;
-import org.ray.api.util.RayLog;
+import org.ray.runtime.util.StringUtil;
+import org.ray.runtime.util.RayLog;
 import redis.clients.jedis.Jedis;
 
 /**

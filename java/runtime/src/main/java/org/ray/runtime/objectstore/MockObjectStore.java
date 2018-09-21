@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.WorkerContext;
 import org.ray.runtime.raylet.MockRayletClient;
+import org.ray.runtime.task.TaskSpec;
 import org.ray.runtime.util.RayLog;
 
 /**
@@ -16,9 +16,14 @@ import org.ray.runtime.util.RayLog;
  */
 public class MockObjectStore implements ObjectStoreLink {
 
+  private final TaskSpec currentTask;
   private final Map<UniqueId, byte[]> data = new ConcurrentHashMap<>();
   private final Map<UniqueId, byte[]> metadata = new ConcurrentHashMap<>();
   private MockRayletClient scheduler = null;
+
+  public MockObjectStore(TaskSpec currentTask) {
+    this.currentTask = currentTask;
+  }
 
   @Override
   public void put(byte[] objectId, byte[] value, byte[] metadataValue) {
@@ -87,7 +92,7 @@ public class MockObjectStore implements ObjectStoreLink {
   }
 
   private String logPrefix() {
-    return WorkerContext.currentTask().taskId + "-" + getUserTrace() + " -> ";
+    return currentTask.taskId + "-" + getUserTrace() + " -> ";
   }
 
   private String getUserTrace() {

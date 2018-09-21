@@ -66,9 +66,8 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     if (rayConfig.workerMode == WorkerMode.DRIVER) {
       // TODO: The relationship between workerID, driver_id and dummy_task.driver_id should be
       // recheck carefully
-      WorkerContext.workerID = rayConfig.driverId;
+      workerContext.setWorkerId(rayConfig.driverId);
     }
-    WorkerContext.init(rayConfig);
 
     // initialize the links
     final int releaseDelay = 0;
@@ -76,9 +75,9 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
     RayletClient rayletClient = new RayletClientImpl(
         rayConfig.rayletSocketName,
-        WorkerContext.currentWorkerId(),
+        workerContext.getCurrentWorkerId(),
         isWorker,
-        WorkerContext.currentTask().taskId
+        workerContext.getCurrentTask().taskId
     );
 
     initMembers(rayletClient, plink, funcMgr);
@@ -117,7 +116,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
 
   private void registerWorker(boolean isWorker) {
     Map<String, String> workerInfo = new HashMap<>();
-    String workerId = new String(WorkerContext.currentWorkerId().getBytes());
+    String workerId = new String(workerContext.getCurrentWorkerId().getBytes());
     if (!isWorker) {
       workerInfo.put("node_ip_address", rayConfig.nodeIp);
       workerInfo.put("driver_id", workerId);

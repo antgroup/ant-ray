@@ -34,6 +34,7 @@ import org.ray.runtime.util.RayLog;
 public abstract class AbstractRayRuntime implements RayRuntime {
 
   protected RayConfig rayConfig;
+  protected WorkerContext workerContext;
   protected Worker worker;
   protected RayletClient rayletClient;
   protected ObjectStoreProxy objectStoreProxy;
@@ -48,6 +49,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   // app level Ray.init()
   // make it private so there is no direct usage but only from Ray.init
   public void init(RayConfig rayConfig) {
+    workerContext = new WorkerContext(rayConfig.workerMode, rayConfig.driverId);
     this.rayConfig = rayConfig;
     RayLog.init(rayConfig.logDir);
 
@@ -70,7 +72,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     functions = new LocalFunctionManager(remoteLoader);
     rayletClient = slink;
 
-    objectStoreProxy = new ObjectStoreProxy(plink);
+    objectStoreProxy = new ObjectStoreProxy(plink, workerContext.getCurrentClassLoader());
     worker = new Worker(this);
   }
 
@@ -85,14 +87,14 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   @Override
   public <T> RayObject<T> put(T obj) {
     UniqueId objectId = UniqueIdHelper.computePutId(
-        WorkerContext.currentTask().taskId, WorkerContext.nextPutIndex());
+        workerContext.getCurrentTask().taskId, workerContext.nextPutIndex());
 
     put(objectId, obj);
     return new RayObjectImpl<>(objectId);
   }
 
   public <T> void put(UniqueId objectId, T obj) {
-    UniqueId taskId = WorkerContext.currentTask().taskId;
+    UniqueId taskId = workerContext.getCurrentTask().taskId;
     RayLog.core.info("Putting object {}, for task {} ", objectId, taskId);
     objectStoreProxy.put(objectId, obj, null);
   }
@@ -106,7 +108,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   @Override
   public <T> List<T> get(List<UniqueId> objectIds) {
     boolean wasBlocked = false;
-    UniqueId taskId = WorkerContext.currentTask().taskId;
+    UniqueId taskId = workerContext.getCurrentTask().taskId;
 
     try {
       int numObjectIds = objectIds.size();
@@ -257,10 +259,10 @@ public abstract class AbstractRayRuntime implements RayRuntime {
    */
   private TaskSpec createTaskSpec(RayFunc func, RayActorImpl actor, Object[] args,
       boolean isActorCreationTask) {
-    final TaskSpec current = WorkerContext.currentTask();
+    final TaskSpec current = workerContext.getCurrentTask();
     UniqueId taskId = rayletClient.generateTaskId(current.driverId,
         current.taskId,
-        WorkerContext.nextCallIndex());
+        workerContext.nextCallIndex());
     int numReturns = actor.getId().isNil() ? 1 : 2;
     UniqueId[] returnIds = genReturnIds(taskId, numReturns);
 

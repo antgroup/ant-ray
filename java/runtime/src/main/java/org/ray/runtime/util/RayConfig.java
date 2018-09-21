@@ -6,11 +6,11 @@ import com.typesafe.config.ConfigException;
 import org.ray.api.RunMode;
 import org.ray.api.WorkerMode;
 import org.ray.api.id.UniqueId;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class is used to manager configurations of runtime.
  */
 public class RayConfig {
   private Logger logger = LoggerFactory.getLogger(RayConfig.class);
@@ -29,7 +29,7 @@ public class RayConfig {
   public final int defaultFirstCheckTimeoutMs;
   public final int defaultGetCheckIntervalMs;
   public final String jvmParamters;
-  public final Long ObjectStoreOccupiedSize;
+  public final Long objectStoreOccupiedSize;
   public final int rayletPort;
   public final int workerFetchRequestSize;
   public final String staticResources;
@@ -84,7 +84,7 @@ public class RayConfig {
     defaultFirstCheckTimeoutMs = config.getInt("ray.default-first-check-timeout-ms");
     defaultGetCheckIntervalMs = config.getInt("ray.default-get-check-interval-ms");
     jvmParamters = config.getString("ray.jvm-parameters");
-    ObjectStoreOccupiedSize = config.getBytes("ray.object-store.occupied-size");
+    objectStoreOccupiedSize = config.getBytes("ray.object-store.occupied-size");
     rayletSocketName = config.getString("ray.raylet.socket-name");
     rayletPort = config.getInt("ray.raylet.port");
     workerFetchRequestSize = config.getInt("ray.worker-fetch-request-size");

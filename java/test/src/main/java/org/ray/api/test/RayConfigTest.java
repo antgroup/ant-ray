@@ -11,10 +11,12 @@ import org.ray.runtime.util.RayConfig;
 
 @RunWith(MyRunner.class)
 public class RayConfigTest {
+
+  private static final String DEFAULT_CONFIG_FILE = "ray.default.conf";
+  private static final String CUSTOM_CONFIG_FILE = "ray.conf";
+
   @Test
   public void testDefaultConfFile() {
-    final String DEFAULT_CONFIG_FILE = "ray.default.conf";
-    final String CUSTOM_CONFIG_FILE = "ray.conf";
     Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
                         .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
     RayConfig rayConfig = new RayConfig(config);

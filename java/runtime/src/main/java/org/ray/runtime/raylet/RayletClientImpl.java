@@ -15,8 +15,8 @@ import org.ray.runtime.generated.TaskInfo;
 import org.ray.runtime.generated.TaskLanguage;
 import org.ray.runtime.task.FunctionArg;
 import org.ray.runtime.task.TaskSpec;
-import org.ray.runtime.util.UniqueIdHelper;
 import org.ray.runtime.util.RayLog;
+import org.ray.runtime.util.UniqueIdHelper;
 
 public class RayletClientImpl implements RayletClient {
 
@@ -230,7 +230,8 @@ public class RayletClientImpl implements RayletClient {
 
     if (buffer.remaining() > MAX_SUBMIT_TASK_BUFFER_SIZE) {
       RayLog.core.error(
-          "Allocated buffer is not enough to transfer the task specification: " + MAX_SUBMIT_TASK_BUFFER_SIZE + " vs " + buffer.remaining());
+          "Allocated buffer is not enough to transfer the task specification: {} vs {}.",
+          MAX_SUBMIT_TASK_BUFFER_SIZE, buffer.remaining());
       assert (false);
     }
 

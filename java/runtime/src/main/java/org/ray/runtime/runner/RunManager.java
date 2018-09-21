@@ -12,12 +12,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.ray.api.id.UniqueId;
-import org.ray.runtime.util.RayConfig;
 import org.ray.runtime.gcs.AddressInfo;
 import org.ray.runtime.runner.RunInfo.ProcessType;
+import org.ray.runtime.util.RayConfig;
+import org.ray.runtime.util.RayLog;
 import org.ray.runtime.util.ResourceUtil;
 import org.ray.runtime.util.StringUtil;
-import org.ray.runtime.util.RayLog;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -451,7 +451,7 @@ public class RunManager {
   }
 
   private void startObjectStore(int index, AddressInfo info) {
-    long memoryBytes = rayConfig.ObjectStoreOccupiedSize;
+    long memoryBytes = rayConfig.objectStoreOccupiedSize;
     String filePath = rayConfig.plasmaStorePath;
     int rpcPort = rayConfig.objectStoreNameIndex + index;
     String name = "/tmp/plasma_store" + rpcPort;
@@ -460,7 +460,8 @@ public class RunManager {
 
     Map<String, String> env = null;
     Process p = startProcess(cmd.split(" "), env, RunInfo.ProcessType.PT_PLASMA_STORE,
-        "plasma_store", rayConfig.redisAddress, rayConfig.nodeIp, rayConfig.redirectOutput, rayConfig.cleanup);
+        "plasma_store", rayConfig.redisAddress, rayConfig.nodeIp,
+        rayConfig.redirectOutput, rayConfig.cleanup);
 
     if (p != null && p.isAlive()) {
       try {

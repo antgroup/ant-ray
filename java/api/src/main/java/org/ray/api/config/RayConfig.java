@@ -99,7 +99,7 @@ public class RayConfig {
 
     javaClasspaths = new String[] {
         rayHome + "/java/test/target/classes",
-    rayHome + "/java/test/lib/*"
+        rayHome + "/java/test/lib/*"
     };
 
     javaJnilibPaths = new String[] {

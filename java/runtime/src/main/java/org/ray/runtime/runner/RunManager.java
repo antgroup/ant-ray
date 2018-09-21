@@ -386,15 +386,14 @@ public class RunManager {
   }
 
   private void startRaylet(String storeName, AddressInfo info, int numWorkers,
-      String redisAddress, String ip,
-      Map<String, Double> staticResources) {
+      String redisAddress, String ip, Map<String, Double> staticResources) {
 
     int rpcPort = rayConfig.rayletPort;
     String rayletSocketName = "/tmp/raylet" + rpcPort;
 
     String filePath = rayConfig.rayletPath;
 
-    //Create the worker command that the raylet will use to start workers.
+    // Create the worker command that the raylet will use to start workers.
     String workerCommand = buildWorkerCommandRaylet(info.storeName, rayletSocketName, ip);
 
     int sep = redisAddress.indexOf(':');

@@ -1,5 +1,6 @@
 package org.ray.runtime;
 
+import com.google.common.base.Strings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
   public void start() throws Exception {
     final boolean isWorker = (rayConfig.workerMode == WorkerMode.WORKER);
 
-    if (rayConfig.redisAddress.length() == 0) {
+    if (Strings.isNullOrEmpty(rayConfig.redisAddress)) {
       if (isWorker) {
         throw new Error("Redis address must be configured under Worker mode.");
       }

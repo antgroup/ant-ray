@@ -1,12 +1,13 @@
 package org.ray.cli;
 
 import com.beust.jcommander.JCommander;
-import com.typesafe.config.ConfigFactory;
+
 import java.io.File;
 import java.io.IOException;
 import net.lingala.zip4j.core.ZipFile;
 import org.ray.api.RunMode;
 import org.ray.api.id.UniqueId;
+import org.ray.runtime.config.RayConfig;
 import org.ray.runtime.functionmanager.NativeRemoteFunctionManager;
 import org.ray.runtime.functionmanager.RemoteFunctionManager;
 import org.ray.runtime.gcs.KeyValueStoreLink;
@@ -16,7 +17,6 @@ import org.ray.runtime.gcs.StateStoreProxyImpl;
 import org.ray.runtime.runner.RunManager;
 import org.ray.runtime.runner.worker.DefaultDriver;
 import org.ray.runtime.util.FileUtil;
-import org.ray.runtime.util.RayConfig;
 import org.ray.runtime.util.RayLog;
 
 
@@ -26,12 +26,8 @@ import org.ray.runtime.util.RayLog;
 public class RayCli {
 
   private static RayCliArgs rayArgs = new RayCliArgs();
-  private static final String DEFAULT_CONFIG_FILE = "ray.default.conf";
-  private static final String CUSTOM_CONFIG_FILE = "ray.conf";
 
-  private static RayConfig rayConfig =
-      new RayConfig(ConfigFactory.load(DEFAULT_CONFIG_FILE)
-                        .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE)));
+  private static RayConfig rayConfig = new RayConfig();
 
   private static RunManager startRayHead() {
     RunManager manager = new RunManager(rayConfig);

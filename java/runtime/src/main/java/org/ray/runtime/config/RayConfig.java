@@ -1,11 +1,13 @@
-package org.ray.runtime.util;
+package org.ray.runtime.config;
 
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigException;
+import com.typesafe.config.ConfigFactory;
 import org.ray.api.RunMode;
 import org.ray.api.WorkerMode;
 import org.ray.api.id.UniqueId;
+import org.ray.runtime.util.NetworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +16,9 @@ import org.slf4j.LoggerFactory;
  */
 public class RayConfig {
   private Logger logger = LoggerFactory.getLogger(RayConfig.class);
+
+  public static final String DEFAULT_CONFIG_FILE = "ray.default.conf";
+  public static final String CUSTOM_CONFIG_FILE = "ray.conf";
 
   // Configuration fields.
 
@@ -46,7 +51,10 @@ public class RayConfig {
   public String objectStoreName;
   public String rayletSocketName;
 
-  public RayConfig(Config config) {
+  public RayConfig() {
+    Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
+        .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
+
     workerMode = config.getEnum(WorkerMode.class, "ray.worker.mode");
     runMode = config.getEnum(RunMode.class, "ray.run-mode");
 

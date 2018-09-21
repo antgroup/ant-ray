@@ -35,11 +35,12 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
   private RunManager manager = null;
 
   public RayNativeRuntime() {
+
   }
 
   @Override
   public void start() throws Exception {
-    boolean isWorker = (rayConfig.workerMode == WorkerMode.WORKER);
+    final boolean isWorker = (rayConfig.workerMode == WorkerMode.WORKER);
 
     if (rayConfig.redisAddress.length() == 0) {
       if (isWorker) {
@@ -69,29 +70,21 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     }
     WorkerContext.init(rayConfig);
 
-    if (rayConfig.workerMode != WorkerMode.NONE) {
-      // initialize the links
-      //TODO(qwang): We should use `releaseDelay` as a config item.
-      //int releaseDelay = AbstractRayRuntime.configReader
-      //    .getIntegerValue("ray", "plasma_default_release_delay", 0,
-      //        "how many release requests should be delayed in plasma client");
-      int releaseDelay = 0;
-      ObjectStoreLink plink = new PlasmaClient(rayConfig.objectStoreName, "", releaseDelay);
+    // initialize the links
+    final int releaseDelay = 0;
+    ObjectStoreLink plink = new PlasmaClient(rayConfig.objectStoreName, "", releaseDelay);
 
-      RayletClient rayletClient = new RayletClientImpl(
-              rayConfig.rayletSocketName,
-              WorkerContext.currentWorkerId(),
-              isWorker,
-              WorkerContext.currentTask().taskId
-      );
+    RayletClient rayletClient = new RayletClientImpl(
+        rayConfig.rayletSocketName,
+        WorkerContext.currentWorkerId(),
+        isWorker,
+        WorkerContext.currentTask().taskId
+    );
 
-      initMembers(rayletClient, plink, funcMgr);
+    initMembers(rayletClient, plink, funcMgr);
 
-      // register
-      registerWorker(isWorker, rayConfig.nodeIp, rayConfig.objectStoreName,
-          rayConfig.rayletSocketName);
-
-    }
+    // register
+    registerWorker(isWorker);
 
     RayLog.core.info("RayNativeRuntime started with store {}, raylet {}",
         rayConfig.objectStoreName, rayConfig.rayletSocketName);
@@ -108,7 +101,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
   private void startOnebox() throws Exception {
     rayConfig.cleanup = true;
     manager = new RunManager(rayConfig);
-    manager.startRayHead(rayConfig);
+    manager.startRayHead();
 
     rayConfig.redisAddress = manager.info().redisAddress;
     rayConfig.objectStoreName = manager.info().localStores.get(0).storeName;
@@ -122,23 +115,22 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     stateStoreProxy.initializeGlobalState();
   }
 
-  private void registerWorker(boolean isWorker, String nodeIpAddress, String storeName,
-                              String rayletSocketName) {
+  private void registerWorker(boolean isWorker) {
     Map<String, String> workerInfo = new HashMap<>();
     String workerId = new String(WorkerContext.currentWorkerId().getBytes());
     if (!isWorker) {
-      workerInfo.put("node_ip_address", nodeIpAddress);
+      workerInfo.put("node_ip_address", rayConfig.nodeIp);
       workerInfo.put("driver_id", workerId);
       workerInfo.put("start_time", String.valueOf(System.currentTimeMillis()));
-      workerInfo.put("plasma_store_socket", storeName);
-      workerInfo.put("raylet_socket", rayletSocketName);
+      workerInfo.put("plasma_store_socket", rayConfig.objectStoreName);
+      workerInfo.put("raylet_socket", rayConfig.rayletSocketName);
       workerInfo.put("name", System.getProperty("user.dir"));
       //TODO: worker.redis_client.hmset(b"Drivers:" + worker.workerId, driver_info)
       kvStore.hmset("Drivers:" + workerId, workerInfo);
     } else {
-      workerInfo.put("node_ip_address", nodeIpAddress);
-      workerInfo.put("plasma_store_socket", storeName);
-      workerInfo.put("raylet_socket", rayletSocketName);
+      workerInfo.put("node_ip_address", rayConfig.nodeIp);
+      workerInfo.put("plasma_store_socket", rayConfig.objectStoreName);
+      workerInfo.put("raylet_socket", rayConfig.rayletSocketName);
       //TODO: b"Workers:" + worker.workerId,
       kvStore.hmset("Workers:" + workerId, workerInfo);
     }

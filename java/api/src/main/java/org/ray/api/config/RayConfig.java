@@ -10,10 +10,14 @@ import org.ray.api.util.NetworkUtil;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+/**
+ *
+ */
 public class RayConfig {
   private Logger logger = LoggerFactory.getLogger(RayConfig.class);
 
   // Configuration fields.
+
   public final WorkerMode workerMode;
   public RunMode runMode;
   public final String nodeIp;
@@ -39,7 +43,6 @@ public class RayConfig {
   public final String plasmaStorePath;
   public final String rayletPath;
   public final int headRedisPort;
-  ////
   public final int objectStoreNameIndex;
   public String objectStoreName;
   public String rayletSocketName;
@@ -47,7 +50,6 @@ public class RayConfig {
   public RayConfig(Config config) {
     workerMode = config.getEnum(WorkerMode.class, "ray.worker.mode");
     runMode = config.getEnum(RunMode.class, "ray.run-mode");
-
 
     String ip = null;
     try {
@@ -88,17 +90,22 @@ public class RayConfig {
     rayletPort = config.getInt("ray.raylet.port");
     workerFetchRequestSize = config.getInt("ray.worker-fetch-request-size");
     staticResources = config.getString("ray.static-resources");
-    rayHome = config.getString("ray.home");
 
+    String rayHome = config.getString("ray.home");
+    if (rayHome.endsWith("/")) {
+      rayHome = rayHome.substring(0, rayHome.length() - 1);
+    }
+    this.rayHome = rayHome;
 
-    //TODO(qwang): We should delete the lastest '/'.
-    javaClasspaths = new String[2];
-    javaClasspaths[0] = rayHome + "/java/test/target/classes";
-    javaClasspaths[1] = rayHome + "/java/test/lib/*";
+    javaClasspaths = new String[] {
+        rayHome + "/java/test/target/classes",
+    rayHome + "/java/test/lib/*"
+    };
 
-    javaJnilibPaths = new String[2];
-    javaJnilibPaths[0] = rayHome + "/build/src/plasma";
-    javaJnilibPaths[1] = rayHome + "/build/src/local_scheduler";
+    javaJnilibPaths = new String[] {
+        rayHome + "/build/src/plasma",
+        rayHome + "/build/src/local_scheduler"
+    };
 
     redisServerPath = rayHome + "/build/src/common/thirdparty/redis/src/redis-server";
     redisModulePath = rayHome + "/build/src/common/redis_module/libray_redis_module.so";

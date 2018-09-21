@@ -52,14 +52,14 @@ public class RunManager {
     return runInfo;
   }
 
-  public void startRayHead(RayConfig rayConfig) throws Exception {
+  public void startRayHead() throws Exception {
     if (rayConfig.redisAddress.length() != 0) {
       throw new Exception("Redis address must be empty in head node.");
     }
     if (rayConfig.numberRedisShards <= 0) {
       rayConfig.numberRedisShards = 1;
     }
-    startRayProcesses(rayConfig, true);
+    startRayProcesses(true);
   }
 
   public void startRayNode() throws Exception {
@@ -69,7 +69,7 @@ public class RunManager {
     if (rayConfig.numberRedisShards != 0) {
       throw new Exception("Number of redis shards should be zero in non-head node.");
     }
-    startRayProcesses(rayConfig, false);
+    startRayProcesses(false);
   }
 
   public Process startDriver(String mainClass, String redisAddress, UniqueId driverId,
@@ -107,13 +107,13 @@ public class RunManager {
       boolean cleanup, String agentlibAddr) {
 
     String cmd = buildJavaProcessCommand(pt, mainClass, additonalClassPaths,
-        additionalJvmArgs, ip, redisAddr, agentlibAddr);
+        additionalJvmArgs, ip, agentlibAddr);
     return startProcess(cmd.split(" "), null, pt, "", redisAddr, ip, redirect, cleanup);
   }
 
   private String buildJavaProcessCommand(
       RunInfo.ProcessType pt, String mainClass, String additionalClassPaths,
-      String additionalJvmArgs, String ip, String redisAddr, String agentlibAddr) {
+      String additionalJvmArgs, String ip, String agentlibAddr) {
     String cmd = "java -ea -noverify " + rayConfig.jvmParamters + " ";
     if (agentlibAddr != null && !agentlibAddr.equals("")) {
       cmd += " -agentlib:jdwp=transport=dt_socket,address=" + agentlibAddr + ",server=y,suspend=n";
@@ -202,7 +202,7 @@ public class RunManager {
     }
   }
 
-  private void startRayProcesses(RayConfig rayConfig, boolean startRedisShards) {
+  private void startRayProcesses(boolean startRedisShards) {
     Jedis redisClient = null;
 
     RayLog.core.info("start ray processes @ " + rayConfig.nodeIp + " ...");
@@ -246,8 +246,7 @@ public class RunManager {
     int rpcPort = rayConfig.objectStoreNameIndex;
     String storeName = "/tmp/plasma_store" + rpcPort;
 
-    startObjectStore(0, info,
-        rayConfig.redisAddress, rayConfig.nodeIp, rayConfig.redirectOutput, rayConfig.cleanup);
+    startObjectStore(0, info);
 
     Map<String, Double> staticResources =
             ResourceUtil.getResourcesMapFromString(rayConfig.staticResources);
@@ -255,7 +254,7 @@ public class RunManager {
     //Start raylet
     startRaylet(storeName, info, 0,
         rayConfig.redisAddress,
-        rayConfig.nodeIp, rayConfig.redirectOutput, staticResources, rayConfig.cleanup);
+        rayConfig.nodeIp, staticResources);
 
     runInfo.localStores.add(info);
 
@@ -387,8 +386,8 @@ public class RunManager {
   }
 
   private void startRaylet(String storeName, AddressInfo info, int numWorkers,
-      String redisAddress, String ip, boolean redirect,
-      Map<String, Double> staticResources, boolean cleanup) {
+      String redisAddress, String ip,
+      Map<String, Double> staticResources) {
 
     int rpcPort = rayConfig.rayletPort;
     String rayletSocketName = "/tmp/raylet" + rpcPort;
@@ -396,7 +395,7 @@ public class RunManager {
     String filePath = rayConfig.rayletPath;
 
     //Create the worker command that the raylet will use to start workers.
-    String workerCommand = buildWorkerCommandRaylet(info.storeName, rayletSocketName, ip, redisAddress);
+    String workerCommand = buildWorkerCommandRaylet(info.storeName, rayletSocketName, ip);
 
     int sep = redisAddress.indexOf(':');
     assert (sep != -1);
@@ -415,7 +414,7 @@ public class RunManager {
         resourceArgument, "", workerCommand};
 
     Process p = startProcess(cmds, null, RunInfo.ProcessType.PT_RAYLET,
-        "raylet", redisAddress, ip, redirect, cleanup);
+        "raylet", redisAddress, ip, rayConfig.redirectOutput, rayConfig.cleanup);
 
     if (p != null && p.isAlive()) {
       try {
@@ -435,11 +434,8 @@ public class RunManager {
     }
   }
 
-  private String buildWorkerCommandRaylet(String storeName, String rayletSocketName,
-      String ip, String redisAddress) {
-    //TODO(qwang): We should remove this code once we get rid of `ConfigReader`.
-    String workerConfigs = "ray.java.start.raylet_socket_name=" + rayletSocketName;
-
+  private String buildWorkerCommandRaylet(String storeName,
+      String rayletSocketName, String ip) {
 
     String jvmArgs = "";
     jvmArgs += " -Dlogging.file.name=core-*pid_suffix*";
@@ -451,16 +447,14 @@ public class RunManager {
     return buildJavaProcessCommand(
         RunInfo.ProcessType.PT_WORKER,
         "org.ray.runtime.runner.worker.DefaultWorker",
-        workerConfigs,
+        "",
         jvmArgs,
         ip,
-        redisAddress,
         null
     );
   }
 
-  private void startObjectStore(int index, AddressInfo info, String redisAddress,
-      String ip, boolean redirect, boolean cleanup) {
+  private void startObjectStore(int index, AddressInfo info) {
     long memoryBytes = rayConfig.ObjectStoreOccupiedSize;
     String filePath = rayConfig.plasmaStorePath;
     int rpcPort = rayConfig.objectStoreNameIndex + index;
@@ -470,7 +464,7 @@ public class RunManager {
 
     Map<String, String> env = null;
     Process p = startProcess(cmd.split(" "), env, RunInfo.ProcessType.PT_PLASMA_STORE,
-        "plasma_store", redisAddress, ip, redirect, cleanup);
+        "plasma_store", rayConfig.redisAddress, rayConfig.nodeIp, rayConfig.redirectOutput, rayConfig.cleanup);
 
     if (p != null && p.isAlive()) {
       try {

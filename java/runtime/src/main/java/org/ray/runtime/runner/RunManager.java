@@ -210,7 +210,7 @@ public class RunManager {
     // start primary redis
     if (rayConfig.redisAddress.length() == 0) {
       List<String> primaryShards = startRedis(
-          rayConfig.nodeIp, rayConfig.headRedisPort, 1, rayConfig.redirectOutput, rayConfig.cleanup);
+          rayConfig.nodeIp, rayConfig.headRedisPort, 1);
       rayConfig.redisAddress = primaryShards.get(0);
 
       String[] args = rayConfig.redisAddress.split(":");
@@ -228,9 +228,7 @@ public class RunManager {
     // start redis shards
     if (startRedisShards) {
       runInfo.redisShards = startRedis(
-          rayConfig.nodeIp, rayConfig.headRedisPort + 1, rayConfig.numberRedisShards,
-          rayConfig.redirectOutput,
-          rayConfig.cleanup);
+          rayConfig.nodeIp, rayConfig.headRedisPort + 1, rayConfig.numberRedisShards);
 
       // Store redis shard information in the primary redis shard.
       for (int i = 0; i < runInfo.redisShards.size(); i++) {
@@ -320,15 +318,14 @@ public class RunManager {
   // when the worker exits
   // @return primary redis shard address
   //
-  private List<String> startRedis(String ip, int port, int numOfShards,
-      boolean redirect, boolean cleanup) {
+  private List<String> startRedis(String ip, int port, int numOfShards) {
     ArrayList<String> shards = new ArrayList<>();
     String addr;
     for (int i = 0; i < numOfShards; i++) {
-      addr = startRedisInstance(ip, port + i, redirect, cleanup);
+      addr = startRedisInstance(ip, port + i, rayConfig.redirectOutput, rayConfig.cleanup);
 
       if (addr.length() == 0) {
-        cleanup(cleanup);
+        cleanup(rayConfig.cleanup);
         shards.clear();
         return shards;
       } else {

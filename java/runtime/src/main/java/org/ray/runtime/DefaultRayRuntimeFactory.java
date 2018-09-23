@@ -17,9 +17,9 @@ public class DefaultRayRuntimeFactory implements RayRuntimeFactory {
 
   @Override
   public RayRuntime createRayRuntime() {
+    RayLog.init();
     RayConfig rayConfig = RayConfig.create();
     try {
-      RayLog.init(rayConfig.logDir);
       AbstractRayRuntime runtime;
       if (rayConfig.runMode == RunMode.SINGLE_PROCESS) {
         runtime = new RayDevRuntime(rayConfig);

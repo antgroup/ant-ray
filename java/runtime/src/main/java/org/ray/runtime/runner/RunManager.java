@@ -28,7 +28,7 @@ public class RunManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(RunManager.class);
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
-      DateTimeFormatter.ofPattern("Y-m-d_H-M-S");
+      DateTimeFormatter.ofPattern("Y-M-d_H-m-s");
 
   private static final String WORKER_CLASS = "org.ray.runtime.runner.worker.DefaultWorker";
 
@@ -226,15 +226,16 @@ public class RunManager {
     // library path
     String libraryPath = concatPath(rayConfig.libraryPath.stream());
     cmd.add("-Djava.library.path=" + libraryPath);
+
     // logging path
-    cmd.add("-Dlogging.path=" + rayConfig.logDir);
-    cmd.add("-Dlogging.file.name=worker-*pid_suffix*");
+    if (rayConfig.redirectOutput) {
+      cmd.add("-Dray.logging.stdout=org.apache.log4j.varia.NullAppender");
+      cmd.add("-Dray.logging.file=org.apache.log4j.FileAppender");
+      cmd.add("-Dray.logging.file.path=" + rayConfig.logDir + "/worker");
+    }
 
     // Config overwrite
     cmd.add("-Dray.redis.address=" + rayConfig.getRedisAddress());
-    // XXX
-//    cmd.add("-Dray.object-store.name" + rayConfig.objectStoreName);
-//    cmd.add("-Dray.raylet.socket-name=" + rayConfig.rayletSocketName);
 
     // Main class
     cmd.add(WORKER_CLASS);

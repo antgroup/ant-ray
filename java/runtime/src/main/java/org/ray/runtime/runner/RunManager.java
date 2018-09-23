@@ -165,7 +165,9 @@ public class RunManager {
         "--port",
         String.valueOf(port),
         "--loglevel",
-        "warning"
+        "warning",
+        "--loadmodule",
+        rayConfig.redisModulePath
     );
     String name = shard == null ? "redis" : "redis-" + shard;
     startProcess(command, null, name);
@@ -203,24 +205,30 @@ public class RunManager {
     startProcess(command, null, "raylet");
   }
 
+  private String concatPath(Stream<String> stream) {
+    // TODO (hchen): Right now, raylet backend doesn't support worker command with spaces.
+    // Thus, we have to drop some some paths until that is fixed.
+    return stream.filter(s -> !s.contains(" ")).collect(Collectors.joining(":"));
+  }
+
   private String buildWorkerCommandRaylet() {
     List<String> cmd = new ArrayList<>();
     cmd.add("java");
     cmd.add("-classpath");
 
     // Generate classpath based on current classpath + user-defined classpath.
-    List<String> classpathList = Stream.concat(
+    String classpath = concatPath(Stream.concat(
         Stream.of(System.getProperty("java.class.path").split(":")),
         rayConfig.classpath.stream()
-    ).collect(Collectors.toList());
-    // TODO (hchen): Right now, raylet backend doesn't support worker command with spaces.
-    // Thus, we have to drop some some class paths until that is fixed.
-    classpathList.forEach(s -> {
-      if (s.contains(" ")) {
-        LOGGER.warn("Dropping {} from classpath, because it contains space(s).", s);
-      }
-    });
-    cmd.add(classpathList.stream().filter(s -> !s.contains(" ")).collect(Collectors.joining(":")));
+    ));
+    cmd.add(classpath);
+
+    // library path
+    String libraryPath = concatPath(rayConfig.libraryPath.stream());
+    cmd.add("-Djava.library.path=" + libraryPath);
+    // logging path
+    cmd.add("-Dlogging.path=" + rayConfig.logDir);
+    cmd.add("-Dlogging.file.name=worker-*pid_suffix*");
 
     // Config overwrite
     cmd.add("-Dray.redis.address=" + rayConfig.getRedisAddress());
@@ -230,7 +238,9 @@ public class RunManager {
 
     // Main class
     cmd.add(WORKER_CLASS);
-    return Joiner.on(" ").join(cmd);
+    String command = Joiner.on(" ").join(cmd);
+    LOGGER.debug("Worker command is: {}", command);
+    return command;
   }
 
   private void startObjectStore() {

@@ -9,8 +9,9 @@ public class TestListener extends RunListener {
 
   @Override
   public void testRunStarted(Description description) {
-//    String workDir = System.getProperty("user.dir");
-    System.setProperty("ray.home", "/Users/haochen/code/ant_ray/");
+    String workDir = System.getProperty("user.dir");
+    String rayHome = workDir.substring(0, workDir.length() - "java/test".length());
+    System.setProperty("ray.home", rayHome);
     Ray.init();
   }
 

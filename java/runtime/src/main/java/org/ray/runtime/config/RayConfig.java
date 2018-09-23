@@ -50,6 +50,7 @@ public class RayConfig {
   public final int fetchBatchSize;
 
   public final String redisServerExecutablePath;
+  public final String redisModulePath;
   public final String plasmaStoreExecutablePath;
   public final String rayletExecutablePath;
 
@@ -61,9 +62,14 @@ public class RayConfig {
   }
 
   public RayConfig(Config config) {
+    // worker mode
+    workerMode = config.getEnum(WorkerMode.class, "ray.worker.mode");
+    boolean isDriver = workerMode == WorkerMode.DRIVER;
+    // run mode
+    runMode = config.getEnum(RunMode.class, "ray.run-mode");
     // ray home
     String rayHome = config.getString("ray.home");
-    if (rayHome.isEmpty()) {
+    if (isDriver && rayHome.isEmpty()) {
       String workDir = System.getProperty("user.dir");
       LOGGER.warn(
           "Couldn't find 'ray.home' in configuration, use current worker dir as Ray home: {}",
@@ -80,13 +86,21 @@ public class RayConfig {
       nodeIp = NetworkUtil.getIpAddress(null);
     }
     this.nodeIp = nodeIp;
-    // worker mode
-    workerMode = config.getEnum(WorkerMode.class, "ray.worker.mode");
-    // run mode
-    runMode = config.getEnum(RunMode.class, "ray.run-mode");
     // resources
     resources = ResourceUtil.getResourcesMapFromString(
         config.getString("ray.resources"));
+    if (isDriver) {
+      if (!resources.containsKey("CPU")) {
+        int numCpu = Runtime.getRuntime().availableProcessors();
+        LOGGER.warn("No CPU resource is set in configuration, "
+            + "setting it to the number of CPU cores: {}", numCpu);
+        resources.put("CPU", numCpu * 1.0);
+      }
+      if (!resources.containsKey("GPU")) {
+        LOGGER.warn("No GPU resource is set in configuration, setting it to 0");
+        resources.put("GPU", 0.0);
+      }
+    }
     // driver id
     String driverId = config.getString("ray.driver.id");
     if (!driverId.isEmpty()) {
@@ -132,13 +146,13 @@ public class RayConfig {
     ).addAll(customLibraryPath).build();
 
     redisServerExecutablePath = rayHome + "/build/src/common/thirdparty/redis/src/redis-server";
+    redisModulePath = rayHome + "/build/src/common/redis_module/libray_redis_module.so";
     plasmaStoreExecutablePath = rayHome + "/build/src/plasma/plasma_store_server";
     rayletExecutablePath = rayHome + "/build/src/ray/raylet/raylet";
 
     // validate config
     validate();
     LOGGER.debug("Created config: {}", this);
-    System.out.println(this);
   }
 
   public void setRedisAddress(String redisAddress) {

@@ -50,34 +50,19 @@ public class RunManager {
     }
   }
 
-//  public Process startDriver(String mainClass, String redisAddress, UniqueId driverId,
-//      String logDir, String ip,
-//      String driverClass, String driverArgs, String additonalClassPaths,
-//      String additionalConfigs) {
-//    String driverConfigs =
-//        "ray.java.start.driver_id=" + driverId + ";ray.java.start.driver_class=" + driverClass;
-//    if (driverArgs != null) {
-//      driverConfigs += ";ray.java.start.driver_args=" + driverArgs;
-//    }
-//
-//    if (null != additionalConfigs) {
-//      additionalConfigs += ";" + driverConfigs;
-//    } else {
-//      additionalConfigs = driverConfigs;
-//    }
-//
-//    String cmd = buildJavaProcessCommand(mainClass, additonalClassPaths,
-//        "", ip);
-//    return startProcess(cmd.split(" "), null, ProcessType.PT_DRIVER, "");
-//  }
-
   private void createTempDirs() {
     FileUtil.mkDir(new File(rayConfig.logDir));
     FileUtil.mkDir(new File(rayConfig.rayletSocketName).getParentFile());
     FileUtil.mkDir(new File(rayConfig.objectStoreSocketName).getParentFile());
   }
 
-  private Process startProcess(List<String> command, Map<String, String> env, String name) {
+  /**
+   * Start a process.
+   * @param command The command to start the process with.
+   * @param env Environment variables.
+   * @param name Process name.
+   */
+  private void startProcess(List<String> command, Map<String, String> env, String name) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Starting process {} with command: {}", name, command,
           Joiner.on(" ").join(command));
@@ -117,9 +102,12 @@ public class RunManager {
     }
     processes.add(p);
     LOGGER.info("{} process started", name);
-    return p;
   }
 
+  /**
+   * Start all Ray processes on this node.
+   * @param isHead Whether this node is the head node. If true, redis server will be started.
+   */
   public void startRayProcesses(boolean isHead) {
     LOGGER.info("Starting ray processes @ {}.", rayConfig.nodeIp);
     try {
@@ -141,7 +129,6 @@ public class RunManager {
   private void startRedisServer() {
     // start primary redis
     String primary = startRedisInstance(rayConfig.nodeIp, rayConfig.headRedisPort, null);
-    // XXX
     rayConfig.setRedisAddress(primary);
     try (Jedis client = new Jedis("127.0.0.1", rayConfig.headRedisPort)) {
       client.set("UseRaylet", "1");
@@ -231,7 +218,10 @@ public class RunManager {
     if (rayConfig.redirectOutput) {
       cmd.add("-Dray.logging.stdout=org.apache.log4j.varia.NullAppender");
       cmd.add("-Dray.logging.file=org.apache.log4j.FileAppender");
-      cmd.add("-Dray.logging.file.path=" + rayConfig.logDir + "/worker");
+      int logId = random.nextInt(10000);
+      String date = DATE_TIME_FORMATTER.format(LocalDateTime.now());
+      String logFile = String.format("%s/worker-%s-%05d.out", rayConfig.logDir, date, logId);
+      cmd.add("-Dray.logging.file.path=" + logFile);
     }
 
     // Config overwrite

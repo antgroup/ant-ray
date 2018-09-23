@@ -69,7 +69,7 @@ public class RayCli {
     }
   }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
 
     CommandStart cmdStart = new CommandStart();
     CommandStop cmdStop = new CommandStop();

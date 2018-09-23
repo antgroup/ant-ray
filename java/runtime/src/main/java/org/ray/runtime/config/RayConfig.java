@@ -209,17 +209,16 @@ public class RayConfig {
   }
 
   /**
-   * Create a RayConfig from default config files.
+   * Create a RayConfig by reading configuration in the following order:
+   * 1. System properties.
+   * 2. `ray.conf` file.
+   * 3. `ray.default.conf` file.
   */
   public static RayConfig create() {
-    return create(CUSTOM_CONFIG_FILE, DEFAULT_CONFIG_FILE);
-  }
-
-  public static RayConfig create(String... configFiles) {
-    Config config = ConfigFactory.systemProperties();
-    for (String configFile : configFiles) {
-        config = config.withFallback(ConfigFactory.load(configFile));
-    }
+    Config config = ConfigFactory.systemProperties()
+        .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE))
+        .withFallback(ConfigFactory.load(DEFAULT_CONFIG_FILE));
     return new RayConfig(config);
   }
+
 }

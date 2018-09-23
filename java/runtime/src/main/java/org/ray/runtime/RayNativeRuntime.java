@@ -16,7 +16,6 @@ import org.ray.runtime.gcs.RedisClient;
 import org.ray.runtime.objectstore.ObjectStoreProxy;
 import org.ray.runtime.raylet.RayletClientImpl;
 import org.ray.runtime.runner.RunManager;
-import org.ray.runtime.util.logger.RayLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +76,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     // register
     registerWorker();
 
-    RayLog.core.info("RayNativeRuntime started with store {}, raylet {}",
+    LOGGER.info("RayNativeRuntime started with store {}, raylet {}",
         rayConfig.objectStoreSocketName, rayConfig.rayletSocketName);
   }
 

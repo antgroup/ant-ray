@@ -79,7 +79,13 @@ public class RayConfig {
     // run mode
     runMode = config.getEnum(RunMode.class, "ray.run-mode");
     // ray home
-    rayHome = removeTrailingSlash(config.getString("ray.home"));
+    String rayHome = config.getString("ray.home");
+    if (!rayHome.startsWith("/")) {
+      // If ray.home isn't an absolute path, prepend it with current work dir.
+      rayHome = System.getProperty("user.dir") + "/" + rayHome;
+    }
+    this.rayHome = removeTrailingSlash(rayHome);
+    System.out.println(this.rayHome);
     // node ip
     String nodeIp = config.getString("ray.node-ip");
     if (nodeIp.isEmpty()) {

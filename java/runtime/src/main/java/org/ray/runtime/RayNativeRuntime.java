@@ -1,7 +1,10 @@
 package org.ray.runtime;
 
+import com.google.common.base.Strings;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.apache.arrow.plasma.PlasmaClient;
 import org.ray.runtime.config.RayConfig;
@@ -33,10 +36,36 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     super(rayConfig);
   }
 
+  private void resetLibaryPath() {
+    String path = System.getProperty("java.library.path");
+    if (Strings.isNullOrEmpty(path)) {
+      path = "";
+    } else {
+      path += ":";
+    }
+
+    path += rayConfig.libraryPath.stream().collect(Collectors.joining(":"));
+
+    // This is a hack to reset library path at runtime,
+    // see https://stackoverflow.com/questions/15409223/.
+    System.setProperty("java.library.path", path);
+    //set sys_paths to null so that java.library.path will be re-evalueted next time it is needed
+    final Field sysPathsField;
+    try {
+      sysPathsField = ClassLoader.class.getDeclaredField("sys_paths");
+      sysPathsField.setAccessible(true);
+      sysPathsField.set(null, null);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      e.printStackTrace();
+      LOGGER.error("Failed to set library path.", e);
+    }
+  }
+
   @Override
   public void start() throws Exception {
     // Load native libraries.
     try {
+      resetLibaryPath();
       System.loadLibrary("local_scheduler_library_java");
       System.loadLibrary("plasma_java");
     } catch (Exception e) {

@@ -1,21 +1,20 @@
 package org.ray.api.test;
 
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.ray.runtime.config.RayConfig;
+import org.ray.runtime.config.RunMode;
+import org.ray.runtime.config.WorkerMode;
 
-@RunWith(MyRunner.class)
 public class RayConfigTest {
 
   @Test
-  public void testDefaultConfFile() {
-//    RayConfig rayConfig = Ra
-//
-//    Assert.assertEquals(rayConfig.workerMode, WorkerMode.DRIVER);
-//    Assert.assertEquals(rayConfig.runMode, RunMode.SINGLE_BOX);
-  }
+  public void testCreateRayConfig() {
+    System.setProperty("ray.home", "/path/to/ray");
+    RayConfig rayConfig = RayConfig.create();
 
-  @Test
-  public void testCustomConfFile() {
-
+    Assert.assertEquals(rayConfig.rayHome, "/path/to/ray");
+    Assert.assertEquals(rayConfig.workerMode, WorkerMode.DRIVER);
+    Assert.assertEquals(rayConfig.runMode, RunMode.SINGLE_BOX);
   }
 }

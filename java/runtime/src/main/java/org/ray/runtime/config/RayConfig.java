@@ -58,6 +58,17 @@ public class RayConfig {
     if (workerMode == WorkerMode.WORKER) {
       Preconditions.checkArgument(redisAddress != null,
           "Redis address must be set in worker mode.");
+    } else {
+      Preconditions.checkArgument(!rayHome.isEmpty(),
+          "'ray.home' must be set in driver mode");
+    }
+  }
+
+  private String removeTrailingSlash(String path) {
+    if (path.endsWith("/")) {
+      return path.substring(0, path.length() - 1);
+    } else {
+      return path;
     }
   }
 
@@ -68,18 +79,7 @@ public class RayConfig {
     // run mode
     runMode = config.getEnum(RunMode.class, "ray.run-mode");
     // ray home
-    String rayHome = config.getString("ray.home");
-    if (isDriver && rayHome.isEmpty()) {
-      String workDir = System.getProperty("user.dir");
-      LOGGER.warn(
-          "Couldn't find 'ray.home' in configuration, use current worker dir as Ray home: {}",
-          workDir);
-      rayHome = workDir;
-    }
-    if (rayHome.endsWith("/")) {
-      rayHome = rayHome.substring(0, rayHome.length() - 1);
-    }
-    this.rayHome = rayHome;
+    rayHome = removeTrailingSlash(config.getString("ray.home"));
     // node ip
     String nodeIp = config.getString("ray.node-ip");
     if (nodeIp.isEmpty()) {
@@ -109,7 +109,7 @@ public class RayConfig {
       this.driverId = UniqueId.randomId();
     }
     // log dir
-    logDir = config.getString("ray.log-dir");
+    logDir = removeTrailingSlash(config.getString("ray.log-dir"));
     // redirect output
     redirectOutput = config.getBoolean("ray.redirect-output");
     // custom library path

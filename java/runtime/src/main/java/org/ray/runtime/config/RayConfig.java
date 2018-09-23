@@ -1,122 +1,211 @@
 package org.ray.runtime.config;
 
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
-import org.ray.api.RunMode;
-import org.ray.api.WorkerMode;
+import java.util.List;
+import java.util.Map;
 import org.ray.api.id.UniqueId;
 import org.ray.runtime.util.NetworkUtil;
+import org.ray.runtime.util.ResourceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is used to manager configurations of runtime.
+ * Configurations of Ray runtime.
  */
 public class RayConfig {
-  private Logger logger = LoggerFactory.getLogger(RayConfig.class);
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(RayConfig.class);
 
   public static final String DEFAULT_CONFIG_FILE = "ray.default.conf";
   public static final String CUSTOM_CONFIG_FILE = "ray.conf";
 
-  // Configuration fields.
-
-  public final WorkerMode workerMode;
-  public RunMode runMode;
+  public final String rayHome;
   public final String nodeIp;
-  public String redisAddress;
+  public final WorkerMode workerMode;
+  public final RunMode runMode;
+  public final Map<String, Double> resources;
   public final UniqueId driverId;
   public final String logDir;
   public final boolean redirectOutput;
-  public boolean cleanup;
-  public int numberRedisShards;
+  public final List<String> libraryPath;
+  public final List<String> classpath;
+
+  private String redisAddress;
+  private String redisIp;
+  private Integer redisPort;
+  public final int headRedisPort;
+  public final int numberRedisShards;
+
+  public final String objectStoreSocketName;
+  public final Long objectStoreSize;
+
+  public final String rayletSocketName;
+
   public final int defaultFirstCheckTimeoutMs;
   public final int defaultGetCheckIntervalMs;
-  public final String jvmParamters;
-  public final Long objectStoreOccupiedSize;
-  public final int rayletPort;
-  public final int workerFetchRequestSize;
-  public final String staticResources;
+  public final int fetchBatchSize;
 
-  public final String rayHome;
-  public final String[] javaClasspaths;
-  public final String[] javaJnilibPaths;
-  public final String redisServerPath;
-  public final String redisModulePath;
-  public final String plasmaStorePath;
-  public final String rayletPath;
-  public final int headRedisPort;
-  public final int objectStoreNameIndex;
-  public String objectStoreName;
-  public String rayletSocketName;
+  public final String redisServerExecutablePath;
+  public final String plasmaStoreExecutablePath;
+  public final String rayletExecutablePath;
 
-  public RayConfig() {
-    Config config = ConfigFactory.load(DEFAULT_CONFIG_FILE)
-        .withFallback(ConfigFactory.load(CUSTOM_CONFIG_FILE));
-
-    workerMode = config.getEnum(WorkerMode.class, "ray.worker.mode");
-    runMode = config.getEnum(RunMode.class, "ray.run-mode");
-
-    String ip = null;
-    try {
-      ip = config.getString("ray.node-ip");
-    } catch (ConfigException.Missing e) {
-      ip = NetworkUtil.getIpAddress(null);
+  private void validate() {
+    if (workerMode == WorkerMode.WORKER) {
+      Preconditions.checkArgument(redisAddress != null,
+          "Redis address must be set in worker mode.");
     }
-    nodeIp = ip;
-    redisAddress = config.getString("ray.redis.address");
-    objectStoreName = config.getString("ray.object-store.name");
+  }
 
-    UniqueId uniqueId = null;
-    try {
-      uniqueId = UniqueId.fromHexString(config.getString("ray.driver-id"));
-    } catch (ConfigException.Missing e) {
-      uniqueId = UniqueId.randomId();
-    }
-    driverId = uniqueId;
-
-    String dir = null;
-    try {
-      dir = config.getString("ray.log-dir");
-    } catch (ConfigException.Missing e) {
-      dir = "/tmp/raylogs";
-    }
-    logDir = dir;
-
-    headRedisPort = config.getInt("ray.head.redis.port");
-    objectStoreNameIndex = config.getInt("ray.object-store.name-index");
-    redirectOutput = config.getBoolean("ray.redirect-output");
-    cleanup = config.getBoolean("ray.cleanup");
-    numberRedisShards = config.getInt("ray.number-redis-shards");
-    defaultFirstCheckTimeoutMs = config.getInt("ray.default-first-check-timeout-ms");
-    defaultGetCheckIntervalMs = config.getInt("ray.default-get-check-interval-ms");
-    jvmParamters = config.getString("ray.jvm-parameters");
-    objectStoreOccupiedSize = config.getBytes("ray.object-store.occupied-size");
-    rayletSocketName = config.getString("ray.raylet.socket-name");
-    rayletPort = config.getInt("ray.raylet.port");
-    workerFetchRequestSize = config.getInt("ray.worker-fetch-request-size");
-    staticResources = config.getString("ray.static-resources");
-
+  public RayConfig(Config config) {
+    // ray home
     String rayHome = config.getString("ray.home");
+    if (rayHome.isEmpty()) {
+      String workDir = System.getProperty("user.dir");
+      LOGGER.warn(
+          "Couldn't find 'ray.home' in configuration, use current worker dir as Ray home: {}",
+          workDir);
+      rayHome = workDir;
+    }
     if (rayHome.endsWith("/")) {
       rayHome = rayHome.substring(0, rayHome.length() - 1);
     }
     this.rayHome = rayHome;
+    // node ip
+    String nodeIp = config.getString("ray.node-ip");
+    if (nodeIp.isEmpty()) {
+      nodeIp = NetworkUtil.getIpAddress(null);
+    }
+    this.nodeIp = nodeIp;
+    // worker mode
+    workerMode = config.getEnum(WorkerMode.class, "ray.worker.mode");
+    // run mode
+    runMode = config.getEnum(RunMode.class, "ray.run-mode");
+    // resources
+    resources = ResourceUtil.getResourcesMapFromString(
+        config.getString("ray.resources"));
+    // driver id
+    String driverId = config.getString("ray.driver.id");
+    if (!driverId.isEmpty()) {
+      this.driverId = UniqueId.fromHexString(driverId);
+    } else {
+      this.driverId = UniqueId.randomId();
+    }
+    // log dir
+    logDir = config.getString("ray.log-dir");
+    // redirect output
+    redirectOutput = config.getBoolean("ray.redirect-output");
+    // custom library path
+    List<String> customLibraryPath = config.getStringList("ray.library.path");
+    // custom classpath
+    classpath = config.getStringList("ray.classpath");
 
-    javaClasspaths = new String[] {
-        rayHome + "/java/test/target/classes",
-        rayHome + "/java/test/lib/*"
-    };
+    // redis configurations
+    String redisAddress = config.getString("ray.redis.address");
+    if (!redisAddress.isEmpty()) {
+      setRedisAddress(redisAddress);
+    } else {
+      this.redisAddress = null;
+    }
+    headRedisPort = config.getInt("ray.redis.head-port");
+    numberRedisShards = config.getInt("ray.redis.shard-number");
 
-    javaJnilibPaths = new String[] {
+    // object store configurations
+    objectStoreSocketName = config.getString("ray.object-store.socket-name");
+    objectStoreSize = config.getBytes("ray.object-store.size");
+
+    // raylet socket name
+    rayletSocketName = config.getString("ray.raylet.socket-name");
+
+    // runtime configurations
+    defaultFirstCheckTimeoutMs = config.getInt("ray.runtime.default-first-check-timeout-ms");
+    defaultGetCheckIntervalMs = config.getInt("ray.runtime.default-get-check-interval-ms");
+    fetchBatchSize = config.getInt("ray.runtime.fetch-batch-size");
+
+    // library path
+    this.libraryPath = new ImmutableList.Builder<String>().add(
         rayHome + "/build/src/plasma",
         rayHome + "/build/src/local_scheduler"
-    };
+    ).addAll(customLibraryPath).build();
 
-    redisServerPath = rayHome + "/build/src/common/thirdparty/redis/src/redis-server";
-    redisModulePath = rayHome + "/build/src/common/redis_module/libray_redis_module.so";
-    plasmaStorePath = rayHome + "/build/src/plasma/plasma_store_server";
-    rayletPath = rayHome + "/build/src/ray/raylet/raylet";
+    redisServerExecutablePath = rayHome + "/build/src/common/thirdparty/redis/src/redis-server";
+    plasmaStoreExecutablePath = rayHome + "/build/src/plasma/plasma_store_server";
+    rayletExecutablePath = rayHome + "/build/src/ray/raylet/raylet";
+
+    // validate config
+    validate();
+    LOGGER.debug("Created config: {}", this);
+    System.out.println(this);
+  }
+
+  public void setRedisAddress(String redisAddress) {
+    Preconditions.checkNotNull(redisAddress);
+    Preconditions.checkState(this.redisAddress == null, "Redis address was already set");
+
+    this.redisAddress = redisAddress;
+    String[] ipAndPort = redisAddress.split(":");
+    Preconditions.checkArgument(ipAndPort.length == 2, "Invalid redis address.");
+    this.redisIp = ipAndPort[0];
+    this.redisPort = Integer.parseInt(ipAndPort[1]);
+  }
+
+  public String getRedisAddress() {
+    return redisAddress;
+  }
+
+  public String getRedisIp() {
+    return redisIp;
+  }
+
+  public Integer getRedisPort() {
+    return redisPort;
+  }
+
+  @Override
+  public String toString() {
+    return "RayConfig{" +
+        "rayHome='" + rayHome + '\'' +
+        ", nodeIp='" + nodeIp + '\'' +
+        ", workerMode=" + workerMode +
+        ", runMode=" + runMode +
+        ", resources=" + resources +
+        ", driverId=" + driverId +
+        ", logDir='" + logDir + '\'' +
+        ", redirectOutput=" + redirectOutput +
+        ", libraryPath=" + libraryPath +
+        ", classpath=" + classpath +
+        ", redisAddress='" + redisAddress + '\'' +
+        ", redisIp='" + redisIp + '\'' +
+        ", redisPort=" + redisPort +
+        ", headRedisPort=" + headRedisPort +
+        ", numberRedisShards=" + numberRedisShards +
+        ", objectStoreSocketName='" + objectStoreSocketName + '\'' +
+        ", objectStoreSize=" + objectStoreSize +
+        ", rayletSocketName='" + rayletSocketName + '\'' +
+        ", defaultFirstCheckTimeoutMs=" + defaultFirstCheckTimeoutMs +
+        ", defaultGetCheckIntervalMs=" + defaultGetCheckIntervalMs +
+        ", fetchBatchSize=" + fetchBatchSize +
+        ", redisServerExecutablePath='" + redisServerExecutablePath + '\'' +
+        ", plasmaStoreExecutablePath='" + plasmaStoreExecutablePath + '\'' +
+        ", rayletExecutablePath='" + rayletExecutablePath + '\'' +
+        '}';
+  }
+
+  /**
+   * Create a RayConfig from default config files.
+  */
+  public static RayConfig create() {
+    return create(CUSTOM_CONFIG_FILE, DEFAULT_CONFIG_FILE);
+  }
+
+  public static RayConfig create(String... configFiles) {
+    Config config = ConfigFactory.systemProperties();
+    for (String configFile : configFiles) {
+        config = config.withFallback(ConfigFactory.load(configFile));
+    }
+    return new RayConfig(config);
   }
 }

@@ -1,47 +1,42 @@
 package org.ray.runtime;
 
-import org.ray.api.WorkerMode;
+import org.ray.runtime.config.WorkerMode;
 import org.ray.api.id.UniqueId;
 import org.ray.runtime.task.TaskSpec;
 
 public class WorkerContext {
 
   /**
-   * The mode of this worker.
+   * Worker id.
    */
-  private final WorkerMode workerMode;
+  private UniqueId workerId;
 
   /**
-   * id of worker.
-   */
-  private UniqueId workerId = UniqueId.randomId();
-
-  /**
-   * current doing task.
+   * Current task.
    */
   private TaskSpec currentTask;
+
   /**
-   * current app classloader.
+   * Current class loader.
    */
   private ClassLoader currentClassLoader;
+
   /**
-   * how many puts done by current task.
+   * How many puts have been done by current task.
    */
   private int currentTaskPutCount;
+
   /**
-   * how many calls done by current task.
+   * How many calls have been done by current task.
    */
   private int currentTaskCallCount;
 
   public WorkerContext(WorkerMode workerMode, UniqueId driverId) {
-
-    this.workerMode = workerMode;
-
-    // Initialize some member variables.
-    currentTask = createDummyTask(driverId);
+    workerId = UniqueId.randomId();
     currentTaskPutCount = 0;
     currentTaskCallCount = 0;
     currentClassLoader = null;
+    currentTask = createDummyTask(workerMode, driverId);
   }
 
   public void setWorkerId(UniqueId workerId) {
@@ -76,7 +71,7 @@ public class WorkerContext {
     this.currentClassLoader = currentClassLoader;
   }
 
-  private TaskSpec createDummyTask(UniqueId driverId) {
+  private TaskSpec createDummyTask(WorkerMode workerMode, UniqueId driverId) {
     TaskSpec dummy = new TaskSpec();
     dummy.parentTaskId = UniqueId.NIL;
     if (workerMode == WorkerMode.DRIVER) {

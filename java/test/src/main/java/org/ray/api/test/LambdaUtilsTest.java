@@ -12,7 +12,7 @@ import org.ray.api.function.RayFunc0;
 import org.ray.api.function.RayFunc1;
 import org.ray.api.function.RayFunc3;
 import org.ray.runtime.util.MethodId;
-import org.ray.runtime.util.RayLog;
+import org.ray.runtime.util.logger.RayLog;
 
 public class LambdaUtilsTest {
 

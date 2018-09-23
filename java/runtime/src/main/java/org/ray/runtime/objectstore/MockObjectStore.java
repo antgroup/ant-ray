@@ -7,22 +7,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.arrow.plasma.ObjectStoreLink;
 import org.ray.api.id.UniqueId;
+import org.ray.runtime.RayDevRuntime;
 import org.ray.runtime.raylet.MockRayletClient;
-import org.ray.runtime.task.TaskSpec;
-import org.ray.runtime.util.RayLog;
+import org.ray.runtime.util.logger.RayLog;
 
 /**
  * A mock implementation of {@code org.ray.spi.ObjectStoreLink}, which use Map to store data.
  */
 public class MockObjectStore implements ObjectStoreLink {
 
-  private final TaskSpec currentTask;
+  private final RayDevRuntime runtime;
   private final Map<UniqueId, byte[]> data = new ConcurrentHashMap<>();
   private final Map<UniqueId, byte[]> metadata = new ConcurrentHashMap<>();
   private MockRayletClient scheduler = null;
 
-  public MockObjectStore(TaskSpec currentTask) {
-    this.currentTask = currentTask;
+  public MockObjectStore(RayDevRuntime runtime) {
+    this.runtime = runtime;
   }
 
   @Override
@@ -92,7 +92,7 @@ public class MockObjectStore implements ObjectStoreLink {
   }
 
   private String logPrefix() {
-    return currentTask.taskId + "-" + getUserTrace() + " -> ";
+    return runtime.getWorkerContext().getCurrentTask().taskId + "-" + getUserTrace() + " -> ";
   }
 
   private String getUserTrace() {

@@ -89,6 +89,9 @@ public class ResourceUtil {
       String[] items = resources.split(",");
       for (String item : items) {
         String trimItem = item.trim();
+        if (trimItem.isEmpty()) {
+          continue;
+        }
         String[] resourcePair = trimItem.split(":");
 
         if (resourcePair.length != 2) {

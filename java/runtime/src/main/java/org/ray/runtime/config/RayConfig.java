@@ -186,32 +186,32 @@ public class RayConfig {
 
   @Override
   public String toString() {
-    return "RayConfig{" +
-        "rayHome='" + rayHome + '\'' +
-        ", nodeIp='" + nodeIp + '\'' +
-        ", workerMode=" + workerMode +
-        ", runMode=" + runMode +
-        ", resources=" + resources +
-        ", driverId=" + driverId +
-        ", logDir='" + logDir + '\'' +
-        ", redirectOutput=" + redirectOutput +
-        ", libraryPath=" + libraryPath +
-        ", classpath=" + classpath +
-        ", redisAddress='" + redisAddress + '\'' +
-        ", redisIp='" + redisIp + '\'' +
-        ", redisPort=" + redisPort +
-        ", headRedisPort=" + headRedisPort +
-        ", numberRedisShards=" + numberRedisShards +
-        ", objectStoreSocketName='" + objectStoreSocketName + '\'' +
-        ", objectStoreSize=" + objectStoreSize +
-        ", rayletSocketName='" + rayletSocketName + '\'' +
-        ", defaultFirstCheckTimeoutMs=" + defaultFirstCheckTimeoutMs +
-        ", defaultGetCheckIntervalMs=" + defaultGetCheckIntervalMs +
-        ", fetchBatchSize=" + fetchBatchSize +
-        ", redisServerExecutablePath='" + redisServerExecutablePath + '\'' +
-        ", plasmaStoreExecutablePath='" + plasmaStoreExecutablePath + '\'' +
-        ", rayletExecutablePath='" + rayletExecutablePath + '\'' +
-        '}';
+    return "RayConfig{"
+        + "rayHome='" + rayHome + '\''
+        + ", nodeIp='" + nodeIp + '\''
+        + ", workerMode=" + workerMode
+        + ", runMode=" + runMode
+        + ", resources=" + resources
+        + ", driverId=" + driverId
+        + ", logDir='" + logDir + '\''
+        + ", redirectOutput=" + redirectOutput
+        + ", libraryPath=" + libraryPath
+        + ", classpath=" + classpath
+        + ", redisAddress='" + redisAddress + '\''
+        + ", redisIp='" + redisIp + '\''
+        + ", redisPort=" + redisPort
+        + ", headRedisPort=" + headRedisPort
+        + ", numberRedisShards=" + numberRedisShards
+        + ", objectStoreSocketName='" + objectStoreSocketName + '\''
+        + ", objectStoreSize=" + objectStoreSize
+        + ", rayletSocketName='" + rayletSocketName + '\''
+        + ", defaultFirstCheckTimeoutMs=" + defaultFirstCheckTimeoutMs
+        + ", defaultGetCheckIntervalMs=" + defaultGetCheckIntervalMs
+        + ", fetchBatchSize=" + fetchBatchSize
+        + ", redisServerExecutablePath='" + redisServerExecutablePath + '\''
+        + ", plasmaStoreExecutablePath='" + plasmaStoreExecutablePath + '\''
+        + ", rayletExecutablePath='" + rayletExecutablePath + '\''
+        + '}';
   }
 
   /**

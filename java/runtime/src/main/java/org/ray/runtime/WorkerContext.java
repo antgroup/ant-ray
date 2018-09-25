@@ -1,7 +1,7 @@
 package org.ray.runtime;
 
-import org.ray.runtime.config.WorkerMode;
 import org.ray.api.id.UniqueId;
+import org.ray.runtime.config.WorkerMode;
 import org.ray.runtime.task.TaskSpec;
 
 public class WorkerContext {

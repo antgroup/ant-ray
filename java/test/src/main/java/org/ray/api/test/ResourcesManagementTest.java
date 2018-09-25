@@ -37,7 +37,7 @@ public class ResourcesManagementTest {
     }
   }
 
-  @RayRemote(resources = {@ResourceItem(name = "CPU", value = 8),
+  @RayRemote(resources = {@ResourceItem(name = "CPU", value = 1000),
       @ResourceItem(name = "GPU", value = 0)})
   public static class Echo2 {
     public Integer echo(Integer number) {

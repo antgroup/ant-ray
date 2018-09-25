@@ -4,6 +4,7 @@ package org.ray.runtime.config;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,14 @@ public class RayConfig {
 
   public RayConfig(Config config) {
     // worker mode
-    workerMode = config.getEnum(WorkerMode.class, "ray.worker.mode");
+    WorkerMode localWorkerMode;
+    try {
+      localWorkerMode = config.getEnum(WorkerMode.class, "ray.worker.mode");
+    } catch (ConfigException.Missing e) {
+      localWorkerMode = WorkerMode.DRIVER;
+    }
+
+    workerMode = localWorkerMode;
     boolean isDriver = workerMode == WorkerMode.DRIVER;
     // run mode
     runMode = config.getEnum(RunMode.class, "ray.run-mode");

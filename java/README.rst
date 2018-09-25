@@ -3,10 +3,10 @@ Quick start
 
 Configuration
 -------------
-
 Ray will read your configurations in the following order:
-1) Java system properties: for example ``-Dray.home=/path/to/ray``.
-2) A ``ray.conf`` file in the classpath:`example <https://github.com/ray-project/ray/java/example.conf>`_.
+
+* Java system properties: for example ``-Dray.home=/path/to/ray``.
+* A ``ray.conf`` file in the classpath:`example <https://github.com/ray-project/ray/java/example.conf>`_.
 
 For all available config items, see `this file <https://github.com/ray-project/ray/java/runtime/src/main/resources/ray.default.conf>`_.
 

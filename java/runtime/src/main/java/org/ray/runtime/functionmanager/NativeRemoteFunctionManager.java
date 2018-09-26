@@ -9,9 +9,9 @@ import org.ray.api.id.UniqueId;
 import org.ray.runtime.gcs.KeyValueStoreLink;
 import org.ray.runtime.util.FileUtil;
 import org.ray.runtime.util.JarLoader;
-import org.ray.runtime.util.RayLog;
 import org.ray.runtime.util.Sha1Digestor;
 import org.ray.runtime.util.SystemUtil;
+import org.ray.runtime.util.logger.RayLog;
 
 /**
  * native implementation of remote function manager.

@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.arrow.plasma.ObjectStoreLink;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ray.api.RayActor;
 import org.ray.api.RayObject;
@@ -17,17 +16,16 @@ import org.ray.api.runtime.RayRuntime;
 import org.ray.runtime.config.RayConfig;
 import org.ray.runtime.functionmanager.LocalFunctionManager;
 import org.ray.runtime.functionmanager.RayMethod;
-import org.ray.runtime.functionmanager.RemoteFunctionManager;
 import org.ray.runtime.objectstore.ObjectStoreProxy;
 import org.ray.runtime.objectstore.ObjectStoreProxy.GetStatus;
 import org.ray.runtime.raylet.RayletClient;
 import org.ray.runtime.task.ArgumentsBuilder;
 import org.ray.runtime.task.TaskSpec;
 import org.ray.runtime.util.MethodId;
-import org.ray.runtime.util.RayLog;
 import org.ray.runtime.util.ResourceUtil;
 import org.ray.runtime.util.UniqueIdHelper;
 import org.ray.runtime.util.exception.TaskExecutionException;
+import org.ray.runtime.util.logger.RayLog;
 
 /**
  * Core functionality to implement Ray APIs.
@@ -40,45 +38,20 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   protected RayletClient rayletClient;
   protected ObjectStoreProxy objectStoreProxy;
   protected LocalFunctionManager functions;
-  protected RemoteFunctionManager remoteFunctionManager;
 
   /**
    * Actor ID -> local actor instance.
    */
   Map<UniqueId, Object> localActors = new HashMap<>();
 
-  // app level Ray.init()
-  // make it private so there is no direct usage but only from Ray.init
-  public void init(RayConfig rayConfig) {
-    workerContext = new WorkerContext(rayConfig.workerMode, rayConfig.driverId);
+  public AbstractRayRuntime(RayConfig rayConfig) {
     this.rayConfig = rayConfig;
-    RayLog.init(rayConfig.logDir);
-
-    try {
-      start();
-    } catch (Exception e) {
-      e.printStackTrace();
-      RayLog.core.error("Failed to init RayRuntime", e);
-      System.exit(-1);
-    }
-  }
-
-  protected void initMembers(
-      RayletClient slink,
-      ObjectStoreLink plink,
-      RemoteFunctionManager remoteLoader
-  ) {
-    remoteFunctionManager = remoteLoader;
-
-    functions = new LocalFunctionManager(remoteLoader);
-    rayletClient = slink;
-
-    objectStoreProxy = new ObjectStoreProxy(plink, workerContext.getCurrentClassLoader());
     worker = new Worker(this);
+    workerContext = new WorkerContext(rayConfig.workerMode, rayConfig.driverId);
   }
 
   /**
-   * start runtime.
+   * Start runtime.
    */
   public abstract void start() throws Exception;
 
@@ -116,7 +89,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
       // Do an initial fetch for remote objects.
       List<List<UniqueId>> fetchBatches =
-          splitIntoBatches(objectIds, rayConfig.workerFetchRequestSize);
+          splitIntoBatches(objectIds, rayConfig.fetchBatchSize);
       for (List<UniqueId> batch : fetchBatches) {
         rayletClient.reconstructObjects(batch, true);
       }
@@ -140,7 +113,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       while (unreadys.size() > 0) {
         List<UniqueId> unreadyList = new ArrayList<>(unreadys.keySet());
         List<List<UniqueId>> reconstructBatches =
-            splitIntoBatches(unreadyList, rayConfig.workerFetchRequestSize);
+            splitIntoBatches(unreadyList, rayConfig.fetchBatchSize);
 
         for (List<UniqueId> batch : reconstructBatches) {
           rayletClient.reconstructObjects(batch, false);
@@ -308,6 +281,10 @@ public abstract class AbstractRayRuntime implements RayRuntime {
 
   public Worker getWorker() {
     return worker;
+  }
+
+  public WorkerContext getWorkerContext() {
+    return workerContext;
   }
 
   public RayletClient getRayletClient() {

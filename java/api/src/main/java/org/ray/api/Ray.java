@@ -20,9 +20,8 @@ public final class Ray extends RayCall {
       Class clz = Class.forName("org.ray.runtime.DefaultRayRuntimeFactory");
       RayRuntimeFactory factory = (RayRuntimeFactory) clz.newInstance();
       init(factory);
-
     } catch (Exception e) {
-      throw new RuntimeException("Failded to initialize Ray API.");
+      throw new RuntimeException("Failed to initialize Ray runtime.", e);
     }
 
   }

@@ -93,7 +93,6 @@ public class RayConfig {
       rayHome = System.getProperty("user.dir") + "/" + rayHome;
     }
     this.rayHome = removeTrailingSlash(rayHome);
-    System.out.println(this.rayHome);
     // node ip
     String nodeIp = config.getString("ray.node-ip");
     if (nodeIp.isEmpty()) {

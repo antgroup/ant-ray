@@ -30,6 +30,9 @@ matrix:
         - export PATH="$HOME/miniconda/bin:$PATH"
       script:
       - ./java/test.sh
+      - pushd java
+      - ./test_cluster.sh
+      - popd
 
     - os: linux
       dist: trusty

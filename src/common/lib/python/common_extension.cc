@@ -11,8 +11,8 @@
 #include "common_extension.h"
 #include "common_protocol.h"
 #include "ray/raylet/task.h"
-#include "ray/raylet/task_spec.h"
 #include "ray/raylet/task_execution_spec.h"
+#include "ray/raylet/task_spec.h"
 #include "task.h"
 
 #include <string>
@@ -72,6 +72,33 @@ int PyObjectToUniqueID(PyObject *object, ObjectID *objectid) {
     return 1;
   } else {
     PyErr_SetString(PyExc_TypeError, "must be an ObjectID");
+    return 0;
+  }
+}
+
+int PyListStringToFunctionDescriptor(
+    PyObject *object,
+    std::vector<std::string> *function_descriptor) {
+  if (function_descriptor == nullptr) {
+    PyErr_SetString(PyExc_TypeError,
+                    "function descriptor must be non-empty pointer");
+    return 0;
+  }
+  function_descriptor->clear();
+  std::vector<std::string> string_vector;
+  if (PyList_Check(object)) {
+    if (PyList_Size(object) == 0) {
+      return 1;
+    }
+    Py_ssize_t size = PyList_Size(object);
+    for (Py_ssize_t i = 0; i < size; ++i) {
+      PyObject *item = PyList_GetItem(object, i);
+      function_descriptor->emplace_back(PyBytes_AsString(item),
+                                        PyBytes_Size(item));
+    }
+    return 1;
+  } else {
+    PyErr_SetString(PyExc_TypeError, "must be a list of strings");
     return 0;
   }
 }
@@ -357,8 +384,6 @@ static int PyTask_init(PyTask *self, PyObject *args, PyObject *kwds) {
   int actor_counter = 0;
   // True if this is an actor checkpoint task and false otherwise.
   PyObject *is_actor_checkpoint_method_object = nullptr;
-  // ID of the function this task executes.
-  FunctionID function_id;
   // Arguments of the task (can be PyObjectIDs or Python values).
   PyObject *arguments;
   // Number of return values of this task.
@@ -380,10 +405,12 @@ static int PyTask_init(PyTask *self, PyObject *args, PyObject *kwds) {
   PyObject *placement_resource_map = nullptr;
   // True if we should use the raylet code path and false otherwise.
   PyObject *use_raylet_object = nullptr;
+  // Function descriptor.
+  std::vector<std::string> function_descriptor;
   if (!PyArg_ParseTuple(
           args, "O&O&OiO&i|O&O&O&O&iOOOOO", &PyObjectToUniqueID, &driver_id,
-          &PyObjectToUniqueID, &function_id, &arguments, &num_returns,
-          &PyObjectToUniqueID, &parent_task_id, &parent_counter,
+          &PyListStringToFunctionDescriptor, &function_descriptor, &arguments,
+          &num_returns, &PyObjectToUniqueID, &parent_task_id, &parent_counter,
           &PyObjectToUniqueID, &actor_creation_id, &PyObjectToUniqueID,
           &actor_creation_dummy_object_id, &PyObjectToUniqueID, &actor_id,
           &PyObjectToUniqueID, &actor_handle_id, &actor_counter,
@@ -436,8 +463,8 @@ static int PyTask_init(PyTask *self, PyObject *args, PyObject *kwds) {
     TaskSpec_start_construct(
         g_task_builder, driver_id, parent_task_id, parent_counter,
         actor_creation_id, actor_creation_dummy_object_id, actor_id,
-        actor_handle_id, actor_counter, is_actor_checkpoint_method, function_id,
-        num_returns);
+        actor_handle_id, actor_counter, is_actor_checkpoint_method,
+        function_descriptor, num_returns);
     // Add the task arguments.
     for (Py_ssize_t i = 0; i < num_args; ++i) {
       PyObject *arg = PyList_GetItem(arguments, i);
@@ -490,8 +517,8 @@ static int PyTask_init(PyTask *self, PyObject *args, PyObject *kwds) {
     self->task_spec = new ray::raylet::TaskSpecification(
         driver_id, parent_task_id, parent_counter, actor_creation_id,
         actor_creation_dummy_object_id, actor_id, actor_handle_id,
-        actor_counter, function_id, args, num_returns, required_resources,
-        required_placement_resources, Language::PYTHON);
+        actor_counter, args, num_returns, required_resources,
+        required_placement_resources, Language::PYTHON, function_descriptor);
   }
 
   /* Set the task's execution dependencies. */
@@ -523,14 +550,27 @@ static void PyTask_dealloc(PyTask *self) {
   Py_TYPE(self)->tp_free(reinterpret_cast<PyObject *>(self));
 }
 
-static PyObject *PyTask_function_id(PyTask *self) {
-  FunctionID function_id;
-  if (!use_raylet(self)) {
-    function_id = TaskSpec_function(self->spec);
-  } else {
-    function_id = self->task_spec->FunctionId();
+// Helper function to change a function descriptr to Python list.
+static PyObject *VectorStringToPyBytesList(
+    const std::vector<std::string> &function_descriptor) {
+  size_t size = function_descriptor.size();
+  PyObject *return_list = PyList_New(static_cast<Py_ssize_t>(size));
+  for (size_t i = 0; i < size; ++i) {
+    auto py_bytes = PyBytes_FromStringAndSize(function_descriptor[i].data(),
+                                              function_descriptor[i].size());
+    PyList_SetItem(return_list, i, py_bytes);
   }
-  return PyObjectID_make(function_id);
+  return return_list;
+}
+
+static PyObject *PyTask_function_descriptor_vector(PyTask *self) {
+  std::vector<std::string> function_descriptor;
+  if (!use_raylet(self)) {
+    function_descriptor = TaskSpec_function_descriptor(self->spec);
+  } else {
+    function_descriptor = self->task_spec->FunctionDescriptor();
+  }
+  return VectorStringToPyBytesList(function_descriptor);
 }
 
 static PyObject *PyTask_actor_id(PyTask *self) {
@@ -754,8 +794,9 @@ static PyObject *PyTask_to_serialized_flatbuf(PyTask *self) {
 }
 
 static PyMethodDef PyTask_methods[] = {
-    {"function_id", (PyCFunction) PyTask_function_id, METH_NOARGS,
-     "Return the function ID for this task."},
+    {"function_descriptor_list",
+     (PyCFunction) PyTask_function_descriptor_vector, METH_NOARGS,
+     "Return the function descriptor for this task."},
     {"parent_task_id", (PyCFunction) PyTask_parent_task_id, METH_NOARGS,
      "Return the task ID of the parent task."},
     {"parent_counter", (PyCFunction) PyTask_parent_counter, METH_NOARGS,

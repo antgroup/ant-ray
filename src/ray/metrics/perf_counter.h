@@ -24,9 +24,13 @@ class PerfCounter final {
                               const std::string &short_name,
                               int64_t value);
 
-  static void AddGroup(const std::string &domain,
-                       const std::string &group_name,
-                       const std::map<std::string, std::string> &tag_map = {});
+  static void AddCounterGroup(const std::string &domain,
+                              const std::string &group_name,
+                              const std::map<std::string, std::string> &tag_map = {});
+
+  static void AddCounterGroup(const std::string &domain,
+                              std::shared_ptr<MetricsGroupInterface> group);
+
  private:
   typedef std::unordered_map<std::string, std::shared_ptr<MetricsGroupInterface>> NameToGroupMap;
   typedef std::unordered_map<std::string, NameToGroupMap> DomainToGroupsMap;

@@ -10,29 +10,26 @@ namespace metrics {
 
 class EmptyMetricsRegistry : public MetricsRegistryInterface {
  public:
-  EmptyMetricsRegistry(RegistryOption options)
-  : MetricsRegistryInterface(options) {}
+  explicit EmptyMetricsRegistry(RegistryOption options)
+  : MetricsRegistryInterface(std::move(options)) {}
 
   virtual ~EmptyMetricsRegistry() {}
 
-  virtual void RegisterCounter(const std::string &metric_name) {}
-
-  virtual void RegisterGauge(const std::string &metric_name) {}
-
-  virtual void RegisterHistogram(const std::string &metric_name) {}
-
-  virtual void RegisterHistogram(const std::string &metric_name,
-                                 const std::unordered_set<double> &percentiles) {}
-
-  virtual void UpdateValue(const std::string &metric_name,
-                           int64_t value) {}
-
-  virtual void UpdateValue(const std::string &metric_name,
-                           int64_t value,
-                           const Tags &tags) {}
-
-  virtual void ExportMetrics(const std::regex &filter,
+  virtual void ExportMetrics(const std::string &regex_filter,
                              std::vector<prometheus::MetricFamily> *metrics) {}
+
+ protected:
+  virtual void DoRegisterCounter(const std::string &metric_name, const TagKeys *tag_keys) {}
+
+  virtual void DoRegisterGauge(const std::string &metric_name, const TagKeys *tag_keys) {}
+
+
+  virtual void DoRegisterHistogram(const std::string &metric_name,
+                                   const std::unordered_set<double> &percentiles) {}
+
+  virtual void DoUpdateValue(const std::string &metric_name,
+                             int64_t value,
+                             const Tags *tags) {}
 
  private:
   std::unordered_map<size_t, TagMap> id_to_tagmap_;

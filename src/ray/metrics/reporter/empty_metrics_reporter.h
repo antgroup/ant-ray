@@ -7,10 +7,10 @@ namespace ray {
 
 namespace metrics {
 
-class EmptyMetricsReporter : public MetricsReporter {
+class EmptyMetricsReporter : public MetricsReporterInterface {
  public:
-  EmptyMetricsReporter(ReporterOption options)
-  : MetricsReporter(options) {}
+  explicit EmptyMetricsReporter(ReporterOption options)
+  : MetricsReporterInterface(options) {}
 
   virtual ~EmptyMetricsReporter() = default;
 
@@ -26,9 +26,8 @@ class EmptyMetricsReporter : public MetricsReporter {
     return true;
   }
 
-  virtual void RegisterRegistry(MetricsRegistry* registry) {}
+  virtual void RegisterRegistry(MetricsRegistryInterface* registry) {}
 
-  virtual void UnRegisterRegistry(MetricsRegistry* registry) {}
 };
 
 }  // namespace metrics

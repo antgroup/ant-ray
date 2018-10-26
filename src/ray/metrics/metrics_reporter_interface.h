@@ -13,9 +13,16 @@ namespace metrics {
 
 class ReporterOption {
  public:
+  std::string user_name_;
+  std::string password_;
+  std::string job_name_;
+
   std::string service_addr_;
+
   std::chrono::seconds report_interval_{10};
-  std::regex filter_{".*"};
+  std::string regex_exp_{".*"};
+
+  int64_t max_retry_times_{3};
 };
 
 class MetricsReporterInterface {
@@ -30,10 +37,8 @@ class MetricsReporterInterface {
 
   virtual void RegisterRegistry(MetricsRegistryInterface* registry) = 0;
 
-  virtual void UnRegisterRegistry(MetricsRegistryInterface* registry) = 0;
-
  protected:
-  MetricsReporterInterface(ReporterOption options)
+  explicit MetricsReporterInterface(ReporterOption options)
   : options_(std::move(options)) {}
 
   ReporterOption options_;

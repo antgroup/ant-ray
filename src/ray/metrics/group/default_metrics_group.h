@@ -11,9 +11,8 @@ class DefaultMetricsGroup : public MetricsGroupInterface {
  public:
    DefaultMetricsGroup(const std::string &domain,
                        const std::string &group_name,
-                       const std::map<std::string, std::string> &tag_map,
-                       std::shared_ptr<MetricsGroupInterface> parent_group,
-                       MetricsRegistryInterface* registry);
+                       MetricsRegistryInterface* registry,
+                       const std::map<std::string, std::string> &tag_map = {});
 
   virtual ~DefaultMetricsGroup() = default;
 
@@ -22,16 +21,6 @@ class DefaultMetricsGroup : public MetricsGroupInterface {
   virtual void UpdateGauge(const std::string &short_name, int64_t value);
 
   virtual void UpdateHistogram(const std::string &short_name, int64_t value);
-
-  virtual void AddGroup(std::shared_ptr<MetricsGroupInterface> childGroup);
-
-  virtual std::shared_ptr<MetricsGroupInterface> AddGroup(
-    const std::string &domain,
-    const std::string &group_name,
-    const std::map<std::string, std::string> &tag_map);
-
-  virtual void RemoveGroup(const std::string &group_name);
-
 };
 
 }  // namespace metrics

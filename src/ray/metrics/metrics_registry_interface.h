@@ -13,11 +13,20 @@ namespace ray {
 
 namespace metrics {
 
+enum class MetricType : int8_t {
+  kCount,
+  kGauge,
+  kHistogram,
+};
+
 class RegistryOption {
  public:
   std::string delimiter_{"."};
-  std::unordered_set<double> default_percentiles_{60, 90, 99, 99.99};
   std::map<std::string, std::string> default_tagmap_;
+
+  // Histogram params
+  std::unordered_set<double> default_percentiles_{0.01, 1, 60, 90, 99, 99.99};
+  size_t bucket_count_{20};
 };
 
 class MetricsRegistryInterface {
@@ -25,19 +34,21 @@ class MetricsRegistryInterface {
   virtual ~MetricsRegistryInterface() = default;
 
   void RegisterCounter(const std::string &metric_name,
-                       const TagKeys *tag_keys = nullptr) {
-    DoRegisterCounter(metric_name, tag_keys);
+                       const Tags *tags = nullptr) {
+    DoRegisterCounter(metric_name, tags);
   }
 
   void RegisterGauge(const std::string &metric_name,
-                     const TagKeys *tag_keys = nullptr) {
-    DoRegisterGauge(metric_name, tag_keys);
+                     const Tags *tags = nullptr) {
+    DoRegisterGauge(metric_name, tags);
   }
 
   void RegisterHistogram(const std::string &metric_name,
+                         int64_t min_value,
+                         int64_t max_value,
                          const std::unordered_set<double> &percentiles = {},
-                         const TagKeys *tag_keys = nullptr) {
-    DoRegisterHistogram(metric_name, percentiles, tag_keys);
+                         const Tags *tags = nullptr) {
+    DoRegisterHistogram(metric_name, percentiles, tags);
   }
 
   void UpdateValue(const std::string &metric_name,
@@ -66,18 +77,24 @@ class MetricsRegistryInterface {
   MetricsRegistryInterface &operator=(const MetricsRegistryInterface &) = delete;
 
   virtual void DoRegisterCounter(const std::string &metric_name,
-                                 const TagKeys *tag_keys) = 0;
+                                 const Tags *tags) = 0;
 
   virtual void DoRegisterGauge(const std::string &metric_name,
-                               const TagKeys *tag_keys) = 0;
+                               const Tags *tags) = 0;
 
   virtual void DoRegisterHistogram(const std::string &metric_name,
+                                   int64_t min_value,
+                                   int64_t max_value,
                                    const std::unordered_set<double> &percentiles,
-                                   const TagKeys *tag_keys) = 0;
+                                   const Tags *tags) = 0;
 
   virtual void DoUpdateValue(const std::string &metric_name,
                              int64_t value,
                              const Tags *tags) = 0;
+
+  std::vector<int64_t> GenBucketBoundaries(int64_t min_value,
+                                           int64_t max_value,
+                                           size_t bucket_count) const;
 
   Tags default_tags_;
   RegistryOption options_;

@@ -64,7 +64,7 @@ void MetricDescr::Init(const RegistryOption &options,
 }
 
 void MetricDescr::AddColumnToDescr(const TagKeys *tag_keys,
-                                   opencensus::stats::ViewDescriptor* view_descr) {
+                                   opencensus::stats::ViewDescriptor *view_descr) {
   if (tag_keys == nullptr) {
     return;
   }
@@ -74,7 +74,6 @@ void MetricDescr::AddColumnToDescr(const TagKeys *tag_keys,
     view_descr->add_column(tag_key);
   }
 }
-
 
 void MetricDescr::UpdateValue(int64_t value, opencensus::tags::TagMap *tag_map) {
   Measurement<int64_t> m(measure_, value);
@@ -116,29 +115,29 @@ void OpenCensusMetricsRegistry::ExportMetrics(const std::string &regex_filter,
 }
 
 void OpenCensusMetricsRegistry::DoRegisterCounter(const std::string &metric_name,
-                                                  const TagKeys *tag_keys) {
-  DoRegisterMetric(metric_name, tag_keys, MetricDescr::MetricType::kCount);
+                                                  const Tags *tags) {
+  DoRegister(metric_name, MetricType::kCount, tags);
 }
 
 void OpenCensusMetricsRegistry::DoRegisterGauge(const std::string &metric_name,
-                                                const TagKeys *tag_keys) {
-  DoRegisterMetric(metric_name, tag_keys, MetricDescr::MetricType::kGauge);
+                                                const Tags *tags) {
+  DoRegister(metric_name, MetricType::kGauge, tags);
 }
 
 void OpenCensusMetricsRegistry::DoRegisterHistogram(
   const std::string &metric_name,
+  int64_t min_value,
+  int64_t max_value,
   const std::unordered_set<double> &percentiles,
-  const TagKeys *tag_keys) {
+  const Tags *tags) {
   // TODO(micafan) percentiles
-  DoRegisterMetric(metric_name, tag_keys, MetricDescr::MetricType::kHistogram);
+  DoRegister(metric_name, MetricType::kHistogram, tags);
 }
 
 
 MetricDescr *OpenCensusMetricsRegistry::DoRegister(const std::string &metric_name,
                                                    MetricDescr::MetricType type,
-                                                   const TagKeys *tag_keys) {
-  const TagKeys *cur_tag_keys = (tag_keys != nullptr) ? tag_keys
-    : &default_tags_.GetTagKeys();
+                                                   const Tags *tags) {
   // Check if it is already registered
   {
     ReadLock lock(shared_mutex_);
@@ -147,6 +146,9 @@ MetricDescr *OpenCensusMetricsRegistry::DoRegister(const std::string &metric_nam
       return &it->second;
     }
   }
+
+  const TagKeys *cur_tag_keys = (tags != nullptr) ? &tags->GetTagKeys()
+    : &default_tags_.GetTagKeys();
   // Try to register
   {
     WriteLock lock(shared_mutex_);
@@ -177,7 +179,7 @@ void OpenCensusMetricsRegistry::DoUpdateValue(const std::string &metric_name,
   if (descr == nullptr) {
     const TagKeys *tag_keys = (tags == nullptr) ? nullptr
       : &tags->GetTagKeys();
-    descr = DoRegister(metric_name, MetricDescr::MetricType::kCount, tag_keys);
+    descr = DoRegister(metric_name, MetricType::kCount, tag_keys);
   }
 
   const opencensus::tags::TagMap &oc_tag_map = (tags != nullptr) ? GetTagMap(*tags)

@@ -12,12 +12,6 @@ namespace metrics {
 
 class MetricDescr {
  public:
-  enum class MetricType : int8_t {
-    kCount = 0,
-    kGauge,
-    kHistogram,
-  };
-
   MetricDescr(MetricType type)
   : type_(type) {}
 
@@ -31,7 +25,7 @@ class MetricDescr {
 
  private:
   void AddColumnToDescr(const TagKeys *tag_keys,
-                        opencensus::stats::ViewDescriptor* view_descr) const;
+                        opencensus::stats::ViewDescriptor *view_descr) const;
 
   MetricType type_;
   opencensus::stats::MeasureInt64 measure_;
@@ -49,14 +43,16 @@ class OpenCensusMetricsRegistry : public MetricsRegistryInterface {
 
  protected:
   virtual void DoRegisterCounter(const std::string &metric_name,
-                                 const TagKeys *tag_keys);
+                                 const Tags *tags);
 
   virtual void DoRegisterGauge(const std::string &metric_name,
-                               const TagKeys *tag_keys);
+                               const Tags *tags);
 
   virtual void DoRegisterHistogram(const std::string &metric_name,
+                                   int64_t min_value,
+                                   int64_t max_value,
                                    const std::unordered_set<double> &percentiles,
-                                   const TagKeys *tag_keys);
+                                   const Tags *tags);
 
   virtual void DoUpdateValue(const std::string &metric_name,
                              int64_t value,
@@ -65,7 +61,7 @@ class OpenCensusMetricsRegistry : public MetricsRegistryInterface {
  private:
   MetricDescr *DoRegister(const std::string &metric_name,
                           MetricDescr::MetricType type,;
-                          const TagKeys *tag_keys);
+                          const Tags *tags);
 
   const opencensus::tags::TagMap &GetTagMap(const Tags &tags);
 

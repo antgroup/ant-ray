@@ -23,7 +23,10 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
   virtual void UpdateGauge(const std::string &short_name, int64_t value) = 0;
 
   /// update histogram by short name
-  virtual void UpdateHistogram(const std::string &short_name, int64_t value) = 0;
+  virtual void UpdateHistogram(const std::string &short_name,
+                               int64_t value,
+                               int64_t min_value,
+                               int64_t max_value) = 0;
 
   virtual const std::string &GetGroupName() const {
     return group_name_;
@@ -33,10 +36,14 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
     return domain_;
   }
 
+  virtual void SetRegistry(MetricsRegistryInterface *registry) {
+    // TODO(micafan) CHECK
+    registry_ = registry;
+  }
+
  protected:
   MetricsGroupInterface(const std::string& domain,
                         const std::string& group_name,
-                        MetricsRegistry* registry,
                         const std::map<std::string, std::string> &tag_map = {});
 
   MetricsGroupInterface(const MetricsGroupInterface &) = delete;
@@ -47,7 +54,7 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
   /// The name of current group
   std::string group_name_;
 
-  MetricsRegistry *registry_{nullptr};
+  MetricsRegistryInterface *registry_{nullptr};
 
   /// Tags of current group
   Tags *tags_(nullptr);

@@ -57,7 +57,7 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
   MetricsRegistryInterface *registry_{nullptr};
 
   /// Tags of current group
-  Tags *tags_(nullptr);
+  Tags *tags_{nullptr};
 };
 
 }  // namespace metrics

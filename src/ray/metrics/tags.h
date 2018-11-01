@@ -35,11 +35,8 @@ class TagKeys {
 /// Tags is immutable
 class Tags {
  public:
-   Tags();
 
   explicit Tags(const std::map<std::string, std::string> &tag_map);
-
-  Tags(const Tags &tags, const std::map<std::string, std::string> &add);
 
   ~Tags() = default;
 

@@ -1,5 +1,6 @@
 #include "tags.h"
 
+#include <numeric>
 #include <unordered_map>
 #include <string>
 
@@ -17,13 +18,13 @@ TagKeys::TagKeys(const std::set<std::string> &keys)
 }
 
 void TagKeys::DoHash() {
-  size_t final_code = 0;
-  for(const auto &tag_key : keys_) {
-    size_t key_code = std::hash<std::string>(tag_key);
-    final_code = final_code ^ (key_code);
-  }
+  auto combined = std::accumulate(keys_.begin(),
+      keys_.end(), std::string{}, [](const std::string &acc,
+                                     const std::string &key){
+    return acc + key;
+  });
 
-  id_ = final_code;
+  id = std::hash<std::string>{}(combined);
 }
 
 Tags::Tags(const std::map<std::string, std::string> &tag_map)
@@ -33,13 +34,15 @@ Tags::Tags(const std::map<std::string, std::string> &tag_map)
 
 //TODO(qwang): Should we implement this with SHA like UniqueID?
 void Tags::DoHash() {
-  size_t final_code = 0;
-  for(const auto &tag : tag_map_) {
-    size_t tag_code = std::hash<std::string>()(tag.first + tag.second);
-    final_code = final_code ^ (tag_code << 1);
-  }
+  const auto accumulate_tag_handler = [](const std::string &acc,
+      const std::pair<std::string, std::string> &tag){
+    return acc + tag.first + tag.second;
+  };
 
-    id_ = final_code;
+  auto combined = std::accumulate(tag_map_.begin(),
+      tag_map_.end(), std::string{},accumulate_pair_handler);
+
+  id_ = std::hash<std::string>{}(combined);
 }
 
 }  // namespace metrics

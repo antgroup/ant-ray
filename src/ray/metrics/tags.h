@@ -13,7 +13,7 @@ class TagKeys {
  public:
   TagKeys();
 
-  TagKeys(const std::set<std::string> &keys);
+  TagKeys(const std::set<std::string> &keys = {});
 
   ~TagKeys() = default;
 
@@ -36,7 +36,7 @@ class TagKeys {
 class Tags {
  public:
 
-  explicit Tags(const std::map<std::string, std::string> &tag_map);
+  explicit Tags(const std::map<std::string, std::string> &tag_map = {});
 
   ~Tags() = default;
 

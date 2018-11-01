@@ -3,6 +3,7 @@
 #include <numeric>
 #include <unordered_map>
 #include <string>
+#include <set>
 
 namespace ray {
 
@@ -30,6 +31,13 @@ void TagKeys::DoHash() {
 Tags::Tags(const std::map<std::string, std::string> &tag_map)
     : tag_map_(tag_map) {
   DoHash();
+
+  std::set<srd::string> keys;
+  for (const auto &tag : tag_map_) {
+    keys.insert(tag.first);
+  }
+
+  keys_ = TagKeys(keys);
 }
 
 //TODO(qwang): Should we implement this with SHA like UniqueID?
@@ -40,7 +48,7 @@ void Tags::DoHash() {
   };
 
   auto combined = std::accumulate(tag_map_.begin(),
-      tag_map_.end(), std::string{},accumulate_pair_handler);
+      tag_map_.end(), std::string{}, accumulate_tag_handler);
 
   id_ = std::hash<std::string>{}(combined);
 }

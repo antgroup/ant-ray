@@ -2,6 +2,7 @@
 #define RAY_METRICS_TAGS_H
 
 #include <map>
+#include <set>
 #include <string>
 
 namespace ray {
@@ -25,8 +26,10 @@ class TagKeys {
   }
 
  private:
+  void DoHash();
+
   std::set<std::string> keys_;
-  size_t id_;
+  size_t id_{0};
 };
 
 /// Tags is immutable
@@ -40,7 +43,9 @@ class Tags {
 
   ~Tags() = default;
 
-  const std::map<std::string, std::string> &GetTags() const;
+  const std::map<std::string, std::string> &GetTags() const {
+    return tag_map_;
+  }
 
   const TagKeys &GetTagKeys() const {
     return keys_;
@@ -54,7 +59,7 @@ class Tags {
   void DoHash();
 
   std::map<std::string, std::string> tag_map_;
-  size_t id_;
+  size_t id_{0};
 
   TagKeys keys_;
 };

@@ -20,7 +20,13 @@ class DefaultMetricsGroup : public MetricsGroupInterface {
 
   virtual void UpdateGauge(const std::string &short_name, int64_t value);
 
-  virtual void UpdateHistogram(const std::string &short_name, int64_t value);
+  virtual void UpdateHistogram(const std::string &short_name,
+                               int64_t value,
+                               int64_t min_value,
+                               int64_t max_value);
+
+ protected:
+  virtual std::string GetMetricName(const std::string &short_name) const;
 };
 
 }  // namespace metrics

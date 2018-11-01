@@ -19,13 +19,18 @@ class EmptyMetricsRegistry : public MetricsRegistryInterface {
                              std::vector<prometheus::MetricFamily> *metrics) {}
 
  protected:
-  virtual void DoRegisterCounter(const std::string &metric_name, const TagKeys *tag_keys) {}
+  virtual void DoRegisterCounter(
+    const std::string &metric_name, const Tags *tags) {}
 
-  virtual void DoRegisterGauge(const std::string &metric_name, const TagKeys *tag_keys) {}
+  virtual void DoRegisterGauge(
+    const std::string &metric_name, const Tags *tags) {}
 
 
   virtual void DoRegisterHistogram(const std::string &metric_name,
-                                   const std::unordered_set<double> &percentiles) {}
+                                   int64_t min_value,
+                                   int64_t max_value,
+                                   const std::unordered_set<double> &percentiles,
+                                   const Tags *tags) {}
 
   virtual void DoUpdateValue(const std::string &metric_name,
                              int64_t value,

@@ -60,6 +60,19 @@ add_dependencies(boost_filesystem boost_ep)
 
 add_custom_target(boost DEPENDS boost_system boost_filesystem)
 
+# prometheus
+include(PrometheusCppExternalProject)
+
+message(STATUS "PrometheusCpp root: ${PROMETHEUS_CPP_ROOT}")
+message(STATUS "PrometheusCpp include dir: ${Prometheus_Cpp_INCLUDE_DIR}")
+message(STATUS "PrometheusCpp push library: ${Prometheus_Cpp_PUSH_LIBRARY}")
+include_directories(${Prometheus_Cpp_INCLUDE_DIR})
+
+ADD_THIRDPARTY_LIB(prometheus-cpp-push
+  STATIC_LIB ${Prometheus_Cpp_PUSH_LIBRARY})
+
+add_dependencies(prometheus-cpp-push prometheus-cpp_ep)
+
 # flatbuffers
 include(FlatBuffersExternalProject)
 

@@ -14,10 +14,10 @@ class MetricFamily {
  public:
   MetricFamily(
     MetricType type,
-    prometheus::Registry *registry,
     const std::string &metric_name,
-    const std::vector<int64_t> &bucket_boundaries = {},
-    const Tags *tags = nullptr);
+    prometheus::Registry *registry,
+    const Tags *tags = nullptr,
+    std::vector<int64_t> bucket_boundaries = {});
 
   ~MetricFamily() = default;
 
@@ -46,7 +46,7 @@ class MetricFamily {
   /// Histograms of each tag
   std::unordered_map<size_t, prometheus::Histogram&> tag_to_histogram_map_;
   /// Boundary of histogram bucket
-  const std::vector<int64_t> &bucket_boundaries_;
+  std::vector<int64_t> bucket_boundaries_;
   /// Shared lock
   boost::shared_mutex mutex_;
   typedef boost::unique_lock<boost::shared_mutex> ReadLock;
@@ -59,6 +59,9 @@ class PrometheusMetricsRegistry : public MetricsRegistryInterface {
 
   virtual ~PrometheusMetricsRegistry() = default;
 
+  virtual void ExportMetrics(const std::string &regex_filter,
+                             std::vector<prometheus::MetricFamily> *metrics);
+
  protected:
   virtual void DoRegisterCounter(const std::string &metric_name,
                                  const Tags *tags);
@@ -67,6 +70,8 @@ class PrometheusMetricsRegistry : public MetricsRegistryInterface {
                                const Tags *tags);
 
   virtual void DoRegisterHistogram(const std::string &metric_name,
+                                   int64_t min_value,
+                                   int64_t max_value,
                                    const std::unordered_set<double> &percentiles,
                                    const Tags *tags);
 
@@ -75,10 +80,14 @@ class PrometheusMetricsRegistry : public MetricsRegistryInterface {
                              const Tags *tags);
 
  private:
-  /// prometheus registry of metric
+  std::shared_ptr<MetricFamily> DoRegister(MetricType type,
+                                           const std::string &metric_name,
+                                           const Tags *tags,
+                                           std::vector<int64_t> bucket_boundaries = {});
+
   prometheus::Registry registry_;
   /// All metrics
-  std::unordered_map<std::string, MetricFamily> metric_map_;
+  std::unordered_map<std::string, std::shared_ptr<MetricFamily>> metric_map_;
   /// Shared lock
   boost::shared_mutex mutex_;
   typedef boost::unique_lock<boost::shared_mutex> ReadLock;

@@ -6,13 +6,12 @@ namespace metrics {
 
 MetricFamily::MetricFamily(
   MetricType type,
-  prometheus::Registry *registry,
   const std::string &metric_name,
-  const std::vector<int64_t> &bucket_boundaries,
-  const Tags *tags)
+  prometheus::Registry *registry,
+  const Tags *tags,
+  std::vector<int64_t> bucket_boundaries)
     : type_(type),
-      bucket_boundaries_(bucket_boundaries) {
-  // const std::map<std::string, std::string> &labels =
+      bucket_boundaries_(std::move(bucket_boundaries)) {
   switch (type_) {
   case MetricType::kCount:
     if (tags != nullptr) {
@@ -137,7 +136,7 @@ prometheus::Gauge &MetricFamily::GetGauge(const Tags *tags) {
 prometheus::Histogram &MetricFamily::GetHistogram(const Tags *tags) {
   if (tags == nullptr) {
     std::map<std::string, std::string> labels;
-    return histogram_family_->Add(labels);
+    return histogram_family_->Add(labels, bucket_boundaries_);
   }
 
   {
@@ -154,7 +153,8 @@ prometheus::Histogram &MetricFamily::GetHistogram(const Tags *tags) {
     if (it != tag_to_histogram_map_.end()) {
       return it->second();
     }
-    prometheus::Histogram &histogram = histogram_family_->Add(tags->GetTags());
+    prometheus::Histogram &histogram
+      = histogram_family_->Add(tags->GetTags(), bucket_boundaries_);
     tag_to_histogram_map_.emplace(tags->GetID(), histogram);
     return histogram;
   }
@@ -163,27 +163,103 @@ prometheus::Histogram &MetricFamily::GetHistogram(const Tags *tags) {
 PrometheusMetricsRegistry::PrometheusMetricsRegistry(RegistryOption options)
     : MetricsRegistryInterface(std::move(options)) {}
 
+void PrometheusMetricsRegistry::ExportMetrics(
+  const std::string &regex_filter,
+  std::vector<prometheus::MetricFamily> *metrics) {
+  if (metrics == nullptr) {
+    return;
+  }
+  if (regex_filter == ".*") {
+    *metrics = registry_.Collect();
+    return;
+  }
+  std::regex filter(regex_filter.c_str());
+  std::vector<prometheus::MetricFamily> source_metrics = registry_->Collect();
+  for (auto &metric : source_metrics) {
+    bool match = std::regex_match(metric.name, filter);
+    if (match) {
+      metrics->emplace_back(std::move(metric));
+    }
+  }
+}
+
 void PrometheusMetricsRegistry::DoRegisterCounter(const std::string &metric_name,
                                                   const Tags *tags) {
-
+  {
+    ReadLock read_lock(mutex_);
+    auto it = metric_map_.find(metric_name);
+    if (it != metric_map_.end()) {
+      return;
+    }
+  }
+  DoRegister(MetricType::kCount, metric_name, &default_tags_);
 }
 
 void PrometheusMetricsRegistry::DoRegisterGauge(const std::string &metric_name,
                                                 const Tags *tags) {
-
+  {
+    ReadLock read_lock(mutex_);
+    auto it = metric_map_.find(metric_name);
+    if (it != metric_map_.end()) {
+      return;
+    }
+  }
+  DoRegister(MetricType::kGauge, metric_name, &default_tags_);
 }
 
 void PrometheusMetricsRegistry::DoRegisterHistogram(
   const std::string &metric_name,
+  int64_t min_value,
+  int64_t max_value,
   const std::unordered_set<double> &percentiles,
   const Tags *tags) {
-
+  std::vector<int64_t> bucket_boundaries = GenBucketBoundaries(
+    min_value, max_value, options.bucket_count_);
+  {
+    ReadLock read_lock(mutex_);
+    auto it = metric_map_.find(metric_name);
+    if (it != metric_map_.end()) {
+      return;
+    }
+  }
+  DoRegister(
+    MetricType::kHistogram, metric_name, &default_tags_, std::move(bucket_boundaries));
 }
 
 void PrometheusMetricsRegistry::DoUpdateValue(const std::string &metric_name,
                                               int64_t value,
                                               const Tags *tags) {
+  std::shared_ptr<MetricFamily> metric;
+  {
+    ReadLock read_lock(mutex_);
+    auto it = metric_map_.find(metric_name);
+    if (it != metric_map_.end()) {
+      metric = it->second;
+    }
+  }
 
+  if (metric == nullptr) {
+    metric = DoRegister(MetricType::kCount, metric_name, &default_tags_);
+  }
+
+  metric->UpdateValue(value, tags);
+}
+
+std::shared_ptr<MetricFamily> PrometheusMetricsRegistry::DoRegister(
+  MetricType type,
+  const std::string &metric_name,
+  const Tags *tags,
+  std::vector<int64_t> bucket_boundaries) {
+
+  WriteLock write_lock(mutex_);
+  auto it = metric_map_.find(metric_name);
+  if (it != metric_map_.end()) {
+    return it->second();
+  }
+  auto metric = std::make_shared<MetricFamily>(
+    type, metric_name, &registry_, tags, bucket_boundaries);
+  metric_map_.emplace(metric_name, metric);
+  return metric;
 }
 
 }  // namespace metrics

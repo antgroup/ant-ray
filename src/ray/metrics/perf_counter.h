@@ -4,7 +4,7 @@
 #include <boost/asio.hpp>
 
 #include "ray/metrics/metrics_conf.h"
-#include "ray/metrics/metrics_group_interface.h"
+#include "ray/metrics/group/metrics_group_interface.h"
 
 namespace ray {
 

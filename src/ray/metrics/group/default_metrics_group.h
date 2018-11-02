@@ -1,7 +1,7 @@
 #ifndef RAY_METRICS_GROUP_DEFAULT_METRICS_GROUP_H
 #define RAY_METRICS_GROUP_DEFAULT_METRICS_GROUP_H
 
-#include "ray/metrics/metrics_group.h"
+#include "ray/metrics/group/metrics_group.h"
 
 namespace ray {
 

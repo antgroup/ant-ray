@@ -1,8 +1,7 @@
-#ifndef RAY_METRICS_EMPTY_METRICS_REGISTRY_H
-#define RAY_METRICS_EMPTY_METRICS_REGISTRY_H
+#ifndef RAY_METRICS_REGISTRY_EMPTY_METRICS_REGISTRY_H
+#define RAY_METRICS_REGISTRY_EMPTY_METRICS_REGISTRY_H
 
-#include "opencensus/tags/tag_map.h"
-#include "ray/metrics/metrics_registry_interface.h"
+#include "ray/metrics/registry/metrics_registry_interface.h"
 
 namespace ray {
 
@@ -35,13 +34,10 @@ class EmptyMetricsRegistry : public MetricsRegistryInterface {
   virtual void DoUpdateValue(const std::string &metric_name,
                              int64_t value,
                              const Tags *tags) {}
-
- private:
-  std::unordered_map<size_t, TagMap> id_to_tagmap_;
 };
 
 }  // namespace metrics
 
 }  // namespace ray
 
-#endif  // RAY_METRICS_EMPTY_METRICS_REGISTRY_H
+#endif  // RAY_METRICS_REGISTRY_EMPTY_METRICS_REGISTRY_H

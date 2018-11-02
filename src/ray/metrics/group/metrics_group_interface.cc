@@ -1,10 +1,11 @@
 #include "metrics_group_interface.h"
 
-#include "ray/util/logging.h"
+#include "ray/metrics/tag/tags.h"
 
 namespace ray {
 
 namespace metrics {
+
 MetricsGroupInterface(const std::string &domain,
                       const std::string &group_name,
                       const std::map<std::string, std::string> &tag_map)

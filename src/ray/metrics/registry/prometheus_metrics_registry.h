@@ -3,7 +3,7 @@
 
 #include <boost/thread/pthread/shared_mutex.hpp>
 
-#include "ray/metrics/metrics_registry_interface.h"
+#include "ray/metrics/registry/metrics_registry_interface.h"
 #include "prometheus/registry.h"
 
 namespace ray {
@@ -17,7 +17,7 @@ class MetricFamily {
     const std::string &metric_name,
     prometheus::Registry *registry,
     const Tags *tags = nullptr,
-    std::vector<int64_t> bucket_boundaries = {});
+    std::vector<double> bucket_boundaries = {});
 
   ~MetricFamily() = default;
 
@@ -46,7 +46,7 @@ class MetricFamily {
   /// Histograms of each tag
   std::unordered_map<size_t, prometheus::Histogram&> tag_to_histogram_map_;
   /// Boundary of histogram bucket
-  std::vector<int64_t> bucket_boundaries_;
+  std::vector<double> bucket_boundaries_;
   /// Shared lock
   boost::shared_mutex mutex_;
   typedef boost::unique_lock<boost::shared_mutex> ReadLock;
@@ -80,10 +80,11 @@ class PrometheusMetricsRegistry : public MetricsRegistryInterface {
                              const Tags *tags);
 
  private:
-  std::shared_ptr<MetricFamily> DoRegister(MetricType type,
-                                           const std::string &metric_name,
-                                           const Tags *tags,
-                                           std::vector<int64_t> bucket_boundaries = {});
+  std::shared_ptr<MetricFamily> DoRegister(
+    MetricType type,
+    const std::string &metric_name,
+    const Tags *tags,
+    std::vector<double> bucket_boundaries = {});
 
   prometheus::Registry registry_;
   /// All metrics

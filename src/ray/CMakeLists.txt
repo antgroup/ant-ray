@@ -5,6 +5,7 @@ add_subdirectory(util)
 add_subdirectory(gcs)
 add_subdirectory(object_manager)
 add_subdirectory(raylet)
+add_subdirectory(metrics)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/common/thirdparty/ae)
 

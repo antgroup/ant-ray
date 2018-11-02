@@ -41,8 +41,11 @@ class PerfCounter final {
                               std::shared_ptr<MetricsGroupInterface> group);
 
  private:
-  using NameToGroupMap
-      = std::unordered_map<std::string, std::shared_ptr<MetricsGroupInterface>>;
+  class Impl;
+  static std::unique_ptr<Impl> impl_ptr_;
+
+  using NameToGroupMap =
+      std::unordered_map<std::string, std::shared_ptr<MetricsGroupInterface>>;
   using DomainToGroupsMap = std::unordered_map<std::string, NameToGroupMap>;
 
   static DomainToGroupsMap perf_counters_;

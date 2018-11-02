@@ -15,13 +15,13 @@ DefaultMetricsGroup::DefaultMetricsGroup(
 void DefaultMetricsGroup::UpdateCounter(const std::string &short_name, int64_t value) {
   std::string metric_name = GetMetricName(short_name);
   registry_->RegisterCounter(metric_name, tags_);
-  registry_->UpdateValue(metric_name, value, tags_)
+  registry_->UpdateValue(metric_name, value, tags_);
 }
 
 void DefaultMetricsGroup::UpdateGauge(const std::string &short_name, int64_t value) {
   std::string metric_name = GetMetricName(short_name);
   registry_->RegisterGauge(metric_name, tags_);
-  registry_->UpdateValue(metric_name, value, tags_)
+  registry_->UpdateValue(metric_name, value, tags_);
 }
 
 void DefaultMetricsGroup::UpdateHistogram(const std::string &short_name,
@@ -30,7 +30,7 @@ void DefaultMetricsGroup::UpdateHistogram(const std::string &short_name,
                                           int64_t max_value) {
   std::string metric_name = GetMetricName(short_name);
   registry_->RegisterHistogram(metric_name, min_value, max_value, tags_);
-  registry_->UpdateValue(metric_name, value, tags_)
+  registry_->UpdateValue(metric_name, value, tags_);
 }
 
 std::string DefaultMetricsGroup::GetMetricName(const std::string &short_name) const {

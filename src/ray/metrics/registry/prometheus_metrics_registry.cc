@@ -26,7 +26,7 @@ MetricFamily::MetricFamily(
     }
     break;
   case MetricType::kGauge:
-    {
+    if (tags != nullptr) {
       gauge_family_ = &prometheus::detail::BuildGauge()
         .Name(metric_name)
         .Labels(tags->GetTags())
@@ -38,7 +38,7 @@ MetricFamily::MetricFamily(
     }
     break;
   case MetricType::kHistogram:
-    {
+    if (tags != nullptr) {
       histogram_family_ = &prometheus::detail::BuildHistogram()
         .Name(metric_name)
         .Labels(tags->GetTags())

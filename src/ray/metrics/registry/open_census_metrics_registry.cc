@@ -98,14 +98,14 @@ OpenCensusMetricsRegistry::~OpenCensusMetricsRegistry() {
 
 void OpenCensusMetricsRegistry::ExportMetrics(const std::string &regex_filter,
                                               std::vector<prometheus::MetricFamily> *metrics) {
-  bool need_filter = (regex_filter == ".*") ? false : true;
+  bool need_filter = regex_filter != ".*";
   std::regex filter(regex_filter.c_str());
 
   const auto view_datas = opencensus::stats::StatsExporter::GetViewData();
   for (const auto &elem : view_datas) {
     const std::string &metric_name = elem.first.measure_descriptor().name();
     bool match = (!need_filter) ? true
-      : (std::regex_match(metric_name, filter) ? true : false);
+      : std::regex_match(metric_name, filter);
     if (match) {
       prometheus::MetricFamily metric_family;
       opencensus::exporters::stats::SetMetricFamily(elem.first, elem.second, &metric_family);

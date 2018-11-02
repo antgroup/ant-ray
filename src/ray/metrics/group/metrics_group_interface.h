@@ -1,12 +1,12 @@
-#ifndef RAY_METRICS_METRICS_GROUP_INTERFACE_H
-#define RAY_METRICS_METRICS_GROUP_INTERFACE_H
+#ifndef RAY_METRICS_GROUP_METRICS_GROUP_INTERFACE_H
+#define RAY_METRICS_GROUP_METRICS_GROUP_INTERFACE_H
 
 #include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
 
-#include "ray/metrics/metrics_registry_interface.h"
+#include "ray/metrics/registry/metrics_registry_interface.h"
 
 namespace ray {
 
@@ -42,9 +42,10 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
   }
 
  protected:
-  MetricsGroupInterface(const std::string& domain,
-                        const std::string& group_name,
-                        const std::map<std::string, std::string> &tag_map = {});
+  MetricsGroupInterface(
+    const std::string& domain,
+    const std::string& group_name,
+    const std::map<std::string, std::string> &tag_map = {});
 
   MetricsGroupInterface(const MetricsGroupInterface &) = delete;
   MetricsGroupInterface &operator=(const MetricsGroupInterface &) = delete;
@@ -64,4 +65,4 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
 
 }  // namespace ray
 
-#endif  // RAY_METRICS_METRICS_GROUP_INTERFACE_H
+#endif  // RAY_METRICS_GROUP_METRICS_GROUP_INTERFACE_H

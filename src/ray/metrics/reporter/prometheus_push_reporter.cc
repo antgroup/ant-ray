@@ -1,4 +1,4 @@
-#include "prometheus_metrics_reporter.h"
+#include "prometheus_push_reporter.h"
 
 namespace ray {
 
@@ -11,7 +11,7 @@ RegistryExportHandler::RegistryExportHandler(const std::string &regex_filter,
 
 std::vector<prometheus::MetricFamily> RegistryExportHandler::Collect() {
   std::vector<prometheus::MetricFamily> metrics;
-  registry_->ExportMetrics(filter_, &metrics);
+  registry_->ExportMetrics(regex_filter_, &metrics);
   return metrics;
 }
 
@@ -20,7 +20,6 @@ PrometheusPushReporter::PrometheusPushReporter(ReporterOption options,
     : MetricsReporterInterface(options),
       io_service_(io_service),
       report_timer_(io_service) {
-  export_handler_ = std::make_shared<RegistryExportHandler>(options_.regex_filter_);
   gate_way_ = new prometheus::Gateway(options_.service_addr_,
                                       options_.job_name_,
                                       {},
@@ -38,8 +37,9 @@ bool PrometheusPushReporter::Init() {
 }
 
 void PrometheusPushReporter::RegisterRegistry(MetricsRegistryInterface* registry) {
+  // TODO(micafan) CHECK(registry != nullptr)
   std::shared_ptr<RegistryExportHandler> export_handler
-    = std::make_shared<RegistryExportHandler>(options_.filter_, registry);
+    = std::make_shared<RegistryExportHandler>(options_.regex_exp_, registry);
 
   {
     std::lock_guard<std::mutex> guard(mutex_);
@@ -61,7 +61,7 @@ void PrometheusPushReporter::DispatchReportTimer() {
   auto report_period = boost::posix_time::seconds(options_.report_interval_.count());
   report_timer_.expires_from_now(report_period);
   report_timer_.async_wait([this](const boost::system::error_code &error) {
-    RAY_CHECK(!error);
+    // TODO(micafan) CHECK(!error)
     DoReport();
   });
 }
@@ -75,6 +75,7 @@ void PrometheusPushReporter::DoReport() {
 bool PrometheusPushReporter::Stop() {
   boost::system::error_code ec;
   report_timer_.cancel(ec);
+  return true;
 }
 
 }  // namespace metrics

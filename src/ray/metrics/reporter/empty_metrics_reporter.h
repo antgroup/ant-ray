@@ -1,7 +1,7 @@
 #ifndef RAY_METRICS_REPORTER_EMPTY_METRICS_REPORTER_H
 #define RAY_METRICS_REPORTER_EMPTY_METRICS_REPORTER_H
 
-#include "ray/metrics/metrics_reporter.h"
+#include "ray/metrics/reporter/metrics_reporter_interface.h"
 
 namespace ray {
 

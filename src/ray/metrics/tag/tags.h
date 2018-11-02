@@ -1,5 +1,5 @@
-#ifndef RAY_METRICS_TAGS_H
-#define RAY_METRICS_TAGS_H
+#ifndef RAY_METRICS_TAG_TAGS_H
+#define RAY_METRICS_TAG_TAGS_H
 
 #include <map>
 #include <set>
@@ -65,4 +65,4 @@ class Tags {
 
 }  // namespace ray
 
-#endif  // RAY_METRICS_TAGS_H
+#endif  // RAY_METRICS_TAG_TAGS_H

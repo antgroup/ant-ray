@@ -29,7 +29,8 @@ void DefaultMetricsGroup::UpdateHistogram(const std::string &short_name,
                                           int64_t min_value,
                                           int64_t max_value) {
   std::string metric_name = GetMetricName(short_name);
-  registry_->RegisterHistogram(metric_name, min_value, max_value, tags_);
+  std::unordered_set<double> percentiles;
+  registry_->RegisterHistogram(metric_name, min_value, max_value, percentiles, tags_);
   registry_->UpdateValue(metric_name, value, tags_);
 }
 

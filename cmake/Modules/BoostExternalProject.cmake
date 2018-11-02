@@ -6,6 +6,8 @@
 #  - Boost_INCLUDE_DIR
 #  - Boost_SYSTEM_LIBRARY
 #  - Boost_FILESYSTEM_LIBRARY
+#  - Boost_THREAD_LIBRARY
+#  - Boost_DATE_TIME_LIBRARY
 
 # boost is a stable library in ray, and it supports to find
 # the boost pre-built in environment to speed up build process
@@ -18,6 +20,8 @@ if (DEFINED ENV{RAY_BOOST_ROOT} AND EXISTS $ENV{RAY_BOOST_ROOT})
   set(Boost_LIBRARY_DIR ${BOOST_ROOT}/lib)
   set(Boost_SYSTEM_LIBRARY ${Boost_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}boost_system${CMAKE_STATIC_LIBRARY_SUFFIX})
   set(Boost_FILESYSTEM_LIBRARY ${Boost_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}boost_filesystem${CMAKE_STATIC_LIBRARY_SUFFIX})
+  set(Boost_DATE_TIME_LIBRARY ${Boost_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}boost_date_time${CMAKE_STATIC_LIBRARY_SUFFIX})
+  set(Boost_THREAD_LIBRARY ${Boost_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}boost_thread${CMAKE_STATIC_LIBRARY_SUFFIX})
 
   add_custom_target(boost_ep)
 else()
@@ -28,12 +32,14 @@ else()
   set(Boost_LIBRARY_DIR ${Boost_INSTALL_PREFIX}/lib)
   set(Boost_SYSTEM_LIBRARY ${Boost_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}boost_system${CMAKE_STATIC_LIBRARY_SUFFIX})
   set(Boost_FILESYSTEM_LIBRARY ${Boost_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}boost_filesystem${CMAKE_STATIC_LIBRARY_SUFFIX})
+  set(Boost_DATE_TIME_LIBRARY ${Boost_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}boost_date_time${CMAKE_STATIC_LIBRARY_SUFFIX})
+  set(Boost_THREAD_LIBRARY ${Boost_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}boost_thread${CMAKE_STATIC_LIBRARY_SUFFIX})
 
   #set(boost_URL https://github.com/boostorg/boost.git)
   #set(boost_TAG boost-1.65.1)
 
   set(Boost_TAR_GZ_URL http://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.gz)
-  set(Boost_BUILD_PRODUCTS ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
+  set(Boost_BUILD_PRODUCTS ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_DATE_TIME_LIBRARY} ${Boost_THREAD_LIBRARY})
   set(Boost_URL_MD5 "ee64fd29a3fe42232c6ac3c419e523cf")
 
   set(Boost_USE_STATIC_LIBS ON)
@@ -48,6 +54,6 @@ else()
     BUILD_IN_SOURCE 1
     BUILD_BYPRODUCTS ${Boost_BUILD_PRODUCTS}
     CONFIGURE_COMMAND ./bootstrap.sh
-    BUILD_COMMAND bash -c "./b2 cxxflags=-fPIC cflags=-fPIC variant=release link=static --with-filesystem --with-system --with-regex -j8 install --prefix=${Boost_INSTALL_PREFIX} > /dev/null"
+    BUILD_COMMAND bash -c "./b2 cxxflags=-fPIC cflags=-fPIC variant=release link=static --with-filesystem --with-system --with-regex --with-date_time --with-thread -j8 install --prefix=${Boost_INSTALL_PREFIX} > /dev/null"
     INSTALL_COMMAND "")
 endif ()

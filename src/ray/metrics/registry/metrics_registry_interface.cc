@@ -6,11 +6,11 @@ namespace ray {
 
 namespace metrics {
 
-std::vector<int64_t> MetricsRegistryInterface::GenBucketBoundaries(
+std::vector<double> MetricsRegistryInterface::GenBucketBoundaries(
   int64_t min_value,
   int64_t max_value,
   size_t bucket_count) const {
-  std::vector<int64_t> boundaries;
+  std::vector<double> boundaries;
   // min_value should be always less than max_value
   if (min_value >= max_value) {
     boundaries.emplace_back(min_value);

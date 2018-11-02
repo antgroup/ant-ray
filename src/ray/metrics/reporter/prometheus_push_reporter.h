@@ -5,14 +5,16 @@
 #include <mutex>
 #include <boost/asio.hpp>
 
+#include "prometheus/collectable.h"
 #include "prometheus/gateway.h"
-#include "ray/metrics/metrics_reporter_interface.h"
+#include "ray/metrics/registry/metrics_registry_interface.h"
+#include "ray/metrics/reporter/metrics_reporter_interface.h"
 
 namespace ray {
 
 namespace metrics {
 
-class RegistryExportHandler : public prometheus::Collect {
+class RegistryExportHandler : public prometheus::Collectable {
  public:
   RegistryExportHandler(const std::string &regex_filter,
                         MetricsRegistryInterface *registry);
@@ -20,8 +22,8 @@ class RegistryExportHandler : public prometheus::Collect {
   virtual std::vector<prometheus::MetricFamily> Collect();
 
  private:
-  const std::string &regex_filter_,
-  MetricsRegistryInterface* registry_;
+  const std::string &regex_filter_;
+  MetricsRegistryInterface *registry_;
 };
 
 class PrometheusPushReporter : public MetricsReporterInterface {
@@ -51,9 +53,9 @@ class PrometheusPushReporter : public MetricsReporterInterface {
   /// Prometheus gateway
   prometheus::Gateway* gate_way_{nullptr};
   /// The handlers used for collect metrics from registrys
-  typedef std::unordered_set<MetricsRegistryInterface*,
+  typedef std::unordered_map<MetricsRegistryInterface *,
           std::shared_ptr<RegistryExportHandler>> ExportHandlerMap;
-  ExportHanderMap handler_map_;
+  ExportHandlerMap handler_map_;
 };
 
 }  // namespace metrics

@@ -1,5 +1,5 @@
-#ifndef RAY_METRICS_METRICS_REGISTRY_INTERFACE_H
-#define RAY_METRICS_METRICS_REGISTRY_INTERFACE_H
+#ifndef RAY_METRICS_REGISTRY_METRICS_REGISTRY_INTERFACE_H
+#define RAY_METRICS_REGISTRY_METRICS_REGISTRY_INTERFACE_H
 
 #include <map>
 #include <regex>
@@ -7,7 +7,7 @@
 #include <unordered_set>
 
 #include "prometheus/metric_family.h"
-#include "ray/metrics/tags.h"
+#include "ray/metrics/tag/tags.h"
 
 namespace ray {
 
@@ -43,12 +43,13 @@ class MetricsRegistryInterface : public boost::noncopyable {
     DoRegisterGauge(metric_name, tags);
   }
 
-  void RegisterHistogram(const std::string &metric_name,
-                         int64_t min_value,
-                         int64_t max_value,
-                         const std::unordered_set<double> &percentiles = {},
-                         const Tags *tags = nullptr) {
-    DoRegisterHistogram(metric_name, percentiles, tags);
+  void RegisterHistogram(
+    const std::string &metric_name,
+    int64_t min_value,
+    int64_t max_value,
+    const std::unordered_set<double> &percentiles = std::unordered_set<double>(),
+    const Tags *tags = nullptr) {
+    DoRegisterHistogram(metric_name, min_value, max_value, percentiles, tags);
   }
 
   void UpdateValue(const std::string &metric_name,
@@ -89,9 +90,9 @@ class MetricsRegistryInterface : public boost::noncopyable {
                              int64_t value,
                              const Tags *tags) = 0;
 
-  std::vector<int64_t> GenBucketBoundaries(int64_t min_value,
-                                           int64_t max_value,
-                                           size_t bucket_count) const;
+  std::vector<double> GenBucketBoundaries(int64_t min_value,
+                                          int64_t max_value,
+                                          size_t bucket_count) const;
 
   Tags default_tags_;
   RegistryOption options_;
@@ -101,4 +102,4 @@ class MetricsRegistryInterface : public boost::noncopyable {
 
 }  // namespace ray
 
-#endif  // RAY_METRICS_METRICS_REGISTRY_INTERFACE_H
+#endif  // RAY_METRICS_REGISTRY_METRICS_REGISTRY_INTERFACE_H

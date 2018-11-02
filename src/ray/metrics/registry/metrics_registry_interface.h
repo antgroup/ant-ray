@@ -1,5 +1,5 @@
-#ifndef RAY_METRICS_METRICS_REGISTRY_INTERFACE_H
-#define RAY_METRICS_METRICS_REGISTRY_INTERFACE_H
+#ifndef RAY_METRICS_REGISTRY_METRICS_REGISTRY_INTERFACE_H
+#define RAY_METRICS_REGISTRY_METRICS_REGISTRY_INTERFACE_H
 
 #include <map>
 #include <regex>
@@ -7,7 +7,7 @@
 #include <unordered_set>
 
 #include "prometheus/metric_family.h"
-#include "ray/metrics/tags.h"
+#include "ray/metrics/tag/tags.h"
 
 namespace ray {
 
@@ -104,4 +104,4 @@ class MetricsRegistryInterface {
 
 }  // namespace ray
 
-#endif  // RAY_METRICS_METRICS_REGISTRY_INTERFACE_H
+#endif  // RAY_METRICS_REGISTRY_METRICS_REGISTRY_INTERFACE_H

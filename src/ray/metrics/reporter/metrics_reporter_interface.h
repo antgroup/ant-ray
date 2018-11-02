@@ -1,11 +1,11 @@
-#ifndef RAY_METRICS_METRICS_REPORTER_H
-#define RAY_METRICS_METRICS_REPORTER_H
+#ifndef RAY_METRICS_REPORTER_METRICS_REPORTER_INTERFACE_H
+#define RAY_METRICS_REPORTER_METRICS_REPORTER_INTERFACE_H
 
 #include <chrono>
 #include <regex>
 #include <string>
 
-#include "ray/metrics/metrics_registry_interface.h"
+#include "ray/metrics/registry/metrics_registry_interface.h"
 
 namespace ray {
 
@@ -48,4 +48,4 @@ class MetricsReporterInterface {
 
 }  // namespace ray
 
-#endif  // RAY_METRICS_METRICS_REPORTER_H
+#endif  // RAY_METRICS_REPORTER_METRICS_REPORTER_INTERFACE_H

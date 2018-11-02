@@ -1,8 +1,8 @@
 #ifndef RAY_METRICS_METRICS_CONF_H
 #define RAY_METRICS_METRICS_CONF_H
 
-#include "metrics_registry_interface.h"
-#include "metrics_reporter_interface.h"
+#include "ray/metrics/registry/metrics_registry_interface.h"
+#include "ray/metrics/reporter/metrics_reporter_interface.h"
 
 namespace ray {
 

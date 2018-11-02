@@ -6,7 +6,7 @@
 #include <boost/asio.hpp>
 
 #include "prometheus/gateway.h"
-#include "ray/metrics/metrics_reporter_interface.h"
+#include "ray/metrics/reporter/metrics_reporter_interface.h"
 
 namespace ray {
 

@@ -43,12 +43,13 @@ class MetricsRegistryInterface {
     DoRegisterGauge(metric_name, tags);
   }
 
-  void RegisterHistogram(const std::string &metric_name,
-                         int64_t min_value,
-                         int64_t max_value,
-                         const std::unordered_set<double> &percentiles = {},
-                         const Tags *tags = nullptr) {
-    DoRegisterHistogram(metric_name, percentiles, tags);
+  void RegisterHistogram(
+    const std::string &metric_name,
+    int64_t min_value,
+    int64_t max_value,
+    const std::unordered_set<double> &percentiles = std::unordered_set<double>(),
+    const Tags *tags = nullptr) {
+    DoRegisterHistogram(metric_name, min_value, max_value, percentiles, tags);
   }
 
   void UpdateValue(const std::string &metric_name,
@@ -92,9 +93,9 @@ class MetricsRegistryInterface {
                              int64_t value,
                              const Tags *tags) = 0;
 
-  std::vector<int64_t> GenBucketBoundaries(int64_t min_value,
-                                           int64_t max_value,
-                                           size_t bucket_count) const;
+  std::vector<double> GenBucketBoundaries(int64_t min_value,
+                                          int64_t max_value,
+                                          size_t bucket_count) const;
 
   Tags default_tags_;
   RegistryOption options_;

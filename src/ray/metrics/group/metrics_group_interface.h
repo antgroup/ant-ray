@@ -42,9 +42,10 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
   }
 
  protected:
-  MetricsGroupInterface(const std::string& domain,
-                        const std::string& group_name,
-                        const std::map<std::string, std::string> &tag_map = {});
+  MetricsGroupInterface(
+    const std::string& domain,
+    const std::string& group_name,
+    const std::map<std::string, std::string> &tag_map = {});
 
   MetricsGroupInterface(const MetricsGroupInterface &) = delete;
   MetricsGroupInterface &operator=(const MetricsGroupInterface &) = delete;
@@ -57,7 +58,7 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
   MetricsRegistryInterface *registry_{nullptr};
 
   /// Tags of current group
-  Tags *tags_(nullptr);
+  Tags *tags_{nullptr};
 };
 
 }  // namespace metrics

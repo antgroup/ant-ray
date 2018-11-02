@@ -9,42 +9,42 @@ MetricFamily::MetricFamily(
   const std::string &metric_name,
   prometheus::Registry *registry,
   const Tags *tags,
-  std::vector<int64_t> bucket_boundaries)
+  std::vector<double> bucket_boundaries)
     : type_(type),
       bucket_boundaries_(std::move(bucket_boundaries)) {
   switch (type_) {
   case MetricType::kCount:
     if (tags != nullptr) {
-      counter_family_ = &prometheus::detail::BuildCounter()
+      counter_family_ = &prometheus::BuildCounter()
         .Name(metric_name)
         .Labels(tags->GetTags())
         .Register(*registry);
     } else {
-      counter_family_ = &prometheus::detail::BuildCounter()
+      counter_family_ = &prometheus::BuildCounter()
         .Name(metric_name)
         .Register(*registry);
     }
     break;
   case MetricType::kGauge:
-    {
-      gauge_family_ = &prometheus::detail::BuildGauge()
+    if (tags != nullptr) {
+      gauge_family_ = &prometheus::BuildGauge()
         .Name(metric_name)
         .Labels(tags->GetTags())
         .Register(*registry);
     } else {
-      gauge_family_ = &prometheus::detail::BuildGauge()
+      gauge_family_ = &prometheus::BuildGauge()
         .Name(metric_name)
         .Register(*registry);
     }
     break;
   case MetricType::kHistogram:
-    {
-      histogram_family_ = &prometheus::detail::BuildHistogram()
+    if (tags != nullptr) {
+      histogram_family_ = &prometheus::BuildHistogram()
         .Name(metric_name)
         .Labels(tags->GetTags())
         .Register(*registry);
     } else {
-      histogram_family_ = &prometheus::detail::BuildHistogram()
+      histogram_family_ = &prometheus::BuildHistogram()
         .Name(metric_name)
         .Register(*registry);
     }
@@ -57,7 +57,7 @@ MetricFamily::MetricFamily(
 
 void MetricFamily::UpdateValue(int64_t value, const Tags *tags) {
   switch (type_) {
-  case MetricType::kCounter:
+  case MetricType::kCount:
     {
       prometheus::Counter &counter = GetCounter(tags);
       counter.Increment(value);
@@ -91,7 +91,7 @@ prometheus::Counter &MetricFamily::GetCounter(const Tags *tags) {
     ReadLock lock(mutex_);
     auto it = tag_to_counter_map_.find(tags->GetID());
     if (it != tag_to_counter_map_.end()) {
-      return it->second();
+      return it->second;
     }
   }
 
@@ -99,7 +99,7 @@ prometheus::Counter &MetricFamily::GetCounter(const Tags *tags) {
     WriteLock lock(mutex_);
     auto it = tag_to_counter_map_.find(tags->GetID());
     if (it != tag_to_counter_map_.end()) {
-      return it->second();
+      return it->second;
     }
     prometheus::Counter &counter = counter_family_->Add(tags->GetTags());
     tag_to_counter_map_.emplace(tags->GetID(), counter);
@@ -117,7 +117,7 @@ prometheus::Gauge &MetricFamily::GetGauge(const Tags *tags) {
     ReadLock lock(mutex_);
     auto it = tag_to_gauge_map_.find(tags->GetID());
     if (it != tag_to_gauge_map_.end()) {
-      return it->second();
+      return it->second;
     }
   }
 
@@ -125,7 +125,7 @@ prometheus::Gauge &MetricFamily::GetGauge(const Tags *tags) {
     WriteLock lock(mutex_);
     auto it = tag_to_gauge_map_.find(tags->GetID());
     if (it != tag_to_gauge_map_.end()) {
-      return it->second();
+      return it->second;
     }
     prometheus::Gauge &gauge = gauge_family_->Add(tags->GetTags());
     tag_to_gauge_map_.emplace(tags->GetID(), gauge);
@@ -143,7 +143,7 @@ prometheus::Histogram &MetricFamily::GetHistogram(const Tags *tags) {
     ReadLock lock(mutex_);
     auto it = tag_to_histogram_map_.find(tags->GetID());
     if (it != tag_to_histogram_map_.end()) {
-      return it->second();
+      return it->second;
     }
   }
 
@@ -151,7 +151,7 @@ prometheus::Histogram &MetricFamily::GetHistogram(const Tags *tags) {
     WriteLock lock(mutex_);
     auto it = tag_to_histogram_map_.find(tags->GetID());
     if (it != tag_to_histogram_map_.end()) {
-      return it->second();
+      return it->second;
     }
     prometheus::Histogram &histogram
       = histogram_family_->Add(tags->GetTags(), bucket_boundaries_);
@@ -174,7 +174,7 @@ void PrometheusMetricsRegistry::ExportMetrics(
     return;
   }
   std::regex filter(regex_filter.c_str());
-  std::vector<prometheus::MetricFamily> source_metrics = registry_->Collect();
+  std::vector<prometheus::MetricFamily> source_metrics = registry_.Collect();
   for (auto &metric : source_metrics) {
     bool match = std::regex_match(metric.name, filter);
     if (match) {
@@ -213,8 +213,8 @@ void PrometheusMetricsRegistry::DoRegisterHistogram(
   int64_t max_value,
   const std::unordered_set<double> &percentiles,
   const Tags *tags) {
-  std::vector<int64_t> bucket_boundaries = GenBucketBoundaries(
-    min_value, max_value, options.bucket_count_);
+  std::vector<double> bucket_boundaries = GenBucketBoundaries(
+    min_value, max_value, options_.bucket_count_);
   {
     ReadLock read_lock(mutex_);
     auto it = metric_map_.find(metric_name);
@@ -249,12 +249,12 @@ std::shared_ptr<MetricFamily> PrometheusMetricsRegistry::DoRegister(
   MetricType type,
   const std::string &metric_name,
   const Tags *tags,
-  std::vector<int64_t> bucket_boundaries) {
+  std::vector<double> bucket_boundaries) {
 
   WriteLock write_lock(mutex_);
   auto it = metric_map_.find(metric_name);
   if (it != metric_map_.end()) {
-    return it->second();
+    return it->second;
   }
   auto metric = std::make_shared<MetricFamily>(
     type, metric_name, &registry_, tags, bucket_boundaries);

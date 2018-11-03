@@ -3,6 +3,8 @@
 
 #include <boost/system/error_code.hpp>
 #include <chrono>
+#include <iostream>
+#include <unordered_map>
 
 #include "ray/status.h"
 
@@ -36,6 +38,31 @@ inline ray::Status boost_to_ray_status(const boost::system::error_code &error) {
   default:
     return ray::Status::IOError(strerror(error.value()));
   }
+}
+
+/// Parse the given string into a map with the given delimiter.
+///
+/// TODO(qwang):  We could make these codes better and rename this function.
+///
+/// \param source The given string that will be parsed.
+/// \param delimiter The given delimiter that we parse by.
+/// \return The k-v map that split by the given source string and delimiter.
+///
+/// E.g. If the source string is "k1,v1,k2,v2" and the delimiter is ",",
+/// the map which contains k1->v1 and k2->v2 will be returned.
+const std::unordered_map<std::string, std::string> &ParseStringToMap(
+    const std::string &source, const std::string &delimiter) {
+  std::unordered_map<std::string, std::string> ret;
+  std::istingstream source_stream_string(source);
+
+  std::string key;
+  std::string value;
+  while (std::getline(source_stream_string, key, delimiter)) {
+    RAY_CHECK(std::getline(source_stream_string, value, delimiter));
+    ret[key] = value;
+  }
+
+  return ret;
 }
 
 class InitShutdownRAII {

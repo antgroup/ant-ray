@@ -25,14 +25,14 @@ void TagKeys::DoHash() {
     return acc + key;
   });
 
-  id = std::hash<std::string>{}(combined);
+  id_ = std::hash<std::string>{}(combined);
 }
 
 Tags::Tags(const std::map<std::string, std::string> &tag_map)
     : tag_map_(tag_map) {
   DoHash();
 
-  std::set<srd::string> keys;
+  std::set<std::string> keys;
   for (const auto &tag : tag_map_) {
     keys.insert(tag.first);
   }

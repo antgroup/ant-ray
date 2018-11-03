@@ -4,7 +4,9 @@ set(METRICS_SRCS
   registry/prometheus_metrics_registry.cc
   reporter/prometheus_push_reporter.cc
   group/metrics_group_interface.cc
-  group/default_metrics_group.cc)
+  group/default_metrics_group.cc
+  perf_counter.cc
+  metrics_conf.cc)
 
 set(METRICS_LIB_DEPENDENCIES
   boost_ep

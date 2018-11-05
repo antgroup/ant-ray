@@ -257,7 +257,7 @@ std::shared_ptr<MetricFamily> PrometheusMetricsRegistry::DoRegister(
     return it->second;
   }
   auto metric = std::make_shared<MetricFamily>(
-    type, metric_name, &registry_, tags, bucket_boundaries);
+    type, metric_name, &registry_, tags, std::move(bucket_boundaries));
   metric_map_.emplace(metric_name, metric);
   return metric;
 }

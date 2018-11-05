@@ -49,7 +49,7 @@ class MetricFamily {
   std::vector<double> bucket_boundaries_;
   /// Shared lock
   boost::shared_mutex mutex_;
-  typedef boost::unique_lock<boost::shared_mutex> ReadLock;
+  typedef boost::shared_lock<boost::shared_mutex> ReadLock;
   typedef boost::shared_lock<boost::shared_mutex> WriteLock;
 };
 
@@ -91,7 +91,7 @@ class PrometheusMetricsRegistry : public MetricsRegistryInterface {
   std::unordered_map<std::string, std::shared_ptr<MetricFamily>> metric_map_;
   /// Shared lock
   boost::shared_mutex mutex_;
-  typedef boost::unique_lock<boost::shared_mutex> ReadLock;
+  typedef boost::shared_lock<boost::shared_mutex> ReadLock;
   typedef boost::shared_lock<boost::shared_mutex> WriteLock;
 };
 

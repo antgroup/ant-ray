@@ -15,14 +15,13 @@ TagKeys::TagKeys(const std::set<std::string> &keys)
 }
 
 void TagKeys::DoHash() {
-  const std::string delimiter = "%%";
-  auto combined = std::accumulate(keys_.begin(),
-      keys_.end(), std::string{}, [](const std::string &acc,
-                                     const std::string &key){
-    return acc + key + delimiter;
-  });
+  size_t final_code = 1;
+  for (const auto &key : keys_) {
+    size_t key_code = std::hash<std::string>{} (key);
+    final_code = 31 * final_code + key_code;
+  }
 
-  id_ = std::hash<std::string>{}(combined);
+  id_ = final_code;
 }
 
 Tags::Tags(const std::map<std::string, std::string> &tag_map)
@@ -39,16 +38,16 @@ Tags::Tags(const std::map<std::string, std::string> &tag_map)
 
 //TODO(qwang): Should we implement this with SHA like UniqueID?
 void Tags::DoHash() {
-  const std::string delimiter = "%%";
-  const auto accumulate_tag_handler = [](const std::string &acc,
-      const std::pair<std::string, std::string> &tag){
-    return acc + tag.first + delimiter + tag.second + delimiter;
-  };
+  size_t final_code = 1;
+  for (const auto &tag : tag_map_) {
+    size_t key_code = std::hash<std::string>{}(tag.first);
+    final_code = 31 * final_code + key_code;
 
-  auto combined = std::accumulate(tag_map_.begin(),
-      tag_map_.end(), std::string{}, accumulate_tag_handler);
+    size_t value_code = std::hash<std::string>{}(tag.second);
+    final_code = 31 * final_code + value_code;
+  }
 
-  id_ = std::hash<std::string>{}(combined);
+  id_ = final_code;
 }
 
 }  // namespace metrics

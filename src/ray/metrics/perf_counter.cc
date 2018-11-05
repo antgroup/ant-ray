@@ -19,11 +19,11 @@ public:
 
   void Shutdown();
 
+    // It not found, we should insert one.
     void UpdateCounter(const std::string &domain,
                        const std::string &group_name,
                        const std::string &short_name,
                        int64_t value) {
-
     }
 
     void UpdateGauge(const std::string &domain,

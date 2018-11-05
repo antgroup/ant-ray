@@ -117,7 +117,6 @@ static void PerfCounter::AddCounterGroup(const std::string &domain,
     return impl_ptr_->AddCounterGroup(domain, group);
   }
 
-
 bool PerfCounter::Impl::Start(const MetricsConf &conf, boost::asio::io_service &io_service) {
   //TODO(qwang): We should use factory to create these instances.
   const auto &registry_name = conf.GetRegistryName();

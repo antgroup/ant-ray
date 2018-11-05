@@ -13,11 +13,6 @@ namespace metrics {
 
 class ReporterOption {
  public:
-  ReporterOption(const std::string &option_str) {
-    //TODO(qwang): Parse option str.
-
-  }
-
   ReporterOption() = default;
 
   std::string user_name_;

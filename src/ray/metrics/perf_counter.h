@@ -11,9 +11,15 @@ namespace ray {
 namespace metrics {
 
 class PerfCounter final {
- public:
+public:
+  /// Initialize the PerfCounter functions.
+  ///
+  /// \param conf The configuration of metrics.
+  /// \param io_service The io service for event loop.
+  /// \return True for success, and false for failure.
   static bool Start(const MetricsConf &conf, boost::asio::io_service &io_service);
 
+  /// Shutdown the PerfCounter.
   static void Shutdown();
 
   static void UpdateCounter(const std::string &domain,

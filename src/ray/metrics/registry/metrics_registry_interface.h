@@ -22,10 +22,6 @@ enum class MetricType : int8_t {
 
 class RegistryOption {
  public:
-  RegistryOption(const std::string &option_str) {
-    //TODO(qwang): Parse option str.
-  }
-
   RegistryOption() = default;
 
   std::string delimiter_{"."};

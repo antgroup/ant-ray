@@ -17,7 +17,7 @@ class MetricsConf {
   ///
   /// \param conf_str The string of configuration. The items of
   /// it should be joined with comma like "k1,v1,k2,v2[,...]".
-  explicit MetricsConf(const std::string *conf_str = "");
+  explicit MetricsConf(const std::string &conf_str = "");
 
   ~MetricsConf() = default;
 
@@ -45,7 +45,7 @@ private:
   /// Initialize the configuration from the given config string.
   ///
   /// \param conf_str The string of configuration.
-  void Init(const std::string *conf_str);
+  void Init(const std::string &conf_str);
 
 private:
   std::string registry_name_{"prometheus"};

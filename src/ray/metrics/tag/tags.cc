@@ -9,12 +9,8 @@ namespace ray {
 
 namespace metrics {
 
-TagKeys::TagKeys() {
-  DoHash();
-}
-
 TagKeys::TagKeys(const std::set<std::string> &keys)
-    : keys_(keys) {
+    : keys_(std::move(keys)) {
   DoHash();
 }
 

@@ -15,8 +15,6 @@ namespace metrics {
 /// All of the members cannot be changed after creating.
 class TagKeys {
 public:
-  TagKeys();
-
   /// Create a TagKeys object from a set of strings.
   ///
   /// \param keys A set of tag keys.

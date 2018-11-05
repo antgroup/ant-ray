@@ -14,7 +14,7 @@ template <typename T>
 void FindAndAssignToField(
     const std::unordered_map<std::string, std::string> &from,
     const std::string &key,
-    std::string *field) {
+    T *field) {
 
   auto it = from.find(key);
   if (it != from.end()) {
@@ -35,7 +35,7 @@ void FindAndAssignToField<std::string>(
   }
 }
 
-MetricsConf::MetricsConf(const std::string *conf_str) {
+MetricsConf::MetricsConf(const std::string &conf_str) {
   Init(conf_str);
 }
 
@@ -55,11 +55,11 @@ const std::string &MetricsConf::GetReporterName() const {
   return reporter_name_;
 }
 
-void MetricsConf::Init(const std::string *conf_str) {
-  const auto &conf_map = ParseStringToMap(conf_str, ",");
+void MetricsConf::Init(const std::string &conf_str) {
+  const auto &conf_map = ParseStringToMap(conf_str, ',');
 
   FindAndAssignToField<std::string>(conf_map, "registry_name", &registry_name_);
-  FindAndAssignToField<std::string>(conf_map, "reporter_name", &reporter_options_);
+  FindAndAssignToField<std::string>(conf_map, "reporter_name", &reporter_name_);
 
   // Parse the registry options.
   FindAndAssignToField<std::string>(conf_map,
@@ -70,7 +70,7 @@ void MetricsConf::Init(const std::string *conf_str) {
   std::string registry_default_tag_map_str;
   FindAndAssignToField<std::string>(conf_map,
       "registry.default_tag_map", &registry_default_tag_map_str);
-  const auto &tags_map = ParseStringToMap(conf_str, ":");
+  const auto &tags_map = ParseStringToMap(conf_str, ':');
   registry_options_.default_tag_map_.insert(tags_map.begin(), tags_map.end());
 
   // Parse percentiles

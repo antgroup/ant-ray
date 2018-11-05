@@ -75,7 +75,7 @@ class OpenCensusMetricsRegistry : public MetricsRegistryInterface {
   /// and should be shared between uses where possible.
   std::unordered_map<size_t, opencensus::tags::TagMap> id_to_tag_;
 
-  typedef boost::unique_lock<boost::shared_mutex> ReadLock;
+  typedef boost::shared_lock<boost::shared_mutex> ReadLock;
   typedef boost::shared_lock<boost::shared_mutex> WriteLock;
 };
 

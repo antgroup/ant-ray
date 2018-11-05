@@ -18,7 +18,6 @@ std::vector<prometheus::MetricFamily> RegistryExportHandler::Collect() {
 PrometheusPushReporter::PrometheusPushReporter(ReporterOption options,
                                                boost::asio::io_service &io_service)
     : MetricsReporterInterface(options),
-      io_service_(io_service),
       report_timer_(io_service) {
   gate_way_ = new prometheus::Gateway(options_.service_addr_,
                                       options_.job_name_,

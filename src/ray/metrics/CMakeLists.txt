@@ -20,9 +20,9 @@ ADD_RAY_LIB(metrics
   STATIC_LINK_LIBS ${METRICS_LIB_STATIC_LINK_LIBS})
 
 install(FILES
-  perf_count.h
+  perf_counter.h
   metrics_conf.h
-  tags/tags.h
+  tag/tags.h
   group/metrics_group_interface.h
   group/default_metrics_group.h
   registry/metrics_registry_interface.h

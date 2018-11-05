@@ -47,10 +47,10 @@ else()
     INSTALL_COMMAND "")
 
   ExternalProject_Add_Step(cpr_ep cpr_ep_install_lib
-    COMMAND bash -c "cp -arf ${CPR_SOURCE_LIB_DIR} ${CPR_HOME}"
+    COMMAND bash -c "cp -rf ${CPR_SOURCE_LIB_DIR} ${CPR_HOME}"
     DEPENDEES build)
   ExternalProject_Add_Step(cpr_ep cpr_ep_install_include
-    COMMAND bash -c "cp -arf ${CPR_SOURCE_INCLUDE_DIR} ${CPR_HOME}"
+    COMMAND bash -c "cp -rf ${CPR_SOURCE_INCLUDE_DIR} ${CPR_HOME}"
     DEPENDEES build)
 
 endif()

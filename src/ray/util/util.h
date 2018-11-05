@@ -51,7 +51,7 @@ inline ray::Status boost_to_ray_status(const boost::system::error_code &error) {
 ///
 /// E.g. If the source string is "k1,v1,k2,v2" and the delimiter is ",",
 /// the map which contains k1->v1 and k2->v2 will be returned.
-const std::unordered_map<std::string, std::string> ParseStringToMap(
+inline const std::unordered_map<std::string, std::string> ParseStringToMap(
     const std::string &source, char delimiter) {
   std::unordered_map<std::string, std::string> ret;
   std::istringstream source_stream_string(source);

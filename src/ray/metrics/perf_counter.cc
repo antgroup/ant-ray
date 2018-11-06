@@ -59,11 +59,11 @@ private:
 
   using DomainToGroupsMap = std::unordered_map<std::string, NameToGroupMap>;
 
-  DomainToGroupsMap perf_counter_ = {};
+  DomainToGroupsMap perf_counter_;
 
   //TODO(qwang): We should make these pointers be smart pointers.
-  MetricsRegistryInterface *registry_ = nullptr;
-  MetricsReporterInterface *reporter_ = nullptr;
+  MetricsRegistryInterface *registry_{nullptr};
+  MetricsReporterInterface *reporter_{nullptr};
 };
 
 

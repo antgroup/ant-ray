@@ -2,7 +2,6 @@
 #include <thread>
 
 #include "gtest/gtest.h"
-#include "ray/util/logging.h"
 #include "ray/metrics/registry/prometheus_metrics_registry.h"
 
 namespace ray {
@@ -12,7 +11,7 @@ namespace metrics {
 class PrometheusMetricsRegistryTest : public ::testing::Test {
  public:
   void SetUp() {
-    options_.default_tagmap_ = {{"host", "10.10.10.10"}, {"appname", "Alipay"}};
+    options_.default_tag_map_ = {{"host", "10.10.10.10"}, {"appname", "Alipay"}};
     registry_ = new PrometheusMetricsRegistry(options_);
   }
 
@@ -63,26 +62,23 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
   }
 
   void CheckCounterResult() {
-    RAY_CHECK(DoCheckResult(MetricType::kCount, "counter_test"))
-      << __FUNCTION__ << " failed!";
+    DoCheckResult(MetricType::kCount, "counter_test");
   }
 
   void CheckGaugeResult() {
-    RAY_CHECK(DoCheckResult(MetricType::kGauge, "gauge_test"))
-      << __FUNCTION__ << " failed!";
+    DoCheckResult(MetricType::kGauge, "gauge_test");
   }
 
   void CheckHistogramResult() {
-    RAY_CHECK(DoCheckResult(MetricType::kHistogram, "histogram_test"))
-      << __FUNCTION__ << " failed!";
+    DoCheckResult(MetricType::kHistogram, "histogram_test");
   }
 
  protected:
-  bool DoCheckResult(MetricType type, const std::string &metric_name) {
+  void DoCheckResult(MetricType type, const std::string &metric_name) {
     std::vector<prometheus::MetricFamily> metrics;
     std::string regex_exp = ".*";
     registry_->ExportMetrics(regex_exp, &metrics);
-    RAY_CHECK(!metrics.empty());
+    EXPECT_TRUE(!metrics.empty());
 
     // for histogram
     size_t his_sum = 0;
@@ -96,50 +92,45 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
       if (elem.name != metric_name) {
         continue;
       }
-      const std::vector<prometheus::ClientMetric> &results = elem.metric;
-      RAY_CHECK(results.size() == op_thread_count_);
       std::unordered_map<std::string ,std::string> all_tags;
+      const std::vector<prometheus::ClientMetric> &results = elem.metric;
       for (const auto &result : results) {
         switch (type) {
         case MetricType::kCount:
-          RAY_CHECK(elem.type == prometheus::MetricType::Counter);
-          RAY_CHECK(static_cast<size_t>(result.counter.value) == loop_update_times_)
-            << " real value=" << result.counter.value;
+          EXPECT_TRUE(elem.type == prometheus::MetricType::Counter);
+          EXPECT_EQ(static_cast<size_t>(result.counter.value), loop_update_times_);
           break;
         case MetricType::kGauge:
-          RAY_CHECK(elem.type == prometheus::MetricType::Gauge);
-          RAY_CHECK(static_cast<size_t>(result.gauge.value) == loop_update_times_)
-            << " real value=" << result.gauge.value;
+          EXPECT_TRUE(elem.type == prometheus::MetricType::Gauge);
+          EXPECT_EQ(static_cast<size_t>(result.gauge.value), loop_update_times_);
           break;
         case MetricType::kHistogram:
-          RAY_CHECK(elem.type == prometheus::MetricType::Histogram);
-          RAY_CHECK(static_cast<size_t>(result.histogram.sample_count)
-                    == loop_update_times_)
-            << " real sample_count=" << result.histogram.sample_count;
-          RAY_CHECK(static_cast<size_t>(result.histogram.sample_sum)
-                    == his_sum)
-            << " real sample_sum=" << result.histogram.sample_sum;
+          EXPECT_TRUE(elem.type == prometheus::MetricType::Histogram);
+          EXPECT_EQ(static_cast<size_t>(result.histogram.sample_count),
+                    loop_update_times_);
+          EXPECT_EQ(static_cast<size_t>(result.histogram.sample_sum), his_sum);
           break;
         default:
-          RAY_CHECK(0);
+          EXPECT_TRUE(0);
         }
         const std::vector<prometheus::ClientMetric::Label> &labels = result.label;
+        EXPECT_EQ(labels.size(), 3U) << " unexpected label for metric=" << metric_name;
         for (const auto &label : labels) {
           all_tags.emplace(label.name, label.value);
         }
-        RAY_CHECK(all_tags.size() == options_.default_tagmap_.size() + op_thread_count_);
       }
-      return true;
+      EXPECT_EQ(all_tags.size(), options_.default_tag_map_.size() + op_thread_count_)
+        << " metric=" << metric_name;
+      EXPECT_EQ(results.size(), op_thread_count_) << " metric=" << metric_name;
+      return;
     }
-    return false;
+    EXPECT_TRUE(0) << "Check failed. not found metric " << metric_name;
   }
 
   void DoUpdate(size_t thread_index, MetricType type, std::string metric_name) {
-    // std::chrono::microseconds sleep_period(10);
-    // std::this_thread::sleep_for(sleep_period);
     auto start = std::chrono::high_resolution_clock::now();
     std::map<std::string, std::string> tag_map;
-    tag_map.emplace("thread_id", std::to_string(thread_index));
+    tag_map.emplace(std::to_string(thread_index), std::to_string(thread_index));
     Tags tags(tag_map);
     switch (type) {
     case MetricType::kCount:
@@ -161,18 +152,19 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
       }
       break;
     default:
-      RAY_CHECK(0);
+      EXPECT_TRUE(0);
     }
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::micro> elapsed = end - start;
     std::cout << "Thread " << thread_index << " update metric " << metric_name
-      << " waited " << elapsed.count() << " us\n";
+      << ", times " << loop_update_times_<< ", waited " << elapsed.count() << " us\n";
   }
 
+ protected:
   RegistryOption options_;
   PrometheusMetricsRegistry* registry_{nullptr};
   size_t loop_update_times_{10000};
-  size_t op_thread_count_{10};
+  size_t op_thread_count_{4};
   std::vector<std::thread> thread_pool_;
 };
 

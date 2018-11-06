@@ -6,7 +6,6 @@ add_subdirectory(metrics)
 add_subdirectory(gcs)
 add_subdirectory(object_manager)
 add_subdirectory(raylet)
-add_subdirectory(metrics)
 
 include_directories(thirdparty/ae)
 

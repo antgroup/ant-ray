@@ -51,7 +51,7 @@ class MetricFamily {
   /// Shared lock
   boost::shared_mutex mutex_;
   typedef boost::shared_lock<boost::shared_mutex> ReadLock;
-  typedef boost::shared_lock<boost::shared_mutex> WriteLock;
+  typedef boost::unique_lock<boost::shared_mutex> WriteLock;
 };
 
 class PrometheusMetricsRegistry : public MetricsRegistryInterface {
@@ -89,11 +89,12 @@ class PrometheusMetricsRegistry : public MetricsRegistryInterface {
 
   prometheus::Registry registry_;
   /// All metrics
+  /// TODO(micafan) thread local, lock free
   std::unordered_map<std::string, std::shared_ptr<MetricFamily>> metric_map_;
   /// Shared lock
   boost::shared_mutex mutex_;
   typedef boost::shared_lock<boost::shared_mutex> ReadLock;
-  typedef boost::shared_lock<boost::shared_mutex> WriteLock;
+  typedef boost::unique_lock<boost::shared_mutex> WriteLock;
 };
 
 }  // namespace metrics

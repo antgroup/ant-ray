@@ -36,7 +36,7 @@ else()
   #set(boost_TAG boost-1.65.1)
 
   set(Boost_TAR_GZ_URL http://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.gz)
-  set(Boost_BUILD_PRODUCTS ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
+  set(Boost_BUILD_PRODUCTS ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
   set(Boost_URL_MD5 "ee64fd29a3fe42232c6ac3c419e523cf")
 
   set(Boost_USE_STATIC_LIBS ON)

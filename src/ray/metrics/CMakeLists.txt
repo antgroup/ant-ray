@@ -35,4 +35,4 @@ install(FILES
 )
 
 ADD_RAY_TEST(registry/prometheus_metrics_registry_test
-  STATIC_LINK_LIBS metrics_static ray_static gtest gtest_main pthread ${PROMETHEUS_CPP_CORE_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
+  STATIC_LINK_LIBS metrics_static gtest gtest_main pthread gmock_main ${PROMETHEUS_CPP_CORE_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})

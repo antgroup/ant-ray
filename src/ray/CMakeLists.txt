@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.2)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Werror -std=c++11")
 
 add_subdirectory(util)
+add_subdirectory(metrics)
 add_subdirectory(gcs)
 add_subdirectory(object_manager)
 add_subdirectory(raylet)
-add_subdirectory(metrics)
 
 include_directories(thirdparty/ae)
 

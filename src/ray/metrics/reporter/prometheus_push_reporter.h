@@ -47,7 +47,6 @@ class PrometheusPushReporter : public MetricsReporterInterface {
   void DoReport();
 
   std::mutex mutex_;
-  boost::asio::io_service &io_service_;
   /// A timer that ticks every ReporterOption.report_interval_ seconds
   boost::asio::deadline_timer report_timer_;
   /// Prometheus gateway

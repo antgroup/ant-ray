@@ -10,7 +10,7 @@ set(METRICS_LIB_DEPENDENCIES
   boost_ep
   prometheus-cpp_ep)
 
-set(METRICS_LIB_STATIC_LINK_LIBS ${PROMETHEUS_CPP_CORE_LIBRARY} ${PROMETHEUS_CPP_PUSH_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+set(METRICS_LIB_STATIC_LINK_LIBS ${PROMETHEUS_CPP_CORE_LIBRARY} ${PROMETHEUS_CPP_PUSH_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
 
 ADD_RAY_LIB(metrics
   SOURCES ${METRICS_SRCS}
@@ -31,3 +31,6 @@ install(FILES
   reporter/empty_metrics_reporter.h
   DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/ray/metrics"
 )
+
+ADD_RAY_TEST(registry/prometheus_metrics_registry_test
+  STATIC_LINK_LIBS metrics_static ray_static gtest gtest_main pthread ${PROMETHEUS_CPP_CORE_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})

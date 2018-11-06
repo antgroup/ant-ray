@@ -48,30 +48,21 @@ message(STATUS "Boost root: ${BOOST_ROOT}")
 message(STATUS "Boost include dir: ${Boost_INCLUDE_DIR}")
 message(STATUS "Boost system library: ${Boost_SYSTEM_LIBRARY}")
 message(STATUS "Boost filesystem library: ${Boost_FILESYSTEM_LIBRARY}")
+message(STATUS "Boost thread library: ${Boost_THREAD_LIBRARY}")
 include_directories(${Boost_INCLUDE_DIR})
 
 ADD_THIRDPARTY_LIB(boost_system
   STATIC_LIB ${Boost_SYSTEM_LIBRARY})
 ADD_THIRDPARTY_LIB(boost_filesystem
   STATIC_LIB ${Boost_FILESYSTEM_LIBRARY})
+ADD_THIRDPARTY_LIB(boost_thread
+  STATIC_LIB ${Boost_THREAD_LIBRARY})
 
 add_dependencies(boost_system boost_ep)
 add_dependencies(boost_filesystem boost_ep)
+add_dependencies(boost_thread boost_ep)
 
-add_custom_target(boost DEPENDS boost_system boost_filesystem)
-
-# cpr
-include(CprExternalProject)
-
-message(STATUS "Cpr root: ${CPR_HOME}")
-message(STATUS "Cpr include dir: ${CPR_INCLUDE_DIR}")
-message(STATUS "Cpr static library: ${CPR_STATIC_LIB}")
-include_directories(${CPR_INCLUDE_DIR})
-
-ADD_THIRDPARTY_LIB(cpr
-  STATIC_LIB ${CPR_STATIC_LIB})
-
-add_dependencies(cpr cpr_ep)
+add_custom_target(boost DEPENDS boost_system boost_filesystem boost_thread)
 
 # prometheus
 include(PrometheusCppExternalProject)

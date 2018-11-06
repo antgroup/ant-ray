@@ -12,8 +12,14 @@ namespace metrics {
 
 class PerfCounter final {
  public:
-  static bool Start(MetricsConf conf, boost::asio::io_service &io_service);
+  /// Initialize the PerfCounter functions.
+  ///
+  /// \param conf The configuration of metrics.
+  /// \param io_service The io service for event loop.
+  /// \return True for success, and false for failure.
+  static bool Start(const MetricsConf &conf, boost::asio::io_service &io_service);
 
+  /// Shutdown the PerfCounter.
   static void Shutdown();
 
   static void UpdateCounter(const std::string &domain,
@@ -41,10 +47,8 @@ class PerfCounter final {
                               std::shared_ptr<MetricsGroupInterface> group);
 
  private:
-  typedef std::unordered_map<std::string,
-          std::shared_ptr<MetricsGroupInterface>> NameToGroupMap;
-  typedef std::unordered_map<std::string, NameToGroupMap> DomainToGroupsMap;
-  static DomainToGroupsMap perf_counters_;
+  class Impl;
+  static std::unique_ptr<Impl> impl_ptr_;
 };
 
 }  // namespace metrics

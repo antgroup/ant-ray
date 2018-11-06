@@ -82,6 +82,37 @@ ADD_THIRDPARTY_LIB(prometheus-cpp-push
 add_dependencies(prometheus-cpp-core prometheus-cpp_ep)
 add_dependencies(prometheus-cpp-push prometheus-cpp_ep)
 
+# cpr
+include(CprExternalProject)
+
+message(STATUS "Cpr root: ${CPR_HOME}")
+message(STATUS "Cpr include dir: ${CPR_INCLUDE_DIR}")
+message(STATUS "Cpr static library: ${CPR_STATIC_LIB}")
+include_directories(${CPR_INCLUDE_DIR})
+
+ADD_THIRDPARTY_LIB(cpr
+  STATIC_LIB ${CPR_STATIC_LIB})
+
+add_dependencies(cpr cpr_ep)
+
+# prometheus
+include(PrometheusCppExternalProject)
+
+message(STATUS "PrometheusCpp root: ${PROMETHEUS_CPP_ROOT}")
+message(STATUS "PrometheusCpp include dir: ${PROMETHEUS_CPP_INCLUDE_DIR}")
+message(STATUS "PrometheusCpp core library: ${PROMETHEUS_CPP_CORE_LIBRARY}")
+message(STATUS "PrometheusCpp push library: ${PROMETHEUS_CPP_PUSH_LIBRARY}")
+include_directories(${PROMETHEUS_CPP_INCLUDE_DIR})
+
+ADD_THIRDPARTY_LIB(prometheus-cpp-core
+  STATIC_LIB ${PROMETHEUS_CPP_CORE_LIBRARY})
+
+ADD_THIRDPARTY_LIB(prometheus-cpp-push
+  STATIC_LIB ${PROMETHEUS_CPP_PUSH_LIBRARY})
+
+add_dependencies(prometheus-cpp-core prometheus-cpp_ep)
+add_dependencies(prometheus-cpp-push prometheus-cpp_ep)
+
 # flatbuffers
 include(FlatBuffersExternalProject)
 

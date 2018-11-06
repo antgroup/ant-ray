@@ -13,6 +13,8 @@ namespace metrics {
 
 class ReporterOption {
  public:
+  ReporterOption() = default;
+
   std::string user_name_;
   std::string password_;
   std::string job_name_;
@@ -20,6 +22,7 @@ class ReporterOption {
   std::string service_addr_;
 
   std::chrono::seconds report_interval_{10};
+
   std::string regex_exp_{".*"};
 
   int64_t max_retry_times_{3};

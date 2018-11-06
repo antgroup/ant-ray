@@ -5,6 +5,7 @@
 #include <regex>
 #include <string>
 #include <unordered_set>
+#include <boost/noncopyable.hpp>
 
 #include "prometheus/metric_family.h"
 #include "ray/metrics/tag/tags.h"
@@ -21,15 +22,17 @@ enum class MetricType : int8_t {
 
 class RegistryOption {
  public:
+  RegistryOption() = default;
+
   std::string delimiter_{"."};
-  std::map<std::string, std::string> default_tagmap_;
+  std::map<std::string, std::string> default_tag_map_{};
 
   // Histogram params
   std::unordered_set<double> default_percentiles_{0.01, 1, 60, 90, 99, 99.99};
   size_t bucket_count_{20};
 };
 
-class MetricsRegistryInterface {
+class MetricsRegistryInterface : public boost::noncopyable {
  public:
   virtual ~MetricsRegistryInterface() = default;
 
@@ -70,12 +73,9 @@ class MetricsRegistryInterface {
   }
 
  protected:
-  explicit MetricsRegistryInterface(RegistryOption options)
-  : default_tags_(std::move(Tags(options.default_tagmap_))),
+  explicit MetricsRegistryInterface(const RegistryOption &options)
+  : default_tags_(std::move(Tags(options.default_tag_map_))),
     options_(std::move(options)) {}
-
-  MetricsRegistryInterface(const MetricsRegistryInterface &) = delete;
-  MetricsRegistryInterface &operator=(const MetricsRegistryInterface &) = delete;
 
   virtual void DoRegisterCounter(const std::string &metric_name,
                                  const Tags *tags) = 0;

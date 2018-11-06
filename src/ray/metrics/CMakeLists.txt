@@ -4,7 +4,9 @@ set(METRICS_SRCS
   registry/prometheus_metrics_registry.cc
   reporter/prometheus_push_reporter.cc
   group/metrics_group_interface.cc
-  group/default_metrics_group.cc)
+  group/default_metrics_group.cc
+  perf_counter.cc
+  metrics_conf.cc)
 
 set(METRICS_LIB_DEPENDENCIES
   boost_ep
@@ -18,9 +20,9 @@ ADD_RAY_LIB(metrics
   STATIC_LINK_LIBS ${METRICS_LIB_STATIC_LINK_LIBS})
 
 install(FILES
-  perf_count.h
+  perf_counter.h
   metrics_conf.h
-  tags/tags.h
+  tag/tags.h
   group/metrics_group_interface.h
   group/default_metrics_group.h
   registry/metrics_registry_interface.h

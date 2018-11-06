@@ -1,6 +1,7 @@
 #ifndef RAY_METRICS_REGISTRY_PROMETHEUS_METRICS_REGISTRY_H
 #define RAY_METRICS_REGISTRY_PROMETHEUS_METRICS_REGISTRY_H
 
+#include <unordered_map>
 #include <boost/thread/pthread/shared_mutex.hpp>
 
 #include "ray/metrics/registry/metrics_registry_interface.h"
@@ -55,7 +56,7 @@ class MetricFamily {
 
 class PrometheusMetricsRegistry : public MetricsRegistryInterface {
  public:
-  PrometheusMetricsRegistry(RegistryOption options);
+  explicit PrometheusMetricsRegistry(RegistryOption options);
 
   virtual ~PrometheusMetricsRegistry() = default;
 

@@ -169,12 +169,14 @@ void PrometheusMetricsRegistry::ExportMetrics(
   if (metrics == nullptr) {
     return;
   }
+
+  auto source_metrics = registry_.Collect();
   if (regex_filter == ".*") {
-    *metrics = registry_.Collect();
+    metrics->insert(metrics->end(), source_metrics.begin(), source_metrics.end());
     return;
   }
+
   std::regex filter(regex_filter.c_str());
-  std::vector<prometheus::MetricFamily> source_metrics = registry_.Collect();
   for (auto &metric : source_metrics) {
     bool match = std::regex_match(metric.name, filter);
     if (match) {

@@ -35,20 +35,12 @@ bool PrometheusPushReporter::Init() {
   return true;
 }
 
-void PrometheusPushReporter::RegisterRegistry(MetricsRegistryInterface* registry) {
-  // TODO(micafan) CHECK(registry != nullptr)
-  std::shared_ptr<RegistryExportHandler> export_handler
-    = std::make_shared<RegistryExportHandler>(options_.regex_exp_, registry);
-
-  {
-    std::lock_guard<std::mutex> guard(mutex_);
-    bool ok = handler_map_.insert(std::make_pair(registry, export_handler)).second;
-    if (!ok) {
-      return;
-    }
+void PrometheusPushReporter::RegisterRegistry(MetricsRegistryInterface *registry) {
+  if (registry != nullptr) {
+      std::shared_ptr<RegistryExportHandler> export_handler
+      = std::make_shared<RegistryExportHandler>(options_.regex_exp_, registry);
+      gate_way_->RegisterCollectable(export_handler);
   }
-
-  gate_way_->RegisterCollectable(export_handler);
 }
 
 bool PrometheusPushReporter::Start() {
@@ -60,14 +52,14 @@ void PrometheusPushReporter::DispatchReportTimer() {
   auto report_period = boost::posix_time::seconds(options_.report_interval_.count());
   report_timer_.expires_from_now(report_period);
   report_timer_.async_wait([this](const boost::system::error_code &error) {
-    // TODO(micafan) CHECK(!error)
     DoReport();
   });
 }
 
 void PrometheusPushReporter::DoReport() {
-  // TODO(micafan) retry on failure
-  std::future<int> push_rt = gate_way_->AsyncPushAdd();
+  // TODO(micafan) Retry on failure.
+  // Ignore the return status, otherwise an prometheus exception will be triggered.
+  gate_way_->AsyncPush();
   DispatchReportTimer();
 }
 

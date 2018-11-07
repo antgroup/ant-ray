@@ -39,22 +39,17 @@ class PrometheusPushReporter : public MetricsReporterInterface {
 
   virtual bool Stop();
 
-  virtual void RegisterRegistry(MetricsRegistryInterface* registry);
+  virtual void RegisterRegistry(MetricsRegistryInterface *registry);
 
  private:
   void DispatchReportTimer();
 
   void DoReport();
 
-  std::mutex mutex_;
   /// A timer that ticks every ReporterOption.report_interval_ seconds
   boost::asio::deadline_timer report_timer_;
   /// Prometheus gateway
   prometheus::Gateway* gate_way_{nullptr};
-  /// The handlers used for collect metrics from registrys
-  typedef std::unordered_map<MetricsRegistryInterface *,
-          std::shared_ptr<RegistryExportHandler>> ExportHandlerMap;
-  ExportHandlerMap handler_map_;
 };
 
 }  // namespace metrics

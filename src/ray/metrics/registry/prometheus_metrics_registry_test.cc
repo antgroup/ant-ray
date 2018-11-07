@@ -88,11 +88,16 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
       }
     }
 
+    // check result
+    size_t matched_family = 0;
+    std::unordered_map<std::string ,std::string> all_tags;
     for (const auto &elem : metrics) {
       if (elem.name != metric_name) {
         continue;
       }
-      std::unordered_map<std::string ,std::string> all_tags;
+      // found match
+      ++matched_family;
+      std::unordered_map<std::string ,std::string> cur_tags;
       const std::vector<prometheus::ClientMetric> &results = elem.metric;
       for (const auto &result : results) {
         switch (type) {
@@ -116,15 +121,19 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
         const std::vector<prometheus::ClientMetric::Label> &labels = result.label;
         EXPECT_EQ(labels.size(), 3U) << " unexpected label for metric=" << metric_name;
         for (const auto &label : labels) {
+          cur_tags.emplace(label.name, label.value);
           all_tags.emplace(label.name, label.value);
         }
       }
-      EXPECT_EQ(all_tags.size(), options_.default_tag_map_.size() + op_thread_count_)
+      EXPECT_EQ(results.size(), 1)
         << " metric=" << metric_name;
-      EXPECT_EQ(results.size(), op_thread_count_) << " metric=" << metric_name;
-      return;
+      EXPECT_EQ(cur_tags.size(), options_.default_tag_map_.size() + 1)
+        << " metric=" << metric_name;
     }
-    EXPECT_TRUE(0) << "Check failed. not found metric " << metric_name;
+    EXPECT_EQ(matched_family, op_thread_count_)
+      << " metric=" << metric_name;
+    EXPECT_EQ(all_tags.size(), options_.default_tag_map_.size() + op_thread_count_)
+      << " metric=" << metric_name;
   }
 
   void DoUpdate(size_t thread_index, MetricType type, std::string metric_name) {
@@ -156,8 +165,10 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
     }
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::micro> elapsed = end - start;
-    std::cout << "Thread " << thread_index << " update metric " << metric_name
-      << ", times " << loop_update_times_<< ", waited " << elapsed.count() << " us\n";
+    std::string info = " Thread " + std::to_string(thread_index) + " update metric="
+      + metric_name + " times=" + std::to_string(loop_update_times_) + ", cost "
+      + std::to_string(elapsed.count()) + " us.";
+    std::cout << info << std::endl;
   }
 
  protected:

@@ -2,7 +2,6 @@
 #define RAY_METRICS_REGISTRY_PROMETHEUS_METRICS_REGISTRY_H
 
 #include <unordered_map>
-#include <boost/thread/pthread/shared_mutex.hpp>
 
 #include "ray/metrics/registry/metrics_registry_interface.h"
 #include "prometheus/registry.h"
@@ -36,22 +35,18 @@ class MetricFamily {
   MetricType type_;
   /// Container of all counters
   prometheus::Family<prometheus::Counter> *counter_family_{nullptr};
-  /// Countesr of each tag
+  /// The counter object corresponding to each tags
   std::unordered_map<size_t, prometheus::Counter&> tag_to_counter_map_;
   /// Container of all gauges
   prometheus::Family<prometheus::Gauge> *gauge_family_{nullptr};
-  /// Gauges of each tag
+  /// The gauge object corresponding to each tags
   std::unordered_map<size_t, prometheus::Gauge&> tag_to_gauge_map_;
   /// Container of all histogram
   prometheus::Family<prometheus::Histogram> *histogram_family_{nullptr};
-  /// Histograms of each tag
+  /// The histogram object corresponding to each tags
   std::unordered_map<size_t, prometheus::Histogram&> tag_to_histogram_map_;
   /// Boundary of histogram bucket
   std::vector<double> bucket_boundaries_;
-  /// Shared lock
-  boost::shared_mutex mutex_;
-  typedef boost::shared_lock<boost::shared_mutex> ReadLock;
-  typedef boost::unique_lock<boost::shared_mutex> WriteLock;
 };
 
 class PrometheusMetricsRegistry : public MetricsRegistryInterface {
@@ -88,13 +83,10 @@ class PrometheusMetricsRegistry : public MetricsRegistryInterface {
     std::vector<double> bucket_boundaries = {});
 
   prometheus::Registry registry_;
+
   /// All metrics
-  /// TODO(micafan) thread local, lock free
-  std::unordered_map<std::string, std::shared_ptr<MetricFamily>> metric_map_;
-  /// Shared lock
-  boost::shared_mutex mutex_;
-  typedef boost::shared_lock<boost::shared_mutex> ReadLock;
-  typedef boost::unique_lock<boost::shared_mutex> WriteLock;
+  static thread_local
+    std::unordered_map<std::string, std::shared_ptr<MetricFamily>> metric_map_;
 };
 
 }  // namespace metrics

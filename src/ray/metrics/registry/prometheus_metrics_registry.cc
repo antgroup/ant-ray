@@ -4,6 +4,9 @@ namespace ray {
 
 namespace metrics {
 
+thread_local std::unordered_map<std::string, std::shared_ptr<MetricFamily>>
+  PrometheusMetricsRegistry::metric_map_;
+
 MetricFamily::MetricFamily(
   MetricType type,
   const std::string &metric_name,
@@ -87,24 +90,13 @@ prometheus::Counter &MetricFamily::GetCounter(const Tags *tags) {
     return counter_family_->Add(labels);
   }
 
-  {
-    ReadLock lock(mutex_);
-    auto it = tag_to_counter_map_.find(tags->GetID());
-    if (it != tag_to_counter_map_.end()) {
-      return it->second;
-    }
+  auto it = tag_to_counter_map_.find(tags->GetID());
+  if (it != tag_to_counter_map_.end()) {
+    return it->second;
   }
-
-  {
-    WriteLock lock(mutex_);
-    auto it = tag_to_counter_map_.find(tags->GetID());
-    if (it != tag_to_counter_map_.end()) {
-      return it->second;
-    }
-    prometheus::Counter &counter = counter_family_->Add(tags->GetTags());
-    tag_to_counter_map_.emplace(tags->GetID(), counter);
-    return counter;
-  }
+  prometheus::Counter &counter = counter_family_->Add(tags->GetTags());
+  tag_to_counter_map_.emplace(tags->GetID(), counter);
+  return counter;
 }
 
 prometheus::Gauge &MetricFamily::GetGauge(const Tags *tags) {
@@ -113,24 +105,13 @@ prometheus::Gauge &MetricFamily::GetGauge(const Tags *tags) {
     return gauge_family_->Add(labels);
   }
 
-  {
-    ReadLock lock(mutex_);
-    auto it = tag_to_gauge_map_.find(tags->GetID());
-    if (it != tag_to_gauge_map_.end()) {
-      return it->second;
-    }
+  auto it = tag_to_gauge_map_.find(tags->GetID());
+  if (it != tag_to_gauge_map_.end()) {
+    return it->second;
   }
-
-  {
-    WriteLock lock(mutex_);
-    auto it = tag_to_gauge_map_.find(tags->GetID());
-    if (it != tag_to_gauge_map_.end()) {
-      return it->second;
-    }
-    prometheus::Gauge &gauge = gauge_family_->Add(tags->GetTags());
-    tag_to_gauge_map_.emplace(tags->GetID(), gauge);
-    return gauge;
-  }
+  prometheus::Gauge &gauge = gauge_family_->Add(tags->GetTags());
+  tag_to_gauge_map_.emplace(tags->GetID(), gauge);
+  return gauge;
 }
 
 prometheus::Histogram &MetricFamily::GetHistogram(const Tags *tags) {
@@ -139,25 +120,14 @@ prometheus::Histogram &MetricFamily::GetHistogram(const Tags *tags) {
     return histogram_family_->Add(labels, bucket_boundaries_);
   }
 
-  {
-    ReadLock lock(mutex_);
-    auto it = tag_to_histogram_map_.find(tags->GetID());
-    if (it != tag_to_histogram_map_.end()) {
-      return it->second;
-    }
+  auto it = tag_to_histogram_map_.find(tags->GetID());
+  if (it != tag_to_histogram_map_.end()) {
+    return it->second;
   }
-
-  {
-    WriteLock lock(mutex_);
-    auto it = tag_to_histogram_map_.find(tags->GetID());
-    if (it != tag_to_histogram_map_.end()) {
-      return it->second;
-    }
-    prometheus::Histogram &histogram
-      = histogram_family_->Add(tags->GetTags(), bucket_boundaries_);
-    tag_to_histogram_map_.emplace(tags->GetID(), histogram);
-    return histogram;
-  }
+  prometheus::Histogram &histogram
+    = histogram_family_->Add(tags->GetTags(), bucket_boundaries_);
+  tag_to_histogram_map_.emplace(tags->GetID(), histogram);
+  return histogram;
 }
 
 PrometheusMetricsRegistry::PrometheusMetricsRegistry(RegistryOption options)
@@ -187,25 +157,21 @@ void PrometheusMetricsRegistry::ExportMetrics(
 
 void PrometheusMetricsRegistry::DoRegisterCounter(const std::string &metric_name,
                                                   const Tags *tags) {
-  {
-    ReadLock read_lock(mutex_);
-    auto it = metric_map_.find(metric_name);
-    if (it != metric_map_.end()) {
-      return;
-    }
+  auto it = metric_map_.find(metric_name);
+  if (it != metric_map_.end()) {
+    return;
   }
+
   DoRegister(MetricType::kCount, metric_name, &default_tags_);
 }
 
 void PrometheusMetricsRegistry::DoRegisterGauge(const std::string &metric_name,
                                                 const Tags *tags) {
-  {
-    ReadLock read_lock(mutex_);
-    auto it = metric_map_.find(metric_name);
-    if (it != metric_map_.end()) {
-      return;
-    }
+  auto it = metric_map_.find(metric_name);
+  if (it != metric_map_.end()) {
+    return;
   }
+
   DoRegister(MetricType::kGauge, metric_name, &default_tags_);
 }
 
@@ -217,13 +183,12 @@ void PrometheusMetricsRegistry::DoRegisterHistogram(
   const Tags *tags) {
   std::vector<double> bucket_boundaries = GenBucketBoundaries(
     min_value, max_value, options_.bucket_count_);
-  {
-    ReadLock read_lock(mutex_);
-    auto it = metric_map_.find(metric_name);
-    if (it != metric_map_.end()) {
-      return;
-    }
+
+  auto it = metric_map_.find(metric_name);
+  if (it != metric_map_.end()) {
+    return;
   }
+
   DoRegister(
     MetricType::kHistogram, metric_name, &default_tags_, std::move(bucket_boundaries));
 }
@@ -232,12 +197,10 @@ void PrometheusMetricsRegistry::DoUpdateValue(const std::string &metric_name,
                                               int64_t value,
                                               const Tags *tags) {
   std::shared_ptr<MetricFamily> metric;
-  {
-    ReadLock read_lock(mutex_);
-    auto it = metric_map_.find(metric_name);
-    if (it != metric_map_.end()) {
-      metric = it->second;
-    }
+
+  auto it = metric_map_.find(metric_name);
+  if (it != metric_map_.end()) {
+    metric = it->second;
   }
 
   if (metric == nullptr) {
@@ -253,7 +216,6 @@ std::shared_ptr<MetricFamily> PrometheusMetricsRegistry::DoRegister(
   const Tags *tags,
   std::vector<double> bucket_boundaries) {
 
-  WriteLock write_lock(mutex_);
   auto it = metric_map_.find(metric_name);
   if (it != metric_map_.end()) {
     return it->second;

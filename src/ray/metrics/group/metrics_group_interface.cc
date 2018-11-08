@@ -12,7 +12,9 @@ MetricsGroupInterface::MetricsGroupInterface(
   const std::map<std::string, std::string> &tag_map)
     : domain_(domain),
       group_name_(group_name) {
-  tags_ = new Tags(tag_map);
+  if (!tag_map.empty()) {
+    tags_ = new Tags(tag_map);
+  }
 }
 
 MetricsGroupInterface::~MetricsGroupInterface() {

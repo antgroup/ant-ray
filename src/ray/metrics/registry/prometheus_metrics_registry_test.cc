@@ -19,6 +19,18 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
     delete registry_;
   }
 
+  void UpdateMetric() {
+    std::unordered_set<double> percentiles = {1, 99, 99.9};
+    for (size_t loop = 1; loop <= loop_update_times_; ++loop) {
+      registry_->RegisterCounter("counter_a", nullptr);
+      registry_->UpdateValue("counter_a", loop, nullptr);
+      registry_->RegisterGauge("gauge_a", nullptr);
+      registry_->UpdateValue("gauge_a", loop, nullptr);
+      registry_->RegisterHistogram("his_a", 1, loop_update_times_, percentiles, nullptr);
+      registry_->UpdateValue("his_a", loop, nullptr);
+    }
+  }
+
   void AsyncUpdateCounter() {
     std::string metric_name = "counter_test";
     for (size_t t_index = 0; t_index < op_thread_count_; ++t_index) {
@@ -174,12 +186,12 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
  protected:
   RegistryOption options_;
   PrometheusMetricsRegistry* registry_{nullptr};
-  size_t loop_update_times_{10000};
+  size_t loop_update_times_{100000};
   size_t op_thread_count_{4};
   std::vector<std::thread> thread_pool_;
 };
 
-TEST_F(PrometheusMetricsRegistryTest, UpdateTest) {
+TEST_F(PrometheusMetricsRegistryTest, UpdateWithTagTest) {
   AsyncUpdateCounter();
   AsyncUpdateGauge();
   AsyncUpdateHistogram();
@@ -187,6 +199,10 @@ TEST_F(PrometheusMetricsRegistryTest, UpdateTest) {
   CheckCounterResult();
   CheckGaugeResult();
   CheckHistogramResult();
+}
+
+TEST_F(PrometheusMetricsRegistryTest, UpdateWithoutTagTest) {
+  UpdateMetric();
 }
 
 }  // namespace metrics

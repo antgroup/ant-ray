@@ -8,8 +8,6 @@
 
 namespace ray {
 
-namespace metrics {
-
 #define METRICS_UPDATE_COUNTER(domain, group_name, short_name, value) \
   PerfCounter::UpdateCounter(domain, group_name, short_name, value)
 
@@ -24,8 +22,10 @@ namespace metrics {
 #define METRICS_ADD_COUNTER_GROUP(domain, group_name, tag_map) \
   PerfCounter::AddCounterGroup(domain, group_name, tag_map)
 
-#define METRICS_ADD_COUNTER_UD_GROUP(domain, group_ptr) \
+#define METRICS_ADD_UD_COUNTER_GROUP(domain, group_ptr) \
   PerfCounter::AddCounterGroup(domain, group_ptr)
+
+namespace metrics {
 
 class PerfCounter final {
  public:
@@ -35,6 +35,12 @@ class PerfCounter final {
   /// \param io_service The io service for event loop.
   /// \return True for success, and false for failure.
   static bool Start(const MetricsConf &conf, boost::asio::io_service &io_service);
+
+  /// Initialize the PerfCounter functions.
+  ///
+  /// \param conf The configuration of metrics.
+  /// \return True for success, and false for failure.
+  static bool Start(const MetricsConf &conf);
 
   /// Shutdown the PerfCounter.
   static void Shutdown();

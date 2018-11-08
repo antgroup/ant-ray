@@ -82,8 +82,9 @@ class PrometheusMetricsRegistry : public MetricsRegistryInterface {
     const Tags *tags,
     std::vector<double> bucket_boundaries = {});
 
+ private:
+  /// Prometheus registry
   prometheus::Registry registry_;
-
   /// Thread local metrics
   static thread_local
     std::unordered_map<std::string, std::shared_ptr<MetricFamily>> metric_map_;

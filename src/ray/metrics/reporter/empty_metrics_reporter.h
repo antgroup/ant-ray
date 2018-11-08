@@ -10,7 +10,7 @@ namespace metrics {
 class EmptyMetricsReporter : public MetricsReporterInterface {
  public:
   explicit EmptyMetricsReporter(ReporterOption options)
-  : MetricsReporterInterface(options) {}
+  : MetricsReporterInterface(std::move(options)) {}
 
   virtual ~EmptyMetricsReporter() = default;
 
@@ -26,7 +26,7 @@ class EmptyMetricsReporter : public MetricsReporterInterface {
     return true;
   }
 
-  virtual void RegisterRegistry(MetricsRegistryInterface* registry) {}
+  virtual void RegisterRegistry(MetricsRegistryInterface *registry) {}
 
 };
 

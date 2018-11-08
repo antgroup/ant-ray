@@ -38,7 +38,7 @@ class MetricsReporterInterface {
 
   virtual bool Stop() = 0;
 
-  virtual void RegisterRegistry(MetricsRegistryInterface* registry) = 0;
+  virtual void RegisterRegistry(MetricsRegistryInterface *registry) = 0;
 
  protected:
   explicit MetricsReporterInterface(ReporterOption options)

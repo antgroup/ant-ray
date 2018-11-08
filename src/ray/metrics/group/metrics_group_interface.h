@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <boost/noncopyable.hpp>
 
 #include "ray/metrics/registry/metrics_registry_interface.h"
 
@@ -12,7 +13,8 @@ namespace ray {
 
 namespace metrics {
 
-class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupInterface> {
+class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupInterface>,
+  boost::noncopyable {
  public:
   virtual ~MetricsGroupInterface();
 
@@ -46,9 +48,6 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
     const std::string& domain,
     const std::string& group_name,
     const std::map<std::string, std::string> &tag_map = {});
-
-  MetricsGroupInterface(const MetricsGroupInterface &) = delete;
-  MetricsGroupInterface &operator=(const MetricsGroupInterface &) = delete;
 
   /// The domain of current group
   std::string domain_;

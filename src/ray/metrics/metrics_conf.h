@@ -41,13 +41,13 @@ class MetricsConf {
   /// \return The name of reporter implementation.
   const std::string &GetReporterName() const;
 
-private:
+ private:
   /// Initialize the configuration from the given config string.
   ///
   /// \param conf_str The string of configuration.
   void Init(const std::string &conf_str);
 
-private:
+ private:
   std::string registry_name_;
   RegistryOption registry_options_;
 

@@ -22,6 +22,8 @@ class PerfCounter::Impl : public boost::noncopyable {
  public:
   bool Start(const MetricsConf &conf, boost::asio::io_service &io_service);
 
+  bool Start(const MetricsConf &conf);
+
   void Shutdown();
 
   // It not found, we should insert one.
@@ -79,6 +81,15 @@ bool PerfCounter::Start(const MetricsConf &conf,
 
   impl_ptr_ = std::unique_ptr<Impl>(new Impl());
   return impl_ptr_->Start(conf, io_service);
+}
+
+bool PerfCounter::Start(const MetricsConf &conf) {
+  if (nullptr != impl_ptr_) {
+    return false;
+  }
+
+  impl_ptr_ = std::unique_ptr<Impl>(new Impl());
+  return impl_ptr_->Start(conf);
 }
 
 void PerfCounter::Shutdown() {
@@ -139,10 +150,45 @@ bool PerfCounter::Impl::Start(const MetricsConf &conf,
     reporter_ = new EmptyMetricsReporter(conf.GetReporterOption());
   } else {
     delete registry_;
-    registry_ = nullptr;
     return false;
   }
   reporter_->RegisterRegistry(registry_);
+  if (!reporter_->Init()) {
+    return false;
+  }
+  if (!reporter_->Start()) {
+    return false;
+  }
+
+  return true;
+}
+
+bool PerfCounter::Impl::Start(const MetricsConf &conf) {
+  const auto &registry_name = conf.GetRegistryName();
+  if (registry_name == kMetricsOptionPrometheusName) {
+    registry_ = new PrometheusMetricsRegistry(conf.GetRegistryOption());
+  } else if (registry_name == kMetricsOptionEmptyName) {
+    registry_ = new EmptyMetricsRegistry(conf.GetRegistryOption());
+  } else {
+    return false;
+  }
+
+  const auto &reporter_name = conf.GetReporterName();
+  if (reporter_name == kMetricsOptionPrometheusName) {
+    reporter_ = new PrometheusPushReporter(conf.GetReporterOption());
+  } else if (reporter_name == kMetricsOptionEmptyName) {
+    reporter_ = new EmptyMetricsReporter(conf.GetReporterOption());
+  } else {
+    delete registry_;
+    return false;
+  }
+  reporter_->RegisterRegistry(registry_);
+  if (!reporter_->Init()) {
+    return false;
+  }
+  if (!reporter_->Start()) {
+    return false;
+  }
 
   return true;
 }

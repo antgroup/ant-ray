@@ -1,62 +1,66 @@
-
 #include "perf_counter.h"
-#include "metrics_conf.h"
-#include "registry/metrics_registry_interface.h"
-#include "registry/prometheus_metrics_registry.h"
-#include "reporter/metrics_reporter_interface.h"
-#include "reporter/prometheus_push_reporter.h"
 
 #include <memory>
+#include <mutex>
 #include <boost/noncopyable.hpp>
+
+#include "ray/metrics/group/default_metrics_group.h"
+#include "ray/metrics/metrics_conf.h"
+#include "ray/metrics/metrics_util.h"
+#include "ray/metrics/registry/empty_metrics_registry.h"
+#include "ray/metrics/registry/metrics_registry_interface.h"
+#include "ray/metrics/registry/prometheus_metrics_registry.h"
+#include "ray/metrics/reporter/empty_metrics_reporter.h"
+#include "ray/metrics/reporter/metrics_reporter_interface.h"
+#include "ray/metrics/reporter/prometheus_push_reporter.h"
 
 namespace ray {
 
 namespace metrics {
 
 class PerfCounter::Impl : public boost::noncopyable {
-public:
+ public:
   bool Start(const MetricsConf &conf, boost::asio::io_service &io_service);
 
   void Shutdown();
 
-    // It not found, we should insert one.
-    void UpdateCounter(const std::string &domain,
-                       const std::string &group_name,
-                       const std::string &short_name,
-                       int64_t value) {
-    }
-
-    void UpdateGauge(const std::string &domain,
+  // It not found, we should insert one.
+  void UpdateCounter(const std::string &domain,
                      const std::string &group_name,
                      const std::string &short_name,
-                     int64_t value) {
+                     int64_t value);
 
-  }
+  void UpdateGauge(const std::string &domain,
+                   const std::string &group_name,
+                   const std::string &short_name,
+                   int64_t value);
 
-    void UpdateHistogram(const std::string &domain,
-                         const std::string &group_name,
-                         const std::string &short_name,
-                         int64_t value,
-                         int64_t min_value,
-                         int64_t max_value) {
+  void UpdateHistogram(const std::string &domain,
+                       const std::string &group_name,
+                       const std::string &short_name,
+                       int64_t value,
+                       int64_t min_value,
+                       int64_t max_value);
 
-  }
+  void AddCounterGroup(const std::string &domain,
+                       const std::string &group_name,
+                       const std::map<std::string, std::string> &tag_map);
 
-    void AddCounterGroup(const std::string &domain,
-                         const std::string &group_name,
-                         const std::map<std::string, std::string> &tag_map = {}) {
+  void AddCounterGroup(const std::string &domain,
+                       std::shared_ptr<MetricsGroupInterface> group);
 
-  }
+ private:
+  std::shared_ptr<MetricsGroupInterface> DoAddGroup(
+    const std::string &domain,
+    const std::string &group_name,
+    const std::map<std::string, std::string> &tag_map = {},
+    std::shared_ptr<MetricsGroupInterface> group = nullptr);
 
-    void AddCounterGroup(const std::string &domain,
-                         std::shared_ptr<MetricsGroupInterface> group) {
+ private:
+  std::mutex mutex_;
 
-  }
-
-private:
   using NameToGroupMap =
       std::unordered_map<std::string, std::shared_ptr<MetricsGroupInterface>>;
-
   using DomainToGroupsMap = std::unordered_map<std::string, NameToGroupMap>;
 
   DomainToGroupsMap perf_counter_;
@@ -68,79 +72,164 @@ private:
 
 
 bool PerfCounter::Start(const MetricsConf &conf,
-                               boost::asio::io_service &io_service) {
-    if (nullptr != impl_ptr_) {
-      return false;
-    }
-
-    impl_ptr_ = std::unique_ptr<Impl>(new Impl());
-    return impl_ptr_->Start(conf, io_service);
+                        boost::asio::io_service &io_service) {
+  if (nullptr != impl_ptr_) {
+    return false;
   }
+
+  impl_ptr_ = std::unique_ptr<Impl>(new Impl());
+  return impl_ptr_->Start(conf, io_service);
+}
 
 void PerfCounter::Shutdown() {
-    return impl_ptr_->Shutdown();
-  }
+  return impl_ptr_->Shutdown();
+}
 
 void PerfCounter::UpdateCounter(const std::string &domain,
-                                         const std::string &group_name,
-                                         const std::string &short_name,
-                                         int64_t value) {
-    return impl_ptr_->UpdateCounter(domain, group_name, short_name, value);
-  }
+                                const std::string &group_name,
+                                const std::string &short_name,
+                                int64_t value) {
+  return impl_ptr_->UpdateCounter(domain, group_name, short_name, value);
+}
 
 void PerfCounter::UpdateGauge(const std::string &domain,
-                                       const std::string &group_name,
-                                       const std::string &short_name,
-                                       int64_t value) {
-    return impl_ptr_->UpdateGauge(domain, group_name, short_name, value);
-  }
+                              const std::string &group_name,
+                              const std::string &short_name,
+                              int64_t value) {
+  return impl_ptr_->UpdateGauge(domain, group_name, short_name, value);
+}
 
 void PerfCounter::UpdateHistogram(const std::string &domain,
-                                           const std::string &group_name,
-                                           const std::string &short_name,
-                                           int64_t value,
-                                           int64_t min_value,
-                                           int64_t max_value) {
-    return impl_ptr_->UpdateHistogram(domain, group_name,
-                                      short_name,value, min_value, max_value);
-  }
+                                  const std::string &group_name,
+                                  const std::string &short_name,
+                                  int64_t value,
+                                  int64_t min_value,
+                                  int64_t max_value) {
+  return impl_ptr_->UpdateHistogram(domain, group_name,
+                                    short_name,value, min_value, max_value);
+}
 
 void PerfCounter::AddCounterGroup(const std::string &domain,
-                                           const std::string &group_name,
-                                           const std::map<std::string, std::string> &tag_map) {
-    return impl_ptr_->AddCounterGroup(domain, group_name, tag_map);
-  }
+                                  const std::string &group_name,
+                                  const std::map<std::string, std::string> &tag_map) {
+  return impl_ptr_->AddCounterGroup(domain, group_name, tag_map);
+}
 
 void PerfCounter::AddCounterGroup(const std::string &domain,
-                                           std::shared_ptr<MetricsGroupInterface> group) {
-    return impl_ptr_->AddCounterGroup(domain, group);
-  }
+                                  std::shared_ptr<MetricsGroupInterface> group) {
+  return impl_ptr_->AddCounterGroup(domain, group);
+}
 
-bool PerfCounter::Impl::Start(const MetricsConf &conf, boost::asio::io_service &io_service) {
+bool PerfCounter::Impl::Start(const MetricsConf &conf,
+                              boost::asio::io_service &io_service) {
   //TODO(qwang): We should use factory to create these instances.
   const auto &registry_name = conf.GetRegistryName();
-  if (registry_name == "prometheus") {
+  if (registry_name == kMetricsOptionPrometheusName) {
     registry_ = new PrometheusMetricsRegistry(conf.GetRegistryOption());
+  } else if (registry_name == kMetricsOptionEmptyName) {
+    registry_ = new EmptyMetricsRegistry(conf.GetRegistryOption());
   } else {
     return false;
   }
 
   const auto &reporter_name = conf.GetReporterName();
-  if (reporter_name == "prometheus") {
+  if (reporter_name == kMetricsOptionPrometheusName) {
     reporter_ = new PrometheusPushReporter(conf.GetReporterOption(), io_service);
+  } else if (reporter_name == kMetricsOptionEmptyName) {
+    reporter_ = new EmptyMetricsReporter(conf.GetReporterOption());
   } else {
+    delete registry_;
+    registry_ = nullptr;
     return false;
   }
+  reporter_->RegisterRegistry(registry_);
 
   return true;
 }
 
 void PerfCounter::Impl::Shutdown() {
-  delete registry_;
-  registry_ = nullptr;
+  reporter_->Stop();
 
   delete reporter_;
   reporter_ = nullptr;
+
+  delete registry_;
+  registry_ = nullptr;
+}
+void PerfCounter::Impl::UpdateCounter(const std::string &domain,
+                                      const std::string &group_name,
+                                      const std::string &short_name,
+                                      int64_t value) {
+  auto group_ptr = DoAddGroup(domain, group_name);
+  group_ptr->UpdateCounter(short_name, value);
+}
+
+void PerfCounter::Impl::UpdateGauge(const std::string &domain,
+                                    const std::string &group_name,
+                                    const std::string &short_name,
+                                    int64_t value) {
+  auto group_ptr = DoAddGroup(domain, group_name);
+  group_ptr->UpdateGauge(short_name, value);
+
+}
+
+void PerfCounter::Impl::UpdateHistogram(const std::string &domain,
+                                        const std::string &group_name,
+                                        const std::string &short_name,
+                                        int64_t value,
+                                        int64_t min_value,
+                                        int64_t max_value) {
+  auto group_ptr = DoAddGroup(domain, group_name);
+  group_ptr->UpdateHistogram(short_name, value, min_value, max_value);
+}
+
+void PerfCounter::Impl::AddCounterGroup(
+  const std::string &domain,
+  const std::string &group_name,
+  const std::map<std::string, std::string> &tag_map) {
+  DoAddGroup(domain, group_name, tag_map);
+}
+
+void PerfCounter::Impl::AddCounterGroup(const std::string &domain,
+                                        std::shared_ptr<MetricsGroupInterface> group) {
+  const std::string &group_name = group->GetGroupName();
+  DoAddGroup(domain, group_name, {}, group);
+}
+
+std::shared_ptr<MetricsGroupInterface> PerfCounter::Impl::DoAddGroup(
+  const std::string &domain,
+  const std::string &group_name,
+  const std::map<std::string, std::string> &tag_map,
+  std::shared_ptr<MetricsGroupInterface> group) {
+
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  auto domain_it = perf_counter_.find(domain);
+  if (domain_it == perf_counter_.end()) {
+    std::shared_ptr<MetricsGroupInterface> new_group = (group == nullptr) ?
+      std::make_shared<DefaultMetricsGroup>(domain, group_name, tag_map)
+      : group;
+    new_group->SetRegistry(registry_);
+
+    NameToGroupMap group_map;
+    group_map.emplace(group_name, new_group);
+    perf_counter_.emplace(domain, group_map);
+    return new_group;
+  }
+
+  auto &group_map = domain_it->second;
+  auto group_it = group_map.find(group_name);
+  if (group_it == group_map.end()) {
+    std::shared_ptr<MetricsGroupInterface> new_group = (group == nullptr) ?
+      std::make_shared<DefaultMetricsGroup>(domain, group_name, tag_map)
+      : group;
+    new_group->SetRegistry(registry_);
+
+    group_map.emplace(group_name, new_group);
+    return new_group;
+  }
+
+  return group_it->second;
 }
 
 } // namespace metrics

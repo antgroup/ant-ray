@@ -15,7 +15,7 @@ namespace ray {
 namespace metrics {
 
 enum class MetricType : int8_t {
-  kCount,
+  kCounter,
   kGauge,
   kHistogram,
 };

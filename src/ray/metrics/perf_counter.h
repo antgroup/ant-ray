@@ -10,6 +10,23 @@ namespace ray {
 
 namespace metrics {
 
+#define METRICS_UPDATE_COUNTER(domain, group_name, short_name, value) \
+  PerfCounter::UpdateCounter(domain, group_name, short_name, value)
+
+#define METRICS_UPDATE_GAUGE(domain, group_name, short_name, value) \
+  PerfCounter::UpdateGauge(domain, group_name, short_name, value)
+
+#define METRICS_UPDATE_HISTOGRAM( \
+  domain, group_name, short_name, value, min_value, max_value) \
+  PerfCounter::UpdateHistogram( \
+  domain, group_name, short_name, value, min_value, max_value)
+
+#define METRICS_ADD_COUNTER_GROUP(domain, group_name, tag_map) \
+  PerfCounter::AddCounterGroup(domain, group_name, tag_map)
+
+#define METRICS_ADD_COUNTER_UD_GROUP(domain, group_ptr) \
+  PerfCounter::AddCounterGroup(domain, group_ptr)
+
 class PerfCounter final {
  public:
   /// Initialize the PerfCounter functions.
@@ -41,7 +58,7 @@ class PerfCounter final {
 
   static void AddCounterGroup(const std::string &domain,
                               const std::string &group_name,
-                              const std::map<std::string, std::string> &tag_map = {});
+                              const std::map<std::string, std::string> &tag_map);
 
   static void AddCounterGroup(const std::string &domain,
                               std::shared_ptr<MetricsGroupInterface> group);

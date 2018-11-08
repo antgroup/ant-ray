@@ -26,7 +26,7 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
           &PrometheusMetricsRegistryTest::DoUpdate,
           this,
           t_index,
-          MetricType::kCount,
+          MetricType::kCounter,
           metric_name));
     }
   }
@@ -62,7 +62,7 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
   }
 
   void CheckCounterResult() {
-    DoCheckResult(MetricType::kCount, "counter_test");
+    DoCheckResult(MetricType::kCounter, "counter_test");
   }
 
   void CheckGaugeResult() {
@@ -101,7 +101,7 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
       const std::vector<prometheus::ClientMetric> &results = elem.metric;
       for (const auto &result : results) {
         switch (type) {
-        case MetricType::kCount:
+        case MetricType::kCounter:
           EXPECT_TRUE(elem.type == prometheus::MetricType::Counter);
           EXPECT_EQ(static_cast<size_t>(result.counter.value), loop_update_times_);
           break;
@@ -142,7 +142,7 @@ class PrometheusMetricsRegistryTest : public ::testing::Test {
     tag_map.emplace(std::to_string(thread_index), std::to_string(thread_index));
     Tags tags(tag_map);
     switch (type) {
-    case MetricType::kCount:
+    case MetricType::kCounter:
       for (size_t loop = 1; loop <= loop_update_times_; ++loop) {
         registry_->RegisterCounter(metric_name);
         registry_->UpdateValue(metric_name, 1, &tags);

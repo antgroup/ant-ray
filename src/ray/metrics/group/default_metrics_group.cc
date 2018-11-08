@@ -6,10 +6,8 @@ namespace metrics {
 DefaultMetricsGroup::DefaultMetricsGroup(
   const std::string &domain,
   const std::string &group_name,
-  MetricsRegistryInterface *registry,
   const std::map<std::string, std::string> &tag_map)
     : MetricsGroupInterface(domain, group_name, tag_map) {
-  SetRegistry(registry);
 }
 
 void DefaultMetricsGroup::UpdateCounter(const std::string &short_name, int64_t value) {

@@ -17,7 +17,7 @@ void MetricDescr::Init(const RegistryOption &options,
   }
   // register view
   switch (type_) {
-  case kCount:
+  case kCounter:
     {
       opencensus::stats::ViewDescriptor count_descr = opencensus::stats::ViewDescriptor()
         .set_name(name + options.delimiter_ + "count")
@@ -124,7 +124,7 @@ void OpenCensusMetricsRegistry::ExportMetrics(const std::string &regex_filter,
 
 void OpenCensusMetricsRegistry::DoRegisterCounter(const std::string &metric_name,
                                                   const Tags *tags) {
-  DoRegister(metric_name, MetricType::kCount, tags);
+  DoRegister(metric_name, MetricType::kCounter, tags);
 }
 
 void OpenCensusMetricsRegistry::DoRegisterGauge(const std::string &metric_name,
@@ -187,7 +187,7 @@ void OpenCensusMetricsRegistry::DoUpdateValue(const std::string &metric_name,
   if (descr == nullptr) {
     const TagKeys *tag_keys = (tags == nullptr) ? nullptr
       : &tags->GetTagKeys();
-    descr = DoRegister(metric_name, MetricType::kCount, tag_keys);
+    descr = DoRegister(metric_name, MetricType::kCounter, tag_keys);
   }
 
   const opencensus::tags::TagMap &oc_tag_map = (tags != nullptr) ? GetTagMap(*tags)

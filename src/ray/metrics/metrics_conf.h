@@ -48,10 +48,10 @@ private:
   void Init(const std::string &conf_str);
 
 private:
-  std::string registry_name_{"prometheus"};
+  std::string registry_name_;
   RegistryOption registry_options_;
 
-  std::string reporter_name_{"prometheus"};
+  std::string reporter_name_;
   ReporterOption reporter_options_;
 };
 

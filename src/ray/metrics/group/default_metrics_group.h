@@ -11,7 +11,6 @@ class DefaultMetricsGroup : public MetricsGroupInterface {
  public:
    DefaultMetricsGroup(const std::string &domain,
                        const std::string &group_name,
-                       MetricsRegistryInterface* registry,
                        const std::map<std::string, std::string> &tag_map = {});
 
   virtual ~DefaultMetricsGroup() = default;

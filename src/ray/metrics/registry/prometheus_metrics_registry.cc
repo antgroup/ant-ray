@@ -16,7 +16,7 @@ MetricFamily::MetricFamily(
     : type_(type),
       bucket_boundaries_(std::move(bucket_boundaries)) {
   switch (type_) {
-  case MetricType::kCount:
+  case MetricType::kCounter:
     if (tags != nullptr) {
       counter_family_ = &prometheus::BuildCounter()
         .Name(metric_name)
@@ -60,7 +60,7 @@ MetricFamily::MetricFamily(
 
 void MetricFamily::UpdateValue(int64_t value, const Tags *tags) {
   switch (type_) {
-  case MetricType::kCount:
+  case MetricType::kCounter:
     {
       prometheus::Counter &counter = GetCounter(tags);
       counter.Increment(value);
@@ -162,7 +162,7 @@ void PrometheusMetricsRegistry::DoRegisterCounter(const std::string &metric_name
     return;
   }
 
-  DoRegister(MetricType::kCount, metric_name, &default_tags_);
+  DoRegister(MetricType::kCounter, metric_name, &default_tags_);
 }
 
 void PrometheusMetricsRegistry::DoRegisterGauge(const std::string &metric_name,
@@ -204,7 +204,7 @@ void PrometheusMetricsRegistry::DoUpdateValue(const std::string &metric_name,
   }
 
   if (metric == nullptr) {
-    metric = DoRegister(MetricType::kCount, metric_name, &default_tags_);
+    metric = DoRegister(MetricType::kCounter, metric_name, &default_tags_);
   }
 
   metric->UpdateValue(value, tags);

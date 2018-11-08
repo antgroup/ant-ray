@@ -1,8 +1,7 @@
+#include <sstream>
 
 #include "metrics_conf.h"
-#include "ray/util/util.h"
-
-#include <sstream>
+#include "ray/metrics/metrics_util.h"
 
 namespace ray {
 
@@ -37,6 +36,12 @@ void FindAndAssignToField<std::string>(
 
 MetricsConf::MetricsConf(const std::string &conf_str) {
   Init(conf_str);
+  if (registry_name_.empty()) {
+    registry_name_ = kMetricsOptionPrometheusName;
+  }
+  if (reporter_name_.empty()) {
+    reporter_name_ = kMetricsOptionPrometheusName;
+  }
 }
 
 const RegistryOption &MetricsConf::GetRegistryOption() const {

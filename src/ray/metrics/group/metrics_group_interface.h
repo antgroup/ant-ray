@@ -37,7 +37,7 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
   }
 
   virtual void SetRegistry(MetricsRegistryInterface *registry) {
-    // TODO(micafan) CHECK
+    // TODO(micafan) CHECK not null
     registry_ = registry;
   }
 

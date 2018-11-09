@@ -1,6 +1,10 @@
 #include <string>
 #include <unordered_map>
 
+namespace ray {
+
+namespace metrics {
+
 static const std::string kMetricsOptionPrometheusName = "prometheus";
 static const std::string kMetricsOptionEmptyName = "empty";
 
@@ -31,3 +35,7 @@ inline const std::unordered_map<std::string, std::string> ParseStringToMap(
 
   return ret;
 }
+
+}  // namespace metrics
+
+}  // namespace ray

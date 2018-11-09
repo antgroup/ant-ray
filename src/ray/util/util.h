@@ -3,8 +3,6 @@
 
 #include <boost/system/error_code.hpp>
 #include <chrono>
-#include <iostream>
-#include <sstream>
 
 #include "ray/status.h"
 

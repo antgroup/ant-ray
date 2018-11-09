@@ -29,11 +29,11 @@ PrometheusPushReporter::PrometheusPushReporter(ReporterOption options,
 
 PrometheusPushReporter::PrometheusPushReporter(ReporterOption options)
     : MetricsReporterInterface(std::move(options)) {
-      gate_way_.reset(new prometheus::Gateway(options_.service_addr_,
-                                              options_.job_name_,
-                                              {},
-                                              options_.user_name_,
-                                              options_.password_));
+  gate_way_.reset(new prometheus::Gateway(options_.service_addr_,
+                                          options_.job_name_,
+                                          {},
+                                          options_.user_name_,
+                                          options_.password_));
 }
 
 PrometheusPushReporter::~PrometheusPushReporter() {

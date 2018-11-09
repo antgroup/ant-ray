@@ -94,5 +94,4 @@ class PrometheusMetricsRegistry : public MetricsRegistryInterface {
 
 }  // namespace ray
 
-
 #endif  // RAY_METRICS_REGISTRY_PROMETHEUS_METRICS_REGISTRY_H

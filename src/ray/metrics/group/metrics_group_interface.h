@@ -54,10 +54,10 @@ class MetricsGroupInterface : public std::enable_shared_from_this<MetricsGroupIn
   /// The name of current group
   std::string group_name_;
 
-  MetricsRegistryInterface *registry_{nullptr};
-
   /// Tags of current group
   Tags *tags_{nullptr};
+
+  MetricsRegistryInterface *registry_{nullptr};
 };
 
 }  // namespace metrics

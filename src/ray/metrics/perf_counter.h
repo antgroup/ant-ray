@@ -45,16 +45,34 @@ class PerfCounter final {
   /// Shutdown the PerfCounter.
   static void Shutdown();
 
+  ///
+  ///
+  /// \param domain
+  /// \param group_name
+  /// \param short_name
+  /// \param value
   static void UpdateCounter(const std::string &domain,
                             const std::string &group_name,
                             const std::string &short_name,
                             int64_t value);
 
+  ///
+  /// \param domain
+  /// \param group_name
+  /// \param short_name
+  /// \param value
   static void UpdateGauge(const std::string &domain,
                           const std::string &group_name,
                           const std::string &short_name,
                           int64_t value);
 
+  ///
+  /// \param domain
+  /// \param group_name
+  /// \param short_name
+  /// \param value
+  /// \param min_value
+  /// \param max_value
   static void UpdateHistogram(const std::string &domain,
                               const std::string &group_name,
                               const std::string &short_name,
@@ -62,10 +80,17 @@ class PerfCounter final {
                               int64_t min_value,
                               int64_t max_value);
 
+  ///
+  /// \param domain
+  /// \param group_name
+  /// \param tag_map
   static void AddCounterGroup(const std::string &domain,
                               const std::string &group_name,
                               const std::map<std::string, std::string> &tag_map);
 
+  /// 
+  /// \param domain
+  /// \param group
   static void AddCounterGroup(const std::string &domain,
                               std::shared_ptr<MetricsGroupInterface> group);
 

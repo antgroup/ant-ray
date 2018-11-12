@@ -19,7 +19,7 @@ class MetricsConf {
   /// it should be joined with comma like "k1,v1,k2,v2[,...]".
   explicit MetricsConf(const std::string &conf_str = "");
 
-  ~MetricsConf() = default;
+  virtual ~MetricsConf() = default;
 
   /// Get the options of registry.
   ///
@@ -47,7 +47,7 @@ class MetricsConf {
   /// \param conf_str The string of configuration.
   void Init(const std::string &conf_str);
 
- private:
+protected:
   std::string registry_name_;
   RegistryOption registry_options_;
 

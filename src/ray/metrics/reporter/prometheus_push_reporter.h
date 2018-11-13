@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <boost/asio.hpp>
 
@@ -51,6 +52,10 @@ class PrometheusPushReporter : public MetricsReporterInterface {
 
   void TimerReportAction();
 
+  std::mutex mutex_;
+  /// Registry handler map
+  std::unordered_map<MetricsRegistryInterface *,
+    std::shared_ptr<RegistryExportHandler>> exporter_handler_;
   /// Prometheus gateway
   std::unique_ptr<prometheus::Gateway> gate_way_;
   /// Whether the reporter stopped

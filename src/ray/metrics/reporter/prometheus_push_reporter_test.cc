@@ -24,8 +24,8 @@ class PrometheusPushReporterTest : public ::testing::Test {
     reporter_options_.report_interval_ = std::chrono::seconds(1);
   }
 
-  void RebuildReporterWithIOS() {
-    reporter_.reset(new PrometheusPushReporter(reporter_options_, service_));
+  void RebuildReporterWithIOS(boost::asio::io_service &service) {
+    reporter_.reset(new PrometheusPushReporter(reporter_options_, service));
     reporter_->RegisterRegistry(registry_.get());
   }
 
@@ -34,20 +34,21 @@ class PrometheusPushReporterTest : public ::testing::Test {
     reporter_->RegisterRegistry(registry_.get());
   }
 
-  void Run(int64_t timeout_ms) {
+  void Run(int64_t timeout_ms, boost::asio::io_service &service) {
     UpdateCounter();
 
     ASSERT_TRUE(reporter_->Init());
     ASSERT_TRUE(reporter_->Start());
 
     auto timer_period = boost::posix_time::milliseconds(timeout_ms);
-    auto timer = std::make_shared<boost::asio::deadline_timer>(service_, timer_period);
-    timer->async_wait([this](const boost::system::error_code &error) {
+    auto timer = std::make_shared<boost::asio::deadline_timer>(
+      service, timer_period);
+    timer->async_wait([&](const boost::system::error_code &error) {
       reporter_->Stop();
-      service_.stop();
+      service.stop();
     });
-    service_.run();
-    std::cout << "--Run Done--" << std::endl;
+    service.run();
+    service.reset();
   }
 
   void UpdateCounter() {
@@ -64,8 +65,6 @@ class PrometheusPushReporterTest : public ::testing::Test {
   }
 
  protected:
-  boost::asio::io_service service_;
-
   RegistryOption registry_options_;
   std::unique_ptr<MetricsRegistryInterface> registry_;
 
@@ -80,16 +79,10 @@ class PrometheusPushReporterTest : public ::testing::Test {
 
 TEST_F(PrometheusPushReporterTest, ReportTest) {
   int64_t timeout_ms = 2100;
+  boost::asio::io_service service;
 
   RebuildReporter();
-  Run(timeout_ms);
-
-  RebuildReporterWithIOS();
-  Run(timeout_ms);
-
-  RebuildReporterWithIOS();
-  Run(timeout_ms);
-
+  Run(timeout_ms, service);
   // TODO(micafan) Check report result
 }
 

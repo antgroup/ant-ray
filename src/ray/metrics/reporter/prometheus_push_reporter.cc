@@ -40,25 +40,33 @@ PrometheusPushReporter::~PrometheusPushReporter() {
 }
 
 bool PrometheusPushReporter::Init() {
+  if (options_.service_addr_.empty()) {
+    return false;
+  }
   return true;
 }
 
 void PrometheusPushReporter::RegisterRegistry(MetricsRegistryInterface *registry) {
   if (registry != nullptr) {
-      std::shared_ptr<RegistryExportHandler> export_handler
+    std::shared_ptr<RegistryExportHandler> export_handler
       = std::make_shared<RegistryExportHandler>(options_.regex_exp_, registry);
-      gate_way_->RegisterCollectable(export_handler);
+    gate_way_->RegisterCollectable(export_handler);
+    {
+      std::lock_guard<std::mutex> lock(mutex_);
+      exporter_handler_.emplace(registry, export_handler);
+    }
   }
 }
 
 bool PrometheusPushReporter::Start() {
   if (report_timer_ != nullptr) {
-    DispatchReportTimer();
-    return true;
+    // TODO(micafan) Fix async push
+    // DispatchReportTimer();
+    return false;
   }
 
   report_thread_.reset(new std::thread(
-      std::bind(&PrometheusPushReporter::ThreadReportAction, this)));
+    std::bind(&PrometheusPushReporter::ThreadReportAction, this)));
   return true;
 }
 
@@ -68,7 +76,9 @@ void PrometheusPushReporter::ThreadReportAction() {
     int ret_code = gate_way_->Push();
     int64_t left_retry_times = options_.max_retry_times_;
     // Retry
+    std::chrono::milliseconds wait_time(100);
     while (ret_code != 200 && (left_retry_times-- > 0)) {
+      std::this_thread::sleep_for(wait_time);
       ret_code = gate_way_->Push();
     }
   }

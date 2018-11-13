@@ -47,6 +47,7 @@ else()
 
   ExternalProject_Add(prometheus-cpp_ep
     PREFIX external/prometheus-cpp
+    DEPENDS curl
     URL ${PROMETHEUS_CPP_URL}
     URL_MD5 ${PROMETHEUS_CPP_URL_MD5}
     BUILD_IN_SOURCE 1

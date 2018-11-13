@@ -60,6 +60,18 @@ add_dependencies(boost_filesystem boost_ep)
 
 add_custom_target(boost DEPENDS boost_system boost_filesystem)
 
+#curl
+include(CurlExternalProject)
+
+message(STATUS "CURL root: ${CURL_HOME}")
+message(STATUS "CURL include dir: ${CURL_INCLUDE_DIR}")
+include_directories(${CURL_INCLUDE_DIR})
+
+ADD_THIRDPARTY_LIB(curl
+  STATIC_LIB ${CURL_STATIC_LIB})
+
+add_dependencies(curl curl_ep)
+
 # prometheus
 include(PrometheusCppExternalProject)
 

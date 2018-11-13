@@ -12,7 +12,7 @@ set(METRICS_LIB_DEPENDENCIES
   boost_ep
   prometheus-cpp_ep)
 
-set(METRICS_LIB_STATIC_LINK_LIBS ${PROMETHEUS_CPP_PUSH_LIBRARY} ${PROMETHEUS_CPP_CORE_LIBRARY} curl ${Boost_SYSTEM_LIBRARY})
+set(METRICS_LIB_STATIC_LINK_LIBS ${PROMETHEUS_CPP_PUSH_LIBRARY} ${PROMETHEUS_CPP_CORE_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
 ADD_RAY_LIB(metrics
   SOURCES ${METRICS_SRCS}
@@ -39,4 +39,4 @@ ADD_RAY_TEST(registry/prometheus_metrics_registry_test
   STATIC_LINK_LIBS metrics_static gtest gtest_main pthread gmock_main ${PROMETHEUS_CPP_CORE_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
 ADD_RAY_TEST(reporter/prometheus_push_reporter_test
-  STATIC_LINK_LIBS metrics_static gtest gtest_main pthread gmock_main ${PROMETHEUS_CPP_PUSH_LIBRARY} ${PROMETHEUS_CPP_CORE_LIBRARY} curl ${Boost_SYSTEM_LIBRARY})
+  STATIC_LINK_LIBS metrics_static gtest gtest_main pthread gmock_main ${PROMETHEUS_CPP_PUSH_LIBRARY} ${PROMETHEUS_CPP_CORE_LIBRARY} ${CURL_STATIC_LIB} ${Boost_SYSTEM_LIBRARY})

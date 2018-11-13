@@ -1,5 +1,6 @@
 #include <string>
 #include <unordered_map>
+#include <math.h>
 
 namespace ray {
 
@@ -36,13 +37,13 @@ inline const std::unordered_map<std::string, std::string> ParseStringToMap(
   return ret;
 }
 
-// Helper function to find a value and transform it to the specified
-// type from the given map. If the key is not found, this will return
-// a 0-value with the specified type.
-//
-// E.g. If `from` is {"k1": "123"}, then
-// GetFromMap<int>(from, "k1") returns a int which value is 123.
-// GetFromMap<std::string>(from, "k1") returns a string "123".
+/// Helper function to find a value and transform it to the specified
+/// type from the given map. If the key is not found, this will return
+/// a 0-value with the specified type.
+///
+/// E.g. If `from` is {"k1": "123"}, then
+/// GetFromMap<int>(from, "k1") returns a int which value is 123.
+/// GetFromMap<std::string>(from, "k1") returns a string "123".
 template <typename T>
 inline T GetFromMap(
     const std::unordered_map<std::string, std::string> &from,
@@ -68,7 +69,6 @@ inline std::string GetFromMap<std::string>(
 
   return it->second;
 }
-
 
 }  // namespace metrics
 

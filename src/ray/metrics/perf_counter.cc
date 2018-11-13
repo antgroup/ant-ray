@@ -69,11 +69,11 @@ protected:
 
   DomainToGroupsMap perf_counter_;
 
-  //TODO(qwang): We should make these pointers be smart pointers.
   MetricsRegistryInterface *registry_{nullptr};
   MetricsReporterInterface *reporter_{nullptr};
 };
 
+// Initialize the class static variable.
 std::unique_ptr<PerfCounter::Impl> PerfCounter::impl_ptr_ = nullptr;
 
 bool PerfCounter::Start(const MetricsConf &conf,

@@ -175,6 +175,7 @@ void PrometheusMetricsRegistry::DoRegisterGauge(const std::string &metric_name,
   DoRegister(MetricType::kGauge, metric_name, &default_tags_);
 }
 
+//TODO(qwang): param tags unused?
 void PrometheusMetricsRegistry::DoRegisterHistogram(
   const std::string &metric_name,
   int64_t min_value,
@@ -210,6 +211,7 @@ void PrometheusMetricsRegistry::DoUpdateValue(const std::string &metric_name,
   metric->UpdateValue(value, tags);
 }
 
+//TODO(qwang): const ref for last param?
 std::shared_ptr<MetricFamily> PrometheusMetricsRegistry::DoRegister(
   MetricType type,
   const std::string &metric_name,

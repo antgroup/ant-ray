@@ -19,14 +19,16 @@ namespace ray {
 namespace metrics {
 
 class PerfCounter::Impl : public boost::noncopyable {
- public:
+public:
+  virtual ~Impl() = default;
+
   bool Start(const MetricsConf &conf, boost::asio::io_service &io_service);
 
   bool Start(const MetricsConf &conf);
 
   void Shutdown();
 
-  // It not found, we should insert one.
+  // If not found, we should insert one.
   void UpdateCounter(const std::string &domain,
                      const std::string &group_name,
                      const std::string &short_name,
@@ -51,14 +53,14 @@ class PerfCounter::Impl : public boost::noncopyable {
   void AddCounterGroup(const std::string &domain,
                        std::shared_ptr<MetricsGroupInterface> group);
 
- private:
+private:
   std::shared_ptr<MetricsGroupInterface> DoAddGroup(
     const std::string &domain,
     const std::string &group_name,
     const std::map<std::string, std::string> &tag_map = {},
     std::shared_ptr<MetricsGroupInterface> group = nullptr);
 
- private:
+protected:
   std::mutex mutex_;
 
   using NameToGroupMap =
@@ -67,11 +69,12 @@ class PerfCounter::Impl : public boost::noncopyable {
 
   DomainToGroupsMap perf_counter_;
 
-  //TODO(qwang): We should make these pointers be smart pointers.
   MetricsRegistryInterface *registry_{nullptr};
   MetricsReporterInterface *reporter_{nullptr};
 };
 
+// Initialize the class static variable.
+std::unique_ptr<PerfCounter::Impl> PerfCounter::impl_ptr_ = nullptr;
 
 bool PerfCounter::Start(const MetricsConf &conf,
                         boost::asio::io_service &io_service) {
@@ -93,21 +96,22 @@ bool PerfCounter::Start(const MetricsConf &conf) {
 }
 
 void PerfCounter::Shutdown() {
-  return impl_ptr_->Shutdown();
+  impl_ptr_->Shutdown();
+  impl_ptr_ = nullptr;
 }
 
 void PerfCounter::UpdateCounter(const std::string &domain,
                                 const std::string &group_name,
                                 const std::string &short_name,
                                 int64_t value) {
-  return impl_ptr_->UpdateCounter(domain, group_name, short_name, value);
+  impl_ptr_->UpdateCounter(domain, group_name, short_name, value);
 }
 
 void PerfCounter::UpdateGauge(const std::string &domain,
                               const std::string &group_name,
                               const std::string &short_name,
                               int64_t value) {
-  return impl_ptr_->UpdateGauge(domain, group_name, short_name, value);
+  impl_ptr_->UpdateGauge(domain, group_name, short_name, value);
 }
 
 void PerfCounter::UpdateHistogram(const std::string &domain,
@@ -116,19 +120,19 @@ void PerfCounter::UpdateHistogram(const std::string &domain,
                                   int64_t value,
                                   int64_t min_value,
                                   int64_t max_value) {
-  return impl_ptr_->UpdateHistogram(domain, group_name,
-                                    short_name,value, min_value, max_value);
+  impl_ptr_->UpdateHistogram(domain, group_name,
+                             short_name,value, min_value, max_value);
 }
 
 void PerfCounter::AddCounterGroup(const std::string &domain,
                                   const std::string &group_name,
                                   const std::map<std::string, std::string> &tag_map) {
-  return impl_ptr_->AddCounterGroup(domain, group_name, tag_map);
+  impl_ptr_->AddCounterGroup(domain, group_name, tag_map);
 }
 
 void PerfCounter::AddCounterGroup(const std::string &domain,
                                   std::shared_ptr<MetricsGroupInterface> group) {
-  return impl_ptr_->AddCounterGroup(domain, group);
+  impl_ptr_->AddCounterGroup(domain, group);
 }
 
 bool PerfCounter::Impl::Start(const MetricsConf &conf,
@@ -202,6 +206,7 @@ void PerfCounter::Impl::Shutdown() {
   delete registry_;
   registry_ = nullptr;
 }
+
 void PerfCounter::Impl::UpdateCounter(const std::string &domain,
                                       const std::string &group_name,
                                       const std::string &short_name,

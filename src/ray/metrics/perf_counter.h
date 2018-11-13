@@ -45,34 +45,36 @@ class PerfCounter final {
   /// Shutdown the PerfCounter.
   static void Shutdown();
 
+  /// Update counter metric.
   ///
-  ///
-  /// \param domain
-  /// \param group_name
-  /// \param short_name
-  /// \param value
+  /// \param domain The domain that we want to update.
+  /// \param group_name The name of this group.
+  /// \param short_name Short name of the metric.
+  /// \param value The value that we want to update to.
   static void UpdateCounter(const std::string &domain,
                             const std::string &group_name,
                             const std::string &short_name,
                             int64_t value);
 
+  /// Update gauge metric.
   ///
-  /// \param domain
-  /// \param group_name
-  /// \param short_name
-  /// \param value
+  /// \param domain The domain that we want to update.
+  /// \param group_name The name of this group.
+  /// \param short_name Short name of the metric.
+  /// \param value The value that we want to update to.
   static void UpdateGauge(const std::string &domain,
                           const std::string &group_name,
                           const std::string &short_name,
                           int64_t value);
 
+  /// Update histogram metric.
   ///
-  /// \param domain
-  /// \param group_name
-  /// \param short_name
-  /// \param value
-  /// \param min_value
-  /// \param max_value
+  /// \param domain The domain that we want to update.
+  /// \param group_name The name of this group.
+  /// \param short_name Short name of the metric.
+  /// \param value The value that we want to update to.
+  /// \param min_value The minimum value that we can specified.
+  /// \param max_value The maximum value that we can specified.
   static void UpdateHistogram(const std::string &domain,
                               const std::string &group_name,
                               const std::string &short_name,
@@ -80,17 +82,19 @@ class PerfCounter final {
                               int64_t min_value,
                               int64_t max_value);
 
+  /// Add a counter metric group.
   ///
-  /// \param domain
-  /// \param group_name
-  /// \param tag_map
+  /// \param domain The domain that we want to add a counter group.
+  /// \param group_name The group name that we want to add.
+  /// \param tag_map The map that contains tag k-v pairs.
   static void AddCounterGroup(const std::string &domain,
                               const std::string &group_name,
                               const std::map<std::string, std::string> &tag_map);
 
-  /// 
-  /// \param domain
-  /// \param group
+  /// Add a counter group with the given group instance.
+  ///
+  /// \param domain The domain that we want to add a counter group.
+  /// \param group The group that we want to add.
   static void AddCounterGroup(const std::string &domain,
                               std::shared_ptr<MetricsGroupInterface> group);
 

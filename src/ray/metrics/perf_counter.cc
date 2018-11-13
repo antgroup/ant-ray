@@ -206,6 +206,7 @@ void PerfCounter::Impl::Shutdown() {
   delete registry_;
   registry_ = nullptr;
 }
+
 void PerfCounter::Impl::UpdateCounter(const std::string &domain,
                                       const std::string &group_name,
                                       const std::string &short_name,

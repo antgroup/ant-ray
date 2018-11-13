@@ -47,7 +47,8 @@ public:
 
   void RegisterAndRun(MetricType type, UpdateFunc update_handler) {
 
-    auto stat_time_handler = [type, this](size_t thread_index, UpdateFunc update_handler) {
+    auto stat_time_handler =
+        [type, this](size_t thread_index, UpdateFunc update_handler) {
       auto start = std::chrono::high_resolution_clock::now();
 
       for (size_t loop_index = 0; loop_index < loop_update_times_; ++loop_index) {

@@ -43,6 +43,7 @@ ADD_RAY_TEST(reporter/prometheus_push_reporter_test
 
 ADD_RAY_TEST(metrics_conf_test STATIC_LINK_LIBS metrics_static gtest gtest_main pthread gmock_main)
 
-ADD_RAY_TEST(perf_counter_test STATIC_LINK_LIBS metrics_static gtest gtest_main pthread gmock_main)
+ADD_RAY_TEST(perf_counter_test STATIC_LINK_LIBS metrics_static gtest gtest_main pthread gmock_main
+  ${PROMETHEUS_CPP_PUSH_LIBRARY} ${PROMETHEUS_CPP_CORE_LIBRARY} ${CURL_STATIC_LIB} ${Boost_SYSTEM_LIBRARY})
 
 ADD_RAY_TEST(metrics_util_test STATIC_LINK_LIBS metrics_static gtest gtest_main pthread gmock_main)

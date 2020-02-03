@@ -21,12 +21,15 @@ public class ActorCreationOptions extends BaseTaskOptions {
 
   public final String jvmOptions;
 
+  public final int maxConcurrency;
+
   private ActorCreationOptions(Map<String, Double> resources, int maxReconstructions,
-                               boolean useDirectCall, String jvmOptions) {
+                               boolean useDirectCall, String jvmOptions, int maxConcurrency) {
     super(resources);
     this.maxReconstructions = maxReconstructions;
     this.useDirectCall = useDirectCall;
     this.jvmOptions = jvmOptions;
+    this.maxConcurrency = maxConcurrency;
   }
 
   /**
@@ -38,7 +41,7 @@ public class ActorCreationOptions extends BaseTaskOptions {
     private int maxReconstructions = NO_RECONSTRUCTION;
     private boolean useDirectCall = DEFAULT_USE_DIRECT_CALL;
     private String jvmOptions = null;
-
+    private int maxConcurrency = 1;
     public Builder setResources(Map<String, Double> resources) {
       this.resources = resources;
       return this;
@@ -62,8 +65,14 @@ public class ActorCreationOptions extends BaseTaskOptions {
       return this;
     }
 
+    public Builder setMaxConcurrency(int maxConcurrency) {
+      this.maxConcurrency = maxConcurrency;
+      return this;
+    }
+
     public ActorCreationOptions createActorCreationOptions() {
-      return new ActorCreationOptions(resources, maxReconstructions, useDirectCall, jvmOptions);
+      return new ActorCreationOptions(
+          resources, maxReconstructions, useDirectCall, jvmOptions, maxConcurrency);
     }
   }
 

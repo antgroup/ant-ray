@@ -233,6 +233,11 @@ public class RunManager {
 
         String name = shard == null ? "redis" : "redis-" + shard;
         startProcess(command, null, name);
+        try {
+          TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+
+        }
       }
     }
 

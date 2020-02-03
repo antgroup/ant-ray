@@ -42,6 +42,7 @@ public class ActorCreationOptions extends BaseTaskOptions {
     private boolean useDirectCall = DEFAULT_USE_DIRECT_CALL;
     private String jvmOptions = null;
     private int maxConcurrency = 1;
+
     public Builder setResources(Map<String, Double> resources) {
       this.resources = resources;
       return this;

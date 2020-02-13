@@ -143,9 +143,9 @@ int WorkerPool::StartWorkerProcess(const Language &language,
   }
   if (starting_workers >= maximum_startup_concurrency_) {
     // Workers have been started, but not registered. Force start disabled -- returning.
-    RAY_LOG(DEBUG) << "Worker not started, " << starting_workers
-                   << " workers of language type " << static_cast<int>(language)
-                   << " pending registration";
+    RAY_LOG(INFO) << "Worker not started, " << starting_workers
+                  << " workers of language type " << static_cast<int>(language)
+                  << " pending registration";
     return -1;
   }
   // Either there are no workers pending registration or the worker start is being forced.

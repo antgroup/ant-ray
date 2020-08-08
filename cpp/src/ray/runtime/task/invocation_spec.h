@@ -17,6 +17,7 @@ class InvocationSpec {
   /// Executable function offset from base address.
   size_t exec_func_offset;
   std::shared_ptr<msgpack::sbuffer> args;
+//  msgpack::sbuffer buf_;
 };
 }  // namespace api
 }  // namespace ray

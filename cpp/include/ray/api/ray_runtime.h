@@ -37,6 +37,9 @@ class RayRuntime {
 
   virtual ObjectID Call(RemoteFunctionPtrHolder &fptr,
                         std::shared_ptr<msgpack::sbuffer> args) = 0;
+
+  virtual ObjectID Call(std::shared_ptr<msgpack::sbuffer> args) = 0;
+
   virtual ActorID CreateActor(RemoteFunctionPtrHolder &fptr,
                               std::shared_ptr<msgpack::sbuffer> args) = 0;
   virtual ObjectID CallActor(const RemoteFunctionPtrHolder &fptr, const ActorID &actor,

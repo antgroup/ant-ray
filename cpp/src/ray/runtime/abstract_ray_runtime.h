@@ -30,6 +30,8 @@ class AbstractRayRuntime : public RayRuntime {
 
   ObjectID Call(RemoteFunctionPtrHolder &fptr, std::shared_ptr<msgpack::sbuffer> args);
 
+  ObjectID Call(std::shared_ptr<msgpack::sbuffer> args);
+
   ActorID CreateActor(RemoteFunctionPtrHolder &fptr,
                       std::shared_ptr<msgpack::sbuffer> args);
 

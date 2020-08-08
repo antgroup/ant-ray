@@ -66,6 +66,16 @@ ObjectID AbstractRayRuntime::Call(RemoteFunctionPtrHolder &fptr,
   return task_submitter_->SubmitTask(invocationSpec);
 }
 
+ObjectID AbstractRayRuntime::Call(std::shared_ptr<msgpack::sbuffer> args) {
+  InvocationSpec invocationSpec{};
+  invocationSpec.task_id =
+      TaskID::ForFakeTask();
+  invocationSpec.actor_id = ActorID::Nil();
+  invocationSpec.args = std::move(args);
+
+  return task_submitter_->SubmitTask(invocationSpec);
+}
+
 ActorID AbstractRayRuntime::CreateActor(RemoteFunctionPtrHolder &fptr,
                                         std::shared_ptr<msgpack::sbuffer> args) {
   return task_submitter_->CreateActor(fptr, args);

@@ -32,6 +32,9 @@ class Ray {
   /// Initialize Ray runtime.
   static void Init();
 
+  static std::shared_ptr<RayRuntime> Runtime(){
+    return runtime_;
+  }
   /// Store an object in the object store.
   ///
   /// \param[in] obj The object which should be stored.

@@ -25,9 +25,9 @@ TaskHelper<absl::result_of_t<F(Args...)>> &&CreateTask(F fn, Args &&... args) {
   return std::move(helper);
 }
 
-#define TASK1(f, ...) CreateTask(f, ##__VA_ARGS__).Remote();
+#define Task1(f, ...) CreateTask(f, ##__VA_ARGS__).Remote();
 
-#define TASK(f, ...) CreateTask(f, ##__VA_ARGS__)
+#define Task(f, ...) CreateTask(f, ##__VA_ARGS__)
 
 TEST(TaskHelper, Init){
   TaskHelper<void> helper("Add");
@@ -71,14 +71,14 @@ TEST(TaskExecutor, Task){
   Ray::Init();
 
   {
-    auto task_id = TASK(bb, 1).Remote();
+    auto task_id = Task(bb, 1).Remote();
     auto r = task_id.Get();
     std::cout<<" result : "<<*r<<'\n';
     EXPECT_EQ(*r, 3);
   }
 
   {
-    auto&& helper = TASK(bb, 1);
+    auto&& helper = Task(bb, 1);
     auto task_id = helper.Remote();
     auto r = task_id.Get();
     std::cout<<" result : "<<*r<<'\n';
@@ -86,7 +86,7 @@ TEST(TaskExecutor, Task){
   }
 
   {
-    ObjectRef<int> task_id = TASK1(bb, 1);
+    ObjectRef<int> task_id = Task1(bb, 1);
 
     auto r = task_id.Get();
     std::cout<<" result : "<<*r<<'\n';

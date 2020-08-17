@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   /// Set redis ip to connect an existing ray cluster.
   ray::api::RayConfig::GetInstance()->redis_ip = "127.0.0.1";
   ray::api::RayConfig::GetInstance()->lib_name =
-      "/Users/jiulong/arcos/opensource/ant/ray/bazel-bin/cpp/example_cluster_mode.so";
+      "~/ray/bazel-bin/cpp/example_cluster_mode.so";
   Ray::Init();
 
   /// put and get object

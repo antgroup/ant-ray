@@ -61,7 +61,7 @@ cc_library(
 cc_binary(
     name = "default_worker",
     srcs = [
-        "src/ray/worker/default_worker_experience.cc",
+        "src/ray/worker/default_worker.cc",
     ],
     copts = COPTS,
     linkstatic = True,
@@ -152,7 +152,7 @@ cc_binary(
 cc_binary(
     name = "example_cluster_mode.so",
     # testonly = 1,
-    # linkopts = ["-Wl,--exclude-libs,ALL"],
+    linkopts = ["-fvisibility=hidden"],
     linkshared = 1,
     linkstatic = True,
     srcs = glob([

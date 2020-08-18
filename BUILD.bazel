@@ -832,6 +832,17 @@ cc_test(
 )
 
 cc_test(
+    name = "safe_hiredis_test",
+    srcs = ["src/ray/util/safe_hiredis_test.cc"],
+    copts = COPTS,
+    deps = [
+        ":hiredis",
+        ":ray_util",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "sample_test",
     srcs = ["src/ray/util/sample_test.cc"],
     copts = COPTS,

@@ -6,6 +6,7 @@
 #define RAY_SAFE_HIREDIS_H
 
 #include <memory>
+#include <functional>
 #include "hiredis/hiredis.h"
 
 namespace ray {
@@ -17,7 +18,8 @@ class RedisContext final {
 
   RedisContext(RedisContext &&) = default;
   RedisContext &operator=(RedisContext &&) = default;
-  RedisContext(redisContext *context) : ctx_(context) {}
+  RedisContext(redisContext *context)
+      : ctx_(context, [](redisContext *context) { redisFree(context); }) {}
 
   operator bool() { return ctx_ != nullptr && !ctx_->err; }
 
@@ -38,6 +40,7 @@ class RedisContext final {
   }
 
  private:
+  using Deleter = void (*)(redisContext *);
   void check() const {
     if (ctx_ == nullptr) {
       throw std::invalid_argument("redisContext is null");
@@ -46,7 +49,7 @@ class RedisContext final {
       throw std::invalid_argument(ctx_->errstr);
     }
   }
-  std::unique_ptr<redisContext> ctx_;
+  std::unique_ptr<redisContext, Deleter> ctx_;
 };
 
 class RedisReply final {
@@ -57,16 +60,11 @@ class RedisReply final {
 
   RedisReply(RedisReply &&) = default;
   RedisReply &operator=(RedisReply &&) = default;
-  RedisReply(redisReply *reply) : reply_(reply) {}
-  RedisReply(nullptr_t reply) : reply_(nullptr) {}
+  RedisReply(redisReply *reply)
+      : reply_(reply, [](redisReply *reply) { freeReplyObject(reply); }) {}
+  RedisReply(nullptr_t reply) : reply_(nullptr, [](redisReply *) {}) {}
 
-  RedisReply(void *reply) {
-    if (reply == nullptr) {
-      reply_ = nullptr;
-    } else {
-      reply_ = std::unique_ptr<redisReply>(static_cast<redisReply *>(reply));
-    }
-  }
+  RedisReply(void *reply) : RedisReply(static_cast<redisReply *>(reply)) {}
 
   operator bool() { return reply_ != nullptr && reply_->type != REDIS_REPLY_ERROR; }
 
@@ -87,6 +85,7 @@ class RedisReply final {
   }
 
  private:
+  using Deleter = void (*)(redisReply *);
   void check() const {
     if (reply_ == nullptr) {
       throw std::invalid_argument("redisContext is null");
@@ -95,7 +94,7 @@ class RedisReply final {
       throw std::invalid_argument("REDIS_REPLY_ERROR");
     }
   }
-  std::unique_ptr<redisReply> reply_;
+  std::unique_ptr<redisReply, Deleter> reply_;
 };
 
 inline RedisContext redisConnect_s(const char *ip, int port) {

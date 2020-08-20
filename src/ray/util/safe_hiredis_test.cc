@@ -7,6 +7,7 @@
 
 namespace ray {
 
+//Old not safe API
 // static std::string GetSessionDir(std::string redis_ip, int port, std::string password)
 // {
 //  redisContext *context = redisConnect(redis_ip.c_str(), port);
@@ -25,7 +26,7 @@ namespace ray {
 //}
 
 // VS
-
+// New safe API
 //static std::string GetSessionDir(std::string redis_ip, int port, std::string password) {
 //  RedisContext context = redisConnect_s(redis_ip.c_str(), port);
 //
@@ -41,13 +42,6 @@ namespace ray {
 //}
 
 //new safe api make the code shorter and safer!
-
-TEST(SafeHiredis, uniqueptr) {
-  int invalid_port = 0;
-  auto context = redisConnect("127.0.0.1", invalid_port);
-  std::unique_ptr<redisContext, std::function<void(redisContext*)>> ctx(context, [](redisContext* context){ redisFree(context); });
-  EXPECT_TRUE(ctx->err);
-}
 
 TEST(SafeHiredis, NoNeedCheckNull) {
   int invalid_port = 0;

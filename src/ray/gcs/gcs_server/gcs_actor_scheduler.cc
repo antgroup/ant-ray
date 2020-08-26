@@ -258,14 +258,12 @@ void GcsActorScheduler::DoRetryLeasingWorkerFromNode(
     std::shared_ptr<GcsActor> actor, std::shared_ptr<rpc::GcsNodeInfo> node) {
   auto iter = node_to_actors_when_leasing_.find(actor->GetNodeID());
   if (iter != node_to_actors_when_leasing_.end()) {
-    // If the node is still available, the actor must be still in the
-    // leasing map as it is erased from leasing map only when
-    // `CancelOnNode` or the `RequestWorkerLeaseReply` is received from
-    // the node, so try leasing again.
-    RAY_CHECK(iter->second.count(actor->GetActorID()) != 0);
-    RAY_LOG(INFO) << "Retry leasing worker from " << actor->GetNodeID() << " for actor "
-                  << actor->GetActorID();
-    LeaseWorkerFromNode(actor, node);
+    if (iter->second.count(actor->GetActorID())) {
+      // If the node is still available and the actor is not canceled, try leasing again.
+      RAY_LOG(INFO) << "Retry leasing worker from " << actor->GetNodeID() << " for actor "
+                    << actor->GetActorID();
+      LeaseWorkerFromNode(actor, node);
+    }
   }
 }
 

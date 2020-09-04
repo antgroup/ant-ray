@@ -343,6 +343,26 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "test_lib",
+    srcs = glob(
+        [
+            "src/ray/exported/test.cc",
+        ],
+    ),
+    hdrs = glob(
+        [
+            "src/ray/exported/test.h",
+        ],
+    ),
+    copts = COPTS,
+    strip_include_prefix = "src",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":core_worker_lib",
+    ],
+)
+
 cc_binary(
     name = "raylet",
     srcs = ["src/ray/raylet/main.cc"],
@@ -567,6 +587,7 @@ cc_library(
             "src/ray/core_worker/store_provider/memory_store/*.cc",
             "src/ray/core_worker/transport/*.cc",
             "src/ray/rpc/worker/*.cc",
+            "src/ray/exported/test.*",
         ],
         exclude = [
             "src/ray/core_worker/**/*_test.cc",

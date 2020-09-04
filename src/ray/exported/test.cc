@@ -1,4 +1,4 @@
-#include "test.h"
+#include "ray/exported/test.h"
 #include "ray/core_worker/core_worker.h"
 
 namespace ray_exported {

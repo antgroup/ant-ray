@@ -356,6 +356,7 @@ cc_library(
         ],
     ),
     copts = COPTS,
+    alwayslink = 1,
     strip_include_prefix = "src",
     visibility = ["//visibility:public"],
     deps = [
@@ -587,7 +588,6 @@ cc_library(
             "src/ray/core_worker/store_provider/memory_store/*.cc",
             "src/ray/core_worker/transport/*.cc",
             "src/ray/rpc/worker/*.cc",
-            "src/ray/exported/test.*",
         ],
         exclude = [
             "src/ray/core_worker/**/*_test.cc",
@@ -1694,6 +1694,7 @@ pyx_library(
         linkstatic = 1,
     ),
     deps = [
+        "//:test_lib",
         "//:core_worker_lib",
         "//:global_state_accessor_lib",
         "//:ray_util",
@@ -1748,6 +1749,7 @@ cc_binary(
     linkstatic = 1,
     visibility = ["//java:__subpackages__"],
     deps = [
+        "//:test_lib",
         "//:core_worker_lib",
         "//:global_state_accessor_lib",
         "//:src/ray/ray_exported_symbols.lds",

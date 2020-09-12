@@ -382,7 +382,7 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
       TaskArg arg = taskSpec.getArgs(i);
       if (arg.getObjectRef().getObjectId() != ByteString.EMPTY) {
         functionArgs.add(FunctionArg
-          .passByReference(new ObjectId(arg.getObjectRef().getObjectId().toByteArray()),
+            .passByReference(new ObjectId(arg.getObjectRef().getObjectId().toByteArray()),
             Address.getDefaultInstance()));
       } else {
         functionArgs.add(FunctionArg.passByValue(

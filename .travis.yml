@@ -24,6 +24,8 @@ matrix:
       env:
         - PYTHON=3.6 PYTHONWARNINGS=ignore
         - RAY_INSTALL_JAVA=1
+      jdk:
+        - openjdk8
       install:
         - jdk_switcher use openjdk8 || true
         - echo "java version in install"

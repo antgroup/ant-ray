@@ -25,15 +25,17 @@ matrix:
         - PYTHON=3.6 PYTHONWARNINGS=ignore
         - RAY_INSTALL_JAVA=1
       install:
+        - jdk_switcher use openjdk8 || true
         - echo "java version in install"
         - java -version
         - . ./ci/travis/ci.sh init RAY_CI_JAVA_AFFECTED
       before_script:
+        - jdk_switcher use openjdk8 || true
         - echo "java version in before_script"
         - java -version
         - . ./ci/travis/ci.sh build
       script:
-        - jdk_switcher use openjdk8
+        - jdk_switcher use openjdk8 || true
         - echo "java version in script"
         - java -version
         - ./java/test.sh

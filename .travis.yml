@@ -1,4 +1,4 @@
-language: java
+language: generic
 # Use Ubuntu 16.04
 dist: xenial
 
@@ -24,23 +24,17 @@ matrix:
       env:
         - PYTHON=3.6 PYTHONWARNINGS=ignore
         - RAY_INSTALL_JAVA=1
+      language: java
       jdk:
         - openjdk8
       install:
-        - jdk_switcher use openjdk8 || true
         - echo "java version in install"
         - java -version
-        # - . ./ci/travis/ci.sh init RAY_CI_JAVA_AFFECTED
+        - . ./ci/travis/ci.sh init RAY_CI_JAVA_AFFECTED
       before_script:
-        - jdk_switcher use openjdk8 || true
-        - echo "java version in before_script"
-        - java -version
-        # - . ./ci/travis/ci.sh build
+        - . ./ci/travis/ci.sh build
       script:
-        - jdk_switcher use openjdk8 || true
-        - echo "java version in script"
-        - java -version
-        # - ./java/test.sh
+        - ./java/test.sh
 
 script:
   # raylet integration tests (core_worker_tests included in bazel tests below)

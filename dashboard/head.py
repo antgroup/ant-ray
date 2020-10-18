@@ -204,10 +204,10 @@ class DashboardHead:
         modules = self._load_modules()
 
         # Http server should be initialized after all modules loaded.
-        app = aiohttp.web.Application()
+        app = aiohttp.web.Application(logger=logger)
         app.add_routes(routes=routes.bound_routes())
         web_server = aiohttp.web._run_app(
-            app, host=self.http_host, port=self.http_port)
+            app, host=self.http_host, port=self.http_port, print=None)
 
         # Dump registered http routes.
         dump_routes = [

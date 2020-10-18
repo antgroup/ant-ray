@@ -5,6 +5,7 @@ This file defines the common pytest fixtures used in current directory.
 from contextlib import contextmanager
 import pytest
 import subprocess
+import tempfile
 
 import ray
 from ray.cluster_utils import Cluster
@@ -181,8 +182,17 @@ def call_ray_start(request):
         request, "param", "ray start --head --num-cpus=1 --min-worker-port=0 "
         "--max-worker-port=0 --port 0")
     command_args = parameter.split(" ")
-    out = ray.utils.decode(
-        subprocess.check_output(command_args, stderr=subprocess.STDOUT))
+    outfile = tempfile.NamedTemporaryFile()
+    with open(outfile.name, "wb") as f:
+        proc = subprocess.Popen(
+            command_args,
+            stdin=subprocess.PIPE,
+            stdout=outfile,
+            stderr=subprocess.STDOUT)
+        with proc:
+            proc.wait(timeout=10)
+    with open(outfile.name, "rb") as f:
+        out = ray.utils.decode(f.read())
     # Get the redis address from the output.
     redis_substring_prefix = "--address='"
     address_location = (

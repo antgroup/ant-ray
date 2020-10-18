@@ -190,7 +190,7 @@ if __name__ == "__main__":
                 logging.handlers.RotatingFileHandler(
                     os.path.join(log_dir, args.logging_filename),
                     maxBytes=args.logging_rotate_bytes,
-                    backupCount=args.logging_rotate_backup_count)
+                    backupCount=args.logging_rotate_backup_count),
             ]
         else:
             logging_handlers = None

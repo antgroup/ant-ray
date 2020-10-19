@@ -103,8 +103,8 @@ class ClusterTaskManager {
   /// \param light_heartbeat_enabled Only send changed fields if true.
   /// \param Output parameter. `resource_load` and `resource_load_by_shape` are the only
   /// fields used.
-  void Heartbeat(bool light_heartbeat_enabled,
-                 std::shared_ptr<HeartbeatTableData> data) const;
+  void ReportResources(bool light_heartbeat_enabled,
+                       std::shared_ptr<ResourcesData> data) const;
 
   std::string DebugString();
 

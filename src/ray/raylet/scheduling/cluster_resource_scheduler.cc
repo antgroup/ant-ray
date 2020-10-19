@@ -782,9 +782,8 @@ void ClusterResourceScheduler::FreeLocalTaskResources(
   UpdateLocalAvailableResourcesFromResourceInstances();
 }
 
-void ClusterResourceScheduler::Heartbeat(
-    bool light_heartbeat_enabled,
-    std::shared_ptr<HeartbeatTableData> heartbeat_data) const {
+void ClusterResourceScheduler::ReportResources(
+    bool light_heartbeat_enabled, std::shared_ptr<ResourcesData> resources_data) const {
   NodeResources resources;
 
   RAY_CHECK(GetNodeResources(local_node_id_, &resources))
@@ -799,11 +798,11 @@ void ClusterResourceScheduler::Heartbeat(
       const auto &label = ResourceEnumToString((PredefinedResources)i);
       const auto &capacity = resources.predefined_resources[i];
       if (capacity.available != 0) {
-        (*heartbeat_data->mutable_resources_available())[label] =
+        (*resources_data->mutable_resources_available())[label] =
             capacity.available.Double();
       }
       if (capacity.total != 0) {
-        (*heartbeat_data->mutable_resources_total())[label] = capacity.total.Double();
+        (*resources_data->mutable_resources_total())[label] = capacity.total.Double();
       }
     }
     for (auto it = resources.custom_resources.begin();
@@ -812,11 +811,11 @@ void ClusterResourceScheduler::Heartbeat(
       const auto &capacity = it->second;
       const auto &label = string_to_int_map_.Get(custom_id);
       if (capacity.available != 0) {
-        (*heartbeat_data->mutable_resources_available())[label] =
+        (*resources_data->mutable_resources_available())[label] =
             capacity.available.Double();
       }
       if (capacity.total != 0) {
-        (*heartbeat_data->mutable_resources_total())[label] = capacity.total.Double();
+        (*resources_data->mutable_resources_total())[label] = capacity.total.Double();
       }
     }
   }

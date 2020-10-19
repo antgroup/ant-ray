@@ -30,7 +30,7 @@
 
 namespace ray {
 
-using rpc::HeartbeatTableData;
+using rpc::ResourcesData;
 
 // Specify resources that consists of unit-size instances.
 static std::unordered_set<int64_t> UnitInstanceResources{CPU, GPU, TPU};
@@ -379,8 +379,8 @@ class ClusterResourceScheduler {
   /// \param light_heartbeat_enabled Only send changed fields if true.
   /// \param Output parameter. `resources_available` and `resources_total` are the only
   /// fields used.
-  void Heartbeat(bool light_heartbeat_enabled,
-                 std::shared_ptr<HeartbeatTableData> data) const;
+  void ReportResources(bool light_heartbeat_enabled,
+                       std::shared_ptr<ResourcesData> data) const;
 
   /// Return human-readable string for this scheduler state.
   std::string DebugString() const;

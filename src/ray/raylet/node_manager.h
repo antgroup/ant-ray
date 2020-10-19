@@ -80,6 +80,8 @@ struct NodeManagerConfig {
   std::string agent_command;
   /// The time between heartbeats in milliseconds.
   uint64_t heartbeat_period_ms;
+  /// The time between reports resources in milliseconds.
+  uint64_t report_resources_period_ms;
   /// The time between debug dumps in milliseconds, or -1 to disable.
   uint64_t debug_dump_period_ms;
   /// The time between attempts to eagerly evict objects from plasma in
@@ -203,7 +205,7 @@ class NodeManager : public rpc::NodeManagerServiceHandler {
                              const ResourceSet &createUpdatedResources);
 
   /// Handler for the deletion of a resource in the GCS
-  /// \param client_id ID of the node that deleted resources.
+  /// \param client_id ID of the node that dOeleted resources.
   /// \param resource_names Names of deleted resources.
   /// \return Void.
   void ResourceDeleted(const NodeID &client_id,
@@ -216,6 +218,9 @@ class NodeManager : public rpc::NodeManagerServiceHandler {
 
   /// Send heartbeats to the GCS.
   void Heartbeat();
+
+  /// Report resources to the GCS.
+  void ReportResources();
 
   /// Write out debug state to a file.
   void DumpDebugState() const;
@@ -234,7 +239,7 @@ class NodeManager : public rpc::NodeManagerServiceHandler {
   /// \param id The ID of the node manager that sent the heartbeat.
   /// \param data The heartbeat data including load information.
   /// \return Void.
-  void HeartbeatAdded(const NodeID &id, const HeartbeatTableData &data);
+  void HeartbeatAdded(const NodeID &id, const ResourcesData &data);
   /// Handler for a heartbeat batch notification from the GCS
   ///
   /// \param heartbeat_batch The batch of heartbeat data.
@@ -697,6 +702,10 @@ class NodeManager : public rpc::NodeManagerServiceHandler {
   boost::asio::steady_timer heartbeat_timer_;
   /// The period used for the heartbeat timer.
   std::chrono::milliseconds heartbeat_period_;
+  /// The timer used to report resources.
+  boost::asio::steady_timer report_resources_timer_;
+  /// The period used for the heartbeat timer.
+  std::chrono::milliseconds report_resources_period_;
   /// The period between debug state dumps.
   int64_t debug_dump_period_;
   /// The period between attempts to eagerly evict objects from plasma.

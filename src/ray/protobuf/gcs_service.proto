@@ -212,6 +212,14 @@ message ReportHeartbeatReply {
   GcsStatus status = 1;
 }
 
+message ReportResourcesRequest {
+  ResourcesData resources = 1;
+}
+
+message ReportResourcesReply {
+  GcsStatus status = 1;
+}
+
 message ReportBatchHeartbeatRequest {
   HeartbeatBatchTableData heartbeat_batch = 1;
 }
@@ -281,6 +289,7 @@ service NodeInfoGcsService {
   rpc GetAllNodeInfo(GetAllNodeInfoRequest) returns (GetAllNodeInfoReply);
   // Report heartbeat of a node to GCS Service.
   rpc ReportHeartbeat(ReportHeartbeatRequest) returns (ReportHeartbeatReply);
+  rpc ReportResources(ReportResourcesRequest) returns (ReportResourcesReply);
   // Get node's resources from GCS Service.
   rpc GetResources(GetResourcesRequest) returns (GetResourcesReply);
   // Update resources of a node in GCS Service.

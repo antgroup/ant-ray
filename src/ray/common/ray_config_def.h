@@ -36,6 +36,8 @@ RAY_CONFIG(int64_t, handler_warning_timeout_ms, 100)
 
 /// The duration between heartbeats sent by the raylets.
 RAY_CONFIG(int64_t, raylet_heartbeat_timeout_milliseconds, 100)
+/// The duration between reports resources sent by the raylets.
+RAY_CONFIG(int64_t, raylet_report_resources_period_milliseconds, 100)
 /// Whether to send heartbeat lightly. When it is enalbed, only changed part,
 /// like should_global_gc or changed resources, will be included in the heartbeat,
 /// and gcs only broadcast the changed heartbeat.

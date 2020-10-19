@@ -129,6 +129,9 @@ NodeManager::NodeManager(boost::asio::io_service &io_service, const NodeID &self
       object_directory_(object_directory),
       heartbeat_timer_(io_service),
       heartbeat_period_(std::chrono::milliseconds(config.heartbeat_period_ms)),
+      report_resources_timer_(io_service),
+      report_resources_period_(
+          std::chrono::milliseconds(config.report_resources_period_ms)),
       debug_dump_period_(config.debug_dump_period_ms),
       free_objects_period_(config.free_objects_period_ms),
       fair_queueing_enabled_(config.fair_queueing_enabled),
@@ -304,6 +307,7 @@ ray::Status NodeManager::RegisterGcs() {
   last_debug_dump_at_ms_ = current_time_ms();
   last_free_objects_at_ms_ = current_time_ms();
   Heartbeat();
+  ReportResources();
   // Start the timer that gets object manager profiling information and sends it
   // to the GCS.
   GetObjectManagerProfileInfo();
@@ -395,93 +399,7 @@ void NodeManager::Heartbeat() {
   last_heartbeat_at_ms_ = now_ms;
 
   auto heartbeat_data = std::make_shared<HeartbeatTableData>();
-  SchedulingResources &local_resources = cluster_resource_map_[self_node_id_];
   heartbeat_data->set_client_id(self_node_id_.Binary());
-
-  if (new_scheduler_enabled_) {
-    new_resource_scheduler_->Heartbeat(light_heartbeat_enabled_, heartbeat_data);
-    cluster_task_manager_->Heartbeat(light_heartbeat_enabled_, heartbeat_data);
-  } else {
-    // TODO(atumanov): modify the heartbeat table protocol to use the ResourceSet
-    // directly.
-    // TODO(atumanov): implement a ResourceSet const_iterator.
-    // If light heartbeat enabled, we only set filed that represent resources changed.
-    if (light_heartbeat_enabled_) {
-      if (!last_heartbeat_resources_.GetTotalResources().IsEqual(
-              local_resources.GetTotalResources())) {
-        for (const auto &resource_pair :
-             local_resources.GetTotalResources().GetResourceMap()) {
-          (*heartbeat_data->mutable_resources_total())[resource_pair.first] =
-              resource_pair.second;
-        }
-        last_heartbeat_resources_.SetTotalResources(
-            ResourceSet(local_resources.GetTotalResources()));
-      }
-
-      if (!last_heartbeat_resources_.GetAvailableResources().IsEqual(
-              local_resources.GetAvailableResources())) {
-        heartbeat_data->set_resources_available_changed(true);
-        for (const auto &resource_pair :
-             local_resources.GetAvailableResources().GetResourceMap()) {
-          (*heartbeat_data->mutable_resources_available())[resource_pair.first] =
-              resource_pair.second;
-        }
-        last_heartbeat_resources_.SetAvailableResources(
-            ResourceSet(local_resources.GetAvailableResources()));
-      }
-
-      local_resources.SetLoadResources(local_queues_.GetTotalResourceLoad());
-      if (!last_heartbeat_resources_.GetLoadResources().IsEqual(
-              local_resources.GetLoadResources())) {
-        heartbeat_data->set_resource_load_changed(true);
-        for (const auto &resource_pair :
-             local_resources.GetLoadResources().GetResourceMap()) {
-          (*heartbeat_data->mutable_resource_load())[resource_pair.first] =
-              resource_pair.second;
-        }
-        last_heartbeat_resources_.SetLoadResources(
-            ResourceSet(local_resources.GetLoadResources()));
-      }
-    } else {
-      // If light heartbeat disabled, we send whole resources information every time.
-      for (const auto &resource_pair :
-           local_resources.GetTotalResources().GetResourceMap()) {
-        (*heartbeat_data->mutable_resources_total())[resource_pair.first] =
-            resource_pair.second;
-      }
-
-      for (const auto &resource_pair :
-           local_resources.GetAvailableResources().GetResourceMap()) {
-        (*heartbeat_data->mutable_resources_available())[resource_pair.first] =
-            resource_pair.second;
-      }
-
-      local_resources.SetLoadResources(local_queues_.GetTotalResourceLoad());
-      for (const auto &resource_pair :
-           local_resources.GetLoadResources().GetResourceMap()) {
-        (*heartbeat_data->mutable_resource_load())[resource_pair.first] =
-            resource_pair.second;
-      }
-    }
-  }
-
-  // Add resource load by shape. This will be used by the new autoscaler.
-  auto resource_load = local_queues_.GetResourceLoadByShape(
-      RayConfig::instance().max_resource_shapes_per_load_report());
-  heartbeat_data->mutable_resource_load_by_shape()->Swap(&resource_load);
-
-  // Set the global gc bit on the outgoing heartbeat message.
-  if (should_global_gc_) {
-    heartbeat_data->set_should_global_gc(true);
-    should_global_gc_ = false;
-  }
-
-  // Trigger local GC if needed. This throttles the frequency of local GC calls
-  // to at most once per heartbeat interval.
-  if (should_local_gc_) {
-    DoLocalGC();
-    should_local_gc_ = false;
-  }
 
   RAY_CHECK_OK(
       gcs_client_->Nodes().AsyncReportHeartbeat(heartbeat_data, /*done*/ nullptr));
@@ -505,6 +423,107 @@ void NodeManager::Heartbeat() {
   heartbeat_timer_.async_wait([this](const boost::system::error_code &error) {
     RAY_CHECK(!error);
     Heartbeat();
+  });
+}
+
+void NodeManager::ReportResources() {
+  auto resources_data = std::make_shared<ResourcesData>();
+  SchedulingResources &local_resources = cluster_resource_map_[self_node_id_];
+  resources_data->set_client_id(self_node_id_.Binary());
+
+  if (new_scheduler_enabled_) {
+    new_resource_scheduler_->ReportResources(light_heartbeat_enabled_, resources_data);
+    cluster_task_manager_->ReportResources(light_heartbeat_enabled_, resources_data);
+  } else {
+    // TODO(atumanov): modify the heartbeat table protocol to use the ResourceSet
+    // directly.
+    // TODO(atumanov): implement a ResourceSet const_iterator.
+    // If light heartbeat enabled, we only set filed that represent resources changed.
+    if (light_heartbeat_enabled_) {
+      if (!last_heartbeat_resources_.GetTotalResources().IsEqual(
+              local_resources.GetTotalResources())) {
+        for (const auto &resource_pair :
+             local_resources.GetTotalResources().GetResourceMap()) {
+          (*resources_data->mutable_resources_total())[resource_pair.first] =
+              resource_pair.second;
+        }
+        last_heartbeat_resources_.SetTotalResources(
+            ResourceSet(local_resources.GetTotalResources()));
+      }
+
+      if (!last_heartbeat_resources_.GetAvailableResources().IsEqual(
+              local_resources.GetAvailableResources())) {
+        resources_data->set_resources_available_changed(true);
+        for (const auto &resource_pair :
+             local_resources.GetAvailableResources().GetResourceMap()) {
+          (*resources_data->mutable_resources_available())[resource_pair.first] =
+              resource_pair.second;
+        }
+        last_heartbeat_resources_.SetAvailableResources(
+            ResourceSet(local_resources.GetAvailableResources()));
+      }
+
+      local_resources.SetLoadResources(local_queues_.GetTotalResourceLoad());
+      if (!last_heartbeat_resources_.GetLoadResources().IsEqual(
+              local_resources.GetLoadResources())) {
+        resources_data->set_resource_load_changed(true);
+        for (const auto &resource_pair :
+             local_resources.GetLoadResources().GetResourceMap()) {
+          (*resources_data->mutable_resource_load())[resource_pair.first] =
+              resource_pair.second;
+        }
+        last_heartbeat_resources_.SetLoadResources(
+            ResourceSet(local_resources.GetLoadResources()));
+      }
+    } else {
+      // If light heartbeat disabled, we send whole resources information every time.
+      for (const auto &resource_pair :
+           local_resources.GetTotalResources().GetResourceMap()) {
+        (*resources_data->mutable_resources_total())[resource_pair.first] =
+            resource_pair.second;
+      }
+
+      for (const auto &resource_pair :
+           local_resources.GetAvailableResources().GetResourceMap()) {
+        (*resources_data->mutable_resources_available())[resource_pair.first] =
+            resource_pair.second;
+      }
+
+      local_resources.SetLoadResources(local_queues_.GetTotalResourceLoad());
+      for (const auto &resource_pair :
+           local_resources.GetLoadResources().GetResourceMap()) {
+        (*resources_data->mutable_resource_load())[resource_pair.first] =
+            resource_pair.second;
+      }
+    }
+  }
+
+  // Add resource load by shape. This will be used by the new autoscaler.
+  auto resource_load = local_queues_.GetResourceLoadByShape(
+      RayConfig::instance().max_resource_shapes_per_load_report());
+  resources_data->mutable_resource_load_by_shape()->Swap(&resource_load);
+
+  // Set the global gc bit on the outgoing heartbeat message.
+  if (should_global_gc_) {
+    resources_data->set_should_global_gc(true);
+    should_global_gc_ = false;
+  }
+
+  // Trigger local GC if needed. This throttles the frequency of local GC calls
+  // to at most once per heartbeat interval.
+  if (should_local_gc_) {
+    DoLocalGC();
+    should_local_gc_ = false;
+  }
+
+  RAY_CHECK_OK(
+      gcs_client_->Nodes().AsyncReportResources(resources_data, /*done*/ nullptr));
+
+  // Reset the timer.
+  report_resources_timer_.expires_from_now(heartbeat_period_);
+  report_resources_timer_.async_wait([this](const boost::system::error_code &error) {
+    RAY_CHECK(!error);
+    ReportResources();
   });
 }
 
@@ -928,7 +947,7 @@ void NodeManager::TryLocalInfeasibleTaskScheduling() {
 }
 
 void NodeManager::HeartbeatAdded(const NodeID &client_id,
-                                 const HeartbeatTableData &heartbeat_data) {
+                                 const ResourcesData &heartbeat_data) {
   // Locate the client id in remote client table and update available resources based on
   // the received heartbeat information.
   auto it = cluster_resource_map_.find(client_id);

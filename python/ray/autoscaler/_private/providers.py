@@ -44,6 +44,13 @@ def _import_kubernetes(provider_config):
     return KubernetesNodeProvider
 
 
+def _import_kubernetes_operator(provider_config):
+    from ray.autoscaler._private.kubernetes_operator.node_provider import \
+        KubernetesOperatorNodeProvider
+    return KubernetesOperatorNodeProvider
+
+
+
 def _import_staroid(provider_config):
     from ray.autoscaler._private.staroid.node_provider import \
         StaroidNodeProvider
@@ -60,6 +67,12 @@ def _load_kubernetes_example_config():
     import ray.autoscaler.kubernetes as ray_kubernetes
     return os.path.join(
         os.path.dirname(ray_kubernetes.__file__), "example-full.yaml")
+
+
+def _load_kubernetes_operator_example_config():
+    import ray.autoscaler.kubernetes_operator as ray_kubernetes_operator
+    return os.path.join(
+        os.path.dirname(ray_kubernetes_operator.__file__), "example-full.yaml")
 
 
 def _load_aws_example_config():
@@ -96,6 +109,7 @@ _NODE_PROVIDERS = {
     "azure": _import_azure,
     "staroid": _import_staroid,
     "kubernetes": _import_kubernetes,
+    "kubernetesOperator": _import_kubernetes_operator,
     "external": _import_external  # Import an external module
 }
 
@@ -106,6 +120,7 @@ _PROVIDER_PRETTY_NAMES = {
     "azure": "Azure",
     "staroid": "Staroid",
     "kubernetes": "Kubernetes",
+    "kubernetesOperator": "KubernetesOperator",
     "external": "External"
 }
 
@@ -116,6 +131,7 @@ _DEFAULT_CONFIGS = {
     "azure": _load_azure_example_config,
     "staroid": _load_staroid_example_config,
     "kubernetes": _load_kubernetes_example_config,
+    "kubernetesOperator": _load_kubernetes_operator_example_config,
 }
 
 

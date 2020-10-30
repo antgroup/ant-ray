@@ -4,10 +4,12 @@ from kubernetes.client.rest import ApiException
 
 from ray.autoscaler._private.command_runner import KubernetesCommandRunner
 from ray.autoscaler._private.kubernetes_operator import core_api, log_prefix, \
-    extensions_beta_api
+    extensions_beta_api, custom_object_api
 from ray.autoscaler._private.kubernetes_operator.config import bootstrap_kubernetes
 from ray.autoscaler.node_provider import NodeProvider
-from ray.autoscaler.tags import TAG_RAY_CLUSTER_NAME
+from ray.autoscaler.tags import TAG_RAY_CLUSTER_NAME, TAG_RAY_NODE_KIND
+from ray.autoscaler._private.kubernetes_operator.ray_cluster_util import CRD_RAY_GROUP, \
+    CRD_RAY_VERSION, CRD_RAY_PLURAL, CRD_RAY_KIND
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +79,7 @@ class KubernetesOperatorNodeProvider(NodeProvider):
         core_api().patch_namespaced_pod(node_id, self.namespace, pod)
 
     def create_node(self, node_config, tags, count):
+        # todo create a raycluster
         conf = node_config.copy()
         pod_spec = conf.get("pod", conf)
         service_spec = conf.get("service")
@@ -90,40 +93,106 @@ class KubernetesOperatorNodeProvider(NodeProvider):
         else:
             pod_spec["metadata"]["labels"] = tags
         logger.info(log_prefix + "calling create_namespaced_pod "
-                    "(count={}).".format(count))
-        new_nodes = []
-        for _ in range(count):
-            pod = core_api().create_namespaced_pod(self.namespace, pod_spec)
-            new_nodes.append(pod)
+                                 "(count={}).".format(count))
+        # new_nodes = []
+        # for _ in range(count):
+        #     pod = core_api().create_namespaced_pod(self.namespace, pod_spec)
+        #     new_nodes.append(pod)
 
-        new_svcs = []
-        if service_spec is not None:
-            logger.info(log_prefix + "calling create_namespaced_service "
-                        "(count={}).".format(count))
+        # init exist_cluster to None
+        exist_cluster = None
+        try:
+            exist_cluster = custom_object_api().get_namespaced_custom_object(
+                group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
+                namespace=self.namespace, plural=CRD_RAY_PLURAL,
+                name=self.cluster_name)
+            print(exist_cluster)
+            logger.info(log_prefix + "calling create_namespaced_pod "
+                                     "(cluster={}).".format(exist_cluster))
+        except ApiException as e:
+            print("Exception when calling CustomObjectsApi->get_namespaced_custom_object: %s\n" % e)
 
-            for new_node in new_nodes:
+        body = {}
+        if exist_cluster is None:
+            extensions = [1]
+            extension = self.generateExtension(count, pod_spec, tags)
+            extensions[0] = extension
+            spec = self.generateCluster(body, pod_spec)
+            spec['extensions'] = extensions
+            body['spec'] = spec
 
-                metadata = service_spec.get("metadata", {})
-                metadata["name"] = new_node.metadata.name
-                service_spec["metadata"] = metadata
-                service_spec["spec"]["selector"] = {"ray-node-uuid": node_uuid}
-                svc = core_api().create_namespaced_service(
-                    self.namespace, service_spec)
-                new_svcs.append(svc)
+            custom_object_api().create_namespaced_custom_object(
+                group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
+                namespace=self.namespace, plural=CRD_RAY_PLURAL, body=body, pretty='true')
+        else:
+            original_extensions = exist_cluster['extensions']
+            new_extensions = [2]
+            new_extensions[0] = original_extensions[0]
+            new_extensions[1] = self.generateExtension(count, pod_spec, tags)
+            exist_cluster['extensions'] = new_extensions
+            body = exist_cluster
+            custom_object_api().patch_namespaced_custom_object(
+                group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
+                namespace=self.namespace, plural=CRD_RAY_PLURAL,
+                name=self.cluster_name, body=body)
 
-        if ingress_spec is not None:
-            logger.info(log_prefix + "calling create_namespaced_ingress "
-                        "(count={}).".format(count))
-            for new_svc in new_svcs:
-                metadata = ingress_spec.get("metadata", {})
-                metadata["name"] = new_svc.metadata.name
-                ingress_spec["metadata"] = metadata
-                ingress_spec = _add_service_name_to_service_port(
-                    ingress_spec, new_svc.metadata.name)
-                extensions_beta_api().create_namespaced_ingress(
-                    self.namespace, ingress_spec)
+        # new_svcs = []
+        # if service_spec is not None:
+        #     logger.info(log_prefix + "calling create_namespaced_service "
+        #                 "(count={}).".format(count))
+        #
+        #     for new_node in new_nodes:
+        #
+        #         metadata = service_spec.get("metadata", {})
+        #         metadata["name"] = new_node.metadata.name
+        #         service_spec["metadata"] = metadata
+        #         service_spec["spec"]["selector"] = {"ray-node-uuid": node_uuid}
+        #         svc = core_api().create_namespaced_service(
+        #             self.namespace, service_spec)
+        #         new_svcs.append(svc)
+        #
+        # if ingress_spec is not None:
+        #     logger.info(log_prefix + "calling create_namespaced_ingress "
+        #                 "(count={}).".format(count))
+        #     for new_svc in new_svcs:
+        #         metadata = ingress_spec.get("metadata", {})
+        #         metadata["name"] = new_svc.metadata.name
+        #         ingress_spec["metadata"] = metadata
+        #         ingress_spec = _add_service_name_to_service_port(
+        #             ingress_spec, new_svc.metadata.name)
+        #         extensions_beta_api().create_namespaced_ingress(
+        #             self.namespace, ingress_spec)
+
+    def generateCluster(self, body, pod_spec):
+        spec = {}
+        body['apiVersion'] = CRD_RAY_GROUP + '/' + CRD_RAY_VERSION
+        body['kind'] = CRD_RAY_KIND
+        body['metadata'] = {}
+        body['metadata']['name'] = self.cluster_name
+        spec['clusterName'] = self.cluster_name
+        spec['images'] = {}
+        spec['images']['defaultImage'] = pod_spec['spec']['containers'][0]['image']
+        spec['imagePullPolicy'] = 'Always'
+        return spec
+
+    def generateExtension(self, count, pod_spec, tags):
+        extension = {}
+        extension['replicas'] = count
+        extension['type'] = tags[TAG_RAY_NODE_KIND]
+        extension['image'] = pod_spec['spec']['containers'][0]['image']
+        extension['groupName'] = 'test-group'
+        extension['command'] = ' '.join(map(str, pod_spec['spec']['containers'][0]['args']))
+        extension['labels'] = pod_spec["metadata"]["labels"]
+        extension['serviceAccountName'] = pod_spec["spec"]["serviceAccountName"]
+        extension['ports'] = pod_spec['spec']['containers'][0]['ports']
+        extension['volumes'] = pod_spec['spec']['volumes']
+        extension['volumeMounts'] = pod_spec['spec']['containers'][0]['volumeMounts']
+        extension['resources'] = pod_spec['spec']['containers'][0]['resources']
+        extension['containerEnv'] = pod_spec['spec']['containers'][0]['env']
+        return extension
 
     def terminate_node(self, node_id):
+        # todo delete raycluster pods
         logger.info(log_prefix + "calling delete_namespaced_pod")
         core_api().delete_namespaced_pod(node_id, self.namespace)
         try:
@@ -139,8 +208,10 @@ class KubernetesOperatorNodeProvider(NodeProvider):
             pass
 
     def terminate_nodes(self, node_ids):
-        for node_id in node_ids:
-            self.terminate_node(node_id)
+        custom_object_api().delete_namespaced_custom_object(
+            group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
+            namespace=self.namespace, plural=CRD_RAY_PLURAL,
+            name=self.cluster_name)
 
     def get_command_runner(self,
                            log_prefix,

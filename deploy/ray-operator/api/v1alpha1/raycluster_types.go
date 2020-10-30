@@ -93,13 +93,19 @@ type Extension struct {
 	// Command to start ray
 	Command string `json:"command,omitempty"`
 
+	// Args to start ray
+	Args string `json:"args,omitempty"`
+
 	// Labels for pod, raycluster.component and rayclusters.ray.io/component-name are default labels, do not overwrite them.
 	// Labels are intended to be used to specify identifying attributes of objects that are meaningful and relevant to users,
 	// but do not directly imply semantics to the core system. Labels can be used to organize and to select subsets of objects.
 	Labels map[string]string `json:"labels,omitempty"`
 
-	// The service acccount name.
+	// The service account name.
 	ServiceAccountName string `json:"serviceAccountName,omitempty"`
+
+	// The container ports
+	Ports []v1.ContainerPort `json:"ports,omitempty" patchStrategy:"merge" patchMergeKey:"containerPort" protobuf:"bytes,6,rep,name=ports"`
 
 	// NodeSelector specifies a map of key-value pairs. For the pod to be eligible
 	// to run on a node, the node must have each of the indicated key-value pairs as

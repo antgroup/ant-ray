@@ -671,6 +671,9 @@ spec:
                       be preserved when modifying objects. Optional. Usage refers
                       to https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
                     type: object
+                  args:
+                    description: Args to start ray
+                    type: string
                   command:
                     description: Command to start ray
                     type: string
@@ -811,6 +814,41 @@ spec:
                       For the pod to be eligible to run on a node, the node must have
                       each of the indicated key-value pairs as labels. Optional.
                     type: object
+                  ports:
+                    description: The container ports
+                    items:
+                      description: ContainerPort represents a network port in a single
+                        container.
+                      properties:
+                        containerPort:
+                          description: Number of port to expose on the pod's IP address.
+                            This must be a valid port number, 0 < x < 65536.
+                          format: int32
+                          type: integer
+                        hostIP:
+                          description: What host IP to bind the external port to.
+                          type: string
+                        hostPort:
+                          description: Number of port to expose on the host. If specified,
+                            this must be a valid port number, 0 < x < 65536. If HostNetwork
+                            is specified, this must match ContainerPort. Most containers
+                            do not need this.
+                          format: int32
+                          type: integer
+                        name:
+                          description: If specified, this must be an IANA_SVC_NAME
+                            and unique within the pod. Each named port in a pod must
+                            have a unique name. Name for the port that can be referred
+                            to by services.
+                          type: string
+                        protocol:
+                          description: Protocol for port. Must be UDP, TCP, or SCTP.
+                            Defaults to "TCP".
+                          type: string
+                      required:
+                      - containerPort
+                      type: object
+                    type: array
                   replicas:
                     description: Number of desired pods in this pod group. This is
                       a pointer to distinguish between explicit zero and not specified.
@@ -837,7 +875,7 @@ spec:
                         type: object
                     type: object
                   serviceAccountName:
-                    description: The service acccount name.
+                    description: The service account name.
                     type: string
                   tolerations:
                     description: The pod this Toleration is attached to tolerates

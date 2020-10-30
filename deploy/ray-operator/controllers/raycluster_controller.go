@@ -13,9 +13,9 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -127,11 +127,11 @@ func (r *RayClusterReconciler) Reconcile(request reconcile.Request) (reconcile.R
 			svcConf := common.DefaultServiceConfig(*instance, podName)
 			rayPodSvc := common.ServiceForPod(svcConf)
 			blockOwnerDeletion := true
-			ownerReference :=  metav1.OwnerReference{
-				APIVersion: instance.APIVersion,
-				Kind: instance.Kind,
-				Name: instance.Name,
-				UID: instance.UID,
+			ownerReference := metav1.OwnerReference{
+				APIVersion:         instance.APIVersion,
+				Kind:               instance.Kind,
+				Name:               instance.Name,
+				UID:                instance.UID,
 				BlockOwnerDeletion: &blockOwnerDeletion,
 			}
 			rayPodSvc.OwnerReferences = append(rayPodSvc.OwnerReferences, ownerReference)

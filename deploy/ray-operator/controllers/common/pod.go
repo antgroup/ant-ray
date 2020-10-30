@@ -85,15 +85,6 @@ func buildContainer(conf *PodConfig) corev1.Container {
 		Resources:       conf.Extension.Resources,
 		VolumeMounts:    conf.Extension.VolumeMounts,
 		ImagePullPolicy: conf.RayCluster.Spec.ImagePullPolicy,
-		Ports: []corev1.ContainerPort{
-			{
-				ContainerPort: int32(defaultRedisPort),
-				Name:          "redis",
-			},
-			{
-				ContainerPort: int32(defaultHTTPServerPort),
-				Name:          "http-server",
-			},
-		},
+		Ports:           conf.Extension.Ports,
 	}
 }

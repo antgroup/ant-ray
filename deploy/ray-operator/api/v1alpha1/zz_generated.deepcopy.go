@@ -24,6 +24,11 @@ func (in *Extension) DeepCopyInto(out *Extension) {
 			(*out)[key] = val
 		}
 	}
+	if in.Ports != nil {
+		in, out := &in.Ports, &out.Ports
+		*out = make([]v1.ContainerPort, len(*in))
+		copy(*out, *in)
+	}
 	if in.NodeSelector != nil {
 		in, out := &in.NodeSelector, &out.NodeSelector
 		*out = make(map[string]string, len(*in))

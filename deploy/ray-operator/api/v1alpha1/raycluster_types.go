@@ -86,6 +86,9 @@ type Extension struct {
 	// Pod docker image
 	Image string `json:"image,omitempty"`
 
+	//create operation should have no idList (generate by controller)
+	IdList []string `json:"idList"`
+
 	// Logical groupName for worker in same group, it's used for heterogeneous feature to distinguish different groups.
 	// GroupName is the unique identifier for the pods with the same configuration in one Ray Cluster
 	GroupName string `json:"groupName,omitempty"`

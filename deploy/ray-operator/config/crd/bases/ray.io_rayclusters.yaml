@@ -794,6 +794,12 @@ spec:
                     description: 'Head service suffix. So head can be accessed by
                       domain name: {namespace}.svc , follows Kubernetes standard.'
                     type: string
+                  idList:
+                    description: create operation should have no idList (generate
+                      by controller)
+                    items:
+                      type: string
+                    type: array
                   image:
                     description: Pod docker image
                     type: string
@@ -2209,6 +2215,7 @@ spec:
                       type: object
                     type: array
                 required:
+                - idList
                 - replicas
                 type: object
               type: array

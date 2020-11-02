@@ -187,10 +187,8 @@ func (r *RayClusterReconciler) buildPods(instance *rayiov1alpha1.RayCluster) []c
 	var pods []corev1.Pod
 	if instance.Spec.Extensions != nil && len(instance.Spec.Extensions) > 0 {
 		for _, extension := range instance.Spec.Extensions {
-			var i int32 = 0
-			for i = 0; i < *extension.Replicas; i++ {
+			for _, podName := range extension.IdList {
 				podType := fmt.Sprintf("%v", extension.Type)
-				podName := instance.Name + common.DashSymbol + extension.GroupName + common.DashSymbol + podType + common.DashSymbol + utils.FormatInt32(i)
 				podConf := common.DefaultPodConfig(instance, podType, podName)
 				podConf.Extension = extension
 				pod := common.BuildPod(podConf)

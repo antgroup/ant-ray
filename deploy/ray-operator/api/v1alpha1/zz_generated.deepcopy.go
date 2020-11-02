@@ -17,6 +17,11 @@ func (in *Extension) DeepCopyInto(out *Extension) {
 		*out = new(int32)
 		**out = **in
 	}
+	if in.IdList != nil {
+		in, out := &in.IdList, &out.IdList
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.Labels != nil {
 		in, out := &in.Labels, &out.Labels
 		*out = make(map[string]string, len(*in))

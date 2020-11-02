@@ -11,3 +11,6 @@ CRD_RAY_PLURAL = "rayclusters"
 
 # RayCluster CRD KIND
 CRD_RAY_KIND = "RayCluster"
+
+# For name separator
+DASH = "-"

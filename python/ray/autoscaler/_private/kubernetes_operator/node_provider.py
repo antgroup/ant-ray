@@ -79,7 +79,7 @@ class KubernetesOperatorNodeProvider(NodeProvider):
         core_api().patch_namespaced_pod(node_id, self.namespace, pod)
 
     def create_node(self, node_config, tags, count):
-        # todo create a raycluster
+        # create a raycluster
         conf = node_config.copy()
         pod_spec = conf.get("pod", conf)
         service_spec = conf.get("service")
@@ -92,8 +92,7 @@ class KubernetesOperatorNodeProvider(NodeProvider):
             pod_spec["metadata"]["labels"].update(tags)
         else:
             pod_spec["metadata"]["labels"] = tags
-        logger.info(log_prefix + "calling create_namespaced_pod "
-                                 "(count={}).".format(count))
+
         new_node_names = []
 
         # init exist_cluster to None
@@ -103,8 +102,7 @@ class KubernetesOperatorNodeProvider(NodeProvider):
                 group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
                 namespace=self.namespace, plural=CRD_RAY_PLURAL,
                 name=self.cluster_name)
-            print(exist_cluster)
-            logger.info(log_prefix + "calling create_namespaced_pod "
+            logger.info(log_prefix + "calling get_namespaced_custom_object "
                                      "(cluster={}).".format(exist_cluster))
         except ApiException:
             pass
@@ -114,10 +112,10 @@ class KubernetesOperatorNodeProvider(NodeProvider):
             extensions = []
             extension = self.generate_extension(count, pod_spec, tags, new_node_names)
             extensions.append(extension)
-            spec = self.generateCluster(body, pod_spec)
+            spec = self.generate_cluster_meta(body, pod_spec)
             spec['extensions'] = extensions
             body['spec'] = spec
-
+            logger.info(log_prefix + "calling create_namespaced_custom_object")
             custom_object_api().create_namespaced_custom_object(
                 group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
                 namespace=self.namespace, plural=CRD_RAY_PLURAL, body=body, pretty='true')
@@ -126,6 +124,7 @@ class KubernetesOperatorNodeProvider(NodeProvider):
             extensions.append(self.generate_extension(count, pod_spec, tags, new_node_names))
             exist_cluster['spec']['extensions'] = extensions
             body = exist_cluster
+            logger.info(log_prefix + "calling patch_namespaced_custom_object")
             custom_object_api().patch_namespaced_custom_object(
                 group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
                 namespace=self.namespace, plural=CRD_RAY_PLURAL,
@@ -158,7 +157,7 @@ class KubernetesOperatorNodeProvider(NodeProvider):
                 extensions_beta_api().create_namespaced_ingress(
                     self.namespace, ingress_spec)
 
-    def generateCluster(self, body, pod_spec):
+    def generate_cluster_meta(self, body, pod_spec):
         spec = {}
         body['apiVersion'] = CRD_RAY_GROUP + '/' + CRD_RAY_VERSION
         body['kind'] = CRD_RAY_KIND
@@ -175,14 +174,14 @@ class KubernetesOperatorNodeProvider(NodeProvider):
         extension['replicas'] = count
         pod_id_list = []
         for _ in range(count):
-            pod_name = self.cluster_name + DASH + 'test-group' + DASH + tags[TAG_RAY_NODE_KIND] + DASH + str(uuid4())[:8]
+            pod_name = self.cluster_name + DASH + tags[TAG_RAY_NODE_KIND] + DASH + str(uuid4())[:8]
             pod_id_list.append(pod_name)
             if pod_name not in new_node_names:
                 new_node_names.append(pod_name)
         extension['type'] = tags[TAG_RAY_NODE_KIND]
         extension['idList'] = pod_id_list
         extension['image'] = pod_spec['spec']['containers'][0]['image']
-        extension['groupName'] = 'test-group'
+        extension['groupName'] = ''
         extension['command'] = ' '.join(map(str, pod_spec['spec']['containers'][0]['args']))
         extension['labels'] = pod_spec["metadata"]["labels"]
         extension['serviceAccountName'] = pod_spec["spec"]["serviceAccountName"]
@@ -194,34 +193,10 @@ class KubernetesOperatorNodeProvider(NodeProvider):
         return extension
 
     def terminate_node(self, node_id):
-        # todo delete raycluster pods
-        logger.info(log_prefix + "calling patch_namespaced_custom_object")
-        exist_cluster = None
-        try:
-            exist_cluster = custom_object_api().get_namespaced_custom_object(
-                group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
-                namespace=self.namespace, plural=CRD_RAY_PLURAL,
-                name=self.cluster_name)
-            extensions = exist_cluster['spec']['extensions']
-            desired_extensions = []
-            for extension in extensions:
-                pod_id_list = extension['idList']
-                if node_id in pod_id_list:
-                    pod_id_list.remove(node_id)
-                if len(pod_id_list) > 0:
-                    extension['idList'] = pod_id_list
-                    desired_extensions.append(extension)
-            exist_cluster['spec']['extensions'] = desired_extensions
-            print(exist_cluster)
-            # logger.info(log_prefix + "calling create_namespaced_pod "
-            #                          "(cluster={}).".format(exist_cluster))
-        except ApiException:
-            pass
+        # delete raycluster pod
+        logger.info(log_prefix + "calling terminate_node")
+        self.terminate_pods([node_id])
 
-        custom_object_api().replace_namespaced_custom_object(
-            group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
-            namespace=self.namespace, plural=CRD_RAY_PLURAL,
-            name=self.cluster_name, body=exist_cluster)
         try:
             core_api().delete_namespaced_service(node_id, self.namespace)
         except ApiException:
@@ -235,9 +210,11 @@ class KubernetesOperatorNodeProvider(NodeProvider):
             pass
 
     def terminate_nodes(self, node_ids):
+        # delete raycluster pods
         nodes = self.non_terminated_nodes({})
         if len(nodes) == len(node_ids):
             try:
+                logger.info(log_prefix + "calling delete_namespaced_custom_object")
                 custom_object_api().delete_namespaced_custom_object(
                     group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
                     namespace=self.namespace, plural=CRD_RAY_PLURAL,
@@ -245,32 +222,36 @@ class KubernetesOperatorNodeProvider(NodeProvider):
             except ApiException:
                 pass
         else:
-            exist_cluster = None
-            try:
-                exist_cluster = custom_object_api().get_namespaced_custom_object(
-                    group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
-                    namespace=self.namespace, plural=CRD_RAY_PLURAL,
-                    name=self.cluster_name)
-                extensions = exist_cluster['spec']['extensions']
-                desired_extensions = []
-                for extension in extensions:
-                    pod_id_list = extension['idList']
-                    for node_id in node_ids:
-                        if node_id in pod_id_list:
-                            pod_id_list.remove(node_id)
-                    if len(pod_id_list) > 0:
-                        extension['idList'] = pod_id_list
-                        desired_extensions.append(extension)
-                exist_cluster['spec']['extensions'] = desired_extensions
-                print(exist_cluster)
-                # logger.info(log_prefix + "calling create_namespaced_pod "
-                #                          "(cluster={}).".format(exist_cluster))
-            except ApiException:
-                pass
+            logger.info(log_prefix + "calling terminate_pods")
+            self.terminate_pods(node_ids)
+
+    def terminate_pods(self, node_ids):
+        try:
+            exist_cluster = custom_object_api().get_namespaced_custom_object(
+                group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
+                namespace=self.namespace, plural=CRD_RAY_PLURAL,
+                name=self.cluster_name)
+            extensions = exist_cluster['spec']['extensions']
+            desired_extensions = []
+            for extension in extensions:
+                pod_id_list = extension['idList']
+                for node_id in node_ids:
+                    if node_id in pod_id_list:
+                        pod_id_list.remove(node_id)
+                if len(pod_id_list) > 0:
+                    extension['idList'] = pod_id_list
+                    desired_extensions.append(extension)
+            exist_cluster['spec']['extensions'] = desired_extensions
+            logger.info(log_prefix + "calling replace_namespaced_custom_object"
+                                     " in terminate_nodes")
             custom_object_api().replace_namespaced_custom_object(
                 group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
                 namespace=self.namespace, plural=CRD_RAY_PLURAL,
                 name=self.cluster_name, body=exist_cluster)
+        except ApiException as e:
+            logger.info(log_prefix + "calling terminate_pods failed "
+                        "(error={})".format(e))
+            pass
 
     def get_command_runner(self,
                            log_prefix,

@@ -1,6 +1,7 @@
-import logging
+import logging, copy
 from uuid import uuid4
 from kubernetes.client.rest import ApiException
+from kubernetes.client.models import v1_owner_reference
 
 from ray.autoscaler._private.command_runner import KubernetesCommandRunner
 from ray.autoscaler._private.kubernetes_operator import core_api, log_prefix, \
@@ -8,7 +9,7 @@ from ray.autoscaler._private.kubernetes_operator import core_api, log_prefix, \
 from ray.autoscaler._private.kubernetes_operator.config import bootstrap_kubernetes
 from ray.autoscaler.node_provider import NodeProvider
 from ray.autoscaler.tags import TAG_RAY_CLUSTER_NAME, TAG_RAY_NODE_KIND
-from ray.autoscaler._private.kubernetes_operator.ray_cluster_util import CRD_RAY_GROUP, \
+from ray.autoscaler._private.kubernetes_operator.ray_cluster_constant import CRD_RAY_GROUP, \
     CRD_RAY_VERSION, CRD_RAY_PLURAL, CRD_RAY_KIND, DASH
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,26 @@ def to_label_selector(tags):
             label_selector += ","
         label_selector += "{}={}".format(k, v)
     return label_selector
+
+
+def build_owner_reference(body) -> v1_owner_reference.V1OwnerReference:
+    reference = v1_owner_reference.V1OwnerReference(
+        controller=True,
+        block_owner_deletion=True,
+        api_version=CRD_RAY_GROUP + '/' + CRD_RAY_VERSION,
+        kind=CRD_RAY_KIND,
+        name=body.get('name'),
+        uid=body.get('uid'),
+    )
+    return reference
+
+
+def append_owner_reference(body, obj):
+    owner_reference = build_owner_reference(body)
+    refs = obj.setdefault('metadata', {}).setdefault('ownerReferences', [])
+    matching = [ref for ref in refs if ref.to_dict()['uid'] == body.get('uid')]
+    if not matching:
+        refs.append(owner_reference)
 
 
 class KubernetesOperatorNodeProvider(NodeProvider):
@@ -84,9 +105,7 @@ class KubernetesOperatorNodeProvider(NodeProvider):
         pod_spec = conf.get("pod", conf)
         service_spec = conf.get("service")
         ingress_spec = conf.get("ingress")
-        node_uuid = str(uuid4())
         tags[TAG_RAY_CLUSTER_NAME] = self.cluster_name
-        tags["ray-node-uuid"] = node_uuid
         pod_spec["metadata"]["namespace"] = self.namespace
         if "labels" in pod_spec["metadata"]:
             pod_spec["metadata"]["labels"].update(tags)
@@ -108,24 +127,25 @@ class KubernetesOperatorNodeProvider(NodeProvider):
             pass
 
         body = {}
+        raycluster = None
         if exist_cluster is None:
             extensions = []
-            extension = self.generate_extension(count, pod_spec, tags, new_node_names)
+            extension = self.generate_cluster_pod_meta(count, pod_spec, tags, new_node_names)
             extensions.append(extension)
             spec = self.generate_cluster_meta(body, pod_spec)
             spec['extensions'] = extensions
             body['spec'] = spec
             logger.info(log_prefix + "calling create_namespaced_custom_object")
-            custom_object_api().create_namespaced_custom_object(
+            raycluster = custom_object_api().create_namespaced_custom_object(
                 group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
                 namespace=self.namespace, plural=CRD_RAY_PLURAL, body=body, pretty='true')
         else:
             extensions = exist_cluster['spec']['extensions']
-            extensions.append(self.generate_extension(count, pod_spec, tags, new_node_names))
+            extensions.append(self.generate_cluster_pod_meta(count, pod_spec, tags, new_node_names))
             exist_cluster['spec']['extensions'] = extensions
             body = exist_cluster
             logger.info(log_prefix + "calling patch_namespaced_custom_object")
-            custom_object_api().patch_namespaced_custom_object(
+            raycluster = custom_object_api().patch_namespaced_custom_object(
                 group=CRD_RAY_GROUP, version=CRD_RAY_VERSION,
                 namespace=self.namespace, plural=CRD_RAY_PLURAL,
                 name=self.cluster_name, body=body)
@@ -136,26 +156,33 @@ class KubernetesOperatorNodeProvider(NodeProvider):
                         "(count={}).".format(count))
 
             for new_node_name in new_node_names:
-
-                metadata = service_spec.get("metadata", {})
+                service_spec_copy = copy.deepcopy(service_spec)
+                metadata = service_spec_copy.get("metadata", {})
                 metadata["name"] = new_node_name
-                service_spec["metadata"] = metadata
-                service_spec["spec"]["selector"] = {"ray-node-uuid": node_uuid}
+                service_spec_copy["metadata"] = metadata
+                append_owner_reference(
+                    body={'name': self.cluster_name, 'uid': raycluster['metadata']['uid']},
+                    obj=service_spec_copy)
+                service_spec_copy["spec"]["selector"] = {"raycluster.component": new_node_name}
                 svc = core_api().create_namespaced_service(
-                    self.namespace, service_spec)
+                    self.namespace, service_spec_copy)
                 new_svcs.append(svc)
 
         if ingress_spec is not None:
             logger.info(log_prefix + "calling create_namespaced_ingress "
                         "(count={}).".format(count))
             for new_svc in new_svcs:
-                metadata = ingress_spec.get("metadata", {})
+                ingress_spec_copy = copy.deepcopy(ingress_spec)
+                metadata = ingress_spec_copy.get("metadata", {})
                 metadata["name"] = new_svc.metadata.name
-                ingress_spec["metadata"] = metadata
-                ingress_spec = _add_service_name_to_service_port(
-                    ingress_spec, new_svc.metadata.name)
+                ingress_spec_copy["metadata"] = metadata
+                append_owner_reference(
+                    body={'name': self.cluster_name, 'uid': raycluster['metadata']['uid']},
+                    obj=ingress_spec_copy)
+                ingress_spec_copy = _add_service_name_to_service_port(
+                    ingress_spec_copy, new_svc.metadata.name)
                 extensions_beta_api().create_namespaced_ingress(
-                    self.namespace, ingress_spec)
+                    self.namespace, ingress_spec_copy)
 
     def generate_cluster_meta(self, body, pod_spec):
         spec = {}
@@ -169,7 +196,7 @@ class KubernetesOperatorNodeProvider(NodeProvider):
         spec['imagePullPolicy'] = 'Always'
         return spec
 
-    def generate_extension(self, count, pod_spec, tags, new_node_names):
+    def generate_cluster_pod_meta(self, count, pod_spec, tags, new_node_names):
         extension = {}
         extension['replicas'] = count
         pod_id_list = []

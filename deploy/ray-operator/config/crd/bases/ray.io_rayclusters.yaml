@@ -671,9 +671,6 @@ spec:
                       be preserved when modifying objects. Optional. Usage refers
                       to https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
                     type: object
-                  args:
-                    description: Args to start ray
-                    type: string
                   command:
                     description: Command to start ray
                     type: string
@@ -795,8 +792,11 @@ spec:
                       domain name: {namespace}.svc , follows Kubernetes standard.'
                     type: string
                   idList:
-                    description: create operation should have no idList (generate
-                      by controller)
+                    description: The pod name list for individual pod management.
+                      Users don’t have to provide ‘idList’. Operator will update this
+                      field and generate names for each Pod. During the ray cluster
+                      is running, autoscaler and users can edit the value of ‘replicas’
+                      and ‘idList’ to delete a specific pod.
                     items:
                       type: string
                     type: array
@@ -2215,7 +2215,6 @@ spec:
                       type: object
                     type: array
                 required:
-                - idList
                 - replicas
                 type: object
               type: array

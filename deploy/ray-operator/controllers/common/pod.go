@@ -76,6 +76,13 @@ func buildContainer(conf *PodConfig) corev1.Container {
 		corev1.EnvVar{Name: "MY_POD_IP", ValueFrom: &corev1.EnvVarSource{FieldRef: &corev1.ObjectFieldSelector{FieldPath: "status.podIP"}}},
 	)
 
+	var ports []corev1.ContainerPort
+    if conf.Extension.Ports != nil && len(conf.Extension.Ports) >0 {
+        ports = conf.Extension.Ports
+    } else {
+        ports = containerDefaultPorts()
+    }
+
 	return corev1.Container{
 		Name:            strings.ToLower(conf.PodTypeName),
 		Image:           image,
@@ -85,6 +92,27 @@ func buildContainer(conf *PodConfig) corev1.Container {
 		Resources:       conf.Extension.Resources,
 		VolumeMounts:    conf.Extension.VolumeMounts,
 		ImagePullPolicy: conf.RayCluster.Spec.ImagePullPolicy,
-		Ports:           conf.Extension.Ports,
+		Ports:           ports,
 	}
+}
+
+func containerDefaultPorts() []corev1.ContainerPort{
+    return []corev1.ContainerPort{
+        {
+            ContainerPort: int32(defaultRedisPort),
+            Name:          "redis",
+        },
+        {
+            ContainerPort: int32(defaultHTTPServerPort),
+            Name:          "http-server",
+        },
+        {
+            // ray internal communication
+            ContainerPort: 12345,
+        },
+        {
+            // ray internal communication
+            ContainerPort: 12346,
+        },
+    }
 }

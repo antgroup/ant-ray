@@ -68,10 +68,10 @@ def _load_kubernetes_defaults_config():
         os.path.dirname(ray_kubernetes.__file__), "defaults.yaml")
 
 
-def _load_kubernetes_operator_example_config():
+def _load_kubernetes_operator_defaults_config():
     import ray.autoscaler.kubernetes_operator as ray_kubernetes_operator
     return os.path.join(
-        os.path.dirname(ray_kubernetes_operator.__file__), "example-full.yaml")
+        os.path.dirname(ray_kubernetes_operator.__file__), "defaults.yaml")
 
   
 def _load_aws_defaults_config():
@@ -128,7 +128,7 @@ _DEFAULT_CONFIGS = {
     "azure": _load_azure_defaults_config,
     "staroid": _load_staroid_defaults_config,
     "kubernetes": _load_kubernetes_defaults_config,
-    "kubernetesOperator": _load_kubernetes_operator_example_config,
+    "kubernetesOperator": _load_kubernetes_operator_defaults_config,
 }
 
 

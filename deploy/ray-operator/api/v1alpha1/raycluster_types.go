@@ -86,8 +86,11 @@ type Extension struct {
 	// Pod docker image
 	Image string `json:"image,omitempty"`
 
-	//create operation should have no idList (generate by controller)
-	IdList []string `json:"idList"`
+	// The pod name list for individual pod management.
+	// Users don’t have to provide ‘idList’. Operator will update this field and generate names
+	// for each Pod. During the ray cluster is running, autoscaler and users can edit the value
+	// of ‘replicas’ and ‘idList’ to delete a specific pod.
+	IdList []string `json:"idList,omitempty"`
 
 	// Logical groupName for worker in same group, it's used for heterogeneous feature to distinguish different groups.
 	// GroupName is the unique identifier for the pods with the same configuration in one Ray Cluster
@@ -95,9 +98,6 @@ type Extension struct {
 
 	// Command to start ray
 	Command string `json:"command,omitempty"`
-
-	// Args to start ray
-	Args string `json:"args,omitempty"`
 
 	// Labels for pod, raycluster.component and rayclusters.ray.io/component-name are default labels, do not overwrite them.
 	// Labels are intended to be used to specify identifying attributes of objects that are meaningful and relevant to users,

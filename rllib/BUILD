@@ -151,6 +151,17 @@ py_test(
     args = ["--torch", "--yaml-dir=tuned_examples/ddpg"]
 )
 
+# DDPPO
+py_test(
+    name = "run_regression_tests_cartpole_ddppo_torch",
+    main = "tests/run_regression_tests.py",
+    tags = ["learning_tests_torch", "learning_tests_cartpole"],
+    size = "large",
+    srcs = ["tests/run_regression_tests.py"],
+    data = glob(["tuned_examples/ppo/cartpole-ddppo.yaml"]),
+    args = ["--yaml-dir=tuned_examples/ppo", "--torch"]
+)
+
 # DQN/Simple-Q
 py_test(
     name = "run_regression_tests_cartpole_dqn_tf",
@@ -1041,19 +1052,26 @@ py_test(
 # --------------------------------------------------------------------
 
 py_test(
-    name = "test_distributions",
-    tags = ["models"],
-    size = "medium",
-    srcs = ["models/tests/test_distributions.py"]
-)
-
-py_test(
     name = "test_attention_nets",
     tags = ["models"],
     size = "small",
     srcs = ["models/tests/test_attention_nets.py"]
 )
 
+py_test(
+    name = "test_convtranspose2d_stack",
+    tags = ["models"],
+    size = "small",
+    data = glob(["tests/data/images/obstacle_tower.png"]),
+    srcs = ["models/tests/test_convtranspose2d_stack.py"]
+)
+
+py_test(
+    name = "test_distributions",
+    tags = ["models"],
+    size = "medium",
+    srcs = ["models/tests/test_distributions.py"]
+)
 
 # --------------------------------------------------------------------
 # Evaluation components
@@ -1177,7 +1195,7 @@ py_test(
 py_test(
     name = "tests/test_catalog",
     tags = ["tests_dir", "tests_dir_C"],
-    size = "small",
+    size = "medium",
     srcs = ["tests/test_catalog.py"]
 )
 
@@ -1424,6 +1442,13 @@ py_test(
     args = ["TestSupportedSpacesEvolutionAlgos"]
 )
 
+py_test(
+    name = "tests/test_timesteps",
+    tags = ["tests_dir", "tests_dir_T"],
+    size = "small",
+    srcs = ["tests/test_timesteps.py"]
+)
+
 # --------------------------------------------------------------------
 # examples/ directory
 #
@@ -1541,7 +1566,7 @@ py_test(
     tags = ["examples", "examples_C"],
     size = "large",
     srcs = ["examples/cartpole_lstm.py"],
-    args = ["--as-test", "--torch", "--run=IMPALA", "--stop-reward=40", "--num-cpus=4"]
+    args = ["--as-test", "--framework=torch", "--run=IMPALA", "--stop-reward=40", "--num-cpus=4"]
 )
 
 py_test(
@@ -1550,7 +1575,16 @@ py_test(
     tags = ["examples", "examples_C"],
     size = "large",
     srcs = ["examples/cartpole_lstm.py"],
-    args = ["--as-test", "--run=PPO", "--stop-reward=40", "--num-cpus=4"]
+    args = ["--as-test", "--framework=tf", "--run=PPO", "--stop-reward=40", "--num-cpus=4"]
+)
+
+py_test(
+    name = "examples/cartpole_lstm_ppo_tf2",
+    main = "examples/cartpole_lstm.py",
+    tags = ["examples", "examples_C"],
+    size = "large",
+    srcs = ["examples/cartpole_lstm.py"],
+    args = ["--as-test", "--framework=tf2", "--run=PPO", "--stop-reward=40", "--num-cpus=4"]
 )
 
 py_test(
@@ -1559,7 +1593,7 @@ py_test(
     tags = ["examples", "examples_C"],
     size = "large",
     srcs = ["examples/cartpole_lstm.py"],
-    args = ["--as-test", "--torch", "--run=PPO", "--stop-reward=40", "--num-cpus=4"]
+    args = ["--as-test", "--framework=torch", "--run=PPO", "--stop-reward=40", "--num-cpus=4"]
 )
 
 py_test(

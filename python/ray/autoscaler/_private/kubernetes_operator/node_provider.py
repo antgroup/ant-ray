@@ -234,12 +234,14 @@ class KubernetesOperatorNodeProvider(NodeProvider):
         extension['labels'] = pod_spec["metadata"]["labels"]
         extension['serviceAccountName'] = pod_spec["spec"][
             "serviceAccountName"]
-        extension['ports'] = pod_spec['spec']['containers'][0]['ports']
+        extension['ports'] = pod_spec['spec']['containers'][0].setdefault(
+            'ports', [])
         extension['volumes'] = pod_spec['spec']['volumes']
-        extension['volumeMounts'] = pod_spec['spec']['containers'][0][
-            'volumeMounts']
+        extension['volumeMounts'] = pod_spec['spec']['containers'][
+            0].setdefault('volumeMounts', [])
         extension['resources'] = pod_spec['spec']['containers'][0]['resources']
-        extension['containerEnv'] = pod_spec['spec']['containers'][0]['env']
+        extension['containerEnv'] = pod_spec['spec']['containers'][
+            0].setdefault('env', [])
         return extension
 
     def terminate_node(self, node_id):

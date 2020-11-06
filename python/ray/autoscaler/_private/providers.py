@@ -50,7 +50,6 @@ def _import_kubernetes_operator(provider_config):
     return KubernetesOperatorNodeProvider
 
 
-
 def _import_staroid(provider_config):
     from ray.autoscaler._private.staroid.node_provider import \
         StaroidNodeProvider
@@ -64,16 +63,16 @@ def _load_local_defaults_config():
 
 def _load_kubernetes_defaults_config():
     import ray.autoscaler.kubernetes as ray_kubernetes
-    return os.path.join(
-        os.path.dirname(ray_kubernetes.__file__), "defaults.yaml")
+    return os.path.join(os.path.dirname(ray_kubernetes.__file__),
+                        "defaults.yaml")
 
 
 def _load_kubernetes_operator_defaults_config():
     import ray.autoscaler.kubernetes_operator as ray_kubernetes_operator
-    return os.path.join(
-        os.path.dirname(ray_kubernetes_operator.__file__), "defaults.yaml")
+    return os.path.join(os.path.dirname(ray_kubernetes_operator.__file__),
+                        "defaults.yaml")
 
-  
+
 def _load_aws_defaults_config():
     import ray.autoscaler.aws as ray_aws
     return os.path.join(os.path.dirname(ray_aws.__file__), "defaults.yaml")

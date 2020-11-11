@@ -201,7 +201,7 @@ func (r *RayClusterReconciler) buildPods(instance *rayiov1alpha1.RayCluster) []c
                 var i int32 = 0
                 for i = 0; i < *extension.Replicas; i++ {
                     podType := fmt.Sprintf("%v", extension.Type)
-                    podName := generatePodName(instance, extension, podType)
+                    podName := generatePodName(instance.Name, extension.GroupName, podType)
                     pods = r.createAndBindPod(instance, podType, podName, extension, pods)
                     extension.IdList = append(extension.IdList, podName)
                 }
@@ -218,12 +218,12 @@ func (r *RayClusterReconciler) buildPods(instance *rayiov1alpha1.RayCluster) []c
     return pods
 }
 
-func generatePodName(instance *rayiov1alpha1.RayCluster, extension rayiov1alpha1.Extension, podType string) string {
+func generatePodName(clusterName string, groupName string, podType string) string {
     podName := ""
-    if extension.GroupName == "" {
-        podName = instance.Name + common.DashSymbol + extension.GroupName + common.DashSymbol + podType + common.DashSymbol + uuid.New()[0:6]
+    if groupName != "" {
+        podName = clusterName + common.DashSymbol + groupName + common.DashSymbol + podType + common.DashSymbol + uuid.New()[0:6]
     } else {
-        podName = instance.Name + common.DashSymbol + podType + common.DashSymbol + uuid.New()[0:6]
+        podName = clusterName + common.DashSymbol + podType + common.DashSymbol + uuid.New()[0:6]
     }
     return podName
 }

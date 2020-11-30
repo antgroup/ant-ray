@@ -95,6 +95,10 @@ done
 # hack, we should use auditwheel instead.
 for path in .whl/*.whl; do
   if [ -f "${path}" ]; then
+    unzip -l "${path}" |grep ray_dist.jar
+    if [ "$?" != "0" ]; then
+      echo "ray_dist.jar is not packaged into $path"
+      exit 1
     mv "${path}" "${path//linux/manylinux2014}"
   fi
 done

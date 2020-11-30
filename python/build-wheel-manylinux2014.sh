@@ -44,6 +44,7 @@ echo "build --incompatible_linkopts_to_linklibs" >> /root/.bazelrc
 if [[ -n "${RAY_INSTALL_JAVA:-}" ]]; then
   bazel build //java:ray_java_pkg
   unset RAY_INSTALL_JAVA
+  export CHECK_JARS=1
 fi
 
 # Install and use the latest version of Node.js in order to build the dashboard.
@@ -95,10 +96,12 @@ done
 # hack, we should use auditwheel instead.
 for path in .whl/*.whl; do
   if [ -f "${path}" ]; then
-    unzip -l "${path}" |grep ray_dist.jar
-    if [ "$?" != "0" ]; then
-      echo "ray_dist.jar is not packaged into $path"
-      exit 1
+    if [[ -n "${CHECK_JARS:-}" ]]; then
+       if ! unzip -l "${path}" | grep ray_dist.jar; then
+          echo "ray_dist.jar is not packaged into $path"
+          exit 1
+       fi
+    fi
     mv "${path}" "${path//linux/manylinux2014}"
   fi
 done

@@ -29,13 +29,21 @@ class GcsResourceManagerInterface {
   /// Get the resources of all nodes in the cluster.
   ///
   /// \return The resources of all nodes in the cluster.
-  virtual const absl::flat_hash_map<NodeID, ResourceSet> &GetClusterResources() const = 0;
+  virtual const absl::flat_hash_map<NodeID, SchedulingResources> &GetClusterResources()
+      const = 0;
 
-  /// Update the resources of the specified node.
+  /// Add the total resources of the specified node.
   ///
   /// \param node_id Id of a node.
   /// \param resources Resources of a node.
-  virtual void UpdateResources(const NodeID &node_id, const ResourceSet &resources) = 0;
+  void AddTotalResources(const NodeID &node_id, const ResourceSet &resources);
+
+  /// Update the available resources of the specified node.
+  ///
+  /// \param node_id Id of a node.
+  /// \param resources Available resources of a node.
+  virtual void UpdateAvailableResources(const NodeID &node_id,
+                                        const ResourceSet &resources) = 0;
 
   /// Remove the resources of the specified node.
   ///
@@ -67,9 +75,11 @@ class GcsResourceManager : public GcsResourceManagerInterface {
  public:
   virtual ~GcsResourceManager() = default;
 
-  const absl::flat_hash_map<NodeID, ResourceSet> &GetClusterResources() const;
+  const absl::flat_hash_map<NodeID, SchedulingResources> &GetClusterResources() const;
 
-  void UpdateResources(const NodeID &node_id, const ResourceSet &resources);
+  void AddTotalResources(const NodeID &node_id, const ResourceSet &resources);
+
+  void UpdateAvailableResources(const NodeID &node_id, const ResourceSet &resources);
 
   void RemoveResources(const NodeID &node_id);
 
@@ -79,7 +89,7 @@ class GcsResourceManager : public GcsResourceManagerInterface {
 
  private:
   /// Map from node id to the resources of the node.
-  absl::flat_hash_map<NodeID, ResourceSet> cluster_resources_;
+  absl::flat_hash_map<NodeID, SchedulingResources> cluster_resources_;
 };
 
 }  // namespace gcs

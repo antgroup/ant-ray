@@ -17,14 +17,20 @@
 namespace ray {
 namespace gcs {
 
-const absl::flat_hash_map<NodeID, ResourceSet> &GcsResourceManager::GetClusterResources()
-    const {
+const absl::flat_hash_map<NodeID, SchedulingResources>
+    &GcsResourceManager::GetClusterResources() const {
   return cluster_resources_;
 }
 
-void GcsResourceManager::UpdateResources(const NodeID &node_id,
-                                         const ResourceSet &resources) {
-  cluster_resources_[node_id] = resources;
+void GcsResourceManager::AddTotalResources(const NodeID &node_id,
+                                           const ResourceSet &resources) {
+  SchedulingResources scheduling_resources(resources);
+  cluster_resources_[node_id] = scheduling_resources;
+}
+
+void GcsResourceManager::UpdateAvailableResources(const NodeID &node_id,
+                                                  const ResourceSet &resources) {
+  cluster_resources_[node_id].SetAvailableResources(ResourceSet(resources));
 }
 
 void GcsResourceManager::RemoveResources(const NodeID &node_id) {
@@ -35,10 +41,10 @@ bool GcsResourceManager::AcquireResources(const NodeID &node_id,
                                           const ResourceSet &required_resources) {
   auto iter = cluster_resources_.find(node_id);
   RAY_CHECK(iter != cluster_resources_.end()) << "Node " << node_id << " not exist.";
-  if (!required_resources.IsSubset(iter->second)) {
+  if (!required_resources.IsSubset(iter->second.GetAvailableResources())) {
     return false;
   }
-  iter->second.SubtractResourcesStrict(required_resources);
+  iter->second.Acquire(required_resources);
   return true;
 }
 
@@ -46,7 +52,7 @@ bool GcsResourceManager::ReleaseResources(const NodeID &node_id,
                                           const ResourceSet &acquired_resources) {
   auto iter = cluster_resources_.find(node_id);
   if (iter != cluster_resources_.end()) {
-    iter->second.AddResources(acquired_resources);
+    iter->second.Release(acquired_resources);
   }
   // If node dead, we will not find the node. This is a normal scenario, so it returns
   // true.

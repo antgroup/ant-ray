@@ -219,7 +219,7 @@ void GcsNodeManager::HandleReportHeartbeat(const rpc::ReportHeartbeatRequest &re
   ++counts_[CountType::REPORT_HEARTBEAT_REQUEST];
 }
 
-// TODO(WangTao): Implenent this to handle resource usage report. Basically move resources
+// TODO(WangTao): Implement this to handle resource usage report. Basically move resources
 // related operations in `HandleReportHeartbeat`.
 void GcsNodeManager::HandleReportResourceUsage(
     const rpc::ReportResourceUsageRequest &request, rpc::ReportResourceUsageReply *reply,
@@ -355,7 +355,7 @@ void GcsNodeManager::HandleGetAllAvailableResources(
   for (const auto &iter : gcs_resource_manager_->GetClusterResources()) {
     rpc::AvailableResources resource;
     resource.set_node_id(iter.first.Binary());
-    for (const auto &res : iter.second.GetResourceAmountMap()) {
+    for (const auto &res : iter.second.GetAvailableResources().GetResourceAmountMap()) {
       (*resource.mutable_resources_available())[res.first] = res.second.ToDouble();
     }
     reply->add_resources_list()->CopyFrom(resource);
@@ -464,6 +464,10 @@ void GcsNodeManager::AddNode(std::shared_ptr<rpc::GcsNodeInfo> node) {
     for (auto &listener : node_added_listeners_) {
       listener(node);
     }
+
+    // Add the total resources of the node.
+    gcs_resource_manager_->AddTotalResources(
+        node_id, ResourceSet(MapFromProtobuf(heartbeat.resources_available())));
   }
 }
 
@@ -538,7 +542,7 @@ void GcsNodeManager::UpdateNodeRealtimeResources(
   if (!RayConfig::instance().light_heartbeat_enabled() ||
       gcs_resource_manager_->GetClusterResources().count(node_id) == 0 ||
       heartbeat.resources_available_changed()) {
-    gcs_resource_manager_->UpdateResources(
+    gcs_resource_manager_->UpdateAvailableResources(
         node_id, ResourceSet(MapFromProtobuf(heartbeat.resources_available())));
   }
 }

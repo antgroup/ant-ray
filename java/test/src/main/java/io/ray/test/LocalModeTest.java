@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -54,5 +56,22 @@ public class LocalModeTest extends BaseTest {
         Assert.assertEquals(threadId.get(), actorThreadIds.get(actor.getId()));
       }
     }
+  }
+
+  public static String recursionEcho(int recursionDepth) throws InterruptedException {
+    TimeUnit.SECONDS.sleep(1);
+    if (recursionDepth > 3) {
+      return String.valueOf(recursionDepth);
+    } else {
+      return String.valueOf(recursionDepth) + "_" +
+        Ray.task(SingleProcessModeTest::recursionEcho, recursionDepth + 1).remote().get();
+    }
+  }
+
+  @Test(groups = {"singleProcess"})
+  public void testShutdownExecutorService() throws InterruptedException {
+    Ray.task(SingleProcessModeTest::recursionEcho, 1).remote();
+    Ray.shutdown();
+    TimeUnit.SECONDS.sleep(3);
   }
 }

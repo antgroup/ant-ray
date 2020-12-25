@@ -35,6 +35,7 @@ import io.ray.runtime.placementgroup.PlacementGroupImpl;
 import io.ray.runtime.util.IdUtil;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,6 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -396,7 +398,7 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
     // Shutdown actor concurrency group manager.
     actorConcurrencyGroupManager.shutdown();
     // Shutdown normal task executor service.
-    normalTaskExecutorService.shutdown();
+    shutdownExecutorServicesAndWaitTasksCompleted(new ExecutorService[] {normalTaskExecutorService});
   }
 
   public static ActorId getActorId(TaskSpec taskSpec) {
@@ -633,5 +635,25 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
         protoJavaFunctionDescriptor.getClassName(),
         protoJavaFunctionDescriptor.getFunctionName(),
         protoJavaFunctionDescriptor.getSignature());
+  }
+
+  private static void shutdownExecutorServicesAndWaitTasksCompleted(ExecutorService[] executorServices) {
+    if (executorServices == null) {
+      return;
+    }
+
+    // Note that `shutdownNow` will interrupt the executing remote tasks.
+    Arrays.stream(executorServices).forEach(ExecutorService::shutdownNow);
+    Arrays.stream(executorServices).forEach((ExecutorService executorService) -> {
+      try {
+        final boolean terminated = executorService.awaitTermination(5, TimeUnit.SECONDS);
+        if (!terminated) {
+          LOGGER.error("The tasks were not executed completely in 5 seconds after executor " +
+            "service getting shutdowned. And some executing tasks may get interrupt exceptions.");
+        }
+      } catch (InterruptedException e) {
+        LOGGER.error("Failed to shutdown the executor service.", e);
+      }
+    });
   }
 }

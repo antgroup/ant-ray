@@ -49,6 +49,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -58,6 +59,8 @@ import org.slf4j.LoggerFactory;
 public class LocalModeTaskSubmitter implements TaskSubmitter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalModeTaskSubmitter.class);
+
+  private final AtomicBoolean isShutdown = new AtomicBoolean(false);
 
   private final Map<ObjectId, Set<TaskSpec>> waitingTasks = new HashMap<>();
   private final Object taskAndObjectLock = new Object();
@@ -395,10 +398,13 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
   }
 
   public void shutdown() {
-    // Shutdown actor concurrency group manager.
-    actorConcurrencyGroupManager.shutdown();
-    // Shutdown normal task executor service.
-    shutdownExecutorServicesAndWaitTasksCompleted(new ExecutorService[] {normalTaskExecutorService});
+    if (!isShutdown.getAndSet(true)) {
+      // Shutdown actor concurrency group manager.
+      actorConcurrencyGroupManager.shutdown();
+      // Shutdown normal task executor service.
+      shutdownExecutorServicesAndWaitTasksCompleted(
+          new ExecutorService[] {normalTaskExecutorService});
+    }
   }
 
   public static ActorId getActorId(TaskSpec taskSpec) {
@@ -448,6 +454,9 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
         ExecutorService executorService;
         if (taskSpec.getType() == TaskType.ACTOR_CREATION_TASK) {
           synchronized (actorConcurrencyGroupManager) {
+            if (isShutdown.get()) {
+              return;
+            }
             actorConcurrencyGroupManager.registerActor(getActorId(taskSpec), taskSpec);
           }
           executorService = normalTaskExecutorService;
@@ -463,11 +472,7 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
         try {
           executorService.submit(runnable);
         } catch (RejectedExecutionException e) {
-          if (executorService.isShutdown()) {
-            LOGGER.warn(
-                "Ignore task submission due to the ExecutorService is shutdown. Task: {}",
-                taskSpec);
-          }
+          Preconditions.checkState(isShutdown.get());
         }
       } else {
         // If some dependencies aren't ready yet, put this task in waiting list.
@@ -479,6 +484,10 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
   }
 
   private void executeTask(TaskSpec taskSpec) {
+    if (isShutdown.get()) {
+      return;
+    }
+
     TaskExecutor.ActorContext actorContext = null;
     UniqueId workerId;
     if (taskSpec.getType() == TaskType.ACTOR_TASK) {
@@ -646,11 +655,7 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
     Arrays.stream(executorServices).forEach(ExecutorService::shutdownNow);
     Arrays.stream(executorServices).forEach((ExecutorService executorService) -> {
       try {
-        final boolean terminated = executorService.awaitTermination(5, TimeUnit.SECONDS);
-        if (!terminated) {
-          LOGGER.error("The tasks were not executed completely in 5 seconds after executor " +
-            "service getting shutdowned. And some executing tasks may get interrupt exceptions.");
-        }
+        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
       } catch (InterruptedException e) {
         LOGGER.error("Failed to shutdown the executor service.", e);
       }

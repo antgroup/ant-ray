@@ -79,6 +79,36 @@ public class TestUtils {
   }
 
   /**
+   * Assert that the given runnable finishes within given timeout.
+   *
+   * @param runnable A runnable that should finish within given timeout.
+   * @param timeoutMs Timeout in milliseconds.
+   */
+  public static void executeWithinTime(Runnable runnable, int timeoutMs) {
+    executeWithinTimeRange(runnable, 0, timeoutMs);
+  }
+
+  /**
+   * Assert that the given runnable finishes within given time range.
+   *
+   * @param runnable A runnable that should finish within given timeout.
+   * @param minTimeMs The minimum time for execution.
+   * @param maxTimeMs The maximum time for execution.
+   */
+  public static void executeWithinTimeRange(Runnable runnable, int minTimeMs, int maxTimeMs) {
+    Instant start = Instant.now();
+    runnable.run();
+    Instant end = Instant.now();
+    long duration = Duration.between(start, end).toMillis();
+    Assert.assertTrue(duration >= minTimeMs,
+        "The given runnable didn't run for at least " + minTimeMs + "ms. "
+            + "Actual execution time: " + duration + " ms.");
+    Assert.assertTrue(duration <= maxTimeMs,
+        "The given runnable didn't finish within " + maxTimeMs + "ms. "
+            + "Actual execution time: " + duration + " ms.");
+  }
+
+  /**
    * Wait until the given condition is met.
    *
    * @param condition A function that predicts the condition.

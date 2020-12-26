@@ -9,10 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@Test(groups = {"local"})
 public class LocalModeTest extends BaseTest {
 
   private static final int NUM_ACTOR_INSTANCE = 10;
@@ -27,7 +29,6 @@ public class LocalModeTest extends BaseTest {
     }
   }
 
-  @Test(groups = {"local"})
   public void testActorTasksInOneThread() {
     List<ActorHandle<MyActor>> actors = new ArrayList<>();
     Map<ActorId, Long> actorThreadIds = new HashMap<>();
@@ -58,7 +59,7 @@ public class LocalModeTest extends BaseTest {
     }
   }
 
-  public static String recursionEcho(int recursionDepth) throws InterruptedException {
+  private static String recursionEcho(int recursionDepth) throws InterruptedException {
     TimeUnit.SECONDS.sleep(1);
     if (recursionDepth > 3) {
       return String.valueOf(recursionDepth);
@@ -68,10 +69,74 @@ public class LocalModeTest extends BaseTest {
     }
   }
 
-  @Test(groups = {"singleProcess"})
-  public void testShutdownExecutorService() throws InterruptedException {
+  public void testShutdownExecutorService() {
     Ray.task(SingleProcessModeTest::recursionEcho, 1).remote();
-    Ray.shutdown();
-    TimeUnit.SECONDS.sleep(3);
+    TestUtils.executeWithinTime(() -> { Ray.shutdown(); }, 500);
+  }
+
+  private static void sleepAndIgnoreInterrupt(long milliseconds) {
+    long finishMs = System.currentTimeMillis() + milliseconds;
+    while (System.currentTimeMillis() < finishMs) {
+      try {
+        TimeUnit.MILLISECONDS.sleep(Math.max(0, finishMs - System.currentTimeMillis()));
+      } catch (InterruptedException e) {
+        // In this test case, we ignore InterruptedException to imitate a compute
+        // task. It makes sure that this method won't be cancelled early.
+      }
+    }
+  }
+
+  static class SpawnActor {
+
+    public static AtomicLong counter = new AtomicLong(0);
+
+    public void spawn() {
+      // The method should run for about 1s.
+      long finishMs = System.currentTimeMillis() + 1000;
+      while (System.currentTimeMillis() < finishMs) {
+        // Spawn a new actor
+        spawnImpl();
+        // Create a normal task to spawn a new actor
+        Ray.task(SpawnActor::spawnImpl).remote();
+
+        sleepAndIgnoreInterrupt(Math.min(finishMs - System.currentTimeMillis(), 100));
+      }
+    }
+
+    public static void spawnImpl() {
+      counter.incrementAndGet();
+      // Spawn a new actor
+      ActorHandle<SpawnActor> actor = Ray.actor(SpawnActor::new).remote();
+      actor.task(SpawnActor::spawn).remote();
+    }
+  }
+
+  public void testShutdownAndWait() throws InterruptedException {
+    SpawnActor.spawnImpl();
+    // Sleep for a while to allow some actors to be created.
+    // NOTE: don't sleep for too long here. Creating too many actors may slow down the
+    // test and result in test failure.
+    TimeUnit.MILLISECONDS.sleep(200);
+    Assert.assertTrue(SpawnActor.counter.get() > 0);
+    // There should be actors just started, and they will continue to execute for at least 900ms.
+    // And Ray.shutdown() should cancel any further tasks, so the shutdown process should finish within 1s.
+    // We loose the time range condition to [500ms, 1500ms].
+    TestUtils.executeWithinTimeRange(() -> Ray.shutdown(), 500, 1500);
+    // Make sure the counter value doesn't change after shutdown.
+    long counterValue = SpawnActor.counter.get();
+    TimeUnit.SECONDS.sleep(1);
+    Assert.assertEquals(SpawnActor.counter.get(), counterValue);
+  }
+
+  private static int add1(int value) {
+    sleepAndIgnoreInterrupt(100);
+    return Ray.task(SingleProcessModeTest::add1, value).remote().get() + 1;
+  }
+
+  public void testShutdownAndGetFailure() throws InterruptedException {
+    Ray.task(SingleProcessModeTest::add1, 0).remote();
+    TimeUnit.MILLISECONDS.sleep(200);
+    // Tasks waiting on ObjectRef::get should get an exception.
+    TestUtils.executeWithinTime(() -> Ray.shutdown(), 500);
   }
 }

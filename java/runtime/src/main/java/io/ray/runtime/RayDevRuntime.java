@@ -64,9 +64,11 @@ public class RayDevRuntime extends AbstractRayRuntime {
 
   @Override
   public void shutdown() {
+    if (objectStore != null) {
+      ((LocalModeObjectStore) objectStore).shutdown();
+    }
     if (taskSubmitter != null) {
       ((LocalModeTaskSubmitter) taskSubmitter).shutdown();
-      taskSubmitter = null;
     }
     taskExecutor = null;
   }

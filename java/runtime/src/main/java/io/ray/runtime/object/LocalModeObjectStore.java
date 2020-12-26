@@ -4,12 +4,14 @@ import com.google.common.base.Preconditions;
 import io.ray.api.exception.RayTimeoutException;
 import io.ray.api.id.ActorId;
 import io.ray.api.id.ObjectId;
+import io.ray.api.exception.RayTaskException;
 import io.ray.runtime.context.WorkerContext;
 import io.ray.runtime.generated.Common.Address;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -21,6 +23,8 @@ public class LocalModeObjectStore extends ObjectStore {
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalModeObjectStore.class);
 
   private static final int GET_CHECK_INTERVAL_MS = 1;
+
+  private final AtomicBoolean isShutdown = new AtomicBoolean(false);
 
   private final Map<ObjectId, NativeRayObject> pool = new ConcurrentHashMap<>();
   private final List<Consumer<ObjectId>> objectPutCallbacks = new ArrayList<>();
@@ -35,6 +39,10 @@ public class LocalModeObjectStore extends ObjectStore {
 
   public boolean isObjectReady(ObjectId id) {
     return pool.containsKey(id);
+  }
+
+  public void shutdown() {
+    isShutdown.set(true);
   }
 
   @Override
@@ -81,6 +89,12 @@ public class LocalModeObjectStore extends ObjectStore {
     long remainingTime = timeoutMs;
     boolean firstCheck = true;
     while (ready < numObjects && (timeoutMs < 0 || remainingTime > 0)) {
+      if (isShutdown.get()) {
+        for (ObjectId objectId : objectIds) {
+          put(new RayTaskException("Ray is shut down."));
+        }
+        return;
+      }
       if (!firstCheck) {
         long sleepTime =
             timeoutMs < 0 ? GET_CHECK_INTERVAL_MS : Math.min(remainingTime, GET_CHECK_INTERVAL_MS);

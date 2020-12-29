@@ -75,7 +75,7 @@ class DefaultActorCreator : public ActorCreatorInterface {
 /// by raylet.
 class ActorManager {
  public:
-  explicit ActorManager(
+  ActorManager(
       std::shared_ptr<gcs::GcsClient> gcs_client,
       std::shared_ptr<CoreWorkerDirectActorTaskSubmitterInterface> direct_actor_submitter,
       std::shared_ptr<ReferenceCounterInterface> reference_counter)
@@ -86,6 +86,10 @@ class ActorManager {
   ~ActorManager() = default;
 
   friend class ActorManagerTest;
+
+  /// Get a handle to a named actor. If it's cached on local, return it immediately,
+  /// otherwise fetch it from Gcs synchronously.
+  std::pair<const ActorHandle *, Status> GetNamedActorHandle(const std::string &name);
 
   /// Register an actor handle.
   ///
@@ -179,6 +183,9 @@ class ActorManager {
   void HandleActorStateNotification(const ActorID &actor_id,
                                     const rpc::ActorTableData &actor_data);
 
+  /// Fetch the named actor from Gcs synchronously with the given name.
+  std::pair<const ActorHandle *, Status> SyncFetchNamedActorFromGcs(const std::string &name);
+
   /// GCS client.
   std::shared_ptr<gcs::GcsClient> gcs_client_;
 
@@ -195,6 +202,10 @@ class ActorManager {
   /// Actor handle is a logical abstraction that holds actor handle's states.
   absl::flat_hash_map<ActorID, std::unique_ptr<ActorHandle>> actor_handles_
       GUARDED_BY(mutex_);
+
+  absl::Mutex cache_mutex_;
+
+  absl::flat_hash_map<std::string, ActorID> actor_name_to_ids_cache_ GUARDED_BY(cache_mutex_);
 };
 
 }  // namespace ray

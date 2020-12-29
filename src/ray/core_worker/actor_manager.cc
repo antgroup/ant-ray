@@ -18,6 +18,40 @@
 
 namespace ray {
 
+std::pair<const ActorHandle *, Status> ActorManager::GetNamedActorHandle(
+    const std::string &name) {
+
+  ActorID found_actor_id_in_cache = ActorID::Nil();
+  {
+    absl::MutexLock lock(&cache_mutex_);
+    auto it = actor_name_to_ids_cache_.find(name);
+    if (it != actor_name_to_ids_cache_.end()) {
+      found_actor_id_in_cache = it->second;
+    }
+  }
+
+  if (found_actor_id_in_cache != ActorID::Nil()) {
+    // We found the actor in local named actor cache, no need to fetch actor
+    // information from Gcs.
+    return std::make_pair(GetActorHandle(actor_id), Status::OK());
+  }
+
+  // We didn't find the actor in local named actor cache, fetch the actor
+  // from Gcs synchronously.
+  auto result = SyncFetchNamedActorFromGcs(name);
+
+  if (result.second == Status::OK()) {
+    // Fetched the named actor from Gcs, let's cache it on local.
+    absl::MutexLock lock(&cache_mutex_);
+    RAY_IGNORE_EXPR(actor_name_to_ids_cache_.emplace(name, result.first));
+  }
+  if (result.second == Status::OK()) {
+    RAY_LOG(DEBUG) << "Cached the named actor on local with actor_name=" << name
+                   << " and actor_id=" << result.first;
+  }
+  return result;
+}
+
 ActorID ActorManager::RegisterActorHandle(std::unique_ptr<ActorHandle> actor_handle,
                                           const ObjectID &outer_object_id,
                                           const TaskID &caller_id,
@@ -145,6 +179,55 @@ void ActorManager::HandleActorStateNotification(const ActorID &actor_id,
   } else {
     // The actor is being created and not yet ready, just ignore!
   }
+}
+
+std::pair<const ActorHandle *, Status> ActorManager::SyncFetchNamedActorFromGcs(
+    const std::string &name) {
+  // This call needs to be blocking because we can't return until the actor
+  // handle is created, which requires the response from the RPC. This is
+  // implemented using a promise that's captured in the RPC callback.
+  // There should be no risk of deadlock because we don't hold any
+  // locks during the call and the RPCs run on a separate thread.
+  ActorID actor_id;
+  std::shared_ptr<std::promise<void>> ready_promise =
+      std::make_shared<std::promise<void>>(std::promise<void>());
+  RAY_CHECK_OK(gcs_client_->Actors().AsyncGetByName(
+      name, [this, &actor_id, name, ready_promise](
+          Status status, const boost::optional<rpc::ActorTableData> &result) {
+        if (status.ok() && result) {
+          auto actor_handle = std::unique_ptr<ActorHandle>(new ActorHandle(*result));
+          actor_id = actor_handle->GetActorID();
+          actor_manager_->AddNewActorHandle(std::move(actor_handle), GetCallerId(),
+                                            CurrentCallSite(), rpc_address_,
+              /*is_detached*/ true);
+        } else {
+          // Use a NIL actor ID to signal that the actor wasn't found.
+          RAY_LOG(DEBUG) << "Failed to look up actor with name: " << name;
+          actor_id = ActorID::Nil();
+        }
+        ready_promise->set_value();
+      }));
+  // Block until the RPC completes. Set a timeout to avoid hangs if the
+  // GCS service crashes.
+  if (ready_promise->get_future().wait_for(std::chrono::seconds(
+      RayConfig::instance().gcs_server_request_timeout_seconds())) !=
+      std::future_status::ready) {
+    std::ostringstream stream;
+    stream << "There was timeout in getting the actor handle. It is probably "
+              "because GCS server is dead or there's a high load there.";
+    return std::make_pair(nullptr, Status::TimedOut(stream.str()));
+  }
+
+  if (actor_id.IsNil()) {
+    std::ostringstream stream;
+    stream << "Failed to look up actor with name '" << name << "'. You are "
+           << "either trying to look up a named actor you didn't create, "
+           << "the named actor died, or the actor hasn't been created "
+           << "because named actor creation is asynchronous.";
+    return std::make_pair(nullptr, Status::NotFound(stream.str()));
+  }
+
+  return std::make_pair(GetActorHandle(actor_id), Status::OK());
 }
 
 std::vector<ObjectID> ActorManager::GetActorHandleIDsFromHandles() {

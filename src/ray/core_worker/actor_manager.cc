@@ -33,19 +33,19 @@ std::pair<const ActorHandle *, Status> ActorManager::GetNamedActorHandle(
   if (found_actor_id_in_cache != ActorID::Nil()) {
     // We found the actor in local named actor cache, no need to fetch actor
     // information from Gcs.
-    return std::make_pair(GetActorHandle(actor_id), Status::OK());
+    return std::make_pair(GetActorHandle(found_actor_id_in_cache), Status::OK());
   }
 
   // We didn't find the actor in local named actor cache, fetch the actor
   // from Gcs synchronously.
   auto result = SyncFetchNamedActorFromGcs(name);
 
-  if (result.second == Status::OK()) {
+  if (result.second == Status::ok()) {
     // Fetched the named actor from Gcs, let's cache it on local.
     absl::MutexLock lock(&cache_mutex_);
     RAY_IGNORE_EXPR(actor_name_to_ids_cache_.emplace(name, result.first));
   }
-  if (result.second == Status::OK()) {
+  if (result.second == Status::ok()) {
     RAY_LOG(DEBUG) << "Cached the named actor on local with actor_name=" << name
                    << " and actor_id=" << result.first;
   }
@@ -182,7 +182,7 @@ void ActorManager::HandleActorStateNotification(const ActorID &actor_id,
 }
 
 std::pair<const ActorHandle *, Status> ActorManager::SyncFetchNamedActorFromGcs(
-    const std::string &name) {
+    const std::string &name, const std::string &call_site) {
   // This call needs to be blocking because we can't return until the actor
   // handle is created, which requires the response from the RPC. This is
   // implemented using a promise that's captured in the RPC callback.
@@ -197,9 +197,8 @@ std::pair<const ActorHandle *, Status> ActorManager::SyncFetchNamedActorFromGcs(
         if (status.ok() && result) {
           auto actor_handle = std::unique_ptr<ActorHandle>(new ActorHandle(*result));
           actor_id = actor_handle->GetActorID();
-          actor_manager_->AddNewActorHandle(std::move(actor_handle), GetCallerId(),
-                                            CurrentCallSite(), rpc_address_,
-              /*is_detached*/ true);
+          AddNewActorHandle(std::move(actor_handle), GetCallerId(),
+                            call_site, rpc_address_, /*is_detached*/ true);
         } else {
           // Use a NIL actor ID to signal that the actor wasn't found.
           RAY_LOG(DEBUG) << "Failed to look up actor with name: " << name;

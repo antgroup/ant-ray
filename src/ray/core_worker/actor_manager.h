@@ -184,7 +184,8 @@ class ActorManager {
                                     const rpc::ActorTableData &actor_data);
 
   /// Fetch the named actor from Gcs synchronously with the given name.
-  std::pair<const ActorHandle *, Status> SyncFetchNamedActorFromGcs(const std::string &name);
+  std::pair<const ActorHandle *, Status> SyncFetchNamedActorFromGcs(
+      const std::string &namei, const std::string &call_site);
 
   /// GCS client.
   std::shared_ptr<gcs::GcsClient> gcs_client_;

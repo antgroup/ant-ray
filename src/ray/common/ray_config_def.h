@@ -293,6 +293,10 @@ RAY_CONFIG(bool, put_small_object_in_memory_store, false)
 /// pipelining task submission.
 RAY_CONFIG(uint32_t, max_tasks_in_flight_per_worker, 1)
 
+/// Whether or not we enable dashboard agent, the default value
+/// is the same as `include_dashboard`.
+RAY_CONFIG(bool, enable_dashboard_agent, true)
+
 /// Interval to restart dashboard agent after the process exit.
 RAY_CONFIG(uint32_t, agent_restart_interval_ms, 1000)
 

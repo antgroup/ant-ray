@@ -222,6 +222,14 @@ class RayParams:
             self._system_config["lineage_pinning_enabled"] = True
             self._system_config["free_objects_period_milliseconds"] = -1
 
+        # Set the system config options for dashboard, same logic with
+        # Node::start_head_processes()
+        if include_dashboard is not None and not include_dashboard:
+            # Turn off dashboard agent.
+            if self._system_config is None:
+                self._system_config = dict()
+            self._system_config["enable_dashboard_agent"] = False
+
     def update(self, **kwargs):
         """Update the settings according to the keyword arguments.
 

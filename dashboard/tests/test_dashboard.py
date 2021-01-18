@@ -47,7 +47,36 @@ def prepare_test_files():
         f.write(">>>")
 
 
+def _search_agent(processes):
+    for p in processes:
+        try:
+            for c in p.cmdline():
+                if "new_dashboard/agent.py" in c:
+                    return p
+        except Exception:
+            pass
+
+
 cleanup_test_files()
+
+
+@pytest.mark.parametrize(
+    "ray_start_regular", [{
+        "include_dashboard": False
+    }], indirect=True)
+def test_not_include_dashboard(ray_start_regular):
+    all_processes = ray.worker._global_node.all_processes
+    assert ray_constants.PROCESS_TYPE_DASHBOARD not in all_processes
+    raylet_proc_info = all_processes[ray_constants.PROCESS_TYPE_RAYLET][0]
+    raylet_proc = psutil.Process(raylet_proc_info.process.pid)
+
+    # The worker is started.
+    r = ray.get(ray.remote(lambda: "foo").remote())
+    assert r == "foo"
+
+    # The dashboard agent is not started.
+    agent_proc = _search_agent(raylet_proc.children())
+    assert agent_proc is None
 
 
 @pytest.mark.parametrize(
@@ -84,15 +113,6 @@ def test_basic(ray_start_with_dashboard):
     ]
     raylet_proc_info = all_processes[ray_constants.PROCESS_TYPE_RAYLET][0]
     raylet_proc = psutil.Process(raylet_proc_info.process.pid)
-
-    def _search_agent(processes):
-        for p in processes:
-            try:
-                for c in p.cmdline():
-                    if "new_dashboard/agent.py" in c:
-                        return p
-            except Exception:
-                pass
 
     # Test for bad imports, the agent should be restarted.
     logger.info("Test for bad imports.")

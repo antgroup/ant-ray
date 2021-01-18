@@ -36,6 +36,11 @@ void AgentManager::HandleRegisterAgent(const rpc::RegisterAgentRequest &request,
 }
 
 void AgentManager::StartAgent() {
+  if (!RayConfig::instance().enable_dashboard_agent()) {
+    RAY_LOG(INFO) << "Not starting agent, the include_dashboard is False.";
+    return;
+  }
+
   if (options_.agent_commands.empty()) {
     RAY_LOG(INFO) << "Not starting agent, the agent command is empty.";
     return;

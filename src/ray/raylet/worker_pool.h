@@ -48,7 +48,8 @@ class WorkerPoolInterface {
   /// \return An idle worker with the requested task spec. Returns nullptr if no
   /// such worker exists.
   virtual std::shared_ptr<WorkerInterface> PopWorker(
-      const TaskSpecification &task_spec) = 0;
+      const TaskSpecification &task_spec,
+      std::function<void(const std::shared_ptr<WorkerInterface> &)> on_worker_available) = 0;
   /// Add an idle worker to the pool.
   ///
   /// \param The idle worker to add.
@@ -246,7 +247,9 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// \param task_spec The returned worker must be able to execute this task.
   /// \return An idle worker with the requested task spec. Returns nullptr if no
   /// such worker exists.
-  std::shared_ptr<WorkerInterface> PopWorker(const TaskSpecification &task_spec);
+  std::shared_ptr<WorkerInterface> PopWorker(
+          const TaskSpecification &task_spec,
+          std::function<void(const std::shared_ptr<WorkerInterface> &)> on_worker_available);
 
   /// Try to prestart a number of workers suitable the given task spec. Prestarting
   /// is needed since core workers request one lease at a time, if starting is slow,

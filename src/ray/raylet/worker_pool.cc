@@ -748,7 +748,9 @@ void WorkerPool::TryKillingIdleWorkers() {
 }
 
 std::shared_ptr<WorkerInterface> WorkerPool::PopWorker(
-    const TaskSpecification &task_spec) {
+    const TaskSpecification &task_spec,
+    std::function<void(const std::shared_ptr<WorkerInterface> &)> on_worker_available) {
+
   auto &state = GetStateForLanguage(task_spec.GetLanguage());
 
   std::shared_ptr<WorkerInterface> worker = nullptr;
@@ -767,7 +769,14 @@ std::shared_ptr<WorkerInterface> WorkerPool::PopWorker(
       // we can remove it from dedicated_workers_to_tasks.
       state.dedicated_workers_to_tasks.erase(worker->GetProcess());
       state.tasks_to_dedicated_workers.erase(task_spec.TaskId());
+      if (worker) {
+          RAY_CHECK(worker->GetAssignedJobId() == task_spec.JobId());
+      }
+      on_worker_available(worker);
+      return;
     } else if (!HasPendingWorkerForTask(task_spec.GetLanguage(), task_spec.TaskId())) {
+      // TODO(qwang): Remove the condition HasPendingWorkerForTask,
+      //  since the pending worker task shouldn't be reach here twice.
       // We are not pending a registration from a worker for this task,
       // so start a new worker process for this task.
       std::vector<std::string> dynamic_options = {};

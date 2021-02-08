@@ -928,6 +928,8 @@ void NodeManager::DispatchTasks(
           return local_queues_.NumRunning(a->first) < local_queues_.NumRunning(b->first);
         });
   }
+
+  // TODO(qwang): This should be removed.
   std::vector<std::function<void()>> post_assign_callbacks;
   // Approximate fair round robin between classes.
   for (const auto &it : fair_order) {
@@ -945,18 +947,24 @@ void NodeManager::DispatchTasks(
       // Try to get an idle worker to execute this task. If nullptr, there
       // aren't any available workers so we can't assign the task.
       std::shared_ptr<WorkerInterface> worker =
-          worker_pool_.PopWorker(task.GetTaskSpecification());
-      if (worker != nullptr) {
-        AssignTask(worker, task, &post_assign_callbacks);
-      }
+          worker_pool_.PopWorker(
+                  task.GetTaskSpecification(),
+                  /*worker_available=*/[task, task_id, this](const std::shared_ptr<WorkerInterface> &worker) {
+              RAY_CHECK(worker != nullptr);
+              AssignTask(worker, task, &post_assign_callbacks);
+              RAY_LOG(DEBUG) << "Finished assigning task " << task_id << " to worker "
+                             << worker->WorkerId();
+              FinishAssignTask(worker, task_id, /*success=*/true);
+          });
     }
   }
   // Call the callbacks from the AssignTask calls above. These need to be called
   // after the above loop, as they may alter the scheduling queues and invalidate
   // the loop iterator.
-  for (auto &func : post_assign_callbacks) {
-    func();
-  }
+  //// TODO(qwang): address this iter ivalid issue.
+//  for (auto &func : post_assign_callbacks) {
+//    func();
+//  }
 }
 
 void NodeManager::ProcessClientMessage(const std::shared_ptr<ClientConnection> &client,

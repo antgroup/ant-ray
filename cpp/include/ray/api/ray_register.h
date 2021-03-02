@@ -52,6 +52,16 @@ struct RemoveFirst<std::tuple<First, Second...>> {
 template <class Tuple>
 using RemoveFirst_t = typename RemoveFirst<Tuple>::type;
 
+template <typename OUT, typename IN>
+inline static OUT AddressOf(IN in) {
+  union {
+    IN in;
+    OUT out;
+  } u = {in};
+
+  return u.out;
+};
+
 class Router {
  public:
   static Router &Instance() {
@@ -60,9 +70,14 @@ class Router {
   }
 
   template <typename Function>
-  void RegisterHandler(std::string const &name, const Function &f) {
-    func_ptr_to_key_map_.emplace((void *)&f, name);
-    return RegisterNonmemberFunc(name, f);
+  bool RegisterHandler(std::string const &name, const Function &f) {
+    auto pair = func_ptr_to_key_map_.emplace(AddressOf<uintptr_t>(f), name);
+    if (!pair.second) {
+      return false;
+    }
+
+    RegisterNonmemberFunc(name, f);
+    return true;
   }
 
   std::string Route(const char *data, std::size_t size) {
@@ -154,7 +169,7 @@ class Router {
   std::unordered_map<std::string,
                      std::function<void(const char *, size_t, std::string &)>>
       map_invokers_;
-  std::unordered_map<void *, std::string> func_ptr_to_key_map_;
+  std::unordered_map<uintptr_t, std::string> func_ptr_to_key_map_;
 
   const static size_t MAX_BUF_LEN = 1024 * 10 * 10;
 };

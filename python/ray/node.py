@@ -186,6 +186,7 @@ class Node:
                     ray._private.services.get_address_info_from_redis(
                         self.redis_address,
                         self._raylet_ip_address,
+                        node=self,
                         redis_password=self.redis_password))
                 self._plasma_store_socket_name = address_info[
                     "object_store_address"]
@@ -234,6 +235,7 @@ class Node:
             address_info = (ray._private.services.get_address_info_from_redis(
                 self.redis_address,
                 self._raylet_ip_address,
+                node=self,
                 redis_password=self.redis_password,
                 log_warning=False))
             self._ray_params.node_manager_port = address_info[

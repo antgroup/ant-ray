@@ -168,6 +168,7 @@ def test_get_address_info_after_raylet_died(ray_start_cluster_head):
         return ray._private.services.get_address_info_from_redis(
             cluster.redis_address,
             cluster.head_node.node_ip_address,
+            node=cluster.head_node,
             num_retries=1,
             redis_password=cluster.redis_password)
 

@@ -252,13 +252,35 @@ def find_redis_address_or_die():
 
 def get_address_info_from_redis_helper(redis_address,
                                        node_ip_address,
+                                       node=None,
                                        redis_password=None):
+    def fail_if_raylet_exited():
+        if node is None:
+            return
+        if ray_constants.PROCESS_TYPE_RAYLET in node.all_processes:
+            for process_info in node.all_processes[
+                    ray_constants.PROCESS_TYPE_RAYLET]:
+                # TODO(kfstorm): Skip checking if Raylet has failed if tmux is
+                # used.
+                # There's no easy way to detect if Raylet has failed if tmux
+                # is used because the tmux process exits immediately while the
+                # underlying Raylet process may be still running.
+                if process_info.use_tmux:
+                    continue
+                if process_info.process.poll() is not None:
+                    error = RuntimeError(
+                        "Raylet failed to start. Exit code: " +
+                        str(process_info.process.returncode))
+                    error.is_raylet_failure = True
+                    raise error
+
     redis_ip_address, redis_port = redis_address.split(":")
     # Get node table from global state accessor.
     global_state = ray.state.GlobalState()
     global_state._initialize_global_state(redis_address, redis_password)
     client_table = global_state.node_table()
     if len(client_table) == 0:
+        fail_if_raylet_exited()
         raise RuntimeError(
             "Redis has started but no raylets have registered yet.")
 
@@ -274,6 +296,7 @@ def get_address_info_from_redis_helper(redis_address,
             relevant_client = client_info
             break
     if relevant_client is None:
+        fail_if_raylet_exited()
         raise RuntimeError(
             f"This node has an IP address of {node_ip_address}, and Ray "
             "expects this IP address to be either the Redis address or one of"
@@ -294,6 +317,7 @@ def get_address_info_from_redis_helper(redis_address,
 
 def get_address_info_from_redis(redis_address,
                                 node_ip_address,
+                                node=None,
                                 num_retries=5,
                                 redis_password=None,
                                 log_warning=True):
@@ -301,8 +325,13 @@ def get_address_info_from_redis(redis_address,
     while True:
         try:
             return get_address_info_from_redis_helper(
-                redis_address, node_ip_address, redis_password=redis_password)
-        except Exception:
+                redis_address,
+                node_ip_address,
+                node=node,
+                redis_password=redis_password)
+        except Exception as e:
+            if hasattr(e, "is_raylet_failure"):
+                raise
             if counter == num_retries:
                 raise
             if log_warning:

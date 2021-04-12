@@ -18,7 +18,7 @@ from ray.autoscaler._private.log_timer import LogTimer
 # from ray.autoscaler._private.aws.utils import boto_exception_handler
 from ray.autoscaler._private.cli_logger import cli_logger, cf
 
-from . acs_client import AcsClient
+from . util import AcsClient
 
 logger = logging.getLogger(__name__)
 

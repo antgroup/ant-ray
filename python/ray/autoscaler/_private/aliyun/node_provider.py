@@ -4,6 +4,7 @@ import threading
 from collections import defaultdict
 import logging
 import time
+from typing import Any, Dict, List, Optional
 
 from aliyunsdkcore.acs_exception.exceptions import ClientException, ServerException
 
@@ -18,29 +19,12 @@ from ray.autoscaler._private.log_timer import LogTimer
 # from ray.autoscaler._private.aws.utils import boto_exception_handler
 from ray.autoscaler._private.cli_logger import cli_logger, cf
 
-from . utils import AcsClient
+from ray.autoscaler._private.aliyun.utils import AcsClient
+from ray.autoscaler._private.aliyun.config import PENDING, STOPPED, STARTING, STOPPING, RUNNING
 
 logger = logging.getLogger(__name__)
 
 TAG_BATCH_DELAY = 1
-
-
-# def to_aws_format(tags):
-#     """Convert the Ray node name tag to the AWS-specific 'Name' tag."""
-#
-#     if TAG_RAY_NODE_NAME in tags:
-#         tags["Name"] = tags[TAG_RAY_NODE_NAME]
-#         del tags[TAG_RAY_NODE_NAME]
-#     return tags
-#
-#
-# def from_aws_format(tags):
-#     """Convert the AWS-specific 'Name' tag to the Ray node name tag."""
-#
-#     if "Name" in tags:
-#         tags[TAG_RAY_NODE_NAME] = tags["Name"]
-#         del tags["Name"]
-#     return tags
 
 
 class AliyunNodeProvider(NodeProvider):
@@ -59,7 +43,7 @@ class AliyunNodeProvider(NodeProvider):
             access_key=provider_config["access_key"],
             access_key_secret=provider_config["access_key_secret"],
             region=provider_config["region"],
-            max_retries=0,
+            max_retries=1,
         )
 
         # Try availability zones round-robin, starting from random offset
@@ -82,11 +66,8 @@ class AliyunNodeProvider(NodeProvider):
         # excessive DescribeInstances requests.
         self.cached_nodes = {}
 
-    def non_terminated_nodes(self, tag_filters):
-        # Note that these filters are acceptable because they are set on
-        #       node initialization, and so can never be sitting in the cache.
-        # tag_filters = to_aws_format(tag_filters)
-        filters = [
+    def non_terminated_nodes(self, tag_filters: Dict[str, str]) -> List[str]:
+        tags = [
             {
                 "Name": "instance-state-name",
                 "Values": ["pending", "running"],
@@ -97,62 +78,73 @@ class AliyunNodeProvider(NodeProvider):
             },
         ]
         for k, v in tag_filters.items():
-            filters.append({
+            tags.append({
                 "Name": "tag:{}".format(k),
                 "Values": [v],
             })
 
-        # with boto_exception_handler(
-        #         "Failed to fetch running instances from AWS."):
-            # nodes = list(self.ec2.instances.filter(Filters=filters))
-        nodes = list(self.acs.describe_instances(tags=filters))
+        instances = self.acs.describe_instances(tags=tags)
+        non_terminated_instance = []
+        for instance in instances:
+            if instance.get('Status') != STOPPED and instance.get('Status') != STOPPING:
+                non_terminated_instance.append(instance.get('InstanceId'))
+                self.cached_nodes[instance.get('InstanceId')] = instance
+        return non_terminated_instance
 
-        # Populate the tag cache with initial information if necessary
-        for node in nodes:
-            if node.id in self.tag_cache:
-                continue
+    def is_running(self, node_id: str) -> bool:
+        instances = self.acs.describe_instances(instance_ids=[node_id])
+        if instances is not None:
+            instance = instances[0]
+            return instance.get('Status') == "Running"
+        cli_logger.error("Invalid node id: %s", node_id)
+        return False
 
-            # self.tag_cache[node.id] = from_aws_format(
-            #     {x["Key"]: x["Value"]
-            #      for x in node.tags})
+    def is_terminated(self, node_id: str) -> bool:
+        instances = self.acs.describe_instances(instance_ids=[node_id])
+        if instances is not None:
+            assert len(instances) == 1
+            instance = instances[0]
+            return instance.get('Status') == "Stopped"
+        cli_logger.error("Invalid node id: %s", node_id)
+        return False
 
-            self.tag_cache[node.id] = {x["Key"]: x["Value"] for x in node.tags}
+    def node_tags(self, node_id: str) -> Dict[str, str]:
+        instances = self.acs.describe_instances(instance_ids=[node_id])
+        if instances is not None:
+            assert len(instances) == 1
+            instance = instances[0]
+            if instance.get('Tags') is not None:
+                node_tags = dict()
+                for tag in instance.get('Tags').get('Tag'):
+                    node_tags[tag.get('TagKey')] = tag.get('TagValue')
+                return node_tags
+        return dict()
 
-        self.cached_nodes = {node.id: node for node in nodes}
-        return [node.id for node in nodes]
+    def external_ip(self, node_id: str) -> str:
+        instances = self.acs.describe_instances(instance_ids=[node_id])
+        if instances is not None:
+            assert len(instances)
+            instance = instances[0]
+            if instance.get('PublicIpAddress') is not None and instance.get('PublicIpAddress').get('IpAddress') is not None:
+                if len(instance.get('PublicIpAddress').get('IpAddress')) > 0:
+                    return instance.get('PublicIpAddress').get('IpAddress')[0]
+            cli_logger.error("PublicIpAddress attribute is not exist")
+            return None
+        return None
 
-    def is_running(self, node_id):
-        node = self._get_cached_node(node_id)
-        return node.state["Name"] == "running"
+    def internal_ip(self, node_id: str) -> str:
+        instances = self.acs.describe_instances(instance_ids=[node_id])
+        if instances is not None:
+            assert len(instances)
+            instance = instances[0]
+            if instance.get('PrivateIpSets') is not None and instance.get('PrivateIpSets').get('PrivateIpSet') is not None and len(instance.get('PrivateIpSets').get('PrivateIpSet')) > 0:
+                if instance.get('PrivateIpSets').get('PrivateIpSet')[0].get('Primary'):
+                    return instance.get('PrivateIpSets').get('PrivateIpSet')[0].get('PrivateIpAddress')
+            cli_logger.error("InnerIpAddress attribute is not exist")
+            return ""
+        return None
 
-    def is_terminated(self, node_id):
-        node = self._get_cached_node(node_id)
-        state = node.state["Name"]
-        return state not in ["running", "pending"]
-
-    def node_tags(self, node_id):
-        with self.tag_cache_lock:
-            d1 = self.tag_cache[node_id]
-            d2 = self.tag_cache_pending.get(node_id, {})
-            return dict(d1, **d2)
-
-    def external_ip(self, node_id):
-        node = self._get_cached_node(node_id)
-
-        if node.public_ip_address is None:
-            node = self._get_node(node_id)
-
-        return node.public_ip_address
-
-    def internal_ip(self, node_id):
-        node = self._get_cached_node(node_id)
-
-        if node.private_ip_address is None:
-            node = self._get_node(node_id)
-
-        return node.private_ip_address
-
-    def set_node_tags(self, node_id, tags):
+    def set_node_tags(self, node_id: str, tags: Dict[str, str]) -> None:
         is_batching_thread = False
         with self.tag_cache_lock:
             if not self.tag_cache_pending:
@@ -184,262 +176,104 @@ class AliyunNodeProvider(NodeProvider):
         for node_id, tags in self.tag_cache_pending.items():
             for x in tags.items():
                 batch_updates[x].append(node_id)
-            self.tag_cache[node_id].update(tags)
+            self.tag_cache[node_id] = tags
 
         self.tag_cache_pending = defaultdict(dict)
 
         self._create_tags(batch_updates)
 
     def _create_tags(self, batch_updates):
+
         for (k, v), node_ids in batch_updates.items():
             m = "Set tag {}={} on {}".format(k, v, node_ids)
-            with LogTimer("AWSNodeProvider: {}".format(m)):
+            with LogTimer("AliyunNodeProvider: {}".format(m)):
                 if k == TAG_RAY_NODE_NAME:
                     k = "Name"
 
-                # # TODO: create tag
-                # self.ec2.meta.client.create_tags(
-                #     Resources=node_ids,
-                #     Tags=[{
-                #         "Key": k,
-                #         "Value": v
-                #     }],
-                # )
+                self.acs.tag_resource(node_ids, [{
+                    "Key": k,
+                    "Value": v
+                }])
 
-                for node_id in node_ids:
-                    self.acs.add_tags(
-                        instance_id=node_id,
-                        tags=[{
-                            "Key": k,
-                            "Value": v
-                        }]
-                    )
+    def create_node(self, node_config: Dict[str, Any], tags: Dict[str, str],
+                    count: int) -> Optional[Dict[str, Any]]:
 
-    def create_node(self, node_config, tags, count):
-        tags = copy.deepcopy(tags)
-        # Try to reuse previously stopped nodes with compatible configs
-        if self.cache_stopped_nodes:
-            # TODO(ekl) this is breaking the abstraction boundary a little by
-            # peeking into the tag set.
-            filters = [
-                {
-                    "Name": "instance-state-name",
-                    "Values": ["stopped", "stopping"],
-                },
-                {
-                    "Name": "tag:{}".format(TAG_RAY_CLUSTER_NAME),
-                    "Values": [self.cluster_name],
-                },
-                {
-                    "Name": "tag:{}".format(TAG_RAY_NODE_KIND),
-                    "Values": [tags[TAG_RAY_NODE_KIND]],
-                },
-                {
-                    "Name": "tag:{}".format(TAG_RAY_LAUNCH_CONFIG),
-                    "Values": [tags[TAG_RAY_LAUNCH_CONFIG]],
-                },
-            ]
-            # This tag may not always be present.
-            if TAG_RAY_USER_NODE_TYPE in tags:
-                filters.append({
-                    "Name": "tag:{}".format(TAG_RAY_USER_NODE_TYPE),
-                    "Values": [tags[TAG_RAY_USER_NODE_TYPE]],
-                })
+        filters = [
+            {
+                "Name": "instance-state-name",
+                "Values": ["stopped", "stopping"],
+            },
+            {
+                "Name": "tag:{}".format(TAG_RAY_CLUSTER_NAME),
+                "Values": [self.cluster_name],
+            },
+            {
+                "Name": "tag:{}".format(TAG_RAY_NODE_KIND),
+                "Values": [tags[TAG_RAY_NODE_KIND]],
+            },
+            {
+                "Name": "tag:{}".format(TAG_RAY_LAUNCH_CONFIG),
+                "Values": [tags[TAG_RAY_LAUNCH_CONFIG]],
+            },
+        ]
 
-            # reuse_nodes = list(
-            #     self.ec2.instances.filter(Filters=filters))[:count]
-            reuse_nodes = list(self.acs.describe_instances(tags=filters))[:count]
-            reuse_node_ids = [n.id for n in reuse_nodes]
-            if reuse_nodes:
-                cli_logger.print(
-                    # todo: handle plural vs singular?
-                    "Reusing nodes {}. "
-                    "To disable reuse, set `cache_stopped_nodes: False` "
-                    "under `provider` in the cluster configuration.",
-                    cli_logger.render_list(reuse_node_ids))
-
-                # todo: timed?
-                with cli_logger.group("Stopping instances to reuse"):
-                    for node in reuse_nodes:
-                        # self.tag_cache[node.id] = from_aws_format(
-                        #     {x["Key"]: x["Value"]
-                        #      for x in node.tags})
-                        self.tag_cache[node.id] = {x["Key"]: x["Value"] for x in node.tags}
-                        if node.state["Name"] == "stopping":
-                            cli_logger.print("Waiting for instance {} to stop",
-                                             node.id)
-                            node.wait_until_stopped()
-
-                # self.ec2.meta.client.start_instances(
-                #     InstanceIds=reuse_node_ids)
-                self.acs.start_instance(instance_id=reuse_node_ids)
-
-                for node_id in reuse_node_ids:
-                    self.set_node_tags(node_id, tags)
-                count -= len(reuse_node_ids)
-
-        if count:
-            self._create_node(node_config, tags, count)
-
-    def _create_node(self, node_config, tags, count):
-        # tags = to_aws_format(tags)
-        conf = node_config.copy()
-
-        tag_pairs = [{
-            "Key": TAG_RAY_CLUSTER_NAME,
-            "Value": self.cluster_name,
-        }]
-        for k, v in tags.items():
-            tag_pairs.append({
-                "Key": k,
-                "Value": v,
+        if TAG_RAY_USER_NODE_TYPE in tags:
+            filters.append({
+                "Name": "tag:{}".format(TAG_RAY_USER_NODE_TYPE),
+                "Values": [tags[TAG_RAY_USER_NODE_TYPE]],
             })
-        tag_specs = [{
-            "ResourceType": "instance",
-            "Tags": tag_pairs,
-        }]
-        user_tag_specs = conf.get("TagSpecifications", [])
-        # Allow users to add tags and override values of existing
-        # tags with their own. This only applies to the resource type
-        # "instance". All other resource types are appended to the list of
-        # tag specs.
-        for user_tag_spec in user_tag_specs:
-            if user_tag_spec["ResourceType"] == "instance":
-                for user_tag in user_tag_spec["Tags"]:
-                    exists = False
-                    for tag in tag_specs[0]["Tags"]:
-                        if user_tag["Key"] == tag["Key"]:
-                            exists = True
-                            tag["Value"] = user_tag["Value"]
-                            break
-                    if not exists:
-                        tag_specs[0]["Tags"] += [user_tag]
-            else:
-                tag_specs += [user_tag_spec]
 
-        # SubnetIds is not a real config key: we must resolve to a
-        # single SubnetId before invoking the AWS API.
-        subnet_ids = conf.pop("SubnetIds")
+        reuse_nodes = self.acs.describe_instances(tags=filters)[:count]
+        reuse_node_ids = [n.get('InstanceId') for n in reuse_nodes]
+        reused_nodes_dict = {n.get('InstanceId'): n for n in reuse_nodes}
 
-        for attempt in range(1, BOTO_CREATE_MAX_RETRIES + 1):
-            try:
-                subnet_id = subnet_ids[self.subnet_idx % len(subnet_ids)]
+        if reuse_nodes:
+            with cli_logger.group("Stopping instances to reuse"):
+                for node in reuse_nodes:
+                    node_id = node.get('InstanceId')
+                    self.tag_cache[node_id] = node.get('Tags')
+                    if node.get('Status') is RUNNING:
+                        self.acs.stop_instance(node_id)
 
-                self.subnet_idx += 1
-                conf.update({
-                    "MinCount": 1,
-                    "MaxCount": count,
-                    "SubnetId": subnet_id,
-                    "TagSpecifications": tag_specs
-                })
-                # created = self.ec2_fail_fast.create_instances(**conf)
 
-                instance_type = conf.pop("InstanceType")
-                created = self.acs_fail_fast.create_instance(instance_type)
+            for node_id in reuse_node_ids:
+                self.acs.start_instance(node_id)
+                self.set_node_tags(node_id, tags)
 
-                # todo: timed?
-                # todo: handle plurality?
-                with cli_logger.group(
-                        "Launched {} nodes",
-                        count,
-                        _tags=dict(subnet_id=subnet_id)):
-                    for instance in created:
-                        # NOTE(maximsmol): This is needed for mocking
-                        # boto3 for tests. This is likely a bug in moto
-                        # but AWS docs don't seem to say.
-                        # You can patch moto/ec2/responses/instances.py
-                        # to fix this (add <stateReason> to EC2_RUN_INSTANCES)
+            count -= len(reuse_node_ids)
 
-                        # The correct value is technically
-                        # {"code": "0", "Message": "pending"}
-                        state_reason = instance.state_reason or {
-                            "Message": "pending"
-                        }
 
-                        cli_logger.print(
-                            "Launched instance {}",
-                            instance.instance_id,
-                            _tags=dict(
-                                state=instance.state["Name"],
-                                info=state_reason["Message"]))
-                break
+        for k, v in tags.items():
+            filters.append({
+                "Name": "tag:{}".format(k),
+                "Values": [v],
+            })
 
-            except ClientException as exc:
-                logging.error("Client Exception %s", exc)
-            except ServerException as exc1:
-                logging.error("Server Exception %s", exc1)
-            # except botocore.exceptions.ClientError as exc:
-            #     if attempt == BOTO_CREATE_MAX_RETRIES:
-            #         # todo: err msg
-            #         cli_logger.abort(
-            #             "Failed to launch instances. Max attempts exceeded.")
-            #         raise exc
-            #     else:
-            #         cli_logger.print(
-            #             "create_instances: Attempt failed with {}, retrying.",
-            #             exc)
+        created_nodes_dict = dict()
+        if count > 0:
+            instance_id_sets = self.acs.run_instances(
+                instance_type=node_config['InstanceType'],
+                image_id=node_config['ImageId'],
+                tags=filters,
+                amount=count,
+                vswitch_id=node_config['VSwitchId'],
+                security_group_id=node_config['SecurityGroupId'],
+            )
+            instances = self.acs.describe_instances(instance_ids=instance_id_sets)
 
-    def terminate_node(self, node_id):
-        node = self._get_cached_node(node_id)
-        if self.cache_stopped_nodes:
-            if node.spot_instance_request_id:
-                cli_logger.print(
-                    "Terminating instance {} " +
-                    cf.dimmed("(cannot stop spot instances, only terminate)"),
-                    node_id)  # todo: show node name?
-                node.terminate()
-            else:
-                cli_logger.print("Stopping instance {} " + cf.dimmed(
-                    "(to terminate instead, "
-                    "set `cache_stopped_nodes: False` "
-                    "under `provider` in the cluster configuration)"),
-                                 node_id)  # todo: show node name?
-                node.stop()
-        else:
-            node.terminate()
 
-        self.tag_cache.pop(node_id, None)
-        self.tag_cache_pending.pop(node_id, None)
+            if instances is not None:
+                for instance in instances:
+                    print(instance.get('Status'))
+                    created_nodes_dict[instance.get('InstanceId')] = instance
 
-    def terminate_nodes(self, node_ids):
-        if not node_ids:
-            return
-        if self.cache_stopped_nodes:
-            spot_ids = []
-            on_demand_ids = []
+        return created_nodes_dict
 
-            for node_id in node_ids:
-                if self._get_cached_node(node_id).spot_instance_request_id:
-                    spot_ids += [node_id]
-                else:
-                    on_demand_ids += [node_id]
+    def terminate_node(self, node_id: str) -> None:
+        self.acs.stop_instance(node_id)
 
-            if on_demand_ids:
-                # todo: show node names?
-                cli_logger.print(
-                    "Stopping instances {} " + cf.dimmed(
-                        "(to terminate instead, "
-                        "set `cache_stopped_nodes: False` "
-                        "under `provider` in the cluster configuration)"),
-                    cli_logger.render_list(on_demand_ids))
-
-                # self.ec2.meta.client.stop_instances(InstanceIds=on_demand_ids)
-                self.acs.stop_instance(instance_id=on_demand_ids)
-            if spot_ids:
-                cli_logger.print(
-                    "Terminating instances {} " +
-                    cf.dimmed("(cannot stop spot instances, only terminate)"),
-                    cli_logger.render_list(spot_ids))
-
-                # self.ec2.meta.client.terminate_instances(InstanceIds=spot_ids)
-                self.acs.delete_instance(instance_id=spot_ids)
-        else:
-            # self.ec2.meta.client.terminate_instances(InstanceIds=node_ids)
-            self.acs.delete_instance(instance_id=node_ids)
-
-        for node_id in node_ids:
-            self.tag_cache.pop(node_id, None)
-            self.tag_cache_pending.pop(node_id, None)
+    def terminate_nodes(self, node_ids: List[str]) -> None:
+        self.acs.stop_instances(node_ids)
 
     def _get_node(self, node_id):
         """Refresh and get info for this node, updating the cache."""
@@ -450,8 +284,8 @@ class AliyunNodeProvider(NodeProvider):
 
         # Node not in {pending, running} -- retry with a point query. This
         # usually means the node was recently preempted or terminated.
-        # matches = list(self.ec2.instances.filter(InstanceIds=[node_id]))
-        matches = list(self.acs.describe_instances(instance_ids=[node_id]))
+        matches = self.acs.describe_instances(instance_ids=[node_id])
+
         assert len(matches) == 1, "Invalid instance id {}".format(node_id)
         return matches[0]
 

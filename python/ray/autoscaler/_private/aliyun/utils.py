@@ -23,6 +23,7 @@ from aliyunsdkecs.request.v20140526.CreateVSwitchRequest import CreateVSwitchReq
 from aliyunsdkecs.request.v20140526.CreateVpcRequest import CreateVpcRequest
 from aliyunsdkecs.request.v20140526.DescribeZonesRequest import DescribeZonesRequest
 from aliyunsdkecs.request.v20140526.DescribeVpcsRequest import DescribeVpcsRequest
+from aliyunsdkecs.request.v20140526.RebootInstanceRequest import RebootInstanceRequest
 
 
 class AcsClient:
@@ -148,7 +149,6 @@ class AcsClient:
             return response.get('Vpcs').get('Vpc')
         return None
 
-
     def tag_resource(self, resource_ids, tags, resource_type='instance'):
         request = TagResourcesRequest()
         request.set_Tags(tags)
@@ -159,7 +159,6 @@ class AcsClient:
             logging.info("instance %s create tag successfully.", resource_ids)
         else:
             logging.error("instance %s create tag failed.", resource_ids)
-
 
     def start_instance(self, instance_id):
         request = StartInstanceRequest()
@@ -188,6 +187,11 @@ class AcsClient:
         logging.error("stop_instances failed")
         return None
 
+    def reboot_instance(self, instance_id):
+        request = RebootInstanceRequest()
+        request.set_InstanceId(instance_id)
+        self._send_request(request)
+        return None
 
     def delete_instance(self, instance_id):
         request = DeleteInstanceRequest()
@@ -256,7 +260,6 @@ class AcsClient:
             logging.error("instance %s attach_key_pair failed.", instance_ids)
             return None
 
-
     def _send_request(self, request):
         """send open api"""
         request.set_accept_format('json')
@@ -268,4 +271,3 @@ class AcsClient:
             logging.error(e1)
         except ServerException as e2:
             logging.error(e2)
-

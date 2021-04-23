@@ -25,6 +25,7 @@ from ray.autoscaler._private.aliyun.config import PENDING, STOPPED, STARTING, ST
 logger = logging.getLogger(__name__)
 
 TAG_BATCH_DELAY = 1
+STOPPING_NODE_DELAY = 1
 
 
 class AliyunNodeProvider(NodeProvider):
@@ -224,7 +225,7 @@ class AliyunNodeProvider(NodeProvider):
             })
 
         reuse_nodes = self.acs.describe_instances(tags=filters)[:count]
-        reuse_node_ids = [n.get('InstanceId') for n in reuse_nodes]
+        # reuse_node_ids = [n.get('InstanceId') for n in reuse_nodes]
         # reused_nodes_dict = {n.get('InstanceId'): n for n in reuse_nodes}
 
         if reuse_nodes:
@@ -232,14 +233,16 @@ class AliyunNodeProvider(NodeProvider):
                 for node in reuse_nodes:
                     node_id = node.get('InstanceId')
                     self.tag_cache[node_id] = node.get('Tags')
-                    if node.get('Status') is RUNNING:
-                        self.acs.stop_instance(node_id)
+                    self.set_node_tags(node_id, tags)
+                    print('node_id:' + node_id)
+                    print('node status:' + node.get('Status'))
+                    if node.get('Status') == RUNNING:
+                        self.acs.reboot_instance(node_id)
 
-            for node_id in reuse_node_ids:
-                self.acs.start_instance(node_id)
-                self.set_node_tags(node_id, tags)
-
-            count -= len(reuse_node_ids)
+                    if node.get('Status') == STOPPED:
+                        print('start instance')
+                        self.acs.start_instance(node_id)
+            count -= len(reuse_nodes)
 
         for k, v in tags.items():
             filters.append({

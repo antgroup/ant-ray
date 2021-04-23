@@ -66,7 +66,7 @@ available_node_types:
         resources: {}
         # Provider-specific config for this node type, e.g. instance type. By default
         node_config:
-            InstanceType: ecs.n4.2xlarge
+            InstanceType: ecs.n4.large
             ImageId: ubuntu_18_04_64_20G_alibase_20190624.vhd
             VpcId: vpc-bp1jyugjw15v5qt2soktg
             VSwitchId: vsw-bp1yhnd9jcivg10ag6t0r
@@ -93,7 +93,7 @@ available_node_types:
         # For more documentation on available fields, see:
         # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
         node_config:
-            InstanceType: ecs.n4.2xlarge
+            InstanceType: ecs.n4.large
             ImageId: ubuntu_18_04_64_20G_alibase_20190624.vhd
             VpcId: vpc-bp1jyugjw15v5qt2soktg
             VSwitchId: vsw-bp1yhnd9jcivg10ag6t0r
@@ -142,35 +142,11 @@ rsync_filter: []
 initialization_commands: []
 
 # List of shell commands to run to set up nodes.
-setup_commands:
-#    - pip uninstall -y ray
-#    - cd ~/alipay/ray/python/dist
-#    - pip install -U "ray[cluster] @ ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl"
+setup_commands: []
 #    - sudo apt-get update
-#    - sudo apt-get install -y build-essential curl unzip psmisc
-#    - wget https://repo.anaconda.com/archive/Anaconda3-2020.07-Linux-x86_64.sh
-#    - rm -rf ~/anaconda3
-#    - bash Anaconda3-2020.07-Linux-x86_64.sh
-#    - export PATH=~/anaconda3/bin:$PATH
-#    - source ~/.bashrc
-#    - conda --version
-#    - rm -rf Anaconda3-2020.07-Linux-x86_64.sh
-#    - conda create -n Ray python=3.6
-#    - conda activate Ray
-#    - pip install cython==0.29.14 pytest
-#    - apt install git
-#    - git clone -b zhuang_aliyun git@github.com:alipay/ray.git
-#    - apt install npm
-#    - ray/ci/travis/install-bazel.sh
-#    - pushd ray/dashboard/client
-#    - npm install
-#    - npm run build
-#    - popd
-    - pip -V
-#    - cd ray/python && pip install -e . --verbose
-
-#export PATH=~/anaconda3/bin:$PATH
-#source ~/.bashrc
+#    - sudo apt-get install python3-pip
+#    - pip3 -V
+#    - pip3 install -U ~/alipay/ray/python/dist/ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
 
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands: []

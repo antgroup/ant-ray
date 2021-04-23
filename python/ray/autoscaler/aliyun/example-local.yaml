@@ -114,7 +114,7 @@ head_node_type: ray.head.default
 # Files or directories to copy to the head and worker nodes. The format is a
 # dictionary from REMOTE_PATH: LOCAL_PATH, e.g.
 file_mounts: {
-    "~/alipay/ray": "~/alipay/ray",
+#    "~/alipay/ray": "~/alipay/ray",
 #    "/path2/on/remote/machine": "/path2/on/local/machine",
 }
 
@@ -142,7 +142,7 @@ rsync_filter: []
 initialization_commands: []
 
 # List of shell commands to run to set up nodes.
-setup_commands: []
+setup_commands:
 #    - pip uninstall -y ray
 #    - cd ~/alipay/ray/python/dist
 #    - pip install -U "ray[cluster] @ ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl"
@@ -166,7 +166,7 @@ setup_commands: []
 #    - npm install
 #    - npm run build
 #    - popd
-#    - pip -V
+    - pip -V
 #    - cd ray/python && pip install -e . --verbose
 
 #export PATH=~/anaconda3/bin:$PATH

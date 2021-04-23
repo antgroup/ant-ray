@@ -143,20 +143,20 @@ initialization_commands: []
 
 # List of shell commands to run to set up nodes.
 setup_commands:
-    - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    - rm -rf ~/miniconda3
-    - bash Miniconda3-latest-Linux-x86_64.sh
-    - export PATH=~/miniconda3/bin:$PATH
-    - source ~/.bashrc
-    - conda --version
-    - rm -rf Miniconda3-latest-Linux-x86_64.sh
-    - conda create -n Ray python=3.6
-    - conda env list
-    - conda activate Ray
-    - pip -V
-    - pip uninstall -y ray
+#    - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+#    - rm -rf ~/miniconda3
+#    - bash Miniconda3-latest-Linux-x86_64.sh
+#    - export PATH=~/miniconda3/bin:$PATH
+#    - source ~/.bashrc
+#    - conda --version
+#    - rm -rf Miniconda3-latest-Linux-x86_64.sh
+#    - conda create -n Ray python=3.6
+#    - conda env list
+#    - conda activate Ray
+    - pip3 -V
+    - pip3 uninstall -y ray
     - pushd ~/alipay/ray/python/dist
-    - pip install -U ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
+    - pip3 install -U ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
     - which ray
     - popd
 #    - sudo apt-get update

@@ -84,13 +84,13 @@ class AcsClient:
         tags,
         security_group_id,
         vswitch_id,
-        amount = 1,
+        key_pair_name,
+        amount=1,
         optimized='optimized',
         instance_charge_type='PostPaid',
         spot_strategy='SpotWithPriceLimit',
         internet_charge_type='PayByTraffic',
         internet_max_bandwidth_out=1,
-        key_pair_name='id_rsa.pub'
     ):
         request = RunInstancesRequest()
         request.set_InstanceType(instance_type)

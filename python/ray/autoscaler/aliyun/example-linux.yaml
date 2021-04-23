@@ -143,39 +143,14 @@ initialization_commands: []
 
 # List of shell commands to run to set up nodes.
 setup_commands:
-#    - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-#    - rm -rf ~/miniconda3
-#    - bash Miniconda3-latest-Linux-x86_64.sh
-#    - export PATH=~/miniconda3/bin:$PATH
-#    - source ~/.bashrc
-#    - conda --version
-#    - rm -rf Miniconda3-latest-Linux-x86_64.sh
-#    - conda create -n Ray python=3.6
-#    - conda env list
-#    - conda activate Ray
+    - sudo apt-get update
+    - sudo apt-get install python3-pip
     - pip3 -V
     - pip3 uninstall -y ray
     - pushd ~/alipay/ray/python/dist
     - pip3 install -U ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
     - which ray
     - popd
-#    - sudo apt-get update
-#    - sudo apt-get install -y build-essential curl unzip psmisc
-
-#    - pip install cython==0.29.14 pytest
-#    - apt install git
-#    - git clone -b zhuang_aliyun git@github.com:alipay/ray.git
-#    - apt install npm
-#    - ray/ci/travis/install-bazel.sh
-#    - pushd ray/dashboard/client
-#    - npm install
-#    - npm run build
-#    - popd
-#    - pip -V
-#    - cd ray/python && pip install -e . --verbose
-
-#export PATH=~/anaconda3/bin:$PATH
-#source ~/.bashrc
 
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands: []

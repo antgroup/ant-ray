@@ -225,7 +225,7 @@ class AliyunNodeProvider(NodeProvider):
 
         reuse_nodes = self.acs.describe_instances(tags=filters)[:count]
         reuse_node_ids = [n.get('InstanceId') for n in reuse_nodes]
-        reused_nodes_dict = {n.get('InstanceId'): n for n in reuse_nodes}
+        # reused_nodes_dict = {n.get('InstanceId'): n for n in reuse_nodes}
 
         if reuse_nodes:
             with cli_logger.group("Stopping instances to reuse"):
@@ -235,13 +235,11 @@ class AliyunNodeProvider(NodeProvider):
                     if node.get('Status') is RUNNING:
                         self.acs.stop_instance(node_id)
 
-
             for node_id in reuse_node_ids:
                 self.acs.start_instance(node_id)
                 self.set_node_tags(node_id, tags)
 
             count -= len(reuse_node_ids)
-
 
         for k, v in tags.items():
             filters.append({
@@ -260,7 +258,6 @@ class AliyunNodeProvider(NodeProvider):
                 security_group_id=node_config['SecurityGroupId'],
             )
             instances = self.acs.describe_instances(instance_ids=instance_id_sets)
-
 
             if instances is not None:
                 for instance in instances:

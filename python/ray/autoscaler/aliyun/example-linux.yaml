@@ -152,9 +152,8 @@ setup_commands:
     - rm -rf Anaconda3-2020.07-Linux-x86_64.sh
     - conda create -n Ray python=3.6
     - conda activate Ray
-    - pushd
     - pip uninstall -y ray
-    - cd ~/alipay/ray/python/dist
+    - pushd ~/alipay/ray/python/dist
     - pip install -U "ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl"
     - popd
 #    - sudo apt-get update

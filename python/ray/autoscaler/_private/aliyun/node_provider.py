@@ -256,6 +256,7 @@ class AliyunNodeProvider(NodeProvider):
                 amount=count,
                 vswitch_id=node_config['VSwitchId'],
                 security_group_id=node_config['SecurityGroupId'],
+                key_pair_name=node_config['KeyPairName']
             )
             instances = self.acs.describe_instances(instance_ids=instance_id_sets)
 

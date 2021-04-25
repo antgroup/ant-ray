@@ -201,7 +201,7 @@ class AliyunNodeProvider(NodeProvider):
 
         filters = [
             {
-                "Name": "instance-state-name",
+                "Name": "Status",
                 "Values": ["stopped", "stopping"],
             },
             {
@@ -224,22 +224,19 @@ class AliyunNodeProvider(NodeProvider):
                 "Values": [tags[TAG_RAY_USER_NODE_TYPE]],
             })
 
-        reuse_nodes = self.acs.describe_instances(tags=filters)[:count]
-        # reuse_node_ids = [n.get('InstanceId') for n in reuse_nodes]
+        reuse_nodes_candidate = self.acs.describe_instances(tags=filters)[:count]
+        reuse_node_ids = []
         # reused_nodes_dict = {n.get('InstanceId'): n for n in reuse_nodes}
-
-        if reuse_nodes:
+        if reuse_nodes_candidate:
             with cli_logger.group("Stopping instances to reuse"):
-                for node in reuse_nodes:
-                    node_id = node.get('InstanceId')
-                    self.tag_cache[node_id] = node.get('Tags')
-                    self.set_node_tags(node_id, tags)
-                    if node.get('Status') == RUNNING:
-                        self.acs.reboot_instance(node_id)
-
+                for node in reuse_nodes_candidate:
                     if node.get('Status') == STOPPED:
+                        node_id = node.get('InstanceId')
+                        reuse_node_ids.append(node_id)
                         self.acs.start_instance(node_id)
-            count -= len(reuse_nodes)
+                        self.tag_cache[node_id] = node.get('Tags')
+                        self.set_node_tags(node_id, tags)
+            count -= len(reuse_node_ids)
 
         for k, v in tags.items():
             filters.append({

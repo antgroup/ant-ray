@@ -76,7 +76,7 @@ available_node_types:
     ray.worker.default:
         # The minimum number of nodes of this type to launch.
         # This number should be >= 0.
-        min_workers: 1
+        min_workers: 2
         # The node type's CPU and GPU resources are auto-detected based on AWS instance type.
         # If desired, you can override the autodetected CPU and GPU resources advertised to the autoscaler.
         # You can also set custom resources.
@@ -109,7 +109,7 @@ head_node_type: ray.head.default
 # Files or directories to copy to the head and worker nodes. The format is a
 # dictionary from REMOTE_PATH: LOCAL_PATH, e.g.
 file_mounts: {
-    "~/alipay/ray": "~/alipay/ray",
+    "~":"~/alipay/ray/python/dist/ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl"
 #    "/path2/on/remote/machine": "/path2/on/local/machine",
 }
 
@@ -140,8 +140,12 @@ initialization_commands: []
 setup_commands:
     - sudo apt-get update
     - sudo apt-get install python3-pip
-    - pip3 -V
-    - pip3 install -U ~/alipay/ray/python/dist/ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
+    - pip3 install --upgrade pip
+    - pip -V
+    - pip install -U ~/ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
+    - pip install aliyun-python-sdk-core
+    - pip install aliyun-python-sdk-ecs
+
 
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands: []

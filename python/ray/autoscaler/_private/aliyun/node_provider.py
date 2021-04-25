@@ -234,13 +234,10 @@ class AliyunNodeProvider(NodeProvider):
                     node_id = node.get('InstanceId')
                     self.tag_cache[node_id] = node.get('Tags')
                     self.set_node_tags(node_id, tags)
-                    print('node_id:' + node_id)
-                    print('node status:' + node.get('Status'))
                     if node.get('Status') == RUNNING:
                         self.acs.reboot_instance(node_id)
 
                     if node.get('Status') == STOPPED:
-                        print('start instance')
                         self.acs.start_instance(node_id)
             count -= len(reuse_nodes)
 

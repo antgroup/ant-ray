@@ -5,11 +5,6 @@ cluster_name: default
 # node.
 max_workers: 2
 
-# The minimum number of workers nodes to launch in addition to the head
-# node. This number should be >= 0.
-# Typically, min_workers == max_workers == len(worker_ips).
-min_workers: 2
-
 # The autoscaler will scale up the cluster faster with higher upscaling speed.
 # E.g., if the task requires adding more nodes then autoscaler will gradually
 # scale up the cluster in chunks of upscaling_speed*currently_running_nodes.
@@ -81,7 +76,7 @@ available_node_types:
     ray.worker.default:
         # The minimum number of nodes of this type to launch.
         # This number should be >= 0.
-        min_workers: 0
+        min_workers: 2
         # The node type's CPU and GPU resources are auto-detected based on AWS instance type.
         # If desired, you can override the autodetected CPU and GPU resources advertised to the autoscaler.
         # You can also set custom resources.

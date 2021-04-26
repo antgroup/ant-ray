@@ -28,6 +28,15 @@ TAG_BATCH_DELAY = 1
 STOPPING_NODE_DELAY = 1
 
 
+# def to_aliyun_format(tags):
+#     """Convert the Ray node name tag to the Aliyun-specific 'Name' tag."""
+#
+#     if TAG_RAY_NODE_NAME in tags:
+#         tags["Name"] = tags[TAG_RAY_NODE_NAME]
+#         del tags[TAG_RAY_NODE_NAME]
+#     return tags
+
+
 class AliyunNodeProvider(NodeProvider):
     def __init__(self, provider_config, cluster_name):
         NodeProvider.__init__(self, provider_config, cluster_name)
@@ -70,24 +79,20 @@ class AliyunNodeProvider(NodeProvider):
     def non_terminated_nodes(self, tag_filters: Dict[str, str]) -> List[str]:
         tags = [
             {
-                "Name": "instance-state-name",
-                "Values": ["pending", "running"],
-            },
-            {
-                "Name": "tag:{}".format(TAG_RAY_CLUSTER_NAME),
-                "Values": [self.cluster_name],
+                "Key": TAG_RAY_CLUSTER_NAME,
+                "Value": self.cluster_name,
             },
         ]
         for k, v in tag_filters.items():
             tags.append({
-                "Name": "tag:{}".format(k),
-                "Values": [v],
+                "Key": k,
+                "Value": v,
             })
 
         instances = self.acs.describe_instances(tags=tags)
         non_terminated_instance = []
         for instance in instances:
-            if instance.get('Status') != STOPPED and instance.get('Status') != STOPPING:
+            if instance.get('Status') == RUNNING or instance.get('Status') == PENDING:
                 non_terminated_instance.append(instance.get('InstanceId'))
                 self.cached_nodes[instance.get('InstanceId')] = instance
         return non_terminated_instance
@@ -201,16 +206,16 @@ class AliyunNodeProvider(NodeProvider):
 
         filter_tags = [
             {
-                "Name": "tag:{}".format(TAG_RAY_CLUSTER_NAME),
-                "Values": self.cluster_name,
+                "Key": TAG_RAY_CLUSTER_NAME,
+                "Value": self.cluster_name,
             },
             {
-                "Name": "tag:{}".format(TAG_RAY_NODE_KIND),
-                "Values": tags[TAG_RAY_NODE_KIND],
+                "Key": TAG_RAY_NODE_KIND,
+                "Value": tags[TAG_RAY_NODE_KIND],
             },
             {
-                "Name": "tag:{}".format(TAG_RAY_LAUNCH_CONFIG),
-                "Values": tags[TAG_RAY_LAUNCH_CONFIG],
+                "Key": TAG_RAY_LAUNCH_CONFIG,
+                "Value": tags[TAG_RAY_LAUNCH_CONFIG],
             },
         ]
 
@@ -218,8 +223,8 @@ class AliyunNodeProvider(NodeProvider):
 
         if TAG_RAY_USER_NODE_TYPE in tags:
             filter_tags.append({
-                "Name": "tag:{}".format(TAG_RAY_USER_NODE_TYPE),
-                "Values": tags[TAG_RAY_USER_NODE_TYPE],
+                "Key": TAG_RAY_USER_NODE_TYPE,
+                "Value": tags[TAG_RAY_USER_NODE_TYPE],
             })
 
         logger.info('filter tags %s' % filter_tags)
@@ -265,7 +270,6 @@ class AliyunNodeProvider(NodeProvider):
                 for instance in instances:
                     # print(instance.get('Status'))
                     created_nodes_dict[instance.get('InstanceId')] = instance
-        logger.info(created_nodes_dict)
         return created_nodes_dict
 
     def terminate_node(self, node_id: str) -> None:

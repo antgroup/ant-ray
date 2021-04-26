@@ -229,7 +229,7 @@ class AliyunNodeProvider(NodeProvider):
 
         logger.info('filter tags %s' % filter_tags)
 
-        reuse_nodes_candidate = self.acs.describe_instances(tags=filter_tags)[:count]
+        reuse_nodes_candidate = self.acs.describe_instances(tags=filter_tags)
         reuse_node_ids = []
         # reused_nodes_dict = {n.get('InstanceId'): n for n in reuse_nodes}
         if reuse_nodes_candidate:
@@ -248,6 +248,8 @@ class AliyunNodeProvider(NodeProvider):
                     self.acs.start_instance(node_id)
                     self.tag_cache[node_id] = node.get('Tags')
                     self.set_node_tags(node_id, tags)
+                    if len(reuse_node_ids) == count:
+                        break
             count -= len(reuse_node_ids)
 
         created_nodes_dict = dict()

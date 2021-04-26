@@ -184,6 +184,8 @@ class StandardAutoscaler:
             nodes_allowed_to_terminate = self._get_nodes_allowed_to_terminate(
                 sorted_node_ids)
 
+        logger.info(nodes_allowed_to_terminate)
+
         for node_id in sorted_node_ids:
             # Make sure to not kill idle node types if the number of workers
             # of that type is lower/equal to the min_workers of that type

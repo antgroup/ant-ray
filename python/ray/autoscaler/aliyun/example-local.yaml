@@ -109,7 +109,7 @@ head_node_type: ray.head.default
 # Files or directories to copy to the head and worker nodes. The format is a
 # dictionary from REMOTE_PATH: LOCAL_PATH, e.g.
 file_mounts: {
-#    "~/alipay/ray": "~/alipay/ray",
+    "~/dist":"~/Github/alipay/ray/python/dist"
 #    "/path2/on/remote/machine": "/path2/on/local/machine",
 }
 
@@ -137,11 +137,14 @@ rsync_filter: []
 initialization_commands: []
 
 # List of shell commands to run to set up nodes.
-setup_commands: []
-#    - sudo apt-get update
-#    - sudo apt-get install python3-pip
-#    - pip3 -V
-#    - pip3 install -U ~/alipay/ray/python/dist/ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
+setup_commands:
+    - sudo apt-get update
+    - sudo apt-get install python3-pip
+    - pip3 install --upgrade pip
+    - pip -V
+    - pip install -U ~/dist/ray-2.0.0.dev0-cp36-cp36m-macosx_11_0_x86_64.whl
+    - pip install aliyun-python-sdk-core
+    - pip install aliyun-python-sdk-ecs
 
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands: []

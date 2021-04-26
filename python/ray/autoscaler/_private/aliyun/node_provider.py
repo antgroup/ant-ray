@@ -202,23 +202,27 @@ class AliyunNodeProvider(NodeProvider):
         filter_tags = [
             {
                 "Name": "tag:{}".format(TAG_RAY_CLUSTER_NAME),
-                "Values": [self.cluster_name],
+                "Values": self.cluster_name,
             },
             {
                 "Name": "tag:{}".format(TAG_RAY_NODE_KIND),
-                "Values": [tags[TAG_RAY_NODE_KIND]],
+                "Values": tags[TAG_RAY_NODE_KIND],
             },
             {
                 "Name": "tag:{}".format(TAG_RAY_LAUNCH_CONFIG),
-                "Values": [tags[TAG_RAY_LAUNCH_CONFIG]],
+                "Values": tags[TAG_RAY_LAUNCH_CONFIG],
             },
         ]
+
+        logger.info('tags %s' % tags)
 
         if TAG_RAY_USER_NODE_TYPE in tags:
             filter_tags.append({
                 "Name": "tag:{}".format(TAG_RAY_USER_NODE_TYPE),
-                "Values": [tags[TAG_RAY_USER_NODE_TYPE]],
+                "Values": tags[TAG_RAY_USER_NODE_TYPE],
             })
+
+        logger.info('filter tags %s' % filter_tags)
 
         reuse_nodes_candidate = self.acs.describe_instances(tags=filter_tags)[:count]
         reuse_node_ids = []
@@ -234,17 +238,12 @@ class AliyunNodeProvider(NodeProvider):
                         while self.acs.describe_instances(instance_ids=[node_id])[0].get('Status') == STOPPING:
                             logging.info("wait for %s stop" % node_id)
                             time.sleep(STOPPING_NODE_DELAY)
+                    print('reuse %s' % node_id)
                     reuse_node_ids.append(node_id)
                     self.acs.start_instance(node_id)
                     self.tag_cache[node_id] = node.get('Tags')
                     self.set_node_tags(node_id, tags)
             count -= len(reuse_node_ids)
-
-        for k, v in tags.items():
-            filter_tags.append({
-                "Name": "tag:{}".format(k),
-                "Values": [v],
-            })
 
         created_nodes_dict = dict()
         if count > 0:
@@ -261,9 +260,9 @@ class AliyunNodeProvider(NodeProvider):
 
             if instances is not None:
                 for instance in instances:
-                    print(instance.get('Status'))
+                    # print(instance.get('Status'))
                     created_nodes_dict[instance.get('InstanceId')] = instance
-
+        logger.info(created_nodes_dict)
         return created_nodes_dict
 
     def terminate_node(self, node_id: str) -> None:

@@ -243,7 +243,7 @@ class AliyunNodeProvider(NodeProvider):
                         while self.acs.describe_instances(instance_ids=[node_id])[0].get('Status') == STOPPING:
                             logging.info("wait for %s stop" % node_id)
                             time.sleep(STOPPING_NODE_DELAY)
-                    print('reuse %s' % node_id)
+                    logger.info('reuse %s' % node_id)
                     reuse_node_ids.append(node_id)
                     self.acs.start_instance(node_id)
                     self.tag_cache[node_id] = node.get('Tags')
@@ -272,9 +272,11 @@ class AliyunNodeProvider(NodeProvider):
         return created_nodes_dict
 
     def terminate_node(self, node_id: str) -> None:
+        logger.info('terminate node: %s' % node_id)
         self.acs.stop_instance(node_id)
 
     def terminate_nodes(self, node_ids: List[str]) -> None:
+        logger.info('terminate nodes: %s' % node_ids)
         self.acs.stop_instances(node_ids)
 
     def _get_node(self, node_id):

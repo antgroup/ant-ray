@@ -134,20 +134,19 @@ class AliyunNodeProvider(NodeProvider):
             if instance.get('PublicIpAddress') is not None and instance.get('PublicIpAddress').get('IpAddress') is not None:
                 if len(instance.get('PublicIpAddress').get('IpAddress')) > 0:
                     return instance.get('PublicIpAddress').get('IpAddress')[0]
-            cli_logger.error("PublicIpAddress attribute is not exist")
+            cli_logger.error("{}: PublicIpAddress attribute is not exist".format(instance))
             return None
         return None
 
     def internal_ip(self, node_id: str) -> str:
         instances = self.acs.describe_instances(instance_ids=[node_id])
         if instances is not None:
-            assert len(instances)
+            assert len(instances) == 1
             instance = instances[0]
-            if instance.get('PrivateIpSets') is not None and instance.get('PrivateIpSets').get('PrivateIpSet') is not None and len(instance.get('PrivateIpSets').get('PrivateIpSet')) > 0:
-                if instance.get('PrivateIpSets').get('PrivateIpSet')[0].get('Primary'):
-                    return instance.get('PrivateIpSets').get('PrivateIpSet')[0].get('PrivateIpAddress')
-            cli_logger.error("InnerIpAddress attribute is not exist")
-            return ""
+            if instance.get('VpcAttributes') is not None and instance.get('VpcAttributes').get('PrivateIpAddress') is not None and len(instance.get('VpcAttributes').get('PrivateIpAddress').get('IpAddress')) > 0:
+                return instance.get('VpcAttributes').get('PrivateIpAddress').get('IpAddress')[0]
+            cli_logger.error("{}: InnerIpAddress attribute is not exist".format(instance))
+            return None
         return None
 
     def set_node_tags(self, node_id: str, tags: Dict[str, str]) -> None:

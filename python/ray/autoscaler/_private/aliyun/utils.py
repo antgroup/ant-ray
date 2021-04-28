@@ -19,6 +19,7 @@ from aliyunsdkecs.request.v20140526.DescribeKeyPairsRequest import DescribeKeyPa
 from aliyunsdkecs.request.v20140526.CreateKeyPairRequest import CreateKeyPairRequest
 from aliyunsdkecs.request.v20140526.RunInstancesRequest import RunInstancesRequest
 from aliyunsdkecs.request.v20140526.CreateSecurityGroupRequest import CreateSecurityGroupRequest
+from aliyunsdkecs.request.v20140526.DescribeSecurityGroupsRequest import DescribeSecurityGroupsRequest
 from aliyunsdkecs.request.v20140526.CreateVSwitchRequest import CreateVSwitchRequest
 from aliyunsdkecs.request.v20140526.CreateVpcRequest import CreateVpcRequest
 from aliyunsdkecs.request.v20140526.DescribeZonesRequest import DescribeZonesRequest
@@ -122,6 +123,19 @@ class AcsClient:
             return security_group_id
         return None
 
+    def describe_security_groups(self, vpc_id=None, tags=None):
+        request = DescribeSecurityGroupsRequest()
+        if vpc_id is not None:
+            request.set_VpcId(vpc_id)
+        if tags is not None:
+            request.set_Tags(tags)
+        response = self._send_request(request)
+        if response is not None:
+            security_groups = response.get('SecurityGroups').get('SecurityGroup')
+            return security_groups
+        logging.error("describe security group failed.")
+        return None
+
     def create_vswitch(self, vpc_id):
         request = CreateVSwitchRequest()
         request.set_ZoneId('cn-hangzhou-b')
@@ -218,7 +232,7 @@ class AcsClient:
         if response is not None:
             logging.info("Create Key Pair %s Successfully", response.get('KeyPairId'))
         else:
-            logging.error("Create Key Pait Failed")
+            logging.error("Create Key Pair Failed")
 
     def import_key_pair(self, key_pair_name, public_key_body):
         request = ImportKeyPairRequest()

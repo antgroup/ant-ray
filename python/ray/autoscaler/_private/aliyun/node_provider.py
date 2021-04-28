@@ -254,8 +254,9 @@ class AliyunNodeProvider(NodeProvider):
         created_nodes_dict = dict()
         if count > 0:
 
-            if node_config['SecurityGroupId'] is None:
-                self.acs.
+            # TODO sovled non-security group
+            # if node_config['SecurityGroupId'] is None:
+            #     self.acs.describe_instances()
             # Create SecurityGroupId
 
 

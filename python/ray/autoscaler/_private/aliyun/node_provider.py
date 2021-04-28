@@ -298,3 +298,7 @@ class AliyunNodeProvider(NodeProvider):
             return self.cached_nodes[node_id]
 
         return self._get_node(node_id)
+
+    @staticmethod
+    def bootstrap_config(cluster_config):
+        return bootstrap_aliyun(cluster_config)

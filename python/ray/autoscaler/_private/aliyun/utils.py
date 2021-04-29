@@ -136,14 +136,13 @@ class AcsClient:
         logging.error("describe security group failed.")
         return None
 
-    def create_vswitch(self, vpc_id):
+    def create_vswitch(self, vpc_id, zone_id, cidr_block):
         request = CreateVSwitchRequest()
-        request.set_ZoneId('cn-hangzhou-b')
+        request.set_ZoneId(zone_id)
         request.set_VpcId(vpc_id)
-        request.set_CidrBlock('172.16.0.0/24')
+        request.set_CidrBlock(cidr_block)
         response = self._send_request(request)
         if response is not None:
-            print(response)
             return response.get('VSwitchId')
         else:
             logging.error("create_vswitch vpc_id %s failed.", vpc_id)

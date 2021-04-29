@@ -46,7 +46,7 @@ class AliyunNodeProvider(NodeProvider):
 
             self.acs_fail_fast = AcsClient(
                 access_key=access_key,
-                access_key_secret=ccess_key_secret,
+                access_key_secret=access_key_secret,
                 region=provider_config["region"],
                 max_retries=1,
             )

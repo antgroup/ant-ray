@@ -109,7 +109,7 @@ head_node_type: ray.head.default
 # Files or directories to copy to the head and worker nodes. The format is a
 # dictionary from REMOTE_PATH: LOCAL_PATH, e.g.
 file_mounts: {
-    # "~/dist":"~/alipay/ray/python/dist"
+     "~/dist":"~/alipay/ray/python/dist"
 #    "/path2/on/remote/machine": "/path2/on/local/machine",
 }
 
@@ -139,8 +139,9 @@ initialization_commands: []
 # List of shell commands to run to set up nodes.
 setup_commands:
     - sudo apt-get update
-    - sudo apt-get install python3-pip
+    - sudo apt-get install python3-pip --yes
     - pip3 install --upgrade pip
+    - pip install -U ~/dist/ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
     - pip install aliyun-python-sdk-core
     - pip install aliyun-python-sdk-ecs
 
@@ -154,7 +155,7 @@ worker_setup_commands: []
 # Command to start ray on the head node. You don't need to change this.
 head_start_ray_commands:
     - ray stop
-    - ulimit -n 65536; ray start --head --port=6379 --object-manager-port=8076 --dashboard-host=172.16.0.233  --autoscaling-config=~/ray_bootstrap_config.yaml
+    - ulimit -n 65536; ray start --head --port=6379 --object-manager-port=8076 --dashboard-host=0.0.0.0  --autoscaling-config=~/ray_bootstrap_config.yaml
 
 # Command to start ray on worker nodes. You don't need to change this.
 worker_start_ray_commands:

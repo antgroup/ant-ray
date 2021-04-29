@@ -28,15 +28,6 @@ TAG_BATCH_DELAY = 1
 STOPPING_NODE_DELAY = 1
 
 
-# def to_aliyun_format(tags):
-#     """Convert the Ray node name tag to the Aliyun-specific 'Name' tag."""
-#
-#     if TAG_RAY_NODE_NAME in tags:
-#         tags["Name"] = tags[TAG_RAY_NODE_NAME]
-#         del tags[TAG_RAY_NODE_NAME]
-#     return tags
-
-
 class AliyunNodeProvider(NodeProvider):
     def __init__(self, provider_config, cluster_name):
         NodeProvider.__init__(self, provider_config, cluster_name)
@@ -218,15 +209,11 @@ class AliyunNodeProvider(NodeProvider):
             },
         ]
 
-        logger.info('tags %s' % tags)
-
         if TAG_RAY_USER_NODE_TYPE in tags:
             filter_tags.append({
                 "Key": TAG_RAY_USER_NODE_TYPE,
                 "Value": tags[TAG_RAY_USER_NODE_TYPE],
             })
-
-        logger.info('filter tags %s' % filter_tags)
 
         reuse_nodes_candidate = self.acs.describe_instances(tags=filter_tags)
         reuse_node_ids = []

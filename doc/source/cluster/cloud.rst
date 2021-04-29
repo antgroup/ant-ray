@@ -115,7 +115,7 @@ AWS/GCP/Azure/Aliyun
 
     .. group-tab:: Aliyun
 
-        First, you need to configure your aliyun account. You will get access key and access key secret.
+        First, you need to configure your aliyun account. You need to set access key in ``~/.ssh/aliyun_access_key`` and access key secret in ``~/.ssh/aliyun_access_secret``.
 
         Second, you need to configure a `VPC <https://vpc.console.aliyun.com/vpc/cn-hangzhou/vpcs>`__ and then use the VpcId to configure a `VSwitch <https://vpc.console.aliyun.com/vpc/cn-hangzhou/switches>`__. Once set up the vpc and switches, set the VpcId and VSwitchId in yaml file.
 

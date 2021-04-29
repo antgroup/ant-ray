@@ -1,3 +1,4 @@
+import os.path
 import random
 import copy
 import threading
@@ -33,19 +34,24 @@ class AliyunNodeProvider(NodeProvider):
         NodeProvider.__init__(self, provider_config, cluster_name)
         self.cache_stopped_nodes = provider_config.get("cache_stopped_nodes",
                                                        True)
-        self.acs = AcsClient(
-            access_key=provider_config["access_key"],
-            access_key_secret=provider_config["access_key_secret"],
-            region=provider_config["region"],
-            max_retries=BOTO_MAX_RETRIES,
-        )
+        try:
+            access_key = open(os.path.expanduser(provider_config["access_key"])).read()
+            access_key_secret = open(os.path.expanduser(provider_config["access_key_secret"])).read()
+            self.acs = AcsClient(
+                access_key=access_key,
+                access_key_secret=access_key_secret,
+                region=provider_config["region"],
+                max_retries=BOTO_MAX_RETRIES,
+            )
 
-        self.acs_fail_fast = AcsClient(
-            access_key=provider_config["access_key"],
-            access_key_secret=provider_config["access_key_secret"],
-            region=provider_config["region"],
-            max_retries=1,
-        )
+            self.acs_fail_fast = AcsClient(
+                access_key=access_key,
+                access_key_secret=ccess_key_secret,
+                region=provider_config["region"],
+                max_retries=1,
+            )
+        except FileNotFoundError:
+            cli_logger.error("Please set aliyun access key or secret in {} and {}".format(provider_config["access_key"], provider_config["access_key_secret"]))
 
         # Try availability zones round-robin, starting from random offset
         self.subnet_idx = random.randint(0, 100)
@@ -293,6 +299,6 @@ class AliyunNodeProvider(NodeProvider):
 
         return self._get_node(node_id)
 
-    @staticmethod
-    def bootstrap_config(cluster_config):
-        return bootstrap_aliyun(cluster_config)
+    # @staticmethod
+    # def bootstrap_config(cluster_config):
+    #     return bootstrap_aliyun(cluster_config)

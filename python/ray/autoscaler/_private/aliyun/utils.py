@@ -24,6 +24,7 @@ from aliyunsdkecs.request.v20140526.CreateVSwitchRequest import CreateVSwitchReq
 from aliyunsdkecs.request.v20140526.CreateVpcRequest import CreateVpcRequest
 from aliyunsdkecs.request.v20140526.DescribeZonesRequest import DescribeZonesRequest
 from aliyunsdkecs.request.v20140526.DescribeVpcsRequest import DescribeVpcsRequest
+from aliyunsdkecs.request.v20140526.DescribeVSwitchesRequest import DescribeVSwitchesRequest
 from aliyunsdkecs.request.v20140526.RebootInstanceRequest import RebootInstanceRequest
 
 
@@ -115,8 +116,9 @@ class AcsClient:
         logging.error("instance created failed.")
         return None
 
-    def create_security_group(self):
+    def create_security_group(self, vpc_id):
         request = CreateSecurityGroupRequest()
+        request.set_VpcId(vpc_id)
         response = self._send_request(request)
         if response is not None:
             security_group_id = response.get('SecurityGroupId')
@@ -136,7 +138,7 @@ class AcsClient:
         logging.error("describe security group failed.")
         return None
 
-    def create_vswitch(self, vpc_id, zone_id, cidr_block):
+    def create_v_switch(self, vpc_id, zone_id, cidr_block):
         request = CreateVSwitchRequest()
         request.set_ZoneId(zone_id)
         request.set_VpcId(vpc_id)
@@ -145,7 +147,7 @@ class AcsClient:
         if response is not None:
             return response.get('VSwitchId')
         else:
-            logging.error("create_vswitch vpc_id %s failed.", vpc_id)
+            logging.error("create_v_switch vpc_id %s failed.", vpc_id)
         return None
 
     def create_vpc(self):
@@ -271,6 +273,17 @@ class AcsClient:
             return response.get('Results').get('Result')
         else:
             logging.error("instance %s attach_key_pair failed.", instance_ids)
+            return None
+
+    def describe_v_switches(self, vpc_id=None):
+        request = DescribeVSwitchesRequest()
+        if vpc_id is not None:
+            request.set_VpcId(vpc_id)
+        response = self._send_request(request)
+        if response is not None:
+            return response.get('VSwitches').get('VSwitch')
+        else:
+            logging.error("Describe VSwitches Failed.")
             return None
 
     def _send_request(self, request):

@@ -14,14 +14,12 @@ from ray.autoscaler.tags import TAG_RAY_CLUSTER_NAME, TAG_RAY_NODE_NAME, \
     TAG_RAY_LAUNCH_CONFIG, TAG_RAY_NODE_KIND, TAG_RAY_USER_NODE_TYPE
 from ray.autoscaler._private.constants import BOTO_MAX_RETRIES, \
     BOTO_CREATE_MAX_RETRIES
-# from ray.autoscaler._private.aws.config import bootstrap_aws
 from ray.autoscaler._private.log_timer import LogTimer
 
-# from ray.autoscaler._private.aws.utils import boto_exception_handler
 from ray.autoscaler._private.cli_logger import cli_logger, cf
 
 from ray.autoscaler._private.aliyun.utils import AcsClient
-from ray.autoscaler._private.aliyun.config import PENDING, STOPPED, STARTING, STOPPING, RUNNING
+from ray.autoscaler._private.aliyun.config import PENDING, STOPPED, STARTING, STOPPING, RUNNING, bootstrap_aliyun
 
 logger = logging.getLogger(__name__)
 
@@ -34,23 +32,16 @@ class AliyunNodeProvider(NodeProvider):
         NodeProvider.__init__(self, provider_config, cluster_name)
         self.cache_stopped_nodes = provider_config.get("cache_stopped_nodes",
                                                        True)
-
-        with open(os.path.expanduser(provider_config["access_key"])) as f:
-            access_key = f.readline().strip('\n')
-        
-        with open(os.path.expanduser(provider_config["access_key_secret"])) as f:
-            access_key_secret = f.readline().strip('\n')
-        
         self.acs = AcsClient(
-            access_key=access_key,
-            access_key_secret=access_key_secret,
+            access_key=provider_config["access_key"],
+            access_key_secret=provider_config["access_key_secret"],
             region=provider_config["region"],
             max_retries=BOTO_MAX_RETRIES,
         )
 
         self.acs_fail_fast = AcsClient(
-            access_key=access_key,
-            access_key_secret=access_key_secret,
+            access_key=provider_config["access_key"],
+            access_key_secret=provider_config["access_key_secret"],
             region=provider_config["region"],
             max_retries=1,
         )
@@ -253,9 +244,9 @@ class AliyunNodeProvider(NodeProvider):
                 image_id=node_config['ImageId'],
                 tags=filter_tags,
                 amount=count,
-                vswitch_id=node_config['VSwitchId'],
-                security_group_id=node_config['SecurityGroupId'],
-                key_pair_name=node_config['KeyPairName']
+                vswitch_id=self.provider_config['v_switch_id'],
+                security_group_id=self.provider_config['security_group_id'],
+                key_pair_name=self.provider_config['key_name']
             )
             instances = self.acs.describe_instances(instance_ids=instance_id_sets)
 
@@ -294,6 +285,6 @@ class AliyunNodeProvider(NodeProvider):
 
         return self._get_node(node_id)
 
-    # @staticmethod
-    # def bootstrap_config(cluster_config):
-    #     return bootstrap_aliyun(cluster_config)
+    @staticmethod
+    def bootstrap_config(cluster_config):
+        return bootstrap_aliyun(cluster_config)

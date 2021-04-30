@@ -1,4 +1,5 @@
 import logging
+import os
 
 from ray.autoscaler._private.aliyun.utils import AcsClient
 
@@ -19,7 +20,7 @@ def bootstrap_aliyun(config):
     # create vswitch
     _get_or_create_vswitch(config)
     # create key pair
-    _get_or_create_key_pair(config)
+    _get_or_import_key_pair(config)
     # print(config["provider"])
     return config
 
@@ -70,7 +71,7 @@ def _get_or_create_vswitch(config):
     if v_switch_id is not None:
         config["provider"]["v_switch_id"] = v_switch_id
 
-def _get_or_create_key_pair(config):
+def _get_or_import_key_pair(config):
     cli = _client(config)
     name = config["provider"].get('key_name', None)
 
@@ -80,12 +81,12 @@ def _get_or_create_key_pair(config):
 
     keypairs = cli.describe_key_pairs(key_pair_name=name)
     if keypairs is not None and len(keypairs) == 1:
-        config["provider"]["finger_print"] = keypairs[0].get('KeyPairFingerPrint')
         return
 
-    key_pair = cli.create_key_pair(name)
-    if key_pair is not None:
-        config["provider"]["private_key"] = key_pair.get('PrivateKeyBody')
+    with open(os.path.expanduser('~/.ssh/id_rsa.pub')) as f:
+        public_key = f.readline().strip('\n')
+        print(public_key)
+        cli.import_key_pair(key_pair_name=name, public_key_body=public_key)
 
 
 

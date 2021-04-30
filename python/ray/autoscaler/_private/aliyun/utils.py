@@ -295,5 +295,7 @@ class AcsClient:
             return response_detail
         except ClientException as e1:
             logging.error(e1)
+            return None
         except ServerException as e2:
             logging.error(e2)
+            return None

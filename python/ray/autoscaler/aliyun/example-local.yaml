@@ -30,9 +30,7 @@ provider:
     cache_stopped_nodes: True # If not present, the default is True.
     access_key: LTAI5t7d1X9zQfkZE1BYa7vB
     access_key_secret: yPnnFDcvX0t0CJKUzu116Ga4YMssHp
-#    VSwitchId: vsw-bp1yhnd9jcivg10ag6t0r
-#    SecurityGroupId: sg-bp1gslgq7cp2pe58qo13
-    key_name: id_rsa.pub
+    key_name: ray
 
 
 # How Ray will ç with newly launched nodes.
@@ -41,7 +39,7 @@ auth:
 # By default Ray creates a new private keypair, but you can also use your own.
 # If you do so, make sure to also set "KeyName" in the head and worker node
 # configurations below.
-#    ssh_private_key: ~/.ssh/id_rsa
+    ssh_private_key: ~/.ssh/id_rsa
 
 # Tell the autoscaler the allowed node types and the resources they provide.
 # The key is the name of the node type, which is just for debugging purposes.
@@ -87,9 +85,6 @@ available_node_types:
         node_config:
             InstanceType: ecs.n4.large
             ImageId: ubuntu_18_04_64_20G_alibase_20190624.vhd
-#            VpcId: vpc-bp1jyugjw15v5qt2soktg
-#            VSwitchId: vsw-bp1yhnd9jcivg10ag6t0r
-#            SecurityGroupId: sg-bp1gslgq7cp2pe58qo13
             # Run workers on spot by default. Comment this out to use on-demand.
             InstanceMarketOptions:
                 MarketType: spot

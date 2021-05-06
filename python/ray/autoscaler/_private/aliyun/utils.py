@@ -242,8 +242,10 @@ class AcsClient:
         response = self._send_request(request)
         if response is not None:
             logging.info("Create Key Pair %s Successfully", response.get('KeyPairId'))
+            return response
         else:
             logging.error("Create Key Pair Failed")
+            return None
 
     def import_key_pair(self, key_pair_name, public_key_body):
         request = ImportKeyPairRequest()

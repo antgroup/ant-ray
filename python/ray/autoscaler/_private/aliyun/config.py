@@ -1,5 +1,6 @@
 import logging
 import os
+import stat
 
 from ray.autoscaler._private.aliyun.utils import AcsClient
 
@@ -76,20 +77,25 @@ def _get_or_create_vswitch(config):
 
 def _get_or_import_key_pair(config):
     cli = _client(config)
-    name = config["provider"].get('key_name', None)
+    key_name = config['provider']['key_name']
 
-    if name is None:
-        logging.error("Please provide key_pair attribute")
-        return
-
-    keypairs = cli.describe_key_pairs(key_pair_name=name)
+    keypairs = cli.describe_key_pairs(key_pair_name=key_name)
     if keypairs is not None and len(keypairs) == 1:
+        config['auth']['ssh_private_key'] = '~/.ssh/{}'.format(key_name)
         return
 
-    with open(os.path.expanduser('~/.ssh/id_rsa.pub')) as f:
-        public_key = f.readline().strip('\n')
-        print(public_key)
-        cli.import_key_pair(key_pair_name=name, public_key_body=public_key)
+    if 'ssh_private_key' in config['auth']:
+        with open(os.path.expanduser(config['auth'].get('ssh_private_key') + '.pub')) as f:
+            public_key = f.readline().strip('\n')
+            cli.import_key_pair(key_pair_name=key_name, public_key_body=public_key)
+            return
+    else:
+        resp = cli.create_key_pair(key_pair_name=key_name)
+        with open(os.path.expanduser('~/.ssh/' + key_name), 'w+') as f:
+            f.write(resp.get('PrivateKeyBody'))
+        os.chmod(os.path.expanduser('~/.ssh/' + key_name), stat.S_IRUSR)
+        config['auth']['ssh_private_key'] = '~/.ssh/{}'.format(key_name)
+
 
 
 

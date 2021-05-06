@@ -31,8 +31,13 @@ provider:
     access_key: LTAI5t7d1X9zQfkZE1BYa7vB
     access_key_secret: yPnnFDcvX0t0CJKUzu116Ga4YMssHp
     key_name: ray
-#    VSwitchId: vsw-bp1yhnd9jcivg10ag6t0r
-#    SecurityGroupId: sg-bp1gslgq7cp2pe58qo13
+    security_group_rule:
+        - port_range: "22/22"
+          source_cidr_ip: "0.0.0.0/0"
+          ip_protocol: "tcp"
+        - port_range: "8265/8265"
+          source_cidr_ip: "0.0.0.0/0"
+          ip_protocol: "tcp"
 
 
 # How Ray will ç with newly launched nodes.

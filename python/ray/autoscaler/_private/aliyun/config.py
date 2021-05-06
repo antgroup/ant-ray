@@ -26,8 +26,8 @@ def bootstrap_aliyun(config):
 
 def _client(config):
     return AcsClient(
-        access_key=config["provider"]["access_key"],
-        access_key_secret=config["provider"]["access_key_secret"],
+        access_key=config["provider"].get("access_key"),
+        access_key_secret=config["provider"].get("access_key_secret"),
         region=config["provider"]["region"],
         max_retries=1,
     )
@@ -41,8 +41,7 @@ def _get_or_create_security_group(config):
 
     security_group_id = cli.create_security_group(vpc_id=config["provider"]["vpc_id"])
 
-    for rule in config["provider"]["security_group_rule"]:
-        print(rule)
+    for rule in config["provider"].get("security_group_rule", {}):
         cli.authorize_security_group(security_group_id=security_group_id, port_range=rule["port_range"], source_cidr_ip=rule["source_cidr_ip"], ip_protocol=rule["ip_protocol"])
     config["provider"]["security_group_id"] = security_group_id
     return

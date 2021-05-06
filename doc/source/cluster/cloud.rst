@@ -115,15 +115,9 @@ AWS/GCP/Azure/Aliyun
 
     .. group-tab:: Aliyun
 
-        First, you need to configure your aliyun account. You need to set access key in ``~/.ssh/aliyun_access_key`` and access key secret in ``~/.ssh/aliyun_access_secret``.
+        First, you need to configure your aliyun account. You need to set access key and access key secret in yaml config file.
 
-        Second, you need to configure a `VPC <https://vpc.console.aliyun.com/vpc/cn-hangzhou/vpcs>`__ and then use the VpcId to configure a `VSwitch <https://vpc.console.aliyun.com/vpc/cn-hangzhou/switches>`__. Once set up the vpc and switches, set the VpcId and VSwitchId in yaml file.
-
-        Third, you need to configure a `SecurityGroup <https://ecs.console.aliyun.com/?spm=5176.11182172.recommend.decs.60ec4882wQcY88#/securityGroup/region/cn-hangzhou>`__ and set the SecurityGroupId in yaml file.
-
-        Last, you need to configure ssh key in `KeyPair <https://ecs.console.aliyun.com/?spm=5176.11182172.recommend.decs.60ec4882wQcY88#/keyPair/region/cn-hangzhou>`__ and set the KeyPairName in yaml file.
-
-        Once above done, you should be ready to launch your cluster. The provided `ray/python/ray/autoscaler/aliyun/example-full.yaml <https://github.com/ray-project/ray/tree/master/python/ray/autoscaler/aliyun/example-full.yaml>`__ cluster config file will create a small cluster with an ecs.n4.large head node (on-demand) configured to autoscale up to two ecs.n4.large.
+        Once above done, you should be ready to launch your cluster. The provided `ray/python/ray/autoscaler/aliyun/example-full.yaml <https://github.com/alipay/ray/blob/zhuang_aliyun/python/ray/autoscaler/aliyun/example-full.yaml>`__ cluster config file will create a small cluster with an ecs.n4.large head node (on-demand) configured to autoscale up to two ecs.n4.large.
 
         Test that it works by running the following commands from your local machine:
 

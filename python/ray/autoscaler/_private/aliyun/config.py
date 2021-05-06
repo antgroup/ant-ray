@@ -81,23 +81,15 @@ def _get_or_import_key_pair(config):
 
     keypairs = cli.describe_key_pairs(key_pair_name=key_name)
     if keypairs is not None and len(keypairs) == 1:
-        if 'ssh_private_key' not in config['auth']:
-            config['auth']['ssh_private_key'] = '~/.ssh/{}'.format(key_name)
         return
 
-    if 'ssh_private_key' in config['auth']:
-        with open(os.path.expanduser(config['auth'].get('ssh_private_key') + '.pub')) as f:
+    if 'ssh_public_key' in config['auth']:
+        with open(os.path.expanduser(config['auth'].get('ssh_public_key'))) as f:
             public_key = f.readline().strip('\n')
             cli.import_key_pair(key_pair_name=key_name, public_key_body=public_key)
             return
     else:
-        resp = cli.create_key_pair(key_pair_name=key_name)
-        if os.path.exists(os.path.expanduser('~/.ssh/' + key_name)):
-            os.remove(os.path.expanduser('~/.ssh/' + key_name))
-        with open(os.path.expanduser('~/.ssh/' + key_name), 'w+') as f:
-            f.write(resp.get('PrivateKeyBody'))
-        os.chmod(os.path.expanduser('~/.ssh/' + key_name), stat.S_IRUSR)
-        config['auth']['ssh_private_key'] = '~/.ssh/{}'.format(key_name)
+        logging.error("Please set ssh public key")
 
 
 

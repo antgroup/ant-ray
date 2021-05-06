@@ -28,8 +28,8 @@ provider:
     # Whether to allow node reuse. If set to False, nodes will be terminated
     # instead of stopped.
     cache_stopped_nodes: True # If not present, the default is True.
-    access_key:
-    access_key_secret:
+    access_key: LTAI5t7d1X9zQfkZE1BYa7vB
+    access_key_secret: yPnnFDcvX0t0CJKUzu116Ga4YMssHp
     key_name: ray
     security_group_rule:
         - port_range: "22/22"
@@ -47,6 +47,7 @@ auth:
 # If you do so, make sure to also set "KeyName" in the head and worker node
 # configurations below.
     ssh_private_key: ~/.ssh/id_rsa
+    ssh_public_key: ~/.ssh/id_rsa.pub
 
 # Tell the autoscaler the allowed node types and the resources they provide.
 # The key is the name of the node type, which is just for debugging purposes.

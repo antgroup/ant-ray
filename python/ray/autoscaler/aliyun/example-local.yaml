@@ -31,6 +31,8 @@ provider:
     access_key: LTAI5t7d1X9zQfkZE1BYa7vB
     access_key_secret: yPnnFDcvX0t0CJKUzu116Ga4YMssHp
     key_name: ray
+#    VSwitchId: vsw-bp1yhnd9jcivg10ag6t0r
+#    SecurityGroupId: sg-bp1gslgq7cp2pe58qo13
 
 
 # How Ray will ç with newly launched nodes.
@@ -83,8 +85,9 @@ available_node_types:
         # For more documentation on available fields, see:
         # http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.ServiceResource.create_instances
         node_config:
-            InstanceType: ecs.n4.large
+            InstanceType: ecs.n4.2xlarge
             ImageId: ubuntu_18_04_64_20G_alibase_20190624.vhd
+#            KeyPairName: id_rsa.pub
             # Run workers on spot by default. Comment this out to use on-demand.
             InstanceMarketOptions:
                 MarketType: spot
@@ -100,7 +103,7 @@ head_node_type: ray.head.default
 # Files or directories to copy to the head and worker nodes. The format is a
 # dictionary from REMOTE_PATH: LOCAL_PATH, e.g.
 file_mounts: {
-#    "~/dist":"~/alipay/ray/python/dist"
+#    "~/dist":"~/alipay/ray/python/dist",
 #    "/path2/on/remote/machine": "/path2/on/local/machine",
 }
 
@@ -134,13 +137,11 @@ setup_commands:
     - wget https://repo.continuum.io/archive/Anaconda3-5.0.1-Linux-x86_64.sh || true
     - bash Anaconda3-5.0.1-Linux-x86_64.sh -b -p $HOME/anaconda3 || true
     - echo 'export PATH="$HOME/anaconda3/bin:$PATH"' >> ~/.bashrc
-    - pip -V
-    - python -V
     # Install Ray
-    - pip install -U ~/dist/ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
+#    - pip install -U ~/dist/ray-2.0.0.dev0-cp36-cp36m-linux_x86_64.whl
     # Install Aliyun skd
-    - pip install aliyun-python-sdk-core
-    - pip install aliyun-python-sdk-ecs
+#    - pip install aliyun-python-sdk-core
+#    - pip install aliyun-python-sdk-ecs
 
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands: []

@@ -19,6 +19,8 @@ from aliyunsdkecs.request.v20140526.DescribeKeyPairsRequest import DescribeKeyPa
 from aliyunsdkecs.request.v20140526.CreateKeyPairRequest import CreateKeyPairRequest
 from aliyunsdkecs.request.v20140526.RunInstancesRequest import RunInstancesRequest
 from aliyunsdkecs.request.v20140526.CreateSecurityGroupRequest import CreateSecurityGroupRequest
+from aliyunsdkecs.request.v20140526.ModifySecurityGroupRuleRequest import ModifySecurityGroupRuleRequest
+from aliyunsdkecs.request.v20140526.AuthorizeSecurityGroupRequest import AuthorizeSecurityGroupRequest
 from aliyunsdkecs.request.v20140526.DescribeSecurityGroupsRequest import DescribeSecurityGroupsRequest
 from aliyunsdkecs.request.v20140526.CreateVSwitchRequest import CreateVSwitchRequest
 from aliyunsdkecs.request.v20140526.CreateVpcRequest import CreateVpcRequest
@@ -137,6 +139,14 @@ class AcsClient:
             return security_groups
         logging.error("describe security group failed.")
         return None
+
+    def authorize_security_group(self, ip_protocol, port_range, security_group_id, source_cidr_ip):
+        request = AuthorizeSecurityGroupRequest()
+        request.set_IpProtocol(ip_protocol)
+        request.set_PortRange(port_range)
+        request.set_SecurityGroupId(security_group_id)
+        request.set_SourceCidrIp(source_cidr_ip)
+        self._send_request(request)
 
     def create_v_switch(self, vpc_id, zone_id, cidr_block):
         request = CreateVSwitchRequest()
@@ -294,8 +304,10 @@ class AcsClient:
             response_detail = json.loads(response_str)
             return response_detail
         except ClientException as e1:
+            logging.error(request.get_action_name())
             logging.error(e1)
             return None
         except ServerException as e2:
+            logging.error(request.get_action_name())
             logging.error(e2)
             return None

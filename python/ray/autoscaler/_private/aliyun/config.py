@@ -39,7 +39,9 @@ def _get_or_create_security_group(config):
         config["provider"]["security_group_id"] = security_groups[0]['SecurityGroupId']
         return config
 
-    security_group_id = cli.create_security_group(vpc_id=config["provider"]["VpcId"])
+    security_group_id = cli.create_security_group(vpc_id=config["provider"]["vpc_id"])
+    cli.authorize_security_group(security_group_id=security_group_id, port_range='22/22', source_cidr_ip='0.0.0.0/0', ip_protocol='tcp')
+    cli.authorize_security_group(security_group_id=security_group_id, port_range='8265/8265', source_cidr_ip='0.0.0.0/0', ip_protocol='tcp')
     config["provider"]["security_group_id"] = security_group_id
     return
 

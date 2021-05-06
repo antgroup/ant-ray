@@ -192,26 +192,16 @@ class AliyunNodeProvider(NodeProvider):
 
     def create_node(self, node_config: Dict[str, Any], tags: Dict[str, str],
                     count: int) -> Optional[Dict[str, Any]]:
-
         filter_tags = [
             {
                 "Key": TAG_RAY_CLUSTER_NAME,
                 "Value": self.cluster_name,
             },
-            {
-                "Key": TAG_RAY_NODE_KIND,
-                "Value": tags[TAG_RAY_NODE_KIND],
-            },
-            {
-                "Key": TAG_RAY_LAUNCH_CONFIG,
-                "Value": tags[TAG_RAY_LAUNCH_CONFIG],
-            },
         ]
-
-        if TAG_RAY_USER_NODE_TYPE in tags:
+        for k, v in tags.items():
             filter_tags.append({
-                "Key": TAG_RAY_USER_NODE_TYPE,
-                "Value": tags[TAG_RAY_USER_NODE_TYPE],
+                "Key": k,
+                "Value": v,
             })
 
         reuse_nodes_candidate = self.acs.describe_instances(tags=filter_tags)

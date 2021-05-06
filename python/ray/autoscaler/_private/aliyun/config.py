@@ -89,8 +89,15 @@ def _get_or_import_key_pair(config):
             cli.import_key_pair(key_pair_name=key_name, public_key_body=public_key)
             return
     else:
-        logging.error("Please set ssh public key")
-
+        resp = cli.create_key_pair(key_pair_name=key_name)
+        if resp is not None:
+            key_path = os.path.expanduser('~/.ssh/{}'.format(key_name))
+            with open(key_path, 'w+') as f:
+                f.write(resp.get('PrivateKeyBody'))
+            os.chmod(key_path, stat.S_IRUSR)
+            config['auth']['ssh_private_key'] = key_path
+            config["head_node"]["KeyName"] = key_name
+            config["worker_nodes"]["KeyName"] = key_name
 
 
 

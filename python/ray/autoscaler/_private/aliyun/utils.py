@@ -19,7 +19,7 @@ from aliyunsdkecs.request.v20140526.DescribeKeyPairsRequest import DescribeKeyPa
 from aliyunsdkecs.request.v20140526.CreateKeyPairRequest import CreateKeyPairRequest
 from aliyunsdkecs.request.v20140526.RunInstancesRequest import RunInstancesRequest
 from aliyunsdkecs.request.v20140526.CreateSecurityGroupRequest import CreateSecurityGroupRequest
-from aliyunsdkecs.request.v20140526.ModifySecurityGroupRuleRequest import ModifySecurityGroupRuleRequest
+from aliyunsdkecs.request.v20140526.DeleteKeyPairsRequest import DeleteKeyPairsRequest
 from aliyunsdkecs.request.v20140526.AuthorizeSecurityGroupRequest import AuthorizeSecurityGroupRequest
 from aliyunsdkecs.request.v20140526.DescribeSecurityGroupsRequest import DescribeSecurityGroupsRequest
 from aliyunsdkecs.request.v20140526.CreateVSwitchRequest import CreateVSwitchRequest
@@ -251,12 +251,12 @@ class AcsClient:
         request = ImportKeyPairRequest()
         request.set_KeyPairName(key_pair_name)
         request.set_PublicKeyBody(public_key_body)
-        response = self._send_request(request)
-        if response is not None:
-            print('import_key_pair: %s' % response)
-            logging.info("Import Key Pair Successfully")
-        else:
-            logging.error("Import Key Pair Failed")
+        self._send_request(request)
+
+    def delete_key_pairs(self, key_pair_names):
+        request = DeleteKeyPairsRequest()
+        request.set_KeyPairNames(key_pair_names)
+        self._send_request(request)
 
     def describe_key_pairs(self, key_pair_name=None):
         request = DescribeKeyPairsRequest()

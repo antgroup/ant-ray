@@ -63,7 +63,9 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
                        std::shared_ptr<gcs::GcsClient> gcs_client,
                        const WorkerCommandMap &worker_commands,
                        std::function<void()> starting_worker_timeout_callback,
-                       const std::function<double()> get_time)
+                       const std::function<double()> get_time,
+                       bool worker_process_in_container, const std::string temp_dir,
+                       const std::string session_dir)
     : io_service_(&io_service),
       node_id_(node_id),
       node_address_(node_address),
@@ -76,7 +78,10 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
           num_initial_python_workers_for_first_job, maximum_startup_concurrency)),
       num_initial_python_workers_for_first_job_(num_initial_python_workers_for_first_job),
       periodical_runner_(io_service),
-      get_time_(get_time) {
+      get_time_(get_time),
+      worker_process_in_container_(worker_process_in_container),
+      temp_dir_(temp_dir),
+      session_dir_(session_dir) {
   RAY_CHECK(maximum_startup_concurrency > 0);
   // We need to record so that the metric exists. This way, we report that 0
   // processes have started before a task runs on the node (as opposed to the
@@ -85,7 +90,13 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
 #ifndef _WIN32
   // Ignore SIGCHLD signals. If we don't do this, then worker processes will
   // become zombies instead of dying gracefully.
-  signal(SIGCHLD, SIG_IGN);
+
+  // When using container to start worker processes, we need to wait for
+  // container starting command to exit. The worker processes' parent process
+  // is OCI container runtime monitor.
+  if (!worker_process_in_container_) {
+    signal(SIGCHLD, SIG_IGN);
+  }
 #endif
   for (const auto &entry : worker_commands) {
     // Initialize the pool state for this language.
@@ -149,7 +160,8 @@ Process WorkerPool::StartWorkerProcess(
     const Language &language, const rpc::WorkerType worker_type, const JobID &job_id,
     const std::vector<std::string> &dynamic_options,
     const std::string &serialized_runtime_env,
-    std::unordered_map<std::string, std::string> override_environment_variables) {
+    std::unordered_map<std::string, std::string> override_environment_variables,
+    const ResourceSet &worker_resource) {
   rpc::JobConfig *job_config = nullptr;
   if (!IsIOWorkerType(worker_type)) {
     RAY_CHECK(!job_id.IsNil());
@@ -311,7 +323,12 @@ Process WorkerPool::StartWorkerProcess(
 
   // Start a process and measure the startup time.
   auto start = std::chrono::high_resolution_clock::now();
-  Process proc = StartProcess(worker_command_args, env);
+  Process proc;
+  if (worker_process_in_container_) {
+    proc = StartContainerProcess(worker_command_args, env, worker_resource, runtime_env);
+  } else {
+    proc = StartProcess(worker_command_args, env);
+  }
   auto end = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   stats::ProcessStartupTimeMs.Record(duration.count());
@@ -390,6 +407,99 @@ Process WorkerPool::StartProcess(const std::vector<std::string> &worker_command_
     }
   }
   return child;
+}
+
+Process WorkerPool::StartContainerProcess(
+    const std::vector<std::string> &worker_command_args, const ProcessEnvironment &env,
+    const ResourceSet &worker_resource, const ray::RuntimeEnv &runtime_env) {
+  // Launch the process to create the worker container.
+  std::vector<std::string> argv;
+  // TODO currently worker process will write log to stdout/stderr before initializing logger,
+  // and the worker process' stdout/stderr has been redirected to raylet.err by default.
+  // When starting worker process in container, worker process' stdout/stderr will be
+  // redirected to container log file.
+  // Should we redirect stdout/stderr to raylet.err?
+  argv.emplace_back("podman");
+  argv.emplace_back("run");
+  argv.emplace_back("--rm");
+  if (RAY_LOG_ENABLED(DEBUG)) {
+    argv.emplace_back("--log-level=debug");
+  }
+  // TODO set uid for container, for example: -u admin
+  argv.emplace_back("-d");
+  argv.emplace_back("-v");
+  argv.emplace_back(temp_dir_ + ":" + temp_dir_);
+  argv.emplace_back("--cgroup-manager=cgroupfs");
+  // drop SYS_ADMIN capability
+  argv.emplace_back("--cap-drop");
+  argv.emplace_back("SYS_ADMIN");
+  argv.emplace_back("--network=host");
+  argv.emplace_back("--pid=host");
+  argv.emplace_back("--ipc=host");
+  auto pid_file_random = UniqueID::FromRandom();
+  std::string container_pid_file_path =
+      session_dir_ + "/container/" + pid_file_random.Hex() + ".txt";
+  argv.emplace_back("--pidfile=" + container_pid_file_path);
+  if (!worker_resource.IsEmpty()) {
+    const FractionalResourceQuantity cpu_quantity =
+        worker_resource.GetResource(kCPU_ResourceLabel);
+    if (cpu_quantity.ToDouble() > 0) {
+      argv.emplace_back("--cpus=" + std::to_string(cpu_quantity.ToDouble()));
+    }
+    const FractionalResourceQuantity memory_quantity =
+        worker_resource.GetResource(kMemory_ResourceLabel);
+    if (memory_quantity.ToDouble() > 0) {
+      argv.emplace_back("--memory=" + std::to_string(memory_quantity.ToDouble()) + "b");
+    }
+  }
+  // inherite environment
+  argv.emplace_back("--env-host");
+  for (const auto &item : env) {
+    argv.emplace_back("--env");
+    argv.emplace_back(item.first + '=' + item.second);
+  }
+  argv.emplace_back("--entrypoint");
+  argv.emplace_back(worker_command_args[0]);
+  // TODO get image name from runtime_env
+  argv.emplace_back("ray");
+  for (std::vector<std::string>::size_type i = 1; i < worker_command_args.size(); i++) {
+    argv.emplace_back(worker_command_args[i]);
+  }
+  if (RAY_LOG_ENABLED(DEBUG)) {
+    std::stringstream stream;
+    stream << "Starting worker process with command:";
+    for (const auto &arg : argv) {
+      stream << " " << arg;
+    }
+    RAY_LOG(DEBUG) << stream.str();
+  }
+  std::pair<Process, std::error_code> p = Process::Spawn(argv, false, std::string(), env);
+  std::error_code ec = p.second;
+  if (ec) {
+    // errorcode 24: Too many files. This is caused by ulimit.
+    if (ec.value() == 24) {
+      RAY_LOG(FATAL) << "Too many workers, failed to create a file. Try setting "
+                     << "`ulimit -n <num_files>` then restart Ray.";
+    } else {
+      // The worker failed to start. This is a fatal error.
+      RAY_LOG(FATAL) << "Failed to start worker with return value " << ec << ": "
+                     << ec.message();
+    }
+  }
+  // we need to wait for container started
+  Process proc = Process::FromPid(p.first.GetId());
+  int exit_code = proc.Wait();
+  if (exit_code != 0) {
+    RAY_LOG(FATAL) << "Failed to start container, exit code: " << exit_code;
+  }
+  std::ifstream pid_file(container_pid_file_path, std::ios_base::in);
+  if (!pid_file.good()) {
+    RAY_LOG(FATAL) << "Failed to read container pidfile: " << container_pid_file_path;
+  }
+  pid_t pid = -1;
+  pid_file >> pid;
+  RAY_CHECK(pid != -1);
+  return Process::FromPid(pid);
 }
 
 Status WorkerPool::GetNextFreePort(int *port) {
@@ -856,7 +966,8 @@ std::shared_ptr<WorkerInterface> WorkerPool::PopWorker(
         dynamic_options = task_spec.DynamicWorkerOptions();
       }
       proc = StartWorkerProcess(task_spec.GetLanguage(), rpc::WorkerType::WORKER,
-                                task_spec.JobId(), dynamic_options);
+                                task_spec.JobId(), dynamic_options,
+                                task_spec.GetRequiredResources());
       if (proc.IsValid()) {
         state.dedicated_workers_to_tasks[proc] = task_spec.TaskId();
         state.tasks_to_dedicated_workers[task_spec.TaskId()] = proc;

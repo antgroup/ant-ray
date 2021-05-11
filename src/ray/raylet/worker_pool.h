@@ -167,6 +167,9 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// \param starting_worker_timeout_callback The callback that will be triggered once
   /// it times out to start a worker.
   /// \param get_time A callback to get the current time.
+  /// \param worker_process_in_container Whether start worker in individual container.
+  /// \param temp_dir The path of ray temporary directory.
+  /// \param session_dir The path of ray session directory.
   WorkerPool(instrumented_io_context &io_service, const NodeID node_id,
              const std::string node_address, int num_workers_soft_limit,
              int num_initial_python_workers_for_first_job,
@@ -175,7 +178,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
              std::shared_ptr<gcs::GcsClient> gcs_client,
              const WorkerCommandMap &worker_commands,
              std::function<void()> starting_worker_timeout_callback,
-             const std::function<double()> get_time);
+             const std::function<double()> get_time, bool worker_process_in_container,
+             const std::string temp_dir, const std::string session_dir);
 
   /// Destructor responsible for freeing a set of workers owned by this class.
   virtual ~WorkerPool();
@@ -398,7 +402,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
       const Language &language, const rpc::WorkerType worker_type, const JobID &job_id,
       const std::vector<std::string> &dynamic_options = {},
       const std::string &serialized_runtime_env = "{}",
-      std::unordered_map<std::string, std::string> override_environment_variables = {});
+      std::unordered_map<std::string, std::string> override_environment_variables = {},
+      const ResourceSet &worker_resource = ResourceSet());
 
   /// The implementation of how to start a new worker process with command arguments.
   /// The lifetime of the process is tied to that of the returned object,
@@ -410,6 +415,17 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// \return An object representing the started worker process.
   virtual Process StartProcess(const std::vector<std::string> &worker_command_args,
                                const ProcessEnvironment &env);
+
+    /// The implementation of how to start a new worker process in container.
+    ///
+    /// \param worker_command_args The command arguments of new worker process.
+    /// \param[in] env Additional environment variables to be set on this process besides
+    /// the environment variables of the parent process.
+    /// \param[in] runtime_env The runtime environment for the started worker process.
+    /// \return An object representing the started worker process.
+  virtual Process StartContainerProcess(
+      const std::vector<std::string> &worker_command_args, const ProcessEnvironment &env,
+      const ResourceSet &worker_resource, const ray::RuntimeEnv &runtime_env);
 
   /// Push an warning message to user if worker pool is getting to big.
   virtual void WarnAboutSize();
@@ -593,6 +609,15 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
 
   /// A callback to get the current time.
   const std::function<double()> get_time_;
+
+  /// Whether to start worker process in container
+  bool worker_process_in_container_;
+
+  /// The path of ray temporary directory, it will be mounted into worker process container
+  const std::string temp_dir_;
+
+  /// The path of ray session directory, container pidfile is in session_dir_/container
+  const std::string session_dir_;
 };
 
 }  // namespace raylet

@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/filesystem.hpp>
-
 #include "ray/common/constants.h"
 #include "ray/common/network_util.h"
 #include "ray/common/ray_config.h"
@@ -79,7 +78,7 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
           num_initial_python_workers_for_first_job, maximum_startup_concurrency)),
       num_initial_python_workers_for_first_job_(num_initial_python_workers_for_first_job),
       periodical_runner_(io_service),
-      get_time_(get_time), worker_process_in_container_(worker_process_in_container,
+      get_time_(get_time), worker_process_in_container_(worker_process_in_container),
       temp_dir_(temp_dir) {
   RAY_CHECK(maximum_startup_concurrency > 0);
   // We need to record so that the metric exists. This way, we report that 0
@@ -401,11 +400,11 @@ Process WorkerPool::StartProcess(const std::vector<std::string> &worker_command_
 Process WorkerPool::StartContainerProcess(
     const std::vector<std::string> &worker_command_args, const ProcessEnvironment &env,
     const ResourceSet &worker_resource) {
-  // Launch the process to create the worker.
+  // Launch the process to create the worker container.
   std::vector<std::string> argv;
   argv.push_back("podman");
   argv.push_back("run");
-  // TODO set uid for container: -u root
+  // TODO set uid for container: -u admin
   argv.push_back("-d");
   argv.push_back("-v");
   std::string temp_dir = temp_dir_ + ":" + temp_dir_;
@@ -474,14 +473,13 @@ Process WorkerPool::StartContainerProcess(
     }
   }
   std::ifstream pid_file(container_pid_file_path, std::ios_base::in);
-  if (pid_file.good()) {
-    pid_t pid = -1;
-    pid_file >> pid;
-    RAY_CHECK(pid != -1);
-    return Process::FromPid(pid);
-  } else {
+  if (!pid_file.good()) {
     RAY_LOG(FATAL) << "Failed to read container pidfile: " << container_pid_file_path;
   }
+  pid_t pid = -1;
+  pid_file >> pid;
+  RAY_CHECK(pid != -1);
+  return Process::FromPid(pid);
 }
 
 Status WorkerPool::GetNextFreePort(int *port) {

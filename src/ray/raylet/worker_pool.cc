@@ -402,33 +402,32 @@ Process WorkerPool::StartContainerProcess(
     const ResourceSet &worker_resource) {
   // Launch the process to create the worker container.
   std::vector<std::string> argv;
-  argv.push_back("podman");
-  argv.push_back("run");
+  argv.emplace_back("podman");
+  argv.emplace_back("run");
   if (RAY_LOG_ENABLED(DEBUG)) {
-    argv.push_back("--log-level=debug");
+    argv.emplace_back("--log-level=debug");
   }
   // TODO set uid for container: -u admin
-  argv.push_back("-d");
-  argv.push_back("-v");
-  argv.push_back(temp_dir_ + ":" + temp_dir_);
-  argv.push_back("--cgroup-manager=cgroupfs");
-  argv.push_back("--security-opt=seccomp=unconfined");
-  argv.push_back("--network=host");
-  argv.push_back("--pid=host");
+  argv.emplace_back("-d");
+  argv.emplace_back("-v");
+  argv.emplace_back(temp_dir_ + ":" + temp_dir_);
+  argv.emplace_back("--cgroup-manager=cgroupfs");
+  argv.emplace_back("--security-opt=seccomp=unconfined");
+  argv.emplace_back("--network=host");
+  argv.emplace_back("--pid=host");
   auto pid_file_random = WorkerID::FromRandom();
   std::string container_pid_file_path = "/tmp/ray/container/" + pid_file_random.Hex() + ".txt";
-  std::string pid_file_arg = "--pidfile=" + container_pid_file_path;
-  argv.push_back(pid_file_arg);
+  argv.emplace_back("--pidfile=" + container_pid_file_path);
   if (!worker_resource.IsEmpty()) {
     const FractionalResourceQuantity cpu_quantity =
         worker_resource.GetResource(kCPU_ResourceLabel);
     if (cpu_quantity.ToDouble() > 0) {
-      argv.push_back("--cpus=" + std::to_string(cpu_quantity.ToDouble()));
+      argv.emplace_back("--cpus=" + std::to_string(cpu_quantity.ToDouble()));
     }
     const FractionalResourceQuantity memory_quantity =
         worker_resource.GetResource(kMemory_ResourceLabel);
     if (memory_quantity.ToDouble() > 0) {
-      argv.push_back("--memory=" + std::to_string(memory_quantity.ToDouble()) +
+      argv.emplace_back("--memory=" + std::to_string(memory_quantity.ToDouble()) +
                            "b");
     }
   }
@@ -442,15 +441,15 @@ Process WorkerPool::StartContainerProcess(
 //    argv.push_back((item.first + '=' + item.second).c_str());
 //  }
   for (const auto &item : env) {
-    argv.push_back("--env");
-    argv.push_back(item.first + '=' + item.second);
+    argv.emplace_back("--env");
+    argv.emplace_back(item.first + '=' + item.second);
   }
-  argv.push_back("--entrypoint");
-  argv.push_back(worker_command_args[0]);
+  argv.emplace_back("--entrypoint");
+  argv.emplace_back(worker_command_args[0]);
   // TODO get image name from runtime_env
-  argv.push_back("ray");
+  argv.emplace_back("ray");
   for (std::vector<std::string>::size_type i = 1; i < worker_command_args.size(); i++) {
-    argv.push_back(worker_command_args[i]);
+    argv.emplace_back(worker_command_args[i]);
   }
   if (RAY_LOG_ENABLED(DEBUG)) {
     std::stringstream stream;

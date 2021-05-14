@@ -65,7 +65,7 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
                        std::function<void()> starting_worker_timeout_callback,
                        const std::function<double()> get_time,
                        bool worker_process_in_container,
-                       const std::string temp_dir)
+                       const std::string temp_dir, const std::string session_dir)
     : io_service_(&io_service),
       node_id_(node_id),
       node_address_(node_address),
@@ -79,7 +79,7 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
       num_initial_python_workers_for_first_job_(num_initial_python_workers_for_first_job),
       periodical_runner_(io_service),
       get_time_(get_time), worker_process_in_container_(worker_process_in_container),
-      temp_dir_(temp_dir) {
+      temp_dir_(temp_dir), session_dir_(session_dir) {
   RAY_CHECK(maximum_startup_concurrency > 0);
   // We need to record so that the metric exists. This way, we report that 0
   // processes have started before a task runs on the node (as opposed to the
@@ -407,16 +407,18 @@ Process WorkerPool::StartContainerProcess(
   if (RAY_LOG_ENABLED(DEBUG)) {
     argv.emplace_back("--log-level=debug");
   }
-  // TODO set uid for container: -u admin
+  // TODO set uid for container, for example: -u admin
   argv.emplace_back("-d");
   argv.emplace_back("-v");
   argv.emplace_back(temp_dir_ + ":" + temp_dir_);
   argv.emplace_back("--cgroup-manager=cgroupfs");
-  argv.emplace_back("--security-opt=seccomp=unconfined");
+  // drop SYS_ADMIN capability 
+  argv.emplace_back("--cap-drop SYS_ADMIN");
   argv.emplace_back("--network=host");
   argv.emplace_back("--pid=host");
-  auto pid_file_random = WorkerID::FromRandom();
-  std::string container_pid_file_path = "/tmp/ray/container/" + pid_file_random.Hex() + ".txt";
+  auto pid_file_random = UniqueID::FromRandom();
+  std::string container_pid_file_path =
+      session_dir_ + "/container/" + pid_file_random.Hex() + ".txt";
   argv.emplace_back("--pidfile=" + container_pid_file_path);
   if (!worker_resource.IsEmpty()) {
     const FractionalResourceQuantity cpu_quantity =
@@ -431,15 +433,8 @@ Process WorkerPool::StartContainerProcess(
                            "b");
     }
   }
-//  ProcessEnvironment new_env;
-//  for (char *const *e = environ; *e; ++e) {
-//    RAY_CHECK(*e && **e != '\0') << "environment variable name is absent";
-//    const char *key_end = strchr(*e, '=');
-//    RAY_CHECK(key_end) << "environment variable value is absent: " << e;
-//    new_env[std::string(*e, static_cast<size_t>(key_end - *e))] = key_end + 1;
-//    argv.push_back("--env");
-//    argv.push_back((item.first + '=' + item.second).c_str());
-//  }
+  // inherite environment
+  argv.emplace_back("--env-host");
   for (const auto &item : env) {
     argv.emplace_back("--env");
     argv.emplace_back(item.first + '=' + item.second);

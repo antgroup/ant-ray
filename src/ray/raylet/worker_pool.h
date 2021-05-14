@@ -130,9 +130,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
              std::shared_ptr<gcs::GcsClient> gcs_client,
              const WorkerCommandMap &worker_commands,
              std::function<void()> starting_worker_timeout_callback,
-             const std::function<double()> get_time,
-             bool worker_process_in_container,
-             const std::string temp_dir);
+             const std::function<double()> get_time, bool worker_process_in_container,
+             const std::string temp_dir, const std::string session_dir);
 
   /// Destructor responsible for freeing a set of workers owned by this class.
   virtual ~WorkerPool();
@@ -561,6 +560,7 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
 
   bool worker_process_in_container_;
   const std::string temp_dir_;
+  const std::string session_dir_;
 };
 
 }  // namespace raylet

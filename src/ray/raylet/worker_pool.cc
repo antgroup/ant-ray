@@ -416,6 +416,7 @@ Process WorkerPool::StartContainerProcess(
   argv.emplace_back("--cap-drop SYS_ADMIN");
   argv.emplace_back("--network=host");
   argv.emplace_back("--pid=host");
+  argv.emplace_back("--ipc==host");
   auto pid_file_random = UniqueID::FromRandom();
   std::string container_pid_file_path =
       session_dir_ + "/container/" + pid_file_random.Hex() + ".txt";

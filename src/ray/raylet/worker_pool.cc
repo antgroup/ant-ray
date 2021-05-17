@@ -413,7 +413,8 @@ Process WorkerPool::StartContainerProcess(
   argv.emplace_back(temp_dir_ + ":" + temp_dir_);
   argv.emplace_back("--cgroup-manager=cgroupfs");
   // drop SYS_ADMIN capability 
-  argv.emplace_back("--cap-drop SYS_ADMIN");
+  argv.emplace_back("--cap-drop");
+  argv.emplace_back("SYS_ADMIN");
   argv.emplace_back("--network=host");
   argv.emplace_back("--pid=host");
   argv.emplace_back("--ipc=host");

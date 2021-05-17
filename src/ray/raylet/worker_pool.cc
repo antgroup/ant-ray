@@ -399,7 +399,7 @@ Process WorkerPool::StartProcess(const std::vector<std::string> &worker_command_
 
 Process WorkerPool::StartContainerProcess(
     const std::vector<std::string> &worker_command_args, const ProcessEnvironment &env,
-    const ResourceSet &worker_resource) {
+    const ResourceSet &worker_resource, const ray::RuntimeEnv &runtime_env) {
   // Launch the process to create the worker container.
   std::vector<std::string> argv;
   argv.emplace_back("podman");
@@ -408,7 +408,7 @@ Process WorkerPool::StartContainerProcess(
     argv.emplace_back("--log-level=debug");
   }
   // TODO set uid for container, for example: -u admin
-  argv.emplace_back("-d");
+  argv.emplace_back("-d");node_manager.cc
   argv.emplace_back("-v");
   argv.emplace_back(temp_dir_ + ":" + temp_dir_);
   argv.emplace_back("--cgroup-manager=cgroupfs");

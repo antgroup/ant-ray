@@ -313,7 +313,7 @@ Process WorkerPool::StartWorkerProcess(
   auto start = std::chrono::high_resolution_clock::now();
   Process proc;
   if (worker_process_in_container_) {
-    proc = StartContainerProcess(worker_command_args, env, worker_resource);
+    proc = StartContainerProcess(worker_command_args, env, worker_resource, runtime_env);
   } else {
     proc = StartProcess(worker_command_args, env);
   }
@@ -408,7 +408,7 @@ Process WorkerPool::StartContainerProcess(
     argv.emplace_back("--log-level=debug");
   }
   // TODO set uid for container, for example: -u admin
-  argv.emplace_back("-d");node_manager.cc
+  argv.emplace_back("-d");
   argv.emplace_back("-v");
   argv.emplace_back(temp_dir_ + ":" + temp_dir_);
   argv.emplace_back("--cgroup-manager=cgroupfs");

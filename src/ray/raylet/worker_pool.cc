@@ -413,6 +413,7 @@ Process WorkerPool::StartContainerProcess(
   // TODO redirect worker stdout/stderr to raylet.out
   argv.emplace_back("podman");
   argv.emplace_back("run");
+  argv.emplace_back("-rm");
   if (RAY_LOG_ENABLED(DEBUG)) {
     argv.emplace_back("--log-level=debug");
   }

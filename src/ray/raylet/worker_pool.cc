@@ -64,8 +64,8 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
                        const WorkerCommandMap &worker_commands,
                        std::function<void()> starting_worker_timeout_callback,
                        const std::function<double()> get_time,
-                       bool worker_process_in_container,
-                       const std::string temp_dir, const std::string session_dir)
+                       bool worker_process_in_container, const std::string temp_dir,
+                       const std::string session_dir)
     : io_service_(&io_service),
       node_id_(node_id),
       node_address_(node_address),
@@ -78,8 +78,10 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
           num_initial_python_workers_for_first_job, maximum_startup_concurrency)),
       num_initial_python_workers_for_first_job_(num_initial_python_workers_for_first_job),
       periodical_runner_(io_service),
-      get_time_(get_time), worker_process_in_container_(worker_process_in_container),
-      temp_dir_(temp_dir), session_dir_(session_dir) {
+      get_time_(get_time),
+      worker_process_in_container_(worker_process_in_container),
+      temp_dir_(temp_dir),
+      session_dir_(session_dir) {
   RAY_CHECK(maximum_startup_concurrency > 0);
   // We need to record so that the metric exists. This way, we report that 0
   // processes have started before a task runs on the node (as opposed to the
@@ -88,7 +90,13 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
 #ifndef _WIN32
   // Ignore SIGCHLD signals. If we don't do this, then worker processes will
   // become zombies instead of dying gracefully.
-  signal(SIGCHLD, SIG_IGN);
+
+  // When using container to start worker processes, we need to wait for
+  // container starting command to exit. The worker processes' parent process
+  // is OCI container runtime monitor.
+  if (!worker_process_in_container_) {
+    signal(SIGCHLD, SIG_IGN);
+  }
 #endif
   for (const auto &entry : worker_commands) {
     // Initialize the pool state for this language.
@@ -402,6 +410,7 @@ Process WorkerPool::StartContainerProcess(
     const ResourceSet &worker_resource, const ray::RuntimeEnv &runtime_env) {
   // Launch the process to create the worker container.
   std::vector<std::string> argv;
+  // TODO redirect worker stdout/stderr to raylet.out
   argv.emplace_back("podman");
   argv.emplace_back("run");
   if (RAY_LOG_ENABLED(DEBUG)) {
@@ -412,7 +421,7 @@ Process WorkerPool::StartContainerProcess(
   argv.emplace_back("-v");
   argv.emplace_back(temp_dir_ + ":" + temp_dir_);
   argv.emplace_back("--cgroup-manager=cgroupfs");
-  // drop SYS_ADMIN capability 
+  // drop SYS_ADMIN capability
   argv.emplace_back("--cap-drop");
   argv.emplace_back("SYS_ADMIN");
   argv.emplace_back("--network=host");
@@ -431,8 +440,7 @@ Process WorkerPool::StartContainerProcess(
     const FractionalResourceQuantity memory_quantity =
         worker_resource.GetResource(kMemory_ResourceLabel);
     if (memory_quantity.ToDouble() > 0) {
-      argv.emplace_back("--memory=" + std::to_string(memory_quantity.ToDouble()) +
-                           "b");
+      argv.emplace_back("--memory=" + std::to_string(memory_quantity.ToDouble()) + "b");
     }
   }
   // inherite environment
@@ -456,8 +464,8 @@ Process WorkerPool::StartContainerProcess(
     }
     RAY_LOG(DEBUG) << stream.str();
   }
-  // we need to wait for container started or failed
-  std::error_code ec = Process::Call(argv, env);
+  std::pair<Process, std::error_code> p = Process::Spawn(argv, false, std::string(), env);
+  std::error_code ec = p.second;
   if (ec) {
     // errorcode 24: Too many files. This is caused by ulimit.
     if (ec.value() == 24) {
@@ -468,6 +476,12 @@ Process WorkerPool::StartContainerProcess(
       RAY_LOG(FATAL) << "Failed to start worker with return value " << ec << ": "
                      << ec.message();
     }
+  }
+  // we need to wait for container started
+  Process proc = Process::FromPid(p.first.GetId());
+  int exit_code = proc.Wait();
+  if (exit_code != 0) {
+    RAY_LOG(FATAL) << "Failed to start container, exit code: " << exit_code;
   }
   std::ifstream pid_file(container_pid_file_path, std::ios_base::in);
   if (!pid_file.good()) {

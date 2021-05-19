@@ -410,10 +410,14 @@ Process WorkerPool::StartContainerProcess(
     const ResourceSet &worker_resource, const ray::RuntimeEnv &runtime_env) {
   // Launch the process to create the worker container.
   std::vector<std::string> argv;
-  // TODO redirect worker stdout/stderr to raylet.out
+  // TODO currently worker process will write log to stdout/stderr before initializing logger,
+  // and the worker process' stdout/stderr has been redirected to raylet.err by default.
+  // When starting worker process in container, worker process' stdout/stderr will be
+  // redirected to container log file.
+  // Should we redirect stdout/stderr to raylet.err?
   argv.emplace_back("podman");
   argv.emplace_back("run");
-  argv.emplace_back("-rm");
+  argv.emplace_back("--rm");
   if (RAY_LOG_ENABLED(DEBUG)) {
     argv.emplace_back("--log-level=debug");
   }

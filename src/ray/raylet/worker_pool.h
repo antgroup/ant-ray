@@ -396,7 +396,9 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// \param job_id The ID of the job to which the started worker process belongs.
   /// \param dynamic_options The dynamic options that we should add for worker command.
   /// \param serialized_runtime_env The runtime environment for the started worker
-  /// process. \return The id of the process that we started if it's positive, otherwise
+  /// process.
+  /// \param worker_resource The resource required by worker process.
+  /// \return The id of the process that we started if it's positive, otherwise
   /// it means we didn't start a process.
   Process StartWorkerProcess(
       const Language &language, const rpc::WorkerType worker_type, const JobID &job_id,
@@ -421,11 +423,11 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
     /// \param worker_command_args The command arguments of new worker process.
     /// \param[in] env Additional environment variables to be set on this process besides
     /// the environment variables of the parent process.
-    /// \param[in] runtime_env The runtime environment for the started worker process.
+    /// \param[in] container_image The runtime environment for the started worker process.
     /// \return An object representing the started worker process.
   virtual Process StartContainerProcess(
       const std::vector<std::string> &worker_command_args, const ProcessEnvironment &env,
-      const ResourceSet &worker_resource, const ray::RuntimeEnv &runtime_env);
+      const ResourceSet &worker_resource, const std::string &container_image);
 
   /// Push an warning message to user if worker pool is getting to big.
   virtual void WarnAboutSize();

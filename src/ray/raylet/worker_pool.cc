@@ -324,8 +324,9 @@ Process WorkerPool::StartWorkerProcess(
   // Start a process and measure the startup time.
   auto start = std::chrono::high_resolution_clock::now();
   Process proc;
-  if (worker_process_in_container_) {
-    proc = StartContainerProcess(worker_command_args, env, worker_resource, runtime_env);
+  std::string container_image = job_config->container_image();
+  if (worker_process_in_container_ && container_image != "") {
+    proc = StartContainerProcess(worker_command_args, env, worker_resource, container_image);
   } else {
     proc = StartProcess(worker_command_args, env);
   }
@@ -411,7 +412,7 @@ Process WorkerPool::StartProcess(const std::vector<std::string> &worker_command_
 
 Process WorkerPool::StartContainerProcess(
     const std::vector<std::string> &worker_command_args, const ProcessEnvironment &env,
-    const ResourceSet &worker_resource, const ray::RuntimeEnv &runtime_env) {
+    const ResourceSet &worker_resource, const std::string &container_image) {
   // Launch the process to create the worker container.
   std::vector<std::string> argv;
   // TODO currently worker process will write log to stdout/stderr before initializing logger,
@@ -460,8 +461,7 @@ Process WorkerPool::StartContainerProcess(
   }
   argv.emplace_back("--entrypoint");
   argv.emplace_back(worker_command_args[0]);
-  // TODO get image name from runtime_env
-  argv.emplace_back("ray");
+  argv.emplace_back(container_image);
   for (std::vector<std::string>::size_type i = 1; i < worker_command_args.size(); i++) {
     argv.emplace_back(worker_command_args[i]);
   }

@@ -122,6 +122,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// it times out to start a worker.
   /// \param get_time A callback to get the current time.
   /// \param worker_process_in_container Whether start worker in individual container.
+  /// \param temp_dir The path of ray temporary directory.
+  /// \param session_dir The path of ray session directory.
   WorkerPool(instrumented_io_context &io_service, const NodeID node_id,
              const std::string node_address, int num_workers_soft_limit,
              int num_initial_python_workers_for_first_job,
@@ -368,6 +370,13 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   virtual Process StartProcess(const std::vector<std::string> &worker_command_args,
                                const ProcessEnvironment &env);
 
+    /// The implementation of how to start a new worker process in container.
+    ///
+    /// \param worker_command_args The command arguments of new worker process.
+    /// \param[in] env Additional environment variables to be set on this process besides
+    /// the environment variables of the parent process.
+    /// \param[in] runtime_env The runtime environment for the started worker process.
+    /// \return An object representing the started worker process.
   virtual Process StartContainerProcess(
       const std::vector<std::string> &worker_command_args, const ProcessEnvironment &env,
       const ResourceSet &worker_resource, const ray::RuntimeEnv &runtime_env);

@@ -422,4 +422,5 @@ RAY_CONFIG(uint64_t, publish_batch_size, 5000)
 RAY_CONFIG(uint64_t, subscriber_timeout_ms, 30000)
 
 /// Feature flag to start worker process in individual container.
+/// Currently it only works on linux.
 RAY_CONFIG(bool, worker_process_in_container, false)

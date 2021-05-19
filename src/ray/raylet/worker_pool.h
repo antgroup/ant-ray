@@ -558,8 +558,13 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// A callback to get the current time.
   const std::function<double()> get_time_;
 
+  /// Whether to start worker process in container
   bool worker_process_in_container_;
+
+  /// The path of ray temporary directory, it will be mounted into worker process container
   const std::string temp_dir_;
+
+  /// The path of ray session directory, container pidfile is in session_dir_/container
   const std::string session_dir_;
 };
 

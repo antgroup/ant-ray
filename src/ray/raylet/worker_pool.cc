@@ -308,7 +308,9 @@ Process WorkerPool::StartWorkerProcess(
       }
     }
 
-    WorkerCacheKey env = {override_environment_variables, serialized_runtime_env};
+    WorkerCacheKey env = {override_environment_variables,
+                          serialized_runtime_env,
+                          worker_resource};
     const std::string runtime_env_hash_str = std::to_string(env.IntHash());
     worker_command_args.push_back("--runtime-env-hash=" + runtime_env_hash_str);
   }

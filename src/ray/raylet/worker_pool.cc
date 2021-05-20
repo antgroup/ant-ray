@@ -967,6 +967,7 @@ std::shared_ptr<WorkerInterface> WorkerPool::PopWorker(
       }
       proc = StartWorkerProcess(task_spec.GetLanguage(), rpc::WorkerType::WORKER,
                                 task_spec.JobId(), dynamic_options,
+                                "{}",{},
                                 task_spec.GetRequiredResources());
       if (proc.IsValid()) {
         state.dedicated_workers_to_tasks[proc] = task_spec.TaskId();
@@ -978,7 +979,8 @@ std::shared_ptr<WorkerInterface> WorkerPool::PopWorker(
     // the specified runtime env.
     // Try to pop the most recently pushed worker.
     const WorkerCacheKey env = {task_spec.OverrideEnvironmentVariables(),
-                                task_spec.SerializedRuntimeEnv()};
+                                task_spec.SerializedRuntimeEnv(),
+                                task_spec.GetRequiredResources()};
     const int runtime_env_hash = env.IntHash();
     for (auto it = idle_of_all_languages_.rbegin(); it != idle_of_all_languages_.rend();
          it++) {
@@ -1013,7 +1015,8 @@ std::shared_ptr<WorkerInterface> WorkerPool::PopWorker(
       proc = StartWorkerProcess(task_spec.GetLanguage(), rpc::WorkerType::WORKER,
                                 task_spec.JobId(), {}, /* dynamic_options */
                                 task_spec.SerializedRuntimeEnv(),
-                                task_spec.OverrideEnvironmentVariables());
+                                task_spec.OverrideEnvironmentVariables(),
+                                task_spec.GetRequiredResources());
     }
   }
 
@@ -1302,9 +1305,11 @@ WorkerPool::IOWorkerState &WorkerPool::GetIOWorkerStateFromWorkerType(
 
 WorkerCacheKey::WorkerCacheKey(
     const std::unordered_map<std::string, std::string> override_environment_variables,
-    const std::string serialized_runtime_env)
+    const std::string serialized_runtime_env,
+    const ResourceSet worker_resource)
     : override_environment_variables(override_environment_variables),
-      serialized_runtime_env(serialized_runtime_env) {}
+      serialized_runtime_env(serialized_runtime_env),
+      worker_resource(worker_resource){}
 
 bool WorkerCacheKey::operator==(const WorkerCacheKey &k) const {
   return Hash() == k.Hash();
@@ -1312,7 +1317,8 @@ bool WorkerCacheKey::operator==(const WorkerCacheKey &k) const {
 
 bool WorkerCacheKey::EnvIsEmpty() const {
   return override_environment_variables.size() == 0 &&
-         (serialized_runtime_env == "" || serialized_runtime_env == "{}");
+         (serialized_runtime_env == "" || serialized_runtime_env == "{}") &&
+         worker_resource.IsEmpty();
 }
 
 std::size_t WorkerCacheKey::Hash() const {
@@ -1334,6 +1340,7 @@ std::size_t WorkerCacheKey::Hash() const {
       }
 
       boost::hash_combine(hash_, serialized_runtime_env);
+      boost::hash_combine(hash_, worker_resource.ToString());
     }
   }
   return hash_;

@@ -326,9 +326,9 @@ Process WorkerPool::StartWorkerProcess(
   // Start a process and measure the startup time.
   auto start = std::chrono::high_resolution_clock::now();
   Process proc;
-  std::string container_image = job_config->container_image();
-  if (worker_process_in_container_enabled_ && container_image != "") {
-    proc = StartContainerProcess(worker_command_args, env, worker_resource, container_image);
+  std::string worker_container_image = job_config->worker_container_image();
+  if (worker_process_in_container_enabled_ && worker_container_image != "") {
+    proc = StartContainerProcess(worker_command_args, env, worker_resource, worker_container_image);
   } else {
     proc = StartProcess(worker_command_args, env);
   }
@@ -414,7 +414,7 @@ Process WorkerPool::StartProcess(const std::vector<std::string> &worker_command_
 
 Process WorkerPool::StartContainerProcess(
     const std::vector<std::string> &worker_command_args, const ProcessEnvironment &env,
-    const ResourceSet &worker_resource, const std::string &container_image) {
+    const ResourceSet &worker_resource, const std::string &worker_container_image) {
   // Launch the process to create the worker container.
   std::vector<std::string> argv;
   // TODO currently worker process will write log to stdout/stderr before initializing logger,

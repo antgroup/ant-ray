@@ -32,7 +32,7 @@ class JobConfig:
                  client_job=False,
                  metadata=None,
                  ray_namespace=None,
-                 container_image=None):
+                 worker_container_image=None):
         if worker_env is None:
             self.worker_env = dict()
         else:
@@ -50,6 +50,7 @@ class JobConfig:
         self.ray_namespace = ray_namespace
         self.set_runtime_env(runtime_env)
         self.container_image = container_image or ""
+        self.worker_container_image = worker_container_image or ""
         self._cached_pb = None
 
     def set_metadata(self, key: str, value: str) -> None:
@@ -100,7 +101,7 @@ class JobConfig:
             self._cached_pb.runtime_env.CopyFrom(self._get_proto_runtime())
             self._cached_pb.serialized_runtime_env = \
                 self.get_serialized_runtime_env()
-            self._cached_pb.container_image = self.container_image
+            self._cached_pb.worker_container_image = self.worker_container_image
             for k, v in self.metadata.items():
                 self._cached_pb.metadata[k] = v
         return self._cached_pb

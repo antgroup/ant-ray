@@ -183,7 +183,7 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
              std::function<void()> starting_worker_timeout_callback,
              const std::function<double()> get_time,
              bool worker_process_in_container_enabled,
-             const std::string temp_dir, const std::string session_dir);
+             const std::string &temp_dir, const std::string &session_dir);
 
   /// Destructor responsible for freeing a set of workers owned by this class.
   virtual ~WorkerPool();

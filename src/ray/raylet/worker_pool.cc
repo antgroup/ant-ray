@@ -467,7 +467,7 @@ Process WorkerPool::StartContainerProcess(
   }
   argv.emplace_back("--entrypoint");
   argv.emplace_back(worker_command_args[0]);
-  argv.emplace_back(container_image);
+  argv.emplace_back(worker_container_image);
   for (std::vector<std::string>::size_type i = 1; i < worker_command_args.size(); i++) {
     argv.emplace_back(worker_command_args[i]);
   }

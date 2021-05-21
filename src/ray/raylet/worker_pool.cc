@@ -65,7 +65,7 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
                        std::function<void()> starting_worker_timeout_callback,
                        const std::function<double()> get_time,
                        bool worker_process_in_container_enabled,
-                       const std::string temp_dir, const std::string session_dir)
+                       const std::string &temp_dir, const std::string &session_dir)
     : io_service_(&io_service),
       node_id_(node_id),
       node_address_(node_address),

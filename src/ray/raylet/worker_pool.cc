@@ -64,8 +64,8 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
                        const WorkerCommandMap &worker_commands,
                        std::function<void()> starting_worker_timeout_callback,
                        const std::function<double()> get_time,
-                       bool worker_process_in_container, const std::string temp_dir,
-                       const std::string session_dir)
+                       bool worker_process_in_container_enabled,
+                       const std::string temp_dir, const std::string session_dir)
     : io_service_(&io_service),
       node_id_(node_id),
       node_address_(node_address),
@@ -79,7 +79,7 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
       num_initial_python_workers_for_first_job_(num_initial_python_workers_for_first_job),
       periodical_runner_(io_service),
       get_time_(get_time),
-      worker_process_in_container_(worker_process_in_container),
+      worker_process_in_container_enabled_(worker_process_in_container_enabled),
       temp_dir_(temp_dir),
       session_dir_(session_dir) {
   RAY_CHECK(maximum_startup_concurrency > 0);
@@ -94,7 +94,7 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
   // When using container to start worker processes, we need to wait for
   // container starting command to exit. The worker processes' parent process
   // is OCI container runtime monitor.
-  if (!worker_process_in_container_) {
+  if (!worker_process_in_container_enabled_) {
     signal(SIGCHLD, SIG_IGN);
   }
 #endif
@@ -327,7 +327,7 @@ Process WorkerPool::StartWorkerProcess(
   auto start = std::chrono::high_resolution_clock::now();
   Process proc;
   std::string container_image = job_config->container_image();
-  if (worker_process_in_container_ && container_image != "") {
+  if (worker_process_in_container_enabled_ && container_image != "") {
     proc = StartContainerProcess(worker_command_args, env, worker_resource, container_image);
   } else {
     proc = StartProcess(worker_command_args, env);

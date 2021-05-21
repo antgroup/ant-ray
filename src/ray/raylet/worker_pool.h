@@ -170,7 +170,7 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// \param starting_worker_timeout_callback The callback that will be triggered once
   /// it times out to start a worker.
   /// \param get_time A callback to get the current time.
-  /// \param worker_process_in_container Whether start worker in individual container.
+  /// \param worker_process_in_container_enabled Whether start worker in individual container.
   /// \param temp_dir The path of ray temporary directory.
   /// \param session_dir The path of ray session directory.
   WorkerPool(instrumented_io_context &io_service, const NodeID node_id,
@@ -181,7 +181,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
              std::shared_ptr<gcs::GcsClient> gcs_client,
              const WorkerCommandMap &worker_commands,
              std::function<void()> starting_worker_timeout_callback,
-             const std::function<double()> get_time, bool worker_process_in_container,
+             const std::function<double()> get_time,
+             bool worker_process_in_container_enabled,
              const std::string temp_dir, const std::string session_dir);
 
   /// Destructor responsible for freeing a set of workers owned by this class.
@@ -616,7 +617,7 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   const std::function<double()> get_time_;
 
   /// Whether to start worker process in container
-  bool worker_process_in_container_;
+  bool worker_process_in_container_enabled_;
 
   /// The path of ray temporary directory, it will be mounted into worker process container
   const std::string temp_dir_;

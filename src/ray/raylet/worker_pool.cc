@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/filesystem.hpp>
+
 #include "ray/common/constants.h"
 #include "ray/common/network_util.h"
 #include "ray/common/ray_config.h"
@@ -312,8 +313,7 @@ Process WorkerPool::StartWorkerProcess(
       }
     }
 
-    WorkerCacheKey env = {override_environment_variables,
-                          serialized_runtime_env,
+    WorkerCacheKey env = {override_environment_variables, serialized_runtime_env,
                           worker_resource};
     const std::string runtime_env_hash_str = std::to_string(env.IntHash());
     worker_command_args.push_back("--runtime-env-hash=" + runtime_env_hash_str);
@@ -332,7 +332,8 @@ Process WorkerPool::StartWorkerProcess(
   Process proc;
   std::string worker_container_image = job_config->worker_container_image();
   if (worker_process_in_container_enabled_ && worker_container_image != "") {
-    proc = StartContainerProcess(worker_command_args, env, worker_resource, worker_container_image);
+    proc = StartContainerProcess(worker_command_args, env, worker_resource,
+                                 worker_container_image);
   } else {
     proc = StartProcess(worker_command_args, env);
   }
@@ -421,11 +422,11 @@ Process WorkerPool::StartContainerProcess(
     const ResourceSet &worker_resource, const std::string &worker_container_image) {
   // Launch the process to create the worker container.
   std::vector<std::string> argv;
-  // TODO currently worker process will write log to stdout/stderr before initializing logger,
-  // and the worker process' stdout/stderr has been redirected to raylet.err by default.
-  // When starting worker process in container, worker process' stdout/stderr will be
-  // redirected to container log file.
-  // Should we redirect stdout/stderr to raylet.err?
+  // TODO currently worker process will write log to stdout/stderr before initializing
+  // logger, and the worker process' stdout/stderr has been redirected to raylet.err by
+  // default. When starting worker process in container, worker process' stdout/stderr
+  // will be redirected to container log file. Should we redirect stdout/stderr to
+  // raylet.err?
   argv.emplace_back("podman");
   argv.emplace_back("run");
   argv.emplace_back("--rm");
@@ -972,8 +973,7 @@ std::shared_ptr<WorkerInterface> WorkerPool::PopWorker(
         dynamic_options = task_spec.DynamicWorkerOptions();
       }
       proc = StartWorkerProcess(task_spec.GetLanguage(), rpc::WorkerType::WORKER,
-                                task_spec.JobId(), dynamic_options,
-                                "{}",{},
+                                task_spec.JobId(), dynamic_options, "{}", {},
                                 task_spec.GetRequiredResources());
       if (proc.IsValid()) {
         state.dedicated_workers_to_tasks[proc] = task_spec.TaskId();
@@ -1311,11 +1311,10 @@ WorkerPool::IOWorkerState &WorkerPool::GetIOWorkerStateFromWorkerType(
 
 WorkerCacheKey::WorkerCacheKey(
     const std::unordered_map<std::string, std::string> override_environment_variables,
-    const std::string serialized_runtime_env,
-    const ResourceSet worker_resource)
+    const std::string serialized_runtime_env, const ResourceSet worker_resource)
     : override_environment_variables(override_environment_variables),
       serialized_runtime_env(serialized_runtime_env),
-      worker_resource(worker_resource){}
+      worker_resource(worker_resource) {}
 
 bool WorkerCacheKey::operator==(const WorkerCacheKey &k) const {
   return Hash() == k.Hash();

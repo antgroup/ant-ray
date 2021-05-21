@@ -53,8 +53,7 @@ class WorkerCacheKey {
   /// worker.
   WorkerCacheKey(
       const std::unordered_map<std::string, std::string> override_environment_variables,
-      const std::string serialized_runtime_env,
-      const ResourceSet worker_resource);
+      const std::string serialized_runtime_env, const ResourceSet worker_resource);
 
   bool operator==(const WorkerCacheKey &k) const;
 
@@ -170,9 +169,9 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// \param starting_worker_timeout_callback The callback that will be triggered once
   /// it times out to start a worker.
   /// \param get_time A callback to get the current time.
-  /// \param worker_process_in_container_enabled Whether start worker in individual container.
-  /// \param temp_dir The path of ray temporary directory.
-  /// \param session_dir The path of ray session directory.
+  /// \param worker_process_in_container_enabled Whether start worker in individual
+  /// container. \param temp_dir The path of ray temporary directory. \param session_dir
+  /// The path of ray session directory.
   WorkerPool(instrumented_io_context &io_service, const NodeID node_id,
              const std::string node_address, int num_workers_soft_limit,
              int num_initial_python_workers_for_first_job,
@@ -182,8 +181,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
              const WorkerCommandMap &worker_commands,
              std::function<void()> starting_worker_timeout_callback,
              const std::function<double()> get_time,
-             bool worker_process_in_container_enabled,
-             const std::string &temp_dir, const std::string &session_dir);
+             bool worker_process_in_container_enabled, const std::string &temp_dir,
+             const std::string &session_dir);
 
   /// Destructor responsible for freeing a set of workers owned by this class.
   virtual ~WorkerPool();
@@ -422,14 +421,14 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   virtual Process StartProcess(const std::vector<std::string> &worker_command_args,
                                const ProcessEnvironment &env);
 
-    /// The implementation of how to start a new worker process in container.
-    ///
-    /// \param worker_command_args The command arguments of new worker process.
-    /// \param[in] env Additional environment variables to be set on this process besides
-    /// the environment variables of the parent process.
-    /// \param[in] worker_resource The resource required by worker process.
-    /// \param[in] worker_container_image The container image which worker process run in.
-    /// \return An object representing the started worker process.
+  /// The implementation of how to start a new worker process in container.
+  ///
+  /// \param worker_command_args The command arguments of new worker process.
+  /// \param[in] env Additional environment variables to be set on this process besides
+  /// the environment variables of the parent process.
+  /// \param[in] worker_resource The resource required by worker process.
+  /// \param[in] worker_container_image The container image which worker process run in.
+  /// \return An object representing the started worker process.
   virtual Process StartContainerProcess(
       const std::vector<std::string> &worker_command_args, const ProcessEnvironment &env,
       const ResourceSet &worker_resource, const std::string &worker_container_image);
@@ -620,7 +619,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// Whether to start worker process in container
   bool worker_process_in_container_enabled_;
 
-  /// The path of ray temporary directory, it will be mounted into worker process container
+  /// The path of ray temporary directory, it will be mounted into worker process
+  /// container
   const std::string temp_dir_;
 
   /// The path of ray session directory, container pidfile is in session_dir_/container

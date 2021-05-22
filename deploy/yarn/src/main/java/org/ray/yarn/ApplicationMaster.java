@@ -64,6 +64,7 @@ import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
 import org.apache.hadoop.yarn.util.timeline.TimelineUtils;
 import org.apache.log4j.LogManager;
 import org.ray.yarn.config.RayClusterConfig;
+import org.ray.yarn.utils.TimelineUtil;
 import org.ray.yarn.utils.YamlUtil;
 
 @InterfaceAudience.Public
@@ -100,29 +101,19 @@ public class ApplicationMaster {
   private NMClientAsync nmClientAsync;
   // Listen to process the response from the Node Manager
   private NmCallbackHandler containerListener;
-  // Application Attempt Id ( combination of attemptId and fail count )
-  @VisibleForTesting
-  protected ApplicationAttemptId appAttemptId;
   // Hostname of the container
   private String appMasterHostname = "";
   // Port on which the app master listens for status updates from clients
   private int appMasterRpcPort = -1;
   // Tracking url to which app master publishes info for clients to monitor
   private String appMasterTrackingUrl = "";
-  // App Master configuration
-  // No. of containers to run shell command on
+  // Runtime state of AM
+  ApplicationMasterState amState = null;
+
+  // FIXME state begin
+  // Application Attempt Id ( combination of attemptId and fail count )
   @VisibleForTesting
-  protected int numTotalContainers = 1;
-
-  // No. of each of the Ray roles including head and work
-  private Map<String, Integer> numRoles = Maps.newHashMapWithExpectedSize(2);
-  private RayNodeContext[] indexToNode = null;
-  private Map<String, RayNodeContext> containerToNode = Maps.newHashMap();
-
-  // The default value should be consistent with Ray RunParameters
-  private int redisPort = 34222;
-  private String redisAddress;
-
+  protected ApplicationAttemptId appAttemptId;
   // Counter for completed containers ( complete denotes successful or failed )
   private AtomicInteger numCompletedContainers = new AtomicInteger();
   // Allocated container count so that we know how many containers has the RM
@@ -136,18 +127,35 @@ public class ApplicationMaster {
   // Only request for more if the original requirement changes.
   @VisibleForTesting
   protected AtomicInteger numRequestedContainers = new AtomicInteger();
+  // App Master configuration
+  // No. of containers to run shell command on
+  @VisibleForTesting
+  protected int numTotalContainers = 1;
 
+  // No. of each of the Ray roles including head and work
+  private Map<String, Integer> numRoles = Maps.newHashMapWithExpectedSize(2);
+  private RayNodeContext[] indexToNode = null;
+  private Map<String, RayNodeContext> containerToNode = Maps.newHashMap();
+
+  @VisibleForTesting
+  protected final Set<ContainerId> launchedContainers =
+    Collections.newSetFromMap(new ConcurrentHashMap<ContainerId, Boolean>());
+
+  private int rayInstanceCounter = 1;
+  private volatile boolean done;
+  private ByteBuffer allTokens;
+
+  // The default value should be consistent with Ray RunParameters
+  private int redisPort = 34222;
+  private String redisAddress;
+  // FIXME state end
+
+  // Launch threads
+  private List<Thread> launchThreads = new ArrayList<Thread>();
   // Hardcoded path to shell script in launch container's local env
   private static final String rayShellStringPath = "run.sh";
   // Hardcoded path to custom log_properties
   private static final String log4jPath = "log4j.properties";
-
-  private volatile boolean done;
-
-  private ByteBuffer allTokens;
-
-  // Launch threads
-  private List<Thread> launchThreads = new ArrayList<Thread>();
 
   // Timeline Client
   @VisibleForTesting
@@ -157,17 +165,14 @@ public class ApplicationMaster {
   static final String USER_TIMELINE_FILTER_NAME = "user";
   static final String LINUX_BASH_COMMEND = "bash";
 
-  private int rayInstanceCounter = 1;
   private RayClusterConfig rayConf;
-
-  @VisibleForTesting
-  protected final Set<ContainerId> launchedContainers =
-      Collections.newSetFromMap(new ConcurrentHashMap<ContainerId, Boolean>());
 
 
   public ApplicationMaster() {
     // Set up the configuration
     conf = new YarnConfiguration();
+    // Initialize internal state
+    amState = new ApplicationMasterState();
   }
 
   /**
@@ -315,13 +320,13 @@ public class ApplicationMaster {
     appSubmitterUgi = UserGroupInformation.createRemoteUser(appSubmitterUserName);
     appSubmitterUgi.addCredentials(credentials);
 
-    AMRMClientAsync.AbstractCallbackHandler allocListener = new RmCallbackHandler();
+    AMRMClientAsync.AbstractCallbackHandler allocListener = createRmCallbackHandler();
     amRmClient = AMRMClientAsync.createAMRMClientAsync(1000, allocListener);
     amRmClient.init(conf);
     amRmClient.start();
 
     containerListener = createNmCallbackHandler();
-    nmClientAsync = new NMClientAsyncImpl(containerListener);
+    nmClientAsync = containerListener.getNmClientAsync();
     nmClientAsync.init(conf);
     nmClientAsync.start();
 
@@ -611,68 +616,6 @@ public class ApplicationMaster {
     }
   }
 
-  void publishContainerStartEvent(final TimelineClient timelineClient,
-      final Container container, String domainId, UserGroupInformation ugi) {
-    final TimelineEntity entity = new TimelineEntity();
-    entity.setEntityId(container.getId().toString());
-    entity.setEntityType(DsEntity.DS_CONTAINER.toString());
-    entity.setDomainId(domainId);
-    entity.addPrimaryFilter(USER_TIMELINE_FILTER_NAME, ugi.getShortUserName());
-    entity.addPrimaryFilter(APPID_TIMELINE_FILTER_NAME,
-        container.getId().getApplicationAttemptId().getApplicationId().toString());
-    TimelineEvent event = new TimelineEvent();
-    event.setTimestamp(System.currentTimeMillis());
-    event.setEventType(DsEvent.DS_CONTAINER_START.toString());
-    event.addEventInfo("Node", container.getNodeId().toString());
-    event.addEventInfo("Resources", container.getResource().toString());
-    entity.addEvent(event);
-
-    try {
-      processTimelineResponseErrors(
-          putContainerEntity(timelineClient, container.getId().getApplicationAttemptId(), entity));
-    } catch (YarnException | IOException | ClientHandlerException e) {
-      logger.error("Container start event could not be published for " + container.getId().toString(),
-          e);
-    }
-  }
-
-  @VisibleForTesting
-  void publishContainerEndEvent(final TimelineClient timelineClient, ContainerStatus container,
-      String domainId, UserGroupInformation ugi) {
-    final TimelineEntity entity = new TimelineEntity();
-    entity.setEntityId(container.getContainerId().toString());
-    entity.setEntityType(DsEntity.DS_CONTAINER.toString());
-    entity.setDomainId(domainId);
-    entity.addPrimaryFilter(USER_TIMELINE_FILTER_NAME, ugi.getShortUserName());
-    entity.addPrimaryFilter(APPID_TIMELINE_FILTER_NAME,
-        container.getContainerId().getApplicationAttemptId().getApplicationId().toString());
-    TimelineEvent event = new TimelineEvent();
-    event.setTimestamp(System.currentTimeMillis());
-    event.setEventType(DsEvent.DS_CONTAINER_END.toString());
-    event.addEventInfo("State", container.getState().name());
-    event.addEventInfo("Exit Status", container.getExitStatus());
-    entity.addEvent(event);
-    try {
-      processTimelineResponseErrors(putContainerEntity(timelineClient,
-          container.getContainerId().getApplicationAttemptId(), entity));
-    } catch (YarnException | IOException | ClientHandlerException e) {
-      logger.error(
-          "Container end event could not be published for " + container.getContainerId().toString(),
-          e);
-    }
-  }
-
-  private TimelinePutResponse putContainerEntity(TimelineClient timelineClient,
-      ApplicationAttemptId currAttemptId, TimelineEntity entity) throws YarnException, IOException {
-    if (TimelineUtils.timelineServiceV1_5Enabled(conf)) {
-      TimelineEntityGroupId groupId = TimelineEntityGroupId
-          .newInstance(currAttemptId.getApplicationId(), CONTAINER_ENTITY_GROUP_ID);
-      return timelineClient.putEntities(currAttemptId, groupId, entity);
-    } else {
-      return timelineClient.putEntities(entity);
-    }
-  }
-
   private void publishApplicationAttemptEvent(final TimelineClient timelineClient,
       String appAttemptId, DsEvent appEvent, String domainId, UserGroupInformation ugi) {
     final TimelineEntity entity = new TimelineEntity();
@@ -686,28 +629,15 @@ public class ApplicationMaster {
     entity.addEvent(event);
     try {
       TimelinePutResponse response = timelineClient.putEntities(entity);
-      processTimelineResponseErrors(response);
+      TimelineUtil.processTimelineResponseErrors(response);
     } catch (YarnException | IOException | ClientHandlerException e) {
       logger.error("App Attempt " + (appEvent.equals(DsEvent.DS_APP_ATTEMPT_START) ? "start" : "end")
           + " event could not be published for " + appAttemptId.toString(), e);
     }
   }
 
-  private TimelinePutResponse processTimelineResponseErrors(TimelinePutResponse response) {
-    List<TimelinePutResponse.TimelinePutError> errors = response.getErrors();
-    if (errors.size() == 0) {
-      logger.debug("Timeline entities are successfully put");
-    } else {
-      for (TimelinePutResponse.TimelinePutError error : errors) {
-        logger.error("Error when publishing entity [" + error.getEntityType() + ","
-            + error.getEntityId() + "], server side error code: " + error.getErrorCode());
-      }
-    }
-    return response;
-  }
-
-  RmCallbackHandler getRmCallbackHandler() {
-    return new RmCallbackHandler();
+  RmCallbackHandler createRmCallbackHandler() {
+    return new RmCallbackHandler(this);
   }
 
   @SuppressWarnings("rawtypes")
@@ -733,4 +663,14 @@ public class ApplicationMaster {
         allocatedContainer, containerListener, shellId, role, sleepMillis);
     return new Thread(runnableLaunchContainer);
   }
+
+  public RayClusterConfig getRayConf() {
+    return rayConf;
+  }
+
+  public TimelineClient getTimelineClient() {
+    return timelineClient;
+  }
+
+
 }

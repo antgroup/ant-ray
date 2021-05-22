@@ -28,7 +28,7 @@ public class TimelineUtil {
 
 
   public static void publishContainerStartEvent(final TimelineClient timelineClient, final Container container,
-      String domainId, UserGroupInformation ugi, Configuration conf) {
+      String domainId, UserGroupInformation ugi) {
     final TimelineEntity entity = new TimelineEntity();
     entity.setEntityId(container.getId().toString());
     entity.setEntityType(ApplicationMaster.DsEntity.DS_CONTAINER.toString());
@@ -46,7 +46,7 @@ public class TimelineUtil {
 
     try {
       processTimelineResponseErrors(putContainerEntity(timelineClient, container.getId().getApplicationAttemptId(),
-          entity, conf));
+          entity, timelineClient.getConfig()));
     } catch (YarnException | IOException | ClientHandlerException e) {
       logger.error("Container start event could not be published for " + container
           .getId()
@@ -56,7 +56,7 @@ public class TimelineUtil {
 
   public static void publishContainerEndEvent(final TimelineClient timelineClient,
       ContainerStatus container,
-      String domainId, UserGroupInformation ugi, Configuration conf) {
+      String domainId, UserGroupInformation ugi) {
     final TimelineEntity entity = new TimelineEntity();
     entity.setEntityId(container.getContainerId().toString());
     entity.setEntityType(ApplicationMaster.DsEntity.DS_CONTAINER.toString());
@@ -72,7 +72,8 @@ public class TimelineUtil {
     event.addEventInfo("Exit Status", container.getExitStatus());
     entity.addEvent(event);
     try {
-      processTimelineResponseErrors(putContainerEntity(timelineClient, container.getContainerId().getApplicationAttemptId(), entity, conf));
+      processTimelineResponseErrors(putContainerEntity(timelineClient, container.getContainerId().getApplicationAttemptId(),
+          entity, timelineClient.getConfig()));
     } catch (YarnException | IOException | ClientHandlerException e) {
       logger.error("Container end event could not be published for " + container
           .getContainerId()
@@ -80,7 +81,7 @@ public class TimelineUtil {
     }
   }
 
-  private static TimelinePutResponse processTimelineResponseErrors(
+  public static TimelinePutResponse processTimelineResponseErrors(
       TimelinePutResponse response) {
     List<TimelinePutError> errors = response.getErrors();
     if (errors.size() == 0) {
@@ -97,9 +98,9 @@ public class TimelineUtil {
   }
 
   private static TimelinePutResponse putContainerEntity(TimelineClient timelineClient, ApplicationAttemptId currAttemptId,
-      TimelineEntity entity, Configuration conf)
+      TimelineEntity entity, Configuration yarnConf)
       throws YarnException, IOException {
-    if (org.apache.hadoop.yarn.util.timeline.TimelineUtils.timelineServiceV1_5Enabled(conf)) {
+    if (org.apache.hadoop.yarn.util.timeline.TimelineUtils.timelineServiceV1_5Enabled(yarnConf)) {
       TimelineEntityGroupId groupId = TimelineEntityGroupId.newInstance(currAttemptId.getApplicationId(), CONTAINER_ENTITY_GROUP_ID);
       return timelineClient.putEntities(currAttemptId, groupId, entity);
     } else {

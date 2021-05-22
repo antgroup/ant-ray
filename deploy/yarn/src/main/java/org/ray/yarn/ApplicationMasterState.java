@@ -37,6 +37,9 @@ public class ApplicationMasterState {
   int numTotalContainers = 1;
   // Ray Node List
   RayNodeContext[] indexToNode = null;
+
+  // No. of each of the Ray roles including head and work
+  private Map<String, Integer> numRoles = Maps.newHashMapWithExpectedSize(2);
   Map<String, RayNodeContext> containerToNode = Maps.newHashMap();
   @VisibleForTesting
   final Set<ContainerId> launchedContainers =

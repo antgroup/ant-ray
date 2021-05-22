@@ -25,14 +25,19 @@ import org.ray.yarn.utils.TimelineUtil;
 public class RmCallbackHandler extends AMRMClientAsync.AbstractCallbackHandler {
 
   public static final Log logger = LogFactory.getLog(RmCallbackHandler.class);
-  private final RayClusterConfig rayConf = null;
-  private final ApplicationMasterState amState = null;
-  private final NMClientAsync nmClientAsync = null;
+  private final RayClusterConfig rayConf;
+  private final ApplicationMasterState amState;
   private final AMRMClientAsync amRmClient = null;
-  private final TimelineClient timelineClient = null;
+  private final TimelineClient timelineClient;
   private final List<Thread> launchThreads = new ArrayList<Thread>();
-  private final UserGroupInformation appSubmitterUgi = null;
-  private final Configuration yarnConf = null;
+  private final UserGroupInformation appSubmitterUgi;
+
+  public RmCallbackHandler(ApplicationMaster applicationMaster) {
+    rayConf = applicationMaster.getRayConf();
+    amState = applicationMaster.amState;
+    timelineClient = applicationMaster.timelineClient;
+    appSubmitterUgi = applicationMaster.appSubmitterUgi;
+  }
 
   @Override
   public void onContainersCompleted(List<ContainerStatus> completedContainers) {
@@ -120,7 +125,7 @@ public class RmCallbackHandler extends AMRMClientAsync.AbstractCallbackHandler {
             + containerStatus.getContainerId());
       }
       if (timelineClient != null) {
-        TimelineUtil.publishContainerEndEvent(timelineClient, containerStatus, rayConf.getDomainId(), appSubmitterUgi, yarnConf);
+        TimelineUtil.publishContainerEndEvent(timelineClient, containerStatus, rayConf.getDomainId(), appSubmitterUgi);
       }
 
       if (restartClasterFlag) {

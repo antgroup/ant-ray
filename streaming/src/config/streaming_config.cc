@@ -1,6 +1,5 @@
-#include <unistd.h>
+#include "config/streaming_config.h"
 
-#include "streaming_config.h"
 #include "util/streaming_logging.h"
 
 namespace ray {
@@ -11,32 +10,39 @@ uint32_t StreamingConfig::DEFAULT_RING_BUFFER_CAPACITY = 500;
 uint32_t StreamingConfig::DEFAULT_EMPTY_MESSAGE_TIME_INTERVAL = 20;
 // Time to force clean if barrier in queue, default 0ms
 const uint32_t StreamingConfig::MESSAGE_BUNDLE_MAX_SIZE = 2048;
+const uint32_t StreamingConfig::RESEND_NOTIFY_MAX_INTERVAL = 1000;  // ms
+
+#define RESET_IF_INT_CONF(KEY, VALUE) \
+  if (0 != VALUE) {                   \
+    Set##KEY(VALUE);                  \
+  }
+#define RESET_IF_STR_CONF(KEY, VALUE) \
+  if (!VALUE.empty()) {               \
+    Set##KEY(VALUE);                  \
+  }
+#define RESET_IF_NOT_DEFAULT_CONF(KEY, VALUE, DEFAULT) \
+  if (DEFAULT != VALUE) {                              \
+    Set##KEY(VALUE);                                   \
+  }
 
 void StreamingConfig::FromProto(const uint8_t *data, uint32_t size) {
   proto::StreamingConfig config;
   STREAMING_CHECK(config.ParseFromArray(data, size)) << "Parse streaming conf failed";
-  if (!config.job_name().empty()) {
-    SetJobName(config.job_name());
-  }
-  if (!config.task_job_id().empty()) {
-    STREAMING_CHECK(config.task_job_id().size() == 2 * JobID::Size());
-    SetTaskJobId(config.task_job_id());
-  }
-  if (!config.worker_name().empty()) {
-    SetWorkerName(config.worker_name());
-  }
-  if (!config.op_name().empty()) {
-    SetOpName(config.op_name());
-  }
-  if (config.role() != proto::OperatorType::UNKNOWN) {
-    SetOperatorType(config.role());
-  }
-  if (config.ring_buffer_capacity() != 0) {
-    SetRingBufferCapacity(config.ring_buffer_capacity());
-  }
-  if (config.empty_message_interval() != 0) {
-    SetEmptyMessageTimeInterval(config.empty_message_interval());
-  }
+  RESET_IF_STR_CONF(JobName, config.job_name())
+  RESET_IF_STR_CONF(WorkerName, config.worker_name())
+  RESET_IF_STR_CONF(OpName, config.op_name())
+  RESET_IF_NOT_DEFAULT_CONF(NodeType, config.role(), proto::NodeType::UNKNOWN)
+  RESET_IF_INT_CONF(RingBufferCapacity, config.ring_buffer_capacity())
+  RESET_IF_INT_CONF(EmptyMessageTimeInterval, config.empty_message_interval())
+  RESET_IF_NOT_DEFAULT_CONF(FlowControlType, config.flow_control_type(),
+                            proto::FlowControlType::UNKNOWN_FLOW_CONTROL_TYPE)
+  RESET_IF_INT_CONF(WriterConsumedStep, config.writer_consumed_step())
+  RESET_IF_INT_CONF(ReaderConsumedStep, config.reader_consumed_step())
+  RESET_IF_INT_CONF(EventDrivenFlowControlInterval,
+                    config.event_driven_flow_control_interval())
+  STREAMING_CHECK(writer_consumed_step_ >= reader_consumed_step_)
+      << "Writer consuemd step " << writer_consumed_step_
+      << "can not be smaller then reader consumed step " << reader_consumed_step_;
 }
 
 uint32_t StreamingConfig::GetRingBufferCapacity() const { return ring_buffer_capacity_; }
@@ -45,45 +51,5 @@ void StreamingConfig::SetRingBufferCapacity(uint32_t ring_buffer_capacity) {
   StreamingConfig::ring_buffer_capacity_ =
       std::min(ring_buffer_capacity, StreamingConfig::MESSAGE_BUNDLE_MAX_SIZE);
 }
-
-uint32_t StreamingConfig::GetEmptyMessageTimeInterval() const {
-  return empty_message_time_interval_;
-}
-
-void StreamingConfig::SetEmptyMessageTimeInterval(uint32_t empty_message_time_interval) {
-  StreamingConfig::empty_message_time_interval_ = empty_message_time_interval;
-}
-
-streaming::proto::OperatorType StreamingConfig::GetOperatorType() const {
-  return operator_type_;
-}
-
-void StreamingConfig::SetOperatorType(streaming::proto::OperatorType type) {
-  StreamingConfig::operator_type_ = type;
-}
-
-const std::string &StreamingConfig::GetJobName() const { return job_name_; }
-
-void StreamingConfig::SetJobName(const std::string &job_name) {
-  StreamingConfig::job_name_ = job_name;
-}
-
-const std::string &StreamingConfig::GetOpName() const { return op_name_; }
-
-void StreamingConfig::SetOpName(const std::string &op_name) {
-  StreamingConfig::op_name_ = op_name;
-}
-
-const std::string &StreamingConfig::GetWorkerName() const { return worker_name_; }
-void StreamingConfig::SetWorkerName(const std::string &worker_name) {
-  StreamingConfig::worker_name_ = worker_name;
-}
-
-const std::string &StreamingConfig::GetTaskJobId() const { return task_job_id_; }
-
-void StreamingConfig::SetTaskJobId(const std::string &task_job_id) {
-  StreamingConfig::task_job_id_ = task_job_id;
-}
-
 }  // namespace streaming
 }  // namespace ray

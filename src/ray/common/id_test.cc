@@ -1,39 +1,36 @@
-#include "gtest/gtest.h"
+// Copyright 2017 The Ray Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#include "gtest/gtest.h"
 #include "ray/common/common_protocol.h"
 #include "ray/common/task/task_spec.h"
 
 namespace ray {
 
-void TestReturnObjectId(const TaskID &task_id, int64_t return_index,
-                        uint8_t transport_type) {
-  // Round trip test for computing the object ID for a task's return value,
-  // then computing the task ID that created the object.
-  ObjectID return_id = ObjectID::ForTaskReturn(task_id, return_index, transport_type);
-  ASSERT_TRUE(return_id.CreatedByTask());
-  ASSERT_TRUE(return_id.IsReturnObject());
-  ASSERT_FALSE(return_id.IsPutObject());
-  ASSERT_EQ(return_id.TaskId(), task_id);
-  ASSERT_TRUE(transport_type == return_id.GetTransportType());
-  ASSERT_EQ(return_id.ObjectIndex(), return_index);
-}
-
-void TestPutObjectId(const TaskID &task_id, int64_t put_index) {
-  // Round trip test for computing the object ID for a task's put value, then
-  // computing the task ID that created the object.
-  ObjectID put_id = ObjectID::ForPut(task_id, put_index, 1);
-  ASSERT_TRUE(put_id.CreatedByTask());
-  ASSERT_FALSE(put_id.IsReturnObject());
-  ASSERT_TRUE(put_id.IsPutObject());
-  ASSERT_EQ(put_id.TaskId(), task_id);
-  ASSERT_TRUE(1 == put_id.GetTransportType());
-  ASSERT_EQ(put_id.ObjectIndex(), put_index);
+void TestFromIndexObjectId(const TaskID &task_id, int64_t index) {
+  // Round trip test for computing the object ID for an object created by a task, either
+  // via an object put or by being a return object for the task.
+  ObjectID obj_id = ObjectID::FromIndex(task_id, index);
+  ASSERT_EQ(obj_id.TaskId(), task_id);
+  ASSERT_EQ(obj_id.ObjectIndex(), index);
 }
 
 void TestRandomObjectId() {
   // Round trip test for computing the object ID from random.
   const ObjectID random_object_id = ObjectID::FromRandom();
-  ASSERT_FALSE(random_object_id.CreatedByTask());
+  ASSERT_FALSE(random_object_id.TaskId().IsNil());
+  ASSERT_EQ(random_object_id.ObjectIndex(), 0);
 }
 
 const static JobID kDefaultJobId = JobID::FromInt(199);
@@ -73,17 +70,10 @@ TEST(ObjectIDTest, TestObjectID) {
       TaskID::ForActorTask(kDefaultJobId, kDefaultDriverTaskId, 1, default_actor_id);
 
   {
-    // test for put
-    TestPutObjectId(default_task_id, 1);
-    TestPutObjectId(default_task_id, 2);
-    TestPutObjectId(default_task_id, ObjectID::kMaxObjectIndex);
-  }
-
-  {
-    // test for return
-    TestReturnObjectId(default_task_id, 1, 2);
-    TestReturnObjectId(default_task_id, 2, 3);
-    TestReturnObjectId(default_task_id, ObjectID::kMaxObjectIndex, 4);
+    // test from index
+    TestFromIndexObjectId(default_task_id, 1);
+    TestFromIndexObjectId(default_task_id, 2);
+    TestFromIndexObjectId(default_task_id, ObjectID::kMaxObjectIndex);
   }
 
   {
@@ -97,6 +87,16 @@ TEST(NilTest, TestIsNil) {
   ASSERT_TRUE(TaskID::Nil().IsNil());
   ASSERT_TRUE(ObjectID().IsNil());
   ASSERT_TRUE(ObjectID::Nil().IsNil());
+}
+
+TEST(HashTest, TestNilHash) {
+  // Manually trigger the hash calculation of the static global nil ID.
+  auto nil_hash = ObjectID::Nil().Hash();
+  ObjectID id1 = ObjectID::FromRandom();
+  ASSERT_NE(nil_hash, id1.Hash());
+  ObjectID id2 = ObjectID::FromBinary(ObjectID::FromRandom().Binary());
+  ASSERT_NE(nil_hash, id2.Hash());
+  ASSERT_NE(id1.Hash(), id2.Hash());
 }
 
 }  // namespace ray

@@ -1,32 +1,34 @@
+// Copyright 2017 The Ray Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <string.h>
+
 #include <sstream>
 
 #include "ray/common/common_protocol.h"
 #include "ray/common/id.h"
 #include "ray/common/status.h"
-#include "ray/protobuf/gcs.pb.h"
+#include "ray/gcs/redis_module/redis_string.h"
+#include "ray/gcs/redis_module/redismodule.h"
 #include "ray/util/logging.h"
-#include "redis_string.h"
-#include "redismodule.h"
+#include "src/ray/protobuf/gcs.pb.h"
 
 using ray::Status;
 using ray::rpc::GcsChangeMode;
 using ray::rpc::GcsEntry;
 using ray::rpc::TablePrefix;
 using ray::rpc::TablePubsub;
-
-#if RAY_USE_NEW_GCS
-// Under this flag, ray-project/credis will be loaded.  Specifically, via
-// "path/redis-server --loadmodule <credis module> --loadmodule <current
-// libray_redis_module>" (dlopen() under the hood) will a definition of "module"
-// be supplied.
-//
-// All commands in this file that depend on "module" must be wrapped by "#if
-// RAY_USE_NEW_GCS", until we switch to this launch configuration as the
-// default.
-#include "chain_module.h"
-extern RedisChainModule module;
-#endif
 
 #define REPLY_AND_RETURN_IF_FALSE(CONDITION, MESSAGE) \
   if (!(CONDITION)) {                                 \
@@ -313,13 +315,6 @@ int TableAdd_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int arg
   return TableAdd_DoPublish(ctx, argv, argc);
 }
 
-#if RAY_USE_NEW_GCS
-int ChainTableAdd_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
-  return module.ChainReplicate(ctx, argv, argc, /*node_func=*/TableAdd_DoWrite,
-                               /*tail_func=*/TableAdd_DoPublish);
-}
-#endif
-
 int TableAppend_DoWrite(RedisModuleCtx *ctx, RedisModuleString **argv, int argc,
                         RedisModuleString **mutated_key_str) {
   if (argc < 5 || argc > 6) {
@@ -419,15 +414,6 @@ int TableAppend_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int 
   }
   return TableAppend_DoPublish(ctx, argv, argc);
 }
-
-#if RAY_USE_NEW_GCS
-int ChainTableAppend_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
-                                  int argc) {
-  return module.ChainReplicate(ctx, argv, argc,
-                               /*node_func=*/TableAppend_DoWrite,
-                               /*tail_func=*/TableAppend_DoPublish);
-}
-#endif
 
 int Set_DoPublish(RedisModuleCtx *ctx, RedisModuleString **argv, bool is_add) {
   RedisModuleString *pubsub_channel_str = argv[2];
@@ -968,16 +954,15 @@ AUTO_MEMORY(TableRequestNotifications_RedisCommand);
 AUTO_MEMORY(TableDelete_RedisCommand);
 AUTO_MEMORY(TableCancelNotifications_RedisCommand);
 AUTO_MEMORY(DebugString_RedisCommand);
-#if RAY_USE_NEW_GCS
-AUTO_MEMORY(ChainTableAdd_RedisCommand);
-AUTO_MEMORY(ChainTableAppend_RedisCommand);
-#endif
 
 extern "C" {
 
 /// This function must be present on each Redis module. It is used in order to
 /// register the commands into the Redis server.
-int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
+    int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   REDISMODULE_NOT_USED(argv);
   REDISMODULE_NOT_USED(argc);
 
@@ -1036,19 +1021,6 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
                                 "readonly", 0, 0, 0) == REDISMODULE_ERR) {
     return REDISMODULE_ERR;
   }
-
-#if RAY_USE_NEW_GCS
-  // Chain-enabled commands that depend on ray-project/credis.
-  if (RedisModule_CreateCommand(ctx, "ray.chain.table_add", ChainTableAdd_RedisCommand,
-                                "write pubsub", 0, 0, 0) == REDISMODULE_ERR) {
-    return REDISMODULE_ERR;
-  }
-  if (RedisModule_CreateCommand(ctx, "ray.chain.table_append",
-                                ChainTableAppend_RedisCommand, "write pubsub", 0, 0,
-                                0) == REDISMODULE_ERR) {
-    return REDISMODULE_ERR;
-  }
-#endif
 
   return REDISMODULE_OK;
 }

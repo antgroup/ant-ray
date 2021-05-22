@@ -9,6 +9,7 @@ VERSION_1.0 {
         *ray*RayObject*;
         *ray*Status*;
         *ray*RayFunction*;
+        *ray*FunctionDescriptorBuilder*;
         *ray*TaskArg*;
         *ray*TaskOptions*;
         *ray*Buffer*;
@@ -22,11 +23,15 @@ VERSION_1.0 {
         *ray*TaskID*;
         *ray*ActorID*;
         *ray*ObjectID*;
+        *ray*ObjectReference*;
         # Others
         *ray*CoreWorker*;
         *PyInit*;
         *init_raylet*;
         *Java*;
         *JNI_*;
+        *ray*streaming*;
+        *aligned_free*;
+        *aligned_malloc*;
     local: *;
 };

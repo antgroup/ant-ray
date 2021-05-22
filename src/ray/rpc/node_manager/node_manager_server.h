@@ -1,6 +1,20 @@
-#ifndef RAY_RPC_NODE_MANAGER_SERVER_H
-#define RAY_RPC_NODE_MANAGER_SERVER_H
+// Copyright 2017 The Ray Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#pragma once
+
+#include "ray/common/asio/instrumented_io_context.h"
 #include "ray/rpc/grpc_server.h"
 #include "ray/rpc/server_call.h"
 #include "src/ray/protobuf/node_manager.grpc.pb.h"
@@ -10,12 +24,24 @@ namespace ray {
 namespace rpc {
 
 /// NOTE: See src/ray/core_worker/core_worker.h on how to add a new grpc handler.
-#define RAY_NODE_MANAGER_RPC_HANDLERS                              \
-  RPC_SERVICE_HANDLER(NodeManagerService, RequestWorkerLease, 100) \
-  RPC_SERVICE_HANDLER(NodeManagerService, ReturnWorker, 100)       \
-  RPC_SERVICE_HANDLER(NodeManagerService, ForwardTask, 100)        \
-  RPC_SERVICE_HANDLER(NodeManagerService, PinObjectIDs, 100)       \
-  RPC_SERVICE_HANDLER(NodeManagerService, GetNodeStats, 1)
+#define RAY_NODE_MANAGER_RPC_HANDLERS                             \
+  RPC_SERVICE_HANDLER(NodeManagerService, UpdateResourceUsage)    \
+  RPC_SERVICE_HANDLER(NodeManagerService, RequestResourceReport)  \
+  RPC_SERVICE_HANDLER(NodeManagerService, RequestWorkerLease)     \
+  RPC_SERVICE_HANDLER(NodeManagerService, ReturnWorker)           \
+  RPC_SERVICE_HANDLER(NodeManagerService, ReleaseUnusedWorkers)   \
+  RPC_SERVICE_HANDLER(NodeManagerService, CancelWorkerLease)      \
+  RPC_SERVICE_HANDLER(NodeManagerService, PinObjectIDs)           \
+  RPC_SERVICE_HANDLER(NodeManagerService, GetNodeStats)           \
+  RPC_SERVICE_HANDLER(NodeManagerService, GlobalGC)               \
+  RPC_SERVICE_HANDLER(NodeManagerService, FormatGlobalMemoryInfo) \
+  RPC_SERVICE_HANDLER(NodeManagerService, PrepareBundleResources) \
+  RPC_SERVICE_HANDLER(NodeManagerService, CommitBundleResources)  \
+  RPC_SERVICE_HANDLER(NodeManagerService, CancelResourceReserve)  \
+  RPC_SERVICE_HANDLER(NodeManagerService, RequestObjectSpillage)  \
+  RPC_SERVICE_HANDLER(NodeManagerService, ReleaseUnusedBundles)   \
+  RPC_SERVICE_HANDLER(NodeManagerService, GetSystemConfig)        \
+  RPC_SERVICE_HANDLER(NodeManagerService, GetGcsServerAddress)
 
 /// Interface of the `NodeManagerService`, see `src/ray/protobuf/node_manager.proto`.
 class NodeManagerServiceHandler {
@@ -31,6 +57,15 @@ class NodeManagerServiceHandler {
   /// \param[out] reply The reply message.
   /// \param[in] send_reply_callback The callback to be called when the request is done.
 
+  virtual void HandleUpdateResourceUsage(const rpc::UpdateResourceUsageRequest &request,
+                                         rpc::UpdateResourceUsageReply *reply,
+                                         rpc::SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleRequestResourceReport(
+      const rpc::RequestResourceReportRequest &request,
+      rpc::RequestResourceReportReply *reply,
+      rpc::SendReplyCallback send_reply_callback) = 0;
+
   virtual void HandleRequestWorkerLease(const RequestWorkerLeaseRequest &request,
                                         RequestWorkerLeaseReply *reply,
                                         SendReplyCallback send_reply_callback) = 0;
@@ -39,9 +74,28 @@ class NodeManagerServiceHandler {
                                   ReturnWorkerReply *reply,
                                   SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleForwardTask(const ForwardTaskRequest &request,
-                                 ForwardTaskReply *reply,
-                                 SendReplyCallback send_reply_callback) = 0;
+  virtual void HandleReleaseUnusedWorkers(const ReleaseUnusedWorkersRequest &request,
+                                          ReleaseUnusedWorkersReply *reply,
+                                          SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleCancelWorkerLease(const rpc::CancelWorkerLeaseRequest &request,
+                                       rpc::CancelWorkerLeaseReply *reply,
+                                       rpc::SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandlePrepareBundleResources(
+      const rpc::PrepareBundleResourcesRequest &request,
+      rpc::PrepareBundleResourcesReply *reply,
+      rpc::SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleCommitBundleResources(
+      const rpc::CommitBundleResourcesRequest &request,
+      rpc::CommitBundleResourcesReply *reply,
+      rpc::SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleCancelResourceReserve(
+      const rpc::CancelResourceReserveRequest &request,
+      rpc::CancelResourceReserveReply *reply,
+      rpc::SendReplyCallback send_reply_callback) = 0;
 
   virtual void HandlePinObjectIDs(const PinObjectIDsRequest &request,
                                   PinObjectIDsReply *reply,
@@ -50,6 +104,29 @@ class NodeManagerServiceHandler {
   virtual void HandleGetNodeStats(const GetNodeStatsRequest &request,
                                   GetNodeStatsReply *reply,
                                   SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleGlobalGC(const GlobalGCRequest &request, GlobalGCReply *reply,
+                              SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleFormatGlobalMemoryInfo(const FormatGlobalMemoryInfoRequest &request,
+                                            FormatGlobalMemoryInfoReply *reply,
+                                            SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleRequestObjectSpillage(const RequestObjectSpillageRequest &request,
+                                           RequestObjectSpillageReply *reply,
+                                           SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleReleaseUnusedBundles(const ReleaseUnusedBundlesRequest &request,
+                                          ReleaseUnusedBundlesReply *reply,
+                                          SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleGetSystemConfig(const GetSystemConfigRequest &request,
+                                     GetSystemConfigReply *reply,
+                                     SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleGetGcsServerAddress(const GetGcsServerAddressRequest &request,
+                                         GetGcsServerAddressReply *reply,
+                                         SendReplyCallback send_reply_callback) = 0;
 };
 
 /// The `GrpcService` for `NodeManagerService`.
@@ -59,7 +136,7 @@ class NodeManagerGrpcService : public GrpcService {
   ///
   /// \param[in] io_service See super class.
   /// \param[in] handler The service handler that actually handle the requests.
-  NodeManagerGrpcService(boost::asio::io_service &io_service,
+  NodeManagerGrpcService(instrumented_io_context &io_service,
                          NodeManagerServiceHandler &service_handler)
       : GrpcService(io_service), service_handler_(service_handler){};
 
@@ -68,8 +145,7 @@ class NodeManagerGrpcService : public GrpcService {
 
   void InitServerCallFactories(
       const std::unique_ptr<grpc::ServerCompletionQueue> &cq,
-      std::vector<std::pair<std::unique_ptr<ServerCallFactory>, int>>
-          *server_call_factories_and_concurrencies) override {
+      std::vector<std::unique_ptr<ServerCallFactory>> *server_call_factories) override {
     RAY_NODE_MANAGER_RPC_HANDLERS
   }
 
@@ -83,5 +159,3 @@ class NodeManagerGrpcService : public GrpcService {
 
 }  // namespace rpc
 }  // namespace ray
-
-#endif

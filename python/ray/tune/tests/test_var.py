@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import random
 import unittest
 
 import ray
@@ -7,16 +8,14 @@ from ray.rllib import _register_all
 
 from ray import tune
 from ray.tune.result import DEFAULT_RESULTS_DIR
-from ray.tune.experiment import Experiment
 from ray.tune.suggest import grid_search, BasicVariantGenerator
-from ray.tune.suggest.suggestion import _MockSuggestionAlgorithm
 from ray.tune.suggest.variant_generator import (RecursiveDependencyError,
                                                 resolve_nested_dict)
 
 
 class VariantGeneratorTest(unittest.TestCase):
     def setUp(self):
-        ray.init()
+        ray.init(num_cpus=2)
 
     def tearDown(self):
         ray.shutdown()
@@ -25,7 +24,14 @@ class VariantGeneratorTest(unittest.TestCase):
     def generate_trials(self, spec, name):
         suggester = BasicVariantGenerator()
         suggester.add_configurations({name: spec})
-        return suggester.next_trials()
+        trials = []
+        while not suggester.is_finished():
+            trial = suggester.next_trial()
+            if trial:
+                trials.append(trial)
+            else:
+                break
+        return trials
 
     def testParseToTrials(self):
         trials = self.generate_trials({
@@ -210,6 +216,29 @@ class VariantGeneratorTest(unittest.TestCase):
         self.assertEqual(trials[0].config, {"x": 100, "y": 1})
         self.assertEqual(trials[1].config, {"x": 200, "y": 1})
 
+    def testDependentGridSearchCallable(self):
+        class Normal:
+            def __call__(self, _config):
+                return random.normalvariate(mu=0, sigma=1)
+
+        class Single:
+            def __call__(self, _config):
+                return 20
+
+        trials = self.generate_trials({
+            "run": "PPO",
+            "config": {
+                "x": grid_search(
+                    [tune.sample_from(Normal()),
+                     tune.sample_from(Normal())]),
+                "y": tune.sample_from(Single()),
+            },
+        }, "dependent_grid_search")
+        trials = list(trials)
+        self.assertEqual(len(trials), 2)
+        self.assertEqual(trials[0].config["y"], 20)
+        self.assertEqual(trials[1].config["y"], 20)
+
     def testNestedValues(self):
         trials = self.generate_trials({
             "run": "PPO",
@@ -241,13 +270,13 @@ class VariantGeneratorTest(unittest.TestCase):
         })
 
     def testLogUniform(self):
-        sampler = tune.loguniform(1e-10, 1e-1).func
-        results = [sampler(None) for i in range(1000)]
+        sampler = tune.loguniform(1e-10, 1e-1)
+        results = sampler.sample(None, 1000)
         assert abs(np.log(min(results)) / np.log(10) - -10) < 0.1
         assert abs(np.log(max(results)) / np.log(10) - -1) < 0.1
 
-        sampler_e = tune.loguniform(np.e**-4, np.e, base=np.e).func
-        results_e = [sampler_e(None) for i in range(1000)]
+        sampler_e = tune.loguniform(np.e**-4, np.e, base=np.e)
+        results_e = sampler_e.sample(None, 1000)
         assert abs(np.log(min(results_e)) - -4) < 0.1
         assert abs(np.log(max(results_e)) - 1) < 0.1
 
@@ -277,36 +306,7 @@ class VariantGeneratorTest(unittest.TestCase):
         except RecursiveDependencyError as e:
             assert "`foo` recursively depends on" in str(e), e
         else:
-            assert False
-
-    def testMaxConcurrentSuggestions(self):
-        """Checks that next_trials() supports throttling."""
-        experiment_spec = {
-            "run": "PPO",
-            "num_samples": 6,
-        }
-        experiments = [Experiment.from_json("test", experiment_spec)]
-
-        searcher = _MockSuggestionAlgorithm(max_concurrent=4)
-        searcher.add_configurations(experiments)
-        trials = searcher.next_trials()
-        self.assertEqual(len(trials), 4)
-        self.assertEqual(searcher.next_trials(), [])
-
-        finished_trial = trials.pop()
-        searcher.on_trial_complete(finished_trial.trial_id)
-        self.assertEqual(len(searcher.next_trials()), 1)
-
-        finished_trial = trials.pop()
-        searcher.on_trial_complete(finished_trial.trial_id)
-
-        finished_trial = trials.pop()
-        searcher.on_trial_complete(finished_trial.trial_id)
-
-        finished_trial = trials.pop()
-        searcher.on_trial_complete(finished_trial.trial_id)
-        self.assertEqual(len(searcher.next_trials()), 1)
-        self.assertEqual(len(searcher.next_trials()), 0)
+            raise
 
 
 if __name__ == "__main__":

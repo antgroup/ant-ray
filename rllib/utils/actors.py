@@ -1,6 +1,7 @@
 import logging
-import os
+import platform
 import ray
+from collections import deque
 
 logger = logging.getLogger(__name__)
 
@@ -11,15 +12,15 @@ class TaskPool:
     def __init__(self):
         self._tasks = {}
         self._objects = {}
-        self._fetching = []
+        self._fetching = deque()
 
-    def add(self, worker, all_obj_ids):
-        if isinstance(all_obj_ids, list):
-            obj_id = all_obj_ids[0]
+    def add(self, worker, all_obj_refs):
+        if isinstance(all_obj_refs, list):
+            obj_ref = all_obj_refs[0]
         else:
-            obj_id = all_obj_ids
-        self._tasks[obj_id] = worker
-        self._objects[obj_id] = all_obj_ids
+            obj_ref = all_obj_refs
+        self._tasks[obj_ref] = worker
+        self._objects[obj_ref] = all_obj_refs
 
     def completed(self, blocking_wait=False):
         pending = list(self._tasks)
@@ -27,38 +28,37 @@ class TaskPool:
             ready, _ = ray.wait(pending, num_returns=len(pending), timeout=0)
             if not ready and blocking_wait:
                 ready, _ = ray.wait(pending, num_returns=1, timeout=10.0)
-            for obj_id in ready:
-                yield (self._tasks.pop(obj_id), self._objects.pop(obj_id))
+            for obj_ref in ready:
+                yield (self._tasks.pop(obj_ref), self._objects.pop(obj_ref))
 
     def completed_prefetch(self, blocking_wait=False, max_yield=999):
         """Similar to completed but only returns once the object is local.
 
-        Assumes obj_id only is one id."""
+        Assumes obj_ref only is one id."""
 
-        for worker, obj_id in self.completed(blocking_wait=blocking_wait):
-            self._fetching.append((worker, obj_id))
+        for worker, obj_ref in self.completed(blocking_wait=blocking_wait):
+            self._fetching.append((worker, obj_ref))
 
-        remaining = []
-        num_yielded = 0
-        for worker, obj_id in self._fetching:
-            if num_yielded < max_yield:
-                yield (worker, obj_id)
-                num_yielded += 1
-            else:
-                remaining.append((worker, obj_id))
-        self._fetching = remaining
+        for _ in range(max_yield):
+            if not self._fetching:
+                break
+
+            yield self._fetching.popleft()
 
     def reset_workers(self, workers):
         """Notify that some workers may be removed."""
-        for obj_id, ev in self._tasks.copy().items():
+        for obj_ref, ev in self._tasks.copy().items():
             if ev not in workers:
-                del self._tasks[obj_id]
-                del self._objects[obj_id]
-        ok = []
-        for ev, obj_id in self._fetching:
+                del self._tasks[obj_ref]
+                del self._objects[obj_ref]
+
+        # We want to keep the same deque reference so that we don't suffer from
+        # stale references in generators that are still in flight
+        for _ in range(len(self._fetching)):
+            ev, obj_ref = self._fetching.popleft()
             if ev in workers:
-                ok.append((ev, obj_id))
-        self._fetching = ok
+                # Re-queue items that are still valid
+                self._fetching.append((ev, obj_ref))
 
     @property
     def count(self):
@@ -73,7 +73,7 @@ def drop_colocated(actors):
 
 
 def split_colocated(actors):
-    localhost = os.uname()[1]
+    localhost = platform.node()
     hosts = ray.get([a.get_host.remote() for a in actors])
     local = []
     non_local = []

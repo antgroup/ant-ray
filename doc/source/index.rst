@@ -1,164 +1,166 @@
-Ray
-===
+What is Ray?
+============
 
-.. raw:: html
+.. tip:: Please take 5 minutes to take the `Ray Pulse Community Survey <https://www.surveymonkey.com/r/ray-community-pulse-2021>`_!
 
-  <embed>
-    <a href="https://github.com/ray-project/ray"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
-  </embed>
+.. include:: ray-overview/basics.rst
 
-.. image:: https://github.com/ray-project/ray/raw/master/doc/source/images/ray_header_logo.png
+Getting Started with Ray
+------------------------
 
-**Ray is a fast and simple framework for building and running distributed applications.**
+Check out :ref:`gentle-intro` to learn more about Ray and its ecosystem of libraries that enable things like distributed hyperparameter tuning,
+reinforcement learning, and distributed training.
+
+Ray provides Python, Java, and *EXPERIMENTAL* C++ API. And Ray uses Tasks (functions) and Actors (Classes) to allow you to parallelize your code.
+
+.. tabs::
+  .. group-tab:: Python
+
+    .. code-block:: python
+
+        # First, run `pip install ray`.
+
+        import ray
+        ray.init()
+
+        @ray.remote
+        def f(x):
+            return x * x
+
+        futures = [f.remote(i) for i in range(4)]
+        print(ray.get(futures)) # [0, 1, 4, 9]
+
+        @ray.remote
+        class Counter(object):
+            def __init__(self):
+                self.n = 0
+
+            def increment(self):
+                self.n += 1
+
+            def read(self):
+                return self.n
+
+        counters = [Counter.remote() for i in range(4)]
+        [c.increment.remote() for c in counters]
+        futures = [c.read.remote() for c in counters]
+        print(ray.get(futures)) # [1, 1, 1, 1]
+
+  .. group-tab:: Java
+
+    First, add the `ray-api <https://mvnrepository.com/artifact/io.ray/ray-api>`__ and `ray-runtime <https://mvnrepository.com/artifact/io.ray/ray-runtime>`__ dependencies in your project.
+
+    .. code-block:: java
+
+        import io.ray.api.ActorHandle;
+        import io.ray.api.ObjectRef;
+        import io.ray.api.Ray;
+        import java.util.ArrayList;
+        import java.util.List;
+        import java.util.stream.Collectors;
+
+        public class RayDemo {
+
+          public static int square(int x) {
+            return x * x;
+          }
+
+          public static class Counter {
+
+            private int value = 0;
+
+            public void increment() {
+              this.value += 1;
+            }
+
+            public int read() {
+              return this.value;
+            }
+          }
+
+          public static void main(String[] args) {
+            // Intialize Ray runtime.
+            Ray.init();
+            {
+              List<ObjectRef<Integer>> objectRefList = new ArrayList<>();
+              // Invoke the `square` method 4 times remotely as Ray tasks.
+              // The tasks will run in parallel in the background.
+              for (int i = 0; i < 4; i++) {
+                objectRefList.add(Ray.task(RayDemo::square, i).remote());
+              }
+              // Get the actual results of the tasks with `get`.
+              System.out.println(Ray.get(objectRefList));  // [0, 1, 4, 9]
+            }
+
+            {
+              List<ActorHandle<Counter>> counters = new ArrayList<>();
+              // Create 4 actors from the `Counter` class.
+              // They will run in remote worker processes.
+              for (int i = 0; i < 4; i++) {
+                counters.add(Ray.actor(Counter::new).remote());
+              }
+
+              // Invoke the `increment` method on each actor.
+              // This will send an actor task to each remote actor.
+              for (ActorHandle<Counter> counter : counters) {
+                counter.task(Counter::increment).remote();
+              }
+              // Invoke the `read` method on each actor, and print the results.
+              List<ObjectRef<Integer>> objectRefList = counters.stream()
+                  .map(counter -> counter.task(Counter::read).remote())
+                  .collect(Collectors.toList());
+              System.out.println(Ray.get(objectRefList));  // [1, 1, 1, 1]
+            }
+          }
+        }
+
+  .. group-tab:: C++ (EXPERIMENTAL)
+
+    | The C++ Ray API is currently experimental with limited support. You can track its development `here <https://github.com/ray-project/ray/milestone/17>`__ and report issues on GitHub.
+    | Run the following commands to get started:
+    | - Build ray from source with *bazel* as shown `here <https://docs.ray.io/en/master/development.html#building-ray-full>`__.
+    | - Modify and build `cpp/example/example.cc`.
+
+    .. code-block:: shell
+
+      bazel build //cpp/example:example
+
+    | Option 1: run the example directly with a dynamic library path. It will start a Ray cluster automatically.
+
+    .. code-block:: shell
+
+      ray stop
+      ./bazel-bin/cpp/example/example --dynamic-library-path=bazel-bin/cpp/example/example.so
+
+    | Option 2: connect to an existing Ray cluster with a known redis address (e.g. `127.0.0.1:6379`).
+
+    .. code-block:: shell
+
+      ray stop
+      ray start --head --port 6379 --redis-password 5241590000000000 --node-manager-port 62665
+      ./bazel-bin/cpp/example/example --dynamic-library-path=bazel-bin/cpp/example/example.so --redis-address=127.0.0.1:6379
+
+    .. literalinclude:: ../../cpp/example/example.cc
+       :language: cpp
+
+You can also get started by visiting our `Tutorials <https://github.com/ray-project/tutorial>`_. For the latest wheels (nightlies), see the `installation page <installation.html>`__.
 
 
-Ray is packaged with the following libraries for accelerating machine learning workloads:
+Getting Involved
+================
 
-- `Tune`_: Scalable Hyperparameter Tuning
-- `RLlib`_: Scalable Reinforcement Learning
-- `RaySGD`_: Distributed Training
+.. include:: ray-overview/involvement.rst
 
-
-Star us on `on GitHub`_. You can also get started by visiting our `Tutorials <https://github.com/ray-project/tutorial>`_. For the latest wheels (nightlies), see the `installation page <installation.html>`__.
-
-.. _`on GitHub`: https://github.com/ray-project/ray
-.. _`RaySGD`: raysgd/raysgd.html
-
-.. attention:: If you're in the Bay Area, `RSVP here and come to our Ray meetup <https://www.meetup.com/Bay-Area-Ray-Meetup/events/267883815/>`_  in downtown SF on the evening of January 30!
-.. important:: Join our `community slack <https://forms.gle/9TSdDYUgxYs8SA9e8>`_ to discuss Ray!
-
-
-Quick Start
------------
-
-First, install Ray with: ``pip install ray``
-
-.. code-block:: python
-
-    # Execute Python functions in parallel.
-
-    import ray
-    ray.init()
-
-    @ray.remote
-    def f(x):
-        return x * x
-
-    futures = [f.remote(i) for i in range(4)]
-    print(ray.get(futures))
-
-To use Ray's actor model:
-
-.. code-block:: python
-
-    import ray
-    ray.init()
-
-    @ray.remote
-    class Counter(object):
-        def __init__(self):
-            self.n = 0
-
-        def increment(self):
-            self.n += 1
-
-        def read(self):
-            return self.n
-
-    counters = [Counter.remote() for i in range(4)]
-    [c.increment.remote() for c in counters]
-    futures = [c.read.remote() for c in counters]
-    print(ray.get(futures))
-
-Visit the `Walkthrough <walkthrough.html>`_ page a more comprehensive overview of Ray features.
-
-Ray programs can run on a single machine, and can also seamlessly scale to large clusters. To execute the above Ray script in the cloud, just download `this configuration file <https://github.com/ray-project/ray/blob/master/python/ray/autoscaler/aws/example-full.yaml>`__, and run:
-
-``ray submit [CLUSTER.YAML] example.py --start``
-
-Read more about `launching clusters <autoscaling.html>`_.
-
-Tune Quick Start
-----------------
-
-`Tune`_ is a library for hyperparameter tuning at any scale. With Tune, you can launch a multi-node distributed hyperparameter sweep in less than 10 lines of code. Tune supports any deep learning framework, including PyTorch, TensorFlow, and Keras.
-
-.. note::
-
-    To run this example, you will need to install the following:
-
-    .. code-block:: bash
-
-        $ pip install ray torch torchvision filelock
-
-
-This example runs a small grid search to train a CNN using PyTorch and Tune.
-
-.. literalinclude:: ../../python/ray/tune/tests/example.py
-   :language: python
-   :start-after: __quick_start_begin__
-   :end-before: __quick_start_end__
-
-If TensorBoard is installed, automatically visualize all trial results:
-
-.. code-block:: bash
-
-    tensorboard --logdir ~/ray_results
-
-.. _`Tune`: tune.html
-
-RLlib Quick Start
------------------
-
-`RLlib`_ is an open-source library for reinforcement learning built on top of Ray that offers both high scalability and a unified API for a variety of applications.
-
-.. code-block:: bash
-
-  pip install tensorflow  # or tensorflow-gpu
-  pip install ray[rllib]  # also recommended: ray[debug]
-
-.. code-block:: python
-
-    import gym
-    from gym.spaces import Discrete, Box
-    from ray import tune
-
-    class SimpleCorridor(gym.Env):
-        def __init__(self, config):
-            self.end_pos = config["corridor_length"]
-            self.cur_pos = 0
-            self.action_space = Discrete(2)
-            self.observation_space = Box(0.0, self.end_pos, shape=(1, ))
-
-        def reset(self):
-            self.cur_pos = 0
-            return [self.cur_pos]
-
-        def step(self, action):
-            if action == 0 and self.cur_pos > 0:
-                self.cur_pos -= 1
-            elif action == 1:
-                self.cur_pos += 1
-            done = self.cur_pos >= self.end_pos
-            return [self.cur_pos], 1 if done else 0, done, {}
-
-    tune.run(
-        "PPO",
-        config={
-            "env": SimpleCorridor,
-            "num_workers": 4,
-            "env_config": {"corridor_length": 5}})
-
-.. _`RLlib`: rllib.html
+If you're interested in contributing to Ray, visit our page on :ref:`Getting Involved <getting-involved>` to read about the contribution process and see what you can work on!
 
 
 More Information
-----------------
+================
 
-Here are some talks, papers, and press coverage involving Ray and its libraries. Please raise an issue if any of the below links are broken!
+Here are some talks, papers, and press coverage involving Ray and its libraries. Please raise an issue if any of the below links are broken, or if you'd like to add your own talk!
 
 Blog and Press
-~~~~~~~~~~~~~~
+--------------
 
   - `Modern Parallel and Distributed Python: A Quick Tutorial on Ray <https://towardsdatascience.com/modern-parallel-and-distributed-python-a-quick-tutorial-on-ray-99f8d70369b8>`_
   - `Why Every Python Developer Will Love Ray <https://www.datanami.com/2019/11/05/why-every-python-developer-will-love-ray/>`_
@@ -180,7 +182,7 @@ Blog and Press
 .. _`Ray Blog`: https://ray-project.github.io/
 
 Talks (Videos)
-~~~~~~~~~~~~~~
+--------------
 
  - `Programming at any Scale with Ray | SF Python Meetup Sept 2019 <https://www.youtube.com/watch?v=LfpHyIXBhlE>`_
  - `Ray for Reinforcement Learning | Data Council 2019 <https://www.youtube.com/watch?v=Ayc0ca150HI>`_
@@ -192,74 +194,98 @@ Talks (Videos)
  - `Tune: Distributed Hyperparameter Search | RISECamp 2018 <https://www.youtube.com/watch?v=38Yd_dXW51Q>`_
 
 Slides
-~~~~~~
+------
+
 - `Talk given at UC Berkeley DS100 <https://docs.google.com/presentation/d/1sF5T_ePR9R6fAi2R6uxehHzXuieme63O2n_5i9m7mVE/edit?usp=sharing>`_
 - `Talk given in October 2019 <https://docs.google.com/presentation/d/13K0JsogYQX3gUCGhmQ1PQ8HILwEDFysnq0cI2b88XbU/edit?usp=sharing>`_
 - [Tune] `Talk given at RISECamp 2019 <https://docs.google.com/presentation/d/1v3IldXWrFNMK-vuONlSdEuM82fuGTrNUDuwtfx4axsQ/edit?usp=sharing>`_
 
-Academic Papers
-~~~~~~~~~~~~~~~
+Papers
+------
+
+- `Ray 1.0 Architecture whitepaper`_ **(new)**
+- `Ray Design Patterns`_ **(new)**
+- `RLlib paper`_
+- `RLlib flow paper`_
+- `Tune paper`_
+
+*Older papers:*
 
 - `Ray paper`_
 - `Ray HotOS paper`_
-- `RLlib paper`_
-- `Tune paper`_
 
+.. _`Ray 1.0 Architecture whitepaper`: https://docs.google.com/document/d/1lAy0Owi-vPz2jEqBSaHNQcy2IBSDEHyXNOQZlGuj93c/preview
+.. _`Ray Design Patterns`: https://docs.google.com/document/d/167rnnDFIVRhHhK4mznEIemOtj63IOhtIPvSYaPgI4Fg/edit
 .. _`Ray paper`: https://arxiv.org/abs/1712.05889
 .. _`Ray HotOS paper`: https://arxiv.org/abs/1703.03924
 .. _`RLlib paper`: https://arxiv.org/abs/1712.09381
+.. _`RLlib flow paper`: https://arxiv.org/abs/2011.12719
 .. _`Tune paper`: https://arxiv.org/abs/1807.05118
 
-Getting Involved
-----------------
-
-- `ray-dev@googlegroups.com`_: For discussions about development or any general
-  questions.
-- `StackOverflow`_: For questions about how to use Ray.
-- `GitHub Issues`_: For reporting bugs and feature requests.
-- `Pull Requests`_: For submitting code contributions.
-
-.. _`ray-dev@googlegroups.com`: https://groups.google.com/forum/#!forum/ray-dev
-.. _`GitHub Issues`: https://github.com/ray-project/ray/issues
-.. _`StackOverflow`: https://stackoverflow.com/questions/tagged/ray
-.. _`Pull Requests`: https://github.com/ray-project/ray/pulls
-
-
-
 .. toctree::
+   :hidden:
    :maxdepth: -1
-   :caption: Installation
+   :caption: Overview of Ray
 
+   ray-overview/index.rst
+   ray-libraries.rst
    installation.rst
 
 .. toctree::
+   :hidden:
    :maxdepth: -1
    :caption: Ray Core
 
+   walkthrough.rst
    using-ray.rst
    configure.rst
-   cluster-index.rst
-   Tutorials <https://github.com/ray-project/tutorial>
-   Examples <auto_examples/overview.rst>
+   ray-dashboard.rst
+   Tutorial and Examples <auto_examples/overview.rst>
    package-ref.rst
 
 .. toctree::
+   :hidden:
    :maxdepth: -1
-   :caption: Tune
+   :caption: Ray Clusters/Autoscaler
 
-   tune.rst
-   tune-tutorial.rst
-   tune-advanced-tutorial.rst
-   tune-usage.rst
-   tune-distributed.rst
-   tune-schedulers.rst
-   tune-searchalg.rst
-   tune-package-ref.rst
-   tune-design.rst
-   tune-examples.rst
-   tune-contrib.rst
+   cluster/index.rst
+   cluster/quickstart.rst
+   cluster/reference.rst
+   cluster/cloud.rst
+   cluster/deploy.rst
 
 .. toctree::
+   :hidden:
+   :maxdepth: -1
+   :caption: Ray Serve
+
+   serve/index.rst
+   serve/tutorial.rst
+   serve/core-apis.rst
+   serve/http-servehandle.rst
+   serve/deployment.rst
+   serve/ml-models.rst
+   serve/performance.rst
+   serve/architecture.rst
+   serve/tutorials/index.rst
+   serve/faq.rst
+   serve/package-ref.rst
+
+.. toctree::
+   :hidden:
+   :maxdepth: -1
+   :caption: Ray Tune
+
+   tune/index.rst
+   tune/key-concepts.rst
+   tune/user-guide.rst
+   tune/tutorials/overview.rst
+   tune/examples/index.rst
+   tune/api_docs/overview.rst
+   tune/contrib.rst
+
+.. toctree::
+   :hidden:
    :maxdepth: -1
    :caption: RLlib
 
@@ -269,35 +295,71 @@ Getting Involved
    rllib-env.rst
    rllib-models.rst
    rllib-algorithms.rst
+   rllib-sample-collection.rst
    rllib-offline.rst
    rllib-concepts.rst
    rllib-examples.rst
-   rllib-dev.rst
    rllib-package-ref.rst
+   rllib-dev.rst
 
 .. toctree::
+   :hidden:
    :maxdepth: -1
-   :caption: RaySGD
+   :caption: Ray SGD
 
    raysgd/raysgd.rst
+   raysgd/raysgd_pytorch.rst
+   raysgd/raysgd_tensorflow.rst
+   raysgd/raysgd_dataset.rst
+   raysgd/raysgd_ptl.rst
+   raysgd/raysgd_tune.rst
+   raysgd/raysgd_ref.rst
 
 .. toctree::
+   :hidden:
    :maxdepth: -1
-   :caption: Experimental
+   :caption: Data Processing
 
-   pandas_on_ray.rst
-   projects.rst
-   signals.rst
-   async_api.rst
-   serve.rst
-   iter.rst
+   modin/index.rst
+   dask-on-ray.rst
+   mars-on-ray.rst
+   raydp.rst
+
+.. toctree::
+   :hidden:
+   :maxdepth: -1
+   :caption: More Libraries
+
    multiprocessing.rst
+   joblib.rst
+   iter.rst
+   xgboost-ray.rst
+   ray-client.rst
 
 .. toctree::
+   :hidden:
    :maxdepth: -1
-   :caption: Development and Internals
+   :caption: Ray Observability
+
+   ray-metrics.rst
+   ray-debugging.rst
+   ray-logging.rst
+   ray-tracing.rst
+
+.. toctree::
+   :hidden:
+   :maxdepth: -1
+   :caption: Contributing
+
+   getting-involved.rst
+
+.. toctree::
+   :hidden:
+   :maxdepth: -1
+   :caption: Development and Ray Internals
 
    development.rst
+   whitepaper.rst
+   debugging.rst
    profiling.rst
    fault-tolerance.rst
-   getting-involved.rst

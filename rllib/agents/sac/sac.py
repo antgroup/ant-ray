@@ -1,72 +1,116 @@
+"""
+Soft Actor Critic (SAC)
+=======================
+
+This file defines the distributed Trainer class for the soft actor critic
+algorithm.
+See `sac_[tf|torch]_policy.py` for the definition of the policy loss.
+
+Detailed documentation: https://docs.ray.io/en/master/rllib-algorithms.html#sac
+"""
+
+import logging
+from typing import Optional, Type
+
 from ray.rllib.agents.trainer import with_common_config
 from ray.rllib.agents.dqn.dqn import GenericOffPolicyTrainer
-from ray.rllib.agents.sac.sac_policy import SACTFPolicy
+from ray.rllib.agents.sac.sac_tf_policy import SACTFPolicy
+from ray.rllib.policy.policy import Policy
+from ray.rllib.utils.deprecation import DEPRECATED_VALUE, deprecation_warning
+from ray.rllib.utils.typing import TrainerConfigDict
+
+logger = logging.getLogger(__name__)
 
 OPTIMIZER_SHARED_CONFIGS = [
     "buffer_size", "prioritized_replay", "prioritized_replay_alpha",
-    "prioritized_replay_beta", "prioritized_replay_eps", "sample_batch_size",
-    "train_batch_size", "learning_starts"
+    "prioritized_replay_beta", "prioritized_replay_eps",
+    "rollout_fragment_length", "train_batch_size", "learning_starts"
 ]
 
 # yapf: disable
 # __sphinx_doc_begin__
+
+# Adds the following updates to the (base) `Trainer` config in
+# rllib/agents/trainer.py (`COMMON_CONFIG` dict).
 DEFAULT_CONFIG = with_common_config({
     # === Model ===
+    # Use two Q-networks (instead of one) for action-value estimation.
+    # Note: Each Q-network will have its own target network.
     "twin_q": True,
-    "use_state_preprocessor": False,
-    "policy": "GaussianLatentSpacePolicy",
-    # RLlib model options for the Q function
+    # Use a e.g. conv2D state preprocessing network before concatenating the
+    # resulting (feature) vector with the action input for the input to
+    # the Q-networks.
+    "use_state_preprocessor": DEPRECATED_VALUE,
+    # Model options for the Q network(s). These will override MODEL_DEFAULTS.
+    # The `Q_model` dict is treated just as the top-level `model` dict in
+    # setting up the Q-network(s) (2 if twin_q=True).
+    # That means, you can do for different observation spaces:
+    # obs=Box(1D) -> Tuple(Box(1D) + Action) -> concat -> post_fcnet
+    # obs=Box(3D) -> Tuple(Box(3D) + Action) -> vision-net -> concat w/ action
+    #   -> post_fcnet
+    # obs=Tuple(Box(1D), Box(3D)) -> Tuple(Box(1D), Box(3D), Action)
+    #   -> vision-net -> concat w/ Box(1D) and action -> post_fcnet
+    # You can also have SAC use your custom_model as Q-model(s), by simply
+    # specifying the `custom_model` sub-key in below dict (just like you would
+    # do in the top-level `model` dict.
     "Q_model": {
-        "hidden_activation": "relu",
-        "hidden_layer_sizes": (256, 256),
+        "fcnet_hiddens": [256, 256],
+        "fcnet_activation": "relu",
+        "post_fcnet_hiddens": [],
+        "post_fcnet_activation": None,
+        "custom_model": None,  # Use this to define custom Q-model(s).
+        "custom_model_config": {},
     },
-    # RLlib model options for the policy function
+    # Model options for the policy function (see `Q_model` above for details).
+    # The difference to `Q_model` above is that no action concat'ing is
+    # performed before the post_fcnet stack.
     "policy_model": {
-        "hidden_activation": "relu",
-        "hidden_layer_sizes": (256, 256),
+        "fcnet_hiddens": [256, 256],
+        "fcnet_activation": "relu",
+        "post_fcnet_hiddens": [],
+        "post_fcnet_activation": None,
+        "custom_model": None,  # Use this to define a custom policy model.
+        "custom_model_config": {},
     },
-    # Unsquash actions to the upper and lower bounds of env's action space
+    # Unsquash actions to the upper and lower bounds of env's action space.
+    # Ignored for discrete action spaces.
     "normalize_actions": True,
 
     # === Learning ===
-    # Update the target by \tau * policy + (1-\tau) * target_policy
+    # Disable setting done=True at end of episode. This should be set to True
+    # for infinite-horizon MDPs (e.g., many continuous control problems).
+    "no_done_at_end": False,
+    # Update the target by \tau * policy + (1-\tau) * target_policy.
     "tau": 5e-3,
-    # Target entropy lower bound. This is the inverse of reward scale,
-    # and will be optimized automatically.
-    "target_entropy": "auto",
-    # Disable setting done=True at end of episode.
-    "no_done_at_end": True,
-    # N-step target updates
+    # Initial value to use for the entropy weight alpha.
+    "initial_alpha": 1.0,
+    # Target entropy lower bound. If "auto", will be set to -|A| (e.g. -2.0 for
+    # Discrete(2), -3.0 for Box(shape=(3,))).
+    # This is the inverse of reward scale, and will be optimized automatically.
+    "target_entropy": None,
+    # N-step target updates. If >1, sars' tuples in trajectories will be
+    # postprocessed to become sa[discounted sum of R][s t+n] tuples.
     "n_step": 1,
-
-    # === Evaluation ===
-    # The evaluation stats will be reported under the "evaluation" metric key.
-    "evaluation_interval": 1,
-    # Number of episodes to run per evaluation period.
-    "evaluation_num_episodes": 1,
-    # Extra configuration that disables exploration.
-    "evaluation_config": {
-        "exploration_enabled": False,
-    },
-
-    # === Exploration ===
-    # Number of env steps to optimize for before returning
+    # Number of env steps to optimize for before returning.
     "timesteps_per_iteration": 100,
-    "exploration_enabled": True,
 
     # === Replay buffer ===
-    # Size of the replay buffer. Note that if async_updates is set, then
-    # each worker will have a replay buffer of this size.
+    # Size of the replay buffer (in time steps).
     "buffer_size": int(1e6),
     # If True prioritized replay buffer will be used.
-    # TODO(hartikainen): Make sure this works or remove the option.
     "prioritized_replay": False,
     "prioritized_replay_alpha": 0.6,
     "prioritized_replay_beta": 0.4,
     "prioritized_replay_eps": 1e-6,
-    "beta_annealing_fraction": 0.2,
+    "prioritized_replay_beta_annealing_timesteps": 20000,
     "final_prioritized_replay_beta": 0.4,
+    # Whether to LZ4 compress observations
     "compress_observations": False,
+    # If set, this will fix the ratio of replayed from a buffer and learned on
+    # timesteps to sampled from an environment and stored in the replay buffer
+    # timesteps. Otherwise, the replay will proceed at the native ratio
+    # determined by (train_batch_size / rollout_fragment_length).
+    "training_intensity": None,
 
     # === Optimization ===
     "optimization": {
@@ -74,16 +118,14 @@ DEFAULT_CONFIG = with_common_config({
         "critic_learning_rate": 3e-4,
         "entropy_learning_rate": 3e-4,
     },
-    # If not None, clip gradients during optimization at this value
-    "grad_norm_clipping": None,
+    # If not None, clip gradients during optimization at this value.
+    "grad_clip": None,
     # How many steps of the model to sample before learning starts.
     "learning_starts": 1500,
     # Update the replay buffer with this many samples at once. Note that this
     # setting applies per-worker if num_workers > 1.
-    "sample_batch_size": 1,
-    # Size of a batched sampled from replay buffer for training. Note that
-    # if async_updates is set, then each worker returns gradients for a
-    # batch of this size.
+    "rollout_fragment_length": 1,
+    # Size of a batched sampled from replay buffer for training.
     "train_batch_size": 256,
     # Update the target network every `target_network_update_freq` steps.
     "target_network_update_freq": 0,
@@ -101,17 +143,69 @@ DEFAULT_CONFIG = with_common_config({
     "num_cpus_per_worker": 1,
     # Whether to compute priorities on workers.
     "worker_side_prioritization": False,
-    # Prevent iterations from going lower than this time span
+    # Prevent iterations from going lower than this time span.
     "min_iter_time_s": 1,
 
-    # TODO(ekl) these are unused; remove them from sac config
-    "per_worker_exploration": False,
-    "exploration_fraction": 0.1,
-    "schedule_max_timesteps": 100000,
-    "exploration_final_eps": 0.02,
+    # Whether the loss should be calculated deterministically (w/o the
+    # stochastic action sampling step). True only useful for cont. actions and
+    # for debugging!
+    "_deterministic_loss": False,
+    # Use a Beta-distribution instead of a SquashedGaussian for bounded,
+    # continuous action spaces (not recommended, for debugging only).
+    "_use_beta_distribution": False,
 })
 # __sphinx_doc_end__
 # yapf: enable
 
+
+def validate_config(config: TrainerConfigDict) -> None:
+    """Validates the Trainer's config dict.
+
+    Args:
+        config (TrainerConfigDict): The Trainer's config to check.
+
+    Raises:
+        ValueError: In case something is wrong with the config.
+    """
+    if config["num_gpus"] > 1 and config["framework"] != "torch":
+        raise ValueError("`num_gpus` > 1 not yet supported for tf-SAC!")
+
+    if config["use_state_preprocessor"] != DEPRECATED_VALUE:
+        deprecation_warning(
+            old="config['use_state_preprocessor']", error=False)
+        config["use_state_preprocessor"] = DEPRECATED_VALUE
+
+    if config["grad_clip"] is not None and config["grad_clip"] <= 0.0:
+        raise ValueError("`grad_clip` value must be > 0.0!")
+
+    if config["simple_optimizer"] != DEPRECATED_VALUE or \
+            config["simple_optimizer"] is False:
+        logger.warning("`simple_optimizer` must be True (or unset) for SAC!")
+        config["simple_optimizer"] = True
+
+
+def get_policy_class(config: TrainerConfigDict) -> Optional[Type[Policy]]:
+    """Policy class picker function. Class is chosen based on DL-framework.
+
+    Args:
+        config (TrainerConfigDict): The trainer's configuration dict.
+
+    Returns:
+        Optional[Type[Policy]]: The Policy class to use with PPOTrainer.
+            If None, use `default_policy` provided in build_trainer().
+    """
+    if config["framework"] == "torch":
+        from ray.rllib.agents.sac.sac_torch_policy import SACTorchPolicy
+        return SACTorchPolicy
+
+
+# Build a child class of `Trainer` (based on the kwargs used to create the
+# GenericOffPolicyTrainer class and the kwargs used in the call below), which
+# uses the framework specific Policy determined in `get_policy_class()` above.
 SACTrainer = GenericOffPolicyTrainer.with_updates(
-    name="SAC", default_config=DEFAULT_CONFIG, default_policy=SACTFPolicy)
+    name="SAC",
+    default_config=DEFAULT_CONFIG,
+    validate_config=validate_config,
+    default_policy=SACTFPolicy,
+    get_policy_class=get_policy_class,
+)

@@ -1,16 +1,29 @@
 import unittest
 
-from ray.rllib.agents.ppo import PPOTrainer, DEFAULT_CONFIG
 import ray
+from ray.rllib.agents.pg import PGTrainer, DEFAULT_CONFIG
+from ray.rllib.utils.test_utils import framework_iterator
 
 
 class LocalModeTest(unittest.TestCase):
-    def testLocal(self):
+    def setUp(self) -> None:
         ray.init(local_mode=True)
+
+    def tearDown(self) -> None:
+        ray.shutdown()
+
+    def test_local(self):
         cf = DEFAULT_CONFIG.copy()
-        agent = PPOTrainer(cf, "CartPole-v0")
-        print(agent.train())
+        cf["model"]["fcnet_hiddens"] = [10]
+        cf["num_workers"] = 2
+
+        for _ in framework_iterator(cf):
+            agent = PGTrainer(cf, "CartPole-v0")
+            print(agent.train())
+            agent.stop()
 
 
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    import pytest
+    import sys
+    sys.exit(pytest.main(["-v", __file__]))

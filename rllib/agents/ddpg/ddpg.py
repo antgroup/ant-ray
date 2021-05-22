@@ -1,8 +1,14 @@
+import logging
+from typing import Optional, Type
+
 from ray.rllib.agents.trainer import with_common_config
-from ray.rllib.agents.dqn.dqn import GenericOffPolicyTrainer, \
-    update_worker_explorations
-from ray.rllib.agents.ddpg.ddpg_policy import DDPGTFPolicy
-from ray.rllib.utils.schedules import ConstantSchedule, LinearSchedule
+from ray.rllib.agents.dqn.dqn import GenericOffPolicyTrainer
+from ray.rllib.agents.ddpg.ddpg_tf_policy import DDPGTFPolicy
+from ray.rllib.policy.policy import Policy
+from ray.rllib.utils.deprecation import DEPRECATED_VALUE
+from ray.rllib.utils.typing import TrainerConfigDict
+
+logger = logging.getLogger(__name__)
 
 # yapf: disable
 # __sphinx_doc_begin__
@@ -56,49 +62,32 @@ DEFAULT_CONFIG = with_common_config({
     "n_step": 1,
 
     # === Exploration ===
-    # Turns on annealing schedule for exploration noise. Exploration is
-    # annealed from 1.0 to exploration_final_eps over schedule_max_timesteps
-    # scaled by exploration_fraction. Original DDPG and TD3 papers do not
-    # anneal noise, so this is False by default.
-    "exploration_should_anneal": False,
-    # Max num timesteps for annealing schedules.
-    "schedule_max_timesteps": 100000,
+    "exploration_config": {
+        # DDPG uses OrnsteinUhlenbeck (stateful) noise to be added to NN-output
+        # actions (after a possible pure random phase of n timesteps).
+        "type": "OrnsteinUhlenbeckNoise",
+        # For how many timesteps should we return completely random actions,
+        # before we start adding (scaled) noise?
+        "random_timesteps": 1000,
+        # The OU-base scaling factor to always apply to action-added noise.
+        "ou_base_scale": 0.1,
+        # The OU theta param.
+        "ou_theta": 0.15,
+        # The OU sigma param.
+        "ou_sigma": 0.2,
+        # The initial noise scaling factor.
+        "initial_scale": 1.0,
+        # The final noise scaling factor.
+        "final_scale": 1.0,
+        # Timesteps over which to anneal scale (from initial to final values).
+        "scale_timesteps": 10000,
+    },
     # Number of env steps to optimize for before returning
     "timesteps_per_iteration": 1000,
-    # Fraction of entire training period over which the exploration rate is
-    # annealed
-    "exploration_fraction": 0.1,
-    # Final scaling multiplier for action noise (initial is 1.0)
-    "exploration_final_scale": 0.02,
-    # valid values: "ou" (time-correlated, like original DDPG paper),
-    # "gaussian" (IID, like TD3 paper)
-    "exploration_noise_type": "ou",
-    # OU-noise scale; this can be used to scale down magnitude of OU noise
-    # before adding to actions (requires "exploration_noise_type" to be "ou")
-    "exploration_ou_noise_scale": 0.1,
-    # theta for OU
-    "exploration_ou_theta": 0.15,
-    # sigma for OU
-    "exploration_ou_sigma": 0.2,
-    # gaussian stddev of act noise for exploration (requires
-    # "exploration_noise_type" to be "gaussian")
-    "exploration_gaussian_sigma": 0.1,
-    # If True parameter space noise will be used for exploration
-    # See https://blog.openai.com/better-exploration-with-parameter-noise/
-    "parameter_noise": False,
-    # Until this many timesteps have elapsed, the agent's policy will be
-    # ignored & it will instead take uniform random actions. Can be used in
-    # conjunction with learning_starts (which controls when the first
-    # optimization step happens) to decrease dependence of exploration &
-    # optimization on initial policy parameters. Note that this will be
-    # disabled when the action noise scale is set to 0 (e.g during evaluation).
-    "pure_exploration_steps": 1000,
     # Extra configuration that disables exploration.
     "evaluation_config": {
-        "exploration_fraction": 0,
-        "exploration_final_eps": 0,
+        "explore": False
     },
-
     # === Replay buffer ===
     # Size of the replay buffer. Note that if async_updates is set, then
     # each worker will have a replay buffer of this size.
@@ -109,15 +98,19 @@ DEFAULT_CONFIG = with_common_config({
     "prioritized_replay_alpha": 0.6,
     # Beta parameter for sampling from prioritized replay buffer.
     "prioritized_replay_beta": 0.4,
-    # Fraction of entire training period over which the beta parameter is
-    # annealed
-    "beta_annealing_fraction": 0.2,
+    # Time steps over which the beta parameter is annealed.
+    "prioritized_replay_beta_annealing_timesteps": 20000,
     # Final value of beta
     "final_prioritized_replay_beta": 0.4,
     # Epsilon to add to the TD errors when updating priorities.
     "prioritized_replay_eps": 1e-6,
     # Whether to LZ4 compress observations
     "compress_observations": False,
+    # If set, this will fix the ratio of replayed from a buffer and learned on
+    # timesteps to sampled from an environment and stored in the replay buffer
+    # timesteps. Otherwise, the replay will proceed at the native ratio
+    # determined by (train_batch_size / rollout_fragment_length).
+    "training_intensity": None,
 
     # === Optimization ===
     # Learning rate for the critic (Q-function) optimizer.
@@ -136,12 +129,12 @@ DEFAULT_CONFIG = with_common_config({
     # Weights for L2 regularization
     "l2_reg": 1e-6,
     # If not None, clip gradients during optimization at this value
-    "grad_norm_clipping": None,
+    "grad_clip": None,
     # How many steps of the model to sample before learning starts.
     "learning_starts": 1500,
     # Update the replay buffer with this many samples at once. Note that this
     # setting applies per-worker if num_workers > 1.
-    "sample_batch_size": 1,
+    "rollout_fragment_length": 1,
     # Size of a batched sampled from replay buffer for training. Note that
     # if async_updates is set, then each worker returns gradients for a
     # batch of this size.
@@ -152,8 +145,6 @@ DEFAULT_CONFIG = with_common_config({
     # to increase if your environment is particularly slow to sample, or if
     # you're using the Async or Ape-X optimizers.
     "num_workers": 0,
-    # Whether to use a distribution of epsilons across workers for exploration.
-    "per_worker_exploration": False,
     # Whether to compute priorities on workers.
     "worker_side_prioritization": False,
     # Prevent iterations from going lower than this time span
@@ -163,63 +154,56 @@ DEFAULT_CONFIG = with_common_config({
 # yapf: enable
 
 
-def make_exploration_schedule(config, worker_index):
-    # Modification of DQN's schedule to take into account
-    # `exploration_ou_noise_scale`
-    if config["per_worker_exploration"]:
-        assert config["num_workers"] > 1, "This requires multiple workers"
-        if worker_index >= 0:
-            # FIXME: what do magic constants mean? (0.4, 7)
-            max_index = float(config["num_workers"] - 1)
-            exponent = 1 + worker_index / max_index * 7
-            return ConstantSchedule(0.4**exponent)
-        else:
-            # local ev should have zero exploration so that eval rollouts
-            # run properly
-            return ConstantSchedule(0.0)
-    elif config["exploration_should_anneal"]:
-        return LinearSchedule(
-            schedule_timesteps=int(config["exploration_fraction"] *
-                                   config["schedule_max_timesteps"]),
-            initial_p=1.0,
-            final_p=config["exploration_final_scale"])
+def validate_config(config: TrainerConfigDict) -> None:
+    """Checks and updates the config based on settings.
+
+    Rewrites rollout_fragment_length to take into account n_step truncation.
+    """
+    if config["num_gpus"] > 1:
+        raise ValueError("`num_gpus` > 1 not yet supported for DDPG!")
+    if config["model"]["custom_model"]:
+        logger.warning(
+            "Setting use_state_preprocessor=True since a custom model "
+            "was specified.")
+        config["use_state_preprocessor"] = True
+
+    if config["grad_clip"] is not None and config["grad_clip"] <= 0.0:
+        raise ValueError("`grad_clip` value must be > 0.0!")
+
+    if config["exploration_config"]["type"] == "ParameterNoise":
+        if config["batch_mode"] != "complete_episodes":
+            logger.warning(
+                "ParameterNoise Exploration requires `batch_mode` to be "
+                "'complete_episodes'. Setting batch_mode=complete_episodes.")
+            config["batch_mode"] = "complete_episodes"
+
+    if config["simple_optimizer"] != DEPRECATED_VALUE or \
+            config["simple_optimizer"] is False:
+        logger.warning("`simple_optimizer` must be True (or unset) for DDPG!")
+        config["simple_optimizer"] = True
+
+
+def get_policy_class(config: TrainerConfigDict) -> Optional[Type[Policy]]:
+    """Policy class picker function. Class is chosen based on DL-framework.
+
+    Args:
+        config (TrainerConfigDict): The trainer's configuration dict.
+
+    Returns:
+        Optional[Type[Policy]]: The Policy class to use with DQNTrainer.
+            If None, use `default_policy` provided in build_trainer().
+    """
+    if config["framework"] == "torch":
+        from ray.rllib.agents.ddpg.ddpg_torch_policy import DDPGTorchPolicy
+        return DDPGTorchPolicy
     else:
-        # *always* add exploration noise
-        return ConstantSchedule(1.0)
-
-
-def setup_ddpg_exploration(trainer):
-    trainer.exploration0 = make_exploration_schedule(trainer.config, -1)
-    trainer.explorations = [
-        make_exploration_schedule(trainer.config, i)
-        for i in range(trainer.config["num_workers"])
-    ]
-
-
-def add_pure_exploration_phase(trainer):
-    global_timestep = trainer.optimizer.num_steps_sampled
-    pure_expl_steps = trainer.config["pure_exploration_steps"]
-    if pure_expl_steps:
-        # tell workers whether they should do pure exploration
-        only_explore = global_timestep < pure_expl_steps
-        trainer.workers.local_worker().foreach_trainable_policy(
-            lambda p, _: p.set_pure_exploration_phase(only_explore))
-        for e in trainer.workers.remote_workers():
-            e.foreach_trainable_policy.remote(
-                lambda p, _: p.set_pure_exploration_phase(only_explore))
-    update_worker_explorations(trainer)
-
-
-def validate_config(config):
-    # PyTorch check.
-    if config["use_pytorch"]:
-        raise ValueError("DDPG does not support PyTorch yet! Use tf instead.")
+        return DDPGTFPolicy
 
 
 DDPGTrainer = GenericOffPolicyTrainer.with_updates(
     name="DDPG",
     default_config=DEFAULT_CONFIG,
     default_policy=DDPGTFPolicy,
+    get_policy_class=get_policy_class,
     validate_config=validate_config,
-    before_init=setup_ddpg_exploration,
-    before_train_step=add_pure_exploration_phase)
+)

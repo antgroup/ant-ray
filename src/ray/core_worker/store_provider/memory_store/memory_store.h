@@ -1,5 +1,6 @@
-#ifndef RAY_CORE_WORKER_MEMORY_STORE_H
-#define RAY_CORE_WORKER_MEMORY_STORE_H
+#pragma once
+
+#include <gtest/gtest_prod.h>
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
@@ -13,6 +14,7 @@
 namespace ray {
 
 struct MemoryStoreStats {
+  int32_t num_in_plasma = 0;
   int32_t num_local_objects = 0;
   int64_t used_object_store_memory = 0;
 };
@@ -34,15 +36,18 @@ class CoreWorkerMemoryStore {
   CoreWorkerMemoryStore(
       std::function<void(const RayObject &, const ObjectID &)> store_in_plasma = nullptr,
       std::shared_ptr<ReferenceCounter> counter = nullptr,
-      std::shared_ptr<raylet::RayletClient> raylet_client = nullptr);
+      std::shared_ptr<raylet::RayletClient> raylet_client = nullptr,
+      std::function<Status()> check_signals = nullptr,
+      std::function<void(const RayObject &)> unhandled_exception_handler = nullptr);
   ~CoreWorkerMemoryStore(){};
 
   /// Put an object with specified ID into object store.
   ///
   /// \param[in] object The ray object.
   /// \param[in] object_id Object ID specified by user.
-  /// \return Status.
-  Status Put(const RayObject &object, const ObjectID &object_id);
+  /// \return Whether the object was put into the memory store. If false, then
+  /// this is because the object was promoted to and stored in plasma instead.
+  bool Put(const RayObject &object, const ObjectID &object_id);
 
   /// Get a list of objects from the object store.
   ///
@@ -110,7 +115,7 @@ class CoreWorkerMemoryStore {
   ///
   /// \param[in] object_id The object to check.
   /// \param[out] in_plasma Set to true if the object was spilled to plasma.
-  /// If this is set to true, Contains() will return false.
+  /// Will only be true if the store contains the object.
   /// \return Whether the store has the object.
   bool Contains(const ObjectID &object_id, bool *in_plasma);
 
@@ -132,7 +137,35 @@ class CoreWorkerMemoryStore {
   /// \return Total size of objects in the store.
   uint64_t UsedMemory();
 
+  /// Raise any unhandled errors that have not been accessed within a timeout.
+  /// This is used to surface unhandled task errors in interactive consoles.
+  /// In those settings, errors may never be garbage collected and hence we
+  /// never trigger the deletion hook for task errors that prints them.
+  void NotifyUnhandledErrors();
+
  private:
+  FRIEND_TEST(TestMemoryStore, TestMemoryStoreStats);
+
+  /// See the public version of `Get` for meaning of the other arguments.
+  /// \param[in] abort_if_any_object_is_exception Whether we should abort if any object
+  /// resources. is an exception.
+  Status GetImpl(const std::vector<ObjectID> &object_ids, int num_objects,
+                 int64_t timeout_ms, const WorkerContext &ctx, bool remove_after_get,
+                 std::vector<std::shared_ptr<RayObject>> *results,
+                 bool abort_if_any_object_is_exception);
+
+  /// Called when an object is deleted from the store.
+  void OnDelete(std::shared_ptr<RayObject> obj);
+
+  /// Emplace the given object entry to the in-memory-store and update stats properly.
+  void EmplaceObjectAndUpdateStats(const ObjectID &object_id,
+                                   std::shared_ptr<RayObject> &object_entry)
+      EXCLUSIVE_LOCKS_REQUIRED(mu_);
+
+  /// Erase the object of the object id from the in memory store and update stats
+  /// properly.
+  void EraseObjectAndUpdateStats(const ObjectID &object_id) EXCLUSIVE_LOCKS_REQUIRED(mu_);
+
   /// Optional callback for putting objects into the plasma store.
   std::function<void(const RayObject &, const ObjectID &)> store_in_plasma_;
 
@@ -144,12 +177,14 @@ class CoreWorkerMemoryStore {
   std::shared_ptr<raylet::RayletClient> raylet_client_ = nullptr;
 
   /// Protects the data structures below.
-  absl::Mutex mu_;
+  mutable absl::Mutex mu_;
 
   /// Set of objects that should be promoted to plasma once available.
   absl::flat_hash_set<ObjectID> promoted_to_plasma_ GUARDED_BY(mu_);
 
   /// Map from object ID to `RayObject`.
+  /// NOTE: This map should be modified by EmplaceObjectAndUpdateStats and
+  /// EraseObjectAndUpdateStats.
   absl::flat_hash_map<ObjectID, std::shared_ptr<RayObject>> objects_ GUARDED_BY(mu_);
 
   /// Map from object ID to its get requests.
@@ -160,8 +195,23 @@ class CoreWorkerMemoryStore {
   absl::flat_hash_map<ObjectID,
                       std::vector<std::function<void(std::shared_ptr<RayObject>)>>>
       object_async_get_requests_ GUARDED_BY(mu_);
+
+  /// Function passed in to be called to check for signals (e.g., Ctrl-C).
+  std::function<Status()> check_signals_;
+
+  /// Function called to report unhandled exceptions.
+  std::function<void(const RayObject &)> unhandled_exception_handler_;
+
+  ///
+  /// Below information is stats.
+  ///
+  /// Number of objects in the plasma store for this memory store.
+  int32_t num_in_plasma_ GUARDED_BY(mu_) = 0;
+  /// Number of objects that don't exist in the plasma store.
+  int32_t num_local_objects_ GUARDED_BY(mu_) = 0;
+  /// Number of object store memory used by this memory store. (It doesn't include plasma
+  /// store memory usage).
+  int64_t used_object_store_memory_ GUARDED_BY(mu_) = 0;
 };
 
 }  // namespace ray
-
-#endif  // RAY_CORE_WORKER_MEMORY_STORE_H

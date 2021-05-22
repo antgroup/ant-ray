@@ -1,19 +1,30 @@
-#ifndef RAY_OBJECT_MANAGER_OBJECT_BUFFER_POOL_H
-#define RAY_OBJECT_MANAGER_OBJECT_BUFFER_POOL_H
+// Copyright 2017 The Ray Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#pragma once
+
+#include <boost/asio.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/bind.hpp>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <vector>
 
-#include <boost/asio.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/bind.hpp>
-
-#include "plasma/client.h"
-
 #include "ray/common/id.h"
 #include "ray/common/status.h"
+#include "ray/object_manager/plasma/client.h"
 
 namespace ray {
 
@@ -89,6 +100,7 @@ class ObjectBufferPool {
   /// SealChunk has already been invoked.
   ///
   /// \param object_id The ObjectID.
+  /// \param owner_address The address of the object's owner.
   /// \param data_size The sum of the object size and metadata size.
   /// \param metadata_size The size of the metadata.
   /// \param chunk_index The index of the chunk.
@@ -97,8 +109,8 @@ class ObjectBufferPool {
   /// or if create is invoked consecutively on the same chunk
   /// (with no intermediate AbortCreateChunk).
   std::pair<const ObjectBufferPool::ChunkInfo &, ray::Status> CreateChunk(
-      const ObjectID &object_id, uint64_t data_size, uint64_t metadata_size,
-      uint64_t chunk_index);
+      const ObjectID &object_id, const rpc::Address &owner_address, uint64_t data_size,
+      uint64_t metadata_size, uint64_t chunk_index);
 
   /// Abort the create operation associated with a chunk at chunk_index.
   /// This method will fail if it's invoked on a chunk_index on which
@@ -125,16 +137,16 @@ class ObjectBufferPool {
   /// \return Void.
   void FreeObjects(const std::vector<ObjectID> &object_ids);
 
+  /// Abort the create operation associated with an object. This destroys the buffer
+  /// state, including create operations in progress for all chunks of the object.
+  void AbortCreate(const ObjectID &object_id);
+
   /// Returns debug string for class.
   ///
   /// \return string.
   std::string DebugString() const;
 
  private:
-  /// Abort the create operation associated with an object. This destroys the buffer
-  /// state, including create operations in progress for all chunks of the object.
-  void AbortCreate(const ObjectID &object_id);
-
   /// Abort the get operation associated with an object.
   void AbortGet(const ObjectID &object_id);
 
@@ -196,5 +208,3 @@ class ObjectBufferPool {
 };
 
 }  // namespace ray
-
-#endif  // RAY_OBJECT_MANAGER_OBJECT_BUFFER_POOL_H

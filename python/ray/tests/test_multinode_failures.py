@@ -1,4 +1,3 @@
-import json
 import os
 import signal
 import sys
@@ -9,9 +8,9 @@ import pytest
 import ray
 import ray.ray_constants as ray_constants
 from ray.cluster_utils import Cluster
-from ray.test_utils import RayTestTimeoutException
+from ray.test_utils import RayTestTimeoutException, get_other_nodes
 
-RAY_FORCE_DIRECT = ray_constants.direct_call_enabled()
+SIGKILL = signal.SIGKILL if sys.platform != "win32" else signal.SIGTERM
 
 
 @pytest.fixture(params=[(1, 4), (4, 4)])
@@ -58,20 +57,25 @@ def test_worker_failed(ray_start_workers_separate_multinode):
 
     # Submit more tasks than there are workers so that all workers and
     # cores are utilized.
-    object_ids = [f.remote(i) for i in range(num_initial_workers * num_nodes)]
-    object_ids += [f.remote(object_id) for object_id in object_ids]
+    object_refs = [f.remote(i) for i in range(num_initial_workers * num_nodes)]
+    object_refs += [f.remote(object_ref) for object_ref in object_refs]
     # Allow the tasks some time to begin executing.
     time.sleep(0.1)
     # Kill the workers as the tasks execute.
     for pid in pids:
-        os.kill(pid, signal.SIGKILL)
+        try:
+            os.kill(pid, SIGKILL)
+        except OSError:
+            # The process may have already exited due to worker capping.
+            pass
         time.sleep(0.1)
     # Make sure that we either get the object or we get an appropriate
     # exception.
-    for object_id in object_ids:
+    for object_ref in object_refs:
         try:
-            ray.get(object_id)
-        except (ray.exceptions.RayTaskError, ray.exceptions.RayWorkerError):
+            ray.get(object_ref)
+        except (ray.exceptions.RayTaskError,
+                ray.exceptions.WorkerCrashedError):
             pass
 
 
@@ -80,27 +84,23 @@ def _test_component_failed(cluster, component_type):
     # Submit many tasks with many dependencies.
     @ray.remote
     def f(x):
-        if RAY_FORCE_DIRECT:
-            # Sleep to make sure that tasks actually fail mid-execution. We
-            # only use it for direct calls because the test already takes a
-            # long time to run with the raylet codepath.
-            time.sleep(0.01)
+        # Sleep to make sure that tasks actually fail mid-execution.
+        time.sleep(0.01)
         return x
 
     @ray.remote
     def g(*xs):
-        if RAY_FORCE_DIRECT:
-            # Sleep to make sure that tasks actually fail mid-execution. We
-            # only use it for direct calls because the test already takes a
-            # long time to run with the raylet codepath.
-            time.sleep(0.01)
+        # Sleep to make sure that tasks actually fail mid-execution. We
+        # only use it for direct calls because the test already takes a
+        # long time to run with the raylet codepath.
+        time.sleep(0.01)
         return 1
 
     # Kill the component on all nodes except the head node as the tasks
     # execute. Do this in a loop while submitting tasks between each
     # component failure.
     time.sleep(0.1)
-    worker_nodes = cluster.list_all_nodes()[1:]
+    worker_nodes = get_other_nodes(cluster)
     assert len(worker_nodes) > 0
     for node in worker_nodes:
         process = node.all_processes[component_type][0].process
@@ -129,7 +129,7 @@ def _test_component_failed(cluster, component_type):
 
 def check_components_alive(cluster, component_type, check_component_alive):
     """Check that a given component type is alive on all worker nodes."""
-    worker_nodes = cluster.list_all_nodes()[1:]
+    worker_nodes = get_other_nodes(cluster)
     assert len(worker_nodes) > 0
     for node in worker_nodes:
         process = node.all_processes[component_type][0].process
@@ -149,45 +149,16 @@ def check_components_alive(cluster, component_type, check_component_alive):
     [{
         "num_cpus": 8,
         "num_nodes": 4,
-        "_internal_config": json.dumps({
+        "_system_config": {
             # Raylet codepath is not stable with a shorter timeout.
-            "num_heartbeats_timeout": 10 if RAY_FORCE_DIRECT else 100
-        }),
+            "num_heartbeats_timeout": 10
+        },
     }],
     indirect=True)
 def test_raylet_failed(ray_start_cluster):
     cluster = ray_start_cluster
     # Kill all raylets on worker nodes.
     _test_component_failed(cluster, ray_constants.PROCESS_TYPE_RAYLET)
-
-    # The plasma stores should still be alive on the worker nodes.
-    check_components_alive(cluster, ray_constants.PROCESS_TYPE_PLASMA_STORE,
-                           True)
-
-
-@pytest.mark.skipif(
-    os.environ.get("RAY_USE_NEW_GCS") == "on",
-    reason="Hanging with new GCS API.")
-@pytest.mark.parametrize(
-    "ray_start_cluster",
-    [{
-        "num_cpus": 8,
-        "num_nodes": 2,
-        "_internal_config": json.dumps({
-            # Raylet codepath is not stable with a shorter timeout.
-            "num_heartbeats_timeout": 10 if RAY_FORCE_DIRECT else 100
-        }),
-    }],
-    indirect=True)
-def test_plasma_store_failed(ray_start_cluster):
-    cluster = ray_start_cluster
-    # Kill all plasma stores on worker nodes.
-    _test_component_failed(cluster, ray_constants.PROCESS_TYPE_PLASMA_STORE)
-
-    # No processes should be left alive on the worker nodes.
-    check_components_alive(cluster, ray_constants.PROCESS_TYPE_PLASMA_STORE,
-                           False)
-    check_components_alive(cluster, ray_constants.PROCESS_TYPE_RAYLET, False)
 
 
 if __name__ == "__main__":

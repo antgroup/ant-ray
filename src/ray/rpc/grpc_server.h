@@ -1,5 +1,18 @@
-#ifndef RAY_RPC_GRPC_SERVER_H
-#define RAY_RPC_GRPC_SERVER_H
+// Copyright 2017 The Ray Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#pragma once
 
 #include <grpcpp/grpcpp.h>
 
@@ -7,20 +20,21 @@
 #include <thread>
 #include <utility>
 
+#include "ray/common/asio/instrumented_io_context.h"
 #include "ray/common/status.h"
 #include "ray/rpc/server_call.h"
 
 namespace ray {
 namespace rpc {
 
-#define RPC_SERVICE_HANDLER(SERVICE, HANDLER, CONCURRENCY)                      \
+#define RPC_SERVICE_HANDLER(SERVICE, HANDLER)                                   \
   std::unique_ptr<ServerCallFactory> HANDLER##_call_factory(                    \
       new ServerCallFactoryImpl<SERVICE, SERVICE##Handler, HANDLER##Request,    \
                                 HANDLER##Reply>(                                \
           service_, &SERVICE::AsyncService::Request##HANDLER, service_handler_, \
-          &SERVICE##Handler::Handle##HANDLER, cq, main_service_));              \
-  server_call_factories_and_concurrencies->emplace_back(                        \
-      std::move(HANDLER##_call_factory), CONCURRENCY);
+          &SERVICE##Handler::Handle##HANDLER, cq, main_service_,                \
+          #SERVICE ".grpc_server." #HANDLER));                                  \
+  server_call_factories->emplace_back(std::move(HANDLER##_call_factory));
 
 // Define a void RPC client method.
 #define DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(METHOD)            \
@@ -95,10 +109,8 @@ class GrpcServer {
   bool is_closed_;
   /// The `grpc::Service` objects which should be registered to `ServerBuilder`.
   std::vector<std::reference_wrapper<grpc::Service>> services_;
-  /// The `ServerCallFactory` objects, and the maximum number of concurrent requests that
-  /// this gRPC server can handle.
-  std::vector<std::pair<std::unique_ptr<ServerCallFactory>, int>>
-      server_call_factories_and_concurrencies_;
+  /// The `ServerCallFactory` objects.
+  std::vector<std::unique_ptr<ServerCallFactory>> server_call_factories_;
   /// The number of completion queues the server is polling from.
   int num_threads_;
   /// The `ServerCompletionQueue` object used for polling events.
@@ -119,11 +131,11 @@ class GrpcService {
   ///
   /// \param[in] main_service The main event loop, to which service handler functions
   /// will be posted.
-  explicit GrpcService(boost::asio::io_service &main_service)
+  explicit GrpcService(instrumented_io_context &main_service)
       : main_service_(main_service) {}
 
   /// Destruct this gRPC service.
-  ~GrpcService() = default;
+  virtual ~GrpcService() = default;
 
  protected:
   /// Return the underlying grpc::Service object for this class.
@@ -135,20 +147,17 @@ class GrpcService {
   /// server can handle.
   ///
   /// \param[in] cq The grpc completion queue.
-  /// \param[out] server_call_factories_and_concurrencies The `ServerCallFactory` objects,
+  /// \param[out] server_call_factories The `ServerCallFactory` objects,
   /// and the maximum number of concurrent requests that this gRPC server can handle.
   virtual void InitServerCallFactories(
       const std::unique_ptr<grpc::ServerCompletionQueue> &cq,
-      std::vector<std::pair<std::unique_ptr<ServerCallFactory>, int>>
-          *server_call_factories_and_concurrencies) = 0;
+      std::vector<std::unique_ptr<ServerCallFactory>> *server_call_factories) = 0;
 
   /// The main event loop, to which the service handler functions will be posted.
-  boost::asio::io_service &main_service_;
+  instrumented_io_context &main_service_;
 
   friend class GrpcServer;
 };
 
 }  // namespace rpc
 }  // namespace ray
-
-#endif

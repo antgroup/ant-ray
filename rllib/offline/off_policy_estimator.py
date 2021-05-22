@@ -1,8 +1,15 @@
 from collections import namedtuple
 import logging
 
-from ray.rllib.policy.sample_batch import MultiAgentBatch
+import numpy as np
+
+from ray.rllib.policy.sample_batch import MultiAgentBatch, SampleBatch
+from ray.rllib.policy import Policy
 from ray.rllib.utils.annotations import DeveloperAPI
+from ray.rllib.offline.io_context import IOContext
+from ray.rllib.utils.numpy import convert_to_numpy
+from ray.rllib.utils.typing import TensorType, SampleBatchType
+from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -15,10 +22,10 @@ class OffPolicyEstimator:
     """Interface for an off policy reward estimator."""
 
     @DeveloperAPI
-    def __init__(self, policy, gamma):
+    def __init__(self, policy: Policy, gamma: float):
         """Creates an off-policy estimator.
 
-        Arguments:
+        Args:
             policy (Policy): Policy to evaluate.
             gamma (float): Discount of the MDP.
         """
@@ -27,7 +34,7 @@ class OffPolicyEstimator:
         self.new_estimates = []
 
     @classmethod
-    def create(cls, ioctx):
+    def create(cls, ioctx: IOContext) -> "OffPolicyEstimator":
         """Create an off-policy estimator from a IOContext."""
         gamma = ioctx.worker.policy_config["gamma"]
         # Grab a reference to the current model
@@ -40,7 +47,7 @@ class OffPolicyEstimator:
         return cls(policy, gamma)
 
     @DeveloperAPI
-    def estimate(self, batch):
+    def estimate(self, batch: SampleBatchType):
         """Returns an estimate for the given batch of experiences.
 
         The batch will only contain data from one episode, but it may only be
@@ -49,7 +56,7 @@ class OffPolicyEstimator:
         raise NotImplementedError
 
     @DeveloperAPI
-    def action_prob(self, batch):
+    def action_prob(self, batch: SampleBatchType) -> np.ndarray:
         """Returns the probs for the batch actions for the current policy."""
 
         num_state_inputs = 0
@@ -57,26 +64,21 @@ class OffPolicyEstimator:
             if k.startswith("state_in_"):
                 num_state_inputs += 1
         state_keys = ["state_in_{}".format(i) for i in range(num_state_inputs)]
-        _, _, info = self.policy.compute_actions(
-            obs_batch=batch["obs"],
+        log_likelihoods: TensorType = self.policy.compute_log_likelihoods(
+            actions=batch[SampleBatch.ACTIONS],
+            obs_batch=batch[SampleBatch.CUR_OBS],
             state_batches=[batch[k] for k in state_keys],
-            prev_action_batch=batch.data.get("prev_action"),
-            prev_reward_batch=batch.data.get("prev_reward"),
-            info_batch=batch.data.get("info"))
-        if "action_prob" not in info:
-            raise ValueError(
-                "Off-policy estimation is not possible unless the policy "
-                "returns action probabilities when computing actions (i.e., "
-                "the 'action_prob' key is output by the policy). You "
-                "can set `input_evaluation: []` to resolve this.")
-        return info["action_prob"]
+            prev_action_batch=batch.get(SampleBatch.PREV_ACTIONS),
+            prev_reward_batch=batch.get(SampleBatch.PREV_REWARDS))
+        log_likelihoods = convert_to_numpy(log_likelihoods)
+        return np.exp(log_likelihoods)
 
     @DeveloperAPI
-    def process(self, batch):
+    def process(self, batch: SampleBatchType):
         self.new_estimates.append(self.estimate(batch))
 
     @DeveloperAPI
-    def check_can_estimate_for(self, batch):
+    def check_can_estimate_for(self, batch: SampleBatchType):
         """Returns whether we can support OPE for this batch."""
 
         if isinstance(batch, MultiAgentBatch):
@@ -89,11 +91,11 @@ class OffPolicyEstimator:
                 "Off-policy estimation is not possible unless the inputs "
                 "include action probabilities (i.e., the policy is stochastic "
                 "and emits the 'action_prob' key). For DQN this means using "
-                "`soft_q: True`. You can also set `input_evaluation: []` to "
-                "disable estimation.")
+                "`exploration_config: {type: 'SoftQ'}`. You can also set "
+                "`input_evaluation: []` to disable estimation.")
 
     @DeveloperAPI
-    def get_metrics(self):
+    def get_metrics(self) -> List[OffPolicyEstimate]:
         """Return a list of new episode metric estimates since the last call.
 
         Returns:

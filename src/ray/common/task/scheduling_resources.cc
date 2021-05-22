@@ -1,8 +1,9 @@
-#include "scheduling_resources.h"
+#include "ray/common/task/scheduling_resources.h"
 
 #include <cmath>
 #include <sstream>
 
+#include "absl/container/flat_hash_map.h"
 #include "ray/util/logging.h"
 
 namespace ray {
@@ -199,8 +200,8 @@ void ResourceSet::AddResourcesCapacityConstrained(const ResourceSet &other,
     const FractionalResourceQuantity &to_add_resource_capacity = resource_pair.second;
     if (total_resource_map.count(to_add_resource_label) != 0) {
       // If resource exists in total map, add to the local capacity map.
-      // If the new capacity will be greater the total capacity, set the new capacity to
-      // total capacity (capping to the total)
+      // If the new capacity is less than the total capacity, set the new capacity to
+      // the local capacity (capping to the total).
       const FractionalResourceQuantity &total_capacity =
           total_resource_map.at(to_add_resource_label);
       resource_capacity_[to_add_resource_label] =
@@ -246,8 +247,7 @@ const ResourceSet ResourceSet::GetNumCpus() const {
 
 const std::string format_resource(std::string resource_name, double quantity) {
   if (resource_name == "object_store_memory" || resource_name == "memory") {
-    // Convert to 50MiB chunks and then to GiB
-    return std::to_string(quantity * (50 * 1024 * 1024) / (1024 * 1024 * 1024)) + " GiB";
+    return std::to_string(quantity / (1024 * 1024 * 1024)) + " GiB";
   }
   return std::to_string(quantity);
 }
@@ -281,7 +281,7 @@ const std::string ResourceSet::ToString() const {
 
 const std::unordered_map<std::string, double> ResourceSet::GetResourceMap() const {
   std::unordered_map<std::string, double> result;
-  for (const auto resource_pair : resource_capacity_) {
+  for (const auto &resource_pair : resource_capacity_) {
     result[resource_pair.first] = resource_pair.second.ToDouble();
   }
   return result;
@@ -640,7 +640,9 @@ void ResourceIdSet::AddOrUpdateResource(const std::string &resource_name,
 }
 
 void ResourceIdSet::DeleteResource(const std::string &resource_name) {
-  available_resources_.erase(resource_name);
+  if (available_resources_.count(resource_name) != 0) {
+    available_resources_.erase(resource_name);
+  }
 }
 
 const std::unordered_map<std::string, ResourceIds> &ResourceIdSet::AvailableResources()
@@ -743,12 +745,16 @@ const ResourceSet &SchedulingResources::GetTotalResources() const {
   return resources_total_;
 }
 
-void SchedulingResources::SetLoadResources(ResourceSet &&newset) {
-  resources_load_ = newset;
+void SchedulingResources::SetTotalResources(ResourceSet &&newset) {
+  resources_total_ = newset;
 }
 
 const ResourceSet &SchedulingResources::GetLoadResources() const {
   return resources_load_;
+}
+
+void SchedulingResources::SetLoadResources(ResourceSet &&newset) {
+  resources_load_ = newset;
 }
 
 // Return specified resources back to SchedulingResources.
@@ -760,6 +766,14 @@ void SchedulingResources::Release(const ResourceSet &resources) {
 // Take specified resources from SchedulingResources.
 void SchedulingResources::Acquire(const ResourceSet &resources) {
   resources_available_.SubtractResourcesStrict(resources);
+}
+
+// The reason we need this method is sometimes we may want add some converted
+// resource which is not exist in total resource to the available resource.
+// (e.g., placement group)
+void SchedulingResources::AddResource(const ResourceSet &resources) {
+  resources_total_.AddResources(resources);
+  resources_available_.AddResources(resources);
 }
 
 void SchedulingResources::UpdateResourceCapacity(const std::string &resource_name,

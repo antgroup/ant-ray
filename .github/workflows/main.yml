@@ -1,9 +1,17 @@
 name: CI
 
-env:
-  LLVM_VERSION_WINDOWS: 9.0.0
+on:
+  push:
+    branches-ignore:
+      # Don't run CI for Dependabot branch pushes.
+      - "dependabot/**"
+  pull_request:
 
-on: [push, pull_request]
+env:
+  # Git GITHUB_... variables are useful for translating Travis environment variables
+  GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+  GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+  GITHUB_PULL_REQUEST: ${{ github.event.number }}
 
 jobs:
   build:
@@ -12,101 +20,108 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Github Actions requires a single row to be added to the build matrix.
-        # See https://help.github.com/en/articles/workflow-syntax-for-github-actions.
-        name: [
-          windows-clang-cl,
-        ]
+        # Useful info: https://help.github.com/en/articles/workflow-syntax-for-github-actions
         include:
-          - name: windows-clang-cl
-            os: windows-latest
-            compiler: clang-cl
+          - name: windows-msvc
+            os: windows-2019
+            python-version: 3.8
+            # Can be 'msvc' or 'clang-cl'
+            config: msvc
+    env:
+      BAZEL_CONFIG: ${{ matrix.config }}
+      PYTHON: ${{ matrix.python-version }}
+      TRAVIS_COMMIT: ${{ github.sha }}
+      #TRAVIS_PULL_REQUEST is defined in the scripts to account for "false"
     steps:
+    - name: Pre-checkout system configuration
+      # We add -l to process .bashrc, but need -e -o pipefail for consistency with GitHub Actions's default behavior.
+      shell: bash -e -o pipefail -l {0}
+      run: |
+        # Note: only configure settings here that are required _before_ the repository is cloned (such as Git settings).
+        # Different machines behave very differently with Bash initialization -- make them more uniform
+        rm -f -- ~/.bash_profile ~/.profile ~/.bashrc
+        printf '\n%s\n' 'if [ -n "${BASH_VERSION}" ] && [ -f ~/.bashrc ]; then . ~/.bashrc; fi' >> ~/.profile
+        git config --global core.symlinks true && git config --global core.autocrlf false
+        if command -v dpkg > /dev/null; then sudo dpkg-reconfigure debconf -f noninteractive -p high; fi
     - name: Checkout repository
       uses: actions/checkout@v1
+    - name: Configure AWS Credentials
+      continue-on-error: true
+      if: github.repository == 'ray-project/ray' && github.event_name != 'pull_request'
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        fetch-depth: 1
-    - name: Setup Bazel
+        aws-access-key-id: ${{ secrets.GHA_AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.GHA_AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+    - name: Prepare caching
+      id: info
       shell: bash
+      run: |
+        case "${OSTYPE}" in
+          linux*) pip_cache=~/.cache/pip;;
+          darwin*) pip_cache=~/Library/Caches/pip;;
+          msys) pip_cache="${LOCALAPPDATA}\pip\Cache";;
+        esac
+        cat <<-EOF
+        ::set-output name=git_tree_hash::$(git cat-file -p HEAD | sed -n "s/^tree //p")
+        ::set-output name=pip_cache::${pip_cache}
+        EOF
+    - name: Cache (pip)
+      uses: actions/cache@v1.1.2
+      continue-on-error: true
+      if: steps.info.outputs.pip_cache
+      with:
+        path: ${{ steps.info.outputs.pip_cache }}
+        key: |
+          pip-${{ runner.os }}-${{ steps.info.outputs.git_tree_hash }}
+        restore-keys: |
+          pip-${{ runner.os }}-
+          pip-
+    - name: Build
+      shell: bash -x -e -o pipefail -l {0}
       env:
         BAZEL_CACHE_CREDENTIAL_B64: ${{ secrets.BAZEL_CACHE_CREDENTIAL_B64 }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: ./ci/travis/install-bazel.sh
-    - name: Install C/C++ toolchains
-      if: matrix.compiler == 'clang' || matrix.compiler == 'clang-cl'
-      shell: bash
+        RAY_DEFAULT_BUILD: 1
+        WINDOWS_WHEELS: 1
+        BAZEL_LOG_BUCKET_ACCESS_KEY: ${{ secrets.BAZEL_LOG_BUCKET_ACCESS_KEY }}
+        TRAVIS_BRANCH: ${{ github.ref	}}
+        TRAVIS_COMMIT: ${{ github.sha }}
+        TRAVIS_JOB_ID: ${{ github.run_id }}
       run: |
-        set -euo pipefail
-        if [ "${OSTYPE}" = "msys" ]; then
-          export MSYS2_ARG_CONV_EXCL="*"  # Don't let MSYS2 attempt to auto-translate arguments that look like paths
-          # Ideally we should be able to use the Chocolatey package manager:
-          #   choco install --no-progress llvm
-          # However, it frequently gives HTTP 503 errors, so we just download and install manually.
-          urldir="https://releases.llvm.org"
-          arch=64
-          if [ "${HOSTTYPE}" = "${HOSTTYPE%64}" ]; then arch=32; fi
-          target="./LLVM-${LLVM_VERSION_WINDOWS}-win${arch}.exe"
-          curl -s -L -R -o "${target}" "http://releases.llvm.org/${LLVM_VERSION_WINDOWS}/${target##*/}"
-          chmod +x "${target}"
-          "${target}" /S
-          rm -f -- "${target}"
-        elif 1>&- command -v pacman; then
-          sudo pacman -S --needed --noconfirm --noprogressbar clang
-        elif 1>&- command -v apt-get; then
-          sudo apt-get -q -y install clang
-        fi
-    - name: Install MSYS2 (only needed if some shell commands are missing)
-      if: false && runner.os == 'Windows'
-      uses: numworks/setup-msys2@v1
-      with:
-        update: false
-    - name: Perform build
-      shell: bash
-      run: |
-        set -euo pipefail
-        main() {
-          if [ "${OSTYPE}" = "msys" ]; then
-            export MSYS2_ARG_CONV_EXCL="*"  # Don't let MSYS2 attempt to auto-translate arguments that look like paths
-            local latest_python_bin=""
-            for latest_python_bin in /proc/registry/HKEY_LOCAL_MACHINE/Software/Python/PythonCore/*/InstallPath/@; do
-              if [ -f "${latest_python_bin}" ]; then
-                latest_python_bin="$(tr -d '\0' < "${latest_python_bin}")"
-                latest_python_bin="${latest_python_bin}\\"
-              else
-                latest_python_bin=""
-              fi
-            done
-            latest_python_bin="${latest_python_bin}python.exe"
-            if [ -f "${latest_python_bin}" ]; then
-              export PYTHON2_BIN_PATH="${latest_python_bin}" PYTHON3_BIN_PATH="${latest_python_bin}"
-            fi
-          fi
-          # NOTE: Only options that are _user preferences_ (i.e. not repository-specific) should go here.
-          # These are options that people may disagree on having on their own machines, but which are useful for our builds.
-          bazel_output_root="${HOME}/bazel"
-          if [ "${OSTYPE}" = "msys" ]; then
-            bazel_output_root="$(cygpath -w -- "${bazel_output_root}")"
-          fi
-          local startflags=()
-          startflags+=(--batch)
-          startflags+=(--nodeep_execroot)
-          #startflags+=(--output_user_root="${bazel_output_root}")
-          local cmdflags=()
-          cmdflags+=(--attempt_to_print_relative_paths)
-          cmdflags+=(--color=yes)
-          cmdflags+=(--experimental_repository_cache_hardlinks)
-          cmdflags+=(--experimental_ui_deduplicate)
-          cmdflags+=(--incompatible_strict_action_env)
-          cmdflags+=(--keep_going)
-          cmdflags+=(--per_file_copt="-\\.(asm|S)$@-fansi-escape-codes")
-          cmdflags+=(--per_file_copt="-\\.(asm|S)$@-fcolor-diagnostics")
-          cmdflags+=(--show_progress_rate_limit=5)
-          cmdflags+=(--show_task_finish)
-          cmdflags+=(--show_timestamps)
-          cmdflags+=(--symlink_prefix=/)
-          cmdflags+=(--verbose_failures)
-          local packages=()
-          packages+=("//:ray_pkg")
-          bazel "${startflags[@]}" build "${cmdflags[@]}" "${packages[@]}" "$@"
+        function clean_up() {
+          echo "Performing cleanup"
+          if [ "${GITHUB_EVENT_NAME}" != "pull_request" ]; then ./ci/travis/upload_build_info.sh; fi
         }
-        main "$@"
+        trap clean_up EXIT
+
+        python -u ci/remote-watch.py --skip_repo=ray-project/ray &
+        . ./ci/travis/ci.sh init
+        . ./ci/travis/ci.sh build
+        . ./ci/travis/ci.sh upload_wheels || true
+    - name: Run Tests
+      shell: bash -x -e -o pipefail -l {0}
+      env:
+        BAZEL_CACHE_CREDENTIAL_B64: ${{ secrets.BAZEL_CACHE_CREDENTIAL_B64 }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RAY_DEFAULT_BUILD: 1
+        WINDOWS_WHEELS: 1
+        BAZEL_LOG_BUCKET_ACCESS_KEY: ${{ secrets.BAZEL_LOG_BUCKET_ACCESS_KEY }}
+        TRAVIS_BRANCH: ${{ github.ref	}}
+        TRAVIS_COMMIT: ${{ github.sha }}
+        TRAVIS_JOB_ID: ${{ github.run_id }}
+      run: |
+        function clean_up() {
+          echo "Performing cleanup"
+          if [ "${GITHUB_EVENT_NAME}" != "pull_request" ]; then ./ci/travis/upload_build_info.sh; fi
+        }
+        trap clean_up EXIT
+
+        python -u ci/remote-watch.py --skip_repo=ray-project/ray &
+        . ./ci/travis/ci.sh test_core
+        . ./ci/travis/ci.sh test_python
+    - name: Run Clang Include-What-You-Use
+      continue-on-error: true
+      if: runner.os == 'Linux'
+      shell: bash -e -o pipefail -l {0}
+      run: ci/travis/iwyu.sh process "//:*"

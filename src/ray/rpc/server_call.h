@@ -1,9 +1,24 @@
-#ifndef RAY_RPC_SERVER_CALL_H
-#define RAY_RPC_SERVER_CALL_H
+// Copyright 2017 The Ray Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#pragma once
 
 #include <grpcpp/grpcpp.h>
+
 #include <boost/asio.hpp>
 
+#include "ray/common/asio/instrumented_io_context.h"
 #include "ray/common/grpc_util.h"
 #include "ray/common/status.h"
 
@@ -78,8 +93,6 @@ class ServerCallFactory {
  public:
   /// Create a new `ServerCall` and request gRPC runtime to start accepting the
   /// corresponding type of requests.
-  ///
-  /// \return Pointer to the `ServerCall` object.
   virtual void CreateCall() const = 0;
 
   virtual ~ServerCallFactory() = default;
@@ -113,13 +126,14 @@ class ServerCallImpl : public ServerCall {
   ServerCallImpl(
       const ServerCallFactory &factory, ServiceHandler &service_handler,
       HandleRequestFunction<ServiceHandler, Request, Reply> handle_request_function,
-      boost::asio::io_service &io_service)
+      instrumented_io_context &io_service, std::string call_name)
       : state_(ServerCallState::PENDING),
         factory_(factory),
         service_handler_(service_handler),
         handle_request_function_(handle_request_function),
         response_writer_(&context_),
-        io_service_(io_service) {}
+        io_service_(io_service),
+        call_name_(std::move(call_name)) {}
 
   ServerCallState GetState() const override { return state_; }
 
@@ -127,7 +141,7 @@ class ServerCallImpl : public ServerCall {
 
   void HandleRequest() override {
     if (!io_service_.stopped()) {
-      io_service_.post([this] { HandleRequestImpl(); });
+      io_service_.post([this] { HandleRequestImpl(); }, call_name_);
     } else {
       // Handle service for rpc call has stopped, we must handle the call here
       // to send reply and remove it from cq
@@ -141,6 +155,10 @@ class ServerCallImpl : public ServerCall {
     // NOTE(hchen): This `factory` local variable is needed. Because `SendReply` runs in
     // a different thread, and will cause `this` to be deleted.
     const auto &factory = factory_;
+    // Create a new `ServerCall` to accept the next incoming request.
+    // We create this before handling the request so that the it can be populated by
+    // the completion queue in the background if a new request comes in.
+    factory.CreateCall();
     (service_handler_.*handle_request_function_)(
         request_, &reply_,
         [this](Status status, std::function<void()> success,
@@ -155,22 +173,19 @@ class ServerCallImpl : public ServerCall {
           // this server call might be deleted
           SendReply(status);
         });
-    // We've finished handling this request,
-    // create a new `ServerCall` to accept the next incoming request.
-    factory.CreateCall();
   }
 
   void OnReplySent() override {
     if (send_reply_success_callback_ && !io_service_.stopped()) {
       auto callback = std::move(send_reply_success_callback_);
-      io_service_.post([callback]() { callback(); });
+      io_service_.post([callback]() { callback(); }, call_name_ + ".success_callback");
     }
   }
 
   void OnReplyFailed() override {
     if (send_reply_failure_callback_ && !io_service_.stopped()) {
       auto callback = std::move(send_reply_failure_callback_);
-      io_service_.post([callback]() { callback(); });
+      io_service_.post([callback]() { callback(); }, call_name_ + ".failure_callback");
     }
   }
 
@@ -201,13 +216,16 @@ class ServerCallImpl : public ServerCall {
   grpc_impl::ServerAsyncResponseWriter<Reply> response_writer_;
 
   /// The event loop.
-  boost::asio::io_service &io_service_;
+  instrumented_io_context &io_service_;
 
   /// The request message.
   Request request_;
 
   /// The reply message.
   Reply reply_;
+
+  /// Human-readable name for this RPC call.
+  std::string call_name_;
 
   /// The callback when sending reply successes.
   std::function<void()> send_reply_success_callback_ = nullptr;
@@ -255,19 +273,20 @@ class ServerCallFactoryImpl : public ServerCallFactory {
       ServiceHandler &service_handler,
       HandleRequestFunction<ServiceHandler, Request, Reply> handle_request_function,
       const std::unique_ptr<grpc::ServerCompletionQueue> &cq,
-      boost::asio::io_service &io_service)
+      instrumented_io_context &io_service, std::string call_name)
       : service_(service),
         request_call_function_(request_call_function),
         service_handler_(service_handler),
         handle_request_function_(handle_request_function),
         cq_(cq),
-        io_service_(io_service) {}
+        io_service_(io_service),
+        call_name_(std::move(call_name)) {}
 
   void CreateCall() const override {
     // Create a new `ServerCall`. This object will eventually be deleted by
     // `GrpcServer::PollEventsFromCompletionQueue`.
     auto call = new ServerCallImpl<ServiceHandler, Request, Reply>(
-        *this, service_handler_, handle_request_function_, io_service_);
+        *this, service_handler_, handle_request_function_, io_service_, call_name_);
     /// Request gRPC runtime to starting accepting this kind of request, using the call as
     /// the tag.
     (service_.*request_call_function_)(&call->context_, &call->request_,
@@ -292,10 +311,11 @@ class ServerCallFactoryImpl : public ServerCallFactory {
   const std::unique_ptr<grpc::ServerCompletionQueue> &cq_;
 
   /// The event loop.
-  boost::asio::io_service &io_service_;
+  instrumented_io_context &io_service_;
+
+  /// Human-readable name for this RPC call.
+  std::string call_name_;
 };
 
 }  // namespace rpc
 }  // namespace ray
-
-#endif

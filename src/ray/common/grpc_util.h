@@ -1,5 +1,18 @@
-#ifndef RAY_COMMON_GRPC_UTIL_H
-#define RAY_COMMON_GRPC_UTIL_H
+// Copyright 2017 The Ray Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#pragma once
 
 #include <google/protobuf/map.h>
 #include <google/protobuf/repeated_field.h>
@@ -7,7 +20,7 @@
 
 #include <sstream>
 
-#include "status.h"
+#include "ray/common/status.h"
 
 namespace ray {
 
@@ -22,7 +35,10 @@ class MessageWrapper {
   /// The input message will be **copied** into this object.
   ///
   /// \param message The protobuf message.
-  explicit MessageWrapper(const Message message)
+  explicit MessageWrapper(const Message &message)
+      : message_(std::make_shared<Message>(message)) {}
+
+  explicit MessageWrapper(Message &&message)
       : message_(std::make_shared<Message>(std::move(message))) {}
 
   /// Construct from a protobuf message shared_ptr.
@@ -102,10 +118,9 @@ inline std::vector<ID> IdVectorFromProtobuf(
 
 /// Converts a Protobuf map to a `unordered_map`.
 template <class K, class V>
-inline std::unordered_map<K, V> MapFromProtobuf(::google::protobuf::Map<K, V> pb_map) {
+inline std::unordered_map<K, V> MapFromProtobuf(
+    const ::google::protobuf::Map<K, V> &pb_map) {
   return std::unordered_map<K, V>(pb_map.begin(), pb_map.end());
 }
 
 }  // namespace ray
-
-#endif

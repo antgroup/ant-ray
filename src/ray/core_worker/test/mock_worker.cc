@@ -1,7 +1,21 @@
+// Copyright 2017 The Ray Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #define BOOST_BIND_NO_PLACEHOLDERS
+#include "ray/common/test_util.h"
 #include "ray/core_worker/context.h"
 #include "ray/core_worker/core_worker.h"
-#include "src/ray/util/test_util.h"
 
 using namespace std::placeholders;
 
@@ -19,36 +33,57 @@ namespace ray {
 class MockWorker {
  public:
   MockWorker(const std::string &store_socket, const std::string &raylet_socket,
-             int node_manager_port, const gcs::GcsClientOptions &gcs_options)
-      : worker_(WorkerType::WORKER, Language::PYTHON, store_socket, raylet_socket,
-                JobID::FromInt(1), gcs_options, /*log_dir=*/"",
-                /*node_id_address=*/"127.0.0.1", node_manager_port,
-                std::bind(&MockWorker::ExecuteTask, this, _1, _2, _3, _4, _5, _6, _7)) {}
+             int node_manager_port, const gcs::GcsClientOptions &gcs_options) {
+    CoreWorkerOptions options;
+    options.worker_type = WorkerType::WORKER;
+    options.language = Language::PYTHON;
+    options.store_socket = store_socket;
+    options.raylet_socket = raylet_socket;
+    options.gcs_options = gcs_options;
+    options.enable_logging = true;
+    options.install_failure_signal_handler = true;
+    options.node_ip_address = "127.0.0.1";
+    options.node_manager_port = node_manager_port;
+    options.raylet_ip_address = "127.0.0.1";
+    options.task_execution_callback =
+        std::bind(&MockWorker::ExecuteTask, this, _1, _2, _3, _4, _5, _6, _7, _8, _9);
+    options.ref_counting_enabled = true;
+    options.num_workers = 1;
+    options.metrics_agent_port = -1;
+    CoreWorkerProcess::Initialize(options);
+  }
 
-  void StartExecutingTasks() { worker_.StartExecutingTasks(); }
+  void RunTaskExecutionLoop() { CoreWorkerProcess::RunTaskExecutionLoop(); }
 
  private:
-  Status ExecuteTask(TaskType task_type, const RayFunction &ray_function,
+  Status ExecuteTask(TaskType task_type, const std::string task_name,
+                     const RayFunction &ray_function,
                      const std::unordered_map<std::string, double> &required_resources,
                      const std::vector<std::shared_ptr<RayObject>> &args,
                      const std::vector<ObjectID> &arg_reference_ids,
                      const std::vector<ObjectID> &return_ids,
+                     const std::string &debugger_breakpoint,
                      std::vector<std::shared_ptr<RayObject>> *results) {
     // Note that this doesn't include dummy object id.
-    const std::vector<std::string> &function_descriptor =
+    const ray::FunctionDescriptor function_descriptor =
         ray_function.GetFunctionDescriptor();
-    RAY_CHECK(return_ids.size() >= 0 && 1 == function_descriptor.size());
+    RAY_CHECK(function_descriptor->Type() ==
+              ray::FunctionDescriptorType::kPythonFunctionDescriptor);
+    auto typed_descriptor = function_descriptor->As<ray::PythonFunctionDescriptor>();
 
-    if ("actor creation task" == function_descriptor[0]) {
+    if ("actor creation task" == typed_descriptor->ModuleName()) {
       return Status::OK();
-    } else if ("GetWorkerPid" == function_descriptor[0]) {
+    } else if ("GetWorkerPid" == typed_descriptor->ModuleName()) {
       // Get mock worker pid
       return GetWorkerPid(results);
-    } else if ("MergeInputArgsAsOutput" == function_descriptor[0]) {
+    } else if ("MergeInputArgsAsOutput" == typed_descriptor->ModuleName()) {
       // Merge input args and write the merged content to each of return ids
       return MergeInputArgsAsOutput(args, return_ids, results);
+    } else if ("WhileTrueLoop" == typed_descriptor->ModuleName()) {
+      return WhileTrueLoop(args, return_ids, results);
     } else {
-      return Status::TypeError("Unknown function descriptor: " + function_descriptor[0]);
+      return Status::TypeError("Unknown function descriptor: " +
+                               typed_descriptor->ModuleName());
     }
   }
 
@@ -59,7 +94,8 @@ class MockWorker {
         const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(pid_string.data()));
     auto memory_buffer =
         std::make_shared<LocalMemoryBuffer>(data, pid_string.size(), true);
-    results->push_back(std::make_shared<RayObject>(memory_buffer, nullptr));
+    results->push_back(
+        std::make_shared<RayObject>(memory_buffer, nullptr, std::vector<ObjectID>()));
     return Status::OK();
   }
 
@@ -87,13 +123,22 @@ class MockWorker {
 
     // Write the merged content to each of return ids.
     for (size_t i = 0; i < return_ids.size(); i++) {
-      results->push_back(std::make_shared<RayObject>(memory_buffer, nullptr));
+      results->push_back(
+          std::make_shared<RayObject>(memory_buffer, nullptr, std::vector<ObjectID>()));
     }
 
     return Status::OK();
   }
 
-  CoreWorker worker_;
+  Status WhileTrueLoop(const std::vector<std::shared_ptr<RayObject>> &args,
+                       const std::vector<ObjectID> &return_ids,
+                       std::vector<std::shared_ptr<RayObject>> *results) {
+    while (1) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    return Status::OK();
+  }
+
   int64_t prev_seq_no_ = 0;
 };
 
@@ -107,6 +152,6 @@ int main(int argc, char **argv) {
 
   ray::gcs::GcsClientOptions gcs_options("127.0.0.1", 6379, "");
   ray::MockWorker worker(store_socket, raylet_socket, node_manager_port, gcs_options);
-  worker.StartExecutingTasks();
+  worker.RunTaskExecutionLoop();
   return 0;
 }

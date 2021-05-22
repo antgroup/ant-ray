@@ -1,12 +1,28 @@
-#ifndef RAY_RPC_CLIENT_CALL_H
-#define RAY_RPC_CLIENT_CALL_H
+// Copyright 2017 The Ray Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#pragma once
 
 #include <grpcpp/grpcpp.h>
-#include <boost/asio.hpp>
-#include "absl/synchronization/mutex.h"
 
+#include <boost/asio.hpp>
+
+#include "absl/synchronization/mutex.h"
+#include "ray/common/asio/instrumented_io_context.h"
 #include "ray/common/grpc_util.h"
 #include "ray/common/status.h"
+#include "ray/util/util.h"
 
 namespace ray {
 namespace rpc {
@@ -25,6 +41,8 @@ class ClientCall {
   virtual ray::Status GetStatus() = 0;
   /// Set return status.
   virtual void SetReturnStatus() = 0;
+  /// Get human-readable name for this RPC.
+  virtual std::string GetName() = 0;
 
   virtual ~ClientCall() = default;
 };
@@ -47,7 +65,9 @@ class ClientCallImpl : public ClientCall {
   /// Constructor.
   ///
   /// \param[in] callback The callback function to handle the reply.
-  explicit ClientCallImpl(const ClientCallback<Reply> &callback) : callback_(callback) {}
+  explicit ClientCallImpl(const ClientCallback<Reply> &callback, std::string call_name)
+      : callback_(std::move(const_cast<ClientCallback<Reply> &>(callback))),
+        call_name_(std::move(call_name)) {}
 
   Status GetStatus() override {
     absl::MutexLock lock(&mutex_);
@@ -70,12 +90,17 @@ class ClientCallImpl : public ClientCall {
     }
   }
 
+  std::string GetName() override { return call_name_; }
+
  private:
   /// The reply message.
   Reply reply_;
 
   /// The callback function to handle the reply.
   ClientCallback<Reply> callback_;
+
+  /// The human-readable name of the RPC.
+  std::string call_name_;
 
   /// The response reader.
   std::unique_ptr<grpc_impl::ClientAsyncResponseReader<Reply>> response_reader_;
@@ -149,7 +174,7 @@ class ClientCallManager {
   ///
   /// \param[in] main_service The main event loop, to which the callback functions will be
   /// posted.
-  explicit ClientCallManager(boost::asio::io_service &main_service, int num_threads = 1)
+  explicit ClientCallManager(instrumented_io_context &main_service, int num_threads = 1)
       : main_service_(main_service), num_threads_(num_threads), shutdown_(false) {
     rr_index_ = rand() % num_threads_;
     // Start the polling threads.
@@ -188,8 +213,9 @@ class ClientCallManager {
   std::shared_ptr<ClientCall> CreateCall(
       typename GrpcService::Stub &stub,
       const PrepareAsyncFunction<GrpcService, Request, Reply> prepare_async_function,
-      const Request &request, const ClientCallback<Reply> &callback) {
-    auto call = std::make_shared<ClientCallImpl<Reply>>(callback);
+      const Request &request, const ClientCallback<Reply> &callback,
+      std::string call_name) {
+    auto call = std::make_shared<ClientCallImpl<Reply>>(callback, std::move(call_name));
     // Send request.
     // Find the next completion queue to wait for response.
     call->response_reader_ = (stub.*prepare_async_function)(
@@ -212,6 +238,7 @@ class ClientCallManager {
   /// `CompletionQueue`, and dispatches the event to the callbacks via the `ClientCall`
   /// objects.
   void PollEventsFromCompletionQueue(int index) {
+    SetThreadName("client.poll" + std::to_string(index));
     void *got_tag;
     bool ok = false;
     // Keep reading events from the `CompletionQueue` until it's shutdown.
@@ -234,11 +261,13 @@ class ClientCallManager {
         tag->GetCall()->SetReturnStatus();
         if (ok && !main_service_.stopped() && !shutdown_) {
           // Post the callback to the main event loop.
-          main_service_.post([tag]() {
-            tag->GetCall()->OnReplyReceived();
-            // The call is finished, and we can delete this tag now.
-            delete tag;
-          });
+          main_service_.post(
+              [tag]() {
+                tag->GetCall()->OnReplyReceived();
+                // The call is finished, and we can delete this tag now.
+                delete tag;
+              },
+              tag->GetCall()->GetName());
         } else {
           delete tag;
         }
@@ -247,7 +276,7 @@ class ClientCallManager {
   }
 
   /// The main event loop, to which the callback functions will be posted.
-  boost::asio::io_service &main_service_;
+  instrumented_io_context &main_service_;
 
   /// The number of polling threads.
   int num_threads_;
@@ -267,5 +296,3 @@ class ClientCallManager {
 
 }  // namespace rpc
 }  // namespace ray
-
-#endif

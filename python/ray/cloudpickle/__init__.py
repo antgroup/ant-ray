@@ -1,19 +1,47 @@
 from __future__ import absolute_import
+
 import os
-import sys
+from pickle import PicklingError
 
-CLOUDPICKLE_PATH = os.path.dirname(os.path.realpath(__file__))
+from ray.cloudpickle.cloudpickle import *  # noqa
+from ray.cloudpickle.cloudpickle_fast import CloudPickler, dumps, dump  # noqa
 
-if os.path.exists(os.path.join(CLOUDPICKLE_PATH, "..", "pickle5_files", "pickle5")):
-    HAS_PICKLE5 = True
-else:
-    HAS_PICKLE5 = False
 
-if sys.version_info[:2] >= (3, 8) or HAS_PICKLE5:
-    from ray.cloudpickle.cloudpickle_fast import *
-    FAST_CLOUDPICKLE_USED = True
-else:
-    from ray.cloudpickle.cloudpickle import *
-    FAST_CLOUDPICKLE_USED = False
+# Conform to the convention used by python serialization libraries, which
+# expose their Pickler subclass at top-level under the  "Pickler" name.
+Pickler = CloudPickler
 
-__version__ = '1.2.2.dev0'
+__version__ = "1.6.0"
+
+
+def _warn_msg(obj, method, exc):
+    return (
+        f"{method}({str(obj)}) failed."
+        "\nTo check which non-serializable variables are captured "
+        "in scope, re-run the ray script with 'RAY_PICKLE_VERBOSE_DEBUG=1'.")
+
+
+def dump_debug(obj, *args, **kwargs):
+    try:
+        return dump(obj, *args, **kwargs)
+    except (TypeError, PicklingError) as exc:
+        if os.environ.get("RAY_PICKLE_VERBOSE_DEBUG"):
+            from ray.util.check_serialize import inspect_serializability
+            inspect_serializability(obj)
+            raise
+        else:
+            msg = _warn_msg(obj, "ray.cloudpickle.dump", exc)
+            raise type(exc)(msg)
+
+
+def dumps_debug(obj, *args, **kwargs):
+    try:
+        return dumps(obj, *args, **kwargs)
+    except (TypeError, PicklingError) as exc:
+        if os.environ.get("RAY_PICKLE_VERBOSE_DEBUG"):
+            from ray.util.check_serialize import inspect_serializability
+            inspect_serializability(obj)
+            raise
+        else:
+            msg = _warn_msg(obj, "ray.cloudpickle.dumps", exc)
+            raise type(exc)(msg)

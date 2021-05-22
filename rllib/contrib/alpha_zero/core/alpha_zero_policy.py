@@ -2,9 +2,9 @@ import numpy as np
 
 from ray.rllib.policy.policy import Policy, LEARNER_STATS_KEY
 from ray.rllib.policy.torch_policy import TorchPolicy
-from ray.rllib.utils.annotations import override
 from ray.rllib.contrib.alpha_zero.core.mcts import Node, RootParentNode
-from ray.rllib.utils import try_import_torch
+from ray.rllib.utils.annotations import override
+from ray.rllib.utils.framework import try_import_torch
 
 torch, _ = try_import_torch()
 
@@ -14,9 +14,12 @@ class AlphaZeroPolicy(TorchPolicy):
                  action_distribution_class, mcts_creator, env_creator,
                  **kwargs):
         super().__init__(
-            observation_space, action_space, config, model, loss,
-            action_distribution_class
-        )
+            observation_space,
+            action_space,
+            config,
+            model=model,
+            loss=loss,
+            action_distribution_class=action_distribution_class)
         # we maintain an env copy in the policy that is used during mcts
         # simulations
         self.env_creator = env_creator
@@ -35,15 +38,27 @@ class AlphaZeroPolicy(TorchPolicy):
                         episodes=None,
                         **kwargs):
 
+        input_dict = {"obs": obs_batch}
+        if prev_action_batch:
+            input_dict["prev_actions"] = prev_action_batch
+        if prev_reward_batch:
+            input_dict["prev_rewards"] = prev_reward_batch
+
+        return self.compute_actions_from_input_dict(
+            input_dict=input_dict,
+            episodes=episodes,
+            state_batches=state_batches,
+        )
+
+    @override(Policy)
+    def compute_actions_from_input_dict(self,
+                                        input_dict,
+                                        explore=None,
+                                        timestep=None,
+                                        episodes=None,
+                                        **kwargs):
         with torch.no_grad():
-            input_dict = {"obs": obs_batch}
-            if prev_action_batch:
-                input_dict["prev_actions"] = prev_action_batch
-            if prev_reward_batch:
-                input_dict["prev_rewards"] = prev_reward_batch
-
             actions = []
-
             for i, episode in enumerate(episodes):
                 if episode.length == 0:
                     # if first time step of episode, get initial env state
@@ -86,7 +101,7 @@ class AlphaZeroPolicy(TorchPolicy):
                     episode.user_data["mcts_policies"].append(mcts_policy)
 
             return np.array(actions), [], self.extra_action_out(
-                input_dict, state_batches, self.model)
+                input_dict, kwargs.get("state_batches", []), self.model, None)
 
     @override(Policy)
     def postprocess_trajectory(self,
@@ -113,18 +128,19 @@ class AlphaZeroPolicy(TorchPolicy):
 
         loss_out, policy_loss, value_loss = self._loss(
             self, self.model, self.dist_class, train_batch)
-        self._optimizer.zero_grad()
+        self._optimizers[0].zero_grad()
         loss_out.backward()
 
-        grad_process_info = self.extra_grad_process()
-        self._optimizer.step()
+        grad_process_info = self.extra_grad_process(self._optimizers[0],
+                                                    loss_out)
+        self._optimizers[0].step()
 
         grad_info = self.extra_grad_info(train_batch)
         grad_info.update(grad_process_info)
         grad_info.update({
-            "total_loss": loss_out.detach().numpy(),
-            "policy_loss": policy_loss.detach().numpy(),
-            "value_loss": value_loss.detach().numpy()
+            "total_loss": loss_out.detach().cpu().numpy(),
+            "policy_loss": policy_loss.detach().cpu().numpy(),
+            "value_loss": value_loss.detach().cpu().numpy()
         })
 
         return {LEARNER_STATS_KEY: grad_info}

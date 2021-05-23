@@ -1,7 +1,6 @@
 package org.ray.yarn;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.ClientHandlerException;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -13,13 +12,11 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.ByteBuffer;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Vector;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -41,27 +38,26 @@ import org.apache.hadoop.util.ExitUtil;
 import org.apache.hadoop.util.Shell;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.apache.hadoop.yarn.api.ApplicationConstants.Environment;
+import org.apache.hadoop.yarn.api.ContainerManagementProtocol;
 import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponse;
 import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
-import org.apache.hadoop.yarn.api.records.ContainerStatus;
+import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
+import org.apache.hadoop.yarn.api.records.LocalResource;
 import org.apache.hadoop.yarn.api.records.Priority;
 import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.api.records.timeline.TimelineEntity;
-import org.apache.hadoop.yarn.api.records.timeline.TimelineEntityGroupId;
 import org.apache.hadoop.yarn.api.records.timeline.TimelineEvent;
 import org.apache.hadoop.yarn.api.records.timeline.TimelinePutResponse;
 import org.apache.hadoop.yarn.client.api.AMRMClient.ContainerRequest;
 import org.apache.hadoop.yarn.client.api.TimelineClient;
 import org.apache.hadoop.yarn.client.api.async.AMRMClientAsync;
 import org.apache.hadoop.yarn.client.api.async.NMClientAsync;
-import org.apache.hadoop.yarn.client.api.async.impl.NMClientAsyncImpl;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
-import org.apache.hadoop.yarn.util.timeline.TimelineUtils;
 import org.apache.log4j.LogManager;
 import org.ray.yarn.config.RayClusterConfig;
 import org.ray.yarn.utils.TimelineUtil;
@@ -85,10 +81,6 @@ public class ApplicationMaster {
     DS_APP_ATTEMPT, DS_CONTAINER
   }
 
-  private static final String YARN_SHELL_ID = "YARN_SHELL_ID";
-  private static final String HEAD_NAME = "head";
-  private static final String WORK_NAME = "work";
-
   // Configuration
   private Configuration conf;
   // Handle to communicate with the Resource Manager
@@ -98,74 +90,29 @@ public class ApplicationMaster {
   @VisibleForTesting
   UserGroupInformation appSubmitterUgi;
   // Handle to communicate with the Node Manager
-  private NMClientAsync nmClientAsync;
+  private static NMClientAsync nmClientAsync;
   // Listen to process the response from the Node Manager
-  private NmCallbackHandler containerListener;
+  private static NmCallbackHandler containerListener;
   // Hostname of the container
-  private String appMasterHostname = "";
+  private static String appMasterHostname = "";
   // Port on which the app master listens for status updates from clients
-  private int appMasterRpcPort = -1;
+  private static int appMasterRpcPort = -1;
   // Tracking url to which app master publishes info for clients to monitor
-  private String appMasterTrackingUrl = "";
+  private static String appMasterTrackingUrl = "";
   // Runtime state of AM
-  ApplicationMasterState amState = null;
-
-  // FIXME state begin
-  // Application Attempt Id ( combination of attemptId and fail count )
-  @VisibleForTesting
-  protected ApplicationAttemptId appAttemptId;
-  // Counter for completed containers ( complete denotes successful or failed )
-  private AtomicInteger numCompletedContainers = new AtomicInteger();
-  // Allocated container count so that we know how many containers has the RM
-  // allocated to us
-  @VisibleForTesting
-  protected AtomicInteger numAllocatedContainers = new AtomicInteger();
-  // Count of failed containers
-  private AtomicInteger numFailedContainers = new AtomicInteger();
-  // Count of containers already requested from the RM
-  // Needed as once requested, we should not request for containers again.
-  // Only request for more if the original requirement changes.
-  @VisibleForTesting
-  protected AtomicInteger numRequestedContainers = new AtomicInteger();
-  // App Master configuration
-  // No. of containers to run shell command on
-  @VisibleForTesting
-  protected int numTotalContainers = 1;
-
-  // No. of each of the Ray roles including head and work
-  private Map<String, Integer> numRoles = Maps.newHashMapWithExpectedSize(2);
-  private RayNodeContext[] indexToNode = null;
-  private Map<String, RayNodeContext> containerToNode = Maps.newHashMap();
-
-  @VisibleForTesting
-  protected final Set<ContainerId> launchedContainers =
-    Collections.newSetFromMap(new ConcurrentHashMap<ContainerId, Boolean>());
-
-  private int rayInstanceCounter = 1;
-  private volatile boolean done;
-  private ByteBuffer allTokens;
-
-  // The default value should be consistent with Ray RunParameters
-  private int redisPort = 34222;
-  private String redisAddress;
-  // FIXME state end
+  protected static ApplicationMasterState amState = null;
+  // RayCluster Configuration
+  protected static RayClusterConfig rayConf;
 
   // Launch threads
   private List<Thread> launchThreads = new ArrayList<Thread>();
-  // Hardcoded path to shell script in launch container's local env
-  private static final String rayShellStringPath = "run.sh";
   // Hardcoded path to custom log_properties
   private static final String log4jPath = "log4j.properties";
 
   // Timeline Client
   @VisibleForTesting
   TimelineClient timelineClient;
-  static final String CONTAINER_ENTITY_GROUP_ID = "CONTAINERS";
-  static final String APPID_TIMELINE_FILTER_NAME = "appId";
   static final String USER_TIMELINE_FILTER_NAME = "user";
-  static final String LINUX_BASH_COMMEND = "bash";
-
-  private RayClusterConfig rayConf;
 
 
   public ApplicationMaster() {
@@ -286,9 +233,9 @@ public class ApplicationMaster {
     checkEnvs(envs);
     initContainerInfo();
 
-    logger.info("Application master for app" + ", appId=" + appAttemptId.getApplicationId().getId()
-        + ", clustertimestamp=" + appAttemptId.getApplicationId().getClusterTimestamp()
-        + ", attemptId=" + appAttemptId.getAttemptId());
+    logger.info("Application master for app" + ", appId=" + amState.appAttemptId.getApplicationId().getId()
+        + ", clustertimestamp=" + amState.appAttemptId.getApplicationId().getClusterTimestamp()
+        + ", attemptId=" + amState.appAttemptId.getAttemptId());
     return true;
   }
 
@@ -313,7 +260,7 @@ public class ApplicationMaster {
         iter.remove();
       }
     }
-    allTokens = ByteBuffer.wrap(dob.getData(), 0, dob.getLength());
+    amState.allTokens = ByteBuffer.wrap(dob.getData(), 0, dob.getLength());
 
     // Create appSubmitterUgi and add original tokens to it
     String appSubmitterUserName = System.getenv(ApplicationConstants.Environment.USER.name());
@@ -332,7 +279,7 @@ public class ApplicationMaster {
 
     // startTimelineClient(conf);
     if (timelineClient != null) {
-      publishApplicationAttemptEvent(timelineClient, appAttemptId.toString(),
+      publishApplicationAttemptEvent(timelineClient, amState.appAttemptId.toString(),
           DsEvent.DS_APP_ATTEMPT_START, rayConf.getDomainId(), appSubmitterUgi);
     }
 
@@ -369,19 +316,19 @@ public class ApplicationMaster {
     }
 
     List<Container> previousAmRunningContainers = response.getContainersFromPreviousAttempts();
-    logger.info(appAttemptId + " received " + previousAmRunningContainers.size()
+    logger.info(amState.appAttemptId + " received " + previousAmRunningContainers.size()
         + " previous attempts' running containers on AM registration.");
     for (Container container : previousAmRunningContainers) {
-      launchedContainers.add(container.getId());
+      amState.launchedContainers.add(container.getId());
     }
-    numAllocatedContainers.addAndGet(previousAmRunningContainers.size());
+    amState.numAllocatedContainers.addAndGet(previousAmRunningContainers.size());
 
-    int numTotalContainersToRequest = numTotalContainers - previousAmRunningContainers.size();
+    int numTotalContainersToRequest = amState.numTotalContainers - previousAmRunningContainers.size();
 
     if (previousAmRunningContainers.size() > 0) {
       // TODO: support failover about recovery ray node context
       logger.warn("Some previous containers found.");
-      rayNodeContextRecovery(indexToNode, previousAmRunningContainers);
+      rayNodeContextRecovery(amState.indexToNode, previousAmRunningContainers);
     }
     // Setup ask for containers from RM
     // Send request for containers to RM
@@ -398,7 +345,7 @@ public class ApplicationMaster {
     // ContainerRequest containerAsk = setupContainerAskForRM(null);
     // amRMClient.addContainerRequest(containerAsk);
     // }
-    numRequestedContainers.set(numTotalContainers);
+    amState.numRequestedContainers.set(amState.numTotalContainers);
   }
 
   private void printUsage(Options opts) {
@@ -409,7 +356,7 @@ public class ApplicationMaster {
     if (!envs.containsKey(Environment.CONTAINER_ID.name())) {
       if (cliParser.hasOption("appAttemptId")) {
         String appIdStr = cliParser.getOptionValue("appAttemptId", "");
-        appAttemptId = ApplicationAttemptId.fromString(appIdStr);
+        amState.appAttemptId = ApplicationAttemptId.fromString(appIdStr);
       } else {
         throw new IllegalArgumentException(
             "Application Attempt Id not set in the environment");
@@ -417,7 +364,7 @@ public class ApplicationMaster {
     } else {
       ContainerId containerId = ContainerId
           .fromString(envs.get(Environment.CONTAINER_ID.name()));
-      appAttemptId = containerId.getApplicationAttemptId();
+      amState.appAttemptId = containerId.getApplicationAttemptId();
     }
   }
 
@@ -442,30 +389,30 @@ public class ApplicationMaster {
   }
 
   private void initContainerInfo() {
-    numTotalContainers = rayConf.getNumContainers();
-    if (numTotalContainers == 0) {
+    amState.numTotalContainers = rayConf.getNumContainers();
+    if (amState.numTotalContainers == 0) {
       throw new IllegalArgumentException("Cannot run distributed shell with no launchedContainers");
     }
 
     // FIXME get node numbers from rayConf
-    numTotalContainers = rayConf.getNumRoles().get("head") + rayConf.getNumRoles().get("work");
+    amState.numTotalContainers = rayConf.getNumRoles().get("head") + rayConf.getNumRoles().get("work");
 
-    indexToNode = new RayNodeContext[numTotalContainers];
+    amState.indexToNode = new RayNodeContext[amState.numTotalContainers];
     int i = 0;
     if (rayConf.getNumRoles().get("head") == 1) {
-      indexToNode[i] = new RayNodeContext("head");
+      amState.indexToNode[i] = new RayNodeContext("head");
       ++i;
     }
     for (int j = 0; j < rayConf.getNumRoles().get("work"); ++j) {
-      indexToNode[i] = new RayNodeContext("word");
+      amState.indexToNode[i] = new RayNodeContext("word");
       ++i;
     }
-    assert numTotalContainers == i;
+    assert amState.numTotalContainers == i;
   }
 
   private int setupContainerRequest() {
     int requestCount = 0;
-    for (RayNodeContext nodeContext : indexToNode) {
+    for (RayNodeContext nodeContext : amState.indexToNode) {
       if (nodeContext.isRunning == false && nodeContext.isAllocating == false) {
         ContainerRequest containerAsk = setupContainerAskForRm();
         amRmClient.addContainerRequest(containerAsk);
@@ -517,7 +464,7 @@ public class ApplicationMaster {
   @VisibleForTesting
   protected boolean finish() {
     // wait for completion.
-    while (!done && (numCompletedContainers.get() != numTotalContainers)) {
+    while (!amState.done && (amState.numCompletedContainers.get() != amState.numTotalContainers)) {
       try {
         Thread.sleep(200);
       } catch (InterruptedException ex) {
@@ -526,7 +473,7 @@ public class ApplicationMaster {
     }
 
     if (timelineClient != null) {
-      publishApplicationAttemptEvent(timelineClient, appAttemptId.toString(),
+      publishApplicationAttemptEvent(timelineClient, amState.appAttemptId.toString(),
           DsEvent.DS_APP_ATTEMPT_END, rayConf.getDomainId(), appSubmitterUgi);
     }
 
@@ -553,13 +500,13 @@ public class ApplicationMaster {
     FinalApplicationStatus appStatus;
     String appMessage = null;
     boolean success = true;
-    if (numFailedContainers.get() == 0 && numCompletedContainers.get() == numTotalContainers) {
+    if (amState.numFailedContainers.get() == 0 && amState.numCompletedContainers.get() == amState.numTotalContainers) {
       appStatus = FinalApplicationStatus.SUCCEEDED;
     } else {
       appStatus = FinalApplicationStatus.FAILED;
-      appMessage = "Diagnostics." + ", total=" + numTotalContainers + ", completed="
-          + numCompletedContainers.get() + ", allocated=" + numAllocatedContainers.get()
-          + ", failed=" + numFailedContainers.get();
+      appMessage = "Diagnostics." + ", total=" + amState.numTotalContainers + ", completed="
+          + amState.numCompletedContainers.get() + ", allocated=" + amState.numAllocatedContainers.get()
+          + ", failed=" + amState.numFailedContainers.get();
       logger.info(appMessage);
       success = false;
     }
@@ -648,19 +595,13 @@ public class ApplicationMaster {
 
   @VisibleForTesting
   int getNumCompletedContainers() {
-    return numCompletedContainers.get();
-  }
-
-  @VisibleForTesting
-  boolean getDone() {
-    return done;
+    return amState.numCompletedContainers.get();
   }
 
   @VisibleForTesting
   Thread createLaunchContainerThread(Container allocatedContainer, String shellId, String role,
       long sleepMillis) {
-    ContainerLauncher runnableLaunchContainer = new ContainerLauncher(
-        allocatedContainer, containerListener, shellId, role, sleepMillis);
+    ContainerLauncher runnableLaunchContainer = new ContainerLauncher(allocatedContainer, shellId, role, sleepMillis);
     return new Thread(runnableLaunchContainer);
   }
 
@@ -672,5 +613,114 @@ public class ApplicationMaster {
     return timelineClient;
   }
 
+  public NMClientAsync getNmClientAsync() {
+    return nmClientAsync;
+  }
 
+  public NmCallbackHandler getContainerListener() {
+    return containerListener;
+  }
+
+  public ApplicationMasterState getAmState() {
+    return amState;
+  }
+
+  @VisibleForTesting
+  public static Thread createContainerAsync(Container allocatedContainer, String shellId, String role, long sleepMillis) {
+    ContainerLauncher runnableLaunchContainer = new ContainerLauncher(allocatedContainer, shellId, role, sleepMillis);
+    return new Thread(runnableLaunchContainer);
+  }
+
+  /**
+   * Thread to connect to the {@link ContainerManagementProtocol} and launch the container that will
+   * execute the shell command.
+   */
+  public static class ContainerLauncher implements Runnable {
+
+    // Allocated container
+    private Container container;
+    private String rayInstanceId;
+    private String role;
+    private long sleepMillis = 0;
+
+    public static final String SHELL_SEMICOLON = ";";
+
+    public ContainerLauncher(Container lcontainer,
+      String rayInstanceId, String role, long sleepMillis) {
+      this.container = lcontainer;
+      this.rayInstanceId = rayInstanceId;
+      this.role = role;
+      this.sleepMillis = sleepMillis;
+    }
+
+    @Override
+    /**
+     * Connects to CM, sets up container launch context for shell command and eventually dispatches
+     * the container start request to the CM.
+     */
+    public void run() {
+      logger.info("Setting up container launch container for containerid=" + container.getId()
+        + " with rayInstanceId=" + rayInstanceId + " ,sleep millis " + sleepMillis);
+
+      if (sleepMillis != 0) {
+        try {
+          Thread.sleep(sleepMillis);
+        } catch (InterruptedException e) {
+          logger.warn("Catch InterruptedException when sleep.");
+        }
+
+      }
+      // Set the local resources
+      Map<String, LocalResource> localResources = new HashMap<String, LocalResource>();
+
+      // The container for the eventual shell commands needs its own local
+      // resources too.
+      // In this scenario, if a shell script is specified, we need to have it
+      // copied and made available to the container.
+      // TODO distribute user resource through hdfs
+
+      // Set the necessary command to execute on the allocated container
+      Vector<CharSequence> vargs = new Vector<CharSequence>(5);
+      vargs.add(rayConf.getSetupCommands());
+      vargs.add(SHELL_SEMICOLON);
+
+      // Set args based on role
+      switch (role) {
+        case "head":
+          vargs.add(rayConf.getHeadSetupCommands());
+          vargs.add(SHELL_SEMICOLON);
+          vargs.add(rayConf.getHeadStartCommands());
+          vargs.add(SHELL_SEMICOLON);
+          break;
+        case "work":
+          String export_head_address = "export RAY_HEAD_ADDRESS=" + amState.redisAddress + SHELL_SEMICOLON;
+          vargs.add(export_head_address);
+          vargs.add(rayConf.getWorkerSetupCommands());
+          vargs.add(SHELL_SEMICOLON);
+          vargs.add(rayConf.getWorkerStartCommands());
+          vargs.add(SHELL_SEMICOLON);
+          break;
+        default:
+          break;
+      }
+
+      // Get final commmand
+      StringBuilder command = new StringBuilder();
+      for (CharSequence str : vargs) {
+        command.append(str).append(" ");
+      }
+
+      List<String> commands = new ArrayList<String>();
+      commands.add(command.toString());
+      logger.info("command: " + commands);
+
+      // Set up ContainerLaunchContext, setting local resource, environment,
+      // command and token for constructor.
+      Map<String, String> myShellEnv = new HashMap<String, String>();
+      ContainerLaunchContext ctx = ContainerLaunchContext.newInstance(localResources, myShellEnv,
+        commands, null, amState.allTokens.duplicate(), null);
+      containerListener.addContainer(container.getId(), container);
+      nmClientAsync.startContainerAsync(container, ctx);
+    }
+  }
 }

@@ -1,0 +1,7 @@
+clusterName: ray
+setupCommands: pip install ray
+headSetupCommands:
+workerSetupCommands:
+headStartCommands: ray start --head --block
+workerStartCommands: ray start --address=$RAY_HEAD_ADDRESS:6379 --block
+workNodeNumber: 1

@@ -6,13 +6,35 @@ import java.util.Map;
 
 /**
  * Configuration for Ray Cluster Setup
+ * TODO: support multiple worker group
  */
 public class RayClusterConfig extends AppConfig {
 
+  private Map<String,Object> fullContent;
+
+  // Cluster Name
+  private String clusterName;
+  // App master priority
+  private int priority = 0;
+  // Shell Command Container priority
+  private int shellCmdPriority = 0;
+  // Queue for App master
+  private String physicalQueueName;
+  // Amt. of memory resource to request for to run the App Master
+  private long amMemory = 1024;
+  // Amt. of virtual core resource to request for to run the App Master
+  private int amVCores = 1;
+  // Application master jar url
+  private String amJarUploadUrl;
+
+  // Amt. of virtual cores to request for container in which shell script will be executed
+  int headContainerVCores = 1;
   // Amt of memory to request for container in which shell script will be executed
-  long containerMemory = 10;
+  long headContainerMemory = 2048;
   // Amt. of virtual cores to request for container in which shell script will be executed
   int containerVCores = 1;
+  // Amt of memory to request for container in which shell script will be executed
+  long containerMemory = 4096;
   // No. of containers in which the shell script needs to be executed
   int numContainers = 1;
   // Node Label to schedule
@@ -25,13 +47,23 @@ public class RayClusterConfig extends AppConfig {
   String[] shellArgs = new String[] {};
   // Env variables to be setup for the shell command
   Map<String, String> shellEnv = new HashMap<String, String>();
-  // Shell Command Container priority
-  int shellCmdPriority = 0;
-  // Shell command to be executed
-  // TODO different group have different shell commands
-  String shellCommand = "";
   // No. of the Ray roles including head and work
   private Map<String, Integer> numRoles = Maps.newHashMapWithExpectedSize(2);
+
+  // Common setup commands
+  String setupCommands;
+  // Head setup commands
+  String headSetupCommands;
+  // Worker setup commands
+  String workerSetupCommands;
+  // Head start commands
+  String headStartCommands;
+  // Worker start commands
+  String workerStartCommands;
+
+  private int headNodeNumber = 1;
+  private int workNodeNumber;
+
 
   @Override
   public void validate() {
@@ -71,12 +103,88 @@ public class RayClusterConfig extends AppConfig {
 
   }
 
-  public long getContainerMemory() {
-    return containerMemory;
+  public Map<String, Object> getFullContent() {
+    return fullContent;
   }
 
-  public void setContainerMemory(long containerMemory) {
-    this.containerMemory = containerMemory;
+  public void setFullContent(Map<String, Object> fullContent) {
+    this.fullContent = fullContent;
+  }
+
+  public String getClusterName() {
+    return clusterName;
+  }
+
+  public void setClusterName(String clusterName) {
+    this.clusterName = clusterName;
+  }
+
+  public int getPriority() {
+    return priority;
+  }
+
+  public void setPriority(int priority) {
+    this.priority = priority;
+  }
+
+  public int getShellCmdPriority() {
+    return shellCmdPriority;
+  }
+
+  public void setShellCmdPriority(int shellCmdPriority) {
+    this.shellCmdPriority = shellCmdPriority;
+  }
+
+  public String getPhysicalQueueName() {
+    return physicalQueueName;
+  }
+
+  public void setPhysicalQueueName(String physicalQueueName) {
+    this.physicalQueueName = physicalQueueName;
+  }
+
+  @Override
+  public long getAmMemory() {
+    return amMemory;
+  }
+
+  @Override
+  public void setAmMemory(long amMemory) {
+    this.amMemory = amMemory;
+  }
+
+  @Override
+  public int getAmVCores() {
+    return amVCores;
+  }
+
+  @Override
+  public void setAmVCores(int amVCores) {
+    this.amVCores = amVCores;
+  }
+
+  public String getAmJarUploadUrl() {
+    return amJarUploadUrl;
+  }
+
+  public void setAmJarUploadUrl(String amJarUploadUrl) {
+    this.amJarUploadUrl = amJarUploadUrl;
+  }
+
+  public int getHeadContainerVCores() {
+    return headContainerVCores;
+  }
+
+  public void setHeadContainerVCores(int headContainerVCores) {
+    this.headContainerVCores = headContainerVCores;
+  }
+
+  public long getHeadContainerMemory() {
+    return headContainerMemory;
+  }
+
+  public void setHeadContainerMemory(long headContainerMemory) {
+    this.headContainerMemory = headContainerMemory;
   }
 
   public int getContainerVCores() {
@@ -85,6 +193,14 @@ public class RayClusterConfig extends AppConfig {
 
   public void setContainerVCores(int containerVCores) {
     this.containerVCores = containerVCores;
+  }
+
+  public long getContainerMemory() {
+    return containerMemory;
+  }
+
+  public void setContainerMemory(long containerMemory) {
+    this.containerMemory = containerMemory;
   }
 
   public int getNumContainers() {
@@ -135,27 +251,67 @@ public class RayClusterConfig extends AppConfig {
     this.shellEnv = shellEnv;
   }
 
-  public int getShellCmdPriority() {
-    return shellCmdPriority;
-  }
-
-  public void setShellCmdPriority(int shellCmdPriority) {
-    this.shellCmdPriority = shellCmdPriority;
-  }
-
-  public String getShellCommand() {
-    return shellCommand;
-  }
-
-  public void setShellCommand(String shellCommand) {
-    this.shellCommand = shellCommand;
-  }
-
   public Map<String, Integer> getNumRoles() {
     return numRoles;
   }
 
   public void setNumRoles(Map<String, Integer> numRoles) {
     this.numRoles = numRoles;
+  }
+
+  public String getSetupCommands() {
+    return setupCommands;
+  }
+
+  public void setSetupCommands(String setupCommands) {
+    this.setupCommands = setupCommands;
+  }
+
+  public String getHeadSetupCommands() {
+    return headSetupCommands;
+  }
+
+  public void setHeadSetupCommands(String headSetupCommands) {
+    this.headSetupCommands = headSetupCommands;
+  }
+
+  public String getWorkerSetupCommands() {
+    return workerSetupCommands;
+  }
+
+  public void setWorkerSetupCommands(String workerSetupCommands) {
+    this.workerSetupCommands = workerSetupCommands;
+  }
+
+  public String getHeadStartCommands() {
+    return headStartCommands;
+  }
+
+  public void setHeadStartCommands(String headStartCommands) {
+    this.headStartCommands = headStartCommands;
+  }
+
+  public String getWorkerStartCommands() {
+    return workerStartCommands;
+  }
+
+  public void setWorkerStartCommands(String workerStartCommands) {
+    this.workerStartCommands = workerStartCommands;
+  }
+
+  public int getHeadNodeNumber() {
+    return headNodeNumber;
+  }
+
+  public void setHeadNodeNumber(int headNodeNumber) {
+    this.headNodeNumber = headNodeNumber;
+  }
+
+  public int getWorkNodeNumber() {
+    return workNodeNumber;
+  }
+
+  public void setWorkNodeNumber(int workNodeNumber) {
+    this.workNodeNumber = workNodeNumber;
   }
 }

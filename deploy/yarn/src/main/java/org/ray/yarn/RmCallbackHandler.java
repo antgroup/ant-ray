@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerState;
@@ -18,7 +17,6 @@ import org.apache.hadoop.yarn.api.records.UpdatedContainer;
 import org.apache.hadoop.yarn.client.api.AMRMClient.ContainerRequest;
 import org.apache.hadoop.yarn.client.api.TimelineClient;
 import org.apache.hadoop.yarn.client.api.async.AMRMClientAsync;
-import org.apache.hadoop.yarn.client.api.async.NMClientAsync;
 import org.ray.yarn.config.RayClusterConfig;
 import org.ray.yarn.utils.TimelineUtil;
 
@@ -177,7 +175,7 @@ public class RmCallbackHandler extends AMRMClientAsync.AbstractCallbackHandler {
         } else {
           shouldSleep = true;
         }
-        launchThread = ContainerLauncher.create(allocatedContainer, rayInstanceId, node.role,
+        launchThread = ApplicationMaster.createContainerAsync(allocatedContainer, rayInstanceId, node.role,
             shouldSleep ? 20000 : 0);
         break;
       }

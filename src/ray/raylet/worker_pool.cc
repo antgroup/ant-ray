@@ -27,6 +27,7 @@
 #include "ray/stats/stats.h"
 #include "ray/util/logging.h"
 #include "ray/util/util.h"
+#include "ray/util/filesystem.h"
 
 namespace {
 
@@ -422,16 +423,19 @@ Process WorkerPool::StartContainerProcess(
     const ResourceSet &worker_resource, const std::string &worker_container_image) {
   // Launch the process to create the worker container.
   std::vector<std::string> argv;
-  // TODO currently worker process will write log to stdout/stderr before initializing
-  // logger, and the worker process' stdout/stderr has been redirected to raylet.err by
-  // default. When starting worker process in container, worker process' stdout/stderr
-  // will be redirected to container log file. Should we redirect stdout/stderr to
-  // raylet.err?
   argv.emplace_back("podman");
   argv.emplace_back("run");
   argv.emplace_back("--rm");
   if (RAY_LOG_ENABLED(DEBUG)) {
     argv.emplace_back("--log-level=debug");
+  }
+  // Currently worker process will write log to stderr before initializing
+  // logger, and the worker process' stdout/stderr has been redirected to raylet.err by
+  // default.
+  std::string stderr_file = ray::GetStderrFile();
+  if (!stderr_file.empty()){
+    argv.emplace_back("--log-opt");
+    argv.emplace_back("path="+stderr_file);
   }
   // TODO set uid for container, for example: -u admin
   argv.emplace_back("-d");

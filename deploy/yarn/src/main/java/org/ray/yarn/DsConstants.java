@@ -13,7 +13,7 @@ public class DsConstants {
   /**
    * Ray configuration file option
    */
-  public static final String RAY_CONF_PARAM = "ray-conf";
+  public static final String RAY_CONF_PARAM = "conf";
   /**
    * Environment key name pointing to the shell script's location.
    */

@@ -36,7 +36,7 @@ Run
 
 .. code:: shell
 
-    $ /path/to/hadoop-2.8.0/bin/yarn jar ./target/ray-on-yarn-1.0.jar  org.ray.yarn.Client  --jar ./target/ray-on-yarn-1.0.jar --rayArchive ./deploy/deploy.zip --containerVcores 2 --containerMemory 2048 --priority 10 --shellCmdPriority 10 --numRoles 1 1 --queue ray --headNodeStaticArgs "'--num-cpus 4 --num-gpus 4'" --workNodeStaticArgs "'--num-cpus 2 --num-gpus 2'"
+    $ /path/to/hadoop-2.8.0/bin/yarn jar ./target/ray-on-yarn-1.0.jar org.ray.yarn.Client --conf src/resources/config_example.yaml
 
 Please modify the command line on-demand. Some detail about the input
 args is in the help doc.

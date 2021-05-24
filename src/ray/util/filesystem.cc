@@ -91,7 +91,7 @@ std::string GetStderrFile() {
   struct stat st;
   if (!fstat(2, &st) && S_ISREG(st.st_mode)) {
     char filepath[PATH_MAX + 1];
-    ssize_t len = ::readlink("/proc/self/fd/2", filepath, sizeof(filepath)-1);
+    ssize_t len = ::readlink("/proc/self/fd/2", filepath, sizeof(filepath) - 1);
     if (len != -1) {
       filepath[len] = '\0';
       return std::string(filepath);

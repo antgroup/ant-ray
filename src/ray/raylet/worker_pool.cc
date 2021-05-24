@@ -25,9 +25,9 @@
 #include "ray/core_worker/common.h"
 #include "ray/gcs/pb_util.h"
 #include "ray/stats/stats.h"
+#include "ray/util/filesystem.h"
 #include "ray/util/logging.h"
 #include "ray/util/util.h"
-#include "ray/util/filesystem.h"
 
 namespace {
 
@@ -433,9 +433,9 @@ Process WorkerPool::StartContainerProcess(
   // logger, and the worker process' stdout/stderr has been redirected to raylet.err by
   // default.
   std::string stderr_file = ray::GetStderrFile();
-  if (!stderr_file.empty()){
+  if (!stderr_file.empty()) {
     argv.emplace_back("--log-opt");
-    argv.emplace_back("path="+stderr_file);
+    argv.emplace_back("path=" + stderr_file);
   }
   // TODO set uid for container, for example: -u admin
   argv.emplace_back("-d");

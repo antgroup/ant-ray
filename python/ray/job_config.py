@@ -49,7 +49,6 @@ class JobConfig:
         self.metadata = metadata or {}
         self.ray_namespace = ray_namespace
         self.set_runtime_env(runtime_env)
-        self.container_image = container_image or ""
         self.worker_container_image = worker_container_image or ""
         self._cached_pb = None
 

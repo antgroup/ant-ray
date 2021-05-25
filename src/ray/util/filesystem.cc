@@ -1,6 +1,5 @@
 #include "ray/util/filesystem.h"
 
-#include <linux/limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -9,6 +8,10 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#endif
+
+#ifdef __linux__
+#include <linux/limits.h>
 #endif
 
 namespace ray {
@@ -89,6 +92,7 @@ std::string GetUserTempDir() {
 }
 
 std::string GetStderrFile() {
+#ifdef __linux__
   struct stat st;
   if (!fstat(2, &st) && S_ISREG(st.st_mode)) {
     char filepath[PATH_MAX + 1];
@@ -98,6 +102,8 @@ std::string GetStderrFile() {
       return std::string(filepath);
     }
   }
+#endif
+  // Not implements on windows/macOs
   return "";
 }
 

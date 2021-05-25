@@ -87,7 +87,8 @@ WorkerPool::WorkerPool(instrumented_io_context &io_service, const NodeID node_id
   RAY_CHECK(maximum_startup_concurrency > 0);
 #ifndef __linux__
   // Currently worker_process_in_container_enabled only works on linux
-  RAY_CHECK(!worker_process_in_container_enabled_);
+  RAY_CHECK(!worker_process_in_container_enabled_)
+      << "Option worker_process_in_container_enabled only works on linux.";
 #endif
   // We need to record so that the metric exists. This way, we report that 0
   // processes have started before a task runs on the node (as opposed to the

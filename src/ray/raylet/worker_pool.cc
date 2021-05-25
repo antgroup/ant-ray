@@ -315,8 +315,12 @@ Process WorkerPool::StartWorkerProcess(
       }
     }
 
-    WorkerCacheKey env = {override_environment_variables, serialized_runtime_env,
-                          worker_resource};
+
+    ResourceSet workerCacheKeyResource = worker_resource;
+    if (!worker_process_in_container_enabled_){
+      workerCacheKeyResource = {};
+    }
+    WorkerCacheKey env = {override_environment_variables, serialized_runtime_env, workerCacheKeyResource};
     const std::string runtime_env_hash_str = std::to_string(env.IntHash());
     worker_command_args.push_back("--runtime-env-hash=" + runtime_env_hash_str);
   }
@@ -989,9 +993,15 @@ std::shared_ptr<WorkerInterface> WorkerPool::PopWorker(
     // Find an available worker which is already assigned to this job and which has
     // the specified runtime env.
     // Try to pop the most recently pushed worker.
+    ResourceSet workerCacheKeyResource = task_spec.GetRequiredResources();
+    if (!worker_process_in_container_enabled_){
+      // If not enable worker process in container, don't add ResourceSet into
+      // WorkerCacheKey. Otherwise there are a lot test will fail.
+      workerCacheKeyResource = {};
+    }
     const WorkerCacheKey env = {task_spec.OverrideEnvironmentVariables(),
                                 task_spec.SerializedRuntimeEnv(),
-                                task_spec.GetRequiredResources()};
+                                workerCacheKeyResource};
     const int runtime_env_hash = env.IntHash();
     for (auto it = idle_of_all_languages_.rbegin(); it != idle_of_all_languages_.rend();
          it++) {

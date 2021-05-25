@@ -50,7 +50,6 @@ class JobConfig:
         self.ray_namespace = ray_namespace
         self.set_runtime_env(runtime_env)
         self.worker_container_image = worker_container_image or ""
-        self._cached_pb = None
 
     def set_metadata(self, key: str, value: str) -> None:
         self.metadata[key] = value

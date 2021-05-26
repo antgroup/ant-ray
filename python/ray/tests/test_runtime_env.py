@@ -489,6 +489,9 @@ print(sum(ray.get([test_actor.one.remote()] * 1000)))
 """
     script = driver_script.format(**locals())
     out = run_string_as_driver(script, env)
+    print("====out===")
+    print(out)
+    print("====outend===")
     assert out.strip().split()[-1] == "1000"
     assert len(list(Path(PKG_DIR).iterdir())) == 1
     assert len(kv._internal_kv_list("gcs://")) == 0

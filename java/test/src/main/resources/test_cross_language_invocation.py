@@ -116,3 +116,21 @@ class Counter(object):
     def increase(self, delta):
         self.value += int(delta)
         return str(self.value).encode("utf-8")
+
+@ray.remote
+def py_func_get_java_named_actor():
+    a = ray.get_actor("INVOCATION")
+    result = a.concat.remote(b"1").get()
+    return result
+
+
+def run_py_driver(address, password):
+    ray.init(address=address, _redis_password='5241590000000000')
+    a = ray.get_actor("INVOCATION")
+    result = a.invoke.remote().get()
+    return result
+
+import sys
+address = sys.argv[1]
+password = sys.argv[2]
+run_py_driver(address, password)

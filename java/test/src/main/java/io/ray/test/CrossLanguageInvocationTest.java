@@ -1,6 +1,7 @@
 package io.ray.test;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import io.ray.api.ActorHandle;
 import io.ray.api.ObjectRef;
 import io.ray.api.PyActorHandle;
@@ -9,6 +10,7 @@ import io.ray.api.function.PyActorClass;
 import io.ray.api.function.PyActorMethod;
 import io.ray.api.function.PyFunction;
 import io.ray.runtime.actor.NativeActorHandle;
+import io.ray.runtime.config.RayConfig;
 import io.ray.runtime.exception.CrossLanguageException;
 import io.ray.runtime.exception.RayException;
 import io.ray.runtime.generated.Common.Language;
@@ -18,6 +20,9 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import io.ray.runtime.runner.RunManager;
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -27,6 +32,8 @@ import org.testng.annotations.Test;
 public class CrossLanguageInvocationTest extends BaseTest {
 
   private static final String PYTHON_MODULE = "test_cross_language_invocation";
+
+  private static File pythonFile;
 
   @BeforeClass
   public void beforeClass() {
@@ -40,7 +47,7 @@ public class CrossLanguageInvocationTest extends BaseTest {
     // Write the test Python file to the temp dir.
     InputStream in =
         CrossLanguageInvocationTest.class.getResourceAsStream("/" + PYTHON_MODULE + ".py");
-    File pythonFile = new File(tempDir.getAbsolutePath() + File.separator + PYTHON_MODULE + ".py");
+    pythonFile = new File(tempDir.getAbsolutePath() + File.separator + PYTHON_MODULE + ".py");
     try {
       FileUtils.copyInputStreamToFile(in, pythonFile);
     } catch (IOException e) {
@@ -286,6 +293,30 @@ public class CrossLanguageInvocationTest extends BaseTest {
     Assert.fail();
   }
 
+
+  @Test
+  public void testNamedActorInCrossLanguage() throws IOException, InterruptedException {
+    ActorHandle<TestActor> actor = Ray.actor(TestActor::new, new byte[0]).setGlobalName("INVOCATION").remote();
+    // New python driver
+    startDriver();
+    // Wait for condition
+    TimeUnit.SECONDS.sleep(30);
+  }
+
+  private Process startDriver() throws IOException {
+    RayConfig rayConfig = TestUtils.getRuntime().getRayConfig();
+
+    String driverPath = pythonFile.getAbsolutePath();
+    ProcessBuilder builder =
+      new ProcessBuilder(
+        "python",
+        driverPath,
+        rayConfig.getRedisAddress(),
+        rayConfig.redisPassword);
+    builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+    return builder.start();
+  }
+
   public static Object[] pack(int i, String s, double f, Object[] o) {
     // This function will be called from test_cross_language_invocation.py
     return new Object[] {i, s, f, o};
@@ -344,6 +375,10 @@ public class CrossLanguageInvocationTest extends BaseTest {
 
   public static class TestActor {
 
+    private byte[] value;
+
+    private boolean invokedFromPy = false;
+
     public TestActor(byte[] v) {
       value = v;
     }
@@ -355,6 +390,13 @@ public class CrossLanguageInvocationTest extends BaseTest {
       return c;
     }
 
-    private byte[] value;
+    public boolean invoke() {
+      invokedFromPy = true;
+      return true;
+    }
+
+    public boolean isInvokedFromPy() {
+      return invokedFromPy;
+    }
   }
 }

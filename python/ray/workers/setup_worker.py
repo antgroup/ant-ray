@@ -64,6 +64,7 @@ def parse_allocated_resource(allocated_instances_serialized_json):
 
 
 def start_worker_in_container(container_option, args, remaining_args):
+    image = container_option.get("image")
     worker_setup_hook = args.worker_setup_hook
     last_period_idx = worker_setup_hook.rfind(".")
     module_name = worker_setup_hook[:last_period_idx]
@@ -88,13 +89,14 @@ def start_worker_in_container(container_option, args, remaining_args):
             "failed to get tmp_dir, the args: {}".format(remaining_args))
 
     container_driver = "podman"
-    # todo add cgroup config
-    # todo flag "--rm"
     container_command = [
-        container_driver, "run", "-v", tmp_dir + ":" + tmp_dir,
-        "--cgroup-manager=cgroupfs", "--network=host", "--pid=host",
-        "--ipc=host", "--env-host"
+        container_driver, "run", "--cgroup-manager=cgroupfs",
+        "--network=host", "--pid=host", "--ipc=host", "--env-host"
     ]
+    if image:
+        # if the container has individual rootfs, we need mount tmp_dir
+        container_command.append("-v")
+        container_command.append(tmp_dir + ":" + tmp_dir)
     container_command.append("--env")
     container_command.append("RAY_RAYLET_PID=" + str(os.getppid()))
     if container_option.get("run_options"):
@@ -104,7 +106,11 @@ def start_worker_in_container(container_option, args, remaining_args):
 
     container_command.append("--entrypoint")
     container_command.append("python")
-    container_command.append(container_option.get("image"))
+    if image:
+        container_command.append(image)
+    else:
+        container_command.append("--rootfs")
+        container_command.append("/")
     container_command.extend(entrypoint_args)
     logger.warning("start worker in container: {}".format(container_command))
     os.execvp(container_driver, container_command)
@@ -114,7 +120,7 @@ if __name__ == "__main__":
     args, remaining_args = parser.parse_known_args()
     runtime_env: dict = json.loads(args.serialized_runtime_env or "{}")
     container_option = runtime_env.get("container")
-    if container_option and container_option.get("image"):
+    if container_option:
         start_worker_in_container(container_option, args, remaining_args)
     else:
         remaining_args.append("--serialized-runtime-env")

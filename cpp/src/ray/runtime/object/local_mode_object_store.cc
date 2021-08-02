@@ -92,5 +92,9 @@ std::vector<bool> LocalModeObjectStore::Wait(const std::vector<ObjectID> &ids,
 void LocalModeObjectStore::AddLocalReference(const std::string &id) { return; }
 
 void LocalModeObjectStore::RemoveLocalReference(const std::string &id) { return; }
+
+std::string LocalModeObjectStore::promoteAndGetOwnershipInfo(const std::string &id) {
+  return "";
+}
 }  // namespace api
 }  // namespace ray

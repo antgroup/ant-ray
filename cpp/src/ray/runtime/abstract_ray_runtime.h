@@ -55,6 +55,8 @@ class AbstractRayRuntime : public RayRuntime {
 
   static std::shared_ptr<AbstractRayRuntime> GetInstance();
 
+  std::string promoteAndGetOwnershipInfo(const std::string &id);
+
  protected:
   std::unique_ptr<WorkerContext> worker_;
   std::unique_ptr<TaskSubmitter> task_submitter_;

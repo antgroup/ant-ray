@@ -95,5 +95,15 @@ void NativeObjectStore::RemoveLocalReference(const std::string &id) {
     core_worker.RemoveLocalReference(ObjectID::FromBinary(id));
   }
 }
+
+std::string NativeObjectStore::promoteAndGetOwnershipInfo(const std::string &id) {
+    ray::CoreWorkerProcess::GetCoreWorker().PromoteObjectToPlasma(ObjectID::FromBinary(id));
+    ray::rpc::Address address;
+    std::string serialized_object_status;
+    ray::CoreWorkerProcess::GetCoreWorker().GetOwnershipInfo(ObjectID::FromBinary(id), &address, &serialized_object_status);
+    auto address_str = address.SerializeAsString();
+    return address_str;
+}
+
 }  // namespace api
 }  // namespace ray

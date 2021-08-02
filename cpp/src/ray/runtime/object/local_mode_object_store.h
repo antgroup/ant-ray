@@ -21,6 +21,8 @@ class LocalModeObjectStore : public ObjectStore {
 
   void RemoveLocalReference(const std::string &id);
 
+  std::string promoteAndGetOwnershipInfo(const std::string &id);
+
  private:
   void PutRaw(std::shared_ptr<msgpack::sbuffer> data, ObjectID *object_id);
 

@@ -70,6 +70,7 @@ class ObjectStore {
   /// \param[in] id The binary string ID to decrease the reference count for.
   virtual void RemoveLocalReference(const std::string &id) = 0;
 
+  virtual std::string promoteAndGetOwnershipInfo(const std::string &id) = 0;
  private:
   virtual void PutRaw(std::shared_ptr<msgpack::sbuffer> data, ObjectID *object_id) = 0;
 

@@ -179,6 +179,7 @@ TEST(RayApiTest, VirtualFunctions) {
 }
 
 TEST(RayApiTest, CallWithObjectRef) {
+  std::cout << "RayApiTest, CallWithObjectRef" << std::endl;
   auto rt0 = Ray::Task(Return).Remote();
   auto rt1 = Ray::Task(PlusOne).Remote(rt0);
   auto rt2 = Ray::Task(PlusTwo).Remote(rt1, 3);
@@ -196,6 +197,12 @@ TEST(RayApiTest, CallWithObjectRef) {
   EXPECT_EQ(return2, 5);
   EXPECT_EQ(return3, 4);
   EXPECT_EQ(return4, 9);
+
+  auto buffer = Serializer::Serialize(rt1);
+  // ObjectRef<int> ref;
+  // auto buffer = Serializer::Serialize(ref);
+  Serializer::Deserialize<ObjectRef<int>>(buffer.data(), buffer.size());
+  std::cout << "RayApiTest, CallWithObjectRef Done" << std::endl;
 }
 
 TEST(RayApiTest, OverloadTest) {

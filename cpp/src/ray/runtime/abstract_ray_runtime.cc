@@ -98,6 +98,10 @@ std::vector<bool> AbstractRayRuntime::Wait(const std::vector<std::string> &ids,
   return object_store_->Wait(StringIDsToObjectIDs(ids), num_objects, timeout_ms);
 }
 
+std::string AbstractRayRuntime::promoteAndGetOwnershipInfo(const std::string &id) {
+  return object_store_->promoteAndGetOwnershipInfo(id);
+}
+
 std::vector<std::unique_ptr<::ray::TaskArg>> TransformArgs(
     std::vector<ray::api::TaskArg> &args) {
   std::vector<std::unique_ptr<::ray::TaskArg>> ray_args;

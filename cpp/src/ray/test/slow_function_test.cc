@@ -15,7 +15,7 @@ int slow_function(int i) {
 RAY_REMOTE(slow_function);
 
 TEST(RaySlowFunctionTest, BaseTest) {
-  RayConfig config;
+  ray::api::RayConfig config;
   config.local_mode = true;
   Ray::Init(config);
   auto time1 = std::chrono::duration_cast<std::chrono::milliseconds>(

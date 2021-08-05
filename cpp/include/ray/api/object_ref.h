@@ -3,12 +3,11 @@
 
 #include <ray/api/ray_runtime_holder.h>
 #include <ray/api/serializer.h>
-#include "ray/runtime/abstract_ray_runtime.h"
 
+#include <iostream>
 #include <memory>
 #include <msgpack.hpp>
 #include <utility>
-#include <iostream>
 
 namespace ray {
 namespace api {
@@ -65,22 +64,23 @@ class ObjectRef {
   std::shared_ptr<T> Get() const;
 
   /// Make ObjectRef serializable
-  template <typename Packer>
-  void msgpack_pack(Packer &msgpack_pk) const {
-    std::cout << "msgpack_pack" << std::endl;
-    msgpack::type::make_define_array(id_).msgpack_pack(msgpack_pk);
-    std::string address = std::dynamic_pointer_cast<AbstractRayRuntime>(internal::RayRuntime())->promoteAndGetOwnershipInfo(id_);
-    msgpack::type::make_define_array(address).msgpack_pack(msgpack_pk);
-  }
-  void msgpack_unpack(msgpack::object const &msgpack_o) {
-    std::cout << "msgpack_unpack" << std::endl;
-    msgpack::type::make_define_array(id_).msgpack_unpack(msgpack_o);
-  }
-  template <typename MSGPACK_OBJECT>
-  void msgpack_object(MSGPACK_OBJECT *msgpack_o, msgpack::zone &msgpack_z) const {
-    std::cout << "msgpack_object" << std::endl;
-    msgpack::type::make_define_array(id_).msgpack_object(msgpack_o, msgpack_z);
-  }
+  MSGPACK_DEFINE(id_);
+  // template <typename Packer>
+  // void msgpack_pack(Packer &msgpack_pk) const {
+  //   std::cout << "msgpack_pack" << std::endl;
+  //   msgpack::type::make_define_array(id_).msgpack_pack(msgpack_pk);
+  //   std::string address = internal::RayRuntime()->promoteAndGetOwnershipInfo(id_);
+  //   msgpack::type::make_define_array(address).msgpack_pack(msgpack_pk);
+  // }
+  // void msgpack_unpack(msgpack::object const &msgpack_o) {
+  //   std::cout << "msgpack_unpack" << std::endl;
+  //   msgpack::type::make_define_array(id_).msgpack_unpack(msgpack_o);
+  // }
+  // template <typename MSGPACK_OBJECT>
+  // void msgpack_object(MSGPACK_OBJECT *msgpack_o, msgpack::zone &msgpack_z) const {
+  //   std::cout << "msgpack_object" << std::endl;
+  //   msgpack::type::make_define_array(id_).msgpack_object(msgpack_o, msgpack_z);
+  // }
 
  private:
   std::string id_;

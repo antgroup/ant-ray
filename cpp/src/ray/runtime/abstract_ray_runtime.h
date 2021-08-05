@@ -21,31 +21,35 @@ class AbstractRayRuntime : public RayRuntime {
  public:
   virtual ~AbstractRayRuntime(){};
 
+  std::string Put(std::shared_ptr<msgpack::sbuffer> data) override;
+
+  std::shared_ptr<msgpack::sbuffer> Get(const std::string &id) override;
+
+  std::vector<std::shared_ptr<msgpack::sbuffer>> Get(
+      const std::vector<std::string> &ids) override;
+
+  std::vector<bool> Wait(const std::vector<std::string> &ids, int num_objects,
+                         int timeout_ms) override;
+
+  std::string Call(const RemoteFunctionHolder &remote_function_holder,
+                   std::vector<ray::api::TaskArg> &args) override;
+
+  std::string CreateActor(const RemoteFunctionHolder &remote_function_holder,
+                          std::vector<ray::api::TaskArg> &args) override;
+
+  std::string CallActor(const RemoteFunctionHolder &remote_function_holder,
+                        const std::string &actor,
+                        std::vector<ray::api::TaskArg> &args) override;
+
+  void AddLocalReference(const std::string &id) override;
+
+  void RemoveLocalReference(const std::string &id) override;
+
+  std::string promoteAndGetOwnershipInfo(const std::string &id) override;
+
   void Put(std::shared_ptr<msgpack::sbuffer> data, ObjectID *object_id);
 
   void Put(std::shared_ptr<msgpack::sbuffer> data, const ObjectID &object_id);
-
-  std::string Put(std::shared_ptr<msgpack::sbuffer> data);
-
-  std::shared_ptr<msgpack::sbuffer> Get(const std::string &id);
-
-  std::vector<std::shared_ptr<msgpack::sbuffer>> Get(const std::vector<std::string> &ids);
-
-  std::vector<bool> Wait(const std::vector<std::string> &ids, int num_objects,
-                         int timeout_ms);
-
-  std::string Call(const RemoteFunctionHolder &remote_function_holder,
-                   std::vector<ray::api::TaskArg> &args);
-
-  std::string CreateActor(const RemoteFunctionHolder &remote_function_holder,
-                          std::vector<ray::api::TaskArg> &args);
-
-  std::string CallActor(const RemoteFunctionHolder &remote_function_holder,
-                        const std::string &actor, std::vector<ray::api::TaskArg> &args);
-
-  void AddLocalReference(const std::string &id);
-
-  void RemoveLocalReference(const std::string &id);
 
   const TaskID &GetCurrentTaskId();
 
@@ -54,8 +58,6 @@ class AbstractRayRuntime : public RayRuntime {
   const std::unique_ptr<WorkerContext> &GetWorkerContext();
 
   static std::shared_ptr<AbstractRayRuntime> GetInstance();
-
-  std::string promoteAndGetOwnershipInfo(const std::string &id);
 
  protected:
   std::unique_ptr<WorkerContext> worker_;

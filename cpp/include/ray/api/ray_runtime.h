@@ -48,6 +48,7 @@ class RayRuntime {
                                 std::vector<ray::api::TaskArg> &args) = 0;
   virtual void AddLocalReference(const std::string &id) = 0;
   virtual void RemoveLocalReference(const std::string &id) = 0;
+  virtual std::string promoteAndGetOwnershipInfo(const std::string &id) = 0;
 };
 }  // namespace api
 }  // namespace ray

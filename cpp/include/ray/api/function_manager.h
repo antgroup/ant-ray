@@ -16,6 +16,7 @@
 
 #include <ray/api/common_types.h>
 #include <ray/api/serializer.h>
+#include <ray/util/logging.h>
 
 #include <boost/callable_traits.hpp>
 #include <functional>
@@ -116,26 +117,30 @@ struct Invoker {
       const Function &func, msgpack::sbuffer *ptr,
       const std::vector<msgpack::sbuffer> &args_buffer) {
     using RetrunType = boost::callable_traits::return_type_t<Function>;
+    RAY_LOG(INFO) << "ApplyMember 1";
     using ArgsTuple =
         RemoveReference_t<RemoveFirst_t<boost::callable_traits::args_t<Function>>>;
     if (std::tuple_size<ArgsTuple>::value != args_buffer.size()) {
       return PackError("Arguments number not match");
     }
-
+    RAY_LOG(INFO) << "ApplyMember 2";
     msgpack::sbuffer result;
     ArgsTuple tp{};
     try {
+      RAY_LOG(INFO) << "ApplyMember 3";
       bool is_ok = GetArgsTuple(
           tp, args_buffer, std::make_index_sequence<std::tuple_size<ArgsTuple>::value>{});
       if (!is_ok) {
         return PackError("arguments error");
       }
-
+      RAY_LOG(INFO) << "ApplyMember 4";
       uint64_t actor_ptr =
           ray::api::Serializer::Deserialize<uint64_t>(ptr->data(), ptr->size());
+      RAY_LOG(INFO) << "ApplyMember 5";
       using Self = boost::callable_traits::class_of_t<Function>;
       Self *self = (Self *)actor_ptr;
       result = Invoker<Function>::CallMember<RetrunType>(func, self, std::move(tp));
+      RAY_LOG(INFO) << "ApplyMember 6";
     } catch (msgpack::type_error &e) {
       result = PackError(std::string("invalid arguments: ") + e.what());
     } catch (const std::exception &e) {
@@ -150,7 +155,16 @@ struct Invoker {
  private:
   template <typename T>
   static inline T ParseArg(char *data, size_t size, bool &is_ok) {
+    RAY_LOG(INFO) << "ParseArg 1  data: " << reinterpret_cast<void*>(data) << " size: " << size;
+    const std::string hex = "0123456789ABCDEF";
+    for (size_t i=0; i<size; i++) {
+      std::stringstream ss;
+      char ch = data[i];
+      ss << hex[ch >> 4] << hex[ch & 0xf];
+      RAY_LOG(INFO) << ss.str();
+    }
     auto pair = ray::api::Serializer::DeserializeWhenNil<T>(data, size);
+    RAY_LOG(INFO) << "ParseArg 2";
     is_ok = pair.first;
     return pair.second;
   }

@@ -2,6 +2,7 @@
 #pragma once
 
 #include <ray/api/ray_exception.h>
+#include <ray/util/logging.h>
 
 #include <msgpack.hpp>
 
@@ -14,6 +15,15 @@ class Serializer {
   static msgpack::sbuffer Serialize(const T &t) {
     msgpack::sbuffer buffer;
     msgpack::pack(buffer, t);
+    RAY_LOG(INFO) << "Serialize size: " << buffer.size();
+    auto data = buffer.data();
+    const std::string hex = "0123456789ABCDEF";
+    for (size_t i=0; i<buffer.size(); i++) {
+      std::stringstream ss;
+      char ch = data[i];
+      ss << hex[ch >> 4] << hex[ch & 0xf];
+      RAY_LOG(INFO) << ss.str();
+    }
     return buffer;
   }
 

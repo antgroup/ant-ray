@@ -43,6 +43,7 @@ public class RunManager {
       throw new RuntimeException("Redis address is not found. output: " + output);
     }
     LOGGER.info("Ray runtime started @ {}.", rayConfig.nodeIp);
+    System.out.println(output);
   }
 
   /** Stop ray. */

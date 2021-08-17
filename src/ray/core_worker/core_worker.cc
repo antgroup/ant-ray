@@ -150,6 +150,7 @@ CoreWorkerProcess::CoreWorkerProcess(const CoreWorkerOptions &options)
     RAY_CHECK(options_.num_workers == 1);
   }
 
+  shared_actor_manager_ = std::make_unique<ActorManager>(gcs_client_);
   RAY_LOG(INFO) << "Constructing CoreWorkerProcess. pid: " << getpid();
 
   // NOTE(kfstorm): any initialization depending on RayConfig must happen after this line.
@@ -678,8 +679,7 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
                                 task_argument_waiter_);
   }
 
-  actor_manager_ = std::make_unique<ActorManager>(gcs_client_, direct_actor_submitter_,
-                                                  reference_counter_);
+  shared_actor_manager_->RegisterWorker(reference_counter_, direct_actor_submitter_);
 
   std::function<Status(const ObjectID &object_id, const ObjectLookupCallback &callback)>
       object_lookup_fn;

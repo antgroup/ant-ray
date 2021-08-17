@@ -81,9 +81,10 @@ class ActorManager {
       std::shared_ptr<gcs::GcsClient> gcs_client,
       std::shared_ptr<CoreWorkerDirectActorTaskSubmitterInterface> direct_actor_submitter,
       std::shared_ptr<ReferenceCounterInterface> reference_counter)
-      : gcs_client_(gcs_client),
-        direct_actor_submitter_(direct_actor_submitter),
-        reference_counter_(reference_counter) {}
+      : gcs_client_(gcs_client)
+        // direct_actor_submitter_(direct_actor_submitter),
+        // reference_counter_(reference_counter) 
+        {}
 
   ~ActorManager() = default;
 
@@ -102,7 +103,8 @@ class ActorManager {
   /// \param[in] is_self Whether this handle is current actor's handle. If true, actor
   /// manager won't subscribe actor info from GCS.
   /// \return The ActorID of the deserialized handle.
-  ActorID RegisterActorHandle(std::unique_ptr<ActorHandle> actor_handle,
+  ActorID RegisterActorHandle(const WorkerID &worker_id,
+                              std::unique_ptr<ActorHandle> actor_handle,
                               const ObjectID &outer_object_id,
                               const std::string &call_site,
                               const rpc::Address &caller_address, bool is_self = false);
@@ -169,6 +171,18 @@ class ActorManager {
   ActorID GetCachedNamedActorID(const std::string &actor_name);
 
  private:
+  std::shared_ptr<ReferenceCounterInterface> GetReferenceCounter(const WorkerID &worker_id) {
+    auto it = reference_counters_.find(worker_id);  
+    RAY_CHECK(it != reference_counters_.end());
+    return it->second;
+  }
+
+  std::shared_ptr<CoreWorkerDirectActorTaskSubmitterInterface> GetActorTaskSubmitter(const WorkerID &worker_id) {
+    auto it = direct_actor_submitters_.find(worker_id);  
+    RAY_CHECK(it != direct_actor_submitters_.end());
+    return it->second;  
+  }
+
   bool AddNewActorHandle(std::unique_ptr<ActorHandle> actor_handle,
                          const std::string &cached_actor_name,
                          const std::string &call_site, const rpc::Address &caller_address,
@@ -207,26 +221,32 @@ class ActorManager {
   void HandleActorStateNotification(const ActorID &actor_id,
                                     const rpc::ActorTableData &actor_data);
 
+  /// ===========================可共享无需额外处理
+  /// 可共享无需额外处理
   /// GCS client.
   std::shared_ptr<gcs::GcsClient> gcs_client_;
 
+  /// ===========================需要处理，每个core worker一个
   /// Interface to submit tasks directly to other actors.
-  std::shared_ptr<CoreWorkerDirectActorTaskSubmitterInterface> direct_actor_submitter_;
+  std::unordered_map<WorkerID, std::shared_ptr<CoreWorkerDirectActorTaskSubmitterInterface>> direct_actor_submitters_;
 
+  /// ===========================需要处理，每个core worker一个
   /// Used to keep track of actor handle reference counts.
   /// All actor handle related ref counting logic should be included here.
-  std::shared_ptr<ReferenceCounterInterface> reference_counter_;
+  std::unordered_map<WorkerID, std::shared_ptr<ReferenceCounterInterface>> reference_counters_;
 
   mutable absl::Mutex mutex_;
 
   /// Map from actor ID to a handle to that actor.
   /// Actor handle is a logical abstraction that holds actor handle's states.
-  absl::flat_hash_map<ActorID, std::shared_ptr<ActorHandle>> actor_handles_
+  absl::flat_hash_map<ActorID, std::shared_ptr<ActorHandle>> shared_actor_handles_
       GUARDED_BY(mutex_);
 
   /// Protects access `cached_actor_name_to_ids_`.
   absl::Mutex cache_mutex_;
 
+
+  /// ===========================可共享无需额外处理
   /// The map to cache name and id of the named actors in this worker locally, to avoid
   /// getting them from GCS frequently.
   absl::flat_hash_map<std::string, ActorID> cached_actor_name_to_ids_

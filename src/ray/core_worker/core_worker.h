@@ -335,6 +335,10 @@ class CoreWorkerProcess {
 
   /// To protect accessing the `workers_` map.
   mutable absl::Mutex worker_map_mutex_;
+
+
+  /// Interface to manage actor handles.
+  std::unique_ptr<ActorManager> shared_actor_manager_;
 };
 
 /// The root class that contains all the core and language-independent functionalities
@@ -1336,8 +1340,8 @@ class CoreWorker : public rpc::CoreWorkerServiceHandler {
   /// Fields related to actor handles.
   ///
 
-  /// Interface to manage actor handles.
-  std::unique_ptr<ActorManager> actor_manager_;
+  // /// Interface to manage actor handles.
+  // std::unique_ptr<ActorManager> actor_manager_;
 
   ///
   /// Fields related to task execution.

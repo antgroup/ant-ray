@@ -807,10 +807,17 @@ void ReferenceCounter::WaitForRefRemoved(const ReferenceTable::iterator &ref_it,
     CleanupBorrowersOnRefRemoved({}, object_id, addr);
   };
 
-  object_info_subscriber_->Subscribe(
-      std::move(sub_message), rpc::ChannelType::WORKER_REF_REMOVED_CHANNEL,
-      addr.ToProto(), object_id.Binary(), message_published_callback,
-      publisher_failed_callback);
+  RAY_LOG(INFO) << "before create thread object id: " << object_id;
+  std::thread(
+    [&] {
+      std::this_thread::sleep_for(
+            std::chrono::milliseconds(5000));
+      object_info_subscriber_->Subscribe(
+          std::move(sub_message), rpc::ChannelType::WORKER_REF_REMOVED_CHANNEL,
+          addr.ToProto(), object_id.Binary(), message_published_callback,
+          publisher_failed_callback);
+  }).detach();
+  RAY_LOG(INFO) << "after create thread object id: " << object_id;
 }
 
 void ReferenceCounter::AddNestedObjectIds(const ObjectID &object_id,

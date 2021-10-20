@@ -2124,8 +2124,10 @@ void NodeManager::HandlePinObjectIDs(const rpc::PinObjectIDsRequest &request,
 void NodeManager::HandleGetSystemConfig(const rpc::GetSystemConfigRequest &request,
                                         rpc::GetSystemConfigReply *reply,
                                         rpc::SendReplyCallback send_reply_callback) {
+  RAY_LOG(INFO) << "=====================handle get system configging...";
   reply->set_system_config(initial_config_.raylet_config);
   send_reply_callback(Status::OK(), nullptr, nullptr);
+  RAY_LOG(INFO) << "=====================replied...";
 }
 
 void NodeManager::HandleGetGcsServerAddress(

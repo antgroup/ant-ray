@@ -163,7 +163,7 @@ RAY_CONFIG(bool, yield_plasma_lock_workaround, true)
 RAY_CONFIG(bool, inline_object_status_in_refs, true)
 
 /// Number of times raylet client tries connecting to a raylet.
-RAY_CONFIG(int64_t, raylet_client_num_connect_attempts, 10)
+RAY_CONFIG(int64_t, raylet_client_num_connect_attempts, 100)
 RAY_CONFIG(int64_t, raylet_client_connect_timeout_milliseconds, 1000)
 
 /// The duration that the raylet will wait before reinitiating a

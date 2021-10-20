@@ -6,6 +6,7 @@ import io.ray.api.Ray;
 import io.ray.api.concurrencygroup.ConcurrencyGroup;
 import io.ray.api.concurrencygroup.ConcurrencyGroupBuilder;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -158,5 +159,69 @@ public class ConcurrencyGroupTest extends BaseTest {
     ObjectRef<Boolean> ret8 = myActor.task(CountDownActor::f5).remote();
     Assert.assertTrue(ret7.get());
     Assert.assertTrue(ret8.get());
+  }
+
+  private static class ConcurrencyActor2 {
+
+    public String f1() throws InterruptedException {
+      TimeUnit.MINUTES.sleep(100);
+      return "never returned";
+    }
+
+    public String f2() {
+      return "ok";
+    }
+  }
+
+  /// 测试f1卡住的时候，f2还能work
+  public void testF1() {
+    ConcurrencyGroup group1 =
+        new ConcurrencyGroupBuilder<ConcurrencyActor2>()
+            .setName("hang")
+            .setMaxConcurrency(1)
+            .addMethod(ConcurrencyActor2::f1)
+            .build();
+
+    ConcurrencyGroup group2 =
+        new ConcurrencyGroupBuilder<ConcurrencyActor2>()
+            .setName("normal")
+            .setMaxConcurrency(1)
+            .addMethod(ConcurrencyActor2::f2)
+            .build();
+
+    ActorHandle<ConcurrencyActor2> myActor =
+        Ray.actor(ConcurrencyActor2::new).setConcurrencyGroups(group1, group2).remote();
+
+    // f1 once
+    myActor.task(ConcurrencyActor2::f1).remote();
+    // cg1 not blocked.
+    Assert.assertEquals(myActor.task(ConcurrencyActor2::f2).remote().get(), "ok");
+  }
+
+  /// 测试f1卡住，并且f1所在的cg还卡在调度的地方，测试f2会不会把调度卡起来
+  public void testF2() {
+    ConcurrencyGroup group1 =
+        new ConcurrencyGroupBuilder<ConcurrencyActor2>()
+            .setName("hang")
+            .setMaxConcurrency(1)
+            .addMethod(ConcurrencyActor2::f1)
+            .build();
+
+    ConcurrencyGroup group2 =
+        new ConcurrencyGroupBuilder<ConcurrencyActor2>()
+            .setName("normal")
+            .setMaxConcurrency(1)
+            .addMethod(ConcurrencyActor2::f2)
+            .build();
+
+    ActorHandle<ConcurrencyActor2> myActor =
+        Ray.actor(ConcurrencyActor2::new).setConcurrencyGroups(group1, group2).remote();
+
+    // f1 twice
+    myActor.task(ConcurrencyActor2::f1).remote();
+    myActor.task(ConcurrencyActor2::f1).remote();
+    // cg1 blocked.
+
+    Assert.assertEquals(myActor.task(ConcurrencyActor2::f2).remote().get(), "ok");
   }
 }

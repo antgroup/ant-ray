@@ -489,38 +489,27 @@ class DependencyWaiterImpl : public DependencyWaiter {
   DependencyWaiterInterface &dependency_client_;
 };
 
-/// Wraps a thread-pool to block posts until the pool has free slots. This is used
+/// Wraps a thread-pool to posts until the pool has free slots. This is used
 /// by the SchedulingQueue to provide backpressure to clients.
-class BoundedExecutor {
+class InboundedExecutor {
  public:
-  BoundedExecutor(int max_concurrency)
-      : num_running_(0), max_concurrency_(max_concurrency), pool_(max_concurrency){};
+  explicit BoundedExecutor(int max_concurrency)
+      : max_concurrency_(max_concurrency), pool_(max_concurrency){};
 
   /// Posts work to the pool, blocking if no free threads are available.
-  void PostBlocking(std::function<void()> fn) {
-    mu_.LockWhen(absl::Condition(this, &BoundedExecutor::ThreadsAvailable));
-    num_running_ += 1;
-    mu_.Unlock();
+  void Post(std::function<void()> fn) {
     boost::asio::post(pool_, [this, fn]() {
       fn();
-      absl::MutexLock lock(&mu_);
-      num_running_ -= 1;
     });
   }
 
  private:
-  bool ThreadsAvailable() EXCLUSIVE_LOCKS_REQUIRED(mu_) {
-    return num_running_ < max_concurrency_;
-  }
-
-  /// Protects access to the counters below.
-  absl::Mutex mu_;
-  /// The number of currently running tasks.
-  int num_running_ GUARDED_BY(mu_);
   /// The max number of concurrently running tasks allowed.
   const int max_concurrency_;
   /// The underlying thread pool for running tasks.
   boost::asio::thread_pool pool_;
+  /// The to be executed tasks are queued in this thread pool.
+  std::queue<std::function<void()>> fns_;
 };
 
 /// Used to implement task queueing at the worker. Abstraction to provide a common
@@ -677,7 +666,7 @@ class ActorSchedulingQueue : public SchedulingQueue {
         if (pool == nullptr) {
           request.Accept();
         } else {
-          pool->PostBlocking([request]() mutable { request.Accept(); });
+          pool->Post([request]() mutable { request.Accept(); });
         }
       }
       pending_actor_tasks_.erase(head);

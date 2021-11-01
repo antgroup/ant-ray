@@ -107,6 +107,15 @@ def py_func_nest_java_throw_exception():
     r = f.remote()
     return ray.get(r)
 
+@ray.remote
+def py_func_call_java_ctor_and_return_object_ref():
+    c = ray.java_actor_class(
+        "io.ray.test.CrossLanguageInvocationTest$RichTypeActor")
+    java_actor = c.remote()
+    r = java_actor.getObject.remote()
+    print("ret=", ray.get(r))
+    return ray.get(r)
+
 
 @ray.remote
 class Counter(object):

@@ -8,6 +8,8 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.ray.runtime.object.ObjectRefImpl;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,6 +27,9 @@ import org.msgpack.value.ValueType;
 public class MessagePackSerializer {
 
   private static final byte LANGUAGE_SPECIFIC_TYPE_EXTENSION_ID = 101;
+
+  private static final byte OBEJCT_REF_TYPE_EXTENSION_ID = 102;
+
   // MessagePack length is an int takes up to 9 bytes.
   // https://github.com/msgpack/msgpack/blob/master/spec.md#int-format-family
   private static final int MESSAGE_PACK_OFFSET = 9;
@@ -83,6 +88,13 @@ public class MessagePackSerializer {
           packer.packBinaryHeader(bytes.length);
           packer.writePayload(bytes);
         }));
+    packers.put(ObjectRefImpl.class, (object, packer, javaSerializer) -> {
+      /// 这里好像不太对，因为我们是支持跨语言的，所以不能用fst序列化object ref
+      /// 这样python里就读不到了，所以我们需要用个meta来表示
+        byte[] payload = FstSerializer.encode(object);
+        packer.packExtensionTypeHeader(OBJECT_REF_TYPE_EXTENSION_ID, payload.length);
+        packer.addPayload(payload);
+    });
 
     // ===== Initialize unpackers =====
     List<Class<?>> booleanClasses = ImmutableList.of(Boolean.class, boolean.class);

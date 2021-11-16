@@ -19,13 +19,14 @@ namespace core {
 
 ActorSchedulingQueue::ActorSchedulingQueue(
     instrumented_io_context &main_io_service, DependencyWaiter &waiter,
-    std::shared_ptr<PoolManager> pool_manager, bool is_asyncio, int fiber_max_concurrency,
+    std::shared_ptr<ConcurrencyGroupManager<BoundedExecutor>> thread_pool_manager,
+    bool is_asyncio, int fiber_max_concurrency,
     const std::vector<ConcurrencyGroup> &concurrency_groups, int64_t reorder_wait_seconds)
     : reorder_wait_seconds_(reorder_wait_seconds),
       wait_timer_(main_io_service),
       main_thread_id_(boost::this_thread::get_id()),
       waiter_(waiter),
-      pool_manager_(pool_manager),
+      thread_pool_manager_(thread_pool_manager),
       is_asyncio_(is_asyncio) {
   if (is_asyncio_) {
     std::stringstream ss;
@@ -35,14 +36,14 @@ ActorSchedulingQueue::ActorSchedulingQueue(
       ss << "\t" << concurrency_group.name << " : " << concurrency_group.max_concurrency;
     }
     RAY_LOG(INFO) << ss.str();
-    fiber_state_manager_ =
-        std::make_unique<FiberStateManager>(concurrency_groups, fiber_max_concurrency);
+    fiber_state_manager_ = std::make_unique<ConcurrencyGroupManager<FiberState>>(
+        concurrency_groups, fiber_max_concurrency);
   }
 }
 
 void ActorSchedulingQueue::Stop() {
-  if (pool_manager_) {
-    pool_manager_->Stop();
+  if (thread_pool_manager_) {
+    thread_pool_manager_->Stop();
   }
 }
 
@@ -136,18 +137,18 @@ void ActorSchedulingQueue::ScheduleRequests() {
 
     if (is_asyncio_) {
       // Process async actor task.
-      auto fiber = fiber_state_manager_->GetFiber(request.ConcurrencyGroupName(),
-                                                  request.FunctionDescriptor());
+      auto fiber = fiber_state_manager_->GetExecutor(request.ConcurrencyGroupName(),
+                                                     request.FunctionDescriptor());
       fiber->EnqueueFiber([request]() mutable { request.Accept(); });
     } else {
       // Process actor tasks.
-      RAY_CHECK(pool_manager_ != nullptr);
-      auto pool = pool_manager_->GetPool(request.ConcurrencyGroupName(),
-                                         request.FunctionDescriptor());
-      if (pool == nullptr) {
+      RAY_CHECK(thread_pool_manager_ != nullptr);
+      auto thread_pool = thread_pool_manager_->GetExecutor(request.ConcurrencyGroupName(),
+                                                           request.FunctionDescriptor());
+      if (thread_pool == nullptr) {
         request.Accept();
       } else {
-        pool->PostBlocking([request]() mutable { request.Accept(); });
+        thread_pool->PostBlocking([request]() mutable { request.Accept(); });
       }
     }
     pending_actor_tasks_.erase(head);

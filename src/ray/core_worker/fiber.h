@@ -128,6 +128,10 @@ class FiberState {
     }
   }
 
+  void Stop() {}
+
+  void Join() {}
+
  private:
   /// The fiber channel used to send task between the submitter thread
   /// (main direct_actor_trasnport thread) and the fiber_runner_thread_ (defined below)

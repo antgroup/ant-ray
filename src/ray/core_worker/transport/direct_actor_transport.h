@@ -62,7 +62,8 @@ class CoreWorkerDirectTaskReceiver {
         task_handler_(task_handler),
         task_main_io_service_(main_io_service),
         task_done_(task_done),
-        pool_manager_(std::make_shared<PoolManager>()) {}
+        thread_pool_manager_(
+            std::make_shared<ConcurrencyGroupManager<BoundedExecutor>>()) {}
 
   /// Initialize this receiver. This must be called prior to use.
   void Init(std::shared_ptr<rpc::CoreWorkerClientPool>, rpc::Address rpc_address,
@@ -124,7 +125,7 @@ class CoreWorkerDirectTaskReceiver {
   int fiber_max_concurrency_ = 0;
 
   /// If concurrent calls are allowed, holds the pools for executing these tasks.
-  std::shared_ptr<PoolManager> pool_manager_;
+  std::shared_ptr<ConcurrencyGroupManager<BoundedExecutor>> thread_pool_manager_;
   /// Whether this actor use asyncio for concurrency.
   bool is_asyncio_ = false;
 

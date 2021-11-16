@@ -125,8 +125,8 @@ void CoreWorkerDirectTaskReceiver::HandleTask(
         /// be 0 if this is an asyncio actor.
         const int default_max_concurrency =
             task_spec.IsAsyncioActor() ? 0 : task_spec.MaxActorConcurrency();
-        pool_manager_ = std::make_shared<PoolManager>(task_spec.ConcurrencyGroups(),
-                                                      default_max_concurrency);
+        thread_pool_manager_ = std::make_shared<ConcurrencyGroupManager<BoundedExecutor>>(
+            task_spec.ConcurrencyGroups(), default_max_concurrency);
         concurrency_groups_cache_[task_spec.TaskId().ActorId()] =
             task_spec.ConcurrencyGroups();
         RAY_LOG(INFO) << "Actor creation task finished, task_id: " << task_spec.TaskId()
@@ -176,7 +176,7 @@ void CoreWorkerDirectTaskReceiver::HandleTask(
       auto result = actor_scheduling_queues_.emplace(
           task_spec.CallerWorkerId(),
           std::unique_ptr<SchedulingQueue>(new ActorSchedulingQueue(
-              task_main_io_service_, *waiter_, pool_manager_, is_asyncio_,
+              task_main_io_service_, *waiter_, thread_pool_manager_, is_asyncio_,
               fiber_max_concurrency_, cg_it->second)));
       it = result.first;
     }

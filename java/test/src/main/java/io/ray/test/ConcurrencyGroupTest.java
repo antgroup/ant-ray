@@ -6,6 +6,8 @@ import io.ray.api.Ray;
 import io.ray.api.concurrencygroup.ConcurrencyGroup;
 import io.ray.api.concurrencygroup.ConcurrencyGroupBuilder;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -159,4 +161,44 @@ public class ConcurrencyGroupTest extends BaseTest {
     Assert.assertTrue(ret7.get());
     Assert.assertTrue(ret8.get());
   }
+
+  private static class ConcurrencyActor2 {
+
+    public String f1() throws InterruptedException {
+      TimeUnit.MINUTES.sleep(100);
+      return "never returned";
+    }
+
+    public String f2() {
+      return "ok";
+    }
+  }
+
+    public void testF() {
+      ConcurrencyGroup group1 =
+        new ConcurrencyGroupBuilder<ConcurrencyActor2>()
+          .setName("group1")
+          .setMaxConcurrency(1)
+          .addMethod(ConcurrencyActor2::f1)
+          .build();
+
+      ConcurrencyGroup group2 =
+        new ConcurrencyGroupBuilder<ConcurrencyActor2>()
+          .setName("group2")
+          .setMaxConcurrency(1)
+          .addMethod(ConcurrencyActor2::f2)
+          .build();
+
+      ActorHandle<ConcurrencyActor2> myActor =
+        Ray.actor(ConcurrencyActor2::new).setConcurrencyGroups(group1, group2).remote();
+
+      // f1 twice
+      myActor.task(ConcurrencyActor2::f1).remote(); // This task is sleep in threadpool.
+      myActor.task(ConcurrencyActor2::f1).remote(); // This task is blocked at `PostBlocking()` so that the next f2 cannot be scheduled in core worker.
+      // cg1 blocked.
+
+      Assert.assertEquals(myActor.task(ConcurrencyActor2::f2).remote().get(), "ok");
+    }
+
+
 }

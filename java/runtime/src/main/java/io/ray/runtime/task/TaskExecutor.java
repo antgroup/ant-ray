@@ -96,139 +96,164 @@ public abstract class TaskExecutor<T extends TaskExecutor.ActorContext> {
   abstract Object handleAsyncActorTaskResult(CompletableFuture<?> result);
 
   protected List<NativeRayObject> execute(List<String> rayFunctionInfo, List<Object> argsBytes) {
-    runtime.setIsContextSet(true);
-    TaskType taskType = runtime.getWorkerContext().getCurrentTaskType();
-    TaskId taskId = runtime.getWorkerContext().getCurrentTaskId();
-    LOGGER.debug("Executing task {} {}", taskId, rayFunctionInfo);
-
-    T actorContext = null;
-    if (taskType == TaskType.ACTOR_CREATION_TASK) {
-      actorContext = createActorContext();
-      setActorContext(runtime.getWorkerContext().getCurrentWorkerId(), actorContext);
-    } else if (taskType == TaskType.ACTOR_TASK) {
-      actorContext = getActorContext();
-      Preconditions.checkNotNull(actorContext);
-    }
-
-    List<NativeRayObject> returnObjects = new ArrayList<>();
-    ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
-    // Find the executable object.
-
-    RayFunction rayFunction = localRayFunction.get();
-    Object[] args = null;
     try {
+      System.err.println("==== 0");
+      runtime.setIsContextSet(true);
+      TaskType taskType = runtime.getWorkerContext().getCurrentTaskType();
+      TaskId taskId = runtime.getWorkerContext().getCurrentTaskId();
+      LOGGER.debug("Executing task {} {}", taskId, rayFunctionInfo);
+
+      System.err.println("==== 1");
+      T actorContext = null;
+      if (taskType == TaskType.ACTOR_CREATION_TASK) {
+        actorContext = createActorContext();
+        setActorContext(runtime.getWorkerContext().getCurrentWorkerId(), actorContext);
+      } else if (taskType == TaskType.ACTOR_TASK) {
+        actorContext = getActorContext();
+        Preconditions.checkNotNull(actorContext);
+      }
+
+      System.err.println("==== 2");
+      List<NativeRayObject> returnObjects = new ArrayList<>();
+      ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
       // Find the executable object.
-      if (rayFunction == null) {
-        // Failed to get RayFunction in checkByteBufferArguments. Redo here to throw
-        // the exception again.
-        rayFunction = getRayFunction(rayFunctionInfo);
-      }
-      Thread.currentThread().setContextClassLoader(rayFunction.classLoader);
-      runtime.getWorkerContext().setCurrentClassLoader(rayFunction.classLoader);
 
-      // Get local actor object and arguments.
-      Object actor = null;
-      if (taskType == TaskType.ACTOR_TASK) {
-        actor = actorContext.currentActor;
-      }
-      args = ArgumentsBuilder.unwrap(argsBytes, rayFunction.executable.getParameterTypes());
-      for (Object arg : args) {
-        throwIfDependencyFailed(arg);
-      }
-
-      // Execute the task.
-      Object result;
+      System.err.println("==== 3");
+      RayFunction rayFunction = localRayFunction.get();
+      Object[] args = null;
       try {
-        if (!rayFunction.isConstructor()) {
-          result = rayFunction.getMethod().invoke(actor, args);
+        // Find the executable object.
+        if (rayFunction == null) {
+          // Failed to get RayFunction in checkByteBufferArguments. Redo here to throw
+          // the exception again.
+          rayFunction = getRayFunction(rayFunctionInfo);
+        }
+        Thread.currentThread().setContextClassLoader(rayFunction.classLoader);
+        runtime.getWorkerContext().setCurrentClassLoader(rayFunction.classLoader);
+
+        // Get local actor object and arguments.
+        Object actor = null;
+        if (taskType == TaskType.ACTOR_TASK) {
+          actor = actorContext.currentActor;
+        }
+        args = ArgumentsBuilder.unwrap(argsBytes, rayFunction.executable.getParameterTypes());
+        for (Object arg : args) {
+          throwIfDependencyFailed(arg);
+        }
+
+        System.err.println("==== 4");
+        // Execute the task.
+        Object result;
+        try {
+          if (!rayFunction.isConstructor()) {
+            result = rayFunction.getMethod().invoke(actor, args);
+          } else {
+            result = rayFunction.getConstructor().newInstance(args);
+          }
+        } catch (InvocationTargetException e) {
+          if (e.getCause() != null) {
+            throw e.getCause();
+          } else {
+            throw e;
+          }
+        }
+        System.err.println("==== 5");
+
+        // Check async actor
+        if (actor != null && result instanceof CompletableFuture) {
+          result = handleAsyncActorTaskResult((CompletableFuture) result);
+        }
+
+        // Set result
+        System.err.println("==== 6 " + result);
+        if (taskType != TaskType.ACTOR_CREATION_TASK) {
+          if (rayFunction.hasReturn()) {
+            System.err.println("==== 6 " + result);
+            returnObjects.add(ObjectSerializer.serialize(result));
+            System.err.println("==== 6 " + result);
+          }
         } else {
-          result = rayFunction.getConstructor().newInstance(args);
+          actorContext.currentActor = result;
         }
-      } catch (InvocationTargetException e) {
-        if (e.getCause() != null) {
-          throw e.getCause();
-        } else {
-          throw e;
+        System.err.println("==== 7");
+        LOGGER.debug("Finished executing task {}", taskId);
+      } catch (Throwable e) {
+        System.err.println("==== 8");
+        System.err.println("==== " + e.getMessage() + e.getClass());
+        System.err.println("==== " +  Arrays.toString(e.getStackTrace()));
+        if (e instanceof RayIntentionalSystemExitException) {
+          // We don't need to fill the `returnObjects` with an exception metadata
+          // because the node manager or the direct actor task submitter will fill
+          // the return object with the ACTOR_DIED metadata.
+          throw (RayIntentionalSystemExitException) e;
         }
-      }
 
-      // Check async actor
-      if (actor != null && result instanceof CompletableFuture) {
-        result = handleAsyncActorTaskResult((CompletableFuture) result);
-      }
+        System.err.println("==== 9");
+        final List<Class<?>> argTypes =
+            args == null
+                ? null
+                : Arrays.stream(args)
+                    .map(arg -> arg == null ? null : arg.getClass())
+                    .collect(Collectors.toList());
+        LOGGER.error(
+            "Failed to execute task {} . rayFunction is {} , argument types are {}",
+            taskId,
+            rayFunction,
+            argTypes,
+            e);
 
-      // Set result
-      if (taskType != TaskType.ACTOR_CREATION_TASK) {
-        if (rayFunction.hasReturn()) {
-          returnObjects.add(ObjectSerializer.serialize(result));
-        }
-      } else {
-        actorContext.currentActor = result;
-      }
-      LOGGER.debug("Finished executing task {}", taskId);
-    } catch (Throwable e) {
-      if (e instanceof RayIntentionalSystemExitException) {
-        // We don't need to fill the `returnObjects` with an exception metadata
-        // because the node manager or the direct actor task submitter will fill
-        // the return object with the ACTOR_DIED metadata.
-        throw (RayIntentionalSystemExitException) e;
-      }
-
-      final List<Class<?>> argTypes =
-          args == null
-              ? null
-              : Arrays.stream(args)
-                  .map(arg -> arg == null ? null : arg.getClass())
-                  .collect(Collectors.toList());
-      LOGGER.error(
-          "Failed to execute task {} . rayFunction is {} , argument types are {}",
-          taskId,
-          rayFunction,
-          argTypes,
-          e);
-
-      if (taskType != TaskType.ACTOR_CREATION_TASK) {
-        boolean hasReturn = rayFunction != null && rayFunction.hasReturn();
-        boolean isCrossLanguage = parseFunctionDescriptor(rayFunctionInfo).signature.equals("");
-        if (hasReturn || isCrossLanguage) {
-          NativeRayObject serializedException;
-          try {
-            serializedException =
-                ObjectSerializer.serialize(
-                    new RayTaskException("Error executing task " + taskId, e));
-          } catch (Exception unserializable) {
-            // We should try-catch `ObjectSerializer.serialize` here. Because otherwise if the
-            // application-level exception is not serializable. `ObjectSerializer.serialize`
-            // will throw an exception and crash the worker.
-            // Refer to the case `TaskExceptionTest.java` for more details.
-            LOGGER.warn("Failed to serialize the exception to a RayObject.", unserializable);
-            serializedException =
+        System.err.println("==== 10");
+        if (taskType != TaskType.ACTOR_CREATION_TASK) {
+          boolean hasReturn = rayFunction != null && rayFunction.hasReturn();
+          boolean isCrossLanguage = parseFunctionDescriptor(rayFunctionInfo).signature.equals("");
+          System.err.println("==== 11");
+          if (hasReturn || isCrossLanguage) {
+            NativeRayObject serializedException;
+            try {
+              serializedException =
+                  ObjectSerializer.serialize(
+                      new RayTaskException("Error executing task " + taskId, e));
+            } catch (Exception unserializable) {
+              // We should try-catch `ObjectSerializer.serialize` here. Because otherwise if the
+              // application-level exception is not serializable. `ObjectSerializer.serialize`
+              // will throw an exception and crash the worker.
+              // Refer to the case `TaskExceptionTest.java` for more details.
+              LOGGER.warn("Failed to serialize the exception to a RayObject.", unserializable);
+              serializedException =
+                  ObjectSerializer.serialize(
+                      new RayTaskException(
+                          String.format(
+                              "Error executing task %s with the exception: %s",
+                              taskId, ExceptionUtils.getStackTrace(e))));
+            }
+            Preconditions.checkNotNull(serializedException);
+            returnObjects.add(serializedException);
+          } else {
+            returnObjects.add(
                 ObjectSerializer.serialize(
                     new RayTaskException(
                         String.format(
-                            "Error executing task %s with the exception: %s",
-                            taskId, ExceptionUtils.getStackTrace(e))));
+                            "Function %s of task %s doesn't exist",
+                            String.join(".", rayFunctionInfo), taskId),
+                        e)));
           }
-          Preconditions.checkNotNull(serializedException);
-          returnObjects.add(serializedException);
         } else {
-          returnObjects.add(
-              ObjectSerializer.serialize(
-                  new RayTaskException(
-                      String.format(
-                          "Function %s of task %s doesn't exist",
-                          String.join(".", rayFunctionInfo), taskId),
-                      e)));
+          throw new RayActorException(e);
         }
-      } else {
-        throw new RayActorException(e);
+        System.err.println("==== 12");
+      } finally {
+        Thread.currentThread().setContextClassLoader(oldLoader);
+        runtime.getWorkerContext().setCurrentClassLoader(null);
+        runtime.setIsContextSet(false);
       }
-    } finally {
-      Thread.currentThread().setContextClassLoader(oldLoader);
-      runtime.getWorkerContext().setCurrentClassLoader(null);
-      runtime.setIsContextSet(false);
+      return returnObjects;
+    } catch (Throwable e) {
+      System.err.println("==== 15");
+      System.err.println("==== " +  e.getMessage() + e.getClass());
+      System.err.println("==== " +  Arrays.toString(e.getStackTrace()));
+      e.printStackTrace(System.err);
+      throw new RuntimeException(e);
     }
-    return returnObjects;
   }
 
   private JavaFunctionDescriptor parseFunctionDescriptor(List<String> rayFunctionInfo) {

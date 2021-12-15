@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,12 +247,14 @@ public class MessagePackSerializer {
   }
 
   public static Pair<byte[], Boolean> encode(Object obj) {
+    System.err.println("=== encode 0 ");
     MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
     try {
       // Reserve MESSAGE_PACK_OFFSET bytes for MessagePack bytes length.
       packer.writePayload(new byte[MESSAGE_PACK_OFFSET]);
       // Serialize input object by MessagePack.
       MutableBoolean isCrossLanguage = new MutableBoolean(true);
+      System.err.println("=== encode 1 ");
       pack(
           obj,
           packer,
@@ -261,18 +264,24 @@ public class MessagePackSerializer {
             packer1.addPayload(payload);
             isCrossLanguage.setFalse();
           }));
+      System.err.println("=== encode 2 ");
       byte[] msgpackBytes = packer.toByteArray();
       // Serialize MessagePack bytes length.
       MessageBufferPacker headerPacker = MessagePack.newDefaultBufferPacker();
+      System.err.println("=== encode 3 ");
       Preconditions.checkState(msgpackBytes.length >= MESSAGE_PACK_OFFSET);
       headerPacker.packLong(msgpackBytes.length - MESSAGE_PACK_OFFSET);
       byte[] msgpackBytesLength = headerPacker.toByteArray();
       // Check serialized MessagePack bytes length is valid.
       Preconditions.checkState(msgpackBytesLength.length <= MESSAGE_PACK_OFFSET);
+      System.err.println("=== encode 4 ");
       // Write MessagePack bytes length to reserved buffer.
       System.arraycopy(msgpackBytesLength, 0, msgpackBytes, 0, msgpackBytesLength.length);
+      System.err.println("=== encode 5 ");
       return ImmutablePair.of(msgpackBytes, isCrossLanguage.getValue());
     } catch (Exception e) {
+      System.err.println("=== encode 6 ");
+      System.err.println("==== " +  Arrays.toString(e.getStackTrace()));
       throw new RuntimeException(e);
     }
   }

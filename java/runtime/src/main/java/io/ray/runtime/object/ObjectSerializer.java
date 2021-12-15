@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -128,6 +129,7 @@ public class ObjectSerializer {
    * @return The serialized object.
    */
   public static NativeRayObject serialize(Object object) {
+    System.err.println("=== ser 0");
     if (object instanceof NativeRayObject) {
       return (NativeRayObject) object;
     } else if (object instanceof byte[]) {
@@ -162,16 +164,29 @@ public class ObjectSerializer {
       return new NativeRayObject(serializedBytes, OBJECT_METADATA_TYPE_ACTOR_HANDLE);
     } else {
       try {
+        System.err.println("=== ser 1");
+        if (object.equals("ok")) {
+          try {
+            TimeUnit.SECONDS.sleep(100);
+          } catch (InterruptedException e) {
+
+          }
+        }
         Pair<byte[], Boolean> serialized = Serializer.encode(object);
+        System.err.println("=== ser 2");
         NativeRayObject nativeRayObject =
             new NativeRayObject(
                 serialized.getLeft(),
                 serialized.getRight()
                     ? OBJECT_METADATA_TYPE_CROSS_LANGUAGE
                     : OBJECT_METADATA_TYPE_JAVA);
+        System.err.println("=== ser 3");
         nativeRayObject.setContainedObjectIds(getAndClearContainedObjectIds());
+        System.err.println("=== ser 4");
         return nativeRayObject;
       } catch (Exception e) {
+        System.err.println("=== ser 5" + e.getClass());
+        System.err.println("==== " +  Arrays.toString(e.getStackTrace()));
         // Clear `containedObjectIds`.
         getAndClearContainedObjectIds();
         throw e;

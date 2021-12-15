@@ -104,6 +104,7 @@ JNIEXPORT void JNICALL Java_io_ray_runtime_RayNativeRuntime_nativeInitialize(
          bool *is_application_level_error,
          const std::vector<ConcurrencyGroup> &defined_concurrency_groups,
          const std::string name_of_concurrency_group_to_execute) {
+        RAY_LOG(INFO) << "Java executor 0";
         // These 2 parameters are used for Python only, and Java worker
         // will not use them.
         RAY_UNUSED(defined_concurrency_groups);
@@ -111,9 +112,11 @@ JNIEXPORT void JNICALL Java_io_ray_runtime_RayNativeRuntime_nativeInitialize(
         // TODO(jjyao): Support retrying application-level errors for Java
         *is_application_level_error = false;
 
+        RAY_LOG(INFO) << "Java executor 1";
         JNIEnv *env = GetJNIEnv();
         RAY_CHECK(java_task_executor);
 
+        RAY_LOG(INFO) << "Java executor 2";
         // convert RayFunction
         auto function_descriptor = ray_function.GetFunctionDescriptor();
         size_t fd_hash = function_descriptor->Hash();
@@ -140,10 +143,12 @@ JNIEXPORT void JNICALL Java_io_ray_runtime_RayNativeRuntime_nativeInitialize(
         RAY_CHECK_JAVA_EXCEPTION(env);
         jobject args_array_list = ToJavaArgs(env, java_check_results, args);
 
+        RAY_LOG(INFO) << "Java executor 3";
         // invoke Java method
         jobject java_return_objects =
             env->CallObjectMethod(java_task_executor, java_task_executor_execute,
                                   ray_function_array_list, args_array_list);
+        RAY_LOG(INFO) << "Java executor 4";
         // Check whether the exception is `IntentionalSystemExit`.
         jthrowable throwable = env->ExceptionOccurred();
         if (throwable) {
@@ -157,10 +162,26 @@ JNIEXPORT void JNICALL Java_io_ray_runtime_RayNativeRuntime_nativeInitialize(
           } else {
             RAY_LOG(ERROR) << "Unkown java exception was thrown while executing tasks.";
           }
+      jstring java_file_name = env->NewStringUTF(__FILE__);
+      jstring java_function = env->NewStringUTF(__func__);
+      jobject java_error_message = env->CallStaticObjectMethod(
+          java_jni_exception_util_class, java_jni_exception_util_get_stack_trace,
+          java_file_name, __LINE__, java_function, throwable);
+      std::string error_message =
+          JavaStringToNativeString(env, static_cast<jstring>(java_error_message));
+      env->DeleteLocalRef(throwable);
+      env->DeleteLocalRef(java_file_name);
+      env->DeleteLocalRef(java_function);
+      env->DeleteLocalRef(java_error_message);
+      RAY_LOG(FATAL) << "An unexpected exception occurred while executing Java code "
+                        "from JNI ("
+                     << __FILE__ << ":" << __LINE__ << " " << __func__ << ")."
+                     << "\n"
+                     << error_message;
           env->ExceptionClear();
           return status_to_return;
         }
-        RAY_CHECK_JAVA_EXCEPTION(env);
+        RAY_LOG(INFO) << "Java executor 5";
 
         int64_t task_output_inlined_bytes = 0;
         // Process return objects.

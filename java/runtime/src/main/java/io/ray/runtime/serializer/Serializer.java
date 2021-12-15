@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 public class Serializer {
 
   public static Pair<byte[], Boolean> encode(Object obj) {
+    System.err.println("== en 0");
     return MessagePackSerializer.encode(obj);
   }
 

@@ -4,6 +4,7 @@ package io.ray.api;
 
 import io.ray.api.call.ActorTaskCaller;
 import io.ray.api.call.VoidActorTaskCaller;
+import io.ray.api.function.RayAsyncFunc0;
 import io.ray.api.function.RayFunc1;
 import io.ray.api.function.RayFunc2;
 import io.ray.api.function.RayFunc3;
@@ -21,6 +22,11 @@ import io.ray.api.function.RayFuncVoid6;
  * This class provides type-safe interfaces for remote actor calls.
  **/
 interface ActorCall<A> {
+
+  default <R> ActorTaskCaller<R> task(RayAsyncFunc0<A, R> f) {
+    Object[] args = new Object[]{};
+    return new ActorTaskCaller<>((ActorHandle) this, f, args);
+  }
 
   default <R> ActorTaskCaller<R> task(RayFunc1<A, R> f) {
     Object[] args = new Object[]{};

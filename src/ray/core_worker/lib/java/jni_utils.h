@@ -184,6 +184,7 @@ extern jfieldID java_actor_creation_options_group;
 extern jfieldID java_actor_creation_options_bundle_index;
 /// concurrencyGroups field of ActorCreationOptions class
 extern jfieldID java_actor_creation_options_concurrency_groups;
+extern jfieldID java_actor_creation_options_is_async;
 
 /// ConcurrencyGroupImpl class
 extern jclass java_concurrency_group_impl_class;

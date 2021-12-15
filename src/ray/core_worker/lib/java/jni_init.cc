@@ -102,6 +102,7 @@ jfieldID java_actor_creation_options_max_concurrency;
 jfieldID java_actor_creation_options_group;
 jfieldID java_actor_creation_options_bundle_index;
 jfieldID java_actor_creation_options_concurrency_groups;
+jfieldID java_actor_creation_options_is_async;
 
 jclass java_placement_group_creation_options_class;
 jclass java_placement_group_creation_options_strategy_class;
@@ -312,6 +313,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
       env->GetFieldID(java_concurrency_group_impl_class, "name", "Ljava/lang/String;");
   java_concurrency_group_impl_max_concurrency =
       env->GetFieldID(java_concurrency_group_impl_class, "maxConcurrency", "I");
+  java_actor_creation_options_is_async = env->GetFieldID(
+      java_actor_creation_options_class, "isAsync", "Z");
 
   java_gcs_client_options_class = LoadClass(env, "io/ray/runtime/gcs/GcsClientOptions");
   java_gcs_client_options_ip =

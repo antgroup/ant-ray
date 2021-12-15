@@ -98,6 +98,11 @@ public class BaseActorCreator<T extends BaseActorCreator> {
     return self();
   }
 
+  public T setAsync() {
+    builder.setAsync(true);
+    return self();
+  }
+
   @SuppressWarnings("unchecked")
   private T self() {
     return (T) this;

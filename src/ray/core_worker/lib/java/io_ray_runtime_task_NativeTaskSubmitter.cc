@@ -150,6 +150,7 @@ inline ActorCreationOptions ToActorCreationOptions(JNIEnv *env,
   uint64_t max_concurrency = 1;
   auto placement_options = std::make_pair(PlacementGroupID::Nil(), -1);
   std::vector<ConcurrencyGroup> concurrency_groups;
+  bool is_async = false;
 
   if (actorCreationOptions) {
     auto java_name = (jstring)env->GetObjectField(actorCreationOptions,
@@ -214,6 +215,8 @@ inline ActorCreationOptions ToActorCreationOptions(JNIEnv *env,
           return ray::ConcurrencyGroup{concurrency_group_name, max_concurrency,
                                        native_func_descriptors};
         });
+    is_async =
+        env->GetBooleanField(actorCreationOptions, java_actor_creation_options_is_async);
   }
 
   // TODO(suquark): support passing namespace for Java. Currently
@@ -240,7 +243,7 @@ inline ActorCreationOptions ToActorCreationOptions(JNIEnv *env,
       /*is_detached=*/false,
       name,
       ray_namespace,
-      /*is_asyncio=*/false,
+      is_async,
       /*scheduling_strategy=*/scheduling_strategy,
       /*serialized_runtime_env=*/"{}",
       concurrency_groups};

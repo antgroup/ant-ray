@@ -17,6 +17,7 @@ public class ActorCreationOptions extends BaseTaskOptions {
   public final PlacementGroup group;
   public final int bundleIndex;
   public final List<ConcurrencyGroup> concurrencyGroups;
+  public final boolean isAsync;
 
   private ActorCreationOptions(
       String name,
@@ -26,7 +27,8 @@ public class ActorCreationOptions extends BaseTaskOptions {
       int maxConcurrency,
       PlacementGroup group,
       int bundleIndex,
-      List<ConcurrencyGroup> concurrencyGroups) {
+      List<ConcurrencyGroup> concurrencyGroups,
+      boolean isAsync) {
     super(resources);
     this.name = name;
     this.maxRestarts = maxRestarts;
@@ -35,6 +37,7 @@ public class ActorCreationOptions extends BaseTaskOptions {
     this.group = group;
     this.bundleIndex = bundleIndex;
     this.concurrencyGroups = concurrencyGroups;
+    this.isAsync = isAsync;
   }
 
   /** The inner class for building ActorCreationOptions. */
@@ -47,6 +50,7 @@ public class ActorCreationOptions extends BaseTaskOptions {
     private PlacementGroup group;
     private int bundleIndex;
     private List<ConcurrencyGroup> concurrencyGroups = new ArrayList<>();
+    private boolean isAsync;
 
     /**
      * Set the actor name of a named actor. This named actor is accessible in this namespace by this
@@ -145,6 +149,17 @@ public class ActorCreationOptions extends BaseTaskOptions {
       return this;
     }
 
+    /** Set the concurrency groups for this actor. */
+    public Builder setConcurrencyGroups(List<ConcurrencyGroup> concurrencyGroups) {
+      this.concurrencyGroups = concurrencyGroups;
+      return this;
+    }
+
+    public Builder setAsync(boolean isAsync) {
+      this.isAsync = isAsync;
+      return this;
+    }
+
     public ActorCreationOptions build() {
       return new ActorCreationOptions(
           name,
@@ -154,13 +169,8 @@ public class ActorCreationOptions extends BaseTaskOptions {
           maxConcurrency,
           group,
           bundleIndex,
-          concurrencyGroups);
-    }
-
-    /** Set the concurrency groups for this actor. */
-    public Builder setConcurrencyGroups(List<ConcurrencyGroup> concurrencyGroups) {
-      this.concurrencyGroups = concurrencyGroups;
-      return this;
+          concurrencyGroups,
+          isAsync);
     }
   }
 }

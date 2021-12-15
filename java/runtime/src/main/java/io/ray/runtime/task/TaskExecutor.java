@@ -19,6 +19,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -92,6 +93,8 @@ public abstract class TaskExecutor<T extends TaskExecutor.ActorContext> {
     }
   }
 
+  abstract Object handleAsyncActorTaskResult(CompletableFuture<?> result);
+
   protected List<NativeRayObject> execute(List<String> rayFunctionInfo, List<Object> argsBytes) {
     runtime.setIsContextSet(true);
     TaskType taskType = runtime.getWorkerContext().getCurrentTaskType();
@@ -147,6 +150,11 @@ public abstract class TaskExecutor<T extends TaskExecutor.ActorContext> {
         } else {
           throw e;
         }
+      }
+
+      // Check async actor
+      if (actor != null && result instanceof CompletableFuture) {
+        result = handleAsyncActorTaskResult((CompletableFuture) result);
       }
 
       // Set result

@@ -184,7 +184,7 @@ public final class MemoryBuffer {
    * Checks whether this memory buffer is backed by off-heap memory.
    *
    * @return <tt>true</tt>, if the memory buffer is backed by off-heap memory, <tt>false</tt> if it
-   *   is backed by heap memory.
+   *     is backed by heap memory.
    */
   public boolean isOffHeap() {
     return heapMemory == null;
@@ -194,7 +194,7 @@ public final class MemoryBuffer {
    * Get the heap byte array object.
    *
    * @return Return non-null if the memory is on the heap, and return null, if the memory if off the
-   *   heap.
+   *     heap.
    */
   public byte[] getHeapMemory() {
     return heapMemory;
@@ -268,42 +268,8 @@ public final class MemoryBuffer {
     }
   }
 
-  public void put(int index, byte b) {
-    final long pos = address + index;
-    if (index >= 0 && pos < addressLimit) {
-      UNSAFE.putByte(heapMemory, pos, b);
-    } else if (address > addressLimit) {
-      throw new IllegalStateException("Buffer has been freed");
-    } else {
-      // index is in fact invalid
-      throw new IndexOutOfBoundsException();
-    }
-  }
-
-  /**
-   * Bulk get method. Copies dst.length memory from the specified position to the destination
-   * memory.
-   *
-   * @param index The position at which the first byte will be read.
-   * @param dst The memory into which the memory will be copied.
-   * @throws IndexOutOfBoundsException Thrown, if the index is negative, or too large that the data
-   *                                   between the index and the memory buffer end is not enough to fill the destination array.
-   */
   public void get(int index, byte[] dst) {
     get(index, dst, 0, dst.length);
-  }
-
-  /**
-   * Bulk put method. Copies src.length memory from the source memory into the memory buffer
-   * beginning at the specified position.
-   *
-   * @param index The index in the memory buffer array, where the data is put.
-   * @param src The source array to copy the data from.
-   * @throws IndexOutOfBoundsException Thrown, if the index is negative, or too large such that the
-   *                                   array size exceed the amount of memory between the index and the memory buffer's end.
-   */
-  public void put(int index, byte[] src) {
-    put(index, src, 0, src.length);
   }
 
   /**
@@ -314,9 +280,9 @@ public final class MemoryBuffer {
    * @param dst The memory into which the memory will be copied.
    * @param offset The copying offset in the destination memory.
    * @param length The number of bytes to be copied.
-   * @throws IndexOutOfBoundsException Thrown, if the index is negative, or too large that the
-   *                                   requested number of bytes exceed the amount of memory between the index and the memory
-   *                                   buffer's end.
+   * @throws IndexOutOfBoundsException
+   * Thrown, if the index is negative, or too large that the requested number of bytes exceed the
+   *     amount of memory between the index and the memory buffer's end.
    */
   public void get(int index, byte[] dst, int offset, int length) {
     // check the byte array offset and length and the status
@@ -337,6 +303,126 @@ public final class MemoryBuffer {
   }
 
   /**
+   * Bulk get method. Copies {@code numBytes} bytes from this memory buffer, starting at position
+   * {@code offset} to the target {@code ByteBuffer}. The bytes will be put into the target buffer
+   * starting at the buffer's current position. If this method attempts to write more bytes than the
+   * target byte buffer has remaining (with respect to {@link ByteBuffer#remaining()}), this method
+   * will cause a {@link BufferOverflowException}.
+   *
+   * @param offset The position where the bytes are started to be read from in this memory buffer.
+   * @param target The ByteBuffer to copy the bytes to.
+   * @param numBytes The number of bytes to copy.
+   * @throws IndexOutOfBoundsException
+   * If the offset is invalid, or this buffer does not contain the given number of bytes
+   *     (starting from offset), or the target byte buffer does not have enough space for the bytes.
+   * @throws ReadOnlyBufferException If the target buffer is read-only.
+   */
+  public void get(int offset, ByteBuffer target, int numBytes) {
+    // check the byte array offset and length
+    if ((offset | numBytes | (offset + numBytes)) < 0) {
+      throw new IndexOutOfBoundsException();
+    }
+    final int targetOffset = target.position();
+    final int remaining = target.remaining();
+    if (remaining < numBytes) {
+      throw new BufferOverflowException();
+    }
+    if (target.isDirect()) {
+      if (target.isReadOnly()) {
+        throw new ReadOnlyBufferException();
+      }
+      // copy to the target memory directly
+      final long targetPointer = Platform.getAddress(target) + targetOffset;
+      final long sourcePointer = address + offset;
+      if (sourcePointer <= addressLimit - numBytes) {
+        UNSAFE.copyMemory(heapMemory, sourcePointer, null, targetPointer, numBytes);
+        target.position(targetOffset + numBytes);
+      } else if (address > addressLimit) {
+        throw new IllegalStateException("Buffer has been freed");
+      } else {
+        throw new IndexOutOfBoundsException();
+      }
+    } else if (target.hasArray()) {
+      // move directly into the byte array
+      get(offset, target.array(), targetOffset + target.arrayOffset(), numBytes);
+      // this must be after the get() call to ensue that the byte buffer is not
+      // modified in case the call fails
+      target.position(targetOffset + numBytes);
+    } else {
+      // neither heap buffer nor direct buffer
+      while (target.hasRemaining()) {
+        target.put(get(offset++));
+      }
+    }
+  }
+
+  /**
+   * Bulk put method. Copies {@code numBytes} bytes from the given {@code ByteBuffer}, into this
+   * memory buffer. The bytes will be read from the target buffer starting at the buffer's current
+   * position, and will be written to this memory buffer starting at {@code offset}. If this method
+   * attempts to read more bytes than the target byte buffer has remaining (with respect to {@link
+   * ByteBuffer#remaining()}), this method will cause a {@link BufferUnderflowException}.
+   *
+   * @param offset The position where the bytes are started to be written to in this memory buffer.
+   * @param source The ByteBuffer to copy the bytes from.
+   * @param numBytes The number of bytes to copy.
+   * @throws IndexOutOfBoundsException
+   * If the offset is invalid, or the source buffer does not contain the given number of bytes, or
+   *     this buffer does not have enough space for the bytes(counting from offset).
+   */
+  public void put(int offset, ByteBuffer source, int numBytes) {
+    // check the byte array offset and length
+    if ((offset | numBytes | (offset + numBytes)) < 0) {
+      throw new IndexOutOfBoundsException();
+    }
+    final int sourceOffset = source.position();
+    final int remaining = source.remaining();
+    if (remaining < numBytes) {
+      throw new BufferUnderflowException();
+    }
+    if (source.isDirect()) {
+      // copy to the target memory directly
+      final long sourcePointer = Platform.getAddress(source) + sourceOffset;
+      final long targetPointer = address + offset;
+      if (targetPointer <= addressLimit - numBytes) {
+        UNSAFE.copyMemory(null, sourcePointer, heapMemory, targetPointer, numBytes);
+        source.position(sourceOffset + numBytes);
+      } else if (address > addressLimit) {
+        throw new IllegalStateException("Buffer has been freed");
+      } else {
+        throw new IndexOutOfBoundsException();
+      }
+    } else if (source.hasArray()) {
+      // move directly into the byte array
+      put(offset, source.array(), sourceOffset + source.arrayOffset(), numBytes);
+      // this must be after the get() call to ensue that the byte buffer is not
+      // modified in case the call fails
+      source.position(sourceOffset + numBytes);
+    } else {
+      // neither heap buffer nor direct buffer
+      while (source.hasRemaining()) {
+        put(offset++, source.get());
+      }
+    }
+  }
+
+  public void put(int index, byte b) {
+    final long pos = address + index;
+    if (index >= 0 && pos < addressLimit) {
+      UNSAFE.putByte(heapMemory, pos, b);
+    } else if (address > addressLimit) {
+      throw new IllegalStateException("Buffer has been freed");
+    } else {
+      // index is in fact invalid
+      throw new IndexOutOfBoundsException();
+    }
+  }
+
+  public void put(int index, byte[] src) {
+    put(index, src, 0, src.length);
+  }
+
+  /**
    * Bulk put method. Copies length memory starting at position offset from the source memory into
    * the memory buffer starting at the specified index.
    *
@@ -344,9 +430,9 @@ public final class MemoryBuffer {
    * @param src The source array to copy the data from.
    * @param offset The offset in the source array where the copying is started.
    * @param length The number of bytes to copy.
-   * @throws IndexOutOfBoundsException Thrown, if the index is negative, or too large such that the
-   *                                   array portion to copy exceed the amount of memory between the index and the memory buffer's
-   *                                   end.
+   * @throws IndexOutOfBoundsException
+   * Thrown, if the index is negative, or too large such that the array portion to copy exceed the
+   *     amount of memory between the index and the memory buffer's end.
    */
   public void put(int index, byte[] src, int offset, int length) {
     // check the byte array offset and length
@@ -703,14 +789,14 @@ public final class MemoryBuffer {
   }
 
   /**
-   * For off-heap buffer, this will make a heap buffer internally
+   * For off-heap buffer, this will make a heap buffer internally.
    */
   public void grow(int neededSize) {
     ensure(writerIndex + neededSize);
   }
 
   /**
-   * For off-heap buffer, this will make a heap buffer internally
+   * For off-heap buffer, this will make a heap buffer internally.
    */
   public void ensure(int length) {
     if (length > size) {
@@ -809,125 +895,6 @@ public final class MemoryBuffer {
     }
   }
 
-  // -------------------------------------------------------------------------
-  //                     Bulk Read and Write Methods
-  // -------------------------------------------------------------------------
-
-  /**
-   * Bulk get method. Copies {@code numBytes} bytes from this memory buffer, starting at position
-   * {@code offset} to the target {@code ByteBuffer}. The bytes will be put into the target buffer
-   * starting at the buffer's current position. If this method attempts to write more bytes than the
-   * target byte buffer has remaining (with respect to {@link ByteBuffer#remaining()}), this method
-   * will cause a {@link BufferOverflowException}.
-   *
-   * @param offset The position where the bytes are started to be read from in this memory buffer.
-   * @param target The ByteBuffer to copy the bytes to.
-   * @param numBytes The number of bytes to copy.
-   * @throws IndexOutOfBoundsException If the offset is invalid, or this buffer does not contain the
-   *                                   given number of bytes (starting from offset), or the target byte buffer does not have
-   *                                   enough space for the bytes.
-   * @throws ReadOnlyBufferException   If the target buffer is read-only.
-   */
-  public void get(int offset, ByteBuffer target, int numBytes) {
-    // check the byte array offset and length
-    if ((offset | numBytes | (offset + numBytes)) < 0) {
-      throw new IndexOutOfBoundsException();
-    }
-
-    final int targetOffset = target.position();
-    final int remaining = target.remaining();
-
-    if (remaining < numBytes) {
-      throw new BufferOverflowException();
-    }
-
-    if (target.isDirect()) {
-      if (target.isReadOnly()) {
-        throw new ReadOnlyBufferException();
-      }
-
-      // copy to the target memory directly
-      final long targetPointer = Platform.getAddress(target) + targetOffset;
-      final long sourcePointer = address + offset;
-
-      if (sourcePointer <= addressLimit - numBytes) {
-        UNSAFE.copyMemory(heapMemory, sourcePointer, null, targetPointer, numBytes);
-        target.position(targetOffset + numBytes);
-      } else if (address > addressLimit) {
-        throw new IllegalStateException("Buffer has been freed");
-      } else {
-        throw new IndexOutOfBoundsException();
-      }
-    } else if (target.hasArray()) {
-      // move directly into the byte array
-      get(offset, target.array(), targetOffset + target.arrayOffset(), numBytes);
-
-      // this must be after the get() call to ensue that the byte buffer is not
-      // modified in case the call fails
-      target.position(targetOffset + numBytes);
-    } else {
-      // neither heap buffer nor direct buffer
-      while (target.hasRemaining()) {
-        target.put(get(offset++));
-      }
-    }
-  }
-
-  /**
-   * Bulk put method. Copies {@code numBytes} bytes from the given {@code ByteBuffer}, into this
-   * memory buffer. The bytes will be read from the target buffer starting at the buffer's current
-   * position, and will be written to this memory buffer starting at {@code offset}. If this method
-   * attempts to read more bytes than the target byte buffer has remaining (with respect to {@link
-   * ByteBuffer#remaining()}), this method will cause a {@link BufferUnderflowException}.
-   *
-   * @param offset The position where the bytes are started to be written to in this memory buffer.
-   * @param source The ByteBuffer to copy the bytes from.
-   * @param numBytes The number of bytes to copy.
-   * @throws IndexOutOfBoundsException If the offset is invalid, or the source buffer does not
-   *                                   contain the given number of bytes, or this buffer does not have enough space for the bytes
-   *                                   (counting from offset).
-   */
-  public void put(int offset, ByteBuffer source, int numBytes) {
-    // check the byte array offset and length
-    if ((offset | numBytes | (offset + numBytes)) < 0) {
-      throw new IndexOutOfBoundsException();
-    }
-
-    final int sourceOffset = source.position();
-    final int remaining = source.remaining();
-
-    if (remaining < numBytes) {
-      throw new BufferUnderflowException();
-    }
-
-    if (source.isDirect()) {
-      // copy to the target memory directly
-      final long sourcePointer = Platform.getAddress(source) + sourceOffset;
-      final long targetPointer = address + offset;
-
-      if (targetPointer <= addressLimit - numBytes) {
-        UNSAFE.copyMemory(null, sourcePointer, heapMemory, targetPointer, numBytes);
-        source.position(sourceOffset + numBytes);
-      } else if (address > addressLimit) {
-        throw new IllegalStateException("Buffer has been freed");
-      } else {
-        throw new IndexOutOfBoundsException();
-      }
-    } else if (source.hasArray()) {
-      // move directly into the byte array
-      put(offset, source.array(), sourceOffset + source.arrayOffset(), numBytes);
-
-      // this must be after the get() call to ensue that the byte buffer is not
-      // modified in case the call fails
-      source.position(sourceOffset + numBytes);
-    } else {
-      // neither heap buffer nor direct buffer
-      while (source.hasRemaining()) {
-        put(offset++, source.get());
-      }
-    }
-  }
-
   /**
    * Bulk copy method. Copies {@code numBytes} bytes to target unsafe object and pointer. NOTE: This
    * is a unsafe method, no check here, please be carefully.
@@ -949,8 +916,8 @@ public final class MemoryBuffer {
   }
 
   /**
-   * @return internal byte array if data is on heap and remaining buffer size is equal to internal
-   *   byte array size, or create a new byte array which copy remaining data from off-heap
+   * Returns internal byte array if data is on heap and remaining buffer size is equal to internal
+   *     byte array size, or create a new byte array which copy remaining data from off-heap.
    */
   public byte[] getRemainingBytes() {
     int length = size - readerIndex;
@@ -962,8 +929,8 @@ public final class MemoryBuffer {
   }
 
   /**
-   * @return internal byte array if data is on heap and buffer size is equal to internal byte array
-   *   size , or create a new byte array which copy data from off-heap
+   * Returns internal byte array if data is on heap and buffer size is equal to internal byte array
+   *     size , or create a new byte array which copy data from off-heap.
    */
   public byte[] getAllBytes() {
     if (heapMemory != null && size == heapMemory.length) {

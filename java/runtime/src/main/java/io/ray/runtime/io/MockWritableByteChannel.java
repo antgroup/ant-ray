@@ -1,12 +1,7 @@
 package io.ray.runtime.io;
 
-import com.google.common.base.Preconditions;
-import io.ray.runtime.util.Platform;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.WritableByteChannel;
-import java.nio.channels.spi.AbstractInterruptibleChannel;
 
 /**
  * A helper class to track the size of allocations.

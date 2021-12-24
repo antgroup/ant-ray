@@ -9,15 +9,6 @@ exports_files([
     "checkstyle-suppressions.xml",
 ])
 
-java_plugin(
-    name = "lombok_plugin",
-    generates_api = 1,
-    processor_class = "lombok.launch.AnnotationProcessorHider$AnnotationProcessor",
-    deps = [
-        "@maven//:org_projectlombok_lombok",
-    ],
-)
-
 all_modules = [
     "api",
     "runtime",

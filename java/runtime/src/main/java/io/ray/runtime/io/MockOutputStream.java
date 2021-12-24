@@ -1,6 +1,5 @@
 package io.ray.runtime.io;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
@@ -10,17 +9,19 @@ import java.nio.ByteBuffer;
  * a size counter that can be later used to know exactly which data size
  * needs to be allocated for actual writing.
  *
- * Note that {@link OutputStream} doesn't support {@link ByteBuffer}, which may
+ * <p>Note that {@link OutputStream} doesn't support {@link ByteBuffer}, which may
  * incur extra copy. See also {@link MockWritableByteChannel}.
  */
 public class MockOutputStream extends OutputStream {
   private int totalBytes;
 
   // Writes the specified byte to this output stream.
-  public void write(int byte_) {
+  @Override
+  public void write(int b) {
     totalBytes += 1;
   }
 
+  @Override
   public void write(byte[] bytes, int offset, int length) {
     totalBytes += length;
   }

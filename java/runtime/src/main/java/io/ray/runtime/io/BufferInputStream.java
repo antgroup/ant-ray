@@ -4,10 +4,10 @@ import io.ray.runtime.util.MemoryBuffer;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FuryInputStream extends InputStream {
+public class BufferInputStream extends InputStream {
   private final MemoryBuffer buffer;
 
-  public FuryInputStream(MemoryBuffer buffer) {
+  public BufferInputStream(MemoryBuffer buffer) {
     this.buffer = buffer;
   }
 

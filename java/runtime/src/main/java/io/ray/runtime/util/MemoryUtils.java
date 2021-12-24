@@ -8,6 +8,10 @@ public class MemoryUtils {
     return wrap(new byte[size]);
   }
 
+  public static MemoryBuffer buffer(long address, int size) {
+    return new MemoryBuffer(address, size);
+  }
+
   /**
    * Creates a new memory segment that targets to the given heap memory region.
    *
@@ -37,9 +41,5 @@ public class MemoryUtils {
       int offset = buffer.arrayOffset() + buffer.position();
       return new MemoryBuffer(buffer.array(), offset, buffer.remaining());
     }
-  }
-
-  public static MemoryBuffer buffer(long address, int size) {
-    return new MemoryBuffer(address, size);
   }
 }

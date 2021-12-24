@@ -4,11 +4,11 @@ import io.ray.runtime.util.MemoryBuffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 
-public class FuryReadableByteChannel implements ReadableByteChannel {
+public class BufferReadableByteChannel implements ReadableByteChannel {
   private boolean open = true;
   private final MemoryBuffer buffer;
 
-  public FuryReadableByteChannel(MemoryBuffer buffer) {
+  public BufferReadableByteChannel(MemoryBuffer buffer) {
     this.buffer = buffer;
   }
 

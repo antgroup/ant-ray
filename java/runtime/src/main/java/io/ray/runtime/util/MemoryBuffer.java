@@ -972,9 +972,10 @@ public final class MemoryBuffer {
   public ByteBuffer sliceAsByteBuffer(int offset, int length) {
     Preconditions.checkArgument(offset + length <= size);
     if (heapMemory != null) {
-      return ByteBuffer.wrap(heapMemory, offset, length);
+      return ByteBuffer.wrap(
+        heapMemory, (int) (address - BYTE_ARRAY_BASE_OFFSET + offset), length);
     } else {
-      ByteBuffer offHeapBuffer = ((MemoryBuffer) this).offHeapBuffer;
+      ByteBuffer offHeapBuffer = this.offHeapBuffer;
       if (offHeapBuffer != null) {
         ByteBuffer duplicate = offHeapBuffer.duplicate();
         int start = (int) (address - Platform.getAddress(duplicate));
@@ -985,6 +986,14 @@ public final class MemoryBuffer {
         return Platform.wrapDirectBuffer(address + offset, length);
       }
     }
+  }
+
+  public boolean equalTo(MemoryBuffer buf2, int offset1, int offset2, int len) {
+    final long pos1 = address + offset1;
+    final long pos2 = buf2.address + offset2;
+    Preconditions.checkArgument(pos1 < addressLimit);
+    Preconditions.checkArgument(pos2 < buf2.addressLimit);
+    return Platform.arrayEquals(heapMemory, pos1, buf2.heapMemory, pos2, len);
   }
 
   /**

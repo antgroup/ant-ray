@@ -1,6 +1,7 @@
 package io.ray.runtime.util;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
@@ -21,6 +22,19 @@ public class PlatformTest {
     assertTrue(
         Platform.arrayEquals(
             bytes, Platform.BYTE_ARRAY_OFFSET, bytes2, Platform.BYTE_ARRAY_OFFSET, bytes.length));
+  }
+
+  @Test
+  public void testGetAddress() {
+    {
+      ByteBuffer buffer1 = ByteBuffer.allocateDirect(10);
+      buffer1.putInt(10);
+      ByteBuffer buffer2 = Platform.wrapDirectBuffer(Platform.getAddress(buffer1), 10);
+      assertEquals(buffer2.getInt(), 10);
+    }
+    assertThrows(IllegalArgumentException.class, () -> {
+      Platform.getAddress(ByteBuffer.allocate(10));
+    });
   }
 
   @Test
@@ -93,4 +107,5 @@ public class PlatformTest {
       Platform.freeMemory(address);
     }
   }
+
 }

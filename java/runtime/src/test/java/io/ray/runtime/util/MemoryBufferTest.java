@@ -94,4 +94,25 @@ public class MemoryBufferTest {
       }
     }
   }
+
+  @Test
+  public void testBulkOperations() {
+    MemoryBuffer buffer = MemoryUtils.buffer(32);
+    ByteBuffer buffer2 = ByteBuffer.allocate(1000);
+    buffer.writeBytes(new byte[] {1, 2, 3, 4});
+    buffer2.put(new byte[] {1, 2, 3, 4});
+    ByteBuffer buffer1 = ByteBuffer.allocateDirect(10 * 8);
+    for (int i = 0; i < 10; i++) {
+      buffer1.putLong(10);
+    }
+    buffer1.flip();
+    buffer.write(buffer1.duplicate());
+    buffer2.put(buffer1.duplicate());
+    buffer.write(ByteBuffer.wrap(new byte[] {1, 2, 3, 4}));
+    buffer2.put(ByteBuffer.wrap(new byte[] {1, 2, 3, 4}));
+    buffer2.flip();
+    assertEquals(buffer.sliceAsByteBuffer(0, buffer.writerIndex()),
+      buffer2);
+    assertTrue(buffer.equalTo(MemoryUtils.wrap(buffer2), 0, 0, buffer.writerIndex()));
+  }
 }

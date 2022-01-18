@@ -19,6 +19,8 @@ import io.ray.api.options.PlacementGroupCreationOptions;
 import io.ray.api.placementgroup.PlacementGroup;
 import io.ray.api.runtimecontext.ResourceValue;
 import io.ray.api.runtimecontext.RuntimeContext;
+import io.ray.api.serializer.RaySerializer2Interface;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -225,6 +227,8 @@ public interface RayRuntime {
 
   /** Intentionally exit the current actor. */
   void exitActor();
+
+  void registerSerializer(Class<?> type, RaySerializer2Interface serializer);
 
   /**
    * Get the resources available on this worker. Note that this API doesn't work on driver.

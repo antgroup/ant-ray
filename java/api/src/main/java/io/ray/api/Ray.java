@@ -3,6 +3,8 @@ package io.ray.api;
 import io.ray.api.runtime.RayRuntime;
 import io.ray.api.runtime.RayRuntimeFactory;
 import io.ray.api.runtimecontext.RuntimeContext;
+import io.ray.api.serializer.RaySerializer2Interface;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -274,4 +276,9 @@ public final class Ray extends RayCall {
   public static void exitActor() {
     runtime.exitActor();
   }
+
+  public static void registerSerializer(Class<?> type, RaySerializer2Interface serialzier) {
+    runtime.registerSerializer(type, serialzier);
+  }
+
 }

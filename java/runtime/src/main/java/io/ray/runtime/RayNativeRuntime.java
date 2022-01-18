@@ -10,6 +10,7 @@ import io.ray.api.id.JobId;
 import io.ray.api.id.UniqueId;
 import io.ray.api.options.ActorLifetime;
 import io.ray.api.runtimecontext.ResourceValue;
+import io.ray.api.serializer.RaySerializer2Interface;
 import io.ray.runtime.config.RayConfig;
 import io.ray.runtime.context.NativeWorkerContext;
 import io.ray.runtime.exception.RayIntentionalSystemExitException;
@@ -22,6 +23,7 @@ import io.ray.runtime.generated.RuntimeEnvCommon.RuntimeEnv;
 import io.ray.runtime.generated.RuntimeEnvCommon.RuntimeEnvInfo;
 import io.ray.runtime.object.NativeObjectStore;
 import io.ray.runtime.runner.RunManager;
+import io.ray.runtime.serializer.SerializerManager;
 import io.ray.runtime.task.NativeTaskExecutor;
 import io.ray.runtime.task.NativeTaskSubmitter;
 import io.ray.runtime.task.TaskExecutor;
@@ -44,6 +46,8 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
   private boolean startRayHead = false;
 
   private GcsClient gcsClient;
+
+  private SerializerManager serializerManager;
 
   /**
    * In Java, GC runs in a standalone thread, and we can't control the exact timing of garbage
@@ -152,6 +156,7 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
       workerContext = new NativeWorkerContext();
       objectStore = new NativeObjectStore(workerContext, shutdownLock);
       taskSubmitter = new NativeTaskSubmitter();
+      serializerManager = new SerializerManager();
 
       LOGGER.debug(
           "RayNativeRuntime started with store {}, raylet {}",
@@ -236,6 +241,11 @@ public final class RayNativeRuntime extends AbstractRayRuntime {
     LOGGER.info("Actor {} is exiting.", runtimeContext.getCurrentActorId());
     throw new RayIntentionalSystemExitException(
         String.format("Actor %s is exiting.", runtimeContext.getCurrentActorId()));
+  }
+
+  @Override
+  public void registerSerializer(Class<?> type, RaySerializer2Interface serializer) {
+    serializerManager.register(type, serializer);
   }
 
   @Override

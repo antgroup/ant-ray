@@ -6,6 +6,7 @@ import io.ray.api.id.JobId;
 import io.ray.api.id.PlacementGroupId;
 import io.ray.api.placementgroup.PlacementGroup;
 import io.ray.api.runtimecontext.ResourceValue;
+import io.ray.api.serializer.RaySerializer2Interface;
 import io.ray.runtime.config.RayConfig;
 import io.ray.runtime.context.LocalModeWorkerContext;
 import io.ray.runtime.gcs.GcsClient;
@@ -127,6 +128,11 @@ public class RayDevRuntime extends AbstractRayRuntime {
 
   @Override
   public void exitActor() {}
+
+  @Override
+  public void registerSerializer(Class<?> type, RaySerializer2Interface serialzier) {
+    // TODO(qwang)
+  }
 
   private JobId nextJobId() {
     return JobId.fromInt(jobCounter.getAndIncrement());

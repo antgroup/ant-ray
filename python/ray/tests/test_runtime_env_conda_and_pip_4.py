@@ -89,5 +89,14 @@ class TestGC:
         ray.shutdown()
 
 
+@pytest.mark.skipif(
+    os.environ.get("IN_VIRTUALENV") or (os.environ.get("CI") and sys.platform != "linux"),
+    reason="Requires PR wheels built in CI, so only run on linux CI machines.",
+)
+def test_run_in_virtualenv(virtualenv):
+    python_exe_path  = virtualenv.python
+    print("python_exe_path:", python_exe_path)
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main(["-sv", __file__]))

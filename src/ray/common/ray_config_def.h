@@ -343,14 +343,8 @@ RAY_CONFIG(int64_t, task_rpc_inlined_bytes_limit, 10 * 1024 * 1024)
 /// Maximum number of pending lease requests per scheduling category
 RAY_CONFIG(uint64_t, max_pending_lease_requests_per_scheduling_category, 10)
 
-/// Interval to restart dashboard agent after the process exit.
-RAY_CONFIG(uint32_t, agent_restart_interval_ms, 1000)
-
 /// Wait timeout for dashboard agent register.
 RAY_CONFIG(uint32_t, agent_register_timeout_ms, 30 * 1000)
-
-/// Max restart count for the dashboard agent.
-RAY_CONFIG(uint32_t, agent_max_restart_count, 5)
 
 /// If the agent manager fails to communicate with the dashboard agent, we will retry
 /// after this interval.

@@ -408,52 +408,47 @@ if __name__ == "__main__":
     except Exception as e:
         # All these env vars should be available because
         # they are provided by the parent raylet.
-        restart_count = os.environ["RESTART_COUNT"]
-        max_restart_count = os.environ["MAX_RESTART_COUNT"]
         raylet_pid = os.environ["RAY_RAYLET_PID"]
         node_ip = args.node_ip_address
-        if restart_count >= max_restart_count:
-            # Agent is failed to be started many times.
-            # Push an error to all drivers, so that users can know the
-            # impact of the issue.
-            redis_client = None
-            gcs_publisher = None
-            if gcs_pubsub_enabled():
-                if use_gcs_for_bootstrap():
-                    gcs_publisher = GcsPublisher(args.gcs_address)
-                else:
-                    redis_client = ray._private.services.create_redis_client(
-                        args.redis_address, password=args.redis_password
-                    )
-                    gcs_publisher = GcsPublisher(
-                        address=get_gcs_address_from_redis(redis_client)
-                    )
+        # Agent is failed to be started many times.
+        # Push an error to all drivers, so that users can know the
+        # impact of the issue.
+        redis_client = None
+        gcs_publisher = None
+        if gcs_pubsub_enabled():
+            if use_gcs_for_bootstrap():
+                gcs_publisher = GcsPublisher(address=args.gcs_address)
             else:
                 redis_client = ray._private.services.create_redis_client(
                     args.redis_address, password=args.redis_password
                 )
+                gcs_publisher = GcsPublisher(
+                    address=get_gcs_address_from_redis(redis_client)
+                )
+        else:
+            redis_client = ray._private.services.create_redis_client(
+                args.redis_address, password=args.redis_password
+            )
 
-            traceback_str = ray._private.utils.format_error_message(
-                traceback.format_exc()
-            )
-            message = (
-                f"(ip={node_ip}) "
-                f"The agent on node {platform.uname()[1]} failed to "
-                f"be restarted {max_restart_count} "
-                "times. There are 3 possible problems if you see this error."
-                "\n  1. The dashboard might not display correct "
-                "information on this node."
-                "\n  2. Metrics on this node won't be reported."
-                "\n  3. runtime_env APIs won't work."
-                "\nCheck out the `dashboard_agent.log` to see the "
-                "detailed failure messages."
-            )
-            ray._private.utils.publish_error_to_driver(
-                ray_constants.DASHBOARD_AGENT_DIED_ERROR,
-                message,
-                redis_client=redis_client,
-                gcs_publisher=gcs_publisher,
-            )
-            logger.error(message)
+        traceback_str = ray._private.utils.format_error_message(traceback.format_exc())
+        message = (
+            f"(ip={node_ip}) "
+            f"The agent on node {platform.uname()[1]} failed to "
+            f"be started."
+            "There are 3 possible problems if you see this error."
+            "\n  1. The dashboard might not display correct "
+            "information on this node."
+            "\n  2. Metrics on this node won't be reported."
+            "\n  3. runtime_env APIs won't work."
+            "\nCheck out the `dashboard_agent.log` to see the "
+            "detailed failure messages."
+        )
+        ray._private.utils.publish_error_to_driver(
+            ray_constants.DASHBOARD_AGENT_DIED_ERROR,
+            message,
+            redis_client=redis_client,
+            gcs_publisher=gcs_publisher,
+        )
+        logger.error(message)
         logger.exception(e)
         exit(1)

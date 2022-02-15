@@ -36,8 +36,6 @@ void AgentManager::HandleRegisterAgent(const rpc::RegisterAgentRequest &request,
   RAY_LOG(INFO) << "HandleRegisterAgent, ip: " << agent_ip_address_
                 << ", port: " << agent_port_ << ", pid: " << agent_pid_;
   reply->set_status(rpc::AGENT_RPC_STATUS_OK);
-  // Reset the restart count after registration is done.
-  agent_restart_count_ = 0;
   send_reply_callback(ray::Status::OK(), nullptr, nullptr);
 }
 
@@ -68,11 +66,6 @@ void AgentManager::StartAgent() {
   ProcessEnvironment env;
   env.insert({"RAY_NODE_ID", options_.node_id.Hex()});
   env.insert({"RAY_RAYLET_PID", std::to_string(getpid())});
-  // Report the restart count to the agent so that we can decide whether or not
-  // report the error message to drivers.
-  env.insert({"RESTART_COUNT", std::to_string(agent_restart_count_)});
-  env.insert({"MAX_RESTART_COUNT",
-              std::to_string(RayConfig::instance().agent_max_restart_count())});
   Process child(argv.data(), nullptr, ec, false, env);
   if (!child.IsValid() || ec) {
     // The worker failed to start. This is a fatal error.
@@ -98,31 +91,10 @@ void AgentManager::StartAgent() {
 
     int exit_code = child.Wait();
     timer->cancel();
-    RAY_LOG(WARNING) << "Agent process with pid " << child.GetId()
+    // Raylet shares fate with agent to make the failover logic easier.
+    RAY_CHECK(false) << "Agent process with pid " << child.GetId()
                      << " exit, return value " << exit_code << ". ip "
                      << agent_ip_address_ << ". pid " << agent_pid_;
-    if (agent_restart_count_ < RayConfig::instance().agent_max_restart_count()) {
-      RAY_UNUSED(delay_executor_(
-          [this] {
-            agent_restart_count_++;
-            StartAgent();
-          },
-          // Retrying with exponential backoff
-          RayConfig::instance().agent_restart_interval_ms() *
-              std::pow(2, (agent_restart_count_ + 1))));
-    } else {
-      RAY_LOG(WARNING) << "Agent has failed "
-                       << RayConfig::instance().agent_max_restart_count()
-                       << " times in a row without registering the agent. This is highly "
-                          "likely there's a bug in the dashboard agent. Please check out "
-                          "the dashboard_agent.log file.";
-      RAY_EVENT(WARNING, EL_RAY_AGENT_EXIT)
-              .WithField("ip", agent_ip_address_)
-              .WithField("pid", agent_pid_)
-          << "Agent failed to be restarted "
-          << RayConfig::instance().agent_max_restart_count()
-          << " times. Agent won't be restarted.";
-    }
   });
   monitor_thread.detach();
 }
@@ -153,24 +125,6 @@ void AgentManager::CreateRuntimeEnv(
   }
 
   if (runtime_env_agent_client_ == nullptr) {
-    // If the agent cannot be restarted anymore, fail the request.
-    if (agent_restart_count_ >= RayConfig::instance().agent_max_restart_count()) {
-      std::stringstream str_stream;
-      str_stream << "Runtime environment " << serialized_runtime_env
-                 << " cannot be created on this node because the agent is dead.";
-      const auto &error_message = str_stream.str();
-      RAY_LOG(WARNING) << error_message;
-      delay_executor_(
-          [callback = std::move(callback),
-           serialized_runtime_env = std::move(serialized_runtime_env), error_message] {
-            callback(/*successful=*/false,
-                     /*serialized_runtime_env_context=*/serialized_runtime_env,
-                     /*setup_error_message*/ error_message);
-          },
-          0);
-      return;
-    }
-
     RAY_LOG_EVERY_MS(INFO, 3 * 10 * 1000)
         << "Runtime env agent is not registered yet. Will retry CreateRuntimeEnv later: "
         << serialized_runtime_env;

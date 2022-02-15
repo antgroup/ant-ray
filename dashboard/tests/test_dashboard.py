@@ -60,25 +60,23 @@ def make_gcs_client(address_info):
     return gcs_client
 
 
-def cleanup_test_files():
-    module_path = ray.dashboard.modules.__path__[0]
-    filename = os.path.join(module_path, "test_for_bad_import.py")
-    logger.info("Remove test file: %s", filename)
-    try:
-        os.remove(filename)
-    except Exception:
-        pass
+def search_agent(processes):
+    for p in processes:
+        try:
+            for c in p.cmdline():
+                if os.path.join("dashboard", "agent.py") in c:
+                    return p
+        except Exception:
+            pass
 
 
-def prepare_test_files():
-    module_path = ray.dashboard.modules.__path__[0]
-    filename = os.path.join(module_path, "test_for_bad_import.py")
-    logger.info("Prepare test file: %s", filename)
-    with open(filename, "w") as f:
-        f.write(">>>")
-
-
-cleanup_test_files()
+def check_agent_register(raylet_proc, agent_pid):
+    # Check if agent register is OK.
+    for x in range(5):
+        logger.info("Check agent is alive.")
+        agent_proc = search_agent(raylet_proc.children())
+        assert agent_proc.pid == agent_pid
+        time.sleep(1)
 
 
 @pytest.mark.parametrize(
@@ -107,60 +105,13 @@ def test_basic(ray_start_with_dashboard):
     raylet_proc_info = all_processes[ray_constants.PROCESS_TYPE_RAYLET][0]
     raylet_proc = psutil.Process(raylet_proc_info.process.pid)
 
-    def _search_agent(processes):
-        for p in processes:
-            try:
-                for c in p.cmdline():
-                    if os.path.join("dashboard", "agent.py") in c:
-                        return p
-            except Exception:
-                pass
-
-    # Test for bad imports, the agent should be restarted.
-    logger.info("Test for bad imports.")
-    agent_proc = _search_agent(raylet_proc.children())
-    prepare_test_files()
-    agent_pids = set()
-    try:
-        assert agent_proc is not None
-        agent_proc.kill()
-        agent_proc.wait()
-        # The agent will be restarted for imports failure.
-        for _ in range(300):
-            agent_proc = _search_agent(raylet_proc.children())
-            if agent_proc:
-                agent_pids.add(agent_proc.pid)
-            # The agent should be restarted,
-            # so we can break if the len(agent_pid) > 1
-            if len(agent_pids) > 1:
-                break
-            time.sleep(0.1)
-    finally:
-        cleanup_test_files()
-    assert len(agent_pids) > 1, agent_pids
-
-    agent_proc = _search_agent(raylet_proc.children())
-    if agent_proc:
-        agent_proc.kill()
-        agent_proc.wait()
-
     logger.info("Test agent register is OK.")
-    wait_for_condition(lambda: _search_agent(raylet_proc.children()))
+    wait_for_condition(lambda: search_agent(raylet_proc.children()))
     assert dashboard_proc.status() in [psutil.STATUS_RUNNING, psutil.STATUS_SLEEPING]
-    agent_proc = _search_agent(raylet_proc.children())
+    agent_proc = search_agent(raylet_proc.children())
     agent_pid = agent_proc.pid
 
-    # Check if agent register is OK.
-    for x in range(5):
-        logger.info("Check agent is alive.")
-        agent_proc = _search_agent(raylet_proc.children())
-        assert agent_proc.pid == agent_pid
-        time.sleep(1)
-
-    # The agent should be dead if raylet exits.
-    raylet_proc.kill()
-    raylet_proc.wait()
-    agent_proc.wait(5)
+    check_agent_register(raylet_proc, agent_pid)
 
     # Check kv keys are set.
     logger.info("Check kv keys are set.")
@@ -178,6 +129,44 @@ def test_basic(ray_start_with_dashboard):
         key, namespace=ray_constants.KV_NAMESPACE_DASHBOARD
     )
     assert agent_ports is not None
+
+
+def test_raylet_and_agent_share_fate(shutdown_only):
+    """Test raylet and agent share fate."""
+
+    ray.init(include_dashboard=True)
+
+    all_processes = ray.worker._global_node.all_processes
+    raylet_proc_info = all_processes[ray_constants.PROCESS_TYPE_RAYLET][0]
+    raylet_proc = psutil.Process(raylet_proc_info.process.pid)
+
+    wait_for_condition(lambda: search_agent(raylet_proc.children()))
+    agent_proc = search_agent(raylet_proc.children())
+    agent_pid = agent_proc.pid
+
+    check_agent_register(raylet_proc, agent_pid)
+
+    # The agent should be dead if raylet exits.
+    raylet_proc.kill()
+    raylet_proc.wait()
+    agent_proc.wait(5)
+
+    ray.shutdown()
+
+    ray.init(include_dashboard=True)
+    all_processes = ray.worker._global_node.all_processes
+    raylet_proc_info = all_processes[ray_constants.PROCESS_TYPE_RAYLET][0]
+    raylet_proc = psutil.Process(raylet_proc_info.process.pid)
+    wait_for_condition(lambda: search_agent(raylet_proc.children()))
+    agent_proc = search_agent(raylet_proc.children())
+    agent_pid = agent_proc.pid
+
+    check_agent_register(raylet_proc, agent_pid)
+
+    # The raylet should be dead if agent exits.
+    agent_proc.kill()
+    agent_proc.wait()
+    raylet_proc.wait(5)
 
 
 @pytest.mark.parametrize(

@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 def _build_proto_pip_runtime_env(runtime_env_dict: dict, runtime_env: ProtoRuntimeEnv):
     """Construct pip runtime env protobuf from runtime env dict."""
     if runtime_env_dict.get("pip"):
-        if isinstance(runtime_env_dict["pip"], list):
-            runtime_env.python_runtime_env.pip_runtime_env.config.packages.extend(
+        if isinstance(runtime_env_dict["pip"], dict):
+            runtime_env.python_runtime_env.pip_runtime_env.config = json.dumps(
                 runtime_env_dict["pip"]
             )
         else:
@@ -38,8 +38,8 @@ def _parse_proto_pip_runtime_env(runtime_env: ProtoRuntimeEnv, runtime_env_dict:
     """Parse pip runtime env protobuf to runtime env dict."""
     if runtime_env.python_runtime_env.HasField("pip_runtime_env"):
         if runtime_env.python_runtime_env.pip_runtime_env.HasField("config"):
-            runtime_env_dict["pip"] = list(
-                runtime_env.python_runtime_env.pip_runtime_env.config.packages
+            runtime_env_dict["pip"] = json.loads(
+                runtime_env.python_runtime_env.pip_runtime_env.config
             )
         else:
             runtime_env_dict[
@@ -509,11 +509,11 @@ class RuntimeEnv(dict):
     def has_pip(self) -> bool:
         return self._proto_runtime_env.python_runtime_env.HasField("pip_runtime_env")
 
-    def pip_packages(self) -> List:
+    def pip_config(self) -> List:
         if not self.has_pip():
-            return []
-        return list(
-            self._proto_runtime_env.python_runtime_env.pip_runtime_env.config.packages
+            return {}
+        return json.loads(
+            self._proto_runtime_env.python_runtime_env.pip_runtime_env.config
         )
 
     def get_extension(self, key) -> str:

@@ -58,7 +58,7 @@ py_test_module_list(
   tags = ["exclusive", "client_tests", "team:serverless"],
   deps = ["//:ray_lib"],
 )
-    
+
 py_test_module_list(
   files = [
     "test_client_builder.py",
@@ -237,6 +237,7 @@ py_test_module_list(
     "test_runtime_env_conda_and_pip_2.py",
     "test_runtime_env_conda_and_pip_3.py",
     "test_runtime_env_conda_and_pip_4.py",
+    "test_runtime_env_conda_and_pip_5.py",
     "test_runtime_env_complicated.py"
   ],
   size = "large",

@@ -685,7 +685,17 @@ def test_serialize_deserialize(option):
 
     proto_runtime_env = RuntimeEnv(**runtime_env, _validate=False)._proto_runtime_env
     cls_runtime_env = RuntimeEnv.from_proto(proto_runtime_env)
-    assert cls_runtime_env.to_dict() == runtime_env
+    cls_runtime_env_dict = cls_runtime_env.to_dict()
+
+    if "pip" in runtime_env:
+        pip_config_in_cls_runtime_env = cls_runtime_env_dict.pop("pip")
+        pip_config_in_runtime_env = runtime_env.pop("pip")
+        assert {
+            "packages": pip_config_in_runtime_env,
+            "pip_check": True,
+        } == pip_config_in_cls_runtime_env
+
+    assert cls_runtime_env_dict == runtime_env
 
 
 if __name__ == "__main__":

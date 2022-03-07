@@ -25,22 +25,47 @@ def _build_proto_pip_runtime_env(runtime_env_dict: dict, runtime_env: ProtoRunti
     """Construct pip runtime env protobuf from runtime env dict."""
     if runtime_env_dict.get("pip"):
         if isinstance(runtime_env_dict["pip"], dict):
-            runtime_env.python_runtime_env.pip_runtime_env.config = json.dumps(
+            runtime_env.python_runtime_env.pip_runtime_env.config.packages.extend(
+                runtime_env_dict["pip"]["packages"]
+            )
+            runtime_env.python_runtime_env.pip_runtime_env.config.pip_check = (
+                runtime_env_dict["pip"]["pip_check"]
+            )
+            if "pip_version" in runtime_env_dict["pip"]:
+                runtime_env.python_runtime_env.pip_runtime_env.config.pip_version = (
+                    runtime_env_dict["pip"]["pip_version"]
+                )
+        elif isinstance(runtime_env_dict["pip"], list):
+            runtime_env.python_runtime_env.pip_runtime_env.config.packages.extend(
                 runtime_env_dict["pip"]
             )
+            runtime_env.python_runtime_env.pip_runtime_env.config.pip_check = True
         else:
             runtime_env.python_runtime_env.pip_runtime_env.virtual_env_name = (
                 runtime_env_dict["pip"]
             )
 
 
+def _parse_proto_pip_runtime_env_config(runtime_env: ProtoRuntimeEnv):
+    pip_runtime_env_dict = {}
+    pip_runtime_env_dict["packages"] = list(
+        runtime_env.python_runtime_env.pip_runtime_env.config.packages
+    )
+    pip_runtime_env_dict[
+        "pip_check"
+    ] = runtime_env.python_runtime_env.pip_runtime_env.config.pip_check
+    if runtime_env.python_runtime_env.pip_runtime_env.config.pip_version:
+        pip_runtime_env_dict[
+            "pip_version"
+        ] = runtime_env.python_runtime_env.pip_runtime_env.config.pip_version
+    return pip_runtime_env_dict
+
+
 def _parse_proto_pip_runtime_env(runtime_env: ProtoRuntimeEnv, runtime_env_dict: dict):
     """Parse pip runtime env protobuf to runtime env dict."""
     if runtime_env.python_runtime_env.HasField("pip_runtime_env"):
         if runtime_env.python_runtime_env.pip_runtime_env.HasField("config"):
-            runtime_env_dict["pip"] = json.loads(
-                runtime_env.python_runtime_env.pip_runtime_env.config
-            )
+            runtime_env_dict["pip"] = _parse_proto_pip_runtime_env_config(runtime_env)
         else:
             runtime_env_dict[
                 "pip"
@@ -512,9 +537,7 @@ class RuntimeEnv(dict):
     def pip_config(self) -> List:
         if not self.has_pip():
             return {}
-        return json.loads(
-            self._proto_runtime_env.python_runtime_env.pip_runtime_env.config
-        )
+        return _parse_proto_pip_runtime_env_config(self._proto_runtime_env)
 
     def get_extension(self, key) -> str:
         return self._proto_runtime_env.extensions.get(key)

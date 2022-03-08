@@ -208,19 +208,19 @@ class TestValidatePip:
 
         result = parse_and_validate_pip(str(requirements_file))
         assert result["packages"] == PIP_LIST
-        assert result["pip_check"] == True
+        assert result["pip_check"]
         assert "pip_version" not in result
 
     def test_validate_pip_valid_list(self):
         result = parse_and_validate_pip(PIP_LIST)
         assert result["packages"] == PIP_LIST
-        assert result["pip_check"] == True
+        assert result["pip_check"]
         assert "pip_version" not in result
 
     def test_validate_ray(self):
         result = parse_and_validate_pip(["pkg1", "ray", "pkg2"])
         assert result["packages"] == ["pkg1", "ray", "pkg2"]
-        assert result["pip_check"] == True
+        assert result["pip_check"]
         assert "pip_version" not in result
 
     def test_replace_ray_libraries_with_dependencies(self):
@@ -230,7 +230,7 @@ class TestValidatePip:
         assert "fastapi" in result["packages"]  # from ray[serve]
         assert "pandas" in result["packages"]  # from ray[tune]
         assert not any("ray" in specifier for specifier in result)
-        assert result["pip_check"] == True
+        assert result["pip_check"]
         assert "pip_version" not in result
 
 

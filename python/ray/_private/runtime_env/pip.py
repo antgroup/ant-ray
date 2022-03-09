@@ -101,6 +101,7 @@ class PipProcessor:
         pip_env: Dict,
         logger: logging.Logger,
     ):
+        """Run the pip command to reinstall pip to the specified version."""
         if not pip_version:
             return
 
@@ -126,6 +127,9 @@ class PipProcessor:
         pip_env: Dict,
         logger: logging.Logger,
     ):
+        """Run the pip check command to check python dependency conflicts.
+        If exists conflicts, the exit code of pip check command will be non-zero.
+        """
         if not pip_check:
             logger.info("Skip pip check.")
             return

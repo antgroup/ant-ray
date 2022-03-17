@@ -22,7 +22,8 @@
 namespace ray {
 
 LocalResourceManager::LocalResourceManager(
-    scheduling::NodeID local_node_id, const NodeResources &node_resources,
+    scheduling::NodeID local_node_id,
+    const NodeResources &node_resources,
     std::function<int64_t(void)> get_used_object_store_memory,
     std::function<bool(void)> get_pull_manager_at_capacity,
     std::function<void(const NodeResources &)> resource_change_subscriber)
@@ -109,7 +110,8 @@ void LocalResourceManager::DeleteLocalResource(scheduling::ResourceID resource_i
   OnResourceChanged();
 }
 
-bool LocalResourceManager::IsAvailableResourceEmpty(scheduling::ResourceID resource_id) {
+bool LocalResourceManager::IsAvailableResourceEmpty(
+    scheduling::ResourceID resource_id) const {
   int idx = GetPredefinedResourceIndex(resource_id);
 
   if (idx != -1) {
@@ -159,7 +161,8 @@ void LocalResourceManager::InitLocalResources(const NodeResources &node_resource
       bool is_unit_instance = predefined_unit_instance_resources_.find(i) !=
                               predefined_unit_instance_resources_.end();
       InitResourceInstances(node_resources.predefined_resources[i].total,
-                            is_unit_instance, &local_resources_.predefined_resources[i]);
+                            is_unit_instance,
+                            &local_resources_.predefined_resources[i]);
     }
   }
 
@@ -168,7 +171,8 @@ void LocalResourceManager::InitLocalResources(const NodeResources &node_resource
   }
 
   for (auto it = node_resources.custom_resources.begin();
-       it != node_resources.custom_resources.end(); ++it) {
+       it != node_resources.custom_resources.end();
+       ++it) {
     if (it->second.total > 0) {
       bool is_unit_instance = custom_unit_instance_resources_.find(it->first) !=
                               custom_unit_instance_resources_.end();
@@ -195,7 +199,8 @@ std::vector<FixedPoint> LocalResourceManager::AddAvailableResourceInstances(
 }
 
 std::vector<FixedPoint> LocalResourceManager::SubtractAvailableResourceInstances(
-    std::vector<FixedPoint> available, ResourceInstanceCapacities *resource_instances,
+    std::vector<FixedPoint> available,
+    ResourceInstanceCapacities *resource_instances,
     bool allow_going_negative) const {
   RAY_CHECK(available.size() == resource_instances->available.size());
 
@@ -220,7 +225,8 @@ std::vector<FixedPoint> LocalResourceManager::SubtractAvailableResourceInstances
 }
 
 bool LocalResourceManager::AllocateResourceInstances(
-    FixedPoint demand, std::vector<FixedPoint> &available,
+    FixedPoint demand,
+    std::vector<FixedPoint> &available,
     std::vector<FixedPoint> *allocation) const {
   allocation->resize(available.size());
   FixedPoint remaining_demand = demand;
@@ -313,8 +319,8 @@ bool LocalResourceManager::AllocateTaskResourceInstances(
     if (it != local_resources_.custom_resources.end()) {
       if (task_req_custom_resource.second > 0) {
         std::vector<FixedPoint> allocation;
-        bool success = AllocateResourceInstances(task_req_custom_resource.second,
-                                                 it->second.available, &allocation);
+        bool success = AllocateResourceInstances(
+            task_req_custom_resource.second, it->second.available, &allocation);
         // Even if allocation failed we need to remember partial allocations to correctly
         // free resources.
         task_allocation->custom_resources.emplace(it->first, allocation);
@@ -353,66 +359,37 @@ void LocalResourceManager::FreeTaskResourceInstances(
   }
 }
 
-std::vector<double> LocalResourceManager::AddCPUResourceInstances(
-    std::vector<double> &cpu_instances) {
-  std::vector<FixedPoint> cpu_instances_fp =
-      VectorDoubleToVectorFixedPoint(cpu_instances);
+std::vector<double> LocalResourceManager::AddResourceInstances(
+    scheduling::ResourceID resource_id, const std::vector<double> &resource_instances) {
+  std::vector<FixedPoint> resource_instances_fp =
+      VectorDoubleToVectorFixedPoint(resource_instances);
 
-  if (cpu_instances.size() == 0) {
-    return cpu_instances;  // No overflow.
+  if (resource_instances.size() == 0) {
+    return resource_instances;  // No overflow.
   }
 
   auto overflow = AddAvailableResourceInstances(
-      cpu_instances_fp, &local_resources_.predefined_resources[CPU]);
+      resource_instances_fp, &local_resources_.GetMutable(resource_id));
   OnResourceChanged();
 
   return VectorFixedPointToVectorDouble(overflow);
 }
 
-std::vector<double> LocalResourceManager::SubtractCPUResourceInstances(
-    std::vector<double> &cpu_instances, bool allow_going_negative) {
-  std::vector<FixedPoint> cpu_instances_fp =
-      VectorDoubleToVectorFixedPoint(cpu_instances);
+std::vector<double> LocalResourceManager::SubtractResourceInstances(
+    scheduling::ResourceID resource_id,
+    const std::vector<double> &resource_instances,
+    bool allow_going_negative) {
+  std::vector<FixedPoint> resource_instances_fp =
+      VectorDoubleToVectorFixedPoint(resource_instances);
 
-  if (cpu_instances.size() == 0) {
-    return cpu_instances;  // No underflow.
+  if (resource_instances.size() == 0) {
+    return resource_instances;  // No underflow.
   }
 
-  auto underflow = SubtractAvailableResourceInstances(
-      cpu_instances_fp, &local_resources_.predefined_resources[CPU],
-      allow_going_negative);
-  OnResourceChanged();
-
-  return VectorFixedPointToVectorDouble(underflow);
-}
-
-std::vector<double> LocalResourceManager::AddGPUResourceInstances(
-    std::vector<double> &gpu_instances) {
-  std::vector<FixedPoint> gpu_instances_fp =
-      VectorDoubleToVectorFixedPoint(gpu_instances);
-
-  if (gpu_instances.size() == 0) {
-    return gpu_instances;  // No overflow.
-  }
-
-  auto overflow = AddAvailableResourceInstances(
-      gpu_instances_fp, &local_resources_.predefined_resources[GPU]);
-  OnResourceChanged();
-
-  return VectorFixedPointToVectorDouble(overflow);
-}
-
-std::vector<double> LocalResourceManager::SubtractGPUResourceInstances(
-    std::vector<double> &gpu_instances) {
-  std::vector<FixedPoint> gpu_instances_fp =
-      VectorDoubleToVectorFixedPoint(gpu_instances);
-
-  if (gpu_instances.size() == 0) {
-    return gpu_instances;  // No underflow.
-  }
-
-  auto underflow = SubtractAvailableResourceInstances(
-      gpu_instances_fp, &local_resources_.predefined_resources[GPU]);
+  auto underflow =
+      SubtractAvailableResourceInstances(resource_instances_fp,
+                                         &local_resources_.GetMutable(resource_id),
+                                         allow_going_negative);
   OnResourceChanged();
 
   return VectorFixedPointToVectorDouble(underflow);
@@ -467,8 +444,8 @@ NodeResources ToNodeResources(const NodeResourceInstances &instance) {
     int64_t resource_name = custom_resource.first;
     auto &instances = custom_resource.second;
 
-    FixedPoint available = std::accumulate(instances.available.begin(),
-                                           instances.available.end(), FixedPoint());
+    FixedPoint available = std::accumulate(
+        instances.available.begin(), instances.available.end(), FixedPoint());
     FixedPoint total =
         std::accumulate(instances.total.begin(), instances.total.end(), FixedPoint());
 
@@ -644,7 +621,7 @@ void LocalResourceManager::ResetLastReportResourceUsage(
                                  replacement.GetAvailableResources().GetResourceMap()));
 }
 
-bool LocalResourceManager::ResourcesExist(scheduling::ResourceID resource_id) {
+bool LocalResourceManager::ResourcesExist(scheduling::ResourceID resource_id) const {
   int idx = GetPredefinedResourceIndex(resource_id);
   if (idx != -1) {
     // Return true directly for predefined resources as we always initialize this kind of

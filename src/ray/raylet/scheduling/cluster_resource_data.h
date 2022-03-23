@@ -251,7 +251,7 @@ class TaskResourceInstances {
   /// check fail will occur.
   const std::vector<FixedPoint> &Get(const ResourceID resource_id) const {
     auto it = custom_resources_.find(resource_id);
-    RAY_CHECK(it != custom_resources_.end() << "Resource ID not found " << resource_id;
+    RAY_CHECK(it != custom_resources_.end()) << "Resource ID not found " << resource_id;
     return it->second;
   }
 
@@ -278,7 +278,7 @@ class TaskResourceInstances {
   /// TODO(hchen): We should hide this method, and encapsulate all mutation operations.
   std::vector<FixedPoint> &GetMutable(const ResourceID resource_id) {
     auto it = custom_resources_.find(resource_id);
-    RAY_CHECK(it != custom_resources_.end() << "Resource ID not found " << resource_id;
+    RAY_CHECK(it != custom_resources_.end()) << "Resource ID not found " << resource_id;
     return it->second;
   }
 
@@ -317,10 +317,10 @@ class TaskResourceInstances {
   }
 
   /// Remove a particular resource.
-  void Remove(ResourceID resource_id) { custom_resources_.erase(resource_id.ToInt()); }
+  void Remove(ResourceID resource_id) { custom_resources_.erase(resource_id); }
 
   /// Return a set of all resource ids.
-  boost::select_first_range<absl::flat_hash_map<int64_t, std::vector<FixedPoint>>>
+  boost::select_first_range<absl::flat_hash_map<ResourceID, std::vector<FixedPoint>>>
   ResourceIds() const {
     return boost::adaptors::keys(custom_resources_);
   }
@@ -397,8 +397,7 @@ class TaskResourceInstances {
 
  private:
   /// The custom resources.
-  absl::flat_hash_map<int64_t, std::vector<FixedPoint>> std::vector<FixedPoint> >
-      custom_resources_;
+  absl::flat_hash_map<ResourceID, std::vector<FixedPoint>> custom_resources_;
 };
 
 /// Total and available capacities of each resource of a node.

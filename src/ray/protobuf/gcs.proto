@@ -279,8 +279,37 @@ message JobConfig {
 }
 
 message JobTableData {
+
+  // The job state transition is as following:
+  //
+  //                              (2)MarkFailed
+  //                     |--------------------------> FAILED
+  //                     |
+  //  (1)ray.init()      |              (3)MarkFinished/KillJob                      
+  // -----------------> RUNNING --------------------------------------------> FINISHED
+  //                     |                                                        ^
+  //                     |                                                        |
+  //                     |  (4)MarkDriverExited                     (5)KillJob    |
+  //                     |------------------------> DRIVER_EXITED -----------------
+  //
+  //  (1) When a driver starts with `ray.init()`, the state should be `RUNNING`.
+  //  (2) The `MarkFailed` RPC should trans the state to `FAILED``.
+  // .(3) The `MarkFinished` RPC from driver/raylet and the `KillJob` RPC from dashboard
+  //      should trans the state from `RUNNING` to `FINISHED`.
+  //  (4) The `MarkDriverExited` RPC should mark the state to `DRIVER_EXITED`.
+  //  (5) The `KillJob` RPC from other componenents should change the state from
+  //      `DRIVER_EXITED` to `FINISHED` as well.
+  enum JobState {
+    NONE = 0;
+    RUNNING = 1;
+    DRIVER_EXITED = 2;
+    FAILED = 3;
+    FINISHED = 4;
+  }
+
   // The job ID.
   bytes job_id = 1;
+  // TODO(qwang): `is_dead` should be removed.
   // Whether it's dead.
   bool is_dead = 2;
   // The UNIX timestamp corresponding to this event (job added or removed).
@@ -295,6 +324,9 @@ message JobTableData {
   uint64 start_time = 7;
   // The timestamp the job was ended at.
   uint64 end_time = 8;
+  // The current state of the job.
+  JobState state = 9;
+  
 }
 
 message WorkerTableData {

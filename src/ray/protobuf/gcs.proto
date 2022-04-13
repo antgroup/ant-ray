@@ -282,23 +282,29 @@ message JobTableData {
 
   // The job state transition is as following:
   //
-  //                              (2)MarkFailed
-  //                     |--------------------------> FAILED
-  //                     |
-  //  (1)ray.init()      |              (3)MarkFinished/KillJob                      
-  // -----------------> RUNNING --------------------------------------------> FINISHED
-  //                     |                                                        ^
-  //                     |                                                        |
-  //                     |  (4)MarkDriverExited                     (5)KillJob    |
-  //                     |------------------------> DRIVER_EXITED -----------------
+  //                                                     (2) MarkFailed
+  //                     |-----------------------------------------------------------------------------> FAILED
+  //                     |                                                                                 ^
+  //  (1) ray.init()     |              (3) MarkFinished/KillJob                                           |
+  // -----------------> RUNNING -----------------------------------------------> FINISHED                  |
+  //                     |                                                          ^                      |
+  //                     |                                                          |                      |
+  //                     |  (4) MarkDriverExited                     (5) KillJob    |                      |
+  //                     |------------------------> DRIVER_EXITED -------------------                      |
+  //                                                       |                                               |
+  //                                                       |         (6) detached actor gets dead          |
+  //                                                       -------------------------------------------------
   //
   //  (1) When a driver starts with `ray.init()`, the state should be `RUNNING`.
   //  (2) The `MarkFailed` RPC should trans the state to `FAILED``.
-  // .(3) The `MarkFinished` RPC from driver/raylet and the `KillJob` RPC from dashboard
+  //  (3) The `MarkFinished` RPC from driver/raylet and the `KillJob` RPC from dashboard
   //      should trans the state from `RUNNING` to `FINISHED`.
   //  (4) The `MarkDriverExited` RPC should mark the state to `DRIVER_EXITED`.
   //  (5) The `KillJob` RPC from other componenents should change the state from
-  //      `DRIVER_EXITED` to `FINISHED` as well.
+  //      `DRIVER_EXITED` to `FINISHED` as well. Or if there is no detached actor, it should
+  //      be changed to FINISHED.
+  //  (6) Once a detached actor gets dead, `DRIVER_EXITED` should be changed to `FAILED`.
+  //
   enum JobState {
     NONE = 0;
     RUNNING = 1;

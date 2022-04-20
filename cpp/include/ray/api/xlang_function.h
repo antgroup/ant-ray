@@ -45,6 +45,15 @@ struct PyActorMethod {
   std::string function_name;
 };
 
+template <typename R>
+struct JavaFunction {
+  bool is_java() { return true; }
+  R operator()() { return {}; }
+
+  std::string class_name;
+  std::string function_name;
+};
+
 namespace internal {
 
 enum class LangType {

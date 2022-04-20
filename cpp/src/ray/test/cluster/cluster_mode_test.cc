@@ -218,6 +218,13 @@ TEST(RayClusterModeTest, FullTest) {
   EXPECT_FALSE(Counter::IsProcessAlive(pid));
 }
 
+TEST(RayClusterModeTest, JavaInvocationTest) {
+  auto java_obj =
+      ray::Task(ray::JavaFunction<std::string>{"HelloWorldTest", "hello"})
+          .Remote();
+  EXPECT_EQ("hello", *java_obj.Get()); 
+}
+
 TEST(RayClusterModeTest, PythonInvocationTest) {
   auto py_actor_handle =
       ray::Actor(ray::PyActorClass{"test_cross_language_invocation", "Counter"})

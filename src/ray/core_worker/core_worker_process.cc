@@ -111,6 +111,7 @@ CoreWorkerProcessImpl::CoreWorkerProcessImpl(const CoreWorkerOptions &options)
         << "install_failure_signal_handler must be false because ray log is disabled.";
   }
 
+  RAY_LOG(INFO)<<"num_workers="<<options.num_workers;
   RAY_CHECK(options_.num_workers > 0);
   if (options_.worker_type == WorkerType::DRIVER) {
     // Driver process can only contain one worker.

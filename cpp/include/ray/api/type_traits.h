@@ -61,5 +61,15 @@ struct is_python_t<T, std::void_t<decltype(std::declval<T>().is_python())>>
 template <typename T>
 auto constexpr is_python_v = is_python_t<T>::value;
 
+template <class, class = void>
+struct is_java_t : std::false_type {};
+
+template <class T>
+struct is_java_t<T, std::void_t<decltype(std::declval<T>().is_java())>>
+    : std::true_type {};
+
+template <typename T>
+auto constexpr is_java_v = is_java_t<T>::value;
+
 }  // namespace internal
 }  // namespace ray

@@ -97,6 +97,9 @@ ray::internal::TaskCaller<F> Task(F func);
 template <typename R>
 ray::internal::TaskCaller<PyFunction<R>> Task(PyFunction<R> func);
 
+template <typename R>
+ray::internal::TaskCaller<JavaFunction<R>> Task(JavaFunction<R> func);
+
 /// Generic version of creating an actor
 /// It is used for creating an actor, such as: ActorCreator<Counter> creator =
 /// ray::Actor(Counter::FactoryCreate<int>).Remote(1);
@@ -230,10 +233,17 @@ inline ray::internal::TaskCaller<PyFunction<R>> Task(PyFunction<R> func) {
   return {ray::internal::GetRayRuntime().get(), std::move(remote_func_holder)};
 }
 
+template <typename R>
+inline ray::internal::TaskCaller<JavaFunction<R>> Task(JavaFunction<R> func) {
+  ray::internal::RemoteFunctionHolder remote_func_holder(
+      "", func.function_name, func.class_name, ray::internal::LangType::JAVA);
+  return {ray::internal::GetRayRuntime().get(), std::move(remote_func_holder)};
+}
+
 /// Normal task.
 template <typename F>
 inline ray::internal::TaskCaller<F> Task(F func) {
-  static_assert(!ray::internal::is_python_v<F>, "Must be a cpp function.");
+  static_assert(!ray::internal::is_python_v<F>&&!ray::internal::is_java_v<F>, "Must be a cpp function.");
   static_assert(!std::is_member_function_pointer_v<F>,
                 "Incompatible type: member function cannot be called with ray::Task.");
   ray::internal::RemoteFunctionHolder remote_func_holder(std::move(func));

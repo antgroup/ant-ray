@@ -74,7 +74,7 @@ ObjectRef<boost::callable_traits::return_type_t<F>> TaskCaller<F>::Remote(
     Args &&...args) {
   CheckTaskOptions(task_options_.resources);
 
-  if constexpr (is_python_v<F>) {
+  if constexpr (is_python_v<F> || is_java_v<F>) {
     using ArgsTuple = std::tuple<Args...>;
     Arguments::WrapArgs<ArgsTuple>(/*cross_lang=*/true,
                                    &args_,

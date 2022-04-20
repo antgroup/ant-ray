@@ -28,6 +28,7 @@
 #include "ray/core_worker/future_resolver.h"
 #include "ray/core_worker/gcs_server_address_updater.h"
 #include "ray/core_worker/lease_policy.h"
+#include "ray/core_worker/object_barrier.h"
 #include "ray/core_worker/object_recovery_manager.h"
 #include "ray/core_worker/profiling.h"
 #include "ray/core_worker/reference_count.h"
@@ -1050,6 +1051,8 @@ class CoreWorker : public rpc::CoreWorkerServiceHandler {
 
   Status WaitForActorRegistered(const std::vector<ObjectID> &ids);
 
+  Status WaitForObjectOwnerReply(const ObjectID &object_id);
+
   /// Shared state of the worker. Includes process-level and thread-level state.
   /// TODO(edoakes): we should move process-level state into this class and make
   /// this a ThreadContext.
@@ -1126,6 +1129,9 @@ class CoreWorker : public rpc::CoreWorkerServiceHandler {
 
   // A class for actor creation.
   std::shared_ptr<ActorCreatorInterface> actor_creator_;
+
+  // A Object Barrier for Async Wait Object Request.
+  std::shared_ptr<ObjectBarrier> object_barrier_;
 
   // Interface to submit tasks directly to other actors.
   std::shared_ptr<CoreWorkerDirectActorTaskSubmitter> direct_actor_submitter_;

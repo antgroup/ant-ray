@@ -366,6 +366,8 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
 
   actor_creator_ = std::make_shared<DefaultActorCreator>(gcs_client_);
 
+  object_barrier_ = std::make_shared<ObjectBarrier>();
+
   direct_actor_submitter_ = std::shared_ptr<CoreWorkerDirectActorTaskSubmitter>(
       new CoreWorkerDirectActorTaskSubmitter(*core_worker_client_pool_,
                                              *memory_store_,
@@ -850,6 +852,17 @@ void CoreWorker::GetOwnershipInfo(const ObjectID &object_id,
     }
   }
   *serialized_object_status = object_status.SerializeAsString();
+
+  // If the owner of this object is current worker, just skip wait the reply
+  // from owner, there are two reason why core_worker need to wait the owner
+  // reply in here:
+  //     1. For multiple-language (python, java, c++ worker etc).
+  //     2. Barrier should be called as late as possible.
+  if (owner_address->worker_id() == rpc_address_.worker_id()) return;
+  if (!WaitForObjectOwnerReply(object_id).ok()) {
+    RAY_LOG(WARNING) << "The owner of object(" << object_id << ") reply failed!";
+  }
+  RAY_LOG(INFO) << "Finish wait object: " << object_id;
 }
 
 void CoreWorker::RegisterOwnershipInfoAndResolveFuture(
@@ -977,40 +990,61 @@ Status CoreWorker::CreateOwnedAndIncrementLocalRef(
                                               real_owner_address,
                                               /*foreign_owner_already_monitoring=*/true));
 
-    // Remote call `AssignObjectOwner()`.
-    rpc::AssignObjectOwnerRequest request;
-    request.set_object_id(object_id->Binary());
-    request.mutable_borrower_address()->CopyFrom(rpc_address_);
-    request.set_call_site(CurrentCallSite());
+    ObjectID object_id_copy = ObjectID::FromBinary(object_id->Binary());
+    io_service_.post(
+        [this,
+         object_id_copy,
+         contained_object_ids,
+         data_size,
+         metadata,
+         real_owner_address]() {
+          // Remote call `AssignObjectOwner()`.
+          rpc::AssignObjectOwnerRequest request;
+          request.set_object_id(object_id_copy.Binary());
+          request.mutable_borrower_address()->CopyFrom(rpc_address_);
+          request.set_call_site(CurrentCallSite());
+          for (auto &contained_object_id : contained_object_ids) {
+            request.add_contained_object_ids(contained_object_id.Binary());
+          }
+          request.set_object_size(data_size + metadata->Size());
+          auto conn = core_worker_client_pool_->GetOrConnect(real_owner_address);
 
-    for (auto &contained_object_id : contained_object_ids) {
-      request.add_contained_object_ids(contained_object_id.Binary());
-    }
-    request.set_object_size(data_size + metadata->Size());
-    auto conn = core_worker_client_pool_->GetOrConnect(real_owner_address);
-    std::promise<Status> status_promise;
-    conn->AssignObjectOwner(request,
-                            [&status_promise](const Status &returned_status,
-                                              const rpc::AssignObjectOwnerReply &reply) {
-                              status_promise.set_value(returned_status);
-                            });
-    // Block until the remote call `AssignObjectOwner` returns.
-    status = status_promise.get_future().get();
+          RAY_LOG(INFO) << "wait object(" << object_id_copy << ") for 20 seconds";
+          std::this_thread::sleep_for(std::chrono::seconds(20));
+          RAY_LOG(INFO) << "finish for wait object(" << object_id_copy
+                        << ") for 20 seconds";
+
+          object_barrier_->AddReplyCallback(object_id_copy,
+                                            [this, object_id_copy](const Status &status) {
+                                              if (status.ok()) return;
+                                              RemoveLocalReference(object_id_copy);
+                                            });
+          conn->AssignObjectOwner(
+              request,
+              [this, object_id_copy](const Status &returned_status,
+                                     const rpc::AssignObjectOwnerReply &reply) {
+                RAY_LOG(INFO) << "hejialing test";
+                RAY_LOG(INFO) << "hejialing test: " << object_id_copy;
+                object_barrier_->RunAllReplyCallback(object_id_copy, returned_status);
+              });
+        },
+        "CoreWorker.AssignObjectOwner");
   }
 
   if (options_.is_local_mode && owned_by_us && inline_small_object) {
     *data = std::make_shared<LocalMemoryBuffer>(data_size);
   } else {
-    if (status.ok()) {
-      status = plasma_store_provider_->Create(metadata,
-                                              data_size,
-                                              *object_id,
-                                              /* owner_address = */ rpc_address_,
-                                              data,
-                                              created_by_worker);
-    }
+    status = plasma_store_provider_->Create(metadata,
+                                            data_size,
+                                            *object_id,
+                                            /* owner_address = */ rpc_address_,
+                                            data,
+                                            created_by_worker);
     if (!status.ok()) {
       RemoveLocalReference(*object_id);
+      io_service_.post(
+          [this, object_id]() { object_barrier_->ClearReplyCallback(*object_id); },
+          "CoreWorker.ClearReplyCallbackForCreateFailed");
       return status;
     } else if (*data == nullptr) {
       // Object already exists in plasma. Store the in-memory value so that the
@@ -3449,6 +3483,19 @@ Status CoreWorker::WaitForActorRegistered(const std::vector<ObjectID> &ids) {
     }
   }
   return Status::OK();
+}
+
+Status CoreWorker::WaitForObjectOwnerReply(const ObjectID &object_id) {
+  std::promise<Status> promise;
+
+  io_service_.post(
+      [&object_id, &promise, &is_replying, this]() {
+        bool is_replying = object_barrier_->AsyncWaitForReplyFinish(
+            object_id, [&promise](const Status &status) { promise.set_value(status); });
+        if (!is_replying) promise.set_value(Status::OK());
+      },
+      "CoreWorker.WaitForObjectOwnerReply");
+  return promise.get_future().get();
 }
 
 std::vector<ObjectID> CoreWorker::GetCurrentReturnIds(int num_returns,

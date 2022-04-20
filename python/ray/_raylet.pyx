@@ -1930,6 +1930,8 @@ cdef class CoreWorker:
         # We need to release the gil since object destruction may call the
         # unhandled exception handler.
         with nogil:
+            CCoreWorkerProcess.GetCoreWorker().SendObjectAssignOwnerRequest(
+                c_object_id)
             CCoreWorkerProcess.GetCoreWorker().RemoveLocalReference(
                 c_object_id)
 

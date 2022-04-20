@@ -17,6 +17,7 @@
 #include <google/protobuf/util/json_util.h>
 
 #include "boost/fiber/all.hpp"
+#include "boost/range/combine.hpp"
 #include "ray/common/bundle_spec.h"
 #include "ray/common/ray_config.h"
 #include "ray/common/runtime_env_common.h"
@@ -365,6 +366,8 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
   };
 
   actor_creator_ = std::make_shared<DefaultActorCreator>(gcs_client_);
+
+  object_barrier_ = std::make_shared<ObjectBarrier>(core_worker_client_pool_);
 
   direct_actor_submitter_ = std::shared_ptr<CoreWorkerDirectActorTaskSubmitter>(
       new CoreWorkerDirectActorTaskSubmitter(*core_worker_client_pool_,
@@ -850,6 +853,17 @@ void CoreWorker::GetOwnershipInfo(const ObjectID &object_id,
     }
   }
   *serialized_object_status = object_status.SerializeAsString();
+
+  // If the owner of this object is current worker, just skip wait the reply
+  // from owner, there are two reason why core_worker need to wait the owner
+  // reply in here:
+  //     1. For multiple-language (python, java, c++ worker etc).
+  //     2. Barrier should be called as late as possible.
+  if (owner_address->worker_id() == rpc_address_.worker_id()) return;
+  if (!WaitForObjectOwnerReply(object_id, *owner_address).ok()) {
+    RAY_LOG(WARNING) << "The owner of object(" << object_id << ") reply failed!";
+  }
+  RAY_LOG(INFO) << "Finish wait object: " << object_id;
 }
 
 void CoreWorker::RegisterOwnershipInfoAndResolveFuture(
@@ -965,7 +979,7 @@ Status CoreWorker::CreateOwnedAndIncrementLocalRef(
                                        /*add_local_ref=*/true,
                                        NodeID::FromBinary(rpc_address_.raylet_id()));
   } else {
-    // Because in the remote worker's `HandleAssignObjectOwner`,
+    // Because in the remote worker's `HandleBatchAssignObjectOwner`,
     // a `WaitForRefRemoved` RPC request will be sent back to
     // the current worker. So we need to make sure ref count is > 0
     // by invoking `AddLocalReference` first. Note that in worker.py we set
@@ -977,40 +991,45 @@ Status CoreWorker::CreateOwnedAndIncrementLocalRef(
                                               real_owner_address,
                                               /*foreign_owner_already_monitoring=*/true));
 
-    // Remote call `AssignObjectOwner()`.
-    rpc::AssignObjectOwnerRequest request;
-    request.set_object_id(object_id->Binary());
-    request.mutable_borrower_address()->CopyFrom(rpc_address_);
-    request.set_call_site(CurrentCallSite());
-
-    for (auto &contained_object_id : contained_object_ids) {
-      request.add_contained_object_ids(contained_object_id.Binary());
-    }
-    request.set_object_size(data_size + metadata->Size());
-    auto conn = core_worker_client_pool_->GetOrConnect(real_owner_address);
-    std::promise<Status> status_promise;
-    conn->AssignObjectOwner(request,
-                            [&status_promise](const Status &returned_status,
-                                              const rpc::AssignObjectOwnerReply &reply) {
-                              status_promise.set_value(returned_status);
-                            });
-    // Block until the remote call `AssignObjectOwner` returns.
-    status = status_promise.get_future().get();
+    ObjectID object_id_copy = ObjectID::FromBinary(object_id->Binary());
+    io_service_.post(
+        [this,
+         object_id_copy,
+         contained_object_ids,
+         data_size,
+         metadata,
+         real_owner_address]() {
+          object_barrier_->PendingAssignOwnerRequest(
+              object_id_copy,
+              real_owner_address,
+              rpc_address_,
+              contained_object_ids,
+              CurrentCallSite(),
+              data_size + metadata->Size(),
+              [this, object_id_copy](const Status &status) {
+                RAY_LOG(INFO) << "In finish reply object_id: " << object_id_copy
+                              << ", status: " << status.ok();
+                if (status.ok()) return;
+                RemoveLocalReference(object_id_copy);
+              });
+        },
+        "CoreWorker.BatchAssignObjectOwner");
   }
 
   if (options_.is_local_mode && owned_by_us && inline_small_object) {
     *data = std::make_shared<LocalMemoryBuffer>(data_size);
   } else {
-    if (status.ok()) {
-      status = plasma_store_provider_->Create(metadata,
-                                              data_size,
-                                              *object_id,
-                                              /* owner_address = */ rpc_address_,
-                                              data,
-                                              created_by_worker);
-    }
+    status = plasma_store_provider_->Create(metadata,
+                                            data_size,
+                                            *object_id,
+                                            /* owner_address = */ rpc_address_,
+                                            data,
+                                            created_by_worker);
     if (!status.ok()) {
       RemoveLocalReference(*object_id);
+      io_service_.post(
+          [this, object_id]() { object_barrier_->ClearReplyCallback(*object_id); },
+          "CoreWorker.ClearReplyCallbackForCreateFailed");
       return status;
     } else if (*data == nullptr) {
       // Object already exists in plasma. Store the in-memory value so that the
@@ -1058,18 +1077,32 @@ Status CoreWorker::SealExisting(const ObjectID &object_id,
   RAY_RETURN_NOT_OK(plasma_store_provider_->Seal(object_id));
   if (pin_object) {
     // Tell the raylet to pin the object **after** it is created.
-    RAY_LOG(DEBUG) << "Pinning sealed object " << object_id;
-    local_raylet_client_->PinObjectIDs(
-        owner_address != nullptr ? *owner_address : rpc_address_,
-        {object_id},
-        [this, object_id](const Status &status, const rpc::PinObjectIDsReply &reply) {
-          // Only release the object once the raylet has responded to avoid the race
-          // condition that the object could be evicted before the raylet pins it.
-          if (!plasma_store_provider_->Release(object_id).ok()) {
-            RAY_LOG(ERROR) << "Failed to release ObjectID (" << object_id
-                           << "), might cause a leak in plasma.";
-          }
-        });
+    rpc::Address real_owner_address =
+        owner_address != nullptr ? *owner_address : rpc_address_;
+    io_service_.post(
+        [this, object_id, real_owner_address]() {
+          auto callback = [this, object_id, real_owner_address](const Status &status) {
+            RAY_CHECK(status.ok());
+            RAY_LOG(DEBUG) << "Pinning sealed object " << object_id;
+            local_raylet_client_->PinObjectIDs(
+                real_owner_address,
+                {object_id},
+                [this, object_id](const Status &status,
+                                  const rpc::PinObjectIDsReply &reply) {
+                  // Only release the object once the raylet has responded to avoid the
+                  // race condition that the object could be evicted before the raylet
+                  // pins it.
+                  if (!plasma_store_provider_->Release(object_id).ok()) {
+                    RAY_LOG(ERROR) << "Failed to release ObjectID (" << object_id
+                                   << "), might cause a leak in plasma.";
+                  }
+                });
+          };
+          bool is_replying =
+              object_barrier_->AsyncWaitForReplyFinish(object_id, callback);
+          if (!is_replying) callback(Status::OK());
+        },
+        "CoreWorker.PinObjectIDs");
   } else {
     RAY_RETURN_NOT_OK(plasma_store_provider_->Release(object_id));
     reference_counter_->FreePlasmaObjects({object_id});
@@ -3256,29 +3289,44 @@ void CoreWorker::HandleExit(const rpc::ExitRequest &request,
       [this]() { Exit(rpc::WorkerExitType::INTENDED_EXIT); });
 }
 
-void CoreWorker::HandleAssignObjectOwner(const rpc::AssignObjectOwnerRequest &request,
-                                         rpc::AssignObjectOwnerReply *reply,
-                                         rpc::SendReplyCallback send_reply_callback) {
-  ObjectID object_id = ObjectID::FromBinary(request.object_id());
+void CoreWorker::HandleBatchAssignObjectOwner(
+    const rpc::BatchAssignObjectOwnerRequest &request,
+    rpc::BatchAssignObjectOwnerReply *reply,
+    rpc::SendReplyCallback send_reply_callback) {
   const auto &borrower_address = request.borrower_address();
   std::string call_site = request.call_site();
+  NodeID borrower_node_id = NodeID::FromBinary(borrower_address.raylet_id());
   // Get a list of contained object ids.
-  std::vector<ObjectID> contained_object_ids;
-  contained_object_ids.reserve(request.contained_object_ids_size());
-  for (const auto &id_binary : request.contained_object_ids()) {
-    contained_object_ids.push_back(ObjectID::FromBinary(id_binary));
+  std::vector<ObjectID> total_contained_object_ids;
+  total_contained_object_ids.reserve(request.total_contained_object_ids_size());
+  for (const auto &id_binary : request.total_contained_object_ids()) {
+    total_contained_object_ids.push_back(ObjectID::FromBinary(id_binary));
   }
-  reference_counter_->AddOwnedObject(
-      object_id,
-      contained_object_ids,
-      rpc_address_,
-      call_site,
-      request.object_size(),
-      /*is_reconstructable=*/false,
-      /*add_local_ref=*/false,
-      /*pinned_at_raylet_id=*/NodeID::FromBinary(borrower_address.raylet_id()));
-  reference_counter_->AddBorrowerAddress(object_id, borrower_address);
-  RAY_CHECK(memory_store_->Put(RayObject(rpc::ErrorType::OBJECT_IN_PLASMA), object_id));
+  auto it = total_contained_object_ids.begin();
+  for (auto [object_id_binary, contained_object_number, object_size] :
+       boost::combine(request.batch_object_ids(),
+                      request.contained_object_numbers(),
+                      request.batch_object_sizes())) {
+    ObjectID object_id = ObjectID::FromBinary(object_id_binary);
+    std::vector<ObjectID> contained_object_ids(0);
+    if (it != total_contained_object_ids.end()) {
+      contained_object_ids.insert(
+          contained_object_ids.begin(), it, it + contained_object_number);
+      it += contained_object_number;
+    } else {
+      RAY_CHECK(contained_object_number == 0);
+    }
+    reference_counter_->AddOwnedObject(object_id,
+                                       contained_object_ids,
+                                       rpc_address_,
+                                       call_site,
+                                       object_size,
+                                       /*is_reconstructable=*/false,
+                                       /*add_local_ref=*/false,
+                                       /*pinned_at_raylet_id=*/borrower_node_id);
+    reference_counter_->AddBorrowerAddress(object_id, borrower_address);
+    RAY_CHECK(memory_store_->Put(RayObject(rpc::ErrorType::OBJECT_IN_PLASMA), object_id));
+  }
   send_reply_callback(Status::OK(), nullptr, nullptr);
 }
 
@@ -3449,6 +3497,41 @@ Status CoreWorker::WaitForActorRegistered(const std::vector<ObjectID> &ids) {
     }
   }
   return Status::OK();
+}
+
+Status CoreWorker::WaitForObjectOwnerReply(const ObjectID &object_id,
+                                           const rpc::Address &owner_address) {
+  std::promise<Status> promise;
+  io_service_.post(
+      [&object_id, &promise, &owner_address, this]() {
+        if (object_barrier_->IsPendingAssignOwnerRequest(object_id, owner_address))
+          object_barrier_->BatchAssignObjectOwner(owner_address);
+        bool is_replying = object_barrier_->AsyncWaitForReplyFinish(
+            object_id, [&promise](const Status &status) { promise.set_value(status); });
+        if (!is_replying) promise.set_value(Status::OK());
+      },
+      "CoreWorker.WaitForObjectOwnerReply");
+  return promise.get_future().get();
+}
+
+void CoreWorker::SendObjectAssignOwnerRequest(const ObjectID &object_id) {
+  if (object_id == ObjectID::Nil()) return;
+  rpc::Address owner_address;
+  auto has_owner = reference_counter_->GetOwner(object_id, &owner_address);
+  RAY_CHECK(has_owner)
+      << "Object IDs generated randomly (ObjectID.from_random()) or out-of-band "
+         "(ObjectID.from_binary(...)) cannot be serialized because Ray does not know "
+         "which task will create them. "
+         "If this was not how your object ID was generated, please file an issue "
+         "at https://github.com/ray-project/ray/issues/: "
+      << object_id;
+
+  io_service_.post(
+      [this, object_id, owner_address]() {
+        if (object_barrier_->IsPendingAssignOwnerRequest(object_id, owner_address))
+          object_barrier_->BatchAssignObjectOwner(owner_address);
+      },
+      "CoreWorker.SendObjectAssignOwnerRequest");
 }
 
 std::vector<ObjectID> CoreWorker::GetCurrentReturnIds(int num_returns,

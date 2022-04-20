@@ -28,6 +28,7 @@
 #include "ray/core_worker/future_resolver.h"
 #include "ray/core_worker/gcs_server_address_updater.h"
 #include "ray/core_worker/lease_policy.h"
+#include "ray/core_worker/object_barrier.h"
 #include "ray/core_worker/object_recovery_manager.h"
 #include "ray/core_worker/profiling.h"
 #include "ray/core_worker/reference_count.h"
@@ -771,9 +772,9 @@ class CoreWorker : public rpc::CoreWorkerServiceHandler {
 
   // Set local worker as the owner of object.
   // Request by borrower's worker, execute by owner's worker.
-  void HandleAssignObjectOwner(const rpc::AssignObjectOwnerRequest &request,
-                               rpc::AssignObjectOwnerReply *reply,
-                               rpc::SendReplyCallback send_reply_callback) override;
+  void HandleBatchAssignObjectOwner(const rpc::BatchAssignObjectOwnerRequest &request,
+                                    rpc::BatchAssignObjectOwnerReply *reply,
+                                    rpc::SendReplyCallback send_reply_callback) override;
 
   ///
   /// Public methods related to async actor call. This should only be used when
@@ -808,6 +809,8 @@ class CoreWorker : public rpc::CoreWorkerServiceHandler {
   /// num_executing, num_executed). It is a std map instead of absl due to its
   /// interface with language bindings.
   std::unordered_map<std::string, std::vector<uint64_t>> GetActorCallStats() const;
+
+  void SendObjectAssignOwnerRequest(const ObjectID &object_id);
 
  private:
   static rpc::RuntimeEnv OverrideRuntimeEnv(
@@ -1050,6 +1053,9 @@ class CoreWorker : public rpc::CoreWorkerServiceHandler {
 
   Status WaitForActorRegistered(const std::vector<ObjectID> &ids);
 
+  Status WaitForObjectOwnerReply(const ObjectID &object_id,
+                                 const rpc::Address &owner_address);
+
   /// Shared state of the worker. Includes process-level and thread-level state.
   /// TODO(edoakes): we should move process-level state into this class and make
   /// this a ThreadContext.
@@ -1126,6 +1132,9 @@ class CoreWorker : public rpc::CoreWorkerServiceHandler {
 
   // A class for actor creation.
   std::shared_ptr<ActorCreatorInterface> actor_creator_;
+
+  // A Object Barrier for Async Wait Object Request.
+  std::shared_ptr<ObjectBarrier> object_barrier_;
 
   // Interface to submit tasks directly to other actors.
   std::shared_ptr<CoreWorkerDirectActorTaskSubmitter> direct_actor_submitter_;

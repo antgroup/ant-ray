@@ -1014,11 +1014,13 @@ Status CoreWorker::CreateOwnedAndIncrementLocalRef(
           RAY_LOG(INFO) << "finish for wait object(" << object_id_copy
                         << ") for 20 seconds";
 
-          object_barrier_->AddReplyCallback(object_id_copy,
-                                            [this, object_id_copy](const Status &status) {
-                                              if (status.ok()) return;
-                                              RemoveLocalReference(object_id_copy);
-                                            });
+          object_barrier_->AddReplyCallback(
+              object_id_copy, [this, object_id_copy](const Status &status) {
+                RAY_LOG(INFO) << "In finish reply object_id: " << object_id_copy
+                              << ", status: " << status.ok();
+                if (status.ok()) return;
+                RemoveLocalReference(object_id_copy);
+              });
           conn->AssignObjectOwner(
               request,
               [this, object_id_copy](const Status &returned_status,
@@ -1092,18 +1094,32 @@ Status CoreWorker::SealExisting(const ObjectID &object_id,
   RAY_RETURN_NOT_OK(plasma_store_provider_->Seal(object_id));
   if (pin_object) {
     // Tell the raylet to pin the object **after** it is created.
-    RAY_LOG(DEBUG) << "Pinning sealed object " << object_id;
-    local_raylet_client_->PinObjectIDs(
-        owner_address != nullptr ? *owner_address : rpc_address_,
-        {object_id},
-        [this, object_id](const Status &status, const rpc::PinObjectIDsReply &reply) {
-          // Only release the object once the raylet has responded to avoid the race
-          // condition that the object could be evicted before the raylet pins it.
-          if (!plasma_store_provider_->Release(object_id).ok()) {
-            RAY_LOG(ERROR) << "Failed to release ObjectID (" << object_id
-                           << "), might cause a leak in plasma.";
-          }
-        });
+    rpc::Address real_owner_address =
+        owner_address != nullptr ? *owner_address : rpc_address_;
+    io_service_.post(
+        [this, object_id, real_owner_address]() {
+          auto callback = [this, object_id, real_owner_address](const Status &status) {
+            RAY_CHECK(status.ok());
+            RAY_LOG(DEBUG) << "Pinning sealed object " << object_id;
+            local_raylet_client_->PinObjectIDs(
+                real_owner_address,
+                {object_id},
+                [this, object_id](const Status &status,
+                                  const rpc::PinObjectIDsReply &reply) {
+                  // Only release the object once the raylet has responded to avoid the
+                  // race condition that the object could be evicted before the raylet
+                  // pins it.
+                  if (!plasma_store_provider_->Release(object_id).ok()) {
+                    RAY_LOG(ERROR) << "Failed to release ObjectID (" << object_id
+                                   << "), might cause a leak in plasma.";
+                  }
+                });
+          };
+          bool is_replying =
+              object_barrier_->AsyncWaitForReplyFinish(object_id, callback);
+          if (!is_replying) callback(Status::OK());
+        },
+        "CoreWorker.PinObjectIDs");
   } else {
     RAY_RETURN_NOT_OK(plasma_store_provider_->Release(object_id));
     reference_counter_->FreePlasmaObjects({object_id});
@@ -3487,9 +3503,8 @@ Status CoreWorker::WaitForActorRegistered(const std::vector<ObjectID> &ids) {
 
 Status CoreWorker::WaitForObjectOwnerReply(const ObjectID &object_id) {
   std::promise<Status> promise;
-
   io_service_.post(
-      [&object_id, &promise, &is_replying, this]() {
+      [&object_id, &promise, this]() {
         bool is_replying = object_barrier_->AsyncWaitForReplyFinish(
             object_id, [&promise](const Status &status) { promise.set_value(status); });
         if (!is_replying) promise.set_value(Status::OK());

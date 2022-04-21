@@ -40,8 +40,6 @@ class ObjectBarrier {
 
   bool AsyncWaitForReplyFinish(const ObjectID &object_id, ReplyCallback callback) {
     auto it = replying_objects_->find(object_id);
-    RAY_LOG(INFO) << "In AsyncWaitForReplyFinish object: " << object_id << " , " << it ==
-        replying_objects_->end();
     if (it == replying_objects_->end()) return false;
     it->second.emplace_back(std::move(callback));
     return true;
@@ -49,7 +47,7 @@ class ObjectBarrier {
 
   void RunAllReplyCallback(const ObjectID &object_id, const Status &status) {
     auto it = replying_objects_->find(object_id);
-    if (it != replying_objects_->end()) return;
+    if (it == replying_objects_->end()) return;
     std::vector<ReplyCallback> cbs = std::move(it->second);
     replying_objects_->erase(it);
     for (auto &cb : cbs) {

@@ -348,6 +348,21 @@ def test_asyncio_actor_with_large_concurrency(ray_start_regular_shared):
     assert sync_id == async_id
 
 
+# Test asyncio actor with many concurrent tasks, and make sure
+# the results are correct.
+def test_asyncio_actor_concurrent_tasks(ray_start_regular_shared):
+    @ray.remote
+    class MyActor:
+
+        async def foo(self, value):
+            await asyncio.sleep(0.1)
+            return value
+
+    actor = MyActor.remote()
+    obj_refs = [actor.foo.remote(i) for i in range(100)]
+    assert ray.get(obj_refs) == list(range(100))
+
+
 if __name__ == "__main__":
     import pytest
 

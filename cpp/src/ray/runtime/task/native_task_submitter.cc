@@ -25,9 +25,20 @@ using ray::core::CoreWorkerProcess;
 using ray::core::TaskOptions;
 
 RayFunction BuildRayFunction(InvocationSpec &invocation) {
-  auto function_descriptor = FunctionDescriptorBuilder::BuildCpp(
-      invocation.remote_function_holder.function_name);
-  return RayFunction(ray::Language::CPP, function_descriptor);
+  if (invocation.remote_function_holder.lang_type == LangType::CPP) {
+    auto function_descriptor = FunctionDescriptorBuilder::BuildCpp(
+        invocation.remote_function_holder.function_name);
+    return RayFunction(ray::Language::CPP, function_descriptor);
+  } else if (invocation.remote_function_holder.lang_type == LangType::PYTHON) {
+    auto function_descriptor = FunctionDescriptorBuilder::BuildPython(
+        invocation.remote_function_holder.module_name,
+        invocation.remote_function_holder.class_name,
+        invocation.remote_function_holder.function_name,
+        "");
+    return RayFunction(ray::Language::PYTHON, function_descriptor);
+  } else {
+    throw RayException("not supported yet");
+  }
 }
 
 template <typename T>
@@ -91,9 +102,6 @@ ActorID NativeTaskSubmitter::CreateActor(InvocationSpec &invocation,
   auto &core_worker = CoreWorkerProcess::GetCoreWorker();
   std::unordered_map<std::string, double> resources;
   std::string name = create_options.name;
-  if (!name.empty()) {
-    name = GetFullName(create_options.global, create_options.name);
-  }
   std::string ray_namespace = "";
   BundleID bundle_id = GetBundleID(create_options);
   rpc::SchedulingStrategy scheduling_strategy;
@@ -132,14 +140,9 @@ ObjectID NativeTaskSubmitter::SubmitActorTask(InvocationSpec &invocation,
   return Submit(invocation, task_options);
 }
 
-JobID NativeTaskSubmitter::GetCurrentJobID() const {
-  return CoreWorkerProcess::GetCoreWorker().GetCurrentJobId();
-}
-
-ActorID NativeTaskSubmitter::GetActor(bool global, const std::string &actor_name) const {
+ActorID NativeTaskSubmitter::GetActor(const std::string &actor_name) const {
   auto &core_worker = CoreWorkerProcess::GetCoreWorker();
-  auto full_actor_name = GetFullName(global, actor_name);
-  auto pair = core_worker.GetNamedActorHandle(full_actor_name, "");
+  auto pair = core_worker.GetNamedActorHandle(actor_name, "");
   if (!pair.second.ok()) {
     RAY_LOG(WARNING) << pair.second.message();
     return ActorID::Nil();
@@ -152,7 +155,6 @@ ActorID NativeTaskSubmitter::GetActor(bool global, const std::string &actor_name
 
 ray::PlacementGroup NativeTaskSubmitter::CreatePlacementGroup(
     const ray::PlacementGroupCreationOptions &create_options) {
-  auto full_name = GetFullName(create_options.global, create_options.name);
   auto options = ray::core::PlacementGroupCreationOptions(
       create_options.name,
       (ray::core::PlacementStrategy)create_options.strategy,

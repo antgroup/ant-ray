@@ -30,7 +30,7 @@ class NativeTaskSubmitter : public TaskSubmitter {
 
   ObjectID SubmitActorTask(InvocationSpec &invocation, const CallOptions &call_options);
 
-  ActorID GetActor(const std::string &actor_name) const;
+  ActorID GetActor(bool global, const std::string &actor_name) const;
 
   ray::PlacementGroup CreatePlacementGroup(
       const ray::PlacementGroupCreationOptions &create_options);
@@ -39,6 +39,7 @@ class NativeTaskSubmitter : public TaskSubmitter {
 
  private:
   ObjectID Submit(InvocationSpec &invocation, const CallOptions &call_options);
+  JobID GetCurrentJobID() const;
 };
 }  // namespace internal
 }  // namespace ray

@@ -884,14 +884,11 @@ class ActorClass:
 
         # Update the creation descriptor based on number of arguments
         if meta.is_cross_language:
-            func_name = "<init>"
-            if meta.language == Language.CPP:
-                func_name = meta.actor_creation_function_descriptor.function_name
             meta.actor_creation_function_descriptor = (
                 cross_language.get_function_descriptor_for_actor_method(
                     meta.language,
                     meta.actor_creation_function_descriptor,
-                    func_name,
+                    "<init>",
                     str(len(args) + len(kwargs)),
                 )
             )

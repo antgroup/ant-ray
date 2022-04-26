@@ -32,22 +32,13 @@ LocalModeRayRuntime::LocalModeRayRuntime()
 }
 
 ActorID LocalModeRayRuntime::GetNextActorID() {
-  const auto next_task_index = worker_.GetNextTaskIndex();
-  const ActorID actor_id =
-      ActorID::Of(worker_.GetCurrentJobID(), worker_.GetCurrentTaskID(), next_task_index);
+  const auto next_task_index = worker_->GetNextTaskIndex();
+  const ActorID actor_id = ActorID::Of(worker_->GetCurrentJobID(),
+                                       worker_->GetCurrentTaskID(), next_task_index);
   return actor_id;
 }
 
-ActorID LocalModeRayRuntime::GetCurrentActorID() { return worker_.GetCurrentActorID(); }
-
-const WorkerContext &LocalModeRayRuntime::GetWorkerContext() { return worker_; }
-
-std::string LocalModeRayRuntime::Put(std::shared_ptr<msgpack::sbuffer> data) {
-  ObjectID object_id =
-      ObjectID::FromIndex(worker_.GetCurrentTaskID(), worker_.GetNextPutIndex());
-  AbstractRayRuntime::Put(data, &object_id);
-  return object_id.Binary();
-}
+ActorID LocalModeRayRuntime::GetCurrentActorID() { return worker_->GetCurrentActorID(); }
 
 }  // namespace internal
 }  // namespace ray

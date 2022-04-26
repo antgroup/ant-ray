@@ -26,8 +26,7 @@ class ActorTaskCaller {
  public:
   ActorTaskCaller() = default;
 
-  ActorTaskCaller(RayRuntime *runtime,
-                  const std::string &id,
+  ActorTaskCaller(RayRuntime *runtime, std::string id,
                   RemoteFunctionHolder remote_function_holder)
       : runtime_(runtime),
         id_(id),
@@ -65,24 +64,12 @@ template <typename F>
 template <typename... Args>
 ObjectRef<boost::callable_traits::return_type_t<F>> ActorTaskCaller<F>::Remote(
     Args &&...args) {
-  CheckTaskOptions(task_options_.resources);
-
-  if constexpr (is_python_v<F>) {
-    using ArgsTuple = std::tuple<Args...>;
-    Arguments::WrapArgs<ArgsTuple>(/*cross_lang=*/true,
-                                   &args_,
-                                   std::make_index_sequence<sizeof...(Args)>{},
-                                   std::forward<Args>(args)...);
-  } else {
-    StaticCheck<F, Args...>();
-    using ArgsTuple = RemoveReference_t<RemoveFirst_t<boost::callable_traits::args_t<F>>>;
-    Arguments::WrapArgs<ArgsTuple>(/*cross_lang=*/false,
-                                   &args_,
-                                   std::make_index_sequence<sizeof...(Args)>{},
-                                   std::forward<Args>(args)...);
-  }
-
   using ReturnType = boost::callable_traits::return_type_t<F>;
+  StaticCheck<F, Args...>();
+  CheckTaskOptions(task_options_.resources);
+  using ArgsTuple = RemoveReference_t<RemoveFirst_t<boost::callable_traits::args_t<F>>>;
+  Arguments::WrapArgs<ArgsTuple>(&args_, std::make_index_sequence<sizeof...(Args)>{},
+                                 std::forward<Args>(args)...);
   auto returned_object_id =
       runtime_->CallActor(remote_function_holder_, id_, args_, task_options_);
   auto return_ref = ObjectRef<ReturnType>(returned_object_id);

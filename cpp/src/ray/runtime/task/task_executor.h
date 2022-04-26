@@ -43,9 +43,6 @@ BOOST_DLL_ALIAS(internal::GetFunctionManager, GetFunctionManager);
 std::pair<const RemoteFunctionMap_t &, const RemoteMemberFunctionMap_t &>
 GetRemoteFunctions();
 BOOST_DLL_ALIAS(internal::GetRemoteFunctions, GetRemoteFunctions);
-
-void InitRayRuntime(std::shared_ptr<RayRuntime> runtime);
-BOOST_DLL_ALIAS(internal::InitRayRuntime, InitRayRuntime);
 }  // namespace internal
 
 namespace internal {
@@ -65,7 +62,7 @@ class ActorContext {
 
 class TaskExecutor {
  public:
-  TaskExecutor() = default;
+  TaskExecutor(AbstractRayRuntime &abstract_ray_tuntime_);
 
   /// TODO(SongGuyang): support multiple tasks execution
   std::unique_ptr<ObjectID> Execute(InvocationSpec &invocation);
@@ -95,6 +92,7 @@ class TaskExecutor {
   virtual ~TaskExecutor(){};
 
  private:
+  AbstractRayRuntime &abstract_ray_tuntime_;
   static std::shared_ptr<msgpack::sbuffer> current_actor_;
 };
 }  // namespace internal

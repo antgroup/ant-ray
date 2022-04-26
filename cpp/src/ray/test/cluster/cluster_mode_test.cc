@@ -37,12 +37,6 @@ TEST(RayClusterModeTest, Initialized) {
   EXPECT_TRUE(!ray::IsInitialized());
 }
 
-struct Person {
-  std::string name;
-  int age;
-  MSGPACK_DEFINE(name, age);
-};
-
 TEST(RayClusterModeTest, FullTest) {
   ray::RayConfig config;
   config.head_args = {
@@ -76,7 +70,7 @@ TEST(RayClusterModeTest, FullTest) {
 
   ray::ActorHandle<Counter> actor = ray::Actor(RAY_FUNC(Counter::FactoryCreate))
                                         .SetMaxRestarts(1)
-                                        .SetName("named_actor")
+                                        .SetGlobalName("named_actor")
                                         .Remote();
   auto named_actor_obj = actor.Task(&Counter::Plus1)
                              .SetName("named_actor_task")
@@ -84,12 +78,12 @@ TEST(RayClusterModeTest, FullTest) {
                              .Remote();
   EXPECT_EQ(1, *named_actor_obj.Get());
 
-  auto named_actor_handle_optional = ray::GetActor<Counter>("named_actor");
+  auto named_actor_handle_optional = ray::GetGlobalActor<Counter>("named_actor");
   EXPECT_TRUE(named_actor_handle_optional);
   auto &named_actor_handle = *named_actor_handle_optional;
   auto named_actor_obj1 = named_actor_handle.Task(&Counter::Plus1).Remote();
   EXPECT_EQ(2, *named_actor_obj1.Get());
-  EXPECT_FALSE(ray::GetActor<Counter>("not_exist_actor"));
+  EXPECT_FALSE(ray::GetGlobalActor<Counter>("not_exist_actor"));
 
   EXPECT_FALSE(
       *named_actor_handle.Task(&Counter::CheckRestartInActorCreationTask).Remote().Get());
@@ -108,7 +102,7 @@ TEST(RayClusterModeTest, FullTest) {
   EXPECT_THROW(named_actor_handle.Task(&Counter::Plus1).Remote().Get(),
                ray::internal::RayActorException);
 
-  EXPECT_FALSE(ray::GetActor<Counter>("named_actor"));
+  EXPECT_FALSE(ray::GetGlobalActor<Counter>("named_actor"));
 
   /// actor task without args
   auto actor1 = ray::Actor(RAY_FUNC(Counter::FactoryCreate)).Remote();
@@ -134,7 +128,7 @@ TEST(RayClusterModeTest, FullTest) {
   auto r2 = ray::Task(Plus).Remote(3, 22);
 
   std::vector<ray::ObjectRef<int>> objects = {r0, r1, r2};
-  auto result = ray::Wait(objects, 3, 5000);
+  auto result = ray::Wait(objects, 3, 1000);
   EXPECT_EQ(result.ready.size(), 3);
   EXPECT_EQ(result.unready.size(), 0);
 
@@ -216,40 +210,6 @@ TEST(RayClusterModeTest, FullTest) {
   std::this_thread::sleep_for(std::chrono::seconds(2));
   EXPECT_THROW(actor_object4.Get(), ray::internal::RayActorException);
   EXPECT_FALSE(Counter::IsProcessAlive(pid));
-}
-
-TEST(RayClusterModeTest, PythonInvocationTest) {
-  auto py_actor_handle =
-      ray::Actor(ray::PyActorClass{"test_cross_language_invocation", "Counter"})
-          .Remote(1);
-  EXPECT_TRUE(!py_actor_handle.ID().empty());
-
-  auto py_actor_ret =
-      py_actor_handle.Task(ray::PyActorMethod<std::string>{"increase"}).Remote(1);
-  EXPECT_EQ("2", *py_actor_ret.Get());
-
-  auto py_obj =
-      ray::Task(ray::PyFunction<int>{"test_cross_language_invocation", "py_return_val"})
-          .Remote();
-  EXPECT_EQ(42, *py_obj.Get());
-
-  auto py_obj1 =
-      ray::Task(ray::PyFunction<int>{"test_cross_language_invocation", "py_return_input"})
-          .Remote(42);
-  EXPECT_EQ(42, *py_obj1.Get());
-
-  auto py_obj2 = ray::Task(ray::PyFunction<std::string>{"test_cross_language_invocation",
-                                                        "py_return_input"})
-                     .Remote("hello");
-  EXPECT_EQ("hello", *py_obj2.Get());
-
-  Person p{"tom", 20};
-  auto py_obj3 = ray::Task(ray::PyFunction<Person>{"test_cross_language_invocation",
-                                                   "py_return_input"})
-                     .Remote(p);
-  auto py_result = *py_obj3.Get();
-  EXPECT_EQ(p.age, py_result.age);
-  EXPECT_EQ(p.name, py_result.name);
 }
 
 TEST(RayClusterModeTest, MaxConcurrentTest) {
@@ -369,7 +329,8 @@ TEST(RayClusterModeTest, GetActorTest) {
 ray::PlacementGroup CreateSimplePlacementGroup(const std::string &name) {
   std::vector<std::unordered_map<std::string, double>> bundles{{{"CPU", 1}}};
 
-  ray::PlacementGroupCreationOptions options{name, bundles, ray::PlacementStrategy::PACK};
+  ray::PlacementGroupCreationOptions options{false, name, bundles,
+                                             ray::PlacementStrategy::PACK};
   return ray::CreatePlacementGroup(options);
 }
 
@@ -401,8 +362,8 @@ TEST(RayClusterModeTest, CreateAndRemovePlacementGroup) {
 TEST(RayClusterModeTest, CreatePlacementGroupExceedsClusterResource) {
   std::vector<std::unordered_map<std::string, double>> bundles{{{"CPU", 10000}}};
 
-  ray::PlacementGroupCreationOptions options{
-      "first_placement_group", bundles, ray::PlacementStrategy::PACK};
+  ray::PlacementGroupCreationOptions options{false, "first_placement_group", bundles,
+                                             ray::PlacementStrategy::PACK};
   auto first_placement_group = ray::CreatePlacementGroup(options);
   EXPECT_FALSE(first_placement_group.Wait(3));
   ray::RemovePlacementGroup(first_placement_group.GetID());

@@ -19,12 +19,13 @@
 
 namespace ray {
 
-static bool is_init_ = false;
+static bool is_init_;
 
 void Init(ray::RayConfig &config, int argc, char **argv) {
   if (!IsInitialized()) {
     internal::ConfigInternal::Instance().Init(config, argc, argv);
     auto runtime = internal::AbstractRayRuntime::DoInit();
+    internal::RayRuntimeHolder::Instance().Init(runtime);
     is_init_ = true;
   }
 }

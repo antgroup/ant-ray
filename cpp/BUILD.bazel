@@ -133,7 +133,7 @@ cc_test(
         "src/ray/test/*.cc",
     ]),
     copts = COPTS,
-    linkstatic = True,
+    linkstatic = False,
     tags = ["team:core"],
     deps = [
         "ray_api",
@@ -149,7 +149,7 @@ cc_test(
         "src/ray/test/cluster/*.h",
     ]),
     args = [
-        "--ray_code_search_path=$(location plus.so):$(location counter.so):cpp/src/ray/test/cluster",
+        "--ray_code_search_path=$(location plus.so):$(location counter.so)",
         "--ray_head_args '--include-dashboard false'",
     ],
     copts = COPTS,
@@ -157,7 +157,6 @@ cc_test(
         "counter.so",
         "plus.so",
         "ray_cpp_pkg",
-        "src/ray/test/cluster/test_cross_language_invocation.py",
     ],
     linkstatic = True,
     tags = ["team:core"],
@@ -220,24 +219,6 @@ cc_binary(
     ]),
     linkopts = ["-shared"],
     linkstatic = True,
-    deps = [
-        ":ray_api",
-    ],
-)
-
-load("//bazel:python.bzl", "py_test_module_list")
-
-py_test_module_list(
-    size = "small",
-    extra_srcs = [],
-    files = [
-        "test_python_call_cpp.py",
-    ],
-    tags = [
-        "exclusive",
-        "small_size_python_tests",
-        "team:core",
-    ],
     deps = [
         ":ray_api",
     ],

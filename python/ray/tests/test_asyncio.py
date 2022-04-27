@@ -5,6 +5,7 @@ import sys
 import threading
 import time
 
+import numpy as np
 import pytest
 
 import ray
@@ -348,19 +349,25 @@ def test_asyncio_actor_with_large_concurrency(ray_start_regular_shared):
     assert sync_id == async_id
 
 
-# Test asyncio actor with many concurrent tasks, and make sure
-# the results are correct.
-def test_asyncio_actor_concurrent_tasks(ray_start_regular_shared):
+def test_asyncio_concurrent_tasks_from_different_callers(ray_start_regular_shared):
     @ray.remote
     class MyActor:
 
         async def foo(self, value):
-            await asyncio.sleep(0.1)
-            return value
+            for _ in range(5):
+                await asyncio.sleep(1)
+            return np.zeros(1024**2, dtype=np.int8)
+
+    @ray.remote
+    class Caller:
+        def call_actor(self, actor):
+            return ray.get(actor.foo.remote("2"))
 
     actor = MyActor.remote()
-    obj_refs = [actor.foo.remote(i) for i in range(100)]
-    assert ray.get(obj_refs) == list(range(100))
+    caller = Caller.remote()
+    obj1 = actor.foo.remote("1")
+    obj2 = caller.call_actor.remote(actor)
+    assert ray.get([obj1, obj2]) == [np.zeros(1024**2, dtype=np.int8)] * 2
 
 
 if __name__ == "__main__":

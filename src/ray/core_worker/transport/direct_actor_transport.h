@@ -65,8 +65,7 @@ class CoreWorkerDirectTaskReceiver {
       : worker_context_(worker_context),
         task_handler_(task_handler),
         task_main_io_service_(main_io_service),
-        task_done_(task_done),
-        pool_manager_(std::make_shared<ConcurrencyGroupManager<BoundedExecutor>>()) {}
+        task_done_(task_done) {}
 
   /// Initialize this receiver. This must be called prior to use.
   void Init(std::shared_ptr<rpc::CoreWorkerClientPool>,
@@ -92,15 +91,6 @@ class CoreWorkerDirectTaskReceiver {
   void Stop();
 
  private:
-  /// Set up the configs for an actor.
-  /// This should be called once for the actor creation task.
-  void SetupActor(bool is_asyncio, int fiber_max_concurrency, bool execute_out_of_order);
-
- protected:
-  /// Cache the concurrency groups of actors.
-  absl::flat_hash_map<ActorID, std::vector<ConcurrencyGroup>> concurrency_groups_cache_;
-
- private:
   // Worker context.
   WorkerContext &worker_context_;
   /// The callback function to process a task.
@@ -122,16 +112,11 @@ class CoreWorkerDirectTaskReceiver {
   // Queue of pending normal (non-actor) tasks.
   std::unique_ptr<SchedulingQueue> normal_scheduling_queue_ =
       std::unique_ptr<SchedulingQueue>(new NormalSchedulingQueue());
-  /// The max number of concurrent calls to allow for fiber mode.
-  /// 0 indicates that the value is not set yet.
-  int fiber_max_concurrency_ = 0;
   /// If concurrent calls are allowed, holds the pools for executing these tasks.
   std::shared_ptr<ConcurrencyGroupManager<BoundedExecutor>> pool_manager_;
-  /// Whether this actor use asyncio for concurrency.
-  bool is_asyncio_ = false;
-  /// Whether this actor executes tasks out of order with respect to client submission
-  /// order.
-  bool execute_out_of_order_ = false;
+  /// Manage the running fiber states of actors in this worker. It works with
+  /// python asyncio if this is an asyncio actor.
+  std::shared_ptr<ConcurrencyGroupManager<FiberState>> fiber_state_manager_;
 };
 
 }  // namespace core

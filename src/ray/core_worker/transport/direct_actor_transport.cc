@@ -58,9 +58,6 @@ void CoreWorkerDirectTaskReceiver::HandleTask(
 
   if (task_spec.IsActorCreationTask()) {
     worker_context_.SetCurrentActorId(task_spec.ActorCreationId());
-    SetupActor(task_spec.IsAsyncioActor(),
-               task_spec.MaxActorConcurrency(),
-               task_spec.ExecuteOutOfOrder());
   }
 
   // Only assign resources for non-actor tasks. Actor tasks inherit the resources
@@ -133,14 +130,27 @@ void CoreWorkerDirectTaskReceiver::HandleTask(
       }
 
       if (task_spec.IsActorCreationTask()) {
-        /// The default max concurrency for creating PoolManager should
-        /// be 0 if this is an asyncio actor.
-        const int default_max_concurrency =
-            task_spec.IsAsyncioActor() ? 0 : task_spec.MaxActorConcurrency();
-        pool_manager_ = std::make_shared<ConcurrencyGroupManager<BoundedExecutor>>(
-            task_spec.ConcurrencyGroups(), default_max_concurrency);
-        concurrency_groups_cache_[task_spec.TaskId().ActorId()] =
-            task_spec.ConcurrencyGroups();
+        const bool is_asyncio = task_spec.IsAsyncioActor();
+        const int max_concurrency = task_spec.MaxActorConcurrency();
+        const auto concurrency_groups = task_spec.ConcurrencyGroups();
+        if (RAY_LOG_ENABLED(INFO)) {
+          std::stringstream ss;
+          ss << "Setting up actor, is_asyncio = " << is_asyncio
+             << ", max_concurrency = " << max_concurrency
+             << ", concurrency_groups = " << std::endl;
+          for (const auto &concurrency_group : concurrency_groups) {
+            ss << "\t" << concurrency_group.name << " : " << concurrency_group.max_concurrency;
+          }
+          RAY_LOG(INFO) << ss.str();
+        }
+
+        if (!is_asyncio) {
+          pool_manager_ = std::make_shared<ConcurrencyGroupManager<BoundedExecutor>>(
+              concurrency_groups, max_concurrency);
+        } else {
+          fiber_state_manager_ = std::make_unique<ConcurrencyGroupManager<FiberState>>(
+              concurrency_groups, max_concurrency);
+        }
         RAY_LOG(INFO) << "Actor creation task finished, task_id: " << task_spec.TaskId()
                       << ", actor_id: " << task_spec.ActorCreationId();
         // Tell raylet that an actor creation task has finished execution, so that
@@ -174,18 +184,14 @@ void CoreWorkerDirectTaskReceiver::HandleTask(
   if (task_spec.IsActorTask()) {
     auto it = actor_scheduling_queues_.find(task_spec.CallerWorkerId());
     if (it == actor_scheduling_queues_.end()) {
-      auto cg_it = concurrency_groups_cache_.find(task_spec.ActorId());
-      RAY_CHECK(cg_it != concurrency_groups_cache_.end());
-      if (execute_out_of_order_) {
+      if (task_spec.ExecuteOutOfOrder()) {
         it = actor_scheduling_queues_
                  .emplace(task_spec.CallerWorkerId(),
                           std::unique_ptr<SchedulingQueue>(
                               new OutOfOrderActorSchedulingQueue(task_main_io_service_,
                                                                  *waiter_,
                                                                  pool_manager_,
-                                                                 is_asyncio_,
-                                                                 fiber_max_concurrency_,
-                                                                 cg_it->second)))
+                                                                 fiber_state_manager_)))
                  .first;
       } else {
         it = actor_scheduling_queues_
@@ -194,9 +200,7 @@ void CoreWorkerDirectTaskReceiver::HandleTask(
                               new ActorSchedulingQueue(task_main_io_service_,
                                                        *waiter_,
                                                        pool_manager_,
-                                                       is_asyncio_,
-                                                       fiber_max_concurrency_,
-                                                       cg_it->second)))
+                                                       fiber_state_manager_)))
                  .first;
       }
     }
@@ -238,17 +242,6 @@ bool CoreWorkerDirectTaskReceiver::CancelQueuedNormalTask(TaskID task_id) {
   // Look up the task to be canceled in the queue of normal tasks. If it is found and
   // removed successfully, return true.
   return normal_scheduling_queue_->CancelTaskIfFound(task_id);
-}
-
-/// Note that this method is only used for asyncio actor.
-void CoreWorkerDirectTaskReceiver::SetupActor(bool is_asyncio,
-                                              int fiber_max_concurrency,
-                                              bool execute_out_of_order) {
-  RAY_CHECK(fiber_max_concurrency_ == 0)
-      << "SetupActor should only be called at most once.";
-  is_asyncio_ = is_asyncio;
-  fiber_max_concurrency_ = fiber_max_concurrency;
-  execute_out_of_order_ = execute_out_of_order;
 }
 
 void CoreWorkerDirectTaskReceiver::Stop() {

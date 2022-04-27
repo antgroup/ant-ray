@@ -21,27 +21,16 @@ ActorSchedulingQueue::ActorSchedulingQueue(
     instrumented_io_context &main_io_service,
     DependencyWaiter &waiter,
     std::shared_ptr<ConcurrencyGroupManager<BoundedExecutor>> pool_manager,
-    bool is_asyncio,
-    int fiber_max_concurrency,
-    const std::vector<ConcurrencyGroup> &concurrency_groups,
+    std::shared_ptr<ConcurrencyGroupManager<FiberState>> fiber_state_manager,
     int64_t reorder_wait_seconds)
     : reorder_wait_seconds_(reorder_wait_seconds),
       wait_timer_(main_io_service),
       main_thread_id_(boost::this_thread::get_id()),
       waiter_(waiter),
       pool_manager_(pool_manager),
-      is_asyncio_(is_asyncio) {
-  if (is_asyncio_) {
-    std::stringstream ss;
-    ss << "Setting actor as asyncio with max_concurrency=" << fiber_max_concurrency
-       << ", and defined concurrency groups are:" << std::endl;
-    for (const auto &concurrency_group : concurrency_groups) {
-      ss << "\t" << concurrency_group.name << " : " << concurrency_group.max_concurrency;
-    }
-    RAY_LOG(INFO) << ss.str();
-    fiber_state_manager_ = std::make_unique<ConcurrencyGroupManager<FiberState>>(
-        concurrency_groups, fiber_max_concurrency);
-  }
+      fiber_state_manager_(fiber_state_manager) {
+    RAY_CHECK(pool_manager_ == nullptr || fiber_state_manager_ == nullptr);
+    RAY_CHECK(!(pool_manager_ == nullptr && fiber_state_manager_ == nullptr));
 }
 
 void ActorSchedulingQueue::Stop() {
@@ -137,7 +126,7 @@ void ActorSchedulingQueue::ScheduleRequests() {
     auto head = pending_actor_tasks_.begin();
     auto request = head->second;
 
-    if (is_asyncio_) {
+    if (fiber_state_manager_ != nullptr) {
       // Process async actor task.
       auto fiber = fiber_state_manager_->GetExecutor(request.ConcurrencyGroupName(),
                                                      request.FunctionDescriptor());

@@ -1,9 +1,12 @@
+.. include:: /_includes/train/announcement.rst
+
 .. _train-docs:
 
 Ray Train: Distributed Deep Learning
 ====================================
 
 .. _`issue on GitHub`: https://github.com/ray-project/ray/issues
+.. _`1.12 docs`: https://docs.ray.io/en/releases-1.12.0/raysgd/raysgd.html
 
 .. tip:: Get in touch with us if you're using or considering using `Ray Train <https://forms.gle/PXFcJmHwszCwQhqX7>`_!
 
@@ -21,7 +24,12 @@ The main features are:
   This API is in its Beta release (as of Ray 1.9) and may be revised in
   future Ray releases. If you encounter any bugs, please file an
   `issue on GitHub`_.
-  If you are looking for the previous API documentation, see :ref:`sgd-index`.
+
+.. note::
+
+  Ray Train replaces Ray SGD as the standard library for distributed deep learning on Ray.
+  Ray SGD has been fully deprecated as of Ray 1.13. If you are using an older version of Ray
+  and are looking for the Ray SGD docs, you can find them in the Ray `1.12 docs`_.
 
 Intro to Ray Train
 ------------------
@@ -38,7 +46,7 @@ Ray Train is a library that aims to simplify distributed deep learning.
 
 * Callbacks for early stopping
 * Checkpointing
-* Integration with Tensorboard, Weights/Biases, and MLflow
+* Integration with TensorBoard, Weights/Biases, and MLflow
 * Jupyter notebooks
 
 **Integration with Ray Ecosystem**: Distributed deep learning often comes with a lot of complexity.
@@ -55,9 +63,7 @@ Quick Start
 Ray Train abstracts away the complexity of setting up a distributed training
 system. Let's take following simple examples:
 
-.. tabs::
-
-  .. group-tab:: PyTorch
+.. tabbed:: PyTorch
 
     This example shows how you can use Ray Train with PyTorch.
 
@@ -89,7 +95,7 @@ system. Let's take following simple examples:
     ``ray.train.torch.prepare_data_loader`` utility functions to
     easily setup your model & data for distributed training.
     This will automatically wrap your model with ``DistributedDataParallel``
-    and place it on the right device, and add ``DisributedSampler`` to your DataLoaders.
+    and place it on the right device, and add ``DistributedSampler`` to your DataLoaders.
 
     .. literalinclude:: /../../python/ray/train/examples/torch_quick_start.py
        :language: python
@@ -106,7 +112,7 @@ system. Let's take following simple examples:
 
     See :ref:`train-porting-code` for a more comprehensive example.
 
-  .. group-tab:: TensorFlow
+.. tabbed:: TensorFlow
 
     This example shows how you can use Ray Train to set up `Multi-worker training
     with Keras <https://www.tensorflow.org/tutorials/distribute/multi_worker_with_keras>`_.
@@ -157,3 +163,5 @@ system. Let's take following simple examples:
 
 
 **Next steps:** Check out the :ref:`User Guide <train-user-guide>`!
+
+.. include:: /_includes/train/announcement_bottom.rst

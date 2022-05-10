@@ -37,6 +37,16 @@ proto_library(
     visibility = ["//java:__subpackages__"],
 )
 
+proto_library(
+    name = "ray_syncer_proto",
+    srcs = ["ray_syncer.proto"],
+)
+
+cc_proto_library(
+    name = "ray_syncer_cc_proto",
+    deps = [":ray_syncer_proto"],
+)
+
 cc_proto_library(
     name = "runtime_env_common_cc_proto",
     deps = [":runtime_env_common_proto"],
@@ -57,13 +67,25 @@ python_grpc_compile(
     deps = [":gcs_proto"],
 )
 
+# Function and class dependencies.
+proto_library(
+    name = "dependency_proto",
+    srcs = ["dependency.proto"],
+)
+
+python_grpc_compile(
+    name = "dependency_py_proto",
+    deps = [":dependency_proto"],
+)
+
+# Text logging.
 proto_library(
     name = "logging_proto",
     srcs = ["logging.proto"],
 )
 
 cc_proto_library(
-    name = "loggings_cc_proto",
+    name = "logging_cc_proto",
     deps = [":logging_proto"],
 )
 
@@ -252,8 +274,10 @@ proto_library(
     srcs = ["pubsub.proto"],
     deps = [
         ":common_proto",
+        ":dependency_proto",
         ":gcs_proto",
         ":logging_proto",
+        ":reporter_proto",
     ],
 )
 
@@ -269,6 +293,7 @@ proto_library(
     deps = [
         ":common_proto",
         ":agent_manager_proto",
+        ":runtime_env_common_proto",
     ],
 )
 

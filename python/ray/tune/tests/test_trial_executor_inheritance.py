@@ -1,60 +1,55 @@
-import warnings
-
-from mock import patch
 import unittest
 
 
 class TestTrialExecutorInheritance(unittest.TestCase):
-    @patch.object(warnings, "warn")
-    def test_direct_inheritance_not_ok(self, mocked_warn):
+    def test_direct_inheritance_not_ok(self):
 
         from ray.tune.trial_executor import TrialExecutor
 
-        class _MyTrialExecutor(TrialExecutor):
-            def __init__(self):
-                pass
+        msg = (
+            "_MyTrialExecutor inherits from TrialExecutor, which is being "
+            "deprecated. "
+            "RFC: https://github.com/ray-project/ray/issues/17593. "
+            "Please reach out on the Ray Github if you have any concerns."
+        )
 
-            def start_trial(self, trial):
-                return True
+        with self.assertRaisesRegex(DeprecationWarning, msg):
 
-            def stop_trial(self, trial):
-                pass
+            class _MyTrialExecutor(TrialExecutor):
+                def __init__(self):
+                    pass
 
-            def restore(self, trial):
-                pass
+                def start_trial(self, trial):
+                    return True
 
-            def save(self, trial):
-                return None
+                def stop_trial(self, trial):
+                    pass
 
-            def reset_trial(self, trial, new_config, new_experiment_tag):
-                return False
+                def restore(self, trial):
+                    pass
 
-            def debug_string(self):
-                return "This is a debug string."
+                def save(self, trial):
+                    return None
 
-            def export_trial_if_needed(self):
-                return {}
+                def reset_trial(self, trial, new_config, new_experiment_tag):
+                    return False
 
-            def fetch_result(self):
-                return []
+                def debug_string(self):
+                    return "This is a debug string."
 
-            def get_next_available_trial(self):
-                return None
+                def export_trial_if_needed(self):
+                    return {}
 
-            def get_next_failed_trial(self):
-                return None
+                def fetch_result(self):
+                    return []
 
-            def get_running_trials(self):
-                return []
+                def get_next_available_trial(self):
+                    return None
 
-        msg = ("_MyTrialExecutor inherits from TrialExecutor, which is being "
-               "deprecated. "
-               "RFC: https://github.com/ray-project/ray/issues/17593. "
-               "Please reach out on the Ray Github if you have any concerns.")
-        mocked_warn.assert_called_once_with(msg, DeprecationWarning)
+                def get_running_trials(self):
+                    return []
 
-    @patch.object(warnings, "warn")
-    def test_indirect_inheritance_ok(self, mocked_warn):
+    def test_indirect_inheritance_ok(self):
         from ray.tune.ray_trial_executor import RayTrialExecutor
 
         class _MyRayTrialExecutor(RayTrialExecutor):
@@ -62,5 +57,3 @@ class TestTrialExecutorInheritance(unittest.TestCase):
 
         class _AnotherMyRayTrialExecutor(_MyRayTrialExecutor):
             pass
-
-        mocked_warn.assert_not_called()

@@ -12,6 +12,7 @@ from ray.rllib.policy.sample_batch import SampleBatch
 from ray.rllib.policy.tf_policy import TFPolicy
 from ray.rllib.policy.torch_policy import TorchPolicy
 from ray.tune.registry import register_trainable
+from ray._private.usage import usage_lib
 
 
 def _setup_logger():
@@ -20,7 +21,8 @@ def _setup_logger():
     handler.setFormatter(
         logging.Formatter(
             "%(asctime)s\t%(levelname)s %(filename)s:%(lineno)s -- %(message)s"
-        ))
+        )
+    )
     logger.addHandler(handler)
     logger.propagate = False
 
@@ -30,8 +32,11 @@ def _register_all():
     from ray.rllib.agents.registry import ALGORITHMS, get_trainer_class
     from ray.rllib.contrib.registry import CONTRIBUTED_ALGORITHMS
 
-    for key in list(ALGORITHMS.keys()) + list(CONTRIBUTED_ALGORITHMS.keys(
-    )) + ["__fake", "__sigmoid_fake_data", "__parameter_tuning"]:
+    for key in (
+        list(ALGORITHMS.keys())
+        + list(CONTRIBUTED_ALGORITHMS.keys())
+        + ["__fake", "__sigmoid_fake_data", "__parameter_tuning"]
+    ):
         register_trainable(key, get_trainer_class(key))
 
     def _see_contrib(name):
@@ -39,8 +44,7 @@ def _register_all():
 
         class _SeeContrib(Trainer):
             def setup(self, config):
-                raise NameError(
-                    "Please run `contrib/{}` instead.".format(name))
+                raise NameError("Please run `contrib/{}` instead.".format(name))
 
         return _SeeContrib
 
@@ -52,7 +56,8 @@ def _register_all():
 
 
 _setup_logger()
-_register_all()
+
+usage_lib.record_library_usage("rllib")
 
 __all__ = [
     "Policy",

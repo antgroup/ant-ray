@@ -29,6 +29,7 @@
 #include "ray/common/id.h"
 #include "ray/common/ray_object.h"
 #include "ray/core_worker/actor_creator.h"
+#include "ray/core_worker/actor_handle.h"
 #include "ray/core_worker/context.h"
 #include "ray/core_worker/fiber.h"
 #include "ray/core_worker/store_provider/memory_store/memory_store.h"
@@ -68,7 +69,8 @@ class CoreWorkerDirectTaskReceiver {
         pool_manager_(std::make_shared<ConcurrencyGroupManager<BoundedExecutor>>()) {}
 
   /// Initialize this receiver. This must be called prior to use.
-  void Init(std::shared_ptr<rpc::CoreWorkerClientPool>, rpc::Address rpc_address,
+  void Init(std::shared_ptr<rpc::CoreWorkerClientPool>,
+            rpc::Address rpc_address,
             std::shared_ptr<DependencyWaiter> dependency_waiter);
 
   /// Handle a `PushTask` request. If it's an actor request, this function will enqueue
@@ -78,20 +80,12 @@ class CoreWorkerDirectTaskReceiver {
   /// \param[in] request The request message.
   /// \param[out] reply The reply message.
   /// \param[in] send_reply_callback The callback to be called when the request is done.
-  void HandleTask(const rpc::PushTaskRequest &request, rpc::PushTaskReply *reply,
+  void HandleTask(const rpc::PushTaskRequest &request,
+                  rpc::PushTaskReply *reply,
                   rpc::SendReplyCallback send_reply_callback);
 
   /// Pop tasks from the queue and execute them sequentially
   void RunNormalTasksFromQueue();
-
-  /// Handle a `StealTask` request.
-  ///
-  /// \param[in] request The request message.
-  /// \param[out] reply The reply message.
-  /// \param[in] send_reply_callback The callback to be called when the request is done.
-  void HandleStealTasks(const rpc::StealTasksRequest &request,
-                        rpc::StealTasksReply *reply,
-                        rpc::SendReplyCallback send_reply_callback);
 
   bool CancelQueuedNormalTask(TaskID task_id);
 
@@ -123,10 +117,11 @@ class CoreWorkerDirectTaskReceiver {
   std::shared_ptr<DependencyWaiter> waiter_;
   /// Queue of pending requests per actor handle.
   /// TODO(ekl) GC these queues once the handle is no longer active.
-  std::unordered_map<WorkerID, std::unique_ptr<SchedulingQueue>> actor_scheduling_queues_;
+  absl::flat_hash_map<WorkerID, std::unique_ptr<SchedulingQueue>>
+      actor_scheduling_queues_;
   // Queue of pending normal (non-actor) tasks.
   std::unique_ptr<SchedulingQueue> normal_scheduling_queue_ =
-      std::unique_ptr<SchedulingQueue>(new NormalSchedulingQueue());
+      std::make_unique<NormalSchedulingQueue>();
   /// The max number of concurrent calls to allow for fiber mode.
   /// 0 indicates that the value is not set yet.
   int fiber_max_concurrency_ = 0;

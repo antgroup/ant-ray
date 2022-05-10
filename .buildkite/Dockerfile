@@ -4,13 +4,15 @@ ARG REMOTE_CACHE_URL
 ARG BUILDKITE_PULL_REQUEST
 ARG BUILDKITE_COMMIT
 ARG BUILDKITE_PULL_REQUEST_BASE_BRANCH
+ARG PYTHON=3.6
+ARG INSTALL_DEPENDENCIES
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Los_Angeles
 
 ENV BUILDKITE=true
 ENV CI=true
-ENV PYTHON=3.6
+ENV PYTHON=$PYTHON
 ENV RAY_USE_RANDOM_PORTS=1
 ENV RAY_DEFAULT_BUILD=1
 ENV RAY_INSTALL_JAVA=1
@@ -59,9 +61,11 @@ WORKDIR /ray
 
 # Below should be re-run each time
 COPY . .
-RUN ./ci/travis/ci.sh init
-RUN bash --login -i ./ci/travis/ci.sh build
+RUN ./ci/ci.sh init
+RUN bash --login -i ./ci/ci.sh build
+
+RUN (if [ "${INSTALL_DEPENDENCIES}" = "ML" ]; then RLLIB_TESTING=1 TRAIN_TESTING=1 TUNE_TESTING=1 bash --login -i ./ci/env/install-dependencies.sh; fi)
 
 # Run determine test to run
-RUN bash --login -i -c "python ./ci/travis/determine_tests_to_run.py --output=json > affected_set.json"
+RUN bash --login -i -c "python ./ci/pipeline/determine_tests_to_run.py --output=json > affected_set.json"
 RUN cat affected_set.json

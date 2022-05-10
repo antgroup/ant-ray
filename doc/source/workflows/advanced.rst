@@ -38,3 +38,51 @@ Inplace is also useful when you need to pass something that is only valid in the
     def Foo():
         x = "<something that is only valid in the current process>"
         return Bar.options(allow_inplace=True).step(x)
+
+
+Wait for Partial Results
+------------------------
+
+By default, a workflow step will only execute after the completion of all of its dependencies. This blocking behavior prevents certain types of workflows from being expressed (e.g., wait for two of the three steps to finish).
+
+Analogous to ``ray.wait()``, in Ray Workflow we have ``workflow.wait(*steps: List[Workflow[T]], num_returns: int = 1, timeout: float = None) -> (List[T], List[Workflow[T])``. Calling `workflow.wait` would generate a logical step . The output of the logical step is a tuple of ready workflow results, and workflow results that have not yet been computed. For example, you can use it to print out workflow results as they are computed in the following dynamic workflow:
+
+.. code-block:: python
+
+    @workflow.step
+    def do_task(i):
+       time.sleep(random.random())
+       return "task {}".format(i)
+
+    @workflow.step
+    def report_results(wait_result: Tuple[List[str], List[Workflow[str]]]):
+        ready, remaining = wait_result
+        for result in ready:
+            print("Completed", result)
+        if not remaining:
+            return "All done"
+        else:
+            return report_results.step(workflow.wait(remaining))
+
+    tasks = [do_task.step(i) for i in range(100)]
+    report_results.step(workflow.wait(tasks)).run()
+
+
+Workflow Step Checkpointing
+---------------------------
+
+Ray Workflows provides strong fault tolerance and exactly-once execution semantics by checkpointing. However, checkpointing could be time consuming, especially when you have large inputs and outputs for workflow steps. When exactly-once execution semantics is not required, you can skip some checkpoints to speed up your workflow.
+
+
+We control the checkpoints by specify the checkpoint options like this:
+
+.. code-block:: python
+
+    data = read_data.options(checkpoint=False).step(10)
+
+This example skips checkpointing the output of ``read_data``. During recovery, ``read_data`` would be executed again if recovery requires its output.
+
+By default, we have ``checkpoint=True`` if not specified.
+
+If the output of a step is another step (i.e. dynamic workflows), we skips checkpointing the entire step.
+

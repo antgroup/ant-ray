@@ -234,8 +234,10 @@ class FunctionLoadingError(RayError):
     """Indicates that the function or class load failed."""
 
     def __str__(self):
-        return ("Failed to load function or class from local. And this node "
-                "don't allow execute task from dynamic pickled function.")
+        return (
+            "Failed to load function or class from local. And this node "
+            "don't allow execute task from dynamic pickled function."
+        )
 
 
 class RayActorError(RayError):

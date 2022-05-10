@@ -145,12 +145,13 @@ parser.add_argument(
     default=False,
     action="store_true",
     help="True if Ray debugger is made available externally.",
+)
 parser.add_argument(
     "--load-code-mode",
     required=False,
     type=str,
     default=None,
-    help="The load code mode for executing remote tasks."),
+    help="The load code mode for executing remote tasks.",
 )
 
 if __name__ == "__main__":
@@ -176,7 +177,8 @@ if __name__ == "__main__":
 
     if args.load_code_mode:
         ray.worker.global_worker.set_load_code_mode(
-            ray_constants.LoadCodeMode(args.load_code_mode))
+            ray_constants.LoadCodeMode(args.load_code_mode)
+        )
 
     ray_params = RayParams(
         node_ip_address=args.node_ip_address,
@@ -191,7 +193,8 @@ if __name__ == "__main__":
         metrics_agent_port=args.metrics_agent_port,
         gcs_address=args.gcs_address,
         load_code_mode=ray_constants.LoadCodeMode(args.load_code_mode)
-        if args.load_code_mode else None,
+        if args.load_code_mode
+        else None,
     )
 
     node = ray.node.Node(

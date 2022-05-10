@@ -15,8 +15,12 @@ from unittest.mock import MagicMock, patch
 from ray.cluster_utils import Cluster, cluster_not_supported
 from ray._private.test_utils import client_test_enabled
 from ray.tests.client_test_utils import create_remote_signal_actor
-from ray.exceptions import (GetTimeoutError, RayTaskError,
-                            FunctionLoadingError, RayActorError)
+from ray.exceptions import (
+    GetTimeoutError,
+    RayTaskError,
+    FunctionLoadingError,
+    RayActorError,
+)
 from ray.ray_constants import KV_NAMESPACE_FUNCTION_TABLE
 
 if client_test_enabled():
@@ -758,8 +762,8 @@ def test_use_dynamic_function_and_class():
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Fails on windows")
 @pytest.mark.parametrize(
-    "call_ray_start", ["ray start --head --load-code-mode=local-only"],
-    indirect=True)
+    "call_ray_start", ["ray start --head --load-code-mode=local-only"], indirect=True
+)
 def test_load_code_mode(call_ray_start):
     ray.init(address="auto")
 

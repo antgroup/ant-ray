@@ -1620,8 +1620,10 @@ def connect(
         )
 
     # Start the import thread
-    if mode not in (RESTORE_WORKER_MODE, SPILL_WORKER_MODE) and \
-            worker.load_code_mode != ray_constants.LoadCodeMode.LOCAL_ONLY:
+    if (
+        mode not in (RESTORE_WORKER_MODE, SPILL_WORKER_MODE)
+        and worker.load_code_mode != ray_constants.LoadCodeMode.LOCAL_ONLY
+    ):
         worker.import_thread = import_thread.ImportThread(
             worker, mode, worker.threads_stopped
         )

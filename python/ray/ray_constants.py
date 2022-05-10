@@ -350,6 +350,7 @@ KV_NAMESPACE_FUNCTION_TABLE = b"fun"
 
 LANGUAGE_WORKER_TYPES = ["python", "java", "cpp"]
 
+
 class LoadCodeMode(Enum):
     DYNAMIC_ONLY = "dynamic-only"
     LOCAL_ONLY = "local-only"

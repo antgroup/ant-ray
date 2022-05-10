@@ -330,11 +330,13 @@ class FunctionActorManager:
                 # even if load_code_from_local is set True
                 if self._load_function_from_local(function_descriptor) is True:
                     return self._function_execution_info[function_id]
-                elif self._worker.load_code_mode == \
-                        ray_constants.LoadCodeMode.LOCAL_ONLY:
+                elif (
+                    self._worker.load_code_mode == ray_constants.LoadCodeMode.LOCAL_ONLY
+                ):
                     raise FunctionLoadingError(
                         "Failded to load function or class: "
-                        f"{function_descriptor.repr}")
+                        f"{function_descriptor.repr}"
+                    )
 
         # Load function from GCS.
         # Wait until the function to be executed has actually been
@@ -366,8 +368,7 @@ class FunctionActorManager:
         )
 
         try:
-            object = self.load_function_or_class_from_local(
-                module_name, function_name)
+            object = self.load_function_or_class_from_local(module_name, function_name)
         except Exception:
             logger.exception("Load function or class from local failed.")
             return False

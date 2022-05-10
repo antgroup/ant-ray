@@ -537,7 +537,6 @@ void CoreWorkerDirectTaskSubmitter::PushNormalTask(
   request->mutable_task_spec()->CopyFrom(task_spec.GetMessage());
   request->mutable_resource_mapping()->CopyFrom(assigned_resources);
   request->set_intended_worker_id(addr.worker_id.Binary());
-
   client.PushNormalTask(
       std::move(request),
       [this,
@@ -585,10 +584,8 @@ void CoreWorkerDirectTaskSubmitter::PushNormalTask(
           if (status.IsFunctionLoadingError()) {
             error_type = rpc::ErrorType::FUNCTION_LOADING_ERROR;
           }
-          RAY_UNUSED(task_finisher_->FailOrRetryPendingTask(
-              task_id,
-              error_type,
-              &status));
+          RAY_UNUSED(
+              task_finisher_->FailOrRetryPendingTask(task_id, error_type, &status));
         } else {
           if (!task_spec.GetMessage().retry_exceptions() ||
               !reply.is_application_level_error() ||
@@ -596,37 +593,7 @@ void CoreWorkerDirectTaskSubmitter::PushNormalTask(
             task_finisher_->CompletePendingTask(task_id, reply, addr.ToProto());
           }
         }
-      } else if (reply.task_stolen()) {
-        // If the task was stolen, we push it to the thief worker & call OnWorkerIdle
-        // in the StealTasks callback within StealTasksOrReturnWorker. So we don't
-        // need to do anything here.
-        return;
-      } else if (!status.ok() || !is_actor_creation) {
-        RAY_LOG(DEBUG) << "Task failed with error: " << status;
-        // Successful actor creation leases the worker indefinitely from the raylet.
-        OnWorkerIdle(addr, scheduling_key,
-                     /*error=*/!status.ok(), assigned_resources);
-      }
-    }
-    if (!status.ok()) {
-      // TODO: It'd be nice to differentiate here between process vs node
-      // failure (e.g., by contacting the raylet). If it was a process
-      // failure, it may have been an application-level error and it may
-      // not make sense to retry the task.
-      rpc::ErrorType error_type =
-          is_actor ? rpc::ErrorType::ACTOR_DIED : rpc::ErrorType::WORKER_DIED;
-      if (status.IsFunctionLoadingError()) {
-        error_type = rpc::ErrorType::FUNCTION_LOADING_ERROR;
-      }
-      RAY_UNUSED(task_finisher_->FailOrRetryPendingTask(task_id, error_type, &status));
-    } else {
-      if (!task_spec.GetMessage().retry_exceptions() ||
-          !reply.is_application_level_error() ||
-          !task_finisher_->RetryTaskIfPossible(task_id)) {
-        task_finisher_->CompletePendingTask(task_id, reply, addr.ToProto());
-      }
-    }
-  });
+      });
 }
 
 Status CoreWorkerDirectTaskSubmitter::CancelTask(TaskSpecification task_spec,

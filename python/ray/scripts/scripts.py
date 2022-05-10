@@ -524,7 +524,8 @@ def debug(address):
     hidden=True,
     default=ray_constants.LoadCodeMode.HYBRID.value,
     help="The load code mode for executing remote tasks. It should be one of "
-    f"{[e.value for e in ray_constants.LoadCodeMode]}")
+    f"{[e.value for e in ray_constants.LoadCodeMode]}",
+)
 @add_click_logging_options
 @PublicAPI
 def start(
@@ -603,8 +604,10 @@ def start(
         )
 
     if load_code_mode not in [e.value for e in ray_constants.LoadCodeMode]:
-        raise Exception("The local code mode should be one of "
-                        f"{[e.value for e in ray_constants.LoadCodeMode]}")
+        raise Exception(
+            "The local code mode should be one of "
+            f"{[e.value for e in ray_constants.LoadCodeMode]}"
+        )
 
     redirect_output = None if not no_redirect_output else True
     ray_params = ray._private.parameter.RayParams(

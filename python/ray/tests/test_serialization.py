@@ -682,6 +682,7 @@ def test_serialization_before_init(shutdown_only):
     ray.init()
     ray.get(ray.put(A(1)))  # success!
 
+
 def test_restricted_loads(shutdown_only):
     config_path = "/tmp/test.yaml"
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -704,6 +705,7 @@ def test_restricted_loads(shutdown_only):
 
         class WrongClass:
             pass
+
         ref3 = ray.put(WrongClass())
         with pytest.raises(ray.exceptions.RaySystemError) as error:
             ray.get(ref3)

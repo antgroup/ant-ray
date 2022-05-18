@@ -36,10 +36,10 @@ jobs:
            pip install -e . -v
            python setup.py bdist_wheel
            ls dist
-           ls dist/ray-2.0.0.dev0-cp38-cp38m-linux_x86_64.whl
+           ls dist/ray-2.0.0.dev0-cp38-cp38-linux_x86_64.whl
 
     - name: Archive ray-wheel
       uses: actions/upload-artifact@v1
       with:
         name: linux_py38_ray_whl
-        path: dist/ray-2.0.0.dev0-cp38-cp38m-linux_x86_64.whl
+        path: dist/ray-2.0.0.dev0-cp38-cp38-linux_x86_64.whl

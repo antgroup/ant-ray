@@ -42,5 +42,14 @@ jobs:
            python3 -m virtualenv -p python3 py3
            . py3/bin/activate
            pip install pytest
-           pip install -e python -v
-           python python/setup.py bdsit
+           cd python
+           pip install -e . -v
+           python setup.py bdist_wheel
+           ls dist
+           ls dist/ray-2.0.0.dev0-cp38-cp38m-linux_x86_64.whl
+
+    - name: Archive ray-wheel
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux_py38_ray_whl
+        path: dist/ray-2.0.0.dev0-cp38-cp38m-linux_x86_64.whl

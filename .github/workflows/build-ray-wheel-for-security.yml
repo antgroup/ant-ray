@@ -6,12 +6,6 @@ on:
   pull_request:
     branches: [ secure ]
 
-env:
-  OSS_HOST: oss-us-west-1.aliyuncs.com
-  OSS_BUCKET: ray-wheel-for-security-use
-  OSS_ID: ${{ secrets.OSS_ID }}
-  OSS_KEY: ${{ secrets.OSS_KEY }}
-
 jobs:
   build-wheel-pipeline:
     timeout-minutes: 120
@@ -31,10 +25,6 @@ jobs:
     - name: Install bazel
       run: |
            sh -c "bash ci/env/install-bazel.sh"
-
-    # - name: Install OSS
-    #   run: |
-    #        sh -c "bash scripts/ossutils.sh install"
 
     - name: Install Ray and export dist
       run: |

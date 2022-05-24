@@ -3,16 +3,15 @@ import os
 import sys
 import yaml
 import ray
-from ray._private.security import ENV_VAR_NAME
 
 config_path = "/tmp/test.yaml"
 
 
 @pytest.fixture
 def enable_whitelist():
-    os.environ[ENV_VAR_NAME] = config_path
+    os.environ["RAY_SECURITY_CONFIG_PATH"] = config_path
     yield
-    del os.environ[ENV_VAR_NAME]
+    del os.environ["RAY_SECURITY_CONFIG_PATH"]
 
 
 @pytest.mark.parametrize("valid_whitelist", [True, False])

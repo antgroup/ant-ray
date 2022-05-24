@@ -1,13 +1,9 @@
-import os
 import logging
 import yaml
 import re
+from ray.ray_constants import SECURITY_CONFIG_PATH
 
 logger = logging.getLogger(__name__)
-
-ENV_VAR_NAME = "RAY_SECURERITY_CONFIG_PATH"
-
-RAY_SECURERITY_CONFIG_PATH = os.environ.get(ENV_VAR_NAME, None)
 
 
 class RemoteFunctionWhitelist:
@@ -15,10 +11,10 @@ class RemoteFunctionWhitelist:
 
     @classmethod
     def whitelist_init(cls):
-        if RAY_SECURERITY_CONFIG_PATH:
-            cls.module_whitelist = yaml.safe_load(
-                open(RAY_SECURERITY_CONFIG_PATH, "rt")
-            ).get("remote_function_whitelist", None)
+        if SECURITY_CONFIG_PATH:
+            cls.module_whitelist = yaml.safe_load(open(SECURITY_CONFIG_PATH, "rt")).get(
+                "remote_function_whitelist", None
+            )
             if cls.module_whitelist:
                 logger.info(
                     "The remote function module whitelist have been set. It means that"
@@ -27,8 +23,8 @@ class RemoteFunctionWhitelist:
                     "modify the environment variable %s to change the whitelist or "
                     'disable this functionality by "unset %s" directly. The whitelist'
                     " is %s.",
-                    ENV_VAR_NAME,
-                    ENV_VAR_NAME,
+                    SECURITY_CONFIG_PATH,
+                    SECURITY_CONFIG_PATH,
                     cls.module_whitelist,
                 )
 
@@ -44,5 +40,6 @@ class RemoteFunctionWhitelist:
                 "Remote function module whitelist check failed "
                 f"for {function_descriptor}"
             )
+
 
 RemoteFunctionWhitelist.whitelist_init()

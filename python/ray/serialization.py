@@ -80,7 +80,7 @@ def restricted_loads(
 
 def patch_pickle_for_security():
     global _pickle_whitelist
-    whitelist_path = ray_constants.RAY_PICKLE_WHITELIST_CONFIG_PATH
+    whitelist_path = ray_constants.SECURITY_CONFIG_PATH
     if whitelist_path is None:
         return
 

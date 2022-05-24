@@ -359,3 +359,9 @@ LANGUAGE_WORKER_TYPES = ["python", "java", "cpp"]
 
 # Security config file absolute path.
 SECURITY_CONFIG_PATH = os.environ.get("RAY_SECURITY_CONFIG_PATH", None)
+
+# For security
+DISABLE_REMOTE_CODE = os.environ.get("RAY_DISABLE_REMOTE_CODE", "0").lower() in (
+    "1",
+    "true",
+)

@@ -333,6 +333,12 @@ class FunctionActorManager:
                 # even if load_code_from_local is set True
                 if self._load_function_from_local(function_descriptor) is True:
                     return self._function_execution_info[function_id]
+                elif ray_constants.DISABLE_REMOTE_CODE:
+                    raise RuntimeError(
+                        "Failded to load function or class: "
+                        f"{function_descriptor.repr}"
+                    )
+
         # Load function from GCS.
         # Wait until the function to be executed has actually been
         # registered on this worker. We will push warnings to the user if
@@ -362,7 +368,12 @@ class FunctionActorManager:
             function_descriptor.function_name,
         )
 
-        object = self.load_function_or_class_from_local(module_name, function_name)
+        try:
+            object = self.load_function_or_class_from_local(module_name, function_name)
+        except Exception:
+            logger.exception("Load function or class from local failed.")
+            return False
+
         if object is not None:
             function = object._function
             self._function_execution_info[function_id] = FunctionExecutionInfo(

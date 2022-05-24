@@ -136,6 +136,7 @@ cdef extern from "ray/common/status.h" namespace "ray::StatusCode" nogil:
     cdef StatusCode StatusCode_NotImplemented "NotImplemented"
     cdef StatusCode StatusCode_RedisError "RedisError"
 
+
 cdef extern from "ray/common/id.h" namespace "ray" nogil:
     const CTaskID GenerateTaskId(const CJobID &job_id,
                                  const CTaskID &parent_task_id,

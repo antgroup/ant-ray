@@ -519,13 +519,6 @@ def debug(address):
     default=False,
     help="If True, the usage stats collection will be disabled.",
 )
-@click.option(
-    "--load-code-mode",
-    hidden=True,
-    default=ray_constants.LoadCodeMode.HYBRID.value,
-    help="The load code mode for executing remote tasks. It should be one of "
-    f"{[e.value for e in ray_constants.LoadCodeMode]}",
-)
 @add_click_logging_options
 @PublicAPI
 def start(
@@ -569,7 +562,6 @@ def start(
     tracing_startup_hook,
     ray_debugger_external,
     disable_usage_stats,
-    load_code_mode,
 ):
     """Start Ray processes manually on the local machine."""
 
@@ -601,12 +593,6 @@ def start(
             "json.loads. Try using a format like\n\n"
             '    --resources=\'{"CustomResource1": 3, '
             '"CustomReseource2": 2}\''
-        )
-
-    if load_code_mode not in [e.value for e in ray_constants.LoadCodeMode]:
-        raise Exception(
-            "The local code mode should be one of "
-            f"{[e.value for e in ray_constants.LoadCodeMode]}"
         )
 
     redirect_output = None if not no_redirect_output else True
@@ -644,7 +630,6 @@ def start(
         no_monitor=no_monitor,
         tracing_startup_hook=tracing_startup_hook,
         ray_debugger_external=ray_debugger_external,
-        load_code_mode=ray_constants.LoadCodeMode(load_code_mode),
     )
 
     if ray_constants.RAY_START_HOOK in os.environ:

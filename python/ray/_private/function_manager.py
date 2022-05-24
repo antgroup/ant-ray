@@ -31,7 +31,6 @@ from ray.util.inspect import (
     is_class_method,
     is_static_method,
 )
-from ray.exceptions import FunctionLoadingError
 
 FunctionExecutionInfo = namedtuple(
     "FunctionExecutionInfo", ["function", "function_name", "max_calls"]
@@ -330,10 +329,8 @@ class FunctionActorManager:
                 # even if load_code_from_local is set True
                 if self._load_function_from_local(function_descriptor) is True:
                     return self._function_execution_info[function_id]
-                elif (
-                    self._worker.load_code_mode == ray_constants.LoadCodeMode.LOCAL_ONLY
-                ):
-                    raise FunctionLoadingError(
+                elif ray_constants.DISABLE_REMOTE_CODE:
+                    raise RuntimeError(
                         "Failded to load function or class: "
                         f"{function_descriptor.repr}"
                     )

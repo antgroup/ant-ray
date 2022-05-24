@@ -28,7 +28,6 @@ from ray.exceptions import (
     LocalRayletDiedError,
     TaskUnschedulableError,
     ActorUnschedulableError,
-    FunctionLoadingError,
 )
 from ray._raylet import (
     split_buffer,
@@ -261,8 +260,6 @@ class SerializationContext:
                 return RayError.from_bytes(obj)
             elif error_type == ErrorType.Value("WORKER_DIED"):
                 return WorkerCrashedError()
-            elif error_type == ErrorType.Value("FUNCTION_LOADING_ERROR"):
-                return FunctionLoadingError()
             elif error_type == ErrorType.Value("ACTOR_DIED"):
                 return self._deserialize_actor_died_error(data, metadata_fields)
             elif error_type == ErrorType.Value("LOCAL_RAYLET_DIED"):

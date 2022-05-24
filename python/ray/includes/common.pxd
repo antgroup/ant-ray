@@ -99,9 +99,6 @@ cdef extern from "ray/common/status.h" namespace "ray" nogil:
         @staticmethod
         CRayStatus NotFound()
 
-        @staticmethod
-        CRayStatus FunctionLoadingError()
-
         c_bool ok()
         c_bool IsOutOfMemory()
         c_bool IsKeyError()
@@ -116,7 +113,6 @@ cdef extern from "ray/common/status.h" namespace "ray" nogil:
         c_bool IsInterrupted()
         c_bool ShouldExitWorker()
         c_bool IsNotFound()
-        c_bool IsFunctionLoadingError()
 
         c_string ToString()
         c_string CodeAsString()
@@ -139,8 +135,6 @@ cdef extern from "ray/common/status.h" namespace "ray::StatusCode" nogil:
     cdef StatusCode StatusCode_UnknownError "UnknownError"
     cdef StatusCode StatusCode_NotImplemented "NotImplemented"
     cdef StatusCode StatusCode_RedisError "RedisError"
-    cdef StatusCode StatusCode_FunctionLoadingError "FunctionLoadingError"
-
 
 cdef extern from "ray/common/id.h" namespace "ray" nogil:
     const CTaskID GenerateTaskId(const CJobID &job_id,

@@ -145,7 +145,6 @@ class Worker:
         # Create the lock here because the serializer will use it before
         # initializing Ray.
         self.lock = threading.RLock()
-        self._load_code_mode = ray_constants.LoadCodeMode.HYBRID
 
     @property
     def connected(self):
@@ -161,11 +160,6 @@ class Worker:
     def load_code_from_local(self):
         self.check_connected()
         return self._load_code_from_local
-
-    @property
-    def load_code_mode(self):
-        self.check_connected()
-        return self._load_code_mode
 
     @property
     def current_job_id(self):
@@ -270,9 +264,6 @@ class Worker:
 
     def set_load_code_from_local(self, load_code_from_local):
         self._load_code_from_local = load_code_from_local
-
-    def set_load_code_mode(self, load_code_mode):
-        self._load_code_mode = load_code_mode
 
     def put_object(self, value, object_ref=None, owner_address=None):
         """Put value in the local object store with object reference `object_ref`.
@@ -1626,7 +1617,7 @@ def connect(
     # Start the import thread
     if (
         mode not in (RESTORE_WORKER_MODE, SPILL_WORKER_MODE)
-        and worker.load_code_mode != ray_constants.LoadCodeMode.LOCAL_ONLY
+        and not ray_constants.DISABLE_REMOTE_CODE
     ):
         worker.import_thread = import_thread.ImportThread(
             worker, mode, worker.threads_stopped

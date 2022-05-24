@@ -95,7 +95,6 @@ enum class StatusCode : char {
   CreationTaskError = 16,
   NotFound = 17,
   Disconnected = 18,
-  FunctionLoadingError = 19,
   // object store status
   ObjectExists = 21,
   ObjectNotFound = 22,
@@ -193,10 +192,6 @@ class RAY_EXPORT Status {
     return Status(StatusCode::Disconnected, msg);
   }
 
-  static Status FunctionLoadingError() {
-    return Status(StatusCode::FunctionLoadingError, "failed to load function");
-  }
-
   static Status ObjectExists(const std::string &msg) {
     return Status(StatusCode::ObjectExists, msg);
   }
@@ -243,7 +238,6 @@ class RAY_EXPORT Status {
   bool ShouldExitWorker() const {
     return code() == StatusCode::IntentionalSystemExit ||
            code() == StatusCode::UnexpectedSystemExit ||
-           code() == StatusCode::FunctionLoadingError ||
            code() == StatusCode::CreationTaskError;
   }
   bool IsIntentionalSystemExit() const {
@@ -255,9 +249,6 @@ class RAY_EXPORT Status {
   }
   bool IsNotFound() const { return code() == StatusCode::NotFound; }
   bool IsDisconnected() const { return code() == StatusCode::Disconnected; }
-  bool IsFunctionLoadingError() const {
-    return code() == StatusCode::FunctionLoadingError;
-  }
   bool IsObjectExists() const { return code() == StatusCode::ObjectExists; }
   bool IsObjectNotFound() const { return code() == StatusCode::ObjectNotFound; }
   bool IsObjectAlreadySealed() const { return code() == StatusCode::ObjectAlreadySealed; }

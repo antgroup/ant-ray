@@ -146,13 +146,6 @@ parser.add_argument(
     action="store_true",
     help="True if Ray debugger is made available externally.",
 )
-parser.add_argument(
-    "--load-code-mode",
-    required=False,
-    type=str,
-    default=None,
-    help="The load code mode for executing remote tasks.",
-)
 
 if __name__ == "__main__":
     # NOTE(sang): For some reason, if we move the code below
@@ -175,11 +168,6 @@ if __name__ == "__main__":
     if raylet_ip_address is None:
         raylet_ip_address = args.node_ip_address
 
-    if args.load_code_mode:
-        ray.worker.global_worker.set_load_code_mode(
-            ray_constants.LoadCodeMode(args.load_code_mode)
-        )
-
     ray_params = RayParams(
         node_ip_address=args.node_ip_address,
         raylet_ip_address=raylet_ip_address,
@@ -192,9 +180,6 @@ if __name__ == "__main__":
         storage=args.storage,
         metrics_agent_port=args.metrics_agent_port,
         gcs_address=args.gcs_address,
-        load_code_mode=ray_constants.LoadCodeMode(args.load_code_mode)
-        if args.load_code_mode
-        else None,
     )
 
     node = ray.node.Node(
@@ -241,7 +226,7 @@ if __name__ == "__main__":
             if os.path.isfile(p):
                 p = os.path.dirname(p)
             sys.path.insert(0, p)
-    if args.load_code_mode:
+    if ray_constants.DISABLE_REMOTE_CODE:
         load_code_from_local = True
     ray.worker.global_worker.set_load_code_from_local(load_code_from_local)
 

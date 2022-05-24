@@ -117,8 +117,6 @@ class RayParams:
             worker available externally to the node it is running on. This will
             bind on 0.0.0.0 instead of localhost.
         env_vars (dict): Override environment variables for the raylet.
-        load_code_mode(LoadCodeMode): The load code mode for executing remote
-            tasks.
     """
 
     def __init__(
@@ -174,7 +172,6 @@ class RayParams:
         tracing_startup_hook=None,
         no_monitor=False,
         env_vars=None,
-        load_code_mode=None,
     ):
         self.redis_address = redis_address
         self.gcs_address = gcs_address
@@ -234,7 +231,6 @@ class RayParams:
         self._system_config = _system_config or {}
         self._enable_object_reconstruction = enable_object_reconstruction
         self._check_usage()
-        self.load_code_mode = load_code_mode
 
         # Set the internal config options for object reconstruction.
         if enable_object_reconstruction:

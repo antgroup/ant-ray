@@ -123,7 +123,6 @@ from ray.exceptions import (
     TaskCancelledError,
     AsyncioActorExit,
     PendingCallsLimitExceeded,
-    FunctionLoadingError,
 )
 from ray import external_storage
 from ray.util.scheduling_strategies import (
@@ -816,8 +815,6 @@ cdef CRayStatus task_execution_handler(
                     (&creation_task_exception_pb_bytes)[0] = (
                         ray_error_to_memory_buf(e))
                     sys_exit.is_creation_task_error = True
-                elif isinstance(e, FunctionLoadingError):
-                    sys_exit.is_function_loading_error = True
                 else:
                     traceback_str = traceback.format_exc() + (
                         "An unexpected internal error "
@@ -834,8 +831,6 @@ cdef CRayStatus task_execution_handler(
             # are processed.
             if hasattr(e, "is_ray_terminate"):
                 return CRayStatus.IntentionalSystemExit()
-            elif hasattr(e, "is_function_loading_error"):
-                return CRayStatus.FunctionLoadingError()
             elif hasattr(e, "is_creation_task_error"):
                 return CRayStatus.CreationTaskError()
             elif e.code and e.code == 0:

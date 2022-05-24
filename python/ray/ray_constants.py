@@ -3,7 +3,6 @@
 import logging
 import math
 import os
-from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -358,8 +357,8 @@ KV_NAMESPACE_FUNCTION_TABLE = b"fun"
 
 LANGUAGE_WORKER_TYPES = ["python", "java", "cpp"]
 
-
-class LoadCodeMode(Enum):
-    DYNAMIC_ONLY = "dynamic-only"
-    LOCAL_ONLY = "local-only"
-    HYBRID = "hybrid"
+# For security
+DISABLE_REMOTE_CODE = os.environ.get("RAY_DISABLE_REMOTE_CODE", "0").lower() in (
+    "1",
+    "true",
+)

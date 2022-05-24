@@ -579,13 +579,10 @@ void CoreWorkerDirectTaskSubmitter::PushNormalTask(
           // failure (e.g., by contacting the raylet). If it was a process
           // failure, it may have been an application-level error and it may
           // not make sense to retry the task.
-          rpc::ErrorType error_type =
-              is_actor ? rpc::ErrorType::ACTOR_DIED : rpc::ErrorType::WORKER_DIED;
-          if (status.IsFunctionLoadingError()) {
-            error_type = rpc::ErrorType::FUNCTION_LOADING_ERROR;
-          }
-          RAY_UNUSED(
-              task_finisher_->FailOrRetryPendingTask(task_id, error_type, &status));
+          RAY_UNUSED(task_finisher_->FailOrRetryPendingTask(
+              task_id,
+              is_actor ? rpc::ErrorType::ACTOR_DIED : rpc::ErrorType::WORKER_DIED,
+              &status));
         } else {
           if (!task_spec.GetMessage().retry_exceptions() ||
               !reply.is_application_level_error() ||

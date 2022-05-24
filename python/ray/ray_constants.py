@@ -361,3 +361,9 @@ LANGUAGE_WORKER_TYPES = ["python", "java", "cpp"]
 RAY_PICKLE_WHITELIST_CONFIG_PATH = os.environ.get(
     "RAY_PICKLE_WHITELIST_CONFIG_PATH", None
 )
+
+# For security
+DISABLE_REMOTE_CODE = os.environ.get("RAY_DISABLE_REMOTE_CODE", "0").lower() in (
+    "1",
+    "true",
+)

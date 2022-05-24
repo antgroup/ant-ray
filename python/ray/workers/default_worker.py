@@ -226,6 +226,8 @@ if __name__ == "__main__":
             if os.path.isfile(p):
                 p = os.path.dirname(p)
             sys.path.insert(0, p)
+    if ray_constants.DISABLE_REMOTE_CODE:
+        load_code_from_local = True
     ray.worker.global_worker.set_load_code_from_local(load_code_from_local)
 
     # Setup log file.

@@ -1615,7 +1615,10 @@ def connect(
         )
 
     # Start the import thread
-    if mode not in (RESTORE_WORKER_MODE, SPILL_WORKER_MODE):
+    if (
+        mode not in (RESTORE_WORKER_MODE, SPILL_WORKER_MODE)
+        and not ray_constants.DISABLE_REMOTE_CODE
+    ):
         worker.import_thread = import_thread.ImportThread(
             worker, mode, worker.threads_stopped
         )

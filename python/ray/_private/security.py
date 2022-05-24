@@ -45,4 +45,5 @@ class RemoteFunctionWhitelist:
                 f"for {function_descriptor}"
             )
 
+
 RemoteFunctionWhitelist.whitelist_init()

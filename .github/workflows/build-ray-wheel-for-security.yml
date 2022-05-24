@@ -1,0 +1,45 @@
+name: build-ray-wheel-for-security.yml
+
+on:
+  push:
+    branches: [ secure ]
+  pull_request:
+    branches: [ secure ]
+
+jobs:
+  build-wheel-pipeline:
+    timeout-minutes: 120
+    runs-on: ubuntu-20.04
+    container: docker.io/library/ubuntu:20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install basics
+      run: |
+           apt-get update
+           apt-get install -yq software-properties-common
+           add-apt-repository -y ppa:deadsnakes/ppa
+           apt-get install -yq wget curl gcc g++ openjdk-8-jdk maven python3.8 zlib1g-dev zip git pip
+
+    - name: Install bazel
+      run: |
+           sh -c "bash ci/env/install-bazel.sh"
+
+    - name: Install Ray and export dist
+      run: |
+           python3 -m pip install virtualenv
+           python3 -m virtualenv -p python3 py3
+           . py3/bin/activate
+           pip install pytest
+           cd python
+           pip install -e . -v
+           python setup.py bdist_wheel
+           ls dist
+           ls dist/ray-2.0.0.dev0-cp38-cp38-linux_x86_64.whl
+
+    - name: Archive ray-wheel
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux_py38_ray_whl
+        path: python/dist/ray-2.0.0.dev0-cp38-cp38-linux_x86_64.whl

@@ -9,16 +9,16 @@ on:
 jobs:
   build-wheel-pipeline:
     timeout-minutes: 120
-    runs-on: ubuntu-20.04
-    container: quay.io/pypa/manylinux_2_24_x86_64
+    runs-on: centos-7
+    container: quay.io/pypa/manylinux2014_x86_64
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install basics
-      run: |
-           apt-get update
-           apt-get install -yq wget curl gcc g++ openjdk-8-jdk maven zlib1g-dev zip git
+    # - name: Install basics
+    #   run: |
+    #        apt-get update
+    #        apt-get install -yq wget curl gcc g++ openjdk-8-jdk maven zlib1g-dev zip git
 
     - name: Install bazel
       run: |

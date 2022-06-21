@@ -11,6 +11,8 @@ echo 10
 EOF
 chmod +x /usr/bin/nproc
 
+TRAVIS_COMMIT=${GITHUB_SHA}
+
 NODE_VERSION="14"
 PYTHONS=("cp36-cp36m"
          "cp37-cp37m"

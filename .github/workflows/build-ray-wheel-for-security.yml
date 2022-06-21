@@ -29,6 +29,8 @@ jobs:
 
     - name: Install Ray and export dist
       run: |
+           set -e
+           set -x
            # python3 -m pip install virtualenv
            # python3 -m virtualenv -p python3 py3
            # . py3/bin/activate
@@ -42,4 +44,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: linux_py38_ray_whl
-        path: .whl/*.whl
+        path: .whl/

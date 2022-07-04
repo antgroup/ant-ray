@@ -86,12 +86,6 @@ class AbstractRayRuntime : public RayRuntime {
   void RemovePlacementGroup(const std::string &group_id);
   bool WaitPlacementGroupReady(const std::string &group_id, int timeout_seconds);
 
-  const TaskID &GetCurrentTaskId();
-
-  const JobID &GetCurrentJobID();
-
-  virtual const WorkerContext &GetWorkerContext();
-
   static std::shared_ptr<AbstractRayRuntime> GetInstance();
   static std::shared_ptr<AbstractRayRuntime> DoInit();
 

@@ -49,5 +49,15 @@ std::string LocalModeRayRuntime::Put(std::shared_ptr<msgpack::sbuffer> data) {
   return object_id.Binary();
 }
 
+const TaskID &LocalModeRayRuntime::GetCurrentTaskId() {
+  return worker_->GetCurrentTaskID();
+}
+
+const JobID &LocalModeRayRuntime::GetCurrentJobID() { return worker_->GetCurrentJobID(); }
+
+const std::unique_ptr<WorkerContext> &LocalModeRayRuntime::GetWorkerContext() {
+  return worker_;
+}
+
 }  // namespace internal
 }  // namespace ray

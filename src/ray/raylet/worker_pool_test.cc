@@ -552,7 +552,7 @@ static inline TaskSpecification ExampleTaskSpec(
     const JobID &job_id = JOB_ID,
     const ActorID actor_creation_id = ActorID::Nil(),
     const std::vector<std::string> &dynamic_worker_options = {},
-    const TaskID &task_id = TaskID::FromRandom(JobID::Nil()),
+    const TaskID &task_id = TaskID::FromRandom(JOB_ID),
     const rpc::RuntimeEnvInfo runtime_env_info = rpc::RuntimeEnvInfo()) {
   rpc::TaskSpec message;
   message.set_job_id(job_id.Binary());
@@ -1022,8 +1022,8 @@ TEST_F(WorkerPoolTest, MaxIOWorkerComplicateTest) {
     spill_workers.insert(worker);
     worker_pool_->OnWorkerStarted(worker);
     worker_pool_->PushSpillWorker(worker);
-    started_processes.pop_back();
   }
+  started_processes.clear();
 
   // Try pop multiple workers and make sure it doesn't exceed max_io_workers.
   for (int i = 0; i < 10; i++) {
@@ -1043,8 +1043,9 @@ TEST_F(WorkerPoolTest, MaxIOWorkerComplicateTest) {
     spill_workers.insert(worker);
     worker_pool_->OnWorkerStarted(worker);
     worker_pool_->PushSpillWorker(worker);
-    started_processes.pop_back();
   }
+  started_processes.clear();
+
   ASSERT_EQ(worker_pool_->GetProcessSize(), MAX_IO_WORKER_SIZE);
   ASSERT_EQ(started_processes.size(), 0);
   ASSERT_EQ(worker_pool_->NumSpillWorkerStarting(), 0);
@@ -1421,6 +1422,7 @@ TEST_F(WorkerPoolTest, TestWorkerCappingWithExitDelay) {
 }
 
 TEST_F(WorkerPoolTest, PopWorkerWithRuntimeEnv) {
+  RegisterDriver(Language::PYTHON, JOB_ID);
   ASSERT_EQ(worker_pool_->GetProcessSize(), 0);
   auto actor_creation_id = ActorID::Of(JOB_ID, TaskID::ForDriverTask(JOB_ID), 1);
   const auto actor_creation_task_spec = ExampleTaskSpec(ActorID::Nil(),
@@ -1428,14 +1430,14 @@ TEST_F(WorkerPoolTest, PopWorkerWithRuntimeEnv) {
                                                         JOB_ID,
                                                         actor_creation_id,
                                                         {"XXX=YYY"},
-                                                        TaskID::FromRandom(JobID::Nil()),
+                                                        TaskID::FromRandom(JOB_ID),
                                                         ExampleRuntimeEnvInfo({"XXX"}));
   const auto normal_task_spec = ExampleTaskSpec(ActorID::Nil(),
                                                 Language::PYTHON,
                                                 JOB_ID,
                                                 ActorID::Nil(),
                                                 {"XXX=YYY"},
-                                                TaskID::FromRandom(JobID::Nil()),
+                                                TaskID::FromRandom(JOB_ID),
                                                 ExampleRuntimeEnvInfo({"XXX"}));
   const auto normal_task_spec_without_runtime_env =
       ExampleTaskSpec(ActorID::Nil(), Language::PYTHON, JOB_ID, ActorID::Nil(), {});

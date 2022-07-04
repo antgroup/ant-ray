@@ -27,7 +27,7 @@ class ActorCreatorTest : public ::testing::Test {
   ActorCreatorTest() {}
   void SetUp() override {
     gcs_client = std::make_shared<ray::gcs::MockGcsClient>();
-    actor_creator = std::make_unique<DefaultActorCreator>(gcs_client);
+    actor_creator = std::make_unique<DefaultActorCreator>(gcs_client, io_service);
   }
   TaskSpecification GetTaskSpec(const ActorID &actor_id) {
     rpc::TaskSpec task_spec;
@@ -39,6 +39,7 @@ class ActorCreatorTest : public ::testing::Test {
   }
   std::shared_ptr<ray::gcs::MockGcsClient> gcs_client;
   std::unique_ptr<DefaultActorCreator> actor_creator;
+  instrumented_io_context io_service;
 };
 
 TEST_F(ActorCreatorTest, IsRegister) {
@@ -53,6 +54,7 @@ TEST_F(ActorCreatorTest, IsRegister) {
   ASSERT_TRUE(actor_creator->AsyncRegisterActor(task_spec, nullptr).ok());
   ASSERT_TRUE(actor_creator->IsActorInRegistering(actor_id));
   cb(Status::OK());
+  io_service.run_one();
   ASSERT_FALSE(actor_creator->IsActorInRegistering(actor_id));
 }
 
@@ -75,6 +77,7 @@ TEST_F(ActorCreatorTest, AsyncWaitForFinish) {
     actor_creator->AsyncWaitForActorRegisterFinish(actor_id, per_finish_cb);
   }
   cb(Status::OK());
+  io_service.run_one();
   ASSERT_FALSE(actor_creator->IsActorInRegistering(actor_id));
   ASSERT_EQ(101, cnt);
 }

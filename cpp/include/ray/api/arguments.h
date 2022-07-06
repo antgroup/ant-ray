@@ -30,9 +30,9 @@ class Arguments {
   static void WrapArgsImpl(LangType lang_type,
                            std::vector<TaskArg> *task_args,
                            InputArgTypes &&arg) {
-    if constexpr (is_object_ref_v<OriginArgType>) {
-      PushReferenceArg(task_args, std::forward<InputArgTypes>(arg));
-    } else if constexpr (is_object_ref_v<InputArgTypes>) {
+    if constexpr (!is_object_ref_v<OriginArgType> && is_object_ref_v<InputArgTypes>) {
+      // PushReferenceArg(task_args, std::forward<InputArgTypes>(arg));
+    // } else if constexpr (is_object_ref_v<InputArgTypes>) {
       // core_worker submitting task callback will get the value of an ObjectRef arg, but
       // local mode we don't call core_worker submit task, so we need get the value of an
       // ObjectRef arg only for local mode.

@@ -30,6 +30,9 @@ class Counter {
 
   int Plus1();
   int Add(int x);
+  int AddWithRef(ray::ObjectRef<int> obj1, ray::ObjectRef<int> obj2) {
+  return *obj1.Get() + *obj2.Get();
+}
   int Exit();
   uint64_t GetPid();
   void ExceptionFunc() { throw std::invalid_argument("error"); }

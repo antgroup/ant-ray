@@ -21,6 +21,8 @@ int Return1();
 int Plus1(int x);
 int Plus(int x, int y);
 void ThrowTask();
+std::string GetVal(ray::ObjectRef<std::string> obj);
+int Add(ray::ObjectRef<int> obj1, ray::ObjectRef<int> obj2);
 
 std::array<int, 100000> ReturnLargeArray(std::array<int, 100000> x);
 std::string Echo(std::string str);

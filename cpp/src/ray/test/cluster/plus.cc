@@ -20,6 +20,10 @@ int Plus(int x, int y) { return x + y; };
 
 std::array<int, 100000> ReturnLargeArray(std::array<int, 100000> x) { return x; };
 void ThrowTask() { throw std::logic_error("error"); }
+std::string GetVal(ray::ObjectRef<std::string> obj) { return *obj.Get(); }
+int Add(ray::ObjectRef<int> obj1, ray::ObjectRef<int> obj2) {
+  return *obj1.Get() + *obj2.Get();
+}
 
 std::string Echo(std::string str) { return str; }
 
@@ -42,6 +46,8 @@ RAY_REMOTE(Return1,
            Plus1,
            Plus,
            ThrowTask,
+           GetVal,
+           Add,
            ReturnLargeArray,
            Echo,
            GetMap,

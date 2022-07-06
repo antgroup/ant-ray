@@ -88,7 +88,7 @@ std::pair<Status, std::shared_ptr<msgpack::sbuffer>> GetExecuteResult(
     const std::string &func_name,
     const ArgsBufferList &args_buffer,
     msgpack::sbuffer *actor_ptr) {
-  try {
+  // try {
     EntryFuntion entry_function;
     if (actor_ptr == nullptr) {
       entry_function = FunctionHelper::GetInstance().GetExecutableFunctions(func_name);
@@ -101,25 +101,25 @@ std::pair<Status, std::shared_ptr<msgpack::sbuffer>> GetExecuteResult(
     RAY_LOG(DEBUG) << "Execute function " << func_name << " ok.";
     return std::make_pair(ray::Status::OK(),
                           std::make_shared<msgpack::sbuffer>(std::move(result)));
-  } catch (RayIntentionalSystemExitException &e) {
-    return std::make_pair(ray::Status::IntentionalSystemExit(""), nullptr);
-  } catch (RayException &e) {
-    return std::make_pair(ray::Status::NotFound(e.what()), nullptr);
-  } catch (msgpack::type_error &e) {
-    return std::make_pair(
-        ray::Status::Invalid(std::string("invalid arguments: ") + e.what()), nullptr);
-  } catch (const std::invalid_argument &e) {
-    return std::make_pair(
-        ray::Status::Invalid(std::string("function execute exception: ") + e.what()),
-        nullptr);
-  } catch (const std::exception &e) {
-    return std::make_pair(
-        ray::Status::Invalid(std::string("function execute exception: ") + e.what()),
-        nullptr);
-  } catch (...) {
-    return std::make_pair(ray::Status::UnknownError(std::string("unknown exception")),
-                          nullptr);
-  }
+  // } catch (RayIntentionalSystemExitException &e) {
+  //   return std::make_pair(ray::Status::IntentionalSystemExit(""), nullptr);
+  // } catch (RayException &e) {
+  //   return std::make_pair(ray::Status::NotFound(e.what()), nullptr);
+  // } catch (msgpack::type_error &e) {
+  //   return std::make_pair(
+  //       ray::Status::Invalid(std::string("invalid arguments: ") + e.what()), nullptr);
+  // } catch (const std::invalid_argument &e) {
+  //   return std::make_pair(
+  //       ray::Status::Invalid(std::string("function execute exception: ") + e.what()),
+  //       nullptr);
+  // } catch (const std::exception &e) {
+  //   return std::make_pair(
+  //       ray::Status::Invalid(std::string("function execute exception: ") + e.what()),
+  //       nullptr);
+  // } catch (...) {
+  //   return std::make_pair(ray::Status::UnknownError(std::string("unknown exception")),
+  //                         nullptr);
+  // }
 }
 
 Status TaskExecutor::ExecuteTask(
@@ -159,6 +159,17 @@ Status TaskExecutor::ExecuteTask(
     }
 
     ray_args_buffer.push_back(std::move(sbuf));
+    auto &ref = arg_refs.at(i);
+    bool is_ref_arg = (ref.object_id() != ray::ObjectID::Nil().Binary());
+    if (is_ref_arg) {
+      RAY_LOG(DEBUG) << "2222222 ";
+      auto address = core::CoreWorkerProcess::GetCoreWorker().GetOwnerAddress(
+          ray::ObjectID::FromBinary(ref.object_id()));
+      AbstractRayRuntime::GetInstance()->RegisterOwnershipInfoAndResolveFutureInternal(
+          ref.object_id(), "", address);
+      RAY_LOG(DEBUG) << "333333 ";
+    }
+    RAY_LOG(DEBUG) << "44444 ";
   }
   if (task_type == ray::TaskType::ACTOR_CREATION_TASK) {
     std::tie(status, data) = GetExecuteResult(func_name, ray_args_buffer, nullptr);
@@ -175,9 +186,10 @@ Status TaskExecutor::ExecuteTask(
     std::tie(status, data) =
         GetExecuteResult(func_name, ray_args_buffer, current_actor_.get());
   } else {  // NORMAL_TASK
+  RAY_LOG(DEBUG) << "@@@@@@@ ";
     std::tie(status, data) = GetExecuteResult(func_name, ray_args_buffer, nullptr);
   }
-
+RAY_LOG(DEBUG) << "555555 ";
   std::shared_ptr<ray::LocalMemoryBuffer> meta_buffer = nullptr;
   if (!status.ok()) {
     if (status.IsIntentionalSystemExit()) {
@@ -206,7 +218,7 @@ Status TaskExecutor::ExecuteTask(
     }
     data = std::make_shared<msgpack::sbuffer>(std::move(buf));
   }
-
+RAY_LOG(DEBUG) << "666666 ";
   results->resize(return_ids.size(), nullptr);
   if (task_type != ray::TaskType::ACTOR_CREATION_TASK) {
     size_t data_size = data->size();
@@ -251,9 +263,11 @@ Status TaskExecutor::ExecuteTask(
     RAY_CHECK_OK(CoreWorkerProcess::GetCoreWorker().SealReturnObject(result_id, result));
   } else {
     if (!status.ok()) {
+      RAY_LOG(DEBUG) << "77777 ";
       return ray::Status::CreationTaskError("");
     }
   }
+  RAY_LOG(DEBUG) << "8888 ";
   return ray::Status::OK();
 }
 

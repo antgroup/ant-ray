@@ -1,10 +1,10 @@
-name: build-ray-wheel-for-security.yml
+name: BUILD-RAY-WHEELS-ON-MANY-LINUX.yml
 
 on:
   push:
-    branches: [ secure ]
+    branches: [ secretflow-ray ]
   pull_request:
-    branches: [ secure ]
+    branches: [ secretflow-ray ]
 
 jobs:
   build-wheel-pipeline:
@@ -31,10 +31,6 @@ jobs:
       run: |
            set -e
            set -x
-           # python3 -m pip install virtualenv
-           # python3 -m virtualenv -p python3 py3
-           # . py3/bin/activate
-           # pip install pytest
            ./python/build-wheel-manylinux2014.sh
 
            ls .whl 

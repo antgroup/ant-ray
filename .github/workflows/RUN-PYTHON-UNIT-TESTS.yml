@@ -1,0 +1,35 @@
+name: RUN-PYTHON-UNIT-TESTS.yml
+
+on:
+  push:
+    branches: [ secretflow-ray ]
+  pull_request:
+    branches: [ secretflow-ray ]
+
+jobs:
+  unit-tests:
+    timeout-minutes: 120
+    runs-on: ubuntu-20.04
+    container: docker.io/library/ubuntu:20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install basics
+      run: |
+           apt-get update
+           apt-get install -yq software-properties-common
+           add-apt-repository -y ppa:deadsnakes/ppa
+           apt-get install -yq wget curl gcc g++ openjdk-8-jdk maven python3.8 zlib1g-dev zip git pip
+    - name: Install bazel
+      run: |
+           sh -c "bash ci/env/install-bazel.sh"
+    - name: Install Ray and run basic unit tests.
+      run: |
+           python3 -m pip install virtualenv
+           python3 -m virtualenv -p python3 py3
+           . py3/bin/activate
+           pip install pytest
+           cd python
+           pip install -e . -v
+           pytest -v ray/tests/test_*.py

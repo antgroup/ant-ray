@@ -14,9 +14,8 @@ chmod +x /usr/bin/nproc
 TRAVIS_COMMIT=${GITHUB_SHA}
 
 NODE_VERSION="14"
-# We only support the Python version >= 3.8 for secretflow-ray.
-PYTHONS=("cp38-cp38"
-         "cp39-cp39")
+# We only support the Python version == 3.8 for secretflow-ray.
+PYTHONS=("cp38-cp38")
 
 NUMPY_VERSIONS=("1.14.5"
                 "1.14.5"

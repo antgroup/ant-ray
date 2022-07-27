@@ -136,6 +136,7 @@ void OwnershipBasedObjectDirectory::ReportObjectAdded(const ObjectID &object_id,
   if (!existing_object) {
     location_buffers_[worker_id].first.emplace_back(object_id);
   }
+  RAY_LOG(DEBUG) << "hejialing test: SendObjectLocationUpdateBatchIfNeeded";
   SendObjectLocationUpdateBatchIfNeeded(worker_id, node_id, owner_address);
 }
 
@@ -194,6 +195,7 @@ void OwnershipBasedObjectDirectory::ReportObjectSpilled(
 
 void OwnershipBasedObjectDirectory::SendObjectLocationUpdateBatchIfNeeded(
     const WorkerID &worker_id, const NodeID &node_id, const rpc::Address &owner_address) {
+  RAY_LOG(DEBUG) << "hejialing test " << in_flight_requests_.contains(worker_id);
   if (in_flight_requests_.contains(worker_id)) {
     // If there's an in-flight request, the buffer will be sent once the request is
     // replied from the owner.
@@ -202,6 +204,7 @@ void OwnershipBasedObjectDirectory::SendObjectLocationUpdateBatchIfNeeded(
 
   // Do nothing if there's no update to this owner.
   auto location_buffer_it = location_buffers_.find(worker_id);
+  RAY_LOG(DEBUG) << "hejialing test " << (location_buffer_it == location_buffers_.end());
   if (location_buffer_it == location_buffers_.end()) {
     return;
   }
@@ -234,6 +237,7 @@ void OwnershipBasedObjectDirectory::SendObjectLocationUpdateBatchIfNeeded(
 
   in_flight_requests_.emplace(worker_id);
   auto owner_client = GetClient(owner_address);
+  RAY_LOG(DEBUG) << "hejialing test UpdateObjectLocationBatch, to address: " << owner_address.ip_address() << ":" << owner_address.port() << ", worker_id:" << WorkerID::FromBinary(owner_address.worker_id());
   owner_client->UpdateObjectLocationBatch(
       request,
       [this, worker_id, node_id, owner_address](

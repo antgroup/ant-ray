@@ -2,6 +2,8 @@ import pytest
 import ray
 import time
 import numpy as np
+import os
+import sys
 
 
 def test_owner_failed(ray_start_cluster):
@@ -90,7 +92,11 @@ def test_checkpoint(ray_start_cluster, actor_resources):
         cluster.add_node(**kwargs)
     ray.init(address=cluster.address)
 
-    @ray.remote(resources=actor_resources["owner"], num_cpus=0, max_restarts=100)
+    @ray.remote(
+        resources=actor_resources["owner"],
+        num_cpus=0,
+        max_restarts=100,
+        runtime_env={"env_vars": {"RAY_is_global_owner": "true"}})
     class Owner:
         def __init__(self):
             self.refs = None
@@ -102,26 +108,31 @@ def test_checkpoint(ray_start_cluster, actor_resources):
             return 0
 
         def exit(self):
-            raise RuntimeError
+            sys.exit(1)
 
-    owner = Owner.remote()
-    ray.get(owner.warmup.remote())
+        def get_pid(self):
+            return os.getpid()
 
-    ref = ray.put("test_data", _owner=owner)
-    checkpoint_url = ref.checkpoint_url()
-    print("checkpoint_url:", checkpoint_url, "len:", len(checkpoint_url))
-    print("ref:", ref)
-    print("data:", ray.get(ref))
-    try:
-        ray.get(owner.exit.remote())
-    except RuntimeError:
-        pass
-    else:
-        raise RuntimeError
-    print("wait 5 seconds for owner died.")
-    time.sleep(5)
-    print("data:", ray.get(ref))
+    # owner = Owner.remote()
+    # ray.get(owner.warmup.remote())
 
+    # ref = ray.put("test_data", _owner=owner)
+    # checkpoint_url = ref.checkpoint_url()
+    # print("checkpoint_url:", checkpoint_url, "len:", len(checkpoint_url))
+    # print("ref:", ref)
+    # print("data:", ray.get(ref))
+    # print("older owner pid: ", ray.get(owner.get_pid.remote()))
+    # try:
+    #     ray.get(owner.exit.remote())
+    # except ray.exceptions.RayActorError:
+    #     pass
+    # else:
+    #     raise RuntimeError
+    # print("wait 5 seconds for owner died.")
+    # time.sleep(5)
+    # print("older new pid: ", ray.get(owner.get_pid.remote()))
+    # print("data:", ray.get(ref))
+    # time.sleep(3600)
     class Worker:
         def __init__(self):
             self.refs = None
@@ -149,7 +160,7 @@ def test_checkpoint(ray_start_cluster, actor_resources):
             ray.put(np.zeros((50 * 1024 * 1024, 1)).astype(np.uint8))
 
         def exit(self):
-            raise RuntimeError
+            sys.exit(1)
 
     owner = Owner.remote()
     ray.get(owner.warmup.remote())
@@ -170,27 +181,31 @@ def test_checkpoint(ray_start_cluster, actor_resources):
     print("test object ref: ", refs[0], "global owner:", ray.ActorID(refs[0].global_owner_id()))
     ray.get(worker_2.send_refs.remote(refs))
     print("try get obj before kill:", ray.get(worker_2.try_get.remote()))
-    ray.get(worker_2.evict_all_object.remote())
+    # ray.get(worker_2.evict_all_object.remote())
+    print("older owner pid: ", ray.get(owner.get_pid.remote()))
     try:
         ray.get(owner.exit.remote())
-    except RuntimeError:
+    except ray.exceptions.RayActorError:
         pass
     else:
         raise RuntimeError
     print("wait 5 seconds for owner died.")
     time.sleep(5)
+    print("new owner pid: ", ray.get(owner.get_pid.remote()))
+    time.sleep(3600)
     print("try get obj after kill:", ray.get(worker_2.try_get.remote()))
-    ray.get(worker_2.evict_all_object.remote())
-    try:
-        ray.get(worker_1.exit.remote())
-    except RuntimeError:
-        pass
-    else:
-        raise RuntimeError
-    print("wait 5 seconds for creater died.")
-    time.sleep(5)
-    ray.get(owner.warmup.remote())
-    print("try get obj after kill:", ray.get(worker_2.try_get.remote()))
+    # ray.get(worker_2.evict_all_object.remote())
+    # try:
+    #     ray.get(worker_1.exit.remote())
+    # except ray.exceptions.RayActorError:
+    #     pass
+    # else:
+    #     raise RuntimeError
+    # print("wait 5 seconds for creater died.")
+    # time.sleep(5)
+    # print("new actor pid: ", ray.get(owner.get_pid.remote()))
+    # ray.get(owner.warmup.remote())
+    # print("try get obj after kill:", ray.get(worker_2.try_get.remote()))
 
 
 if __name__ == "__main__":

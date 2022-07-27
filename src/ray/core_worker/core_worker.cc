@@ -2990,6 +2990,7 @@ void CoreWorker::HandleUpdateObjectLocationBatch(
     rpc::SendReplyCallback send_reply_callback) {
   const auto &worker_id = request.intended_worker_id();
   if (HandleWrongRecipient(WorkerID::FromBinary(worker_id), send_reply_callback)) {
+    RAY_LOG(DEBUG) << "hejialing test in HandleWrongRecipient";
     return;
   }
   const auto &node_id = NodeID::FromBinary(request.node_id());
@@ -3010,9 +3011,11 @@ void CoreWorker::HandleUpdateObjectLocationBatch(
     if (object_location_update.has_plasma_location_update()) {
       if (object_location_update.plasma_location_update() ==
           rpc::ObjectPlasmaLocationUpdate::ADDED) {
+        RAY_LOG(DEBUG) << "hejialing test in rpc::ObjectPlasmaLocationUpdate::ADDED";
         AddObjectLocationOwner(object_id, node_id);
       } else if (object_location_update.plasma_location_update() ==
                  rpc::ObjectPlasmaLocationUpdate::REMOVED) {
+        RAY_LOG(DEBUG) << "hejialing test in rpc::ObjectPlasmaLocationUpdate::REMOVED";
         RemoveObjectLocationOwner(object_id, node_id);
       } else {
         RAY_LOG(FATAL) << "Invalid object plasma location update "
@@ -3042,6 +3045,7 @@ void CoreWorker::AddSpilledObjectLocationOwner(const ObjectID &object_id,
 
 void CoreWorker::AddObjectLocationOwner(const ObjectID &object_id,
                                         const NodeID &node_id) {
+  RAY_LOG(DEBUG) << "hejialing test: " << object_id << " " << node_id;
   if (gcs_client_->Nodes().Get(node_id, /*filter_dead_nodes=*/true) == nullptr) {
     RAY_LOG(DEBUG) << "Attempting to add object location for a dead node. "
                    << "Ignoring this request. object_id: " << object_id

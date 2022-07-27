@@ -2255,6 +2255,7 @@ void NodeManager::HandleObjectLocal(const ObjectInfo &object_info) {
     absl::MutexLock guard(&objects_need_to_report_mutex_);
     auto it = objects_need_to_report_.find(global_owner_id);
     if (it == objects_need_to_report_.end()) {
+      RAY_LOG(INFO) << "hejialing test HandleObjectLocal: " << global_owner_id << " " << object_id;
       it = objects_need_to_report_
                .emplace(global_owner_id, absl::flat_hash_set<ObjectID>())
                .first;
@@ -2313,6 +2314,7 @@ void NodeManager::HandleObjectMissing(const ObjectID &object_id) {
   // Notify the task dependency manager that this object is no longer local.
   auto global_owner_id = GetLocalObjectManager().GetObjectGlobalOwnerID(object_id);
   {
+    RAY_LOG(DEBUG) << "hejialing test HandleObjectMissing " << object_id << " " << global_owner_id;
     absl::MutexLock guard(&objects_need_to_report_mutex_);
     auto it = objects_need_to_report_.find(global_owner_id);
     if (it != objects_need_to_report_.end()) {
@@ -2320,6 +2322,7 @@ void NodeManager::HandleObjectMissing(const ObjectID &object_id) {
         it->second.erase(object_id);
       }
       if (it->second.size() == 0) {
+        RAY_LOG(DEBUG) << "hejialing test HandleObjectMissing 2: " << global_owner_id;
         objects_need_to_report_.erase(it);
       }
     }
@@ -2956,9 +2959,9 @@ void NodeManager::SubscribeGlobalOwnerAddress(ActorID actor_id) {
           }
           {
             absl::MutexLock guard(&objects_need_to_report_mutex_);
-            const ActorID actor_id = ActorID::FromBinary(actor_data.actor_id());
             auto it = objects_need_to_report_.find(actor_id);
             if (it == objects_need_to_report_.end()) return;
+            RAY_LOG(INFO) << "hejialing test AsyncSubscribe 3 " << it->second.size();
             for (const auto &object_id : it->second) {
               ObjectInfo object_info;
               object_info.object_id = object_id;
@@ -2971,6 +2974,7 @@ void NodeManager::SubscribeGlobalOwnerAddress(ActorID actor_id) {
               RAY_LOG(DEBUG) << "try to report object add " << object_id;
               object_directory_->ReportObjectAdded(object_id, self_node_id_, object_info);
             }
+            RAY_LOG(INFO) << "hejialing test AsyncSubscribe 4 " << it->second.size();
           }
         }
       },

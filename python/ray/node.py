@@ -1081,16 +1081,16 @@ class Node:
         assert self._gcs_client is not None
         self._write_cluster_info_to_kv()
 
-        if not self._ray_params.no_monitor:
-            self.start_monitor()
+        # if not self._ray_params.no_monitor:
+        #     self.start_monitor()
 
-        if self._ray_params.ray_client_server_port:
-            self.start_ray_client_server()
+        # if self._ray_params.ray_client_server_port:
+        #     self.start_ray_client_server()
 
-        if self._ray_params.include_dashboard:
-            self.start_dashboard(require_dashboard=True)
-        elif self._ray_params.include_dashboard is None:
-            self.start_dashboard(require_dashboard=False)
+        # if self._ray_params.include_dashboard:
+        #     self.start_dashboard(require_dashboard=True)
+        # elif self._ray_params.include_dashboard is None:
+        #     self.start_dashboard(require_dashboard=False)
 
     def start_ray_processes(self):
         """Start all of the processes on the node."""
@@ -1130,8 +1130,8 @@ class Node:
             huge_pages=self._ray_params.huge_pages,
         )
         self.start_raylet(plasma_directory, object_store_memory)
-        if self._ray_params.include_log_monitor:
-            self.start_log_monitor()
+        # if self._ray_params.include_log_monitor:
+        #     self.start_log_monitor()
 
     def _kill_process_type(
         self, process_type, allow_graceful=False, check_alive=True, wait=False

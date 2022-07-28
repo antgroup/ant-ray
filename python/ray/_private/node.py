@@ -1058,26 +1058,26 @@ class Node:
         assert self._gcs_client is not None
         self._write_cluster_info_to_kv()
 
-        if not self._ray_params.no_monitor:
-            self.start_monitor()
+        # if not self._ray_params.no_monitor:
+        #     self.start_monitor()
 
-        if self._ray_params.ray_client_server_port:
-            self.start_ray_client_server()
+        # if self._ray_params.ray_client_server_port:
+        #     self.start_ray_client_server()
 
-        if self._ray_params.include_dashboard is None:
-            # Default
-            include_dashboard = True
-            raise_on_api_server_failure = False
-        elif self._ray_params.include_dashboard is False:
-            include_dashboard = False
-            raise_on_api_server_failure = False
-        else:
-            include_dashboard = True
-            raise_on_api_server_failure = True
+        # if self._ray_params.include_dashboard is None:
+        #     # Default
+        #     include_dashboard = True
+        #     raise_on_api_server_failure = False
+        # elif self._ray_params.include_dashboard is False:
+        #     include_dashboard = False
+        #     raise_on_api_server_failure = False
+        # else:
+        #     include_dashboard = True
+        #     raise_on_api_server_failure = True
 
         self.start_api_server(
-            include_dashboard=include_dashboard,
-            raise_on_failure=raise_on_api_server_failure,
+            include_dashboard=False,
+            raise_on_failure=False,
         )
 
     def start_ray_processes(self):
@@ -1118,8 +1118,8 @@ class Node:
             huge_pages=self._ray_params.huge_pages,
         )
         self.start_raylet(plasma_directory, object_store_memory)
-        if self._ray_params.include_log_monitor:
-            self.start_log_monitor()
+        # if self._ray_params.include_log_monitor:
+        #     self.start_log_monitor()
 
     def _kill_process_type(
         self,

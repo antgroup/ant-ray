@@ -859,16 +859,8 @@ def start_ray_process(
                 f"got {total_chrs}"
             )
 
-    process = ConsolePopen(
-        command,
-        env=modified_env,
-        cwd=cwd,
-        stdout=stdout_file,
-        stderr=stderr_file,
-        stdin=subprocess.PIPE if pipe_stdin else None,
-        preexec_fn=preexec_fn if sys.platform != "win32" else None,
-        creationflags=CREATE_SUSPENDED if win32_fate_sharing else 0,
-    )
+    logger.info(f"Starting process with command: {command}")
+    process = os.posix_spawn(command[0], command, modified_env)
 
     if win32_fate_sharing:
         try:

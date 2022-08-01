@@ -20,7 +20,8 @@ from itertools import chain
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_PYTHONS = [(3, 6), (3, 7), (3, 8), (3, 9), (3, 10)]
+# A quick workaround to make sure we build Ray in Python 3.8
+SUPPORTED_PYTHONS = [(3, 8)]
 # When the bazel version is updated, make sure to update it
 # in WORKSPACE file as well.
 

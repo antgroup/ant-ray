@@ -305,6 +305,7 @@ class Node:
 
         if not connect_only:
             self.start_ray_processes()
+            print("start_ray_processes end")
             # we should update the address info after the node has been started
             try:
                 ray._private.services.wait_for_node(
@@ -1173,6 +1174,10 @@ class Node:
             assert len(process_infos) == 1
         for process_info in process_infos:
             process = process_info.process
+
+            os.kill(process, signal.SIGKILL)
+            return
+
             # Handle the case where the process has already exited.
             if process.poll() is not None:
                 if check_alive:

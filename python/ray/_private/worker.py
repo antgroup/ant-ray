@@ -1439,6 +1439,7 @@ def init(
         _global_node = ray._private.node.Node(
             head=True, shutdown_at_exit=False, spawn_reaper=True, ray_params=ray_params
         )
+        print("Create node end")
     else:
         # In this case, we are connecting to an existing cluster.
         if num_cpus is not None or num_gpus is not None:
@@ -1915,9 +1916,11 @@ def connect(
     worker.gcs_client = node.get_gcs_client()
     assert worker.gcs_client is not None
     _initialize_internal_kv(worker.gcs_client)
+    print("_initialize_internal_kv end")
     ray._private.state.state._initialize_global_state(
         ray._raylet.GcsClientOptions.from_gcs_address(node.gcs_address)
     )
+    print("_initialize_global_state end")
     worker.gcs_publisher = GcsPublisher(address=worker.gcs_client.address)
     worker.gcs_error_subscriber = GcsErrorSubscriber(address=worker.gcs_client.address)
     worker.gcs_log_subscriber = GcsLogSubscriber(address=worker.gcs_client.address)
@@ -2025,6 +2028,7 @@ def connect(
         logs_dir = ""
     else:
         logs_dir = node.get_logs_dir_path()
+    print("Create CoreWorker...")
     worker.core_worker = ray._raylet.CoreWorker(
         mode,
         node.plasma_store_socket_name,
@@ -2049,6 +2053,7 @@ def connect(
 
     # Notify raylet that the core worker is ready.
     worker.core_worker.notify_raylet()
+    print("notify_raylet end")
 
     if driver_object_store_memory is not None:
         logger.warning(

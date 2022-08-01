@@ -298,6 +298,7 @@ class Node:
 
         if not connect_only:
             self.start_ray_processes()
+            print("start_ray_processes end")
             # we should update the address info after the node has been started
             try:
                 ray._private.services.wait_for_node(
@@ -306,6 +307,7 @@ class Node:
                     self._plasma_store_socket_name,
                     self.redis_password,
                 )
+                print("wait_for_node end")
             except TimeoutError:
                 raise Exception(
                     "The current node has not been updated within 30 "
@@ -318,6 +320,7 @@ class Node:
                 self._raylet_ip_address,
                 redis_password=self.redis_password,
             )
+            print("get_node_to_connect_for_driver end")
             self._ray_params.node_manager_port = node_info.node_manager_port
 
         # Makes sure the Node object has valid addresses after setup.
@@ -1181,6 +1184,10 @@ class Node:
             assert len(process_infos) == 1
         for process_info in process_infos:
             process = process_info.process
+
+            os.kill(process, signal.SIGKILL)
+            return
+
             # Handle the case where the process has already exited.
             if process.poll() is not None:
                 if check_alive:

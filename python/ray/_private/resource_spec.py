@@ -195,7 +195,9 @@ class ResourceSpec(
 
         # Choose a default object store size.
         system_memory = ray._private.utils.get_system_memory()
+        print(f"system_memory: {system_memory}")
         avail_memory = ray._private.utils.estimate_available_memory()
+        print(f"avail_memory: {avail_memory}")
         object_store_memory = self.object_store_memory
         if object_store_memory is None:
             object_store_memory = int(
@@ -232,6 +234,8 @@ class ResourceSpec(
                 object_store_memory = max_cap
 
         redis_max_memory = self.redis_max_memory
+        print(f"redis_max_memory: {redis_max_memory}")
+        print(f"object_store_memory: {object_store_memory}")
         if redis_max_memory is None:
             redis_max_memory = min(
                 ray_constants.DEFAULT_REDIS_MAX_MEMORY_BYTES,
@@ -252,6 +256,7 @@ class ResourceSpec(
                 - object_store_memory
                 - (redis_max_memory if is_head else 0)
             )
+            print(f"memory: {memory}")
             if memory < 100e6 and memory < 0.05 * system_memory:
                 raise ValueError(
                     "After taking into account object store and redis memory "

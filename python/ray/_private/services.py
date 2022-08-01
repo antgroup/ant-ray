@@ -383,10 +383,13 @@ def wait_for_node(
     """
     gcs_options = GcsClientOptions.from_gcs_address(gcs_address)
     global_state = ray.state.GlobalState()
+    print("_initialize_global_state start")
     global_state._initialize_global_state(gcs_options)
+    print("_initialize_global_state end")
     start_time = time.time()
     while time.time() - start_time < timeout:
         clients = global_state.node_table()
+        print("clients: " + str(len(clients)))
         object_store_socket_names = [
             client["ObjectStoreSocketName"] for client in clients
         ]
@@ -1971,6 +1974,7 @@ def determine_plasma_store_config(
     if plasma_directory is None:
         if sys.platform == "linux" or sys.platform == "linux2":
             shm_avail = ray._private.utils.get_shared_memory_bytes()
+            print(f"shm_avail: {shm_avail}")
             # Compare the requested memory size to the memory available in
             # /dev/shm.
             if shm_avail > object_store_memory:

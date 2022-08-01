@@ -724,13 +724,19 @@ Status PlasmaClient::Impl::Connect(const std::string &store_socket_name,
 
   /// The local stream socket that connects to store.
   ray::local_stream_socket socket(main_service_);
+  RAY_LOG(INFO) << "Before ConnectSocketRetry";
   RAY_RETURN_NOT_OK(ray::ConnectSocketRetry(socket, store_socket_name));
+  RAY_LOG(INFO) << "After ConnectSocketRetry";
   store_conn_.reset(new StoreConn(std::move(socket)));
+  RAY_LOG(INFO) << "After new StoreConn";
   // Send a ConnectRequest to the store to get its memory capacity.
   RAY_RETURN_NOT_OK(SendConnectRequest(store_conn_));
+  RAY_LOG(INFO) << "After SendConnectRequest";
   std::vector<uint8_t> buffer;
   RAY_RETURN_NOT_OK(PlasmaReceive(store_conn_, MessageType::PlasmaConnectReply, &buffer));
+  RAY_LOG(INFO) << "After PlasmaReceive";
   RAY_RETURN_NOT_OK(ReadConnectReply(buffer.data(), buffer.size(), &store_capacity_));
+  RAY_LOG(INFO) << "After ReadConnectReply";
   return Status::OK();
 }
 

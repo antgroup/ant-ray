@@ -44,9 +44,11 @@ Status ConnectSocketRetry(local_stream_socket &socket,
   }
   boost::system::error_code ec;
   for (int num_attempts = 0; num_attempts < num_retries; ++num_attempts) {
+    RAY_LOG(INFO) << "ConnectSocketRetry begin " << endpoint << " " << num_attempts;
     // The latest boost::asio always returns void for connect(). Do not
     // treat its return value as error code anymore.
     socket.connect(ParseUrlEndpoint(endpoint), ec);
+    RAY_LOG(INFO) << "ConnectSocketRetry end " << endpoint << " " << num_attempts << ". " << boost_to_ray_status(ec);
     if (!ec) {
       break;
     }

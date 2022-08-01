@@ -29,7 +29,9 @@ ObjectLifecycleManager::ObjectLifecycleManager(
       eviction_policy_(std::make_unique<EvictionPolicy>(*object_store_, allocator)),
       delete_object_callback_(delete_object_callback),
       earger_deletion_objects_(),
-      stats_collector_() {}
+      stats_collector_() {
+  RAY_LOG(INFO) << "ObjectLifecycleManager created";
+}
 
 std::pair<const LocalObject *, flatbuf::PlasmaError> ObjectLifecycleManager::CreateObject(
     const ray::ObjectInfo &object_info,

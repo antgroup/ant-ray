@@ -202,6 +202,8 @@ def simple_shuffle(
                 input_objects.append(obj_ref)
         return output_writer(i, input_objects)
 
+    memory_start = print_memory("START")
+
     shuffle_map_out = [shuffle_map.remote(i) for i in range(input_num_partitions)]
 
     shuffle_reduce_out = [
@@ -217,7 +219,20 @@ def simple_shuffle(
         )
         render_progress_bar(tracker, input_num_partitions, output_num_partitions)
 
-    return ray.get(shuffle_reduce_out)
+    values = ray.get(shuffle_reduce_out)
+    memory_end = print_memory("END")
+    memory_cost = memory_end - memory_start
+    print(f"Memory cost: {memory_cost // 1024 ** 2} MB")
+    print(f"Per-object memory cost: {memory_cost //input_num_partitions // output_num_partitions} bytes")
+    return values
+
+
+def print_memory(stage):
+    import os, psutil
+    process = psutil.Process(os.getpid())
+    memory = process.memory_info().rss
+    print(f"Driver memory usage ({stage}): {memory // 1024 ** 2} MB")
+    return memory
 
 
 def build_cluster(num_nodes, num_cpus, object_store_memory):
@@ -256,7 +271,7 @@ def run(
         ray.init(address=cluster.address)
     else:
         print("Start a new cluster...")
-        ray.init(num_cpus=num_cpus, object_store_memory=object_store_memory)
+        ray.init(num_cpus=num_cpus, object_store_memory=object_store_memory, ignore_reinit_error=True)
 
     partition_size = int(partition_size)
     num_partitions = num_partitions

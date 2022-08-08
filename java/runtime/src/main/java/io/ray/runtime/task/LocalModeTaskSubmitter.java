@@ -646,19 +646,22 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
         protoJavaFunctionDescriptor.getSignature());
   }
 
-  private static void shutdownExecutorServicesAndWaitTasksCompleted(ExecutorService[] executorServices) {
+  private static void shutdownExecutorServicesAndWaitTasksCompleted(
+      ExecutorService[] executorServices) {
     if (executorServices == null) {
       return;
     }
 
     // Note that `shutdownNow` will interrupt the executing remote tasks.
     Arrays.stream(executorServices).forEach(ExecutorService::shutdownNow);
-    Arrays.stream(executorServices).forEach((ExecutorService executorService) -> {
-      try {
-        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-      } catch (InterruptedException e) {
-        LOGGER.error("Failed to shutdown the executor service.", e);
-      }
-    });
+    Arrays.stream(executorServices)
+        .forEach(
+            (ExecutorService executorService) -> {
+              try {
+                executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+              } catch (InterruptedException e) {
+                LOGGER.error("Failed to shutdown the executor service.", e);
+              }
+            });
   }
 }

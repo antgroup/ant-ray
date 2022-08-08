@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -64,14 +63,19 @@ public class LocalModeTest extends BaseTest {
     if (recursionDepth > 3) {
       return String.valueOf(recursionDepth);
     } else {
-      return String.valueOf(recursionDepth) + "_" +
-        Ray.task(SingleProcessModeTest::recursionEcho, recursionDepth + 1).remote().get();
+      return String.valueOf(recursionDepth)
+          + "_"
+          + Ray.task(SingleProcessModeTest::recursionEcho, recursionDepth + 1).remote().get();
     }
   }
 
   public void testShutdownExecutorService() {
     Ray.task(SingleProcessModeTest::recursionEcho, 1).remote();
-    TestUtils.executeWithinTime(() -> { Ray.shutdown(); }, 500);
+    TestUtils.executeWithinTime(
+        () -> {
+          Ray.shutdown();
+        },
+        500);
   }
 
   private static void sleepAndIgnoreInterrupt(long milliseconds) {
@@ -119,7 +123,8 @@ public class LocalModeTest extends BaseTest {
     TimeUnit.MILLISECONDS.sleep(200);
     Assert.assertTrue(SpawnActor.counter.get() > 0);
     // There should be actors just started, and they will continue to execute for at least 900ms.
-    // And Ray.shutdown() should cancel any further tasks, so the shutdown process should finish within 1s.
+    // And Ray.shutdown() should cancel any further tasks, so the shutdown process should finish
+    // within 1s.
     // We loose the time range condition to [500ms, 1500ms].
     TestUtils.executeWithinTimeRange(() -> Ray.shutdown(), 500, 1500);
     // Make sure the counter value doesn't change after shutdown.

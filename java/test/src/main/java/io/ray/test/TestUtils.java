@@ -100,12 +100,22 @@ public class TestUtils {
     runnable.run();
     Instant end = Instant.now();
     long duration = Duration.between(start, end).toMillis();
-    Assert.assertTrue(duration >= minTimeMs,
-        "The given runnable didn't run for at least " + minTimeMs + "ms. "
-            + "Actual execution time: " + duration + " ms.");
-    Assert.assertTrue(duration <= maxTimeMs,
-        "The given runnable didn't finish within " + maxTimeMs + "ms. "
-            + "Actual execution time: " + duration + " ms.");
+    Assert.assertTrue(
+        duration >= minTimeMs,
+        "The given runnable didn't run for at least "
+            + minTimeMs
+            + "ms. "
+            + "Actual execution time: "
+            + duration
+            + " ms.");
+    Assert.assertTrue(
+        duration <= maxTimeMs,
+        "The given runnable didn't finish within "
+            + maxTimeMs
+            + "ms. "
+            + "Actual execution time: "
+            + duration
+            + " ms.");
   }
 
   /**

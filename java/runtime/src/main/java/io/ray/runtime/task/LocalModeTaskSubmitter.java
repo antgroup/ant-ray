@@ -142,7 +142,11 @@ public class LocalModeTaskSubmitter implements TaskSubmitter {
     }
 
     public synchronized void shutdown() {
-      services.forEach((key, service) -> service.shutdown());
+      ExecutorService[] executors;
+      synchronized (services) {
+        executors = services.values().toArray(new ExecutorService[0]);
+      }
+      shutdownExecutorServicesAndWaitTasksCompleted(executors);
       services.clear();
     }
   }

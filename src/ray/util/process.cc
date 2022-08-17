@@ -174,7 +174,7 @@ class ProcessFD {
     if (pipe(pipefds) == -1) {
       pipefds[0] = pipefds[1] = -1;
     }
-    pid = pipefds[1] != -1 ? fork() : -1;
+    pid = pipefds[1] != -1 ? vfork() : -1;
     if (pid <= 0 && pipefds[0] != -1) {
       close(pipefds[0]);  // not the parent, so close the read end of the pipe
       pipefds[0] = -1;
@@ -187,7 +187,7 @@ class ProcessFD {
       // Child process case. Reset the SIGCHLD handler.
       signal(SIGCHLD, SIG_DFL);
       // If process needs to be decoupled, double-fork to avoid zombies.
-      if (pid_t pid2 = decouple ? fork() : 0) {
+      if (pid_t pid2 = decouple ? vfork() : 0) {
         _exit(pid2 == -1 ? errno : 0);  // Parent of grandchild; must exit
       }
       // This is the spawned process. Any intermediate parent is now dead.

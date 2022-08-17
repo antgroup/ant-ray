@@ -3,6 +3,7 @@ package io.ray.serve;
 import io.ray.api.Ray;
 import io.ray.serve.api.Serve;
 import io.ray.serve.common.Constants;
+import io.ray.serve.poll.LongPollClientFactory;
 
 public class BaseTest {
 
@@ -30,6 +31,8 @@ public class BaseTest {
   }
 
   protected void clear() {
+    LongPollClientFactory.stop();
+    LongPollClientFactory.clearAllCache();
     Serve.setInternalReplicaContext(null);
     Serve.setGlobalClient(null);
   }

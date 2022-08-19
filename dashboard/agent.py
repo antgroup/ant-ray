@@ -265,8 +265,8 @@ class DashboardAgent:
                 logger.exception("Failed to check parent PID, exiting.")
                 sys.exit(1)
 
-        if sys.platform not in ["win32", "cygwin"]:
-            check_parent_task = create_task(_check_parent())
+        # if sys.platform not in ["win32", "cygwin"]:
+        #     check_parent_task = create_task(_check_parent())
 
         # Start a grpc asyncio server.
         if self.server:
@@ -317,8 +317,8 @@ class DashboardAgent:
         )
 
         tasks = [m.run(self.server) for m in modules]
-        if sys.platform not in ["win32", "cygwin"]:
-            tasks.append(check_parent_task)
+        # if sys.platform not in ["win32", "cygwin"]:
+        #     tasks.append(check_parent_task)
         await asyncio.gather(*tasks)
 
         await self.server.wait_for_termination()

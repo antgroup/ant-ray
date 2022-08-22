@@ -675,7 +675,7 @@ class ReferenceCounter : public ReferenceCounterInterface,
     /// If this object is owned by us and stored in plasma, and reference
     /// counting is enabled, then some raylet must be pinning the object value.
     /// This is the address of that raylet.
-    absl::optional<NodeID> pinned_at_raylet_id;
+    absl::optional<boost::flyweight<NodeID>> pinned_at_raylet_id;
     /// Whether we own the object. If we own the object, then we are
     /// responsible for tracking the state of the task that creates the object
     /// (see task_manager.h).

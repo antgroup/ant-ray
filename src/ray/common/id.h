@@ -88,6 +88,11 @@ class BaseID {
   mutable size_t hash_ = 0;
 };
 
+template<typename T>
+size_t hash_value(const BaseID<T>& id) {
+  return id.Hash();
+}
+
 class UniqueID : public BaseID<UniqueID> {
  public:
   static constexpr size_t Size() { return kUniqueIDSize; }
@@ -549,9 +554,7 @@ namespace std {
   template <>                                                            \
   struct hash<const ::ray::type> {                                       \
     size_t operator()(const ::ray::type &id) const { return id.Hash(); } \
-  };                                                                     \
-  template <>                                                            \
-  size_t hash_value(const ::ray::type &id) const { return id.Hash(); };  
+  };                                                                     
 
 DEFINE_UNIQUE_ID(UniqueID);
 DEFINE_UNIQUE_ID(JobID);

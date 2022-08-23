@@ -104,6 +104,7 @@ bool ReferenceCounter::AddBorrowedObjectInternal(const ObjectID &object_id,
   }
 
   RAY_LOG(DEBUG) << "Adding borrowed object " << object_id;
+  // it->second.owner_address.value_or(owner_address); // compiled error: Address&& can't be converted to flyweight<Address>
   it->second.owner_address = owner_address;
   it->second.foreign_owner_already_monitoring |= foreign_owner_already_monitoring;
 
@@ -671,7 +672,9 @@ void ReferenceCounter::ResetObjectsOnRemovedNode(const NodeID &raylet_id) {
   absl::MutexLock lock(&mutex_);
   for (auto it = object_id_refs_.begin(); it != object_id_refs_.end(); it++) {
     const auto &object_id = it->first;
-    if (it->second.pinned_at_raylet_id.value_or(NodeID::Nil()) == raylet_id ||
+    boost::flyweight<NodeID> default_node_val;
+    default_node_val = NodeID::Nil();
+    if (it->second.pinned_at_raylet_id.value_or(default_node_val) == raylet_id ||
         it->second.spilled_node_id == raylet_id) {
       ReleasePlasmaObject(it);
       if (!it->second.OutOfScope(lineage_pinning_enabled_)) {
@@ -1424,7 +1427,7 @@ void ReferenceCounter::FillObjectInformationInternal(
   object_info->set_spilled_url(it->second.spilled_url);
   object_info->set_spilled_node_id(it->second.spilled_node_id.Binary());
   auto primary_node_id = it->second.pinned_at_raylet_id.value_or(NodeID::Nil());
-  object_info->set_primary_node_id(primary_node_id.Binary());
+  object_info->set_primary_node_id(primary_node_id.get().Binary());
   object_info->set_pending_creation(it->second.pending_creation);
 }
 

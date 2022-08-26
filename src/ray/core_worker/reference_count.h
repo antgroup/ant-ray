@@ -719,7 +719,7 @@ class ReferenceCounter : public ReferenceCounterInterface,
     /// The ID of the node that spilled the object.
     /// This will be Nil if the object has not been spilled or if it is spilled
     /// distributed external storage.
-    NodeID spilled_node_id = NodeID::Nil();
+    boost::flyweight<NodeID> spilled_node_id = boost::flyweight<NodeID>(NodeID::Nil());
     /// Whether this object has been spilled to external storage.
     bool spilled = false;
 

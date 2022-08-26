@@ -19,7 +19,10 @@ int main(int argc, char *argv[]){
     boost::flyweight<ray::NodeID> nodeid_pool3;
     nodeid_pool3 = ray::NodeID::Nil(); // OK, what's the diff?
 
+
     boost::flyweight<ray::NodeID> nodeid_pool4(ray::NodeID::Nil()); // OK
+
+    boost::flyweight<ray::NodeID> nodeid_pool5 = boost::flyweight<ray::NodeID>(ray::NodeID::Nil()); // OK
     
     const absl::optional<ray::NodeID> pinned_at_raylet_id;
     // pinned_at_raylet_id = ray::NodeID::Nil(); // will be passed as a func param

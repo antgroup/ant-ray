@@ -630,7 +630,7 @@ void ReferenceCounter::ReleasePlasmaObject(ReferenceTable::iterator it) {
     it->second.on_delete = nullptr;
   }
   it->second.pinned_at_raylet_id.reset();
-  if (it->second.spilled && !it->second.spilled_node_id.IsNil()) {
+  if (it->second.spilled && !it->second.spilled_node_id.get().IsNil()) {
     // The spilled copy of the object should get deleted during the on_delete
     // callback, so reset the spill location metadata here.
     // NOTE(swang): Spilled copies in cloud storage are not GCed, so we do not
@@ -1429,7 +1429,7 @@ void ReferenceCounter::FillObjectInformationInternal(
   }
   object_info->set_object_size(it->second.object_size);
   object_info->set_spilled_url(it->second.spilled_url);
-  object_info->set_spilled_node_id(it->second.spilled_node_id.Binary());
+  object_info->set_spilled_node_id(it->second.spilled_node_id.get().Binary());
   boost::flyweight<NodeID> default_node_val;
   default_node_val = NodeID::Nil();
   auto primary_node_id = it->second.pinned_at_raylet_id.value_or(default_node_val);

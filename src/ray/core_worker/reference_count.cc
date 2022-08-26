@@ -672,9 +672,7 @@ void ReferenceCounter::ResetObjectsOnRemovedNode(const NodeID &raylet_id) {
   absl::MutexLock lock(&mutex_);
   for (auto it = object_id_refs_.begin(); it != object_id_refs_.end(); it++) {
     const auto &object_id = it->first;
-    boost::flyweight<NodeID> default_node_val;
-    default_node_val = NodeID::Nil();
-    if (it->second.pinned_at_raylet_id.value_or(default_node_val) == raylet_id ||
+    if (it->second.pinned_at_raylet_id.value_or(boost::flyweight<NodeID>(NodeID::Nil())) == raylet_id ||
         it->second.spilled_node_id == raylet_id) {
       ReleasePlasmaObject(it);
       if (!it->second.OutOfScope(lineage_pinning_enabled_)) {

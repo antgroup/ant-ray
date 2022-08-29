@@ -82,14 +82,20 @@ JobID GlobalStateAccessor::GetNextJobID() {
 }
 
 std::vector<std::string> GlobalStateAccessor::GetAllNodeInfo() {
+  RAY_LOG(INFO) << "Enter GetAllNodeInfo";
   std::vector<std::string> node_table_data;
   std::promise<bool> promise;
   {
     absl::ReaderMutexLock lock(&mutex_);
+    RAY_LOG(INFO) << "Before AsyncGetAll";
     RAY_CHECK_OK(gcs_client_->Nodes().AsyncGetAll(
         TransformForMultiItemCallback<rpc::GcsNodeInfo>(node_table_data, promise)));
+    RAY_LOG(INFO) << "After AsyncGetAll";
   }
+  RAY_LOG(INFO) << "Before promise.get_future().get()";
   promise.get_future().get();
+  RAY_LOG(INFO) << "After promise.get_future().get()";
+  RAY_LOG(INFO) << "Leave GetAllNodeInfo";
   return node_table_data;
 }
 

@@ -104,7 +104,6 @@ bool ReferenceCounter::AddBorrowedObjectInternal(const ObjectID &object_id,
   }
 
   RAY_LOG(DEBUG) << "Adding borrowed object " << object_id;
-  // it->second.owner_address.value_or(owner_address); // compiled error: Address&& can't be converted to flyweight<Address>
   it->second.owner_address = owner_address;
   it->second.foreign_owner_already_monitoring |= foreign_owner_already_monitoring;
 
@@ -731,9 +730,7 @@ bool ReferenceCounter::IsPlasmaObjectPinnedOrSpilled(const ObjectID &object_id,
     if (it->second.owned_by_us) {
       *owned_by_us = true;
       *spilled = it->second.spilled;
-      boost::flyweight<NodeID> nil_flyweight;
-      nil_flyweight = NodeID::Nil();
-      *pinned_at = it->second.pinned_at_raylet_id.value_or(nil_flyweight).get();
+      *pinned_at = it->second.pinned_at_raylet_id.value_or(boost::flyweight<NodeID>(NodeID::Nil())).get();
     }
     return true;
   }
@@ -1386,9 +1383,7 @@ void ReferenceCounter::PushToLocationSubscribers(ReferenceTable::iterator it) {
   const auto &spilled_url = it->second.spilled_url;
   const auto &spilled_node_id = it->second.spilled_node_id;
   const auto &optional_primary_node_id = it->second.pinned_at_raylet_id;
-  boost::flyweight<NodeID> default_node_val;
-  default_node_val = NodeID::Nil();
-  const auto &primary_node_id = optional_primary_node_id.value_or(default_node_val);
+  const auto &primary_node_id = optional_primary_node_id.value_or(boost::flyweight<NodeID>(NodeID::Nil()));
   RAY_LOG(DEBUG) << "Published message for " << object_id << ", " << locations.size()
                  << " locations, spilled url: [" << spilled_url
                  << "], spilled node ID: " << spilled_node_id
@@ -1428,9 +1423,7 @@ void ReferenceCounter::FillObjectInformationInternal(
   object_info->set_object_size(it->second.object_size);
   object_info->set_spilled_url(it->second.spilled_url);
   object_info->set_spilled_node_id(it->second.spilled_node_id.get().Binary());
-  boost::flyweight<NodeID> default_node_val;
-  default_node_val = NodeID::Nil();
-  auto primary_node_id = it->second.pinned_at_raylet_id.value_or(default_node_val);
+  auto primary_node_id = it->second.pinned_at_raylet_id.value_or(boost::flyweight<NodeID>(NodeID::Nil()));
   object_info->set_primary_node_id(primary_node_id.get().Binary());
   object_info->set_pending_creation(it->second.pending_creation);
 }

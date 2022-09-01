@@ -779,15 +779,6 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "core_worker_main",
-    srcs = ["src/ray/core_worker/main.cc"],
-    copts = COPTS,
-    deps = [
-        ":core_worker_lib",
-    ],
-)
-
 cc_library(
     name = "core_worker_lib",
     srcs = glob(

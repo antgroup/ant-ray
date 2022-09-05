@@ -218,13 +218,13 @@ TaskID TaskID::ForExecutionAttempt(const TaskID &task_id, uint64_t attempt_numbe
 
 ActorID TaskID::ActorId() const {
   return ActorID::FromBinary(std::string(
-      reinterpret_cast<const char *>(id_ + kUniqueBytesLength), ActorID::Size()));
+      reinterpret_cast<const char *>(Data() + kUniqueBytesLength), ActorID::Size()));
 }
 
 bool TaskID::IsForActorCreationTask() const {
   static std::string nil_data(kUniqueBytesLength, 0);
   FillNil(&nil_data);
-  bool unique_bytes_nil = std::memcmp(id_, nil_data.data(), kUniqueBytesLength) == 0;
+  bool unique_bytes_nil = std::memcmp(Data(), nil_data.data(), kUniqueBytesLength) == 0;
   bool actor_id_nil = ActorId().IsNil();
   return unique_bytes_nil && !actor_id_nil;
 }
@@ -239,12 +239,12 @@ TaskID TaskID::ComputeDriverTaskId(const WorkerID &driver_id) {
 
 TaskID ObjectID::TaskId() const {
   return TaskID::FromBinary(
-      std::string(reinterpret_cast<const char *>(id_), TaskID::Size()));
+      std::string(reinterpret_cast<const char *>(Data()), TaskID::Size()));
 }
 
 ObjectIDIndexType ObjectID::ObjectIndex() const {
   ObjectIDIndexType index;
-  std::memcpy(&index, id_ + TaskID::kLength, sizeof(index));
+  std::memcpy(&index, Data() + TaskID::kLength, sizeof(index));
   return index;
 }
 
@@ -269,7 +269,7 @@ ObjectID ObjectID::ForActorHandle(const ActorID &actor_id) {
 
 bool ObjectID::IsActorID(const ObjectID &object_id) {
   for (size_t i = 0; i < (TaskID::kLength - ActorID::kLength); ++i) {
-    if (object_id.id_[i] != 0xff) {
+    if (object_id.Data()[i] != 0xff) {
       return false;
     }
   }
@@ -277,7 +277,7 @@ bool ObjectID::IsActorID(const ObjectID &object_id) {
 }
 
 ActorID ObjectID::ToActorID(const ObjectID &object_id) {
-  auto beg = reinterpret_cast<const char *>(object_id.id_) + ObjectID::kLength -
+  auto beg = reinterpret_cast<const char *>(object_id.Data()) + ObjectID::kLength -
              ActorID::kLength - ObjectID::kIndexBytesLength;
   std::string actor_id(beg, beg + ActorID::kLength);
   return ActorID::FromBinary(actor_id);
@@ -286,10 +286,11 @@ ActorID ObjectID::ToActorID(const ObjectID &object_id) {
 ObjectID ObjectID::GenerateObjectId(const std::string &task_id_binary,
                                     ObjectIDIndexType object_index) {
   RAY_CHECK(task_id_binary.size() == TaskID::Size());
-  ObjectID ret;
-  std::memcpy(ret.id_, task_id_binary.c_str(), TaskID::kLength);
-  std::memcpy(ret.id_ + TaskID::kLength, &object_index, sizeof(object_index));
-  return ret;
+  std::string tmp(ObjectID::Size(), 0);
+  auto data = reinterpret_cast<char *>(tmp.data());
+  std::memcpy(data, task_id_binary.c_str(), TaskID::kLength);
+  std::memcpy(data + TaskID::kLength, &object_index, sizeof(object_index));
+  return ObjectID::FromBinary(tmp);
 }
 
 JobID JobID::FromInt(uint32_t value) {
@@ -301,7 +302,7 @@ JobID JobID::FromInt(uint32_t value) {
 
 uint32_t JobID::ToInt() {
   uint32_t value;
-  std::memcpy(&value, &id_, JobID::Size());
+  std::memcpy(&value, Data(), JobID::Size());
   return value;
 }
 

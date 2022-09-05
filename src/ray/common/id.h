@@ -17,6 +17,7 @@
 #include <inttypes.h>
 #include <limits.h>
 
+#include <boost/flyweight.hpp>
 #include <chrono>
 #include <cstring>
 #include <msgpack.hpp>
@@ -73,11 +74,7 @@ class BaseID {
  public:
   static constexpr int64_t kLength = LENGTH;
 
-  BaseID() {
-    // Using const_cast to directly change data is dangerous. The cached
-    // hash may not be changed. This is used in construction time.
-    std::fill_n(this->MutableData(), T::Size(), 0xff);
-  }
+  BaseID() { id_ = std::string(kLength, 0xff); }
 
   // Warning: this can duplicate IDs after a fork() call. We assume this never happens.
   static T FromRandom() {
@@ -90,7 +87,9 @@ class BaseID {
     RAY_CHECK(binary.size() == T::Size() || binary.size() == 0)
         << "expected size is " << T::Size() << ", but got data size is " << binary.size();
     T t;
-    std::memcpy(t.MutableData(), binary.data(), binary.size());
+    if (binary.size() > 0) {
+      t.id_ = binary;
+    }
     return t;
   }
 
@@ -103,7 +102,8 @@ class BaseID {
       return T::Nil();
     }
 
-    uint8_t *data = id.MutableData();
+    std::string binary(T::Size(), 0);
+    uint8_t *data = reinterpret_cast<uint8_t *>(binary.data());
     for (size_t i = 0; i < T::Size(); i++) {
       char first = hex_str[2 * i];
       char second = hex_str[2 * i + 1];
@@ -114,6 +114,7 @@ class BaseID {
         return T::Nil();
       }
     }
+    id.id_ = binary;
 
     return id;
   }
@@ -125,33 +126,22 @@ class BaseID {
 
   static constexpr size_t Size() { return kLength; }
 
-  size_t Hash() const {
-    // Note(ashione): hash code lazy calculation(it's invoked every time if hash code is
-    // default value 0)
-    if (!hash_) {
-      hash_ = MurmurHash64A(Data(), T::Size(), 0);
-    }
-    return hash_;
-  }
+  size_t Hash() const { return MurmurHash64A(Data(), T::Size(), 0); }
 
   bool IsNil() const {
     static T nil_id = T::Nil();
     return *this == nil_id;
   }
 
-  bool operator==(const BaseID &rhs) const {
-    return std::memcmp(Data(), rhs.Data(), T::Size()) == 0;
-  }
+  bool operator==(const BaseID &rhs) const { return id_.get() == rhs.id_.get(); }
 
   bool operator!=(const BaseID &rhs) const { return !(*this == rhs); }
 
   const uint8_t *Data() const {
-    return reinterpret_cast<const uint8_t *>(this) + sizeof(hash_);
+    return reinterpret_cast<const uint8_t *>(id_.get().data());
   }
 
-  std::string Binary() const {
-    return std::string(reinterpret_cast<const char *>(Data()), T::Size());
-  }
+  std::string Binary() const { return id_.get(); }
 
   std::string Hex() const {
     constexpr char hex[] = "0123456789abcdef";
@@ -173,18 +163,14 @@ class BaseID {
     RAY_CHECK(binary.size() == Size() || binary.size() == 0)
         << "expected size is " << Size() << ", but got data " << binary << " of size "
         << binary.size();
-    std::memcpy(const_cast<uint8_t *>(this->Data()), binary.data(), binary.size());
+    if (binary.size() > 0) {
+      id_ = binary;
+    }
   }
 
-  // All IDs are immutable for hash evaluations. MutableData is only allow to use
-  // in construction time, so this function is protected.
-  uint8_t *MutableData() { return reinterpret_cast<uint8_t *>(this) + sizeof(hash_); }
+  struct IDTag {};
 
-  // For lazy evaluation, be careful to have one Id contained in another.
-  // This hash code will be duplicated.
-  mutable size_t hash_ = 0;
-
-  uint8_t id_[kLength];
+  boost::flyweight<std::string, boost::flyweights::tag<IDTag>> id_;
 };
 
 template <typename T, size_t LENGTH>
@@ -386,7 +372,9 @@ class ObjectID : public BaseID<ObjectID, sizeof(ObjectIDIndexType) + TaskID::kLe
                                    ObjectIDIndexType object_index = 0);
 };
 
-class PlacementGroupID : public BaseID<PlacementGroupID, kPlacementGroupIDUniqueBytesLength + JobID::kLength> {
+class PlacementGroupID
+    : public BaseID<PlacementGroupID,
+                    kPlacementGroupIDUniqueBytesLength + JobID::kLength> {
  private:
   static constexpr size_t kUniqueBytesLength = kPlacementGroupIDUniqueBytesLength;
 
@@ -411,17 +399,6 @@ class PlacementGroupID : public BaseID<PlacementGroupID, kPlacementGroupIDUnique
 
 typedef std::pair<PlacementGroupID, int64_t> BundleID;
 
-static_assert(sizeof(JobID) == JobID::kLength + sizeof(size_t),
-              "JobID size is not as expected");
-static_assert(sizeof(ActorID) == ActorID::kLength + sizeof(size_t),
-              "ActorID size is not as expected");
-static_assert(sizeof(TaskID) == TaskID::kLength + sizeof(size_t),
-              "TaskID size is not as expected");
-static_assert(sizeof(ObjectID) == ObjectID::kLength + sizeof(size_t),
-              "ObjectID size is not as expected");
-static_assert(sizeof(PlacementGroupID) == PlacementGroupID::kLength + sizeof(size_t),
-              "PlacementGroupID size is not as expected");
-
 std::ostream &operator<<(std::ostream &os, const UniqueID &id);
 std::ostream &operator<<(std::ostream &os, const JobID &id);
 std::ostream &operator<<(std::ostream &os, const ActorID &id);
@@ -432,9 +409,7 @@ std::ostream &operator<<(std::ostream &os, const PlacementGroupID &id);
 #define DEFINE_UNIQUE_ID(type)                                                           \
   class RAY_EXPORT type : public UniqueID {                                              \
    public:                                                                               \
-    explicit type(const UniqueID &from) {                                                \
-      std::memcpy(&id_, from.Data(), kUniqueIDSize);                                     \
-    }                                                                                    \
+    explicit type(const UniqueID &from) { id_ = from.Binary(); }                         \
     type() : UniqueID() {}                                                               \
     static type FromRandom() { return type(UniqueID::FromRandom()); }                    \
     static type FromBinary(const std::string &binary) { return type(binary); }           \
@@ -446,7 +421,9 @@ std::ostream &operator<<(std::ostream &os, const PlacementGroupID &id);
       RAY_CHECK(binary.size() == Size() || binary.size() == 0)                           \
           << "expected size is " << Size() << ", but got data " << binary << " of size " \
           << binary.size();                                                              \
-      std::memcpy(&id_, binary.data(), binary.size());                                   \
+      if (binary.size() > 0) {                                                           \
+        id_ = binary;                                                                    \
+      }                                                                                  \
     }                                                                                    \
   };
 

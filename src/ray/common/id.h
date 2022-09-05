@@ -49,29 +49,124 @@ uint64_t MurmurHash64A(const void *key, int len, unsigned int seed);
 // Change the compiler alignment to 1 byte (default is 8).
 #pragma pack(push, 1)
 
+inline unsigned char hex_to_uchar(const char c, bool &err) {
+  unsigned char num = 0;
+  if (c >= '0' && c <= '9') {
+    num = c - '0';
+  } else if (c >= 'a' && c <= 'f') {
+    num = c - 'a' + 0xa;
+  } else if (c >= 'A' && c <= 'F') {
+    num = c - 'A' + 0xA;
+  } else {
+    err = true;
+  }
+  return num;
+}
+
 /// The `ID`s of Ray.
 ///
 /// Please refer to the specification of Ray UniqueIDs.
 /// https://github.com/ray-project/ray/blob/master/src/ray/design_docs/id_specification.md
 
-template <typename T>
+template <typename T, size_t LENGTH>
 class BaseID {
  public:
-  BaseID();
-  // Warning: this can duplicate IDs after a fork() call. We assume this never happens.
-  static T FromRandom();
-  static T FromBinary(const std::string &binary);
-  static T FromHex(const std::string &hex_str);
-  static const T &Nil();
-  static constexpr size_t Size() { return T::Size(); }
+  static constexpr int64_t kLength = LENGTH;
 
-  size_t Hash() const;
-  bool IsNil() const;
-  bool operator==(const BaseID &rhs) const;
-  bool operator!=(const BaseID &rhs) const;
-  const uint8_t *Data() const;
-  std::string Binary() const;
-  std::string Hex() const;
+  BaseID() {
+    // Using const_cast to directly change data is dangerous. The cached
+    // hash may not be changed. This is used in construction time.
+    std::fill_n(this->MutableData(), T::Size(), 0xff);
+  }
+
+  // Warning: this can duplicate IDs after a fork() call. We assume this never happens.
+  static T FromRandom() {
+    std::string data(T::Size(), 0);
+    FillRandom(&data);
+    return T::FromBinary(data);
+  }
+
+  static T FromBinary(const std::string &binary) {
+    RAY_CHECK(binary.size() == T::Size() || binary.size() == 0)
+        << "expected size is " << T::Size() << ", but got data size is " << binary.size();
+    T t;
+    std::memcpy(t.MutableData(), binary.data(), binary.size());
+    return t;
+  }
+
+  static T FromHex(const std::string &hex_str) {
+    T id;
+
+    if (2 * T::Size() != hex_str.size()) {
+      RAY_LOG(ERROR) << "incorrect hex string length: 2 * " << T::Size()
+                     << " != " << hex_str.size() << ", hex string: " << hex_str;
+      return T::Nil();
+    }
+
+    uint8_t *data = id.MutableData();
+    for (size_t i = 0; i < T::Size(); i++) {
+      char first = hex_str[2 * i];
+      char second = hex_str[2 * i + 1];
+      bool err = false;
+      data[i] = (hex_to_uchar(first, err) << 4) + hex_to_uchar(second, err);
+      if (err) {
+        RAY_LOG(ERROR) << "incorrect hex character, hex string: " << hex_str;
+        return T::Nil();
+      }
+    }
+
+    return id;
+  }
+
+  static const T &Nil() {
+    static const T nil_id;
+    return nil_id;
+  }
+
+  static constexpr size_t Size() { return kLength; }
+
+  size_t Hash() const {
+    // Note(ashione): hash code lazy calculation(it's invoked every time if hash code is
+    // default value 0)
+    if (!hash_) {
+      hash_ = MurmurHash64A(Data(), T::Size(), 0);
+    }
+    return hash_;
+  }
+
+  bool IsNil() const {
+    static T nil_id = T::Nil();
+    return *this == nil_id;
+  }
+
+  bool operator==(const BaseID &rhs) const {
+    return std::memcmp(Data(), rhs.Data(), T::Size()) == 0;
+  }
+
+  bool operator!=(const BaseID &rhs) const { return !(*this == rhs); }
+
+  const uint8_t *Data() const {
+    return reinterpret_cast<const uint8_t *>(this) + sizeof(hash_);
+  }
+
+  std::string Binary() const {
+    return std::string(reinterpret_cast<const char *>(Data()), T::Size());
+  }
+
+  std::string Hex() const {
+    constexpr char hex[] = "0123456789abcdef";
+    const uint8_t *id = Data();
+    std::string result;
+    result.reserve(T::Size());
+    for (size_t i = 0; i < T::Size(); i++) {
+      unsigned int val = id[i];
+      result.push_back(hex[val >> 4]);
+      result.push_back(hex[val & 0xf]);
+    }
+    return result;
+  }
+
+  MSGPACK_DEFINE(id_);
 
  protected:
   BaseID(const std::string &binary) {
@@ -80,68 +175,48 @@ class BaseID {
         << binary.size();
     std::memcpy(const_cast<uint8_t *>(this->Data()), binary.data(), binary.size());
   }
+
   // All IDs are immutable for hash evaluations. MutableData is only allow to use
   // in construction time, so this function is protected.
-  uint8_t *MutableData();
+  uint8_t *MutableData() { return reinterpret_cast<uint8_t *>(this) + sizeof(hash_); }
+
   // For lazy evaluation, be careful to have one Id contained in another.
   // This hash code will be duplicated.
   mutable size_t hash_ = 0;
+
+  uint8_t id_[kLength];
 };
 
-template<typename T>
-size_t hash_value(const BaseID<T>& id) {
+template <typename T, size_t LENGTH>
+size_t hash_value(const BaseID<T, LENGTH> &id) {
   return id.Hash();
 }
 
-class UniqueID : public BaseID<UniqueID> {
+class UniqueID : public BaseID<UniqueID, kUniqueIDSize> {
  public:
-  static constexpr size_t Size() { return kUniqueIDSize; }
-
   UniqueID() : BaseID() {}
-
-  MSGPACK_DEFINE(id_);
 
  protected:
   UniqueID(const std::string &binary);
-
- protected:
-  uint8_t id_[kUniqueIDSize];
 };
 
-class JobID : public BaseID<JobID> {
+class JobID : public BaseID<JobID, 4> {
  public:
-  static constexpr int64_t kLength = 4;
-
   static JobID FromInt(uint32_t value);
 
   uint32_t ToInt();
-
-  static constexpr size_t Size() { return kLength; }
 
   // Warning: this can duplicate IDs after a fork() call. We assume this never happens.
   static JobID FromRandom() = delete;
 
   JobID() : BaseID() {}
-
-  MSGPACK_DEFINE(id_);
-
- private:
-  uint8_t id_[kLength];
 };
 
-class ActorID : public BaseID<ActorID> {
+class ActorID : public BaseID<ActorID, kActorIDUniqueBytesLength + JobID::kLength> {
  private:
-  static constexpr size_t kUniqueBytesLength = 12;
+  static constexpr size_t kUniqueBytesLength = kActorIDUniqueBytesLength;
 
  public:
-  /// Length of `ActorID` in bytes.
-  static constexpr size_t kLength = kUniqueBytesLength + JobID::kLength;
-
-  /// Size of `ActorID` in bytes.
-  ///
-  /// \return Size of `ActorID` in bytes.
-  static constexpr size_t Size() { return kLength; }
-
   /// Creates an `ActorID` by hashing the given information.
   ///
   /// \param job_id The job id to which this actor belongs.
@@ -170,23 +245,14 @@ class ActorID : public BaseID<ActorID> {
   ///
   /// \return The job id to which this actor belongs.
   JobID JobId() const;
-
-  MSGPACK_DEFINE(id_);
-
- private:
-  uint8_t id_[kLength];
 };
 
-class TaskID : public BaseID<TaskID> {
+class TaskID : public BaseID<TaskID, kTaskIDUniqueBytesLength + ActorID::kLength> {
  private:
-  static constexpr size_t kUniqueBytesLength = 8;
+  static constexpr size_t kUniqueBytesLength = kTaskIDUniqueBytesLength;
 
  public:
-  static constexpr size_t kLength = kUniqueBytesLength + ActorID::kLength;
-
   TaskID() : BaseID() {}
-
-  static constexpr size_t Size() { return kLength; }
 
   static TaskID ComputeDriverTaskId(const WorkerID &driver_id);
 
@@ -256,23 +322,15 @@ class TaskID : public BaseID<TaskID> {
   ///
   /// \return The `JobID` of the job which creates this task.
   JobID JobId() const;
-
-  MSGPACK_DEFINE(id_);
-
- private:
-  uint8_t id_[kLength];
 };
 
-class ObjectID : public BaseID<ObjectID> {
+class ObjectID : public BaseID<ObjectID, sizeof(ObjectIDIndexType) + TaskID::kLength> {
  private:
   static constexpr size_t kIndexBytesLength = sizeof(ObjectIDIndexType);
 
  public:
   /// The maximum number of objects that can be returned or put by a task.
   static constexpr int64_t kMaxObjectIndex = ((int64_t)1 << kObjectIdIndexSize) - 1;
-
-  /// The length of ObjectID in bytes.
-  static constexpr size_t kLength = kIndexBytesLength + TaskID::kLength;
 
   ObjectID() : BaseID() {}
 
@@ -282,8 +340,6 @@ class ObjectID : public BaseID<ObjectID> {
   ///
   /// \return The maximum index of object.
   static uint64_t MaxObjectIndex() { return kMaxObjectIndex; }
-
-  static constexpr size_t Size() { return kLength; }
 
   /// Get the index of this object in the task that created it.
   ///
@@ -324,30 +380,17 @@ class ObjectID : public BaseID<ObjectID> {
   static bool IsActorID(const ObjectID &object_id);
   static ActorID ToActorID(const ObjectID &object_id);
 
-  MSGPACK_DEFINE(id_);
-
  private:
   /// A helper method to generate an ObjectID.
   static ObjectID GenerateObjectId(const std::string &task_id_binary,
                                    ObjectIDIndexType object_index = 0);
-
- private:
-  uint8_t id_[kLength];
 };
 
-class PlacementGroupID : public BaseID<PlacementGroupID> {
+class PlacementGroupID : public BaseID<PlacementGroupID, kPlacementGroupIDUniqueBytesLength + JobID::kLength> {
  private:
-  static constexpr size_t kUniqueBytesLength = 14;
+  static constexpr size_t kUniqueBytesLength = kPlacementGroupIDUniqueBytesLength;
 
  public:
-  /// Length of `PlacementGroupID` in bytes.
-  static constexpr size_t kLength = kUniqueBytesLength + JobID::kLength;
-
-  /// Size of `PlacementGroupID` in bytes.
-  ///
-  /// \return Size of `PlacementGroupID` in bytes.
-  static constexpr size_t Size() { return kLength; }
-
   /// Creates a `PlacementGroupID` by hashing the given information.
   ///
   /// \param job_id The job id to which this actor belongs.
@@ -364,11 +407,6 @@ class PlacementGroupID : public BaseID<PlacementGroupID> {
   ///
   /// \return The job id to which this placement group belongs.
   JobID JobId() const;
-
-  MSGPACK_DEFINE(id_);
-
- private:
-  uint8_t id_[kLength];
 };
 
 typedef std::pair<PlacementGroupID, int64_t> BundleID;
@@ -418,129 +456,6 @@ std::ostream &operator<<(std::ostream &os, const PlacementGroupID &id);
 
 // Restore the compiler alignment to default (8 bytes).
 #pragma pack(pop)
-
-template <typename T>
-BaseID<T>::BaseID() {
-  // Using const_cast to directly change data is dangerous. The cached
-  // hash may not be changed. This is used in construction time.
-  std::fill_n(this->MutableData(), T::Size(), 0xff);
-}
-
-template <typename T>
-T BaseID<T>::FromRandom() {
-  std::string data(T::Size(), 0);
-  FillRandom(&data);
-  return T::FromBinary(data);
-}
-
-template <typename T>
-T BaseID<T>::FromBinary(const std::string &binary) {
-  RAY_CHECK(binary.size() == T::Size() || binary.size() == 0)
-      << "expected size is " << T::Size() << ", but got data size is " << binary.size();
-  T t;
-  std::memcpy(t.MutableData(), binary.data(), binary.size());
-  return t;
-}
-
-inline unsigned char hex_to_uchar(const char c, bool &err) {
-  unsigned char num = 0;
-  if (c >= '0' && c <= '9') {
-    num = c - '0';
-  } else if (c >= 'a' && c <= 'f') {
-    num = c - 'a' + 0xa;
-  } else if (c >= 'A' && c <= 'F') {
-    num = c - 'A' + 0xA;
-  } else {
-    err = true;
-  }
-  return num;
-}
-
-template <typename T>
-T BaseID<T>::FromHex(const std::string &hex_str) {
-  T id;
-
-  if (2 * T::Size() != hex_str.size()) {
-    RAY_LOG(ERROR) << "incorrect hex string length: 2 * " << T::Size()
-                   << " != " << hex_str.size() << ", hex string: " << hex_str;
-    return T::Nil();
-  }
-
-  uint8_t *data = id.MutableData();
-  for (size_t i = 0; i < T::Size(); i++) {
-    char first = hex_str[2 * i];
-    char second = hex_str[2 * i + 1];
-    bool err = false;
-    data[i] = (hex_to_uchar(first, err) << 4) + hex_to_uchar(second, err);
-    if (err) {
-      RAY_LOG(ERROR) << "incorrect hex character, hex string: " << hex_str;
-      return T::Nil();
-    }
-  }
-
-  return id;
-}
-
-template <typename T>
-const T &BaseID<T>::Nil() {
-  static const T nil_id;
-  return nil_id;
-}
-
-template <typename T>
-bool BaseID<T>::IsNil() const {
-  static T nil_id = T::Nil();
-  return *this == nil_id;
-}
-
-template <typename T>
-size_t BaseID<T>::Hash() const {
-  // Note(ashione): hash code lazy calculation(it's invoked every time if hash code is
-  // default value 0)
-  if (!hash_) {
-    hash_ = MurmurHash64A(Data(), T::Size(), 0);
-  }
-  return hash_;
-}
-
-template <typename T>
-bool BaseID<T>::operator==(const BaseID &rhs) const {
-  return std::memcmp(Data(), rhs.Data(), T::Size()) == 0;
-}
-
-template <typename T>
-bool BaseID<T>::operator!=(const BaseID &rhs) const {
-  return !(*this == rhs);
-}
-
-template <typename T>
-uint8_t *BaseID<T>::MutableData() {
-  return reinterpret_cast<uint8_t *>(this) + sizeof(hash_);
-}
-
-template <typename T>
-const uint8_t *BaseID<T>::Data() const {
-  return reinterpret_cast<const uint8_t *>(this) + sizeof(hash_);
-}
-
-template <typename T>
-std::string BaseID<T>::Binary() const {
-  return std::string(reinterpret_cast<const char *>(Data()), T::Size());
-}
-
-template <typename T>
-std::string BaseID<T>::Hex() const {
-  constexpr char hex[] = "0123456789abcdef";
-  const uint8_t *id = Data();
-  std::string result;
-  result.reserve(T::Size());
-  for (size_t i = 0; i < T::Size(); i++) {
-    unsigned int val = id[i];
-    result.push_back(hex[val >> 4]);
-    result.push_back(hex[val & 0xf]);
-  }
-  return result;
-}
 
 }  // namespace ray
 

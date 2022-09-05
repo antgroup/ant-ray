@@ -20,6 +20,10 @@
 /// Length of Ray full-length IDs in bytes.
 constexpr size_t kUniqueIDSize = 28;
 
+constexpr size_t kActorIDUniqueBytesLength = 12;
+constexpr size_t kTaskIDUniqueBytesLength = 8;
+constexpr size_t kPlacementGroupIDUniqueBytesLength = 14;
+
 /// An ObjectID's bytes are split into the task ID itself and the index of the
 /// object's creation. This is the maximum width of the object index in bits.
 constexpr int kObjectIdIndexSize = 32;

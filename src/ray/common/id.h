@@ -173,11 +173,6 @@ class BaseID {
   boost::flyweight<std::string, boost::flyweights::tag<IDTag>> id_;
 };
 
-template <typename T, size_t LENGTH>
-size_t hash_value(const BaseID<T, LENGTH> &id) {
-  return id.Hash();
-}
-
 class UniqueID : public BaseID<UniqueID, kUniqueIDSize> {
  public:
   UniqueID() : BaseID() {}

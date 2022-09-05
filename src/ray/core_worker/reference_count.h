@@ -564,7 +564,7 @@ class ReferenceCounter : public ReferenceCounterInterface,
         : call_site(call_site),
           object_size(object_size),
           owner_address(owner_address),
-          pinned_at_raylet_id(boost::flyweight<NodeID>(pinned_at_raylet_id.value_or(NodeID::Nil()))),
+          pinned_at_raylet_id(pinned_at_raylet_id),
           owned_by_us(true),
           is_reconstructable(is_reconstructable),
           foreign_owner_already_monitoring(false),
@@ -675,7 +675,7 @@ class ReferenceCounter : public ReferenceCounterInterface,
     /// If this object is owned by us and stored in plasma, and reference
     /// counting is enabled, then some raylet must be pinning the object value.
     /// This is the address of that raylet.
-    absl::optional<boost::flyweight<NodeID>> pinned_at_raylet_id;
+    absl::optional<NodeID> pinned_at_raylet_id;
     /// Whether we own the object. If we own the object, then we are
     /// responsible for tracking the state of the task that creates the object
     /// (see task_manager.h).
@@ -719,7 +719,7 @@ class ReferenceCounter : public ReferenceCounterInterface,
     /// The ID of the node that spilled the object.
     /// This will be Nil if the object has not been spilled or if it is spilled
     /// distributed external storage.
-    boost::flyweight<NodeID> spilled_node_id = boost::flyweight<NodeID>(NodeID::Nil());
+    NodeID spilled_node_id = NodeID::Nil();
     /// Whether this object has been spilled to external storage.
     bool spilled = false;
 

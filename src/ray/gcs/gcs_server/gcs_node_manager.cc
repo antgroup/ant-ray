@@ -137,6 +137,7 @@ void GcsNodeManager::DrainNode(const NodeID &node_id) {
 void GcsNodeManager::HandleGetAllNodeInfo(const rpc::GetAllNodeInfoRequest &request,
                                           rpc::GetAllNodeInfoReply *reply,
                                           rpc::SendReplyCallback send_reply_callback) {
+  RAY_LOG(INFO) << "HandleGetAllNodeInfo";
   // Here the unsafe allocate is safe here, because entry.second's life cycle is longer
   // then reply.
   // The request will be sent when call send_reply_callback and after that, reply will

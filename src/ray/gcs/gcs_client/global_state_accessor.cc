@@ -26,14 +26,21 @@ GlobalStateAccessor::GlobalStateAccessor(const GcsClientOptions &gcs_client_opti
   io_service_ = std::make_unique<instrumented_io_context>();
 
   std::promise<bool> promise;
+  RAY_LOG(INFO) << "GlobalStateAccessor IO thread init";
   thread_io_service_ = std::make_unique<std::thread>([this, &promise] {
     SetThreadName("global.accessor");
+    RAY_LOG(INFO) << "GlobalStateAccessor IO thread start";
     std::unique_ptr<boost::asio::io_service::work> work(
         new boost::asio::io_service::work(*io_service_));
     promise.set_value(true);
+    RAY_LOG(INFO) << "GlobalStateAccessor IO thread run. Address of io_service_: "
+                  << io_service_.get();
     io_service_->run();
+    RAY_LOG(INFO) << "GlobalStateAccessor IO thread finish";
   });
+  RAY_LOG(INFO) << "GlobalStateAccessor IO thread init end";
   promise.get_future().get();
+  RAY_LOG(INFO) << "GlobalStateAccessor promise.get_future().get() end";
 }
 
 GlobalStateAccessor::~GlobalStateAccessor() { Disconnect(); }

@@ -162,7 +162,14 @@ class ServerCallImpl : public ServerCall {
     start_time_ = absl::GetCurrentTimeNanos();
     ray::stats::STATS_grpc_server_req_handling.Record(1.0, call_name_);
     if (!io_service_.stopped()) {
-      io_service_.post([this] { HandleRequestImpl(); }, call_name_);
+      RAY_LOG(INFO) << "HandleRequest before post " << call_name_;
+      io_service_.post(
+          [this] {
+            RAY_LOG(INFO) << "HandleRequest in post " << call_name_;
+            HandleRequestImpl();
+            RAY_LOG(INFO) << "Finished HandleRequest in post " << call_name_;
+          },
+          call_name_);
     } else {
       // Handle service for rpc call has stopped, we must handle the call here
       // to send reply and remove it from cq

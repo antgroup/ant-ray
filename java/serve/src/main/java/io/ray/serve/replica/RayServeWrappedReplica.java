@@ -17,6 +17,7 @@ import io.ray.serve.util.LogUtil;
 import io.ray.serve.util.ReflectUtil;
 import io.ray.serve.util.ServeProtoUtil;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
@@ -95,9 +96,7 @@ public class RayServeWrappedReplica implements RayServeReplica {
               true,
               Optional.ofNullable(Thread.currentThread().getContextClassLoader())
                   .orElse(getClass().getClassLoader()));
-      Object callable =
-          ReflectUtil.getConstructor(deploymentClass, deploymentWrapper.getInitArgs())
-              .newInstance(deploymentWrapper.getInitArgs());
+      Object callable = buildCallable(deploymentClass,deploymentWrapper);
       Serve.getReplicaContext().setServableObject(callable);
 
       // Get the controller by controllerName.
@@ -226,6 +225,12 @@ public class RayServeWrappedReplica implements RayServeReplica {
   public Object getVersion() {
     DeploymentVersion deploymentVersion = replica.getVersion();
     return deploymentVersion.toProtoBytes();
+  }
+
+  public Object buildCallable(Class deploymentClass, DeploymentWrapper deploymentInfo)
+      throws Exception {
+    return ReflectUtil.getConstructor(deploymentClass, deploymentInfo.getInitArgs())
+        .newInstance(deploymentInfo.getInitArgs());
   }
 
   public Object getCallable() {

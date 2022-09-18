@@ -300,7 +300,7 @@ class ClientCallManager {
               [tag]() {
                 RAY_LOG(INFO) << "OnReplyReceived";
                 tag->GetCall()->OnReplyReceived();
-                RAY_LOG(INFO) << "OnReplyReceived end";
+                RAY_LOG(INFO) << "OnReplyReceived end. Status: " << tag->GetCall()->GetStatus();
                 // The call is finished, and we can delete this tag now.
                 delete tag;
               },

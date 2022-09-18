@@ -54,15 +54,21 @@ void RunTest() {
   std::unique_ptr<std::thread> server_thread_io_service(
       new std::thread([&server_io_service] { server_io_service.run(); }));
 
-  instrumented_io_context io_service;
+  std::unique_ptr<instrumented_io_context> io_service_ptr;
+  // Pass if created in main thread.
+  // io_service_ptr.reset(new instrumented_io_context());
   std::promise<bool> promise1;
   std::unique_ptr<std::thread> thread_io_service(
-      new std::thread([&io_service, &promise1] {
+      new std::thread([&io_service_ptr, &promise1] {
+        // Fail if created in child thread.
+        io_service_ptr.reset(new instrumented_io_context());
+        auto &io_service = *io_service_ptr;
         promise1.set_value(true);
         auto work = std::make_unique<boost::asio::io_service::work>(io_service);
         io_service.run();
       }));
   promise1.get_future().get();
+  auto &io_service = *io_service_ptr;
 
   // Create GCS client and global state.
   gcs::GcsClientOptions options("127.0.0.1:6379");

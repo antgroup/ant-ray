@@ -155,10 +155,11 @@ Status GcsClient::Connect(instrumented_io_context &io_service) {
   internal_kv_accessor_ = std::make_unique<InternalKVAccessor>(this);
   // Init gcs service address check timer.
   periodical_runner_ = std::make_unique<PeriodicalRunner>(io_service);
-  periodical_runner_->RunFnPeriodically(
-      [this] { PeriodicallyCheckGcsConnection(); },
-      RayConfig::instance().gcs_service_address_check_interval_milliseconds(),
-      "GcsClient.deadline_timer.check_gcs_connection");
+  // Workaround: Driver hangs if RunFnPeriodically is called.
+  // periodical_runner_->RunFnPeriodically(
+  //     [this] { PeriodicallyCheckGcsConnection(); },
+  //     RayConfig::instance().gcs_service_address_check_interval_milliseconds(),
+  //     "GcsClient.deadline_timer.check_gcs_connection");
 
   is_connected_ = true;
 

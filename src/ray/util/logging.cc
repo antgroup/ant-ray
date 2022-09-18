@@ -43,7 +43,7 @@
 
 namespace ray {
 
-RayLogLevel RayLog::severity_threshold_ = RayLogLevel::DEBUG;
+RayLogLevel RayLog::severity_threshold_ = RayLogLevel::INFO;
 std::string RayLog::app_name_ = "";
 std::string RayLog::log_dir_ = "";
 // Format pattern is 2020-08-21 17:00:00,000 I 100 1001 msg.

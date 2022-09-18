@@ -291,13 +291,10 @@ class ClientCallManager {
         std::shared_ptr<StatsHandle> stats_handle = tag->GetCall()->GetStatsHandle();
         RAY_CHECK(stats_handle != nullptr);
         if (ok && !main_service_.stopped() && !shutdown_) {
-          RAY_LOG(INFO) << "Received reply. Address of main_service_: " << &main_service_;
           // Post the callback to the main event loop.
           main_service_.post(
               [tag]() {
-                RAY_LOG(INFO) << "OnReplyReceived";
                 tag->GetCall()->OnReplyReceived();
-                RAY_LOG(INFO) << "OnReplyReceived end. Status: " << tag->GetCall()->GetStatus();
                 // The call is finished, and we can delete this tag now.
                 delete tag;
               },

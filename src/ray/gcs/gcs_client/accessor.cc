@@ -484,7 +484,7 @@ Status NodeInfoAccessor::AsyncDrainNode(const NodeID &node_id,
 }
 
 Status NodeInfoAccessor::AsyncGetAll(const MultiItemCallback<GcsNodeInfo> &callback) {
-  RAY_LOG(INFO) << "Getting information of all nodes.";
+  RAY_LOG(DEBUG) << "Getting information of all nodes.";
   rpc::GetAllNodeInfoRequest request;
   client_impl_->GetGcsRpcClient().GetAllNodeInfo(
       request, [callback](const Status &status, const rpc::GetAllNodeInfoReply &reply) {
@@ -497,7 +497,6 @@ Status NodeInfoAccessor::AsyncGetAll(const MultiItemCallback<GcsNodeInfo> &callb
         RAY_LOG(DEBUG) << "Finished getting information of all nodes, status = "
                        << status;
       });
-  RAY_LOG(INFO) << "Request sent.";
   return Status::OK();
 }
 

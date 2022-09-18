@@ -150,12 +150,10 @@ void GrpcServer::PollEventsFromCompletionQueue(int index) {
     if (ok) {
       switch (server_call->GetState()) {
       case ServerCallState::PENDING:
-        RAY_LOG(INFO) << "New incoming request.";
         // We've received a new incoming request. Now this call object is used to
         // track this request.
         server_call->SetState(ServerCallState::PROCESSING);
         server_call->HandleRequest();
-        RAY_LOG(INFO) << "New incoming request handled.";
         break;
       case ServerCallState::SENDING_REPLY:
         // GRPC has sent reply successfully, invoking the callback.

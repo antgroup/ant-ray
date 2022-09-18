@@ -170,14 +170,7 @@ class ServerCallImpl : public ServerCall {
       ray::stats::STATS_grpc_server_req_handling.Record(1.0, call_name_);
     }
     if (!io_service_.stopped()) {
-      RAY_LOG(INFO) << "HandleRequest before post " << call_name_;
-      io_service_.post(
-          [this] {
-            RAY_LOG(INFO) << "HandleRequest in post " << call_name_;
-            HandleRequestImpl();
-            RAY_LOG(INFO) << "Finished HandleRequest in post " << call_name_;
-          },
-          call_name_);
+      io_service_.post([this] { HandleRequestImpl(); }, call_name_);
     } else {
       // Handle service for rpc call has stopped, we must handle the call here
       // to send reply and remove it from cq
@@ -211,9 +204,7 @@ class ServerCallImpl : public ServerCall {
           // When the handler is done with the request, tell gRPC to finish this request.
           // Must send reply at the bottom of this callback, once we invoke this funciton,
           // this server call might be deleted
-          RAY_LOG(INFO) << "Sending RPC reply for " << call_name_;
           SendReply(status);
-          RAY_LOG(INFO) << "Sent RPC reply for " << call_name_;
         });
   }
 

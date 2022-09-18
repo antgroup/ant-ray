@@ -1450,19 +1450,6 @@ cc_test(
 )
 
 cc_test(
-    name = "boost_test",
-    size = "small",
-    srcs = ["src/ray/boost_test.cc"],
-    copts = COPTS,
-    # linkshared = 1,
-    linkstatic = 1,
-    tags = ["team:core"],
-    deps = [
-        "ray_common",
-    ],
-)
-
-cc_test(
     name = "logging_test",
     size = "small",
     srcs = ["src/ray/util/logging_test.cc"],
@@ -2186,8 +2173,15 @@ cc_test(
     srcs = [
         "src/ray/gcs/gcs_client/test/global_state_accessor_test.cc",
     ],
+    args = [
+        "$(location redis-server)",
+        "$(location redis-cli)",
+    ],
     copts = COPTS,
-    linkstatic = 1,
+    data = [
+        "//:redis-cli",
+        "//:redis-server",
+    ],
     tags = ["team:core"],
     deps = [
         ":gcs_client_lib",

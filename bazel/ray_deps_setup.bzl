@@ -159,7 +159,6 @@ def ray_deps_setup():
         sha256 = "83bfc1507731a0906e387fc28b7ef5417d591429e51e788417fe9ff025e116b1",
         url = "https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.tar.bz2",
         patches = [
-            "@com_github_ray_project_ray//thirdparty/patches:boost-epoll-patch.patch",
             "@com_github_ray_project_ray//thirdparty/patches:boost-exception-no_warn_typeid_evaluated.patch",
         ],
     )

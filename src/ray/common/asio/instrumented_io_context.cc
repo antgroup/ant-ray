@@ -60,14 +60,8 @@ void instrumented_io_context::post(std::function<void()> handler,
       EventTracker::RecordExecution(handler, std::move(stats_handle));
     };
   }
-  RAY_LOG(INFO) << "instrumented_io_context::post";
   if (defer_us == 0) {
-    RAY_LOG(INFO) << "instrumented_io_context::post with defer_us == 0. stopped: "
-                  << stopped();
-    boost::asio::io_context::post(std::move(handler));
-    RAY_LOG(INFO) << "instrumented_io_context::post with defer_us == 0 end. stopped: "
-                  << stopped();
-    return;
+    return boost::asio::io_context::post(std::move(handler));
   } else {
     RAY_LOG(DEBUG) << "Deferring " << stats_handle->event_name << " by " << defer_us
                    << "us";

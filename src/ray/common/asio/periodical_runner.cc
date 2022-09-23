@@ -34,7 +34,6 @@ PeriodicalRunner::~PeriodicalRunner() {
 void PeriodicalRunner::RunFnPeriodically(std::function<void()> fn,
                                          uint64_t period_ms,
                                          const std::string name) {
-  RAY_LOG(WARNING) << "!!! RunFnPeriodically may be not supported in Occlum. !!!";
   if (period_ms > 0) {
     auto timer = std::make_shared<boost::asio::deadline_timer>(io_service_);
     {

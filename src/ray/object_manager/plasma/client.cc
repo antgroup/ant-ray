@@ -172,14 +172,6 @@ class PlasmaClient::Impl : public std::enable_shared_from_this<PlasmaClient::Imp
                            uint64_t *retry_with_request_id,
                            std::shared_ptr<Buffer> *data);
 
-  /// Check if store_fd has already been received from the store. If yes,
-  /// return it. Otherwise, receive it from the store (see analogous logic
-  /// in store.cc).
-  ///
-  /// \param store_fd File descriptor to fetch from the store.
-  /// \return The pointer corresponding to store_fd.
-  uint8_t *GetStoreFdAndMmap(MEMFD_TYPE store_fd, int64_t map_size);
-
   /// This is a helper method for marking an object as unused by this client.
   ///
   /// \param object_id The object ID we mark unused.
@@ -195,8 +187,6 @@ class PlasmaClient::Impl : public std::enable_shared_from_this<PlasmaClient::Imp
                     ObjectBuffer *object_buffers,
                     bool is_from_worker);
 
-  uint8_t *LookupMmappedFile(MEMFD_TYPE store_fd_val);
-
   void IncrementObjectCount(const ObjectID &object_id,
                             PlasmaObject *object,
                             bool is_sealed);
@@ -205,14 +195,6 @@ class PlasmaClient::Impl : public std::enable_shared_from_this<PlasmaClient::Imp
   instrumented_io_context main_service_;
   /// The connection to the store service.
   std::shared_ptr<StoreConn> store_conn_;
-  /// Table of dlmalloc buffer files that have been memory mapped so far. This
-  /// is a hash table mapping a file descriptor to a struct containing the
-  /// address of the corresponding memory-mapped file.
-  absl::flat_hash_map<MEMFD_TYPE, std::unique_ptr<ClientMmapTableEntry>> mmap_table_;
-  /// Used to clean up old fd entries in mmap_table_ that are no longer needed,
-  /// since their fd has been reused. TODO(ekl) we should be more proactive about
-  /// unmapping unused segments.
-  absl::flat_hash_map<MEMFD_TYPE_NON_UNIQUE, MEMFD_TYPE> dedup_fd_table_;
   /// A hash table of the object IDs that are currently being used by this
   /// client.
   absl::flat_hash_map<ObjectID, std::unique_ptr<ObjectInUseEntry>> objects_in_use_;
@@ -231,37 +213,6 @@ PlasmaBuffer::~PlasmaBuffer() { RAY_UNUSED(client_->Release(object_id_)); }
 PlasmaClient::Impl::Impl() : store_capacity_(0) {}
 
 PlasmaClient::Impl::~Impl() {}
-
-// If the file descriptor fd has been mmapped in this client process before,
-// return the pointer that was returned by mmap, otherwise mmap it and store the
-// pointer in a hash table.
-uint8_t *PlasmaClient::Impl::GetStoreFdAndMmap(MEMFD_TYPE store_fd_val,
-                                               int64_t map_size) {
-  auto entry = mmap_table_.find(store_fd_val);
-  if (entry != mmap_table_.end()) {
-    return entry->second->pointer();
-  } else {
-    MEMFD_TYPE fd;
-    RAY_CHECK_OK(store_conn_->RecvFd(&fd.first));
-    fd.second = store_fd_val.second;
-    // Close and erase the old duplicated fd entry that is no longer needed.
-    if (dedup_fd_table_.find(store_fd_val.first) != dedup_fd_table_.end()) {
-      RAY_LOG(INFO) << "Erasing re-used mmap entry for fd " << store_fd_val.first;
-      mmap_table_.erase(dedup_fd_table_[store_fd_val.first]);
-    }
-    dedup_fd_table_[store_fd_val.first] = store_fd_val;
-    mmap_table_[store_fd_val] = std::make_unique<ClientMmapTableEntry>(fd, map_size);
-    return mmap_table_[store_fd_val]->pointer();
-  }
-}
-
-// Get a pointer to a file that we know has been memory mapped in this client
-// process before.
-uint8_t *PlasmaClient::Impl::LookupMmappedFile(MEMFD_TYPE store_fd_val) {
-  auto entry = mmap_table_.find(store_fd_val);
-  RAY_CHECK(entry != mmap_table_.end());
-  return entry->second->pointer();
-}
 
 bool PlasmaClient::Impl::IsInUse(const ObjectID &object_id) {
   std::lock_guard<std::recursive_mutex> guard(client_mutex_);
@@ -332,7 +283,7 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
     RAY_CHECK(object.metadata_offset == object.data_offset + object.data_size);
     *data = std::make_shared<PlasmaMutableBuffer>(
         shared_from_this(),
-        GetStoreFdAndMmap(store_fd, mmap_size) + object.data_offset,
+        object.address + object.data_offset,
         object.data_size);
     // If plasma_create is being called from a transfer, then we will not copy the
     // metadata here. The metadata will be written along with the data streamed
@@ -458,9 +409,8 @@ Status PlasmaClient::Impl::GetBuffers(
       std::shared_ptr<Buffer> physical_buf;
 
       if (object->device_num == 0) {
-        uint8_t *data = LookupMmappedFile(object->store_fd);
         physical_buf = std::make_shared<SharedMemoryBuffer>(
-            data + object->data_offset, object->data_size + object->metadata_size);
+            object->address, object->data_size + object->metadata_size);
       } else {
         RAY_LOG(FATAL) << "GPU library is not enabled.";
       }
@@ -499,13 +449,6 @@ Status PlasmaClient::Impl::GetBuffers(
                                  store_fds,
                                  mmap_sizes));
 
-  // We mmap all of the file descriptors here so that we can avoid look them up
-  // in the subsequent loop based on just the store file descriptor and without
-  // having to know the relevant file descriptor received from recv_fd.
-  for (size_t i = 0; i < store_fds.size(); i++) {
-    GetStoreFdAndMmap(store_fds[i], mmap_sizes[i]);
-  }
-
   for (int64_t i = 0; i < num_objects; ++i) {
     RAY_DCHECK(received_object_ids[i] == object_ids[i]);
     object = &object_data[i];
@@ -522,9 +465,8 @@ Status PlasmaClient::Impl::GetBuffers(
     if (object->data_size != -1) {
       std::shared_ptr<Buffer> physical_buf;
       if (object->device_num == 0) {
-        uint8_t *data = LookupMmappedFile(object->store_fd);
         physical_buf = std::make_shared<SharedMemoryBuffer>(
-            data + object->data_offset, object->data_size + object->metadata_size);
+            object->address, object->data_size + object->metadata_size);
       } else {
         RAY_LOG(FATAL) << "Arrow GPU library is not enabled.";
       }

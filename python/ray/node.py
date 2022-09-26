@@ -1084,6 +1084,9 @@ class Node:
         assert self._gcs_client is not None
         self._write_cluster_info_to_kv()
 
+        # Workaround because these params are not available in ray.init().
+        # Should be reverted once we start Ray with `ray start` CLI.
+
         # if not self._ray_params.no_monitor:
         #     self.start_monitor()
 
@@ -1133,6 +1136,8 @@ class Node:
             huge_pages=self._ray_params.huge_pages,
         )
         self.start_raylet(plasma_directory, object_store_memory)
+        # Workaround because these params are not available in ray.init().
+        # Should be reverted once we start Ray with `ray start` CLI.
         # if self._ray_params.include_log_monitor:
         #     self.start_log_monitor()
 

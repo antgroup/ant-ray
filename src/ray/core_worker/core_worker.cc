@@ -116,6 +116,7 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
   NodeID local_raylet_id;
   int assigned_port;
   std::string serialized_job_config = options_.serialized_job_config;
+  RAY_LOG(INFO) << "Connecting to local Raylet.";
   local_raylet_client_ =
       std::make_shared<raylet::RayletClient>(io_service_,
                                              std::move(grpc_client),
@@ -131,6 +132,7 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
                                              &assigned_port,
                                              &serialized_job_config,
                                              options_.startup_token);
+  RAY_LOG(INFO) << "Connected to local Raylet.";
 
   if (!raylet_client_status.ok()) {
     // Avoid using FATAL log or RAY_CHECK here because they may create a core dump file.
@@ -159,12 +161,14 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
 
   // Start RPC server after all the task receivers are properly initialized and we have
   // our assigned port from the raylet.
+  RAY_LOG(INFO) << "Starting GRPC server.";
   core_worker_server_ =
       std::make_unique<rpc::GrpcServer>(WorkerTypeString(options_.worker_type),
                                         assigned_port,
                                         options_.node_ip_address == "127.0.0.1");
   core_worker_server_->RegisterService(grpc_service_);
   core_worker_server_->Run();
+  RAY_LOG(INFO) << "Started GRPC server.";
 
   // Set our own address.
   RAY_CHECK(!local_raylet_id.IsNil());
@@ -198,7 +202,9 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
       });
 
   RAY_CHECK_OK(gcs_client_->Connect(io_service_));
+  RAY_LOG(INFO) << "GCS client created.";
   RegisterToGcs();
+  RAY_LOG(INFO) << "Registered to GCS.";
 
   // Register a callback to monitor removed nodes.
   auto on_node_change = [this](const NodeID &node_id, const rpc::GcsNodeInfo &data) {
@@ -258,6 +264,7 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
         RayConfig::instance().raylet_death_check_interval_milliseconds());
   }
 
+  RAY_LOG(INFO) << "Creating CoreWorkerPlasmaStoreProvider";
   plasma_store_provider_.reset(new CoreWorkerPlasmaStoreProvider(
       options_.store_socket,
       local_raylet_client_,
@@ -267,6 +274,7 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
       (options_.worker_type != WorkerType::SPILL_WORKER &&
        options_.worker_type != WorkerType::RESTORE_WORKER),
       /*get_current_call_site=*/boost::bind(&CoreWorker::CurrentCallSite, this)));
+  RAY_LOG(INFO) << "Created CoreWorkerPlasmaStoreProvider";
   memory_store_.reset(new CoreWorkerMemoryStore(
       reference_counter_,
       local_raylet_client_,

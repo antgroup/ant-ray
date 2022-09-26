@@ -113,7 +113,9 @@ raylet::RayletClient::RayletClient(
     std::string *serialized_job_config,
     StartupToken startup_token)
     : grpc_client_(std::move(grpc_client)), worker_id_(worker_id), job_id_(job_id) {
+  RAY_LOG(INFO) << "Creating RayletConnection.";
   conn_ = std::make_unique<raylet::RayletConnection>(io_service, raylet_socket, -1, -1);
+  RAY_LOG(INFO) << "Created RayletConnection.";
 
   flatbuffers::FlatBufferBuilder fbb;
   // TODO(suquark): Use `WorkerType` in `common.proto` without converting to int.
@@ -133,8 +135,10 @@ raylet::RayletClient::RayletClient(
   // Register the process ID with the raylet.
   // NOTE(swang): If raylet exits and we are registered as a worker, we will get killed.
   std::vector<uint8_t> reply;
+  RAY_LOG(INFO) << "Begin AtomicRequestReply RegisterClientRequest";
   auto request_status = conn_->AtomicRequestReply(
       MessageType::RegisterClientRequest, MessageType::RegisterClientReply, &reply, &fbb);
+  RAY_LOG(INFO) << "End AtomicRequestReply RegisterClientRequest. Status: " << request_status;
   if (!request_status.ok()) {
     *status =
         Status(request_status.code(),

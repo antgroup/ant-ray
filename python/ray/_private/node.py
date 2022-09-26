@@ -1175,6 +1175,7 @@ class Node:
         for process_info in process_infos:
             process = process_info.process
 
+            # TODO: Use SIGTERM first if allow_graceful is True
             os.kill(process, signal.SIGKILL)
             return
 

@@ -618,9 +618,9 @@ cdef execute_task(
     with core_worker.profile_event(b"task::" + name, extra_data=extra_data):
         try:
             task_exception = False
-            if not (<int>task_type == <int>TASK_TYPE_ACTOR_TASK
-                    and function_name == "__ray_terminate__"):
-                worker.memory_monitor.raise_if_low_memory()
+            # if not (<int>task_type == <int>TASK_TYPE_ACTOR_TASK
+            #         and function_name == "__ray_terminate__"):
+            #     worker.memory_monitor.raise_if_low_memory()
 
             with core_worker.profile_event(b"task:deserialize_arguments"):
                 if c_args.empty():

@@ -282,9 +282,7 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
     // The metadata should come right after the data.
     RAY_CHECK(object.metadata_offset == object.data_offset + object.data_size);
     *data = std::make_shared<PlasmaMutableBuffer>(
-        shared_from_this(),
-        object.address + object.data_offset,
-        object.data_size);
+        shared_from_this(), object.address, object.data_size);
     // If plasma_create is being called from a transfer, then we will not copy the
     // metadata here. The metadata will be written along with the data streamed
     // from the transfer.

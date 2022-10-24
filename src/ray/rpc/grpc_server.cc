@@ -102,7 +102,8 @@ void GrpcServer::Run() {
       << "Try running lsof -i :" << specified_port
       << " to check if there are other processes listening to the port.";
   RAY_CHECK(port_ > 0);
-  RAY_LOG(INFO) << name_ << " server started, listening on port " << port_ << ".";
+  RAY_LOG(INFO) << name_ << " GRPC server started, listening on port " << port_ << ". "
+                << "And keepalive_time_ms set to " << keepalive_time_ms_ << ".";
 
   // Create calls for all the server call factories.
   for (auto &entry : server_call_factories_) {

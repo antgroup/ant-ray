@@ -1,4 +1,4 @@
-name: BUILD-RAY-WHEELS-ON-MANY-LINUX.yml
+name: RUN-BASIC-TESTS.yml
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ secretflow-ray ]
 
 jobs:
-  build-wheel-pipeline:
+  run-basic-tests-on-unbuntu:
     timeout-minutes: 600
     runs-on: ubuntu-20.04
     container: 'quay.io/pypa/manylinux2014_x86_64'
@@ -20,17 +20,23 @@ jobs:
 
     - name: Install basics
       run: |
-          #  apt-get update
-          #  apt-get install -yq wget curl gcc g++ openjdk-8-jdk maven zlib1g-dev zip git
+           apt-get update
+           apt-get install -yq software-properties-common
+           add-apt-repository -y ppa:deadsnakes/ppa
+           apt-get install -yq wget curl gcc g++ openjdk-8-jdk maven python3.8 zlib1g-dev zip git pip
 
-    # - name: Install bazel
-    #   run: |
-    #        sh -c "bash ci/env/install-bazel.sh"
+    - name: Install bazel
+      run: |
+           sh -c "bash ci/env/install-bazel.sh"
 
-    - name: Install Ray and export dist
+    - name: Install Ray and Run tests
       run: |
            set -e
            set -x
+           python3 -m pip install virtualenv
+           python3 -m virtualenv -p python3 py3
+           . py3/bin/activate
+           pip install pytest
            pip install -e ./python -v
            pushd ./python/ray/tests
            pytest -v test_basic.py test_basic_2.py test_actor.py 

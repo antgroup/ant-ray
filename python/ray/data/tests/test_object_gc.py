@@ -1,6 +1,7 @@
 import time
 
 import pytest
+import numpy as np
 
 import ray
 from ray._private.internal_api import memory_summary
@@ -175,6 +176,53 @@ def test_pipeline_splitting_has_no_spilling_with_equal_splitting(shutdown_only):
             ray.cancel(t, force=True)
     meminfo = memory_summary(ctx.address_info["address"], stats_only=True)
     assert "Spilled" not in meminfo, meminfo
+
+
+def test_task_argument_reference(shutdown_only):
+
+    def get_big_object(size):
+        return np.random.randint(0, high=255, size=size, dtype=np.uint8)
+
+    ray.init(
+        # 150MB
+        object_store_memory=150 * 1024 * 1024,
+        _system_config = {
+            "max_direct_call_object_size": 100 * 1024,
+            # disable unlimited plasma store
+            "oom_grace_period_s": 3600,
+        }
+    )
+
+    # @ray.remote
+    # def test_return_big_object(arg):
+    #     del arg
+    #     return get_big_object((80, 1024 * 1024))
+
+    # ray.get(test_return_big_object.remote(get_big_object((80, 1024 * 1024))))
+    class TestTuple(tuple):
+        pass
+    class TestObject:
+        def __init__(self, value):
+            print("__init__", self, value)
+            self._value = value
+
+        def __reduce__(self):
+            print("__reduce__", self, self._value)
+            return TestObject, TestTuple((self._value,))
+
+        def __del__(self):
+            print("__del__", self, self._value)
+
+
+    @ray.remote
+    def get_frame_locals(x):
+        print("hejialing test")
+        return TestObject(2)
+
+
+    r = get_frame_locals.remote(TestObject(1))
+    ray.get(r)
+
 
 
 if __name__ == "__main__":

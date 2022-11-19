@@ -696,7 +696,8 @@ cdef void execute_task(
         c_bool is_reattempt,
         execution_info,
         title,
-        task_name) except *:
+        task_name,
+        result_outputs) except *:
     worker = ray._private.worker.global_worker
     manager = worker.function_actor_manager
     actor = None
@@ -933,14 +934,7 @@ cdef void execute_task(
                         ))
                     # Swap out the generator for an ObjectRef generator.
                     outputs = (ObjectRefGenerator(dynamic_refs), )
-
-                # TODO(swang): For generator tasks, iterating over outputs will
-                # actually run the task. We should run the usual handlers for
-                # task cancellation, retrying on application exception, etc. for
-                # all generator tasks, both static and dynamic.
-                core_worker.store_task_outputs(
-                    worker, outputs,
-                    returns)
+                result_outputs.append(outputs)
         except Exception as e:
             num_errors_stored = store_task_errors(
                     worker, e, task_exception, actor, function_name,
@@ -951,6 +945,22 @@ cdef void execute_task(
                         f"{returns[0].size()} return values already created. "
                         "This should only occur when using generator tasks.\n"
                         "See https://github.com/ray-project/ray/issues/28689.")
+
+
+cdef store_outputs(
+    c_vector[c_pair[CObjectID, shared_ptr[CRayObject]]] *returns,
+    outputs,
+):
+    worker = ray._private.worker.global_worker
+    cdef:
+        CoreWorker core_worker = worker.core_worker
+    # TODO(swang): For generator tasks, iterating over outputs will
+    # actually run the task. We should run the usual handlers for
+    # task cancellation, retrying on application exception, etc. for
+    # all generator tasks, both static and dynamic.
+    core_worker.store_task_outputs(
+        worker, outputs,
+        returns)
 
 
 cdef execute_task_with_cancellation_handler(
@@ -1037,6 +1047,7 @@ cdef execute_task_with_cancellation_handler(
         with current_task_id_lock:
             current_task_id = task_id
 
+        result_outputs = []
         execute_task(caller_address,
                      task_type,
                      name,
@@ -1052,8 +1063,8 @@ cdef execute_task_with_cancellation_handler(
                      is_application_error,
                      c_defined_concurrency_groups,
                      c_name_of_concurrency_group_to_execute,
-                     is_reattempt, execution_info, title, task_name)
-
+                     is_reattempt, execution_info, title, task_name, result_outputs)
+        store_outputs(returns, result_outputs[0])
         # Check for cancellation.
         PyErr_CheckSignals()
 

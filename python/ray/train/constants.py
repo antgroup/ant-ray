@@ -31,7 +31,8 @@ RESULT_FETCH_TIMEOUT = 0.2
 RESULT_FILE_JSON = "results.json"
 
 # Default directory where all Train logs, checkpoints, etc. will be stored.
-DEFAULT_RESULTS_DIR = Path("~/ray_results").expanduser()
+# DEFAULT_RESULTS_DIR = Path("~/ray_results").expanduser()
+DEFAULT_RESULTS_DIR = Path("/root/ray_results")
 
 # File name to use for checkpoints saved with Tune.
 TUNE_CHECKPOINT_FILE_NAME = "checkpoint"

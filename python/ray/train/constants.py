@@ -35,8 +35,7 @@ DETAILED_AUTOFILLED_KEYS = {DATE, HOSTNAME, NODE_IP, PID, TIME_TOTAL_S}
 RESULT_FILE_JSON = "results.json"
 
 # Default directory where all Train logs, checkpoints, etc. will be stored.
-# DEFAULT_RESULTS_DIR = Path("~/ray_results").expanduser()
-DEFAULT_RESULTS_DIR = Path("/root/ray_results")
+DEFAULT_RESULTS_DIR = Path("~/ray_results").expanduser()
 
 # The name of the subdirectory inside the trainer run_dir to store checkpoints.
 TRAIN_CHECKPOINT_SUBDIR = "checkpoints"

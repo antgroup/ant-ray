@@ -363,3 +363,8 @@ def gcs_actor_scheduling_enabled():
 
 
 DEFAULT_RESOURCES = {"CPU", "GPU", "memory", "object_store_memory"}
+
+# ray whitelist config file absolute path.
+RAY_PICKLE_WHITELIST_CONFIG_PATH = os.environ.get(
+    "RAY_PICKLE_WHITELIST_CONFIG_PATH", None
+)

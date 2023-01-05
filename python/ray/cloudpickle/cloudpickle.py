@@ -688,6 +688,8 @@ def _rebuild_tornado_coroutine(func):
 # including pickles unloading functions in this namespace
 load = pickle.load
 loads = pickle.loads
+Unpickler = pickle.Unpickler
+UnpicklingError = pickle.UnpicklingError
 
 
 def subimport(name):

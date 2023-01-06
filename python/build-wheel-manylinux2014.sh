@@ -39,7 +39,7 @@ echo "java_bin path $java_bin"
 java_home=${java_bin%jre/bin/java}
 export JAVA_HOME="$java_home"
 
-/ray/ci/env/install-bazel.sh
+ci/env/install-bazel.sh
 # Put bazel into the PATH if building Bazel from source
 # export PATH=/root/bazel-3.2.0/output:$PATH:/root/bin
 

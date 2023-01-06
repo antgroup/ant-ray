@@ -694,7 +694,6 @@ def test_restricted_loads(shutdown_only):
             }
         }
         yaml.safe_dump(whitelist_config, open(config_path, "wt"))
-        print(f"========config_path={config_path}")
         ray.ray_constants.RAY_PICKLE_WHITELIST_CONFIG_PATH = config_path
         import os
         os.environ["RAY_PICKLE_WHITELIST_CONFIG_PATH"] = config_path 
@@ -711,9 +710,6 @@ def test_restricted_loads(shutdown_only):
             pass
 
         ref3 = ray.put(WrongClass())
-        print("========================testing start")
-        # ray.get(ref3)
-        print("========================testing end")
         with pytest.raises(ray.exceptions.RaySystemError) as error:
             ray.get(ref3)
         assert isinstance(error.value.args[0], ray.cloudpickle.UnpicklingError)

@@ -55,17 +55,19 @@ _pickle_whitelist = None
 
 class RestrictedUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
-        print(f"=======find_class: {module} {name}")
         if _pickle_whitelist is None or (
             module in _pickle_whitelist
             and (_pickle_whitelist[module] is None or name in _pickle_whitelist[module])
         ):
-            print(f"=======find_class A: {module} {name}")
             return super().find_class(module, name)
 
-        allowed_module_list = ["ray.serialization", "ray.cloudpickle.cloudpickle", "ray.cloudpickle.cloudpickle_fast", "ray._private.serialization"]
-        if module in allowed_module_list:
-            print(f"=======find_class A: {module} {name}")
+        ray_allowed_module_list = [
+            "ray.serialization",
+            "ray.cloudpickle.cloudpickle",
+            "ray.cloudpickle.cloudpickle_fast",
+            "ray._private.serialization",
+        ]
+        if module in ray_allowed_module_list:
             return super().find_class(module, name)
 
         # Forbid everything else.

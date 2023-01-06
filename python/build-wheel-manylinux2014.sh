@@ -10,13 +10,11 @@ cat << EOF > "/usr/bin/nproc"
 echo 10
 EOF
 chmod +x /usr/bin/nproc
+TRAVIS_COMMIT=${GITHUB_SHA}
 
 NODE_VERSION="14"
-PYTHONS=("cp36-cp36m"
-         "cp37-cp37m"
-         "cp38-cp38"
-         "cp39-cp39"
-         "cp310-cp310")
+# We only support the Python version == 3.8 for secretflow-ray.
+PYTHONS=("cp38-cp38")
 
 NUMPY_VERSIONS=("1.14.5"
                 "1.14.5"

@@ -128,7 +128,7 @@ else:
     # "ray" primary wheel package.
     setup_spec = SetupSpec(
         SetupType.RAY,
-        "ray",
+        "secretflow-ray",
         "Ray provides a simple, "
         "universal API for building distributed applications.",
         BUILD_TYPE,

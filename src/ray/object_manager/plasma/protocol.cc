@@ -216,7 +216,10 @@ Status SendCreateRequest(const std::shared_ptr<StoreConn> &store_conn,
                                     source,
                                     device_num,
                                     try_immediately);
-  return PlasmaSend(store_conn, MessageType::PlasmaCreateRequest, &fbb, message);
+  RAY_LOG(INFO) << "After CreatePlasmaCreateRequest, prepare to send";
+  Status status =  PlasmaSend(store_conn, MessageType::PlasmaCreateRequest, &fbb, message);
+  RAY_LOG(INFO) << "After PlasmaSend, status: " << status.ok();
+  return status;
 }
 
 void ReadCreateRequest(uint8_t *data,

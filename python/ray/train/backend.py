@@ -142,8 +142,11 @@ class BackendExecutor:
         train_cls_kwargs: Optional[Dict] = None,
     ):
         """Starts the worker group."""
+        logger.info("Start to create PG.")
         self._create_placement_group()
         placement_group = self._placement_group or "default"
+        logger.info(f"Created PG: {placement_group}")
+        logger.info("Start to create `WorkerGroup`")
         self.worker_group = WorkerGroup(
             num_workers=self._num_workers,
             num_cpus_per_worker=self._num_cpus_per_worker,
@@ -154,6 +157,7 @@ class BackendExecutor:
             actor_cls_kwargs=train_cls_kwargs,
             placement_group=placement_group,
         )
+        logger.info(f"WorkerGroup: {self.worker_group}")
         try:
             if initialization_hook:
                 self._initialization_hook = initialization_hook
@@ -168,7 +172,10 @@ class BackendExecutor:
 
             if self._num_gpus_per_worker > 0 and share_cuda_visible_devices_enabled:
                 self._share_cuda_visible_devices()
+
+            logger.info(f"_backend: {self._backend} calling `on_start`.")
             self._backend.on_start(self.worker_group, self._backend_config)
+            logger.info(f"Done calling {self._backend}'s `on_start`")
         except RayActorError as exc:
             logger.exception(str(exc))
             logger.warning(
@@ -191,7 +198,9 @@ class BackendExecutor:
         If a placement group is created it will be stored as
         self._placement_group.
         """
+        logger.info("Prepare to get current PG.")
         current_placement_group = get_current_placement_group()
+        logger.info(f"Current PG: {current_placement_group}")
         should_capture_child_tasks_in_placement_group = (
             ray.worker.global_worker.should_capture_child_tasks_in_placement_group
         )
@@ -217,7 +226,9 @@ class BackendExecutor:
             placement_group = ray.util.placement_group(bundles, strategy=strategy)
             logger.debug("Waiting for placement group to start.")
             timeout = env_integer(TRAIN_PLACEMENT_GROUP_TIMEOUT_S_ENV, 100)
-            ready, _ = ray.wait([placement_group.ready()], timeout=timeout)
+            pg_ready = placement_group.ready()
+            logger.info("pg_ready, wait")
+            ready, _ = ray.wait([pg_ready], timeout=timeout)
             if ready:
                 logger.debug("Placement group has started.")
             else:

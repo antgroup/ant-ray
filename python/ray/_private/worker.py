@@ -2437,7 +2437,7 @@ def wait(
     """
     worker = global_worker
     worker.check_connected()
-
+    logger.info("ray.wait")
     if (
         hasattr(worker, "core_worker")
         and worker.core_worker.current_actor_is_asyncio()
@@ -2503,6 +2503,7 @@ def wait(
             worker.current_task_id,
             fetch_local,
         )
+        logger.info(f"wait returned, ready_ids: {ready_ids}, remaining_ids: {remaining_ids}")
         return ready_ids, remaining_ids
 
 

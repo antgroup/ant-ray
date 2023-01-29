@@ -74,8 +74,7 @@ std::shared_ptr<ray::LocalMemoryBuffer> MakeSerializedErrorBuffer(
                                                kMessagePackOffset);
   // copy msgpack-serialized bytes
   std::memcpy(final_buffer->Data() + kMessagePackOffset,
-              msgpack_serialized_exception.data(),
-              msgpack_serialized_exception.size());
+              msgpack_serialized_exception.data(), msgpack_serialized_exception.size());
   // copy offset
   msgpack::sbuffer msgpack_int;
   msgpack::pack(msgpack_int, msgpack_serialized_exception.size());
@@ -96,7 +95,7 @@ RayObject::RayObject(rpc::ErrorType error_type, const rpc::RayErrorInfo *ray_err
     return;
   }
 
-  const auto error_buffer = MakeSerializedErrorBuffer<rpc::RayErrorInfo>(*ray_error_info);
+  const auto error_buffer = MakeSerializedErrorBuffer(*ray_error_info);
   Init(std::move(error_buffer), MakeErrorMetadataBuffer(error_type), {});
   return;
 }

@@ -12,20 +12,19 @@ namespace plasma {
 using ray::Status;
 
 std::ostream &operator<<(std::ostream &os, const std::shared_ptr<Client> &client) {
-  os << std::to_string(client->GetNativeHandle());
+  os << (client ? std::to_string(client->GetNativeHandle()) : "nullptr");
   return os;
 }
 
 std::ostream &operator<<(std::ostream &os, const std::shared_ptr<StoreConn> &store_conn) {
-  os << std::to_string(store_conn->GetNativeHandle());
+  os << (store_conn ? std::to_string(store_conn->GetNativeHandle()) : "nullptr");
   return os;
 }
 
 namespace {
 
 const std::vector<std::string> GenerateEnumNames(const char *const *enum_names_ptr,
-                                                 int start_index,
-                                                 int end_index) {
+                                                 int start_index, int end_index) {
   std::vector<std::string> enum_names;
   for (int i = 0; i < start_index; ++i) {
     enum_names.push_back("EmptyMessageType");
@@ -45,15 +44,12 @@ const std::vector<std::string> GenerateEnumNames(const char *const *enum_names_p
 }
 
 static const std::vector<std::string> object_store_message_enum =
-    GenerateEnumNames(flatbuf::EnumNamesMessageType(),
-                      static_cast<int>(MessageType::MIN),
+    GenerateEnumNames(flatbuf::EnumNamesMessageType(), static_cast<int>(MessageType::MIN),
                       static_cast<int>(MessageType::MAX));
 }  // namespace
 
 Client::Client(ray::MessageHandler &message_handler, ray::local_stream_socket &&socket)
-    : ray::ClientConnection(message_handler,
-                            std::move(socket),
-                            "worker",
+    : ray::ClientConnection(message_handler, std::move(socket), "worker",
                             object_store_message_enum,
                             static_cast<int64_t>(MessageType::PlasmaDisconnectClient)) {}
 
@@ -61,12 +57,10 @@ std::shared_ptr<Client> Client::Create(PlasmaStoreMessageHandler message_handler
                                        ray::local_stream_socket &&socket) {
   ray::MessageHandler ray_message_handler =
       [message_handler](std::shared_ptr<ray::ClientConnection> client,
-                        int64_t message_type,
-                        const std::vector<uint8_t> &message) {
+                        int64_t message_type, const std::vector<uint8_t> &message) {
         Status s = message_handler(
             std::static_pointer_cast<Client>(client->shared_ClientConnection_from_this()),
-            (MessageType)message_type,
-            message);
+            (MessageType)message_type, message);
         if (!s.ok()) {
           if (!s.IsDisconnected()) {
             RAY_LOG(ERROR) << "Fail to process client message. " << s.ToString();
@@ -98,13 +92,8 @@ Status Client::SendFd(MEMFD_TYPE fd) {
       return Status::Invalid("Cannot open PID = " + std::to_string(target_pid));
     }
     HANDLE target_handle = NULL;
-    bool success = DuplicateHandle(GetCurrentProcess(),
-                                   fd.first,
-                                   target_process,
-                                   &target_handle,
-                                   0,
-                                   TRUE,
-                                   DUPLICATE_SAME_ACCESS);
+    bool success = DuplicateHandle(GetCurrentProcess(), fd, target_process,
+                                   &target_handle, 0, TRUE, DUPLICATE_SAME_ACCESS);
     if (!success) {
       // TODO(suquark): Define better error type.
       return Status::IOError("Fail to duplicate handle to PID = " +
@@ -114,13 +103,8 @@ Status Client::SendFd(MEMFD_TYPE fd) {
     if (!s.ok()) {
       /* we failed to send the handle, and it needs cleaning up! */
       HANDLE duplicated_back = NULL;
-      if (DuplicateHandle(target_process,
-                          fd.first,
-                          GetCurrentProcess(),
-                          &duplicated_back,
-                          0,
-                          FALSE,
-                          DUPLICATE_CLOSE_SOURCE)) {
+      if (DuplicateHandle(target_process, fd, GetCurrentProcess(), &duplicated_back, 0,
+                          FALSE, DUPLICATE_CLOSE_SOURCE)) {
         CloseHandle(duplicated_back);
       }
       CloseHandle(target_process);
@@ -128,7 +112,7 @@ Status Client::SendFd(MEMFD_TYPE fd) {
     }
     CloseHandle(target_process);
 #else
-    auto ec = send_fd(GetNativeHandle(), fd.first);
+    auto ec = send_fd(GetNativeHandle(), fd);
     if (ec <= 0) {
       if (ec == 0) {
         return Status::IOError("Encountered unexpected EOF");
@@ -145,7 +129,7 @@ Status Client::SendFd(MEMFD_TYPE fd) {
 StoreConn::StoreConn(ray::local_stream_socket &&socket)
     : ray::ServerConnection(std::move(socket)) {}
 
-Status StoreConn::RecvFd(MEMFD_TYPE_NON_UNIQUE *fd) {
+Status StoreConn::RecvFd(MEMFD_TYPE *fd) {
 #ifdef _WIN32
   DWORD pid = GetCurrentProcessId();
   Status s = WriteBuffer({boost::asio::buffer(&pid, sizeof(pid))});

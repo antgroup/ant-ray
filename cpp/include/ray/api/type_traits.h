@@ -44,8 +44,11 @@ using RemoveReference_t = typename RemoveReference<Tuple>::type;
 template <class, class = void>
 struct is_object_ref_t : std::false_type {};
 
+template <class...>
+using void_t = void;
+
 template <class T>
-struct is_object_ref_t<T, std::void_t<decltype(std::declval<T>().IsObjectRef())>>
+struct is_object_ref_t<T, void_t<decltype(std::declval<T>().IsObjectRef())>>
     : std::true_type {};
 
 template <typename T>

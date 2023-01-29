@@ -1,0 +1,59 @@
+// Brpc stream message specification
+//
+// The format of request/reply message for brpc stream is specified as the following.
+// In practice the whole message is packed as a brpc IOBuf to be sent out on the wire.
+//
+//
+//
+//        4B            4B            `meta length` B
+// +----------------------------+----------------------+-----------------------------------------+
+// | message type | meta length |   serialized meta    |       serialized message                |
+// +----------------------------+----------------------+-----------------------------------------+
+//
+// message type: - The type of request/reply for the specific service, used for the server
+//                 to properly deserialize the message, refer to the enum values in
+//                 `EchoStreamServiceMessageType` for an example.
+// meta length:  - The size of the meta data, needed to separate meta from the actual message.
+// serialized mata:      - The flatbuf meta (StreamRpcRequestMeta or StreamRpcReplyMeta) that is serialized.
+// serialized message:   - The actual request/reply protobuf that is serialized.
+//
+
+namespace ray.rpc.brpcfb;
+
+table TraceInfo {
+  // Trace id.
+  trace_id: uint64;
+  // The RPC service name.
+  service_name: string;
+  // Type of method.
+  method_name: string;
+  // destination IP address.
+  address: string;
+  // destination port.
+  port: int32;
+  // request id.
+  request_id: uint64;
+}
+
+// Metadata for stream rpc request.
+table StreamRpcRequestMeta {
+  // Trace info.
+  trace_info: TraceInfo;
+  // The request id, this is unique for each request.
+  request_id: uint64;
+  // Whether reply is required.
+  is_reply_required: bool;
+}
+
+// Metadata for stream rpc reply.
+table StreamRpcReplyMeta {
+  // Trace info.
+  trace_info: TraceInfo;
+  // The request id of this reply. This is used for the caller
+  // to match reply with its correpsonding request.
+  request_id: uint64;
+  // The type of the error.
+  error_code: uint32;
+  // The error message.
+  error_message: string;
+}

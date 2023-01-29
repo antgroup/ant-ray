@@ -57,11 +57,8 @@ class FunctionDescriptorInterface : public MessageWrapper<rpc::FunctionDescripto
   // module/library.
   virtual std::string CallString() const = 0;
 
-  // The class name of the actor (e.g., "Bar"), or the empty string.
-  virtual std::string ClassName() const = 0;
-
   // The default name for a task that executes this function.
-  virtual std::string DefaultTaskName() const { return CallString(); }
+  virtual std::string DefaultTaskName() const { return CallString() + "()"; }
 
   template <typename Subtype>
   Subtype *As() {
@@ -89,8 +86,6 @@ class EmptyFunctionDescriptor : public FunctionDescriptorInterface {
   inline bool operator!=(const EmptyFunctionDescriptor &other) const { return false; }
 
   virtual std::string ToString() const { return "{type=EmptyFunctionDescriptor}"; }
-
-  virtual std::string ClassName() const { return ""; }
 
   virtual std::string CallString() const { return ""; }
 };
@@ -134,13 +129,17 @@ class JavaFunctionDescriptor : public FunctionDescriptorInterface {
            ", signature=" + typed_message_->signature() + "}";
   }
 
+  virtual std::string CallSiteString() const {
+    return CallString() + "." + typed_message_->signature();
+  }
+
   virtual std::string CallString() const {
     const std::string &class_name = typed_message_->class_name();
     const std::string &function_name = typed_message_->function_name();
     return class_name.empty() ? function_name : class_name + "." + function_name;
   }
 
-  virtual std::string ClassName() const { return typed_message_->class_name(); }
+  const std::string &ClassName() const { return typed_message_->class_name(); }
 
   const std::string &FunctionName() const { return typed_message_->function_name(); }
 
@@ -208,9 +207,9 @@ class PythonFunctionDescriptor : public FunctionDescriptorInterface {
     }
   }
 
-  virtual std::string ClassName() const { return typed_message_->class_name(); }
-
   const std::string &ModuleName() const { return typed_message_->module_name(); }
+
+  const std::string &ClassName() const { return typed_message_->class_name(); }
 
   const std::string &FunctionName() const { return typed_message_->function_name(); }
 
@@ -261,11 +260,11 @@ class CppFunctionDescriptor : public FunctionDescriptorInterface {
 
   virtual std::string DefaultTaskName() const { return CallString(); }
 
-  virtual std::string ClassName() const { return typed_message_->class_name(); }
-
   const std::string &FunctionName() const { return typed_message_->function_name(); }
 
   const std::string &Caller() const { return typed_message_->caller(); }
+
+  const std::string &ClassName() const { return typed_message_->class_name(); }
 
  private:
   const rpc::CppFunctionDescriptor *typed_message_;

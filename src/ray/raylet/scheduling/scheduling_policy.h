@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
-
+#include <cstdint>
 #include <vector>
 
 #include "ray/common/ray_config.h"
-#include "ray/gcs/gcs_client/gcs_client.h"
+#include "ray/gcs/gcs_client.h"
 #include "ray/raylet/scheduling/cluster_resource_data.h"
 
 namespace ray {
@@ -25,11 +24,8 @@ namespace raylet_scheduling_policy {
 
 class SchedulingPolicy {
  public:
-  SchedulingPolicy(scheduling::NodeID local_node_id,
-                   const absl::flat_hash_map<scheduling::NodeID, Node> &nodes)
-      : local_node_id_(local_node_id),
-        nodes_(nodes),
-        gen_(std::chrono::high_resolution_clock::now().time_since_epoch().count()) {}
+  SchedulingPolicy(int64_t local_node_id, const absl::flat_hash_map<int64_t, Node> &nodes)
+      : local_node_id_(local_node_id), nodes_(nodes) {}
 
   /// This scheduling policy was designed with the following assumptions in mind:
   ///   1. Scheduling a task on a new node incurs a cold start penalty (warming the worker
@@ -56,48 +52,44 @@ class SchedulingPolicy {
   /// truncation properties will lead to packing of nodes. Above the threshold, the policy
   /// will act like a traditional weighted round robin.
   ///
-  /// \param resource_request: The resource request we're attempting to schedule.
+  /// \param task_request: The task request we're attempting to schedule.
   /// \param scheduler_avoid_gpu_nodes: if set, we would try scheduling
   /// CPU-only requests on CPU-only nodes, and will fallback to scheduling on GPU nodes if
   /// needed.
   ///
   /// \return -1 if the task is unfeasible, otherwise the node id (key in `nodes`) to
   /// schedule on.
-  scheduling::NodeID HybridPolicy(
-      const ResourceRequest &resource_request,
-      float spread_threshold,
-      bool force_spillback,
-      bool require_available,
-      std::function<bool(scheduling::NodeID)> is_node_available,
+  int64_t HybridPolicy(
+      const TaskRequest &task_request, float spread_threshold, bool force_spillback,
+      bool require_available, std::function<bool(int64_t)> is_node_available,
       bool scheduler_avoid_gpu_nodes = RayConfig::instance().scheduler_avoid_gpu_nodes());
 
   /// Round robin among available nodes.
   /// If there are no available nodes, fallback to hybrid policy.
-  scheduling::NodeID SpreadPolicy(
-      const ResourceRequest &resource_request,
-      bool force_spillback,
-      bool require_available,
-      std::function<bool(scheduling::NodeID)> is_node_available);
+  int64_t SpreadPolicy(const TaskRequest &task_request, bool force_spillback,
+                       bool require_available,
+                       std::function<bool(int64_t)> is_node_available);
 
-  /// Policy that "randomly" picks a node that could fulfil the request.
-  /// TODO(scv119): if there are a lot of nodes died or can't fulfill the resource
-  /// requirement, the distribution might not be even.
-  scheduling::NodeID RandomPolicy(
-      const ResourceRequest &resource_request,
-      std::function<bool(scheduling::NodeID)> is_node_available);
+  int64_t NodeAffinityPolicy(const TaskRequest &task_request, float spread_threshold,
+                             bool force_spillback, bool require_available,
+                             std::function<bool(int64_t)> is_node_available,
+                             const absl::flat_hash_set<int64_t> &node_ids, bool soft,
+                             bool anti_affinity = false);
 
  private:
+  /// Get the best node by critical resource utilizatino.
+  int64_t GetBestNodeByResourceUtilization(const absl::flat_hash_set<int64_t> &node_ids,
+                                           float spread_threshold);
+
   /// Identifier of local node.
-  const scheduling::NodeID local_node_id_;
+  const int64_t local_node_id_;
   /// List of nodes in the clusters and their resources organized as a map.
   /// The key of the map is the node ID.
-  const absl::flat_hash_map<scheduling::NodeID, Node> &nodes_;
+  const absl::flat_hash_map<int64_t, Node> &nodes_;
   // The node to start round robin if it's spread scheduling.
   // The index may be inaccurate when nodes are added or removed dynamically,
   // but it should still be better than always scanning from 0 for spread scheduling.
   size_t spread_scheduling_next_index_ = 0;
-  /// Internally maintained random number generator.
-  std::mt19937_64 gen_;
 
   enum class NodeFilter {
     /// Default scheduling.
@@ -110,20 +102,17 @@ class SchedulingPolicy {
     kNonGpu
   };
 
-  /// \param resource_request: The resource request we're attempting to schedule.
+  /// \param task_request: The task request we're attempting to schedule.
   /// \param node_filter: defines the subset of nodes were are allowed to schedule on.
   /// can be one of kAny (can schedule on all nodes), kGPU (can only schedule on kGPU
   /// nodes), kNonGpu (can only schedule on non-GPU nodes.
   ///
   /// \return -1 if the task is unfeasible, otherwise the node id (key in `nodes`) to
   /// schedule on.
-  scheduling::NodeID HybridPolicyWithFilter(
-      const ResourceRequest &resource_request,
-      float spread_threshold,
-      bool force_spillback,
-      bool require_available,
-      std::function<bool(scheduling::NodeID)> is_node_available,
-      NodeFilter node_filter = NodeFilter::kAny);
+  int64_t HybridPolicyWithFilter(const TaskRequest &task_request, float spread_threshold,
+                                 bool force_spillback, bool require_available,
+                                 std::function<bool(int64_t)> is_node_available,
+                                 NodeFilter node_filter = NodeFilter::kAny);
 };
 }  // namespace raylet_scheduling_policy
 }  // namespace ray

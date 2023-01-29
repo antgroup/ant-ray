@@ -5,7 +5,7 @@ import argparse
 import random
 
 import ray
-from ray import air, tune
+from ray import tune
 from ray.tune.schedulers import PopulationBasedTraining
 
 
@@ -84,78 +84,48 @@ class PBTBenchmarkExample(tune.Trainable):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--smoke-test", action="store_true", help="Finish quickly for testing"
-    )
+        "--smoke-test", action="store_true", help="Finish quickly for testing")
     parser.add_argument(
-        "--cluster", action="store_true", help="Distribute tuning on a cluster"
-    )
-    parser.add_argument(
-        "--server-address",
-        type=str,
-        default=None,
-        required=False,
-        help="The address of server to connect to if using Ray Client.",
-    )
+        "--cluster",
+        action="store_true",
+        help="Distribute tuning on a cluster")
     args, _ = parser.parse_known_args()
 
-    if args.server_address:
-        ray.init(f"ray://{args.server_address}")
-    elif args.cluster:
+    if args.cluster:
         ray.init(address="auto")
     elif args.smoke_test:
         ray.init(num_cpus=2)  # force pausing to happen for test
     else:
         ray.init()
 
-    perturbation_interval = 5
     pbt = PopulationBasedTraining(
         time_attr="training_iteration",
-        perturbation_interval=perturbation_interval,
+        perturbation_interval=20,
         hyperparam_mutations={
             # distribution for resampling
             "lr": lambda: random.uniform(0.0001, 0.02),
             # allow perturbations within this set of categorical values
             "some_other_factor": [1, 2],
-        },
-    )
+        })
 
-    tuner = tune.Tuner(
+    analysis = tune.run(
         PBTBenchmarkExample,
-        run_config=air.RunConfig(
-            name="pbt_class_api_example",
-            # Stop when done = True or at some # of train steps (whichever comes first)
-            stop={
-                "done": True,
-                "training_iteration": 10 if args.smoke_test else 1000,
-            },
-            verbose=0,
-            # We recommend matching `perturbation_interval` and `checkpoint_interval`
-            # (e.g. checkpoint every 4 steps, and perturb on those same steps)
-            # or making `perturbation_interval` a multiple of `checkpoint_interval`
-            # (e.g. checkpoint every 2 steps, and perturb every 4 steps).
-            # This is to ensure that the lastest checkpoints are being used by PBT
-            # when trials decide to exploit. If checkpointing and perturbing are not
-            # aligned, then PBT may use a stale checkpoint to resume from.
-            checkpoint_config=air.CheckpointConfig(
-                checkpoint_frequency=perturbation_interval,
-                checkpoint_score_attribute="mean_accuracy",
-                num_to_keep=2,
-            ),
-        ),
-        tune_config=tune.TuneConfig(
-            scheduler=pbt,
-            metric="mean_accuracy",
-            mode="max",
-            reuse_actors=True,
-            num_samples=8,
-        ),
-        param_space={
+        name="pbt_test",
+        scheduler=pbt,
+        metric="mean_accuracy",
+        mode="max",
+        reuse_actors=True,
+        checkpoint_freq=20,
+        verbose=False,
+        stop={
+            "training_iteration": 200,
+        },
+        num_samples=8,
+        config={
             "lr": 0.0001,
             # note: this parameter is perturbed but has no effect on
             # the model training in this example
             "some_other_factor": 1,
-        },
-    )
-    results = tuner.fit()
+        })
 
-    print("Best hyperparameters found were: ", results.get_best_result().config)
+    print("Best hyperparameters found were: ", analysis.best_config)

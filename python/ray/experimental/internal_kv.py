@@ -1,121 +1,95 @@
-from typing import List, Optional, Union
+import ray
+import grpc
+import os
+from typing import List, Union
 
 from ray._private.client_mode_hook import client_mode_hook
-from ray._private.gcs_utils import GcsClient
 
-_initialized = False
-global_gcs_client = None
+redis = os.environ.get("RAY_KV_USE_GCS", "0") == "0"
 
 
-def _internal_kv_reset():
-    global global_gcs_client, _initialized
-    global_gcs_client = None
-    _initialized = False
-
-
-def internal_kv_get_gcs_client():
-    return global_gcs_client
-
-
-def _initialize_internal_kv(gcs_client: GcsClient):
-    """Initialize the internal KV for use in other function calls."""
-    global global_gcs_client, _initialized
-    assert gcs_client is not None
-    global_gcs_client = gcs_client
-    _initialized = True
-
-
-@client_mode_hook(auto_init=False)
+@client_mode_hook
 def _internal_kv_initialized():
-    return global_gcs_client is not None
+    global redis
+    worker = ray.worker.global_worker
+    if not (hasattr(worker, "mode") and worker.mode is not None):
+        return False
+    if not redis:
+        try:
+            _internal_kv_exists("dummy")
+        except grpc.RpcError:
+            redis = True
+    return True
 
 
-@client_mode_hook(auto_init=False)
-def _internal_kv_get(
-    key: Union[str, bytes], *, namespace: Optional[Union[str, bytes]] = None
-) -> bytes:
+@client_mode_hook
+def _internal_kv_get(key: Union[str, bytes]) -> bytes:
     """Fetch the value of a binary key."""
-
-    if isinstance(key, str):
-        key = key.encode()
-    if isinstance(namespace, str):
-        namespace = namespace.encode()
-    assert isinstance(key, bytes)
-    return global_gcs_client.internal_kv_get(key, namespace)
+    _check_arg_len(key)
+    if redis:
+        return ray.worker.global_worker.redis_client.hget(key, "value")
+    else:
+        return ray.worker.global_worker.gcs_client.kv_get(key)
 
 
-@client_mode_hook(auto_init=False)
-def _internal_kv_exists(
-    key: Union[str, bytes], *, namespace: Optional[Union[str, bytes]] = None
-) -> bool:
+@client_mode_hook
+def _internal_kv_exists(key: Union[str, bytes]) -> bool:
     """Check key exists or not."""
-
-    if isinstance(key, str):
-        key = key.encode()
-    if isinstance(namespace, str):
-        namespace = namespace.encode()
-    assert isinstance(key, bytes)
-    return global_gcs_client.internal_kv_exists(key, namespace)
+    _check_arg_len(key)
+    if redis:
+        return ray.worker.global_worker.redis_client.hexists(key, "value")
+    else:
+        return ray.worker.global_worker.gcs_client.kv_exists(key)
 
 
-@client_mode_hook(auto_init=False)
-def _pin_runtime_env_uri(uri: str, *, expiration_s: int) -> None:
-    """Pin a runtime_env URI for expiration_s."""
-    return global_gcs_client.pin_runtime_env_uri(uri, expiration_s)
-
-
-@client_mode_hook(auto_init=False)
-def _internal_kv_put(
-    key: Union[str, bytes],
-    value: Union[str, bytes],
-    overwrite: bool = True,
-    *,
-    namespace: Optional[Union[str, bytes]] = None
-) -> bool:
+@client_mode_hook
+def _internal_kv_put(key: Union[str, bytes],
+                     value: Union[str, bytes],
+                     overwrite: bool = True) -> bool:
     """Globally associates a value with a given binary key.
 
     This only has an effect if the key does not already have a value.
 
     Returns:
-        already_exists: whether the value already exists.
+        updated (bool): whether the value is updated.
     """
-
-    if isinstance(key, str):
-        key = key.encode()
-    if isinstance(value, str):
-        value = value.encode()
-    if isinstance(namespace, str):
-        namespace = namespace.encode()
-    assert (
-        isinstance(key, bytes)
-        and isinstance(value, bytes)
-        and isinstance(overwrite, bool)
-    )
-    return global_gcs_client.internal_kv_put(key, value, overwrite, namespace) == 0
-
-
-@client_mode_hook(auto_init=False)
-def _internal_kv_del(
-    key: Union[str, bytes],
-    *,
-    del_by_prefix: bool = False,
-    namespace: Optional[Union[str, bytes]] = None
-) -> int:
-    if isinstance(key, str):
-        key = key.encode()
-    if isinstance(namespace, str):
-        namespace = namespace.encode()
-    assert isinstance(key, bytes)
-    return global_gcs_client.internal_kv_del(key, del_by_prefix, namespace)
+    _check_arg_len(key)
+    _check_arg_len(value)
+    if redis:
+        if overwrite:
+            ray.worker.global_worker.redis_client.hset(key, "value", value)
+            return True
+        else:
+            updated = ray.worker.global_worker.redis_client.hsetnx(
+                key, "value", value)
+        return updated > 0  # already exists
+    else:
+        return not ray.worker.global_worker.gcs_client.kv_put(
+            key, value, overwrite)
 
 
-@client_mode_hook(auto_init=False)
-def _internal_kv_list(
-    prefix: Union[str, bytes], *, namespace: Optional[Union[str, bytes]] = None
-) -> List[bytes]:
+@client_mode_hook
+def _internal_kv_del(key: Union[str, bytes]):
+    _check_arg_len(key)
+    if redis:
+        return ray.worker.global_worker.redis_client.delete(key)
+    else:
+        return ray.worker.global_worker.gcs_client.kv_del(key)
+
+
+@client_mode_hook
+def _internal_kv_list(prefix: Union[str, bytes]) -> List[bytes]:
     """List all keys in the internal KV store that start with the prefix."""
-    if isinstance(prefix, str):
-        prefix = prefix.encode()
-    if isinstance(namespace, str):
-        namespace = namespace.encode()
-    return global_gcs_client.internal_kv_keys(prefix, namespace)
+    if redis:
+        if isinstance(prefix, bytes):
+            pattern = prefix + b"*"
+        else:
+            pattern = prefix + "*"
+        return ray.worker.global_worker.redis_client.keys(pattern=pattern)
+    else:
+        return ray.worker.global_worker.gcs_client.kv_keys(prefix)
+
+
+def _check_arg_len(arg: Union[str, bytes]):
+    if len(arg) > 5 * 1024 * 1024:
+        raise ValueError("key or value too long")

@@ -41,20 +41,21 @@ class Raylet {
   /// \param object_manager_service The asio io_service tied to the object manager.
   /// \param socket_name The Unix domain socket to listen on for local clients.
   /// \param node_ip_address The IP address of this node.
+  /// \param redis_address The IP address of the redis instance we are connecting to.
+  /// \param redis_port The port of the redis instance we are connecting to.
+  /// \param redis_password The password of the redis instance we are connecting to.
   /// \param node_manager_config Configuration to initialize the node manager.
   /// scheduler with.
   /// \param object_manager_config Configuration to initialize the object
   /// manager.
   /// \param gcs_client A client connection to the GCS.
   /// \param metrics_export_port A port at which metrics are exposed to.
-  Raylet(instrumented_io_context &main_service,
-         const std::string &socket_name,
-         const std::string &node_ip_address,
-         const std::string &node_name,
+  Raylet(instrumented_io_context &main_service, const std::string &socket_name,
+         const std::string &node_ip_address, const std::string &redis_address,
+         int redis_port, const std::string &redis_password,
          const NodeManagerConfig &node_manager_config,
          const ObjectManagerConfig &object_manager_config,
-         std::shared_ptr<gcs::GcsClient> gcs_client,
-         int metrics_export_port);
+         std::shared_ptr<gcs::GcsClient> gcs_client, int metrics_export_port);
 
   /// Start this raylet.
   void Start();
@@ -85,14 +86,15 @@ class Raylet {
   NodeID self_node_id_;
   /// Information of this node.
   GcsNodeInfo self_node_info_;
-
   /// A client connection to the GCS.
   std::shared_ptr<gcs::GcsClient> gcs_client_;
+  /// The object table. This is shared between the object manager and node
+  /// manager.
+  std::shared_ptr<ObjectDirectoryInterface> object_directory_;
   /// Manages client requests for task submission and execution.
   NodeManager node_manager_;
   /// The name of the socket this raylet listens on.
   std::string socket_name_;
-
   /// An acceptor for new clients.
   boost::asio::basic_socket_acceptor<local_stream_protocol> acceptor_;
   /// The socket to listen on for new clients.

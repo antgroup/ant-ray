@@ -48,9 +48,7 @@ TEST_F(WaitManagerTest, TestImmediatelyCompleteWait) {
   local_objects.emplace(obj1);
   std::vector<ObjectID> ready;
   std::vector<ObjectID> remaining;
-  wait_manager.Wait(std::vector<ObjectID>{obj1, obj2},
-                    -1,
-                    1,
+  wait_manager.Wait(std::vector<ObjectID>{obj1, obj2}, -1, 1,
                     [&](std::vector<ObjectID> _ready, std::vector<ObjectID> _remaining) {
                       ready = _ready;
                       remaining = _remaining;
@@ -63,9 +61,7 @@ TEST_F(WaitManagerTest, TestImmediatelyCompleteWait) {
   ready.clear();
   remaining.clear();
   // The wait should immediately complete since the timeout is 0.
-  wait_manager.Wait(std::vector<ObjectID>{obj1, obj2},
-                    0,
-                    1,
+  wait_manager.Wait(std::vector<ObjectID>{obj1, obj2}, 0, 1,
                     [&](std::vector<ObjectID> _ready, std::vector<ObjectID> _remaining) {
                       ready = _ready;
                       remaining = _remaining;
@@ -83,16 +79,12 @@ TEST_F(WaitManagerTest, TestMultiWaits) {
   std::vector<ObjectID> remaining1;
   std::vector<ObjectID> ready2;
   std::vector<ObjectID> remaining2;
-  wait_manager.Wait(std::vector<ObjectID>{obj1},
-                    -1,
-                    1,
+  wait_manager.Wait(std::vector<ObjectID>{obj1}, -1, 1,
                     [&](std::vector<ObjectID> _ready, std::vector<ObjectID> _remaining) {
                       ready1 = _ready;
                       remaining1 = _remaining;
                     });
-  wait_manager.Wait(std::vector<ObjectID>{obj1},
-                    -1,
-                    1,
+  wait_manager.Wait(std::vector<ObjectID>{obj1}, -1, 1,
                     [&](std::vector<ObjectID> _ready, std::vector<ObjectID> _remaining) {
                       ready2 = _ready;
                       remaining2 = _remaining;
@@ -117,9 +109,7 @@ TEST_F(WaitManagerTest, TestWaitTimeout) {
   ObjectID obj1 = ObjectID::FromRandom();
   std::vector<ObjectID> ready;
   std::vector<ObjectID> remaining;
-  wait_manager.Wait(std::vector<ObjectID>{obj1},
-                    1,
-                    1,
+  wait_manager.Wait(std::vector<ObjectID>{obj1}, 1, 1,
                     [&](std::vector<ObjectID> _ready, std::vector<ObjectID> _remaining) {
                       ready = _ready;
                       remaining = _remaining;

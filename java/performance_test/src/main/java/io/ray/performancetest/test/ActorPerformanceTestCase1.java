@@ -1,9 +1,9 @@
 package io.ray.performancetest.test;
 
-/**
- * 1-to-1 ray call, one receiving actor and one sending actor, test the throughput of the engine
- * itself.
- */
+import io.ray.performancetest.Parameters;
+import io.ray.performancetest.test.latency.LatencyParameters;
+
+/** 1对1单向ray call，一收一发，测试引擎本身的吞吐. */
 public class ActorPerformanceTestCase1 {
 
   public static void main(String[] args) {
@@ -13,13 +13,13 @@ public class ActorPerformanceTestCase1 {
     final int argSize = 0;
     final boolean useDirectByteBuffer = false;
     final boolean ignoreReturn = false;
+    final int numJavaWorkerPerProcess = 1;
     ActorPerformanceTestBase.run(
         args,
         layers,
         actorsPerLayer,
-        hasReturn,
-        ignoreReturn,
-        argSize,
-        useDirectByteBuffer);
+        new Parameters(
+            hasReturn, argSize, useDirectByteBuffer, ignoreReturn, numJavaWorkerPerProcess, 1),
+        new LatencyParameters(false, 0, 0));
   }
 }

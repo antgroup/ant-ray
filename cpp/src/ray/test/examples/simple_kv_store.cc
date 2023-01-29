@@ -92,7 +92,7 @@ class MainServer {
   // A map that stores the key-value data.
   std::unordered_map<std::string, std::string> data_;
   // Actor handle to the backup server actor.
-  ray::ActorHandle<BackupServer> backup_actor_;
+  ray::ActorHandleCpp<BackupServer> backup_actor_;
 };
 
 MainServer::MainServer() {
@@ -151,8 +151,8 @@ void StartServer() {
   // different nodes if possible.
   std::vector<std::unordered_map<std::string, double>> bundles{RESOUECES, RESOUECES};
 
-  ray::PlacementGroupCreationOptions options{
-      "kv_server_pg", bundles, ray::PlacementStrategy::SPREAD};
+  ray::PlacementGroupCreationOptionsCpp options{"kv_server_pg", bundles,
+                                                ray::PlacementStrategyCpp::SPREAD};
   auto placement_group = ray::CreatePlacementGroup(options);
   // Wait until the placement group is created.
   assert(placement_group.Wait(10));
@@ -241,12 +241,12 @@ class Client {
 
   bool IsValid(const std::pair<bool, std::string> r) { return r.first; }
 
-  boost::optional<ray::ActorHandle<MainServer>> main_actor_;
+  boost::optional<ray::ActorHandleCpp<MainServer>> main_actor_;
 };
 
 int main(int argc, char **argv) {
   // Start ray cluster and ray runtime.
-  ray::RayConfig config;
+  ray::RayConfigCpp config;
   ray::Init(config, argc, argv);
 
   StartServer();

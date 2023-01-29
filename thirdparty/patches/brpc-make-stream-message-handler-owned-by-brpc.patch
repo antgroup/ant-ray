@@ -1,0 +1,42 @@
+diff --git src/brpc/stream.cpp src/brpc/stream.cpp
+index 69d412e..9d4df7e 100644
+--- src/brpc/stream.cpp
++++ src/brpc/stream.cpp
+@@ -59,6 +59,13 @@ Stream::Stream()
+ }
+ 
+ Stream::~Stream() {
++    // NOTE(zhijunfu): delete the reply handler if it's marked owned by us.
++    if (_options.handler != nullptr) {
++      if (_options.handler_owned_by_brpc) {
++        delete _options.handler;
++        _options.handler = nullptr;
++      }
++    }
+     CHECK(_host_socket == NULL);
+     bthread_mutex_destroy(&_connect_mutex);
+     bthread_mutex_destroy(&_congestion_control_mutex);
+diff --git src/brpc/stream.h src/brpc/stream.h
+index fbf2d51..0609814 100644
+--- src/brpc/stream.h
++++ src/brpc/stream.h
+@@ -54,6 +54,7 @@ struct StreamOptions {
+         , idle_timeout_ms(-1)
+         , messages_in_batch(128)
+         , handler(NULL)
++        , handler_owned_by_brpc(false)
+     {}
+ 
+     // stream max buffer size limit in [min_buf_size, max_buf_size]
+@@ -80,6 +81,11 @@ struct StreamOptions {
+     // write any message, who will get EBADF on writting
+     // default: NULL
+     StreamInputHandler* handler;
++
++    // Whether the handler is owned by brpc. If this is true, then brpc is
++    // responsible for deleting the handler when the stream is destroyed.
++    // default: false
++    bool handler_owned_by_brpc;
+ };
+ 
+ // [Called at the client side]

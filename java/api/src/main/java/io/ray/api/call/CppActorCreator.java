@@ -14,6 +14,12 @@ public class CppActorCreator extends BaseActorCreator<CppActorCreator> {
     this.args = args;
   }
 
+  /// Set the serialized runtime env for the cpp actor.
+  public CppActorCreator setSerializedRuntimeEnv(String serializedRuntimeEnv) {
+    builder.setSerializedRuntimeEnv(serializedRuntimeEnv);
+    return this;
+  }
+
   /**
    * Create a cpp actor remotely and return a handle to the created actor.
    *

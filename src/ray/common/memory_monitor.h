@@ -16,6 +16,8 @@
 
 #include <gtest/gtest_prod.h>
 
+#include <boost/filesystem.hpp>
+
 #include "ray/common/asio/instrumented_io_context.h"
 #include "ray/common/asio/periodical_runner.h"
 #include "ray/util/process.h"
@@ -61,10 +63,8 @@ class MemoryMonitor {
   /// monitor and callbacks won't fire.
   /// \param monitor_callback function to execute on a dedicated thread owned by this
   /// monitor when the usage is refreshed.
-  MemoryMonitor(instrumented_io_context &io_service,
-                float usage_threshold,
-                int64_t min_memory_free_bytes,
-                uint64_t monitor_interval_ms,
+  MemoryMonitor(instrumented_io_context &io_service, float usage_threshold,
+                int64_t min_memory_free_bytes, uint64_t monitor_interval_ms,
                 MemoryUsageRefreshCallback monitor_callback);
 
  public:
@@ -75,8 +75,7 @@ class MemoryMonitor {
   /// \return the debug string that contains up to the top N memory-using processes,
   /// empty if process directory is invalid
   static const std::string TopNMemoryDebugString(
-      uint32_t top_n,
-      const MemorySnapshot system_memory,
+      uint32_t top_n, const MemorySnapshot system_memory,
       const std::string proc_dir = kProcDirectory);
 
   /// \param proc_dir the directory to scan for the processes
@@ -117,13 +116,6 @@ class MemoryMonitor {
   ///
   /// \return the used memory for cgroup v1.
   static int64_t GetCGroupV1MemoryUsedBytes(const char *path);
-
-  /// \param stat_path file path to the memory.stat file.
-  /// \param usage_path file path to the memory.current file
-  /// \return the used memory for cgroup v2. May return negative value, which should be
-  /// discarded.
-  static int64_t GetCGroupV2MemoryUsedBytes(const char *stat_path,
-                                            const char *usage_path);
 
   /// \return the used and total memory in bytes for linux OS.
   std::tuple<int64_t, int64_t> GetLinuxMemoryBytes();
@@ -171,8 +163,7 @@ class MemoryMonitor {
   /// exceeding the threshold.
   ///
   /// \return the memory threshold.
-  static int64_t GetMemoryThreshold(int64_t total_memory_bytes,
-                                    float usage_threshold,
+  static int64_t GetMemoryThreshold(int64_t total_memory_bytes, float usage_threshold,
                                     int64_t min_memory_free_bytes);
 
   /// \param pid the process id
@@ -199,12 +190,6 @@ class MemoryMonitor {
   FRIEND_TEST(MemoryMonitorTest, TestCgroupV1MemFileValidReturnsWorkingSet);
   FRIEND_TEST(MemoryMonitorTest, TestCgroupV1MemFileMissingFieldReturnskNull);
   FRIEND_TEST(MemoryMonitorTest, TestCgroupV1NonexistentMemFileReturnskNull);
-  FRIEND_TEST(MemoryMonitorTest, TestCgroupV2FilesValidReturnsWorkingSet);
-  FRIEND_TEST(MemoryMonitorTest, TestCgroupV2FilesValidKeyLastReturnsWorkingSet);
-  FRIEND_TEST(MemoryMonitorTest, TestCgroupV2FilesValidNegativeWorkingSet);
-  FRIEND_TEST(MemoryMonitorTest, TestCgroupV2FilesValidMissingFieldReturnskNull);
-  FRIEND_TEST(MemoryMonitorTest, TestCgroupV2NonexistentStatFileReturnskNull);
-  FRIEND_TEST(MemoryMonitorTest, TestCgroupV2NonexistentUsageFileReturnskNull);
   FRIEND_TEST(MemoryMonitorTest, TestMonitorPeriodSetMaxUsageThresholdCallbackExecuted);
   FRIEND_TEST(MemoryMonitorTest, TestMonitorPeriodDisableMinMemoryCallbackExecuted);
   FRIEND_TEST(MemoryMonitorTest, TestGetMemoryThresholdTakeGreaterOfTheTwoValues);

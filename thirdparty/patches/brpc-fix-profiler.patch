@@ -1,0 +1,45 @@
+diff --git src/brpc/builtin/hotspots_service.cpp src/brpc/builtin/hotspots_service.cpp
+index c757732..5dc8dfc 100644
+--- src/brpc/builtin/hotspots_service.cpp
++++ src/brpc/builtin/hotspots_service.cpp
+@@ -509,6 +509,7 @@ static void DisplayResult(Controller* cntl,
+ #endif
+ 
+     const std::string cmd = cmd_builder.str();
++    LOG(INFO) << "executing profiling command: " << cmd;
+     for (int ntry = 0; ntry < 2; ++ntry) {
+         if (!g_written_pprof_perl) {
+             if (!WriteSmallFile(pprof_tool.c_str(), pprof_perl())) {
+diff --git src/brpc/builtin/pprof_perl.cpp src/brpc/builtin/pprof_perl.cpp
+index 1ea5903..7c8968f 100644
+--- src/brpc/builtin/pprof_perl.cpp
++++ src/brpc/builtin/pprof_perl.cpp
+@@ -3258,7 +3258,10 @@ const char* pprof_perl() {
+         "    printf STDERR \"Using local file $profile_name.\\n\";\n"
+         "    return 0;\n"
+         "  }\n"
+-        "  return 1;\n"
++        "  if ($profile_name =~ \":\") {\n"
++        "    return 1;\n"
++        "  }\n"
++        "  return 0;\n"
+         "}\n"
+         "\n"
+         "sub ParseProfileURL {\n"
+diff --git src/brpc/details/profiler_linker.h src/brpc/details/profiler_linker.h
+index 8df0197..3c9d7b0 100644
+--- src/brpc/details/profiler_linker.h
++++ src/brpc/details/profiler_linker.h
+@@ -42,9 +42,9 @@ struct ProfilerLinker {
+         cpu_profiler_enabled = true;
+         // compiler has no way to tell if PROFILER_LINKER_DUMMY is 0 or not,
+         // so it has to link the function inside the branch.
+-        if (PROFILER_LINKER_DUMMY != 0/*must be false*/) {
+-            ProfilerStart("this_function_should_never_run");
+-        }
++        // if (PROFILER_LINKER_DUMMY != 0/*must be false*/) {
++        //     ProfilerStart("this_function_should_never_run");
++        // }
+ #endif
+     }
+ };

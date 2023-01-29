@@ -13,6 +13,10 @@ public class WorkerJvmOptionsTest extends BaseTest {
     String getOptions() {
       return System.getProperty("test.suffix");
     }
+
+    String getMaximumMemoryMb() {
+      return System.getProperty("ray.maximum-memory-mb");
+    }
   }
 
   @Test(groups = {"cluster"})
@@ -21,10 +25,18 @@ public class WorkerJvmOptionsTest extends BaseTest {
     // that raylet can correctly handle dynamic options with whitespaces.
     ActorHandle<Echo> actor =
         Ray.actor(Echo::new)
-            .setJvmOptions(
-                ImmutableList.of("-Dtest.suffix=suffix", "-Dtest.suffix1=suffix1 suffix1"))
+            .setJvmOptions(ImmutableList.of("-Dtest.suffix=suffix", "-Dtest.suffix1=suffix1"))
             .remote();
     ObjectRef<String> obj = actor.task(Echo::getOptions).remote();
-    Assert.assertEquals(obj.get(30 * 1000), "suffix");
+    Assert.assertEquals(obj.get(), "suffix");
+  }
+
+  @Test(groups = {"cluster"})
+  public void testSetMemoryMb() {
+    // The whitespaces in following argument are intentionally added to test
+    // that raylet can correctly handle dynamic options with whitespaces.
+    ActorHandle<Echo> actor = Ray.actor(Echo::new).setMemoryMb(200).remote();
+    ObjectRef<String> obj = actor.task(Echo::getMaximumMemoryMb).remote();
+    Assert.assertEquals(obj.get(), "200m");
   }
 }

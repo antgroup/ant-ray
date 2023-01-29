@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "ray/gcs/asio.h"
+#include <utility>
 
 #include "ray/util/logging.h"
 
@@ -21,15 +22,17 @@ extern "C" {
 }
 
 RedisAsioClient::RedisAsioClient(instrumented_io_context &io_service,
-                                 ray::gcs::RedisAsyncContext &redis_async_context)
+                                 ray::gcs::RedisAsyncContext *redis_async_context)
     : redis_async_context_(redis_async_context),
-      io_service_(io_service),
-      socket_(io_service),
+      socket_(boost::asio::ip::tcp::socket(io_service)),
+      socket_assigned_(false),
       read_requested_(false),
       write_requested_(false),
       read_in_progress_(false),
-      write_in_progress_(false) {
-  redisAsyncContext *async_context = redis_async_context_.GetRawRedisAsyncContext();
+      write_in_progress_(false) {}
+
+ray::Status RedisAsioClient::init() {
+  redisAsyncContext *async_context = redis_async_context_->GetRawRedisAsyncContext();
 
   // gives access to c->fd
   redisContext *c = &(async_context->c);
@@ -48,7 +51,16 @@ RedisAsioClient::RedisAsioClient(instrumented_io_context &io_service,
 
   // hiredis is already connected
   // use the existing native socket
-  socket_.assign(boost::asio::ip::tcp::v4(), handle);
+  boost::system::error_code ec;
+  socket_.assign(boost::asio::ip::tcp::v4(), handle, ec);
+  if (ec) {
+    RAY_LOG(DEBUG) << "Something wrong during init in RedisAsioClient."
+                   << " error code: " << ec.value() << ", error message: " << ec.message()
+                   << ", redis fd: " << c->fd << ", redis error code: " << c->err
+                   << ", redis error message: " << c->errstr;
+    return ray::Status::IOError(ec.message());
+  }
+  socket_assigned_ = true;
 
   // register hooks with the hiredis async context
   async_context->ev.addRead = call_C_addRead;
@@ -59,60 +71,93 @@ RedisAsioClient::RedisAsioClient(instrumented_io_context &io_service,
 
   // C wrapper functions will use this pointer to call class members.
   async_context->ev.data = this;
+  return ray::Status::OK();
 }
 
+RedisAsioClient::~RedisAsioClient() { cleanup(); }
+
 void RedisAsioClient::operate() {
+  if (!redis_async_context_) {
+    return;
+  }
+
   if (read_requested_ && !read_in_progress_) {
     read_in_progress_ = true;
-    socket_.async_read_some(
-        boost::asio::null_buffers(),
-        boost::bind(
-            &RedisAsioClient::handle_io, this, boost::asio::placeholders::error, false));
+    socket_.async_read_some(boost::asio::null_buffers(),
+                            boost::bind(&RedisAsioClient::handle_io, this,
+                                        boost::asio::placeholders::error, false));
   }
 
   if (write_requested_ && !write_in_progress_) {
     write_in_progress_ = true;
-    socket_.async_write_some(
-        boost::asio::null_buffers(),
-        boost::bind(
-            &RedisAsioClient::handle_io, this, boost::asio::placeholders::error, true));
+    socket_.async_write_some(boost::asio::null_buffers(),
+                             boost::bind(&RedisAsioClient::handle_io, this,
+                                         boost::asio::placeholders::error, true));
   }
 }
 
 void RedisAsioClient::handle_io(boost::system::error_code error_code, bool write) {
-  RAY_CHECK(!error_code || error_code == boost::asio::error::would_block ||
-            error_code == boost::asio::error::connection_reset ||
-            error_code == boost::asio::error::operation_aborted)
-      << "handle_io(error_code = " << error_code << ")";
-  (write ? write_in_progress_ : read_in_progress_) = false;
-  if (error_code != boost::asio::error::operation_aborted) {
-    if (!redis_async_context_.GetRawRedisAsyncContext()) {
-      RAY_LOG(FATAL) << "redis_async_context_ must not be NULL";
-    }
-    write ? redis_async_context_.RedisAsyncHandleWrite()
-          : redis_async_context_.RedisAsyncHandleRead();
+  if (error_code && error_code != boost::asio::error::would_block &&
+      error_code != boost::asio::error::connection_reset) {
+    RAY_LOG(ERROR) << "Failed to read data from redis, error: " << error_code.message();
+    return;
   }
 
-  if (error_code == boost::asio::error::would_block) {
-    operate();
+  (write ? write_in_progress_ : read_in_progress_) = false;
+  if (!error_code && redis_async_context_) {
+    if (!redis_async_context_->GetRawRedisAsyncContext()) {
+      RAY_LOG(FATAL) << "redis_async_context_ must not be NULL";
+    }
+    write ? redis_async_context_->RedisAsyncHandleWrite()
+          : redis_async_context_->RedisAsyncHandleRead();
   }
+
+  operate();
 }
 
 void RedisAsioClient::add_io(bool write) {
-  // Because redis commands are non-thread safe, dispatch the operation to backend thread.
-  io_service_.dispatch(
-      [this, write]() {
-        (write ? write_requested_ : read_requested_) = true;
-        operate();
-      },
-      "RedisAsioClient.add_io");
+  (write ? write_requested_ : read_requested_) = true;
+  operate();
 }
 
 void RedisAsioClient::del_io(bool write) {
   (write ? write_requested_ : read_requested_) = false;
 }
 
-void RedisAsioClient::cleanup() {}
+void RedisAsioClient::cleanup() {
+  if (!redis_async_context_ || !socket_assigned_) {
+    return;
+  }
+  redisAsyncContext *async_context = redis_async_context_->GetRawRedisAsyncContext();
+
+  RAY_LOG(DEBUG) << "RedisAsioClient: cleanup called for asio context "
+                 << redis_async_context_;
+  if (socket_.is_open()) {
+    boost::system::error_code ec;
+    socket_.close(ec);
+    if (ec) {
+      RAY_LOG(ERROR) << "Something wrong during cleanup in RedisAsioClient."
+                     << " error code: " << ec.value()
+                     << ", error message: " << ec.message();
+    }
+  }
+
+  async_context->ev.addRead = nullptr;
+  async_context->ev.delRead = nullptr;
+  async_context->ev.addWrite = nullptr;
+  async_context->ev.delWrite = nullptr;
+  async_context->ev.cleanup = nullptr;
+
+  async_context->ev.data = nullptr;
+
+  redis_async_context_ = nullptr;
+  socket_assigned_ = false;
+
+  read_in_progress_ = false;
+  read_requested_ = false;
+  write_in_progress_ = false;
+  write_requested_ = false;
+}
 
 static inline RedisAsioClient *cast_to_client(void *private_data) {
   RAY_CHECK(private_data != nullptr);

@@ -1,0 +1,171 @@
+diff --git BUILD.bazel BUILD.bazel
+index 68a7759..81b9804 100644
+--- BUILD.bazel
++++ BUILD.bazel
+@@ -280,10 +280,8 @@ cc_library(
+     tags = ["manual"],
+     deps = [
+         "@com_github_gflags_gflags//:gflags",
+-    ] + select({
+-        "//bazel/config:brpc_with_glog": ["@com_github_google_glog//:glog"],
+-        "//conditions:default": [],
+-    }),
++    ] + ["@com_github_google_glog//:glog"
++    ],
+ )
+ 
+ cc_library(
+@@ -320,10 +318,8 @@ cc_library(
+         "@com_google_protobuf//:protobuf",
+         "@openssl//:crypto",
+         "@openssl//:ssl",
++    ] + ["@com_github_google_glog//:glog"
+     ] + select({
+-        "//bazel/config:brpc_with_glog": ["@com_github_google_glog//:glog"],
+-        "//conditions:default": [],
+-    }) + select({
+         "@bazel_tools//tools/osx:darwin": [":macos_lib"],
+         "//conditions:default": [],
+     }),
+diff --git src/butil/logging.cc src/butil/logging.cc
+index fa0dbae..5c1f2be 100644
+--- src/butil/logging.cc
++++ src/butil/logging.cc
+@@ -122,9 +122,9 @@ DEFINE_bool(crash_on_fatal_log, false,
+ DEFINE_bool(print_stack_on_check, true,
+             "Print the stack trace when a CHECK was failed");
+ 
+-DEFINE_int32(v, 0, "Show all VLOG(m) messages for m <= this."
++DEFINE_int32(brpc_v, 0, "Show all VLOG(m) messages for m <= this."
+              " Overridable by --vmodule.");
+-DEFINE_string(vmodule, "", "per-module verbose level."
++DEFINE_string(brpc_vmodule, "", "per-module verbose level."
+               " Argument is a comma-separated list of MODULE_NAME=LOG_LEVEL."
+               " MODULE_NAME is a glob pattern, matched against the filename base"
+               " (that is, name ignoring .cpp/.h)."
+@@ -132,7 +132,8 @@ DEFINE_string(vmodule, "", "per-module verbose level."
+ 
+ DEFINE_bool(log_pid, false, "Log process id");
+ 
+-DEFINE_int32(minloglevel, 0, "Any log at or above this level will be "
++// ANT-INTERNAL: print only error logs.
++DEFINE_int32(brpc_minloglevel, 3, "Any log at or above this level will be "
+              "displayed. Anything below this level will be silently ignored. "
+              "0=INFO 1=NOTICE 2=WARNING 3=ERROR 4=FATAL");
+ 
+@@ -438,11 +439,11 @@ bool BaseInitLoggingImpl(const LoggingSettings& settings) {
+ }
+ 
+ void SetMinLogLevel(int level) {
+-    FLAGS_minloglevel = std::min(BLOG_FATAL, level);
++    FLAGS_brpc_minloglevel = std::min(BLOG_FATAL, level);
+ }
+ 
+ int GetMinLogLevel() {
+-    return FLAGS_minloglevel;
++    return FLAGS_brpc_minloglevel;
+ }
+ 
+ void SetShowErrorDialogs(bool enable_dialogs) {
+@@ -1129,7 +1130,7 @@ void CloseLogFile() {
+ }
+ 
+ void RawLog(int level, const char* message) {
+-    if (level >= FLAGS_minloglevel) {
++    if (level >= FLAGS_brpc_minloglevel) {
+         size_t bytes_written = 0;
+         const size_t message_len = strlen(message);
+         int rv;
+@@ -1380,12 +1381,12 @@ private:
+ // vlog_site_list. To keep the critical area small, we use optimistic
+ // locking : Assign local site w/o locking, then insert the site into
+ // global list w/ locking, if local_module_list != global_vmodule_list or
+-// local_default_v != FLAGS_v, repeat the assigment.
++// local_default_v != FLAGS_brpc_v, repeat the assigment.
+ // An important property of vlog_site_list is that: It does not remove sites.
+ // When we need to iterate the list, we don't have to hold the lock. What we
+ // do is to get the head of the list inside lock and iterate the list w/o
+ // lock. If new sites is inserted during the iteration, it should see and
+-// use the updated vmodule_list and FLAGS_v, nothing will be missed.
++// use the updated vmodule_list and FLAGS_brpc_v, nothing will be missed.
+ 
+ static int vlog_site_list_add(VLogSite* site,
+                               VModuleList** expected_module_list,
+@@ -1395,8 +1396,8 @@ static int vlog_site_list_add(VLogSite* site,
+         *expected_module_list = vmodule_list;
+         return -1;
+     }
+-    if (*expected_default_v != FLAGS_v) {
+-        *expected_default_v = FLAGS_v;
++    if (*expected_default_v != FLAGS_brpc_v) {
++        *expected_default_v = FLAGS_brpc_v;
+         return -1;
+     }
+     site->set_next(vlog_site_list);
+@@ -1411,7 +1412,7 @@ bool add_vlog_site(const int** v, const char* filename, int line_no,
+         return false;
+     }
+     VModuleList* module_list = vmodule_list;
+-    int default_v = FLAGS_v;
++    int default_v = FLAGS_brpc_v;
+     do {
+         site->v() = default_v;
+         if (module_list) {
+@@ -1465,7 +1466,7 @@ static int on_reset_vmodule(const char* vmodule) {
+             old_vlog_site_list = vlog_site_list;
+         }
+         for (VLogSite* p = old_vlog_site_list; p; p = p->next()) {
+-            p->v() = FLAGS_v;
++            p->v() = FLAGS_brpc_v;
+             module_list->find_verbose_level(
+                 p->module(), p->full_module(), &p->v());
+         }
+@@ -1494,9 +1495,9 @@ static bool validate_vmodule(const char*, const std::string& vmodule) {
+ }
+ 
+ const bool ALLOW_UNUSED validate_vmodule_dummy = GFLAGS_NS::RegisterFlagValidator(
+-    &FLAGS_vmodule, &validate_vmodule);
++    &FLAGS_brpc_vmodule, &validate_vmodule);
+ 
+-// [Thread-safe] Reset FLAGS_v.
++// [Thread-safe] Reset FLAGS_brpc_v.
+ static void on_reset_verbose(int default_v) {
+     VModuleList* cur_module_list = NULL;
+     VLogSite* cur_vlog_site_list = NULL;
+@@ -1524,7 +1525,7 @@ static bool validate_v(const char*, int32_t v) {
+ }
+ 
+ const bool ALLOW_UNUSED validate_v_dummy = GFLAGS_NS::RegisterFlagValidator(
+-    &FLAGS_v, &validate_v);
++    &FLAGS_brpc_v, &validate_v);
+ 
+ static bool PassValidate(const char*, bool) {
+     return true;
+@@ -1541,7 +1542,7 @@ static bool NonNegativeInteger(const char*, int32_t v) {
+ }
+ 
+ const bool ALLOW_UNUSED validate_min_log_level = GFLAGS_NS::RegisterFlagValidator(
+-    &FLAGS_minloglevel, NonNegativeInteger);
++    &FLAGS_brpc_minloglevel, NonNegativeInteger);
+ 
+ }  // namespace logging
+ 
+diff --git src/butil/logging.h src/butil/logging.h
+index e2a4109..327fe70 100644
+--- src/butil/logging.h
++++ src/butil/logging.h
+@@ -408,12 +408,12 @@ const LogSeverity BLOG_0 = BLOG_ERROR;
+ // GNU extensions not available, so we do not support --vmodule.
+ // Dynamic value of FLAGS_verbose always controls the logging level.
+ # define BAIDU_VLOG_IS_ON(verbose_level, filepath)      \
+-    (::logging::FLAGS_v >= (verbose_level))
++    (::logging::FLAGS_brpc_v >= (verbose_level))
+ #endif
+ 
+ #define VLOG_IS_ON(verbose_level) BAIDU_VLOG_IS_ON(verbose_level, __FILE__)
+ 
+-DECLARE_int32(v);
++DECLARE_int32(brpc_v);
+ 
+ extern const int VLOG_UNINITIALIZED;
+ 

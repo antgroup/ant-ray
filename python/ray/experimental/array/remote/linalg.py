@@ -1,28 +1,10 @@
 import numpy as np
-
 import ray
 
 __all__ = [
-    "matrix_power",
-    "solve",
-    "tensorsolve",
-    "tensorinv",
-    "inv",
-    "cholesky",
-    "eigvals",
-    "eigvalsh",
-    "pinv",
-    "slogdet",
-    "det",
-    "svd",
-    "eig",
-    "eigh",
-    "lstsq",
-    "norm",
-    "qr",
-    "cond",
-    "matrix_rank",
-    "multi_dot",
+    "matrix_power", "solve", "tensorsolve", "tensorinv", "inv", "cholesky",
+    "eigvals", "eigvalsh", "pinv", "slogdet", "det", "svd", "eig", "eigh",
+    "lstsq", "norm", "qr", "cond", "matrix_rank", "multi_dot"
 ]
 
 

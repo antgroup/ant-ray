@@ -5,7 +5,7 @@ import com.google.common.primitives.Bytes;
 import io.ray.api.ObjectRef;
 import io.ray.api.Ray;
 import io.ray.api.id.ObjectId;
-import io.ray.runtime.AbstractRayRuntime;
+import io.ray.runtime.RayRuntimeInternal;
 import io.ray.runtime.generated.Common.Address;
 import io.ray.runtime.generated.Common.Language;
 import io.ray.runtime.object.NativeRayObject;
@@ -16,10 +16,13 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Helper methods to convert arguments from/to objects. */
 public class ArgumentsBuilder {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentsBuilder.class);
   /**
    * If the the size of an argument's serialized data is smaller than this number, the argument will
    * be passed by value. Otherwise it'll be passed by reference.
@@ -33,6 +36,7 @@ public class ArgumentsBuilder {
 
   /** Convert real function arguments to task spec arguments. */
   public static List<FunctionArg> wrap(Object[] args, Language language) {
+    int totalLength = 0;
     List<FunctionArg> ret = new ArrayList<>();
     for (Object arg : args) {
       ObjectId id = null;
@@ -41,7 +45,7 @@ public class ArgumentsBuilder {
       if (arg instanceof ObjectRef) {
         Preconditions.checkState(arg instanceof ObjectRefImpl);
         id = ((ObjectRefImpl<?>) arg).getId();
-        address = ((AbstractRayRuntime) Ray.internal()).getObjectStore().getOwnerAddress(id);
+        address = ((RayRuntimeInternal) Ray.internal()).getObjectStore().getOwnerAddress(id);
       } else {
         value = ObjectSerializer.serialize(arg);
         if (language != Language.JAVA) {
@@ -59,9 +63,10 @@ public class ArgumentsBuilder {
                     Arrays.toString(value.metadata), language.getValueDescriptor().getName()));
           }
         }
+        totalLength += value.data.length;
         if (value.data.length > LARGEST_SIZE_PASS_BY_VALUE) {
-          id = ((AbstractRayRuntime) Ray.internal()).getObjectStore().putRaw(value);
-          address = ((AbstractRayRuntime) Ray.internal()).getWorkerContext().getRpcAddress();
+          id = ((RayRuntimeInternal) Ray.internal()).getObjectStore().putRaw(value);
+          address = ((RayRuntimeInternal) Ray.internal()).getWorkerContext().getRpcAddress();
           value = null;
         }
       }
@@ -74,6 +79,7 @@ public class ArgumentsBuilder {
         ret.add(FunctionArg.passByValue(value));
       }
     }
+    LOGGER.debug("Serialized %s bytes in total.", totalLength);
     return ret;
   }
 

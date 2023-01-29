@@ -1,6 +1,5 @@
 """Code to wrap some NCCL API calls."""
 import numpy
-
 try:
     import cupy
     from cupy.cuda import nccl
@@ -39,13 +38,12 @@ NUMPY_NCCL_DTYPE_MAP = {
     numpy.float16: nccl.NCCL_FLOAT16,
     numpy.float32: nccl.NCCL_FLOAT32,
     numpy.float64: nccl.NCCL_FLOAT64,
-    numpy.double: nccl.NCCL_DOUBLE,
+    numpy.double: nccl.NCCL_DOUBLE
 }
 
 if torch_available():
     import torch
     import torch.utils.dlpack
-
     TORCH_NCCL_DTYPE_MAP = {
         # INT types
         torch.int: nccl.NCCL_INT,
@@ -101,9 +99,9 @@ def create_nccl_communicator(world_size, nccl_unique_id, rank):
     """Create an NCCL communicator using NCCL APIs.
 
     Args:
-        world_size: the number of processes of this communicator group.
-        nccl_unique_id: the NCCLUniqueID for this group.
-        rank: the rank of this process.
+        world_size (int): the number of processes of this communicator group.
+        nccl_unique_id (str): the NCCLUniqueID for this group.
+        rank (int): the rank of this process.
     Returns:
         comm (nccl.ncclComm_t): an NCCL communicator.
     """
@@ -115,12 +113,13 @@ def get_nccl_reduce_op(reduce_op):
     """Map the reduce op to NCCL reduce op type.
 
     Args:
-        reduce_op: ReduceOp Enum (SUM/PRODUCT/MIN/MAX).
+        reduce_op (ReduceOp): ReduceOp Enum (SUM/PRODUCT/MIN/MAX).
     Returns:
         (nccl.ncclRedOp_t): the mapped NCCL reduce op.
     """
     if reduce_op not in NCCL_REDUCE_OP_MAP:
-        raise RuntimeError("NCCL does not support reduce op: '{}'.".format(reduce_op))
+        raise RuntimeError(
+            "NCCL does not support reduce op: '{}'.".format(reduce_op))
     return NCCL_REDUCE_OP_MAP[reduce_op]
 
 
@@ -131,11 +130,9 @@ def get_nccl_tensor_dtype(tensor):
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             return TORCH_NCCL_DTYPE_MAP[tensor.dtype]
-    raise ValueError(
-        "Unsupported tensor type. Got: {}. Supported "
-        "GPU tensor types are: torch.Tensor, "
-        "cupy.ndarray.".format(type(tensor))
-    )
+    raise ValueError("Unsupported tensor type. Got: {}. Supported "
+                     "GPU tensor types are: torch.Tensor, "
+                     "cupy.ndarray.".format(type(tensor)))
 
 
 def get_cupy_tensor_dtype(tensor):
@@ -145,11 +142,9 @@ def get_cupy_tensor_dtype(tensor):
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             return TORCH_NUMPY_DTYPE_MAP[tensor.dtype]
-    raise ValueError(
-        "Unsupported tensor type. Got: {}. Supported "
-        "GPU tensor types are: torch.Tensor, "
-        "cupy.ndarray.".format(type(tensor))
-    )
+    raise ValueError("Unsupported tensor type. Got: {}. Supported "
+                     "GPU tensor types are: torch.Tensor, "
+                     "cupy.ndarray.".format(type(tensor)))
 
 
 def get_tensor_ptr(tensor):
@@ -161,15 +156,12 @@ def get_tensor_ptr(tensor):
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             if not tensor.is_cuda:
-                raise RuntimeError(
-                    "Torch tensor must be on GPU when using NCCL collectives."
-                )
+                raise RuntimeError("Torch tensor must be on GPU "
+                                   "when using NCCL collectives.")
             return tensor.data_ptr()
-    raise ValueError(
-        "Unsupported tensor type. Got: {}. Supported "
-        "GPU tensor types are: torch.Tensor, "
-        "cupy.ndarray.".format(type(tensor))
-    )
+    raise ValueError("Unsupported tensor type. Got: {}. Supported "
+                     "GPU tensor types are: torch.Tensor, "
+                     "cupy.ndarray.".format(type(tensor)))
 
 
 def get_tensor_n_elements(tensor):
@@ -179,11 +171,9 @@ def get_tensor_n_elements(tensor):
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             return torch.numel(tensor)
-    raise ValueError(
-        "Unsupported tensor type. Got: {}. Supported "
-        "GPU tensor types are: torch.Tensor, "
-        "cupy.ndarray.".format(type(tensor))
-    )
+    raise ValueError("Unsupported tensor type. Got: {}. Supported "
+                     "GPU tensor types are: torch.Tensor, "
+                     "cupy.ndarray.".format(type(tensor)))
 
 
 def get_tensor_shape(tensor):
@@ -193,25 +183,23 @@ def get_tensor_shape(tensor):
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             return list(tensor.size())
-    raise ValueError(
-        "Unsupported tensor type. Got: {}. Supported "
-        "GPU tensor types are: torch.Tensor, "
-        "cupy.ndarray.".format(type(tensor))
-    )
+    raise ValueError("Unsupported tensor type. Got: {}. Supported "
+                     "GPU tensor types are: torch.Tensor, "
+                     "cupy.ndarray.".format(type(tensor)))
 
 
 def get_tensor_strides(tensor):
     """Return the strides of the tensor as a list."""
     if isinstance(tensor, cupy.ndarray):
-        return [int(stride / tensor.dtype.itemsize) for stride in tensor.strides]
+        return [
+            int(stride / tensor.dtype.itemsize) for stride in tensor.strides
+        ]
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             return list(tensor.stride())
-    raise ValueError(
-        "Unsupported tensor type. Got: {}. Supported "
-        "GPU tensor types are: torch.Tensor, "
-        "cupy.ndarray.".format(type(tensor))
-    )
+    raise ValueError("Unsupported tensor type. Got: {}. Supported "
+                     "GPU tensor types are: torch.Tensor, "
+                     "cupy.ndarray.".format(type(tensor)))
 
 
 def get_tensor_device(tensor):
@@ -220,13 +208,15 @@ def get_tensor_device(tensor):
         try:
             device = tensor.device.id
         except AttributeError as exec:
-            raise RuntimeError("The tensor is not on a valid GPU.") from exec
+            raise RuntimeError("The tensor is not on a valid GPU.") \
+                from exec
     elif torch_available() and isinstance(tensor, torch.Tensor):
         device = tensor.device.index
         if not isinstance(device, int):
             raise RuntimeError("The tensor is not on a valid GPU.")
     else:
-        raise ValueError("Unsupported tensor type. Got: {}.".format(type(tensor)))
+        raise ValueError("Unsupported tensor type. "
+                         "Got: {}.".format(type(tensor)))
     return device
 
 
@@ -241,21 +231,19 @@ def copy_tensor(dst_tensor, src_tensor):
         None
     """
     copied = True
-    if isinstance(dst_tensor, cupy.ndarray) and isinstance(src_tensor, cupy.ndarray):
+    if isinstance(dst_tensor, cupy.ndarray) \
+            and isinstance(src_tensor, cupy.ndarray):
         cupy.copyto(dst_tensor, src_tensor)
     elif torch_available():
         if isinstance(dst_tensor, torch.Tensor) and isinstance(
-            src_tensor, torch.Tensor
-        ):
+                src_tensor, torch.Tensor):
             dst_tensor.copy_(src_tensor)
         elif isinstance(dst_tensor, torch.Tensor) and isinstance(
-            src_tensor, cupy.ndarray
-        ):
+                src_tensor, cupy.ndarray):
             t = torch.utils.dlpack.from_dlpack(src_tensor.toDlpack())
             dst_tensor.copy_(t)
         elif isinstance(dst_tensor, cupy.ndarray) and isinstance(
-            src_tensor, torch.Tensor
-        ):
+                src_tensor, torch.Tensor):
             t = cupy.fromDlpack(torch.utils.dlpack.to_dlpack(src_tensor))
             cupy.copyto(dst_tensor, t)
         else:
@@ -263,19 +251,16 @@ def copy_tensor(dst_tensor, src_tensor):
     else:
         copied = False
     if not copied:
-        raise ValueError(
-            "Unsupported tensor type. Got: {} and {}. Supported "
-            "GPU tensor types are: torch.Tensor, cupy.ndarray.".format(
-                type(dst_tensor), type(src_tensor)
-            )
-        )
+        raise ValueError("Unsupported tensor type. Got: {} and {}. Supported "
+                         "GPU tensor types are: torch.Tensor, cupy.ndarray."
+                         .format(type(dst_tensor), type(src_tensor)))
 
 
 def get_tensor_device_list(tensors):
     """Returns the gpu devices of the list of input tensors.
 
     Args:
-        tensors: a list of tensors, each locates on a GPU.
+        tensors(list): a list of tensors, each locates on a GPU.
 
     Returns:
         list: the list of GPU devices.
@@ -284,7 +269,6 @@ def get_tensor_device_list(tensors):
     if not isinstance(tensors, list):
         raise RuntimeError(
             "Expect a list of tensors each locates on a GPU device. "
-            "Got: '{}'.".format(type(tensors))
-        )
+            "Got: '{}'.".format(type(tensors)))
     devices = [get_tensor_device(t) for t in tensors]
     return devices

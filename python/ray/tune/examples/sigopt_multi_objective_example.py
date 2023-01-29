@@ -1,15 +1,10 @@
-"""
-Example using Sigopt's multi-objective functionality.
-
-Requires the SigOpt library to be installed (`pip install sigopt`).
-"""
+"""Example using Sigopt's multi-objective functionality."""
 import sys
 import time
 
 import numpy as np
-from ray import air, tune
-from ray.air import session
-from ray.tune.search.sigopt import SigOptSearch
+from ray import tune
+from ray.tune.suggest.sigopt import SigOptSearch
 
 np.random.seed(0)
 vector1 = np.random.normal(0, 0.1, 100)
@@ -27,7 +22,7 @@ def easy_objective(config):
     w2 = config["total_weight"] - w1
 
     average, std = evaluate(w1, w2)
-    session.report({"average": average, "std": std, "sharpe": average / std})
+    tune.report(average=average, std=std, sharpe=average / std)
     time.sleep(0.1)
 
 
@@ -37,8 +32,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--smoke-test", action="store_true", help="Finish quickly for testing"
-    )
+        "--smoke-test", action="store_true", help="Finish quickly for testing")
     args, _ = parser.parse_known_args()
 
     if "SIGOPT_KEY" not in os.environ:
@@ -48,14 +42,16 @@ if __name__ == "__main__":
         else:
             raise ValueError(
                 "SigOpt API Key not found. Please set the SIGOPT_KEY "
-                "environment variable."
-            )
+                "environment variable.")
 
     space = [
         {
             "name": "w1",
             "type": "double",
-            "bounds": {"min": 0, "max": 1},
+            "bounds": {
+                "min": 0,
+                "max": 1
+            },
         },
     ]
 
@@ -63,23 +59,15 @@ if __name__ == "__main__":
         space,
         name="SigOpt Example Multi Objective Experiment",
         observation_budget=4 if args.smoke_test else 100,
+        max_concurrent=1,
         metric=["average", "std", "sharpe"],
-        mode=["max", "min", "obs"],
-    )
+        mode=["max", "min", "obs"])
 
-    tuner = tune.Tuner(
+    analysis = tune.run(
         easy_objective,
-        run_config=air.RunConfig(
-            name="my_exp",
-        ),
-        tune_config=tune.TuneConfig(
-            search_alg=algo,
-            num_samples=4 if args.smoke_test else 100,
-        ),
-        param_space={"total_weight": 1},
-    )
-    results = tuner.fit()
-    print(
-        "Best hyperparameters found were: ",
-        results.get_best_result("average", "min").config,
-    )
+        name="my_exp",
+        search_alg=algo,
+        num_samples=4 if args.smoke_test else 100,
+        config={"total_weight": 1})
+    print("Best hyperparameters found were: ",
+          analysis.get_best_config("average", "min"))

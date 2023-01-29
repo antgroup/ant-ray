@@ -1,11 +1,7 @@
 from enum import Enum
 from typing import Union
 
-from ray.util import PublicAPI
-from ray.util.annotations import DeveloperAPI
 
-
-@PublicAPI
 class Verbosity(Enum):
     V0_MINIMAL = 0
     V1_EXPERIMENT = 1
@@ -19,7 +15,6 @@ class Verbosity(Enum):
 verbosity: Union[int, Verbosity] = Verbosity.V3_TRIAL_DETAILS
 
 
-@DeveloperAPI
 def set_verbosity(level: Union[int, Verbosity]):
     global verbosity
 
@@ -29,7 +24,6 @@ def set_verbosity(level: Union[int, Verbosity]):
         verbosity = level
 
 
-@DeveloperAPI
 def has_verbosity(level: Union[int, Verbosity]) -> bool:
     """Return True if passed level exceeds global verbosity level."""
     global verbosity
@@ -38,14 +32,3 @@ def has_verbosity(level: Union[int, Verbosity]) -> bool:
     verbosity_level = int(verbosity)
 
     return verbosity_level >= log_level
-
-
-@DeveloperAPI
-def disable_ipython():
-    """Disable output of IPython HTML objects."""
-    try:
-        from IPython.core.interactiveshell import InteractiveShell
-
-        InteractiveShell.clear_instance()
-    except Exception:
-        pass

@@ -4,9 +4,9 @@
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>io.ray</groupId>
+    <groupId>io.ant-ray</groupId>
     <artifactId>ray-superpom</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -35,7 +35,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.ray</groupId>
+      <groupId>io.ant-ray</groupId>
       <artifactId>ray-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -80,13 +80,12 @@
           <outputDirectory>${output.directory}</outputDirectory>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>3.1.1</version>
-          <executions>
-            <execution>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.1.1</version>
+            <executions>
+                <execution>
                     <phase>package</phase>
                     <goals>
                         <goal>shade</goal>

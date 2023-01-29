@@ -13,7 +13,6 @@ import ray
 class MyActor:
     def __init__(self):
         from my_pkg import impl  # Lazy import.
-
         self.impl = impl
 
     def f(self):
@@ -24,5 +23,4 @@ class MyActor:
 @ray.remote
 def my_func():
     from my_pkg import impl  # Lazy import.
-
     return impl.hello()

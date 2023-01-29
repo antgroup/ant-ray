@@ -1,17 +1,15 @@
+from collections import Counter
 import sys
 import time
-from collections import Counter
-
 import ray
 
 
 @ray.remote
-def get_host_name(x):
+def gethostname(x):
     import platform
     import time
-
     time.sleep(0.01)
-    return x + (platform.node(),)
+    return x + (platform.node(), )
 
 
 def wait_for_nodes(expected):
@@ -19,11 +17,8 @@ def wait_for_nodes(expected):
     while True:
         num_nodes = len(ray.nodes())
         if num_nodes < expected:
-            print(
-                "{} nodes have joined so far, waiting for {} more.".format(
-                    num_nodes, expected - num_nodes
-                )
-            )
+            print("{} nodes have joined so far, waiting for {} more.".format(
+                num_nodes, expected - num_nodes))
             sys.stdout.flush()
             time.sleep(1)
         else:
@@ -36,7 +31,9 @@ def main():
     # Check that objects can be transferred from each node to each other node.
     for i in range(10):
         print("Iteration {}".format(i))
-        results = [get_host_name.remote(get_host_name.remote(())) for _ in range(100)]
+        results = [
+            gethostname.remote(gethostname.remote(())) for _ in range(100)
+        ]
         print(Counter(ray.get(results)))
         sys.stdout.flush()
 
@@ -46,5 +43,7 @@ def main():
 
 
 if __name__ == "__main__":
-    ray.init(address="localhost:6379")
+    DRIVER_MEMORY = 100 * 1024 * 1024
+    ray.init(
+        address="localhost:6379", driver_object_store_memory=DRIVER_MEMORY)
     main()

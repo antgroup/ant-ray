@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
 #pragma once
 
 #include "ray/common/asio/instrumented_io_context.h"
@@ -39,15 +40,13 @@ class ObjectManagerServiceHandler {
   /// \param[in] request The request message.
   /// \param[out] reply The reply message.
   /// \param[in] send_reply_callback The callback to be called when the request is done.
-  virtual void HandlePush(PushRequest request,
-                          PushReply *reply,
+  virtual void HandlePush(const PushRequest &request, PushReply *reply,
                           SendReplyCallback send_reply_callback) = 0;
   /// Handle a `Pull` request
-  virtual void HandlePull(PullRequest request,
-                          PullReply *reply,
+  virtual void HandlePull(const PullRequest &request, PullReply *reply,
                           SendReplyCallback send_reply_callback) = 0;
   /// Handle a `FreeObjects` request
-  virtual void HandleFreeObjects(FreeObjectsRequest request,
+  virtual void HandleFreeObjects(const FreeObjectsRequest &request,
                                  FreeObjectsReply *reply,
                                  SendReplyCallback send_reply_callback) = 0;
 };
@@ -81,3 +80,5 @@ class ObjectManagerGrpcService : public GrpcService {
 
 }  // namespace rpc
 }  // namespace ray
+
+**/

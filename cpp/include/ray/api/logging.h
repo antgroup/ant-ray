@@ -75,8 +75,7 @@ class RayLogger {
   virtual std::ostream &Stream() = 0;
 };
 
-std::unique_ptr<RayLogger> CreateRayLogger(const char *file_name,
-                                           int line_number,
+std::unique_ptr<RayLogger> CreateRayLogger(const char *file_name, int line_number,
                                            RayLoggerLevel severity);
 bool IsLevelEnabled(RayLoggerLevel log_level);
 

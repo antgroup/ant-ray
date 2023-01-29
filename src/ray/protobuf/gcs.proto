@@ -18,7 +18,6 @@ option cc_enable_arenas = true;
 package ray.rpc;
 
 import "src/ray/protobuf/common.proto";
-import "src/ray/protobuf/runtime_env_common.proto";
 
 option java_package = "io.ray.runtime.generated";
 
@@ -37,16 +36,22 @@ enum TablePrefix {
   JOB = 10;
   PROFILE = 11;
   TASK_LEASE = 12;
-  NODE_RESOURCE = 13;
-  DIRECT_ACTOR = 14;
+  KV = 13;
+  NODE_RESOURCE = 14;
+  DIRECT_ACTOR = 15;
   // WORKER is already used in WorkerType, so use WORKERS here.
-  WORKERS = 15;
-  INTERNAL_CONFIG = 16;
-  PLACEMENT_GROUP_SCHEDULE = 17;
-  PLACEMENT_GROUP = 18;
-  KV = 19;
-  ACTOR_TASK_SPEC = 20;
-  TASK_STATE = 21;
+  WORKERS = 16;
+  RAYLET_WORKER = 17;
+  NAMESPACE = 18;
+  INIT_JOB_ENV = 19;
+  INTERNAL_CONFIG = 20;
+  PLACEMENT_GROUP_SCHEDULE = 21;
+  PLACEMENT_GROUP = 22;
+  JOB_STATE = 23;
+  ACTOR_TASK_SPEC = 25;
+  JOB_DATA = 26;
+  FROZEN_NODES_DATA = 27;
+  WORKER_RUNTIME_RESOURCE = 28;
 }
 
 // The channel that Add operations to the Table should be published on, if any.
@@ -81,6 +86,19 @@ message GcsEntry {
 message ObjectTableData {
   // The node manager ID that this object appeared on or was evicted by.
   bytes manager = 1;
+}
+
+message TaskReconstructionData {
+  // The ID of task.
+  bytes task_id = 1;
+  // The number of times this task has been reconstructed so far.
+  uint64 num_reconstructions = 2;
+  // The node manager that is trying to reconstruct the task.
+  bytes node_manager_id = 3;
+}
+
+message TaskTableData {
+  Task task = 1;
 }
 
 message ActorTableData {
@@ -123,41 +141,57 @@ message ActorTableData {
   Address owner_address = 10;
   // Whether the actor is persistent.
   bool is_detached = 11;
-  // Name of the actor.
+  // Name of the actor. Only populated if is_detached is true.
   string name = 12;
-  // Last timestamp that the actor state was updated.
+  // Last timestamp that the actor state was updated in millisecond.
   double timestamp = 13;
+  // Language the job uses.
+  Language language = 14;
   // Resource mapping ids acquired by the leased worker. This field is only set when this
   // actor already has a leased worker.
   repeated ResourceMapEntry resource_mapping = 15;
   // The process id of this actor.
   uint32 pid = 16;
-  // The function descriptor of the actor creation task.
-  FunctionDescriptor function_descriptor = 17;
   // The actor's namespace. Named `ray_namespace` to avoid confusions when invoked in c++.
   string ray_namespace = 19;
+  // Runtime required to run this actor
+  // It'll only be set if it's a detached actor and the original job has this field
+  RuntimeEnv runtime_env = 20;
   // The unix ms timestamp the actor was started at.
-  uint64 start_time = 20;
+  uint64 start_time = 21;
   // The unix ms timestamp the actor was ended at.
-  uint64 end_time = 21;
-  // Serialized runtime_env used to report in the dashboard snapshot. We need to populate
-  // it here instead of grabbing it from the task spec because the task spec is cleared
-  // for deleted actors: https://github.com/ray-project/ray/pull/11149.
-  string serialized_runtime_env = 22;
+  uint64 end_time = 22;
   // The actor's class name. This is necessary because the task spec's lifetime
   // is shorter than the ActorTableData.
   string class_name = 23;
+  // The actor's serialized runtime environment. This is necessary because the
+  // task spec's lifetime is shorter than the ActorTableData.
+  string serialized_runtime_env = 24;
   // Contains metadata about why the actor is dead.
-  ActorDeathCause death_cause = 24;
-  // Quantities of the different resources required by this actor.
-  map<string, double> required_resources = 28;
-  // The node id of the actor once it is created.
-  // address field can contain an address although actor is not created
-  // so we have a separate field to track this.
-  // If the actor is restarting, the node id could be incorrect.
-  optional bytes node_id = 29;
+  ActorDeathCause death_cause = 25;
+  // === ANT-INTERNAL below ===
+  // The function descriptor of the actor creation task.
+  FunctionDescriptor function_descriptor = 30;
+  // ID of the worker process, generated in gcs server.
+  // It is use to both scheduling and failover.
+  bytes worker_process_id = 31;
+  // Field used for storing application-level extensions to the actor definition.
+  // See ActorCreationTaskSpec.
+  string extension_data = 32;
+  // The max number of times tasks submitted on this actor should be retried
+  // if the actor fails and is restarted.
+  // If this number is 0 the tasks won't be resubmitted.
+  // If this number is -1 the tasks will be resubmitted indefinitely.
+  int64 max_task_retries = 33;
+  map<string, double> required_resources = 34;
+  map<string, string> extended_properties = 35;
+  // === ANT-INTERNAL above ===
 }
 
+message GcsWorkerProcessRuntimeResourceTableData {
+  bytes worker_process_id = 1;
+  map<string, double> runtime_resources = 2;
+}
 message ErrorTableData {
   // The ID of the job that the error is for.
   bytes job_id = 1;
@@ -165,8 +199,18 @@ message ErrorTableData {
   string type = 2;
   // The error message.
   string error_message = 3;
+  // The IP address of the node manager.
+  string node_manager_address = 4;
   // The timestamp of the error message.
-  double timestamp = 4;
+  double timestamp = 5;
+}
+
+message PlacementGroupBundlesChangedNotification {
+  // ID of the PlacementGroup.
+  bytes placement_group_id = 1;
+  // A list whose index is `bundle index` and value is a bool that represents the bundle
+  // index is valid or not.
+  repeated bool bundles = 2;
 }
 
 message ScheduleData {
@@ -201,72 +245,25 @@ message ProfileTableData {
   repeated ProfileEvent profile_events = 4;
 }
 
-message ProfileEventEntry {
-  // The start timestamp of the event time.
-  int64 start_time = 1;
-  // The end timestamp of the event. Empty if it's a point event, e.g. TaskStatus
-  // change.
-  int64 end_time = 2;
-  // Additional data associated with the event. This data must be serialized
-  // using JSON.
-  optional string extra_data = 3;
-  // Customized event name if not a TaskStatus change point event.
-  string event_name = 4;
-}
-
-message ProfileEvents {
-  // The type of the component that generated the event, e.g., worker or
-  // object_manager, or node_manager.
-  string component_type = 1;
-  // An identifier for the component that generated the event.
-  bytes component_id = 2;
-  // Node IP address.
-  string node_ip_address = 3;
-  // Events.
-  repeated ProfileEventEntry events = 4;
-}
-
-// Represents task states which could be changed during task execution.
-message TaskStateUpdate {
-  // Node that runs the task.
-  optional bytes node_id = 1;
-  // Timestamp when status changes to PENDING_ARGS_AVAIL.
-  optional int64 pending_args_avail_ts = 2;
-  // Timestamp when status changes to PENDING_NODE_ASSIGNMENT.
-  optional int64 pending_node_assignment_ts = 3;
-  // Timestamp when status changes to SUBMITTED_TO_WORKER.
-  optional int64 submitted_to_worker_ts = 4;
-  // Timestamp when status changes to RUNNING.
-  optional int64 running_ts = 5;
-  // Timestamp when status changes to FINISHED.
-  optional int64 finished_ts = 6;
-  // Timestamp when status changes to FAILED.
-  optional int64 failed_ts = 7;
-}
-
-// Represents events and state changes from a single task run.
-message TaskEvents {
-  // Metadata shared by all event types.
-  bytes task_id = 1;
-  // The current retry attempt number for the task.
-  int32 attempt_number = 2;
-  // Task Info.
-  optional TaskInfoEntry task_info = 3;
-  // Task state updates.
-  optional TaskStateUpdate state_updates = 4;
-  // Task profiling events.
-  optional ProfileEvents profile_events = 5;
-}
-
-// Represents a compact list of task state events by different tasks,
-// where each task has a list of state change events.
-message TaskEventData {
-  // A batch of task state change events.
-  repeated TaskEvents events_by_task = 1;
-  // Number of dropped profile task events due to buffer size limit on workers.
-  int32 num_profile_task_events_dropped = 3;
-  // Number of dropped status task events due to buffer size limit on workers.
-  int32 num_status_task_events_dropped = 4;
+message StatsMetrics {
+  message Tag {
+    // Tag key.
+    string key = 1;
+    // Tag value.
+    string value = 2;
+  }
+  message Metric {
+    // Unique name for each metric.
+    string metric_name = 1;
+    double value = 2;
+    // Record timestamp(UTC).
+    uint64 timestamp = 3;
+    // Metric tag map.
+    repeated Tag tags = 4;
+  }
+  // Nodemanager ip address of reporter.
+  string node_ip_address = 1;
+  repeated Metric Metrics = 2;
 }
 
 message ResourceTableData {
@@ -281,7 +278,7 @@ message AvailableResources {
   map<string, double> resources_available = 2;
 }
 
-message GcsNodeInfo {
+message BasicGcsNodeInfo {
   // State of a node.
   enum GcsNodeState {
     // Node is alive.
@@ -289,15 +286,10 @@ message GcsNodeInfo {
     // Node is dead.
     DEAD = 1;
   }
-
   // The ID of node.
   bytes node_id = 1;
   // The IP address of the node manager.
   string node_manager_address = 2;
-  // The IPC socket name of raylet.
-  string raylet_socket_name = 3;
-  // The IPC socket name of the node's plasma store.
-  string object_store_socket_name = 4;
   // The port at which the node manager is listening for TCP
   // connections from other node managers.
   int32 node_manager_port = 5;
@@ -308,19 +300,51 @@ message GcsNodeInfo {
   // Current state of this node.
   GcsNodeState state = 7;
 
+  // The name of this node. If this is not empty, it must be unique across the cluster.
+  // If node_name is set, when GCS receives a Raylet registration, GCS will kill the old
+  // node which has the same name.
+  string node_name = 15;
+
   // The Hostname address of the node manager.
   string node_manager_hostname = 8;
 
+  // Timestamp that the node is dead.
+  int64 timestamp = 14;
+}
+
+message GcsNodeInfo {
+  // The basic node info
+  BasicGcsNodeInfo basic_gcs_node_info = 22;
+
+  // The IPC socket name of raylet.
+  string raylet_socket_name = 3;
+
+  // The IPC socket name of the node's plasma store.
+  string object_store_socket_name = 4;
+
   // The port at which the node will expose metrics to.
   int32 metrics_export_port = 9;
-  // Timestamp that the node is dead.
-  int64 timestamp = 10;
+
+  // The pid of raylet.
+  int32 pid = 12;
+
+  // The brpc port of raylet.
+  int32 brpc_port = 13;
+
+  // The timestamp when the node is ALIVE.
+  double start_time = 10;
+  // The timestamp when the node is DEAD.
+  double terminate_time = 11;
+
+  // The resource group that the node belongs to.
+  string shape_group = 16;
+  // Name of pod that the node belongs to.
+  string pod_name = 17;
+  // The ID of the physical machine on which this node is deployed.
+  string machine_id = 18;
 
   // The total resources of this node.
-  map<string, double> resources_total = 11;
-
-  // The user-provided identifier or name for this node.
-  string node_name = 12;
+  map<string, double> resources_total = 21;
 }
 
 message HeartbeatTableData {
@@ -328,37 +352,107 @@ message HeartbeatTableData {
   bytes node_id = 1;
 }
 
+// Data for a lease on task execution.
+message TaskLeaseData {
+  // The task ID.
+  bytes task_id = 1;
+  // Node manager ID.
+  bytes node_manager_id = 2;
+  // The time that the lease was last acquired at. NOTE(swang): This is the
+  // system clock time according to the node that added the entry and is not
+  // synchronized with other nodes.
+  uint64 acquired_at = 3;
+  // The period that the lease is active for.
+  uint64 timeout = 4;
+}
+
 message JobConfig {
   enum ActorLifetime {
-    DETACHED = 0;
-    NON_DETACHED = 1;
+    NONE = 0;
+    DETACHED = 1;
+    NON_DETACHED = 2;
   }
 
+  // Environment variables to be set on worker processes.
+  map<string, string> worker_env = 1;
+  // The number of java workers per worker process.
+  uint32 num_java_workers_per_process = 2;
   // The jvm options for java workers of the job.
-  repeated string jvm_options = 2;
+  repeated string jvm_options = 3;
   // A list of directories or files (jar files or dynamic libraries) that specify the
   // search path for user code. This will be used as `CLASSPATH` in Java, and `PYTHONPATH`
   // in Python. In C++, libraries under these paths will be loaded by 'dlopen'.
-  repeated string code_search_path = 3;
+  repeated string code_search_path = 4;
   // Runtime environment to run the code
-  RuntimeEnvInfo runtime_env_info = 4;
+  RuntimeEnv runtime_env = 5;
   // The job's namespace. Named `ray_namespace` to avoid confusions when invoked in c++.
-  string ray_namespace = 5;
+  string ray_namespace = 6;
+  // Serialized JSON string of the parsed runtime environment dict for this job.
+  string serialized_runtime_env = 7;
   // An opaque kv store for job related metadata.
-  map<string, string> metadata = 6;
-  // The default lifetime of actors in this job.
-  // If the lifetime of an actor is not specified explicitly at runtime, this
-  // default value will be applied.
-  ActorLifetime default_actor_lifetime = 7;
+  map<string, string> metadata = 8;
+  // === ANT-INTERNAL below ===
+  // The default memory of java worker process in units.
+  uint64 java_worker_process_default_memory_units = 9;
+  // The number of initial java worker processes of the job.
+  // This is an experimental option. Use this at your own risks.
+  // NOTE: This field is no longer used as the underlying scheduling logic does not depend
+  // on this parameter any more. We continue to have this field to compatible some old
+  // jobs. DO NOT DELETE.
+  uint32 num_initial_java_worker_processes = 10;
+  // The fraction of each java worker's heap size over its total memory.
+  float java_heap_fraction = 11;
+  // The total memory that the job can use.
+  uint64 total_memory_units = 12;
+  // The total gpus that the job can use.
+  uint64 total_gpus = 13;
+  // The total cpus that the job can use.
+  uint64 total_cpus = 14;
+  // The max of total memory that the job can use.
+  uint64 max_total_memory_units = 15;
+  // The max of total gpus that the job can use.
+  uint64 max_total_gpus = 16;
+  // The max of total cpus that the job can use.
+  uint64 max_total_cpus = 17;
+  // Whether to clean up actors, objects and tasks associated with this job during the
+  // shutdown process of the driver.
+  bool long_running = 18;
+  // Whether to enable L1 fault tolerance.
+  bool enable_l1_fault_tolerance = 19;
+  // Level of logging for user's code.
+  string logging_level = 20;
+  // The maximum submitted task number before backpressure.
+  bool actor_task_back_pressure_enabled = 21;
+  int64 max_pending_calls = 22;
+  ActorLifetime default_actor_lifetime = 23;
+  // The number of global owners.
+  uint32 global_owner_number = 24;
+
+  // This is a workaround field that show the job state as failed
+  // when GEAFLOW users invoke `KillCurrentJob()` API.
+  bool mark_job_state_as_failed_when_killing = 30;
 }
 
 message JobTableData {
+  enum JobState {
+    INIT = 0;
+    SUBMITTED = 1;
+    RUNNING = 2;
+    FINISHED = 3;
+    FAILED = 4;
+    CANCEL = 5;
+  }
+  enum DriverExitState {
+    UNKNOWN = 0;
+    OK = 1;
+    ERROR = 2;
+  }
   // The job ID.
   bytes job_id = 1;
   // Whether it's dead.
   bool is_dead = 2;
   // The UNIX timestamp corresponding to this event (job added or removed).
-  int64 timestamp = 3;
+  double timestamp = 3;
   // IP address of the driver that started this job.
   string driver_ip_address = 4;
   // Process ID of the driver running this job.
@@ -369,8 +463,59 @@ message JobTableData {
   uint64 start_time = 7;
   // The timestamp the job was ended at.
   uint64 end_time = 8;
-  // The entrypoint of the job.
-  string entrypoint = 9;
+  // Hostname of the node this job was started on.
+  string driver_hostname = 9;
+  // Raylet which the job's driver belongs to
+  bytes raylet_id = 10;
+  // Language the job uses
+  Language language = 11;
+  // Job state.
+  JobState state = 12;
+  // nodegroup id.
+  string nodegroup_id = 13;
+  // job payload.
+  string job_payload = 14;
+  // The reason for the job failure.
+  string fail_error_message = 15;
+  // The driver cmdline.
+  string driver_cmdline = 16;
+  // driver exit state.
+  DriverExitState driver_exit_state = 18;
+  // Whether the job is waiting for all actors to stop.
+  // This field is valid only if L1 fault tolerance is enabled for the job.
+  bool is_waiting_for_actors_to_stop = 19;
+  // The job name.
+  string job_name = 20;
+  // Whether to allow pre-initialize the job runtime environment.
+  bool pre_initialize_job_runtime_env_enabled = 21;
+}
+
+message NodeInfo {
+  bytes node_id = 1;
+  repeated JobInfo job_info_list = 2;
+  map<string, double> total_resources = 3;
+  map<string, double> available_resources = 4;
+}
+
+message JobInfo {
+  bytes job_id = 1;
+  repeated WorkerInfo worker_info_list = 2;
+}
+
+message WorkerInfo {
+  bytes worker_process_id = 1;
+  bool is_shared = 2;
+  int32 slot_capacity = 3;
+  map<string, double> required_resources = 4;
+  map<string, double> acquired_resources = 5;
+  map<string, double> runtime_resources = 6;
+  Language language = 7;
+  int32 pid = 8;
+}
+
+message ResourceInfo {
+  int32 capacity = 1;
+  int32 count = 2;
 }
 
 message WorkerTableData {
@@ -380,19 +525,19 @@ message WorkerTableData {
   Address worker_address = 2;
   // The UNIX timestamp at which this worker's state was updated.
   int64 timestamp = 3;
+  // Whether it's an intentional disconnect, only applies then `is_alive` is false.
+  WorkerExitType exit_type = 4;
   // Type of this worker.
   WorkerType worker_type = 5;
   // This is for AddWorker.
   map<string, bytes> worker_info = 6;
+  // ID of the job that the worker belongs to.
+  bytes job_id = 7;
+  // ID of the worker process, generated in gcs server.
+  bytes worker_process_id = 8;
   // The exception thrown in creation task. This field is set if this worker died because
   // of exception thrown in actor's creation task. Only applies when is_alive=false.
   RayException creation_task_exception = 18;
-  // Whether it's an intentional disconnect, only applies then `is_alive` is false.
-  optional WorkerExitType exit_type = 19;
-  // The detailed message about worker exit.
-  optional string exit_detail = 20;
-  // pid of the worker process.
-  uint32 pid = 21;
 }
 
 // Fields to publish when worker fails.
@@ -407,6 +552,34 @@ message ResourceMap {
 
 message StoredConfig {
   string config = 1;
+}
+
+message ObjectLocationInfo {
+  bytes object_id = 1;
+  repeated ObjectTableData locations = 2;
+  // For objects that have been spilled to external storage, the URL from which
+  // they can be retrieved.
+  string spilled_url = 3;
+  // The node id that spills the object to the disk.
+  // It will be Nil if it uses a distributed external storage.
+  bytes spilled_node_id = 4;
+  // The size of the object in bytes.
+  uint64 size = 5;
+}
+
+// A notification message about one object's locations being changed.
+message ObjectLocationChange {
+  bool is_add = 1;
+  // The node manager ID that this object appeared on or was evicted by.
+  bytes node_id = 2;
+  // The object has been spilled to this URL. This should be set xor the above
+  // fields are set.
+  string spilled_url = 3;
+  // The node id that spills the object to the disk.
+  // It will be Nil if it uses a distributed external storage.
+  bytes spilled_node_id = 4;
+  // The size of the object in bytes.
+  uint64 size = 5;
 }
 
 // A notification message about one node's resources being changed.
@@ -424,23 +597,45 @@ message PubSubMessage {
   bytes data = 2;
 }
 
-// A notification that the resource table has changed.
-message ResourceUpdate {
-  oneof resource_change_or_data {
-    // The total resources on a node have changed.
-    NodeResourceChange change = 1;
-    // The available resources on a node have changed.
-    ResourcesData data = 2;
-  }
+message JobEnvInitNotification {
+  JobTableData job_table_data = 1;
+  bool start_driver = 2;
 }
 
-message ResourceUsageBroadcastData {
-  // An incrementing sequence number, used for correcting network errors.
-  int64 seq_no = 1;
-  // The changes to the state of the cluster.
-  repeated ResourceUpdate batch = 2;
+message NodeShape {
+  string shape_group = 1;
+  map<string, int32> resource_shape = 2;
 }
 
+message NodeSpec {
+  // The resource shape of the node (`shape_gorup` is embedded in this filed).
+  NodeShape node_shape = 1;
+  // The name of pod that the node in.
+  string pod_name = 2;
+}
+
+message NodegroupData {
+  string nodegroup_id = 1;
+  string nodegroup_name = 2;
+  // If true (default), multiple jobs submitted to this nodegroup will share all the nodes
+  // in this nodegroup. Otherwise, we will create a sub-nodegroup for each job upon
+  // submission.
+  bool enable_sub_nodegroup_isolation = 3;
+  map<string, NodeSpec> host_to_node_spec = 5;
+  map<string, string> schedule_options = 6;
+  bool is_removed = 7;
+  bool enable_revision = 8;
+  uint64 revision = 9;
+  string user_data = 10;
+  uint64 nodegroup_updated_timestamp = 11;
+  bool enable_job_quota = 12;
+}
+
+// === ANT-INTERNAL below
+message ApiServerAddress {
+  string ip = 1;
+  int32 port = 2;
+}
 ///////////////////////////////////////////////////////////////////////////////
 /* Please do not modify/remove/change the following messages to maintain
 backwards compatibility in autoscaler. This is necessary to make sure we can
@@ -493,19 +688,14 @@ message ResourcesData {
   bool should_global_gc = 8;
   // IP address of the node.
   string node_manager_address = 9;
-  // Whether this node has object pulls queued. This can happen if
-  // the node has more pull requests than available object store
-  // memory. This is a proxy for available object store memory.
-  bool object_pulls_queued = 10;
+  // === ANT-INTERNAL below ===
   // Normal task resources.
-  map<string, double> resources_normal_task = 11;
+  map<string, double> resources_normal_task = 10;
   // Indicates whether resource normal task is changed. Only used when
   // light heartbeat enabled.
-  bool resources_normal_task_changed = 12;
+  bool resources_normal_task_changed = 11;
   // The timestamp that normal task resources are measured.
-  int64 resources_normal_task_timestamp = 13;
-  // Whether this node has detected a resource deadlock (full of actors).
-  bool cluster_full_of_actors_detected = 14;
+  int64 resources_normal_task_timestamp = 12;
 }
 
 message ResourceUsageBatchData {
@@ -522,69 +712,6 @@ message PlacementGroupLoad {
   repeated PlacementGroupTableData placement_group_data = 1;
 }
 
-message PlacementGroupStats {
-  // The scheduling state of the placement group.
-  // This is purely for observability and the
-  // information could not be consistent
-  // if GCS restarts.
-  // QUEUED / REMOVED <-----------------------------
-  //          |                                     |
-  // SCHEDULING_STARTED / NO_RESOURCES / INFEASIBLE |
-  //          |                                     |
-  // FINISHED / FAILED_TO_COMMIT_RESOURCES ----------
-  enum SchedulingState {
-    //
-    // Initial scheduling states.
-    //
-    // Queued for scheduling.
-    QUEUED = 0;
-    // Scheduling has cancelled because it is removed.
-    REMOVED = 1;
-
-    //
-    // Scheduling In Progress.
-    //
-    // Scheduling has started.
-    SCHEDULING_STARTED = 2;
-    // Placement group creation failed because there was
-    // no nodes that satisfy resources.
-    NO_RESOURCES = 3;
-    // Placement group creation has failed because the
-    // requested resources are infeasible.
-    INFEASIBLE = 4;
-
-    //
-    // Scheduling Finished.
-    //
-    // Placement group creation failed because there was
-    // an issue commiting resources to nodes
-    // (e.g., node failures).
-    FAILED_TO_COMMIT_RESOURCES = 5;
-    // Scheduling has finished properly.
-    FINISHED = 6;
-  }
-  // The time creation request is first received.
-  int64 creation_request_received_ns = 2;
-  // The time scheduling is started after queuing.
-  int64 scheduling_started_time_ns = 3;
-  // The time from scheduling started <-> scheduling succeeds.
-  int64 scheduling_latency_us = 4;
-  // The time from first request received <-> all placement group
-  // resources are available on all relevant nodes.
-  // end_to_end_creation_latency_us - scheduling_latency_us
-  // == queuing time.
-  int64 end_to_end_creation_latency_us = 5;
-  // The number of time scheduling has attempted on this placement group.
-  uint32 scheduling_attempt = 6;
-  // Scheduler retries the pg scheduling with
-  // exponential backoff delay.
-  // The biggest delay that's ever seen from
-  // this placement group creation process.
-  double highest_retry_delay_ms = 7;
-  // The cause of placement group creation failure.
-  SchedulingState scheduling_state = 8;
-}
-
 message PlacementGroupTableData {
   // State of a placement group.
   enum PlacementGroupState {
@@ -596,6 +723,9 @@ message PlacementGroupTableData {
     REMOVED = 2;
     // Placement Group is rescheduling because the node it placed is dead.
     RESCHEDULING = 3;
+    // Placement Group is updating because bundles are updated.
+    // Note this state can only be transformed from the state of `CREATED` or `UPDATED`.
+    UPDATING = 4;
   }
 
   // ID of the PlacementGroup.
@@ -622,10 +752,25 @@ message PlacementGroupTableData {
   bool is_detached = 10;
   // The pg's namespace. Named `ray_namespace` to avoid confusions when invoked in c++.
   string ray_namespace = 11;
-  // The placement group's stats / information such as when it is created or
-  // what's the current scheduling state.
-  PlacementGroupStats stats = 12;
-  // The maximum fraction of CPU cores that this placement group can use on each node.
-  double max_cpu_fraction_per_node = 13;
+}
+
+message FrozenNodesNotification {
+  repeated bytes frozen_node_set = 1;
+}
+
+message ActorMigrationNotification {
+  repeated bytes actor_id_set = 1;
+  bytes node_name = 3;
+}
+
+message ActorMigrationNotificationBatch {
+  int64 migration_id = 1;
+  repeated ActorMigrationNotification notification_list = 2;
+}
+
+message NodeResources {
+  bytes node_id = 1;
+  map<string, double> total_resources = 2;
+  map<string, double> available_resources = 3;
 }
 ///////////////////////////////////////////////////////////////////////////////

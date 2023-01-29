@@ -1,0 +1,97 @@
+diff --git src/bvar/default_variables.cpp src/bvar/default_variables.cpp
+index be02c50..9743492 100644
+--- src/bvar/default_variables.cpp
++++ src/bvar/default_variables.cpp
+@@ -92,7 +92,7 @@ static bool read_proc_status(ProcStat &stat) {
+                &stat.flags, &stat.minflt, &stat.cminflt, &stat.majflt,
+                &stat.cmajflt, &stat.utime, &stat.stime, &stat.cutime, &stat.cstime,
+                &stat.priority, &stat.nice, &stat.num_threads) != 19) {
+-        PLOG(WARNING) << "Fail to fscanf";
++        // PLOG(WARNING) << "Fail to fscanf"; //Note: avoid too many logs.
+         return false;
+     }
+     return true;
+@@ -106,7 +106,7 @@ static bool read_proc_status(ProcStat &stat) {
+             "ps -p %ld -o pid,ppid,pgid,sess"
+             ",tpgid,flags,pri,nice | tail -n1", (long)pid);
+     if (butil::read_command_output(oss, cmdbuf) != 0) {
+-        LOG(ERROR) << "Fail to read stat";
++        // LOG(ERROR) << "Fail to read stat"; //Note: avoid too many logs.
+         return -1;
+     }
+     const std::string& result = oss.str();
+@@ -114,7 +114,7 @@ static bool read_proc_status(ProcStat &stat) {
+                               "%d %u %ld %ld",
+                &stat.pid, &stat.ppid, &stat.pgrp, &stat.session,
+                &stat.tpgid, &stat.flags, &stat.priority, &stat.nice) != 8) {
+-        PLOG(WARNING) << "Fail to sscanf";
++        // PLOG(WARNING) << "Fail to sscanf"; //Note: avoid too many logs.
+         return false;
+     }
+     return true;
+@@ -216,7 +216,7 @@ static bool read_proc_memory(ProcMemory &m) {
+     if (fscanf(fp, "%ld %ld %ld %ld %ld %ld %ld",
+                &m.size, &m.resident, &m.share,
+                &m.trs, &m.lrs, &m.drs, &m.dt) != 7) {
+-        PLOG(WARNING) << "Fail to fscanf /proc/self/statm";
++        // PLOG(WARNING) << "Fail to fscanf /proc/self/statm"; //Note: avoid too many logs.
+         return false;
+     }
+     return true;
+@@ -229,12 +229,12 @@ static bool read_proc_memory(ProcMemory &m) {
+     char cmdbuf[128];
+     snprintf(cmdbuf, sizeof(cmdbuf), "ps -p %ld -o rss=,vsz=", (long)pid);
+     if (butil::read_command_output(oss, cmdbuf) != 0) {
+-        LOG(ERROR) << "Fail to read memory state";
++        // LOG(ERROR) << "Fail to read memory state"; //Note: avoid too many logs.
+         return -1;
+     }
+     const std::string& result = oss.str();
+     if (sscanf(result.c_str(), "%ld %ld", &m.resident, &m.size) != 2) {
+-        PLOG(WARNING) << "Fail to sscanf";
++        // PLOG(WARNING) << "Fail to sscanf"; //Note: avoid too many logs.
+         return false;
+     }
+     // resident and size in Kbytes
+@@ -284,20 +284,20 @@ static bool read_load_average(LoadAverage &m) {
+     errno = 0;
+     if (fscanf(fp, "%lf %lf %lf",
+                &m.loadavg_1m, &m.loadavg_5m, &m.loadavg_15m) != 3) {
+-        PLOG(WARNING) << "Fail to fscanf";
++        // PLOG(WARNING) << "Fail to fscanf"; //Note: avoid too many logs.
+         return false;
+     }
+     return true;
+ #elif defined(OS_MACOSX)
+     std::ostringstream oss;
+     if (butil::read_command_output(oss, "sysctl -n vm.loadavg") != 0) {
+-        LOG(ERROR) << "Fail to read loadavg";
++        // LOG(ERROR) << "Fail to read loadavg"; //Note: avoid too many logs.
+         return -1;
+     }
+     const std::string& result = oss.str();
+     if (sscanf(result.c_str(), "{ %lf %lf %lf }",
+                &m.loadavg_1m, &m.loadavg_5m, &m.loadavg_15m) != 3) {
+-        PLOG(WARNING) << "Fail to sscanf";
++        // PLOG(WARNING) << "Fail to sscanf"; //Note: avoid too many logs.
+         return false;
+     }
+     return true;
+@@ -332,7 +332,7 @@ static int get_fd_count(int limit) {
+     butil::DirReaderPosix dr("/proc/self/fd");
+     int count = 0;
+     if (!dr.IsValid()) {
+-        PLOG(WARNING) << "Fail to open /proc/self/fd";
++        // PLOG(WARNING) << "Fail to open /proc/self/fd"; //Note: avoid too many logs.
+         return -1;
+     }
+     // Have to limit the scaning which consumes a lot of CPU when #fd
+@@ -449,7 +449,7 @@ static bool read_proc_io(ProcIO* s) {
+     static pid_t pid = getpid();
+     rusage_info_current rusage;
+     if (proc_pid_rusage(pid, RUSAGE_INFO_CURRENT, (void**)&rusage) != 0) {
+-        PLOG(WARNING) << "Fail to proc_pid_rusage";
++        // PLOG(WARNING) << "Fail to proc_pid_rusage"; //Note: avoid too many logs.
+         return false;
+     }
+     s->read_bytes = rusage.ri_diskio_bytesread;

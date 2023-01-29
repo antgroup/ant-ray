@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #pragma once
-#include <gtest/gtest_prod.h>
 
 #include <queue>
 
@@ -21,11 +20,12 @@
 #include "absl/container/flat_hash_set.h"
 #include "ray/common/asio/instrumented_io_context.h"
 #include "ray/common/id.h"
+#include "ray/common/task/task_execution_spec.h"
 #include "ray/common/task/task_spec.h"
+#include "ray/gcs/accessor.h"
+#include "ray/gcs/gcs_server/gcs_actor_schedule_strategy.h"
 #include "ray/gcs/gcs_server/gcs_node_manager.h"
 #include "ray/gcs/gcs_server/gcs_table_storage.h"
-#include "ray/raylet/scheduling/cluster_task_manager.h"
-#include "ray/raylet/scheduling/scheduling_ids.h"
 #include "ray/raylet_client/raylet_client.h"
 #include "ray/rpc/node_manager/node_manager_client.h"
 #include "ray/rpc/node_manager/node_manager_client_pool.h"
@@ -34,24 +34,22 @@
 #include "src/ray/protobuf/gcs_service.pb.h"
 
 namespace ray {
-using raylet::ClusterTaskManager;
 namespace gcs {
 
 class GcsActor;
+class GcsActorScheduleStrategyInterface;
+class GcsLabelManager;
 
-using GcsActorSchedulerFailureCallback =
-    std::function<void(std::shared_ptr<GcsActor>,
-                       rpc::RequestWorkerLeaseReply::SchedulingFailureType,
-                       const std::string &)>;
-using GcsActorSchedulerSuccessCallback =
-    std::function<void(std::shared_ptr<GcsActor>, const rpc::PushTaskReply &reply)>;
+using GcsActorSchedulerFailureCallback = std::function<void(
+    std::shared_ptr<GcsActor>, rpc::RequestWorkerLeaseReply::SchedulingFailureType,
+    const std::string &)>;
 
 class GcsActorSchedulerInterface {
  public:
   /// Schedule the specified actor.
   ///
   /// \param actor to be scheduled.
-  virtual void Schedule(std::shared_ptr<GcsActor> actor) = 0;
+  virtual void Schedule(std::shared_ptr<GcsActor> actor, Status *status = nullptr) = 0;
 
   /// Reschedule the specified actor after gcs server restarts.
   ///
@@ -68,8 +66,7 @@ class GcsActorSchedulerInterface {
   ///
   /// \param node_id ID of the node where the actor leasing request has been sent.
   /// \param actor_id ID of an actor.
-  virtual void CancelOnLeasing(const NodeID &node_id,
-                               const ActorID &actor_id,
+  virtual void CancelOnLeasing(const NodeID &node_id, const ActorID &actor_id,
                                const TaskID &task_id) = 0;
 
   /// Cancel the actor that is being scheduled to the specified worker.
@@ -83,25 +80,17 @@ class GcsActorSchedulerInterface {
   ///
   /// \param node_to_workers Workers used by each node.
   virtual void ReleaseUnusedWorkers(
-      const absl::flat_hash_map<NodeID, std::vector<WorkerID>> &node_to_workers) = 0;
+      const std::unordered_map<NodeID, std::vector<WorkerID>> &node_to_workers) = 0;
 
-  /// Handle the destruction of an actor.
-  ///
-  /// \param actor The actor to be destoryed.
-  virtual void OnActorDestruction(std::shared_ptr<GcsActor> actor) = 0;
+  virtual std::vector<rpc::NodeInfo> GetJobDistribution() const = 0;
 
-  /// Get the count of pending actors.
-  ///
-  /// \return The count of pending actors.
-  virtual size_t GetPendingActorsCount() const = 0;
+  virtual void CancelActorFromWorkerAssignment(std::shared_ptr<GcsActor> actor) = 0;
 
-  /// Cancel an in-flight actor scheduling.
-  ///
-  /// \param The actor to be cancelled.
-  /// \return Whether the actor is cancelled successfully.
-  virtual bool CancelInFlightActorScheduling(const std::shared_ptr<GcsActor> &actor) = 0;
+  /// add the labels of actor into label manager
+  virtual void AddActorLabels(const std::shared_ptr<GcsActor> &actor) = 0;
 
-  virtual std::string DebugString() const = 0;
+  /// remove the labels of actor from label manager
+  virtual void RemoveActorLabels(const std::shared_ptr<GcsActor> &actor) = 0;
 
   virtual ~GcsActorSchedulerInterface() {}
 };
@@ -115,35 +104,38 @@ class GcsActorScheduler : public GcsActorSchedulerInterface {
   /// \param io_context The main event loop.
   /// \param gcs_actor_table Used to flush actor info to storage.
   /// \param gcs_node_manager The node manager which is used when scheduling.
-  /// \param cluster_task_manager The task manager that queues and schedules actor.
-  /// creation tasks.
-  /// \param schedule_failure_handler Invoked when there are no available
-  /// nodes to schedule actors.
-  /// \param schedule_success_handler Invoked when actors are
-  /// created on the worker successfully.
-  /// \param raylet_client_pool Raylet client pool to
-  /// construct connections to raylets.
-  /// \param client_factory Factory to create remote
-  /// core worker client, default factor will be used if not set.
+  /// \param schedule_failure_handler Invoked when there are no available nodes to
+  /// schedule actors.
+  /// \param schedule_success_handler Invoked when actors are created on the worker
+  /// successfully.
+  /// \param raylet_client_pool Raylet client pool to construct connections to raylets.
+  /// \param actor_schedule_strategy Actor schedule strategy.
+  /// \param client_factory Factory to create remote core worker client, default factor
+  /// will be used if not set.
+  /// \param get_job_info_func The function to get the specified job information.
   explicit GcsActorScheduler(
-      instrumented_io_context &io_context,
-      GcsActorTable &gcs_actor_table,
-      const GcsNodeManager &gcs_node_manager,
-      std::shared_ptr<ClusterTaskManager> cluster_task_manager_,
+      instrumented_io_context &io_context, gcs::GcsActorTable &gcs_actor_table,
+      gcs::GcsActorTaskSpecTable &gcs_actor_task_spec_table,
+      const GcsNodeManager &gcs_node_manager, std::shared_ptr<gcs::GcsPubSub> gcs_pub_sub,
       GcsActorSchedulerFailureCallback schedule_failure_handler,
-      GcsActorSchedulerSuccessCallback schedule_success_handler,
+      std::function<void(std::shared_ptr<GcsActor>)> schedule_success_handler,
       std::shared_ptr<rpc::NodeManagerClientPool> raylet_client_pool,
-      rpc::ClientFactoryFn client_factory = nullptr,
+      std::shared_ptr<GcsActorScheduleStrategyInterface> actor_schedule_strategy,
+      rpc::ClientFactoryFn client_factory,
+      std::function<std::shared_ptr<JobTableData>(const JobID &job_id)>
+          get_job_info_func = nullptr,
       std::function<void(const NodeID &, const rpc::ResourcesData &)>
-          normal_task_resources_changed_callback = nullptr);
+          resources_seized_by_normal_tasks_callback = nullptr,
+      std::shared_ptr<GcsLabelManager> gcs_label_manager = nullptr);
+
   virtual ~GcsActorScheduler() = default;
 
   /// Schedule the specified actor.
-  /// If there is no available nodes then the actor would be queued in the
-  /// `cluster_task_manager_`.
+  /// If there is no available nodes then the `schedule_failed_handler_` will be
+  /// triggered, otherwise the actor will be scheduled until succeed or canceled.
   ///
   /// \param actor to be scheduled.
-  void Schedule(std::shared_ptr<GcsActor> actor) override;
+  void Schedule(std::shared_ptr<GcsActor> actor, Status *status = nullptr) override;
 
   /// Reschedule the specified actor after gcs server restarts.
   ///
@@ -164,8 +156,7 @@ class GcsActorScheduler : public GcsActorSchedulerInterface {
   ///
   /// \param node_id ID of the node where the actor leasing request has been sent.
   /// \param actor_id ID of an actor.
-  void CancelOnLeasing(const NodeID &node_id,
-                       const ActorID &actor_id,
+  void CancelOnLeasing(const NodeID &node_id, const ActorID &actor_id,
                        const TaskID &task_id) override;
 
   /// Cancel the actor that is being scheduled to the specified worker.
@@ -179,25 +170,17 @@ class GcsActorScheduler : public GcsActorSchedulerInterface {
   ///
   /// \param node_to_workers Workers used by each node.
   void ReleaseUnusedWorkers(
-      const absl::flat_hash_map<NodeID, std::vector<WorkerID>> &node_to_workers) override;
+      const std::unordered_map<NodeID, std::vector<WorkerID>> &node_to_workers) override;
 
-  /// Handle the destruction of an actor.
-  ///
-  /// \param actor The actor to be destoryed.
-  void OnActorDestruction(std::shared_ptr<GcsActor> actor) override;
+  std::vector<rpc::NodeInfo> GetJobDistribution() const override;
 
-  std::string DebugString() const override;
+  void CancelActorFromWorkerAssignment(std::shared_ptr<GcsActor> actor) override;
 
-  /// Get the count of pending actors, which considers both infeasible and waiting queues.
-  ///
-  /// \return The count of pending actors.
-  size_t GetPendingActorsCount() const override;
+  /// add the labels of actor into label manager
+  void AddActorLabels(const std::shared_ptr<GcsActor> &actor) override;
 
-  /// Cancel an in-flight actor scheduling.
-  ///
-  /// \param The actor to be cancelled.
-  /// \return Whether the actor is cancelled successfully.
-  bool CancelInFlightActorScheduling(const std::shared_ptr<GcsActor> &actor) override;
+  /// remove the labels of actor from label manager
+  void RemoveActorLabels(const std::shared_ptr<GcsActor> &actor) override;
 
  protected:
   /// The GcsLeasedWorker is kind of abstraction of remote leased worker inside raylet. It
@@ -259,17 +242,6 @@ class GcsActorScheduler : public GcsActorSchedulerInterface {
   void LeaseWorkerFromNode(std::shared_ptr<GcsActor> actor,
                            std::shared_ptr<rpc::GcsNodeInfo> node);
 
-  /// Handler to process a worker lease reply.
-  ///
-  /// \param actor The actor to be scheduled.
-  /// \param node The selected node at which a worker is to be leased.
-  /// \param status Status of the reply of `RequestWorkerLeaseRequest`.
-  /// \param reply The reply of `RequestWorkerLeaseRequest`.
-  void HandleWorkerLeaseReply(std::shared_ptr<GcsActor> actor,
-                              std::shared_ptr<rpc::GcsNodeInfo> node,
-                              const Status &status,
-                              const rpc::RequestWorkerLeaseReply &reply);
-
   /// Retry leasing a worker from the specified node for the specified actor.
   /// Make it a virtual method so that the io_context_ could be mocked out.
   ///
@@ -292,25 +264,8 @@ class GcsActorScheduler : public GcsActorSchedulerInterface {
   ///
   /// \param actor Contains the resources needed to lease workers from the specified node.
   /// \param reply The reply of `RequestWorkerLeaseRequest`.
-  void HandleWorkerLeaseGrantedReply(std::shared_ptr<GcsActor> actor,
-                                     const rpc::RequestWorkerLeaseReply &reply);
-
-  /// A rejected rely means resources were preempted by normal tasks. Then
-  /// update the the cluster resource view and reschedule immediately.
-  void HandleWorkerLeaseRejectedReply(std::shared_ptr<GcsActor> actor,
-                                      const rpc::RequestWorkerLeaseReply &reply);
-
-  /// Handler to request worker lease canceled.
-  ///
-  /// \param actor Contains the resources needed to lease workers from the specified node.
-  /// \param node_id The node where the runtime env is failed to setup.
-  /// \param failure_type The type of the canceling.
-  /// \param scheduling_failure_message The scheduling failure error message.
-  void HandleRequestWorkerLeaseCanceled(
-      std::shared_ptr<GcsActor> actor,
-      const NodeID &node_id,
-      rpc::RequestWorkerLeaseReply::SchedulingFailureType failure_type,
-      const std::string &scheduling_failure_message);
+  void HandleWorkerLeasedReply(std::shared_ptr<GcsActor> actor,
+                               const rpc::RequestWorkerLeaseReply &reply);
 
   /// Create the specified actor on the specified worker.
   ///
@@ -339,25 +294,38 @@ class GcsActorScheduler : public GcsActorSchedulerInterface {
   std::shared_ptr<WorkerLeaseInterface> GetOrConnectLeaseClient(
       const rpc::Address &raylet_address);
 
-  /// Kill the actor on a node
-  bool KillActorOnWorker(const rpc::Address &worker_address, ActorID actor_id);
+  /// ======== ANT-INTERNAL begin ========
 
-  /// Schedule the actor at GCS. The target Raylet is selected by hybrid_policy by
-  /// default.
+  /// Check if the granted lease is valid.
   ///
-  /// \param actor The actor to be scheduled.
-  void ScheduleByGcs(std::shared_ptr<GcsActor> actor);
+  /// \param actor Contains the resources needed to lease workers from the specified node.
+  /// \param True If the grant is valid, else False.
+  bool IsGrantedLeaseValid(std::shared_ptr<GcsActor> actor,
+                           const rpc::RequestWorkerLeaseReply &reply);
 
-  /// Forward the actor to a Raylet for scheduling. The target Raylet is the same node for
-  /// the actor's owner, or selected randomly.
+  /// Handler to process an invalid granted lease.
   ///
-  /// \param actor The actor to be scheduled.
-  void ScheduleByRaylet(std::shared_ptr<GcsActor> actor);
+  /// \param actor Contains the resources needed to lease workers from the specified node.
+  /// \param reply The reply of `RequestWorkerLeaseRequest`.
+  void HandleGrantedLeaseInvalidReply(std::shared_ptr<GcsActor> actor,
+                                      const rpc::RequestWorkerLeaseReply &reply);
 
-  /// Return the resources acquired by the actor, which updates GCS' resource view.
+  /// Handler to process a canceled lease.
   ///
-  /// \param acthr The actor whose resources are being returned.
-  void ReturnActorAcquiredResources(std::shared_ptr<GcsActor> actor);
+  /// \param actor Contains the resources needed to lease workers from the specified node.
+  /// \param reply The reply of `RequestWorkerLeaseRequest`.
+  void HandleWorkerLeaseCanceledReply(std::shared_ptr<GcsActor> actor,
+                                      const rpc::RequestWorkerLeaseReply &reply);
+
+  /// Handler to process a rejected lease.
+  ///
+  /// \param actor Contains the resources needed to lease workers from the specified node.
+  /// \param reply The reply of `RequestWorkerLeaseRequest`.
+  void HandleWorkerLeaseRejectedReply(std::shared_ptr<GcsActor> actor,
+                                      const rpc::RequestWorkerLeaseReply &reply);
+
+  void CancelActorFromWorkerAssignmentAndReschedule(std::shared_ptr<GcsActor> actor);
+  /// ======== ANT-INTERNAL end ========
 
  protected:
   /// The io loop that is used to delay execution of tasks (e.g.,
@@ -365,6 +333,8 @@ class GcsActorScheduler : public GcsActorSchedulerInterface {
   instrumented_io_context &io_context_;
   /// The actor info accessor.
   gcs::GcsActorTable &gcs_actor_table_;
+  /// The actor task spec accessor.
+  gcs::GcsActorTaskSpecTable &gcs_actor_task_spec_table_;
   /// Map from node ID to the set of actors for whom we are trying to acquire a lease from
   /// that node. This is needed so that we can retry lease requests from the node until we
   /// receive a reply or the node is removed.
@@ -376,66 +346,29 @@ class GcsActorScheduler : public GcsActorSchedulerInterface {
       node_to_workers_when_creating_;
   /// Reference of GcsNodeManager.
   const GcsNodeManager &gcs_node_manager_;
-  /// The cluster task manager.
-  std::shared_ptr<ClusterTaskManager> cluster_task_manager_;
+  /// A publisher for publishing gcs messages.
+  std::shared_ptr<gcs::GcsPubSub> gcs_pub_sub_;
   /// The handler to handle the scheduling failures.
   GcsActorSchedulerFailureCallback schedule_failure_handler_;
   /// The handler to handle the successful scheduling.
-  GcsActorSchedulerSuccessCallback schedule_success_handler_;
+  std::function<void(std::shared_ptr<GcsActor>)> schedule_success_handler_;
+  /// Whether or not to report the backlog of actors waiting to be scheduled.
+  bool report_worker_backlog_;
   /// The nodes which are releasing unused workers.
   absl::flat_hash_set<NodeID> nodes_of_releasing_unused_workers_;
   /// The cached raylet clients used to communicate with raylet.
   std::shared_ptr<rpc::NodeManagerClientPool> raylet_client_pool_;
+  /// The actor schedule strategy.
+  std::shared_ptr<GcsActorScheduleStrategyInterface> actor_schedule_strategy_;
   /// The cached core worker clients which are used to communicate with leased worker.
   rpc::CoreWorkerClientPool core_worker_clients_;
-
-  /// The resource changed listeners.
-  std::vector<std::function<void()>> resource_changed_listeners_;
-
-  /// Normal task resources changed callback.
+  // Get job info function.
+  std::function<std::shared_ptr<JobTableData>(const JobID &job_id)> get_job_info_func_;
+  // Quick update normal task resources.
   std::function<void(const NodeID &, const rpc::ResourcesData &)>
-      normal_task_resources_changed_callback_;
-
-  /// Select a node where the actor is forwarded (for queueing and scheduling).
-  ///
-  /// \param actor The actor to be forwarded.
-  /// \return The selected node's ID. If the selection fails, NodeID::Nil() is returned.
-  NodeID SelectForwardingNode(std::shared_ptr<GcsActor> actor);
-
-  /// A helper function to select a node from alive nodes randomly.
-  ///
-  /// \return The selected node. If the selection fails, `nullptr` is returned.
-  std::shared_ptr<rpc::GcsNodeInfo> SelectNodeRandomly() const;
-
-  friend class GcsActorSchedulerTest;
-  FRIEND_TEST(GcsActorSchedulerTest, TestScheduleFailedWithZeroNode);
-  FRIEND_TEST(GcsActorSchedulerTest, TestScheduleActorSuccess);
-  FRIEND_TEST(GcsActorSchedulerTest, TestScheduleRetryWhenLeasing);
-  FRIEND_TEST(GcsActorSchedulerTest, TestScheduleRetryWhenCreating);
-  FRIEND_TEST(GcsActorSchedulerTest, TestNodeFailedWhenLeasing);
-  FRIEND_TEST(GcsActorSchedulerTest, TestLeasingCancelledWhenLeasing);
-  FRIEND_TEST(GcsActorSchedulerTest, TestNodeFailedWhenCreating);
-  FRIEND_TEST(GcsActorSchedulerTest, TestWorkerFailedWhenCreating);
-  FRIEND_TEST(GcsActorSchedulerTest, TestSpillback);
-  FRIEND_TEST(GcsActorSchedulerTest, TestReschedule);
-  FRIEND_TEST(GcsActorSchedulerTest, TestReleaseUnusedWorkers);
-  FRIEND_TEST(GcsActorSchedulerTest, TestScheduleFailedWithZeroNodeByGcs);
-  FRIEND_TEST(GcsActorSchedulerTest, TestNotEnoughClusterResources);
-  FRIEND_TEST(GcsActorSchedulerTest, TestScheduleAndDestroyOneActor);
-  FRIEND_TEST(GcsActorSchedulerTest, TestBalancedSchedule);
-  FRIEND_TEST(GcsActorSchedulerTest, TestRejectedRequestWorkerLeaseReply);
-  FRIEND_TEST(GcsActorSchedulerTest, TestScheduleRetryWhenLeasingByGcs);
-  FRIEND_TEST(GcsActorSchedulerTest, TestScheduleRetryWhenCreatingByGcs);
-  FRIEND_TEST(GcsActorSchedulerTest, TestNodeFailedWhenLeasingByGcs);
-  FRIEND_TEST(GcsActorSchedulerTest, TestLeasingCancelledWhenLeasingByGcs);
-  FRIEND_TEST(GcsActorSchedulerTest, TestNodeFailedWhenCreatingByGcs);
-  FRIEND_TEST(GcsActorSchedulerTest, TestWorkerFailedWhenCreatingByGcs);
-  FRIEND_TEST(GcsActorSchedulerTest, TestRescheduleByGcs);
-  FRIEND_TEST(GcsActorSchedulerTest, TestReleaseUnusedWorkersByGcs);
-
-  friend class GcsActorSchedulerMockTest;
-  FRIEND_TEST(GcsActorSchedulerMockTest, KillWorkerLeak1);
-  FRIEND_TEST(GcsActorSchedulerMockTest, KillWorkerLeak2);
+      resources_seized_by_normal_tasks_callback_;
+  // The actor label manager.
+  std::shared_ptr<GcsLabelManager> gcs_label_manager_;
 };
 
 }  // namespace gcs

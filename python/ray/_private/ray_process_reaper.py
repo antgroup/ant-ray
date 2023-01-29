@@ -3,7 +3,6 @@ import os
 import signal
 import sys
 import time
-
 """
 This is a lightweight "reaper" process used to ensure that ray processes are
 cleaned up properly when the main ray process dies unexpectedly (e.g.,

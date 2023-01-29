@@ -7,7 +7,8 @@ from transformers import EvalPrediction
 from transformers import glue_compute_metrics, glue_output_modes
 
 
-def build_compute_metrics_fn(task_name: str) -> Callable[[EvalPrediction], Dict]:
+def build_compute_metrics_fn(
+        task_name: str) -> Callable[[EvalPrediction], Dict]:
     """Function from transformers/examples/text-classification/run_glue.py"""
     output_mode = glue_output_modes[task_name]
 
@@ -27,7 +28,6 @@ def download_data(task_name, data_dir="./data"):
     print("Downloading dataset.")
     import urllib
     import zipfile
-
     if task_name == "rte":
         url = "https://dl.fbaipublicfiles.com/glue/data/RTE.zip"
     else:
@@ -39,8 +39,5 @@ def download_data(task_name, data_dir="./data"):
             zip_ref.extractall(data_dir)
         print("Downloaded data for task {} to {}".format(task_name, data_dir))
     else:
-        print(
-            "Data already exists. Using downloaded data for task {} from {}".format(
-                task_name, data_dir
-            )
-        )
+        print("Data already exists. Using downloaded data for task {} from {}".
+              format(task_name, data_dir))

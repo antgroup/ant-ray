@@ -1,16 +1,3 @@
-// Copyright 2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #include "counter.h"
 
@@ -21,17 +8,12 @@
 #include "unistd.h"
 #endif
 
-Counter::Counter(int init, bool with_exception) {
-  if (with_exception) {
-    throw std::invalid_argument("creation error");
-  }
+Counter::Counter(int init) {
   count = init;
   is_restared = ray::WasCurrentActorRestarted();
 }
 
 Counter *Counter::FactoryCreate() { return new Counter(0); }
-
-Counter *Counter::FactoryCreateException() { return new Counter(0, true); }
 
 Counter *Counter::FactoryCreate(int init) { return new Counter(init); }
 
@@ -52,6 +34,17 @@ int Counter::Add(int x) {
 int Counter::Exit() {
   ray::ExitActor();
   return 1;
+}
+
+std::string Counter::GetJobDataDir() { return ray::GetJobDataDir(); }
+
+std::string Counter::GetEnv(std::string env_name) {
+  const char *env_p = std::getenv(env_name.c_str());
+  std::string env;
+  if (env_p) {
+    env = env_p;
+  }
+  return env;
 }
 
 bool Counter::IsProcessAlive(uint64_t pid) {
@@ -83,42 +76,33 @@ bool Counter::CheckRestartInActorCreationTask() { return is_restared; }
 
 bool Counter::CheckRestartInActorTask() { return ray::WasCurrentActorRestarted(); }
 
-ray::ActorHandle<Counter> Counter::CreateChildActor(std::string actor_name) {
+ray::ActorHandleCpp<Counter> Counter::CreateChildActor(std::string actor_name) {
   auto child_actor =
       ray::Actor(RAY_FUNC(Counter::FactoryCreate)).SetName(actor_name).Remote();
+  child_actor.Task(&Counter::GetCount).Remote().Get();
   return child_actor;
+}
+
+std::string Counter::CreateNestedChildActor(std::string actor_name) {
+  child_actor = ray::Actor(RAY_FUNC(Counter::FactoryCreate)).SetName(actor_name).Remote();
+  child_actor.Task(&Counter::GetCount).Remote().Get();
+  return "OK";
+}
+
+int Counter::Plus1ForActor(ray::ActorHandleCpp<Counter> actor) {
+  return *actor.Task(&Counter::Plus1).Remote().Get();
 }
 
 std::string Counter::GetNamespaceInActor() { return ray::GetNamespace(); }
 
-int Counter::Plus1ForActor(ray::ActorHandle<Counter> actor) {
-  return *actor.Task(&Counter::Plus1).Remote().Get();
-}
-
-RAY_REMOTE(RAY_FUNC(Counter::FactoryCreate),
-           Counter::FactoryCreateException,
-           RAY_FUNC(Counter::FactoryCreate, int),
-           RAY_FUNC(Counter::FactoryCreate, int, int),
-           &Counter::Plus1,
-           &Counter::Add,
-           &Counter::Exit,
-           &Counter::GetPid,
-           &Counter::ExceptionFunc,
-           &Counter::CheckRestartInActorCreationTask,
-           &Counter::CheckRestartInActorTask,
-           &Counter::GetNamespaceInActor,
-           &Counter::GetVal,
-           &Counter::GetIntVal,
-           &Counter::Initialized,
-           &Counter::CreateChildActor,
-           &Counter::GetEnvVar,
-           &Counter::Plus1ForActor);
+RAY_REMOTE(RAY_FUNC(Counter::FactoryCreate), RAY_FUNC(Counter::FactoryCreate, int),
+           RAY_FUNC(Counter::FactoryCreate, int, int), &Counter::Plus1, &Counter::Add,
+           &Counter::Exit, &Counter::GetPid, &Counter::ExceptionFunc,
+           &Counter::CheckRestartInActorCreationTask, &Counter::CheckRestartInActorTask,
+           &Counter::GetVal, &Counter::GetIntVal, &Counter::GetJobDataDir,
+           &Counter::GetEnv, &Counter::GetBytes, &Counter::Initialized,
+           &Counter::CreateChildActor, &Counter::Plus1ForActor, &Counter::GetCount,
+           &Counter::CreateNestedChildActor, &Counter::echoBytes, &Counter::echoString,
+           &Counter::GetNamespaceInActor);
 
 RAY_REMOTE(ActorConcurrentCall::FactoryCreate, &ActorConcurrentCall::CountDown);
-
-std::string GetEnvVar(std::string key) {
-  auto value = std::getenv(key.c_str());
-  return value == NULL ? "" : std::string(value);
-}
-
-RAY_REMOTE(GetEnvVar);

@@ -1,21 +1,23 @@
 import collections
+import logging
 import os
-import sys
-import time
-
 import pytest
-
-import ray
-import ray.cluster_utils
-
 try:
     import pytest_timeout
 except ImportError:
     pytest_timeout = None
+import sys
+import time
+
+import ray
+import ray.test_utils
+import ray.cluster_utils
+from cpuinfo import get_cpu_info
 
 
 def test_actor_deletion_with_gpus(shutdown_only):
-    ray.init(num_cpus=1, num_gpus=1, object_store_memory=int(150 * 1024 * 1024))
+    ray.init(
+        num_cpus=1, num_gpus=1, object_store_memory=int(150 * 1024 * 1024))
 
     # When an actor that uses a GPU exits, make sure that the GPU resources
     # are released.
@@ -86,8 +88,7 @@ def test_actor_gpus(ray_start_cluster):
     num_gpus_per_raylet = 4
     for i in range(num_nodes):
         cluster.add_node(
-            num_cpus=10 * num_gpus_per_raylet, num_gpus=num_gpus_per_raylet
-        )
+            num_cpus=10 * num_gpus_per_raylet, num_gpus=num_gpus_per_raylet)
     ray.init(address=cluster.address)
 
     @ray.remote(num_gpus=1)
@@ -97,23 +98,20 @@ def test_actor_gpus(ray_start_cluster):
 
         def get_location_and_ids(self):
             assert ray.get_gpu_ids() == self.gpu_ids
-            return (
-                ray._private.worker.global_worker.node.unique_id,
-                tuple(self.gpu_ids),
-            )
+            return (ray.worker.global_worker.node.unique_id,
+                    tuple(self.gpu_ids))
 
     # Create one actor per GPU.
     actors = [Actor1.remote() for _ in range(num_nodes * num_gpus_per_raylet)]
     # Make sure that no two actors are assigned to the same GPU.
     locations_and_ids = ray.get(
-        [actor.get_location_and_ids.remote() for actor in actors]
-    )
+        [actor.get_location_and_ids.remote() for actor in actors])
     node_names = {location for location, gpu_id in locations_and_ids}
     assert len(node_names) == num_nodes
     location_actor_combinations = []
     for node_name in node_names:
         for gpu_id in range(num_gpus_per_raylet):
-            location_actor_combinations.append((node_name, (gpu_id,)))
+            location_actor_combinations.append((node_name, (gpu_id, )))
     assert set(locations_and_ids) == set(location_actor_combinations)
 
     # Creating a new actor should fail because all of the GPUs are being
@@ -129,8 +127,7 @@ def test_actor_multiple_gpus(ray_start_cluster):
     num_gpus_per_raylet = 5
     for i in range(num_nodes):
         cluster.add_node(
-            num_cpus=10 * num_gpus_per_raylet, num_gpus=num_gpus_per_raylet
-        )
+            num_cpus=10 * num_gpus_per_raylet, num_gpus=num_gpus_per_raylet)
     ray.init(address=cluster.address)
 
     @ray.remote(num_gpus=2)
@@ -140,17 +137,14 @@ def test_actor_multiple_gpus(ray_start_cluster):
 
         def get_location_and_ids(self):
             assert ray.get_gpu_ids() == self.gpu_ids
-            return (
-                ray._private.worker.global_worker.node.unique_id,
-                tuple(self.gpu_ids),
-            )
+            return (ray.worker.global_worker.node.unique_id,
+                    tuple(self.gpu_ids))
 
     # Create some actors.
     actors1 = [Actor1.remote() for _ in range(num_nodes * 2)]
     # Make sure that no two actors are assigned to the same GPU.
     locations_and_ids = ray.get(
-        [actor.get_location_and_ids.remote() for actor in actors1]
-    )
+        [actor.get_location_and_ids.remote() for actor in actors1])
     node_names = {location for location, gpu_id in locations_and_ids}
     assert len(node_names) == num_nodes
 
@@ -174,17 +168,14 @@ def test_actor_multiple_gpus(ray_start_cluster):
             self.gpu_ids = ray.get_gpu_ids()
 
         def get_location_and_ids(self):
-            return (
-                ray._private.worker.global_worker.node.unique_id,
-                tuple(self.gpu_ids),
-            )
+            return (ray.worker.global_worker.node.unique_id,
+                    tuple(self.gpu_ids))
 
     # Create some actors.
     actors2 = [Actor2.remote() for _ in range(num_nodes)]
     # Make sure that no two actors are assigned to the same GPU.
     locations_and_ids = ray.get(
-        [actor.get_location_and_ids.remote() for actor in actors2]
-    )
+        [actor.get_location_and_ids.remote() for actor in actors2])
     names = {location for location, gpu_id in locations_and_ids}
     assert node_names == names
     for location, gpu_ids in locations_and_ids:
@@ -216,25 +207,23 @@ def test_actor_different_numbers_of_gpus(ray_start_cluster):
             self.gpu_ids = ray.get_gpu_ids()
 
         def get_location_and_ids(self):
-            return (
-                ray._private.worker.global_worker.node.unique_id,
-                tuple(self.gpu_ids),
-            )
+            return (ray.worker.global_worker.node.unique_id,
+                    tuple(self.gpu_ids))
 
     # Create some actors.
     actors = [Actor1.remote() for _ in range(0 + 5 + 10)]
     # Make sure that no two actors are assigned to the same GPU.
     locations_and_ids = ray.get(
-        [actor.get_location_and_ids.remote() for actor in actors]
-    )
+        [actor.get_location_and_ids.remote() for actor in actors])
     node_names = {location for location, gpu_id in locations_and_ids}
     assert len(node_names) == 2
     for node_name in node_names:
         node_gpu_ids = [
-            gpu_id for location, gpu_id in locations_and_ids if location == node_name
+            gpu_id for location, gpu_id in locations_and_ids
+            if location == node_name
         ]
         assert len(node_gpu_ids) in [5, 10]
-        assert set(node_gpu_ids) == {(i,) for i in range(len(node_gpu_ids))}
+        assert set(node_gpu_ids) == {(i, ) for i in range(len(node_gpu_ids))}
 
     # Creating a new actor should fail because all of the GPUs are being
     # used.
@@ -243,16 +232,16 @@ def test_actor_different_numbers_of_gpus(ray_start_cluster):
     assert ready_ids == []
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Failing on Windows.")
 def test_actor_multiple_gpus_from_multiple_tasks(ray_start_cluster):
     cluster = ray_start_cluster
-    num_nodes = 3
-    num_gpus_per_raylet = 2
+    num_nodes = 5
+    num_gpus_per_raylet = 5
     for i in range(num_nodes):
         cluster.add_node(
-            num_cpus=4 * num_gpus_per_raylet,
+            num_cpus=10 * num_gpus_per_raylet,
             num_gpus=num_gpus_per_raylet,
-            _system_config={"num_heartbeats_timeout": 100} if i == 0 else {},
-        )
+            _system_config={"num_heartbeats_timeout": 100} if i == 0 else {})
     ray.init(address=cluster.address)
 
     @ray.remote
@@ -263,10 +252,8 @@ def test_actor_multiple_gpus_from_multiple_tasks(ray_start_cluster):
                 self.gpu_ids = ray.get_gpu_ids()
 
             def get_location_and_ids(self):
-                return (
-                    (ray._private.worker.global_worker.node.unique_id),
-                    tuple(self.gpu_ids),
-                )
+                return ((ray.worker.global_worker.node.unique_id),
+                        tuple(self.gpu_ids))
 
             def sleep(self):
                 time.sleep(100)
@@ -276,7 +263,8 @@ def test_actor_multiple_gpus_from_multiple_tasks(ray_start_cluster):
         for j in range(n):
             actors.append(Actor.remote(i, j))
 
-        locations = ray.get([actor.get_location_and_ids.remote() for actor in actors])
+        locations = ray.get(
+            [actor.get_location_and_ids.remote() for actor in actors])
 
         # Put each actor to sleep for a long time to prevent them from getting
         # terminated.
@@ -285,13 +273,14 @@ def test_actor_multiple_gpus_from_multiple_tasks(ray_start_cluster):
 
         return locations
 
-    all_locations = ray.get(
-        [create_actors.remote(i, num_gpus_per_raylet) for i in range(num_nodes)]
-    )
+    all_locations = ray.get([
+        create_actors.remote(i, num_gpus_per_raylet) for i in range(num_nodes)
+    ])
 
     # Make sure that no two actors are assigned to the same GPU.
     node_names = {
-        location for locations in all_locations for location, gpu_id in locations
+        location
+        for locations in all_locations for location, gpu_id in locations
     }
     assert len(node_names) == num_nodes
 
@@ -309,10 +298,8 @@ def test_actor_multiple_gpus_from_multiple_tasks(ray_start_cluster):
             self.gpu_ids = ray.get_gpu_ids()
 
         def get_location_and_ids(self):
-            return (
-                ray._private.worker.global_worker.node.unique_id,
-                tuple(self.gpu_ids),
-            )
+            return (ray.worker.global_worker.node.unique_id,
+                    tuple(self.gpu_ids))
 
     # All the GPUs should be used up now.
     a = Actor.remote()
@@ -320,12 +307,13 @@ def test_actor_multiple_gpus_from_multiple_tasks(ray_start_cluster):
     assert ready_ids == []
 
 
-def test_actors_and_tasks_with_gpus(enable_syncer_test, ray_start_cluster):
+def test_actors_and_tasks_with_gpus(ray_start_cluster):
     cluster = ray_start_cluster
     num_nodes = 3
     num_gpus_per_raylet = 2
     for i in range(num_nodes):
-        cluster.add_node(num_cpus=num_gpus_per_raylet, num_gpus=num_gpus_per_raylet)
+        cluster.add_node(
+            num_cpus=num_gpus_per_raylet, num_gpus=num_gpus_per_raylet)
     ray.init(address=cluster.address)
 
     def check_intervals_non_overlapping(list_of_intervals):
@@ -339,42 +327,33 @@ def test_actors_and_tasks_with_gpus(enable_syncer_test, ray_start_cluster):
                 assert second_interval[0] < second_interval[1]
                 intervals_nonoverlapping = (
                     first_interval[1] <= second_interval[0]
-                    or second_interval[1] <= first_interval[0]
-                )
-                assert (
-                    intervals_nonoverlapping
-                ), "Intervals {} and {} are overlapping.".format(
-                    first_interval, second_interval
-                )
+                    or second_interval[1] <= first_interval[0])
+                assert intervals_nonoverlapping, (
+                    "Intervals {} and {} are overlapping.".format(
+                        first_interval, second_interval))
 
     @ray.remote(num_gpus=1)
     def f1():
-        t1 = time.time()
+        t1 = time.monotonic()
         time.sleep(0.1)
-        t2 = time.time()
+        t2 = time.monotonic()
         gpu_ids = ray.get_gpu_ids()
         assert len(gpu_ids) == 1
         assert gpu_ids[0] in range(num_gpus_per_raylet)
-        return (
-            ray._private.worker.global_worker.node.unique_id,
-            tuple(gpu_ids),
-            [t1, t2],
-        )
+        return (ray.worker.global_worker.node.unique_id, tuple(gpu_ids),
+                [t1, t2])
 
     @ray.remote(num_gpus=2)
     def f2():
-        t1 = time.time()
+        t1 = time.monotonic()
         time.sleep(0.1)
-        t2 = time.time()
+        t2 = time.monotonic()
         gpu_ids = ray.get_gpu_ids()
         assert len(gpu_ids) == 2
         assert gpu_ids[0] in range(num_gpus_per_raylet)
         assert gpu_ids[1] in range(num_gpus_per_raylet)
-        return (
-            ray._private.worker.global_worker.node.unique_id,
-            tuple(gpu_ids),
-            [t1, t2],
-        )
+        return (ray.worker.global_worker.node.unique_id, tuple(gpu_ids),
+                [t1, t2])
 
     @ray.remote(num_gpus=1)
     class Actor1:
@@ -385,18 +364,15 @@ def test_actors_and_tasks_with_gpus(enable_syncer_test, ray_start_cluster):
 
         def get_location_and_ids(self):
             assert ray.get_gpu_ids() == self.gpu_ids
-            return (
-                ray._private.worker.global_worker.node.unique_id,
-                tuple(self.gpu_ids),
-            )
+            return (ray.worker.global_worker.node.unique_id,
+                    tuple(self.gpu_ids))
 
     def locations_to_intervals_for_many_tasks():
         # Launch a bunch of GPU tasks.
         locations_ids_and_intervals = ray.get(
-            [f1.remote() for _ in range(5 * num_nodes * num_gpus_per_raylet)]
-            + [f2.remote() for _ in range(5 * num_nodes * num_gpus_per_raylet)]
-            + [f1.remote() for _ in range(5 * num_nodes * num_gpus_per_raylet)]
-        )
+            [f1.remote() for _ in range(5 * num_nodes * num_gpus_per_raylet)] +
+            [f2.remote() for _ in range(5 * num_nodes * num_gpus_per_raylet)] +
+            [f1.remote() for _ in range(5 * num_nodes * num_gpus_per_raylet)])
 
         locations_to_intervals = collections.defaultdict(lambda: [])
         for location, gpu_ids, interval in locations_ids_and_intervals:
@@ -429,7 +405,9 @@ def test_actors_and_tasks_with_gpus(enable_syncer_test, ray_start_cluster):
     assert actor_location not in locations_to_intervals
 
     # Create more actors to fill up all the GPUs.
-    more_actors = [Actor1.remote() for _ in range(num_nodes * num_gpus_per_raylet - 1)]
+    more_actors = [
+        Actor1.remote() for _ in range(num_nodes * num_gpus_per_raylet - 1)
+    ]
     # Wait for the actors to finish being created.
     ray.get([actor.get_location_and_ids.remote() for actor in more_actors])
 
@@ -447,8 +425,7 @@ def test_actors_and_tasks_with_gpus_version_two(shutdown_only):
     ray.init(
         num_cpus=(num_gpus + 1),
         num_gpus=num_gpus,
-        object_store_memory=int(150 * 1024 * 1024),
-    )
+        object_store_memory=int(150 * 1024 * 1024))
 
     # The point of this actor is to record which GPU IDs have been seen. We
     # can't just return them from the tasks, because the tasks don't return
@@ -504,15 +481,15 @@ def test_actors_and_tasks_with_gpus_version_two(shutdown_only):
     start_time = time.time()
     while time.time() - start_time < 30:
         seen_gpu_ids, num_calls = ray.get(
-            record_gpu_actor.get_gpu_ids_and_calls.remote()
-        )
+            record_gpu_actor.get_gpu_ids_and_calls.remote())
         if num_calls == num_gpus:
             break
     assert set(seen_gpu_ids) == set(range(num_gpus))
 
 
 def test_blocking_actor_task(shutdown_only):
-    ray.init(num_cpus=1, num_gpus=1, object_store_memory=int(150 * 1024 * 1024))
+    ray.init(
+        num_cpus=1, num_gpus=1, object_store_memory=int(150 * 1024 * 1024))
 
     @ray.remote(num_gpus=1)
     def f():
@@ -563,6 +540,7 @@ def test_blocking_actor_task(shutdown_only):
     assert remaining_ids == [x_id]
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Very flaky.")
 def test_lifetime_and_transient_resources(ray_start_regular):
     # This actor acquires resources only when running methods.
     @ray.remote
@@ -581,29 +559,28 @@ def test_lifetime_and_transient_resources(ray_start_regular):
 
     actor2s = [Actor2.remote() for _ in range(2)]
     results = [a.method.remote() for a in actor2s]
-    ready_ids, remaining_ids = ray.wait(results, num_returns=len(results), timeout=5.0)
+    ready_ids, remaining_ids = ray.wait(
+        results, num_returns=len(results), timeout=5.0)
     assert len(ready_ids) == 1
 
 
 def test_custom_label_placement(ray_start_cluster):
     cluster = ray_start_cluster
     custom_resource1_node = cluster.add_node(
-        num_cpus=2, resources={"CustomResource1": 2}
-    )
+        num_cpus=2, resources={"CustomResource1": 2})
     custom_resource2_node = cluster.add_node(
-        num_cpus=2, resources={"CustomResource2": 2}
-    )
+        num_cpus=2, resources={"CustomResource2": 2})
     ray.init(address=cluster.address)
 
     @ray.remote(resources={"CustomResource1": 1})
     class ResourceActor1:
         def get_location(self):
-            return ray._private.worker.global_worker.node.unique_id
+            return ray.worker.global_worker.node.unique_id
 
     @ray.remote(resources={"CustomResource2": 1})
     class ResourceActor2:
         def get_location(self):
-            return ray._private.worker.global_worker.node.unique_id
+            return ray.worker.global_worker.node.unique_id
 
     # Create some actors.
     actors1 = [ResourceActor1.remote() for _ in range(2)]
@@ -616,6 +593,7 @@ def test_custom_label_placement(ray_start_cluster):
         assert location == custom_resource2_node.unique_id
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Very flaky.")
 def test_creating_more_actors_than_resources(shutdown_only):
     ray.init(num_cpus=10, num_gpus=2, resources={"CustomResource1": 1})
 
@@ -664,10 +642,39 @@ def test_creating_more_actors_than_resources(shutdown_only):
     ray.get(results)
 
 
+def test_cpu_instruction(shutdown_only):
+    os.environ["CPU_INSTRUCTION_SET"] = "avx2"
+    os.environ["EXTEND_CPU_INSTRUCTIONS"] = "avx2"
+    ray.init()
+
+    @ray.remote
+    class ResourceActor():
+        def check_resource(self, res):
+            cpu_info = get_cpu_info()
+            return res in cpu_info["flags"]
+
+    driver_cpu_info = get_cpu_info()
+    required_cpu_instruction_str = os.getenv("EXTEND_CPU_INSTRUCTIONS", "")
+    required_instruction_set = \
+        [x.strip() for x in required_cpu_instruction_str.split(",")]
+    logging.info(driver_cpu_info)
+    for required_ins in required_instruction_set:
+        if required_ins in driver_cpu_info["flags"]:
+            logging.info(f"This actor has {required_ins} instruction set.")
+            actor = ResourceActor.options(resources={
+                required_ins: 1.0
+            }).remote()
+            result = actor.check_resource.remote(required_ins)
+            assert ray.get(result)
+        else:
+            logging.info(
+                f"This actor does't have {required_ins} instruction set.")
+            actor = ResourceActor.remote()
+            result = actor.check_resource.remote(required_ins)
+            assert not ray.get(result)
+    del os.environ["CPU_INSTRUCTION_SET"]
+
+
 if __name__ == "__main__":
     import pytest
-
-    if os.environ.get("PARALLEL_CI"):
-        sys.exit(pytest.main(["-n", "auto", "--boxed", "-vs", __file__]))
-    else:
-        sys.exit(pytest.main(["-sv", __file__]))
+    sys.exit(pytest.main(["-v", __file__]))

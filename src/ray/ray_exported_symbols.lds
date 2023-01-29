@@ -13,6 +13,7 @@
 *ray*Buffer*
 *ray*LocalMemoryBuffer*
 # util
+*ray*Http*
 *ray*RayLog*
 *ray*RayLogLevel*
 # id

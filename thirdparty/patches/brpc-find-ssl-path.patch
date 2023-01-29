@@ -1,0 +1,65 @@
+diff --git BUILD BUILD
+index 84e0271c..76f6d9a0 100644
+--- BUILD
++++ BUILD
+@@ -79,8 +79,6 @@ LINKOPTS = [
+     "-lpthread",
+     "-ldl",
+     "-lz",
+-    "-lssl",
+-    "-lcrypto",
+ ] + select({
+     ":darwin": [
+         "-framework CoreFoundation",
+@@ -96,6 +94,8 @@ LINKOPTS = [
+     ],
+     "//conditions:default": [
+       "-lrt",
++      "-lssl",
++      "-lcrypto",
+     ],
+ }) + select({
+     ":with_mesalink": [
+@@ -337,7 +337,10 @@ cc_library(
+         "@com_github_gflags_gflags//:gflags",
+     ] + select({
+         ":with_glog": ["@com_github_google_glog//:glog"],
+-        ":darwin": [":macos_lib"],
++        ":darwin": [
++            ":macos_lib",
++            "@systemssl//:openssl",
++        ],
+         "//conditions:default": [],
+     }),
+     includes = [
+diff --git bazel/brpc_deps.bzl bazel/brpc_deps.bzl
+new file mode 100644
+index 00000000..bf4cf4e3
+--- /dev/null
++++ bazel/brpc_deps.bzl
+@@ -0,0 +1,6 @@
++def brpc_deps():
++     native.new_local_repository(
++           name = "systemssl",
++           path = "/usr/local/opt/openssl",
++           build_file = "@com_github_brpc_brpc//:systemssl.BUILD",
++     )
+diff --git systemssl.BUILD systemssl.BUILD
+new file mode 100644
+index 00000000..a50ad2bc
+--- /dev/null
++++ systemssl.BUILD
+@@ -0,0 +1,13 @@
++package(default_visibility = ["//visibility:public"])
++cc_library(
++    name = "openssl",
++    hdrs = glob(["**/openssl/*.h"]),
++    srcs = glob([
++        "**/libssl.dylib",
++        "**/libcrypto.dylib",
++    ]),
++    includes = [
++        "include/",
++    ],
++    visibility = ["//visibility:public"],
++)

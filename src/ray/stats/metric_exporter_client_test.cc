@@ -24,7 +24,6 @@
 #include "gtest/gtest.h"
 #include "opencensus/stats/internal/delta_producer.h"
 #include "opencensus/stats/internal/stats_exporter_impl.h"
-#include "ray/stats/metric_defs.h"
 #include "ray/stats/metric_exporter.h"
 #include "ray/stats/stats.h"
 
@@ -125,8 +124,7 @@ class MetricExporterClientTest : public ::testing::Test {
     exporter.reset(new stats::StdoutExporterClient());
     mock1.reset(new MockExporterClient1(exporter));
     mock2.reset(new MockExporterClient2(mock1));
-    ray::stats::Init(
-        global_tags, MetricsAgentPort, WorkerID::Nil(), mock2, kMockReportBatchSize);
+    ray::stats::Init(global_tags, MetricsAgentPort, mock2, kMockReportBatchSize);
   }
 
   virtual void TearDown() override { Shutdown(); }
@@ -143,19 +141,6 @@ bool DoubleEqualTo(double value, double compared_value) {
   return value >= compared_value - 1e-5 && value <= compared_value + 1e-5;
 }
 
-TEST_F(MetricExporterClientTest, decorator_test) {
-  // Export client should emit at least once in report flush interval.
-  for (size_t i = 0; i < 100; ++i) {
-    stats::LiveActors().Record(i + 1);
-  }
-  opencensus::stats::DeltaProducer::Get()->Flush();
-  opencensus::stats::StatsExporterImpl::Get()->Export();
-  ASSERT_GE(100, mock1->GetValue());
-  ASSERT_EQ(1, mock1->GetCount());
-  ASSERT_GE(100, mock2->GetValue());
-  ASSERT_EQ(1, mock2->GetCount());
-}
-
 TEST_F(MetricExporterClientTest, exporter_client_caculation_test) {
   const stats::TagKeyType tag1 = stats::TagKeyType::Register("k1");
   const stats::TagKeyType tag2 = stats::TagKeyType::Register("k2");
@@ -167,8 +152,8 @@ TEST_F(MetricExporterClientTest, exporter_client_caculation_test) {
   for (int i = 0; i < 50; i++) {
     hist_vector.push_back((double)(i * 10.0));
   }
-  static stats::Histogram random_hist(
-      "ray.random.hist", "", "", hist_vector, {tag1, tag2});
+  static stats::Histogram random_hist("ray.random.hist", "", "", hist_vector,
+                                      {tag1, tag2});
   for (size_t i = 0; i < 500; ++i) {
     random_counter.Record(i, {{tag1, std::to_string(i)}, {tag2, std::to_string(i * 2)}});
     random_gauge.Record(i, {{tag1, std::to_string(i)}, {tag2, std::to_string(i * 2)}});

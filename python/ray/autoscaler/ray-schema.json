@@ -23,10 +23,31 @@
             "description": "A unique identifier for the head node and workers of this cluster.",
             "type": "string"
         },
+        "min_workers": {
+            "description": "DEPRECATED. Use the per node_type min_workers field instead.",
+            "type": "integer",
+            "minimum": 0
+        },
         "max_workers": {
             "description": "The maximum number of workers nodes to launch in addition to the head node. This takes precedence over min_workers.",
             "type": "integer",
             "minimum": 0
+        },
+        "initial_workers": {
+            "description": "DEPRECATED.",
+            "type": "integer",
+            "minimum": 0
+        },
+        "autoscaling_mode": {
+            "description": "DEPRECATED. Use upscaling_speed instead.",
+            "type": "string",
+            "enum": [ "default", "aggressive" ]
+        },
+        "target_utilization_fraction": {
+            "description": "DEPRECATED. Use upscaling_speed instead.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
         },
         "upscaling_speed": {
             "description": "The autoscaler will scale up the cluster faster with higher upscaling speed. E.g., if the task requires adding more nodes then autoscaler will gradually scale up the cluster in chunks of upscaling_speed*currently_running_nodes. This number should be > 0.",
@@ -35,7 +56,7 @@
         },
         "idle_timeout_minutes": {
             "description": "If a node is idle for this many minutes, it will be removed.",
-            "type": "number",
+            "type": "integer",
             "minimum": 0
         },
         "provider": {
@@ -48,7 +69,7 @@
                     "type": "string",
                     "description": "e.g. aws, azure, gcp,..."
                 },
-                "region": {
+                "region": { 
                     "type": "string",
                     "description": "e.g. us-east-1"
                 },
@@ -139,10 +160,6 @@
                       }
                     }
                 },
-				"disable_node_updaters": {
-					"type": "boolean",
-					"description": "Disables node updaters if set to True. Default is False. (For Kubernetes operator usage.)"
-				},
                 "gcp_credentials": {
                     "type": "object",
                     "description": "Credentials for authenticating with the GCP client",
@@ -157,44 +174,6 @@
                         "credentials": {
                             "type": "string",
                             "description": "Oauth token or JSON string constituting service account credentials"
-                        }
-                    }
-                },
-                "cloudwatch": {
-                    "agent": {
-                        "CLOUDWATCH_AGENT_INSTALLED_AMI_TAG": {
-                            "type": ["string"],
-                            "description": "Tag to be added to cloudwatch agent pre-installed AMI name."
-                        },
-                        "config": {
-                            "type": ["string", "null"],
-                            "description": "Path to Unified CloudWatch Agent config file. See https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html for additional details."
-                        },
-                        "retryer": {
-                            "max_attempts": {
-                                "type": ["integer", "null"],
-                                "description": "Max allowed Unified CloudWatch Agent installation attempts on any host."
-                            },
-                            "delay_seconds": {
-                                "type": ["integer", "null"],
-                                "description": "Seconds to wait between each Unified CloudWatch Agent installation attempt."
-                            }
-                        }
-                    },
-                    "dashboard": {
-                        "name": {
-                            "type": ["string", "null"],
-                            "description": "User defined CloudWatch Dashboard name."
-                        },
-                        "config": {
-                            "type": ["string", "null"],
-                            "description": "Path to CloudWatch Dashboard config file. See https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html for additional details."
-                        }
-                    },
-                    "alarm": {
-                        "config": {
-                            "type": ["string", "null"],
-                            "description": "Path to CloudWatch Alarm config file. See https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_PutMetricAlarm.html for additional details."
                         }
                     }
                 }
@@ -280,6 +259,18 @@
             "type": "string",
             "description": "If using multiple node types, specifies the head node type."
         },
+        "worker_default_node_type": {
+            "type": "string",
+            "description": "DEPRECATED."
+        },
+        "head_node": {
+            "type": "object",
+            "description": "Provider-specific config for the head node, e.g. instance type."
+        },
+        "worker_nodes": {
+            "type": "object",
+            "description": "Provider-specific config for worker nodes. e.g. instance type."
+        },
         "file_mounts": {
             "type": "object",
             "description": "Map of remote paths to local paths, e.g. {\"/tmp/data\": \"/my/local/data\"}"
@@ -346,7 +337,6 @@
                        "min_workers": {"type": "integer"},
                        "max_workers": {"type": "integer"},
                        "resources": {
-						   "type": "object",
 						   "patternProperties": {
 							   ".*":{
 								   "type": "integer",

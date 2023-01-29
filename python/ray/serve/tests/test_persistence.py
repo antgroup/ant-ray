@@ -1,12 +1,12 @@
 import ray
+import ray.test_utils
 from ray import serve
-from ray._private.test_utils import run_string_as_driver
 
 
 def test_new_driver(serve_instance):
     script = """
 import ray
-ray.init(address="{}", namespace="default_test_namespace")
+ray.init(address="{}", namespace="")
 
 from ray import serve
 
@@ -14,11 +14,9 @@ from ray import serve
 def driver():
     return "OK!"
 
-serve.run(driver.bind())
-""".format(
-        ray._private.worker._global_node.address
-    )
-    run_string_as_driver(script)
+driver.deploy()
+""".format(ray.worker._global_node._redis_address)
+    ray.test_utils.run_string_as_driver(script)
 
     handle = serve.get_deployment("driver").get_handle()
     assert ray.get(handle.remote()) == "OK!"
@@ -26,7 +24,5 @@ serve.run(driver.bind())
 
 if __name__ == "__main__":
     import sys
-
     import pytest
-
     sys.exit(pytest.main(["-v", "-s", __file__]))

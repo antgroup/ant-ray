@@ -41,7 +41,7 @@ inline void CheckTaskOptions(const std::unordered_map<std::string, double> &reso
 
 }  // namespace internal
 
-enum class PlacementStrategy {
+enum class PlacementStrategyCpp {
   PACK = 0,
   SPREAD = 1,
   STRICT_PACK = 2,
@@ -57,17 +57,16 @@ enum PlacementGroupState {
   UNRECOGNIZED = -1,
 };
 
-struct PlacementGroupCreationOptions {
+struct PlacementGroupCreationOptionsCpp {
   std::string name;
   std::vector<std::unordered_map<std::string, double>> bundles;
-  PlacementStrategy strategy;
+  PlacementStrategyCpp strategy;
 };
 
 class PlacementGroup {
  public:
   PlacementGroup() = default;
-  PlacementGroup(std::string id,
-                 PlacementGroupCreationOptions options,
+  PlacementGroup(std::string id, PlacementGroupCreationOptionsCpp options,
                  PlacementGroupState state = PlacementGroupState::UNRECOGNIZED)
       : id_(std::move(id)), options_(std::move(options)), state_(state) {}
   std::string GetID() const { return id_; }
@@ -76,7 +75,7 @@ class PlacementGroup {
     return options_.bundles;
   }
   ray::PlacementGroupState GetState() { return state_; }
-  PlacementStrategy GetStrategy() { return options_.strategy; }
+  PlacementStrategyCpp GetStrategy() { return options_.strategy; }
   bool Wait(int timeout_seconds) { return callback_(id_, timeout_seconds); }
   void SetWaitCallbak(std::function<bool(const std::string &, int)> callback) {
     callback_ = std::move(callback);
@@ -85,7 +84,7 @@ class PlacementGroup {
 
  private:
   std::string id_;
-  PlacementGroupCreationOptions options_;
+  PlacementGroupCreationOptionsCpp options_;
   PlacementGroupState state_;
   std::function<bool(const std::string &, int)> callback_;
 };
@@ -97,7 +96,6 @@ struct CallOptions {
   std::unordered_map<std::string, double> resources;
   PlacementGroup group;
   int bundle_index;
-  std::string serialized_runtime_env_info;
 };
 
 struct ActorCreationOptions {
@@ -108,7 +106,6 @@ struct ActorCreationOptions {
   int max_concurrency = 1;
   PlacementGroup group;
   int bundle_index;
-  std::string serialized_runtime_env_info;
 };
 }  // namespace internal
 

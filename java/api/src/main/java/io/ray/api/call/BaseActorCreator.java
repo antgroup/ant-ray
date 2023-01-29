@@ -1,7 +1,9 @@
 package io.ray.api.call;
 
+import io.ray.api.Ray;
 import io.ray.api.options.ActorCreationOptions;
 import io.ray.api.options.ActorLifetime;
+import io.ray.api.options.SchedulingStrategy;
 import io.ray.api.placementgroup.PlacementGroup;
 import java.util.Map;
 
@@ -12,9 +14,12 @@ import java.util.Map;
  */
 public class BaseActorCreator<T extends BaseActorCreator> {
   protected ActorCreationOptions.Builder builder = new ActorCreationOptions.Builder();
+  private ActorCreationOptions creationOptions;
 
   /**
-   * Set the actor name of a named actor.
+   * Set the actor name of a named actor. This named actor is only accessible from this job by this
+   * name via {@link Ray#getActor(java.lang.String)}. If you want create a named actor that is
+   * accessible from all jobs, use {@link BaseActorCreator#setGlobalName(java.lang.String)} instead.
    *
    * @param name The name of the named actor.
    * @return self
@@ -25,21 +30,22 @@ public class BaseActorCreator<T extends BaseActorCreator> {
     return self();
   }
 
-  /**
-   * Set the actor name along with a different namespace.
-   *
-   * @param name The name of the named actor.
-   * @param namespace The namespace that this actor will live in.
-   * @return self
-   */
-  public T setName(String name, String namespace) {
-    builder.setName(name);
-    builder.setNamespace(namespace);
+  public T setLifetime(ActorLifetime lifetime) {
+    builder.setLifetime(lifetime);
     return self();
   }
 
-  public T setLifetime(ActorLifetime lifetime) {
-    builder.setLifetime(lifetime);
+  /**
+   * Set the memory resource requirement to reserve for the lifetime of this actor. It will assign a
+   * sole worker process for this actor if this method is called. This method can be called multiple
+   * times. If the same resource is set multiple times, the latest quantity will be used.
+   *
+   * @param memoryMb memory size in mb.
+   * @return self
+   * @see ActorCreationOptions.Builder#setMemoryMb(long)
+   */
+  public T setMemoryMb(long memoryMb) {
+    builder.setMemoryMb(memoryMb);
     return self();
   }
 
@@ -87,44 +93,17 @@ public class BaseActorCreator<T extends BaseActorCreator> {
   }
 
   /**
-   * This specifies the maximum number of times that an actor task can be retried. The minimum valid
-   * value is 0 (default), which indicates that the actor task can't be retried. A value of -1
-   * indicates that an actor task can be retried indefinitely.
-   *
-   * @param maxTaskRetries max number of actor task retries
-   * @return self
-   * @see ActorCreationOptions.Builder#setMaxTaskRetries(int)
-   */
-  public T setMaxTaskRetries(int maxTaskRetries) {
-    builder.setMaxTaskRetries(maxTaskRetries);
-    return self();
-  }
-
-  /**
    * Set the max number of concurrent calls to allow for this actor.
    *
-   * <p>The maximum concurrency defaults to 1 for threaded execution. Note that the execution order
-   * is not guaranteed when {@code max_concurrency > 1}.
+   * <p>The max concurrency defaults to 1 for threaded execution. Note that the execution order is
+   * not guaranteed when {@code max_concurrency > 1}.
    *
-   * @param maxConcurrency The maximum number of concurrent calls to allow for this actor.
+   * @param maxConcurrency The max number of concurrent calls to allow for this actor.
    * @return self
    * @see ActorCreationOptions.Builder#setMaxConcurrency(int)
    */
   public T setMaxConcurrency(int maxConcurrency) {
     builder.setMaxConcurrency(maxConcurrency);
-    return self();
-  }
-
-  /**
-   * Set the max number of pending calls allowed on the actor handle. When this value is exceeded,
-   * ray.exceptions.PendingCallsLimitExceededException will be thrown for further tasks. Note that
-   * this limit is counted per handle. -1 means that the number of pending calls is unlimited.
-   *
-   * @param maxPendingCalls The maximum number of pending calls for this actor.
-   * @return self
-   */
-  public T setMaxPendingCalls(int maxPendingCalls) {
-    builder.setMaxPendingCalls(maxPendingCalls);
     return self();
   }
 
@@ -142,14 +121,86 @@ public class BaseActorCreator<T extends BaseActorCreator> {
   }
 
   /**
-   * Set the placement group to place this actor in, which may use any available bundle.
+   * If enabled, tasks of this actor will fail immediately when the actor is temporarily
+   * unavailable. E.g., when there is a network issue, or when the actor is restarting.
    *
-   * @param group The placement group of the actor.
-   * @return self
-   * @see ActorCreationOptions.Builder#setPlacementGroup(PlacementGroup, int)
+   * @param enabled Whether to enable this option.
+   * @return self.
+   * @see ActorCreationOptions.Builder#setEnableTaskFastFail(boolean)
    */
-  public T setPlacementGroup(PlacementGroup group) {
-    return setPlacementGroup(group, -1);
+  public T setEnableTaskFastFail(boolean enabled) {
+    builder.setEnableTaskFastFail(enabled);
+    return self();
+  }
+
+  /**
+   * Set several extended key-value information to this actor, and these fields will be stored into
+   * GCS eventually.
+   *
+   * @param extendedProperties customer extended information.
+   * @return self
+   */
+  public T setExtendedProperties(Map<String, String> extendedProperties) {
+    builder.setExtendedProperties(extendedProperties);
+    return self();
+  }
+
+  public T setExtendedProperties(String key, String value) {
+    builder.setExtendedProperties(key, value);
+    return self();
+  }
+
+  /**
+   * Set a key-value label.
+   *
+   * <p>This interface can be called multiple times. The value of the same key will be overwritten
+   * by the latest one.
+   *
+   * @param key the key of label.
+   * @param value the value of label.
+   * @return self
+   */
+  public T setLabel(String key, String value) {
+    builder.setLabel(key, value);
+    return self();
+  }
+
+  /**
+   * Set batch key-value labels.
+   *
+   * <p>This interface can be called multiple times. The value of the same key will be overwritten
+   * by the latest one.
+   *
+   * @param labels A map that collects multiple labels.
+   * @return self
+   */
+  public T setLabels(Map<String, String> labels) {
+    builder.setLabels(labels);
+    return self();
+  }
+
+  /**
+   * Set scheduling strategy.
+   *
+   * <p>The placement group and scheduling strategy can't be set at the same time.
+   *
+   * @param schedulingStrategy a specific scheduling strategy.
+   * @return self
+   */
+  public T setSchedulingStrategy(SchedulingStrategy schedulingStrategy) {
+    builder.setSchedulingStrategy(schedulingStrategy);
+    return self();
+  }
+
+  /**
+   * Set actor creation options.
+   *
+   * <p>Other setter options won't take effect when is method is called.
+   */
+  @Deprecated
+  public T setOptions(ActorCreationOptions options) {
+    creationOptions = options;
+    return self();
   }
 
   @SuppressWarnings("unchecked")
@@ -158,6 +209,6 @@ public class BaseActorCreator<T extends BaseActorCreator> {
   }
 
   protected ActorCreationOptions buildOptions() {
-    return builder.build();
+    return creationOptions != null ? creationOptions : builder.build();
   }
 }

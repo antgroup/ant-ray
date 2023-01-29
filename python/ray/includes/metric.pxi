@@ -5,7 +5,12 @@ from ray.includes.metric cimport (
     CTagKey,
     CSum,
     CMetric,
+    make_pair,
 )
+
+from ray.includes.metric cimport Start as CStart
+from ray.includes.metric cimport Shutdown as CShutdown
+
 from libcpp.memory cimport unique_ptr
 from libcpp.string cimport string as c_string
 from libcpp.unordered_map cimport unordered_map
@@ -213,3 +218,21 @@ cdef class Histogram(Metric):
                 self.c_tag_keys
             )
         )
+
+
+def stats_start(global_tags={},
+                metrics_agent_port=0,
+                config_list='',
+                callback_shutdown=True,
+                init_log=True,
+                app_name=''):
+    cdef c_vector[c_pair[CTagKey, c_string]] tags
+    for k, v in global_tags.items():
+        tags.push_back(make_pair(CTagKey.Register(k.encode('ascii')),
+                       <c_string>v.encode('ascii')))
+    CStart(tags, metrics_agent_port, config_list.encode("ascii"),
+           callback_shutdown, init_log, app_name)
+
+
+def stats_shutdown():
+    CShutdown()

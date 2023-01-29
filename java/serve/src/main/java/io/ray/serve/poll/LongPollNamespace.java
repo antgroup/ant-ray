@@ -1,20 +1,20 @@
 package io.ray.serve.poll;
 
+import io.ray.serve.RayServeException;
 import org.apache.commons.lang3.StringUtils;
 
 /** The long poll namespace enum. */
 public enum LongPollNamespace {
-  RUNNING_REPLICAS,
+  REPLICA_HANDLES,
 
   ROUTE_TABLE;
 
   public static LongPollNamespace parseFrom(String key) {
-    for (LongPollNamespace namespace : LongPollNamespace.values()) {
-      if (StringUtils.equals(key, namespace.name())) {
-        return namespace;
-      }
+    String[] namespaces = StringUtils.split(key, ".");
+    if (namespaces.length != 2) {
+      throw new RayServeException("Illegal KeyType string: " + key);
     }
-    return null;
+    return valueOf(namespaces[1].trim());
   }
 
   @Override

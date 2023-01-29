@@ -1,6 +1,5 @@
 package io.ray.runtime.util;
 
-import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,35 +43,41 @@ public class BinaryFileUtil {
       } else {
         throw new UnsupportedOperationException("Unsupported os " + SystemUtils.OS_NAME);
       }
-      /// File doesn't exist. Create a temp file and then rename it.
-      final String tempFilePath = String.format("%s/%s.tmp", destDir, fileName);
-      // Adding a temporary file here is used to fix the issue that when
-      // a java worker crashes during extracting dynamic library file, next
-      // java worker will use an incomplete file. The issue link is:
-      //
-      // https://github.com/ray-project/ray/issues/19341
-      File tempFile = new File(tempFilePath);
-
       String resourcePath = resourceDir + fileName;
       File destFile = new File(String.format("%s/%s", destDir, fileName));
       if (destFile.exists()) {
         return destFile;
       }
 
-      // File does not exist.
-      try (InputStream is = BinaryFileUtil.class.getResourceAsStream("/" + resourcePath)) {
-        Preconditions.checkNotNull(is, "{} doesn't exist.", resourcePath);
-        Files.copy(is, Paths.get(tempFile.getCanonicalPath()), StandardCopyOption.REPLACE_EXISTING);
-        if (!tempFile.renameTo(destFile)) {
-          throw new RuntimeException(
-              String.format(
-                  "Couldn't rename temp file(%s) to %s",
-                  tempFile.getAbsolutePath(), destFile.getAbsolutePath()));
+      /// File doesn't exist. Create a temp file and then rename it.
+      final String tempFilePath = String.format("%s/%s.tmp", destDir, fileName);
+      // Adding a temporary file here is used to fix the issue that when
+      // a java worker crashes during extracting dynamic library file, next
+      // java worker will use an incomplete file. The issue link is:
+      //
+      // https://aone.alipay.com/issue/36836313?spm=a2o8d.corp_prod_issue_list.0.0.3b513e1axAelvM&stat=1.5.6&toPage=1&versionId=1969445
+      File tempFile = new File(tempFilePath);
+      for (ClassLoader classLoader :
+          new ClassLoader[] {
+            Thread.currentThread().getContextClassLoader(), BinaryFileUtil.class.getClassLoader()
+          }) {
+        try (InputStream is = classLoader.getResourceAsStream(resourcePath)) {
+          if (is != null) {
+            Files.copy(
+                is, Paths.get(tempFile.getCanonicalPath()), StandardCopyOption.REPLACE_EXISTING);
+            if (!tempFile.renameTo(destFile)) {
+              throw new RuntimeException(
+                  String.format(
+                      "Couldn't rename temp file(%s) to %s",
+                      tempFile.getAbsolutePath(), destFile.getAbsolutePath()));
+            }
+            return destFile;
+          }
+        } catch (IOException e) {
+          throw new RuntimeException("Couldn't get temp file from resource " + fileName, e);
         }
-        return destFile;
-      } catch (IOException e) {
-        throw new RuntimeException("Couldn't get temp file from resource " + resourcePath, e);
       }
+      throw new IllegalArgumentException(String.format("%s doesn't exist", fileName));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

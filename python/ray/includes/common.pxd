@@ -2,13 +2,11 @@ from libcpp cimport bool as c_bool
 from libcpp.memory cimport shared_ptr, unique_ptr
 from libcpp.string cimport string as c_string
 
-from libc.stdint cimport uint8_t, int32_t, uint64_t, int64_t, uint32_t
+from libc.stdint cimport uint8_t, int32_t, uint64_t, int64_t
 from libcpp.unordered_map cimport unordered_map
 from libcpp.vector cimport vector as c_vector
 from libcpp.pair cimport pair as c_pair
-from ray.includes.optional cimport (
-    optional,
-)
+
 from ray.includes.unique_ids cimport (
     CActorID,
     CJobID,
@@ -16,14 +14,13 @@ from ray.includes.unique_ids cimport (
     CObjectID,
     CTaskID,
     CPlacementGroupID,
-    CNodeID,
 )
 from ray.includes.function_descriptor cimport (
     CFunctionDescriptor,
 )
 
 
-cdef extern from * namespace "polyfill" nogil:
+cdef extern from * namespace "polyfill":
     """
     namespace polyfill {
 
@@ -88,13 +85,13 @@ cdef extern from "ray/common/status.h" namespace "ray" nogil:
         CRayStatus Interrupted(const c_string &msg)
 
         @staticmethod
-        CRayStatus IntentionalSystemExit(const c_string &msg)
+        CRayStatus IntentionalSystemExit()
 
         @staticmethod
-        CRayStatus UnexpectedSystemExit(const c_string &msg)
+        CRayStatus UnexpectedSystemExit()
 
         @staticmethod
-        CRayStatus CreationTaskError(const c_string &msg)
+        CRayStatus CreationTaskError()
 
         @staticmethod
         CRayStatus NotFound()
@@ -108,7 +105,6 @@ cdef extern from "ray/common/status.h" namespace "ray" nogil:
         c_bool IsUnknownError()
         c_bool IsNotImplemented()
         c_bool IsObjectStoreFull()
-        c_bool IsOutOfDisk()
         c_bool IsRedisError()
         c_bool IsTimedOut()
         c_bool IsInterrupted()
@@ -147,11 +143,13 @@ cdef extern from "ray/common/id.h" namespace "ray" nogil:
 cdef extern from "src/ray/protobuf/common.pb.h" nogil:
     cdef cppclass CLanguage "Language":
         pass
-    cdef cppclass CWorkerType "ray::core::WorkerType":
+    cdef cppclass CWorkerType "ray::WorkerType":
         pass
     cdef cppclass CTaskType "ray::TaskType":
         pass
-    cdef cppclass CPlacementStrategy "ray::core::PlacementStrategy":
+    cdef cppclass CPlacementStrategy "ray::PlacementStrategy":
+        pass
+    cdef cppclass CActorAffinityOperator "ray::rpc::ActorAffinityOperator":
         pass
     cdef cppclass CDefaultSchedulingStrategy "ray::rpc::DefaultSchedulingStrategy":  # noqa: E501
         CDefaultSchedulingStrategy()
@@ -163,27 +161,32 @@ cdef extern from "src/ray/protobuf/common.pb.h" nogil:
         void set_placement_group_bundle_index(int64_t placement_group_bundle_index)  # noqa: E501
         void set_placement_group_capture_child_tasks(c_bool placement_group_capture_child_tasks)  # noqa: E501
     cdef cppclass CNodeAffinitySchedulingStrategy "ray::rpc::NodeAffinitySchedulingStrategy":  # noqa: E501
-        CNodeAffinitySchedulingStrategy()
-        void set_node_id(const c_string& node_id)
+        void add_nodes(const c_string &c_node)
         void set_soft(c_bool soft)
+        void set_anti_affinity(c_bool anti_affinity)
+
     cdef cppclass CSchedulingStrategy "ray::rpc::SchedulingStrategy":
         CSchedulingStrategy()
         void clear_scheduling_strategy()
         CSpreadSchedulingStrategy* mutable_spread_scheduling_strategy()
         CDefaultSchedulingStrategy* mutable_default_scheduling_strategy()
         CPlacementGroupSchedulingStrategy* mutable_placement_group_scheduling_strategy()  # noqa: E501
-        CNodeAffinitySchedulingStrategy* mutable_node_affinity_scheduling_strategy()
+        CNodeAffinitySchedulingStrategy* mutable_node_affinity_scheduling_strategy()  # noqa: E501
+        CActorAffinitySchedulingStrategy* mutable_actor_affinity_scheduling_strategy()  # noqa: E501
     cdef cppclass CAddress "ray::rpc::Address":
         CAddress()
-        const c_string &SerializeAsString() const
+        const c_string &SerializeAsString()
         void ParseFromString(const c_string &serialized)
         void CopyFrom(const CAddress& address)
         const c_string &worker_id()
-    cdef cppclass CObjectReference "ray::rpc::ObjectReference":
-        CObjectReference()
-        CAddress owner_address() const
-        const c_string &object_id() const
-        const c_string &call_site() const
+    cdef cppclass CActorAffinityMatchExpression "ray::rpc::ActorAffinityMatchExpression":  # noqa: E501
+        void set_key(const c_string &key)
+        void set_actor_affinity_operator(const CActorAffinityOperator &operator)  # noqa: E501
+        void add_values(const c_string &c_values)
+        void set_soft(c_bool soft)
+    cdef cppclass CActorAffinitySchedulingStrategy "ray::rpc::ActorAffinitySchedulingStrategy":  # noqa: E501
+        CActorAffinityMatchExpression* add_match_expressions()
+
 
 # This is a workaround for C++ enum class since Cython has no corresponding
 # representation.
@@ -193,11 +196,11 @@ cdef extern from "src/ray/protobuf/common.pb.h" nogil:
     cdef CLanguage LANGUAGE_JAVA "Language::JAVA"
 
 cdef extern from "src/ray/protobuf/common.pb.h" nogil:
-    cdef CWorkerType WORKER_TYPE_WORKER "ray::core::WorkerType::WORKER"
-    cdef CWorkerType WORKER_TYPE_DRIVER "ray::core::WorkerType::DRIVER"
-    cdef CWorkerType WORKER_TYPE_SPILL_WORKER "ray::core::WorkerType::SPILL_WORKER"  # noqa: E501
-    cdef CWorkerType WORKER_TYPE_RESTORE_WORKER "ray::core::WorkerType::RESTORE_WORKER"  # noqa: E501
-    cdef CWorkerType WORKER_TYPE_UTIL_WORKER "ray::core::WorkerType::UTIL_WORKER"  # noqa: E501
+    cdef CWorkerType WORKER_TYPE_WORKER "ray::WorkerType::WORKER"
+    cdef CWorkerType WORKER_TYPE_DRIVER "ray::WorkerType::DRIVER"
+    cdef CWorkerType WORKER_TYPE_SPILL_WORKER "ray::WorkerType::SPILL_WORKER"
+    cdef CWorkerType WORKER_TYPE_RESTORE_WORKER "ray::WorkerType::RESTORE_WORKER"  # noqa: E501
+    cdef CWorkerType WORKER_TYPE_UTIL_WORKER "ray::WorkerType::UTIL_WORKER"  # noqa: E501
 
 cdef extern from "src/ray/protobuf/common.pb.h" nogil:
     cdef CTaskType TASK_TYPE_NORMAL_TASK "ray::TaskType::NORMAL_TASK"
@@ -206,19 +209,39 @@ cdef extern from "src/ray/protobuf/common.pb.h" nogil:
 
 cdef extern from "src/ray/protobuf/common.pb.h" nogil:
     cdef CPlacementStrategy PLACEMENT_STRATEGY_PACK \
-        "ray::core::PlacementStrategy::PACK"
+        "ray::PlacementStrategy::PACK"
     cdef CPlacementStrategy PLACEMENT_STRATEGY_SPREAD \
-        "ray::core::PlacementStrategy::SPREAD"
+        "ray::PlacementStrategy::SPREAD"
     cdef CPlacementStrategy PLACEMENT_STRATEGY_STRICT_PACK \
-        "ray::core::PlacementStrategy::STRICT_PACK"
+        "ray::PlacementStrategy::STRICT_PACK"
     cdef CPlacementStrategy PLACEMENT_STRATEGY_STRICT_SPREAD \
-        "ray::core::PlacementStrategy::STRICT_SPREAD"
+        "ray::PlacementStrategy::STRICT_SPREAD"
+
+cdef extern from "ray/common/task/scheduling_resources.h" nogil:
+    cdef cppclass ResourceSet "ray::ResourceSet":
+        ResourceSet()
+        ResourceSet(const unordered_map[c_string, double] &resource_map)
+        ResourceSet(const c_vector[c_string] &resource_labels,
+                    const c_vector[double] resource_capacity)
+        c_bool operator==(const ResourceSet &rhs) const
+        c_bool IsEqual(const ResourceSet &other) const
+        c_bool IsSubset(const ResourceSet &other) const
+        c_bool IsSuperset(const ResourceSet &other) const
+        c_bool AddOrUpdateResource(const c_string &resource_name,
+                                   double capacity)
+        c_bool RemoveResource(const c_string &resource_name)
+        void AddResources(const ResourceSet &other)
+        c_bool SubtractResourcesStrict(const ResourceSet &other)
+        c_bool GetResource(const c_string &resource_name, double *value) const
+        double GetNumCpus() const
+        c_bool IsEmpty() const
+        const unordered_map[c_string, double] &GetResourceMap() const
+        const c_string ToString() const
 
 cdef extern from "ray/common/buffer.h" namespace "ray" nogil:
     cdef cppclass CBuffer "ray::Buffer":
         uint8_t *Data() const
         size_t Size() const
-        c_bool IsPlasmaBuffer() const
 
     cdef cppclass LocalMemoryBuffer(CBuffer):
         LocalMemoryBuffer(uint8_t *data, size_t size, c_bool copy_data)
@@ -228,7 +251,7 @@ cdef extern from "ray/common/ray_object.h" nogil:
     cdef cppclass CRayObject "ray::RayObject":
         CRayObject(const shared_ptr[CBuffer] &data,
                    const shared_ptr[CBuffer] &metadata,
-                   const c_vector[CObjectReference] &nested_refs)
+                   const c_vector[CObjectID] &nested_ids)
         c_bool HasData() const
         c_bool HasMetadata() const
         const size_t DataSize() const
@@ -237,7 +260,7 @@ cdef extern from "ray/common/ray_object.h" nogil:
         c_bool IsInPlasmaError() const
 
 cdef extern from "ray/core_worker/common.h" nogil:
-    cdef cppclass CRayFunction "ray::core::RayFunction":
+    cdef cppclass CRayFunction "ray::RayFunction":
         CRayFunction()
         CRayFunction(CLanguage language,
                      const CFunctionDescriptor &function_descriptor)
@@ -249,23 +272,22 @@ cdef extern from "ray/core_worker/common.h" nogil:
 
     cdef cppclass CTaskArgByReference "ray::TaskArgByReference":
         CTaskArgByReference(const CObjectID &object_id,
-                            const CAddress &owner_address,
-                            const c_string &call_site)
+                            const CAddress &owner_address)
 
     cdef cppclass CTaskArgByValue "ray::TaskArgByValue":
         CTaskArgByValue(const shared_ptr[CRayObject] &data)
 
-    cdef cppclass CTaskOptions "ray::core::TaskOptions":
+    cdef cppclass CTaskOptions "ray::TaskOptions":
         CTaskOptions()
         CTaskOptions(c_string name, int num_returns,
-                     unordered_map[c_string, double] &resources,
-                     c_string concurrency_group_name)
+                     unordered_map[c_string, double] &resources)
         CTaskOptions(c_string name, int num_returns,
                      unordered_map[c_string, double] &resources,
-                     c_string concurrency_group_name,
-                     c_string serialized_runtime_env)
+                     c_string serialized_runtime_env,
+                     const unordered_map[c_string, c_string]
+                     &override_environment_variables)
 
-    cdef cppclass CActorCreationOptions "ray::core::ActorCreationOptions":
+    cdef cppclass CActorCreationOptions "ray::ActorCreationOptions":
         CActorCreationOptions()
         CActorCreationOptions(
             int64_t max_restarts,
@@ -274,48 +296,46 @@ cdef extern from "ray/core_worker/common.h" nogil:
             const unordered_map[c_string, double] &resources,
             const unordered_map[c_string, double] &placement_resources,
             const c_vector[c_string] &dynamic_worker_options,
-            optional[c_bool] is_detached, c_string &name, c_string &ray_namespace,
+            shared_ptr[c_bool] is_detached, c_string &name,
+            c_string &ray_namespace,
             c_bool is_asyncio,
             const CSchedulingStrategy &scheduling_strategy,
             c_string serialized_runtime_env,
-            const c_vector[CConcurrencyGroup] &concurrency_groups,
-            c_bool execute_out_of_order,
-            int32_t max_pending_calls)
+            const unordered_map[c_string, c_string]
+            &override_environment_variables,
+            c_bool enable_task_fast_fail,
+            const unordered_map[c_string, c_string] &labels)
 
     cdef cppclass CPlacementGroupCreationOptions \
-            "ray::core::PlacementGroupCreationOptions":
+            "ray::PlacementGroupCreationOptions":
         CPlacementGroupCreationOptions()
         CPlacementGroupCreationOptions(
             const c_string &name,
             CPlacementStrategy strategy,
             const c_vector[unordered_map[c_string, double]] &bundles,
-            c_bool is_detached,
-            double max_cpu_fraction_per_node
+            c_bool is_detached
         )
 
-    cdef cppclass CObjectLocation "ray::core::ObjectLocation":
-        const CNodeID &GetPrimaryNodeID() const
-        const uint64_t GetObjectSize() const
-        const c_vector[CNodeID] &GetNodeIDs() const
-        c_bool IsSpilled() const
-        const c_string &GetSpilledURL() const
-        const CNodeID &GetSpilledNodeID() const
-
-cdef extern from "ray/gcs/gcs_client/gcs_client.h" nogil:
+cdef extern from "ray/gcs/gcs_client.h" nogil:
     cdef cppclass CGcsClientOptions "ray::gcs::GcsClientOptions":
-        CGcsClientOptions(const c_string &gcs_address)
+        CGcsClientOptions(const c_string &ip, int port,
+                          const c_string &password)
 
 cdef extern from "src/ray/protobuf/gcs.pb.h" nogil:
     cdef cppclass CJobConfig "ray::rpc::JobConfig":
         const c_string &SerializeAsString()
 
-cdef extern from "ray/common/task/task_spec.h" nogil:
-    cdef cppclass CConcurrencyGroup "ray::ConcurrencyGroup":
-        CConcurrencyGroup(
-            const c_string &name,
-            uint32_t max_concurrency,
-            const c_vector[CFunctionDescriptor] &c_fds)
-        CConcurrencyGroup()
-        c_string GetName() const
-        uint32_t GetMaxConcurrency() const
-        c_vector[CFunctionDescriptor] GetFunctionDescriptors() const
+cdef extern from "ray/event/event.h" namespace "ray" nogil:
+    cdef cppclass CRayEvent "ray::RayEvent":
+        @staticmethod
+        void ReportEvent(c_string severity, c_string label, c_string message)
+
+cdef extern from "src/ray/protobuf/common.pb.h" nogil:
+    cdef CActorAffinityOperator ACTOR_AFFINITY_OPERATOR_IN \
+        "ray::rpc::ActorAffinityOperator::IN"
+    cdef CActorAffinityOperator ACTOR_AFFINITY_OPERATOR_NOT_IN \
+        "ray::rpc::ActorAffinityOperator::NOT_IN"
+    cdef CActorAffinityOperator ACTOR_AFFINITY_OPERATOR_EXISTS \
+        "ray::rpc::ActorAffinityOperator::EXISTS"
+    cdef CActorAffinityOperator ACTOR_AFFINITY_OPERATOR_DOES_NOT_EXIST \
+        "ray::rpc::ActorAffinityOperator::DOES_NOT_EXIST"

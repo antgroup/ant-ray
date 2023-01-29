@@ -1,0 +1,22 @@
+diff --git example/build_with_bazel/brpc_workspace.bzl example/build_with_bazel/brpc_workspace.bzl
+index 7a0ef40..c1b9d39 100644
+--- example/build_with_bazel/brpc_workspace.bzl
++++ example/build_with_bazel/brpc_workspace.bzl
+@@ -74,11 +74,12 @@ def brpc_workspace():
+         ],
+     )
+ 
+-    native.new_local_repository(
+-        name = "openssl",
+-        path = "/usr",
+-        build_file = "//:openssl.BUILD",
+-    )
++    if "openssl" not in native.existing_rules():
++        native.new_local_repository(
++            name = "openssl",
++            path = "/usr",
++            build_file = "//:openssl.BUILD",
++        )
+ 
+     http_archive(
+         name = "com_github_gflags_gflags",

@@ -1,50 +1,39 @@
-load("@bazel_skylib//lib:paths.bzl", "paths")
-
 # py_test_module_list creates a py_test target for each
 # Python file in `files`
-
-def py_test_module_list(files, size, deps, extra_srcs=[], name_suffix="", **kwargs):
+def py_test_module_list(files, size, deps, extra_srcs, name_suffix="", **kwargs):
     for file in files:
+        if file in skiplist:
+            continue
         # remove .py
-        name = paths.split_extension(file)[0] + name_suffix
-        if name == file:
-            basename = basename + "_test"
+        name = file[:-3] + name_suffix
+        main = file
         native.py_test(
             name = name,
             size = size,
             main = file,
             srcs = extra_srcs + [file],
-            deps = deps,
             **kwargs
         )
 
 def py_test_run_all_subdirectory(include, exclude, extra_srcs, **kwargs):
-    for file in native.glob(include = include, exclude = exclude, allow_empty=False):
+    for file in native.glob(include = include, exclude = exclude):
         print(file)
-        basename = paths.split_extension(file)[0]
-        if basename == file:
-            basename = basename + "_test"
+        basename = file.rpartition("/")[-1]
         native.py_test(
-            name = basename,
+            name = basename[:-3],
             srcs = extra_srcs + [file],
             **kwargs
         )
 
-# Runs all included notebooks as py_test targets, by first converting them to .py files with "test_myst_doc.py".
-def py_test_run_all_notebooks(include, exclude, allow_empty=False, **kwargs):
-    for file in native.glob(include = include, exclude = exclude, allow_empty=allow_empty):
-        print(file)
-        basename = paths.split_extension(file)[0]
-        if basename == file:
-            basename = basename + "_test"
-        native.py_test(
-            name = basename,
-            main = "test_myst_doc.py",
-            srcs = ["//doc:test_myst_doc.py"],
-            # --find-recursively will look for file in all
-            # directories inside cwd recursively if it cannot
-            # find it right away. This allows to deal with
-            # mismatches between `name` and `data` args.
-            args = ["--find-recursively", "--path", file],
-            **kwargs
-        )
+
+# === ANT-INTERNAL below ===
+
+# Skip these test filess in internal code base.
+# Because they require heavy depdencies.
+# Note:
+# 1) this only works for "bazel test", not "Pytest".
+# 2) we can't skip them in "pytest_collection_modifyitems",
+#    because that requires installing the dependencies as well.
+
+skiplist = [
+]

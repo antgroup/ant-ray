@@ -17,13 +17,66 @@
 #include <gtest/gtest_prod.h>
 
 #include "absl/container/flat_hash_map.h"
-#include "ray/core_worker/actor_creator.h"
 #include "ray/core_worker/actor_handle.h"
 #include "ray/core_worker/reference_count.h"
+#include "ray/core_worker/shared_actor_info_accessor.h"
 #include "ray/core_worker/transport/direct_actor_transport.h"
-#include "ray/gcs/gcs_client/gcs_client.h"
+#include "ray/gcs/gcs_client.h"
+
 namespace ray {
-namespace core {
+
+class ActorCreatorInterface {
+ public:
+  virtual ~ActorCreatorInterface() = default;
+  /// Register actor to GCS synchronously.
+  ///
+  /// \param task_spec The specification for the actor creation task.
+  /// \return Status
+  virtual Status RegisterActor(const TaskSpecification &task_spec) = 0;
+
+  /// Asynchronously request GCS to create the actor.
+  ///
+  /// \param task_spec The specification for the actor creation task.
+  /// \param callback Callback that will be called after the actor info is written to GCS.
+  /// \return Status
+  virtual Status AsyncCreateActor(
+      const TaskSpecification &task_spec,
+      const rpc::ClientCallback<rpc::CreateActorReply> &callback) = 0;
+};
+
+class DefaultActorCreator : public ActorCreatorInterface {
+ public:
+  explicit DefaultActorCreator(std::shared_ptr<gcs::GcsClient> gcs_client)
+      : gcs_client_(std::move(gcs_client)) {}
+
+  Status RegisterActor(const TaskSpecification &task_spec) override {
+    auto promise = std::make_shared<std::promise<void>>();
+    auto status = gcs_client_->Actors().AsyncRegisterActor(
+        task_spec, [promise](const Status &status) { promise->set_value(); });
+    if (status.ok() &&
+        promise->get_future().wait_for(std::chrono::seconds(
+            ::RayConfig::instance().gcs_server_request_timeout_seconds())) !=
+            std::future_status::ready) {
+      std::ostringstream stream;
+      stream << "There was timeout("
+             << RayConfig::instance().gcs_server_request_timeout_seconds()
+             << " s) in registering actor " << task_spec.ActorCreationId()
+             << ". It is probably because GCS server is dead or there's a high load "
+                "there or some network problems.";
+      return Status::TimedOut(stream.str());
+    }
+    return status;
+  }
+
+  Status AsyncCreateActor(
+      const TaskSpecification &task_spec,
+      const rpc::ClientCallback<rpc::CreateActorReply> &callback) override {
+    return gcs_client_->Actors().AsyncCreateActor(task_spec, callback);
+  }
+
+ private:
+  std::shared_ptr<gcs::GcsClient> gcs_client_;
+};
 
 /// Class to manage lifetimes of actors that we create (actor children).
 /// Currently this class is only used to publish actor DEAD event
@@ -32,12 +85,15 @@ namespace core {
 class ActorManager {
  public:
   explicit ActorManager(
-      std::shared_ptr<gcs::GcsClient> gcs_client,
+      const WorkerID worker_id, std::shared_ptr<gcs::GcsClient> gcs_client,
       std::shared_ptr<CoreWorkerDirectActorTaskSubmitterInterface> direct_actor_submitter,
-      std::shared_ptr<ReferenceCounterInterface> reference_counter)
-      : gcs_client_(gcs_client),
+      std::shared_ptr<ReferenceCounterInterface> reference_counter,
+      std::shared_ptr<SharedActorInfoAccessor> shared_actor_info_accessor)
+      : worker_id_(worker_id),
+        gcs_client_(gcs_client),
         direct_actor_submitter_(direct_actor_submitter),
-        reference_counter_(reference_counter) {}
+        reference_counter_(reference_counter),
+        shared_actor_info_accessor_(shared_actor_info_accessor) {}
 
   ~ActorManager() = default;
 
@@ -59,8 +115,7 @@ class ActorManager {
   ActorID RegisterActorHandle(std::unique_ptr<ActorHandle> actor_handle,
                               const ObjectID &outer_object_id,
                               const std::string &call_site,
-                              const rpc::Address &caller_address,
-                              bool is_self = false);
+                              const rpc::Address &caller_address, bool is_self = false);
 
   /// Get a handle to an actor.
   ///
@@ -74,15 +129,12 @@ class ActorManager {
   /// local cache in next call.
   ///
   /// \param[in] name The actor name.
-  /// \param[in] ray_namespace Namespace that actor belongs to.
   /// \param[in] call_site The caller's site.
   /// \param[in] caller_address The rpc address of the calling task.
   /// \return KV pair of actor handle pointer and status.
   std::pair<std::shared_ptr<const ActorHandle>, Status> GetNamedActorHandle(
-      const std::string &name,
-      const std::string &ray_namespace,
-      const std::string &call_site,
-      const rpc::Address &caller_address);
+      const std::string &name, const std::string &ray_namespace,
+      const std::string &call_site, const rpc::Address &caller_address);
 
   /// Check if an actor handle that corresponds to an actor_id exists.
   /// \param[in] actor_id The actor id of a handle.
@@ -102,11 +154,10 @@ class ActorManager {
   /// \param actor_handle The handle to the actor.
   /// \param[in] call_site The caller's site.
   /// \param[in] is_detached Whether or not the actor of a handle is detached (named)
-  /// actor. \return True if the handle was added and False if we already had a handle to
-  /// the same actor.
+  /// actor. \return True if the handle was added and False if we already had a handle
+  /// to the same actor.
   bool AddNewActorHandle(std::unique_ptr<ActorHandle> actor_handle,
-                         const std::string &call_site,
-                         const rpc::Address &caller_address,
+                         const std::string &call_site, const rpc::Address &caller_address,
                          bool is_detached);
 
   /// Wait for actor out of scope.
@@ -151,10 +202,8 @@ class ActorManager {
   /// \return True if the handle was added and False if we already had a handle
   /// to the same actor.
   bool AddActorHandle(std::unique_ptr<ActorHandle> actor_handle,
-                      const std::string &call_site,
-                      const rpc::Address &caller_address,
-                      const ActorID &actor_id,
-                      const ObjectID &actor_creation_return_id,
+                      const std::string &call_site, const rpc::Address &caller_address,
+                      const ActorID &actor_id, const ObjectID &actor_creation_return_id,
                       bool is_self = false);
 
   /// Check if named actor is cached locally.
@@ -178,6 +227,8 @@ class ActorManager {
   /// Check if actor is valid.
   bool IsActorKilledOrOutOfScope(const ActorID &actor_id) const;
 
+  const WorkerID worker_id_;
+
   /// GCS client.
   std::shared_ptr<gcs::GcsClient> gcs_client_;
 
@@ -187,6 +238,9 @@ class ActorManager {
   /// Used to keep track of actor handle reference counts.
   /// All actor handle related ref counting logic should be included here.
   std::shared_ptr<ReferenceCounterInterface> reference_counter_;
+
+  // The shared actor info accessor to avoid duplicate subscriptions.
+  std::shared_ptr<SharedActorInfoAccessor> shared_actor_info_accessor_;
 
   mutable absl::Mutex mutex_;
 
@@ -205,11 +259,11 @@ class ActorManager {
 
   /// id -> is_killed_or_out_of_scope
   /// The state of actor is true When the actor is out of scope or is killed
-  absl::flat_hash_map<ActorID, bool> subscribed_actors_ GUARDED_BY(cache_mutex_);
+  absl::flat_hash_map<ActorID, std::pair<bool, absl::flat_hash_set<WorkerID>>>
+      subscribed_actors_ GUARDED_BY(cache_mutex_);
 
   FRIEND_TEST(ActorManagerTest, TestNamedActorIsKilledAfterSubscribeFinished);
   FRIEND_TEST(ActorManagerTest, TestNamedActorIsKilledBeforeSubscribeFinished);
 };
 
-}  // namespace core
 }  // namespace ray

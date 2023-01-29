@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package ray.streaming.proto;
+
+option java_package = "com.alipay.streaming.runtime.generated";
+
+enum Language {
+  JAVA = 0;
+  PYTHON = 1;
+}
+
+enum NodeType {
+  UNKNOWN = 0;
+  // Sources are where your program reads its input from
+  SOURCE = 1;
+  // Transform one or more DataStreams into a new DataStream.
+  TRANSFORM = 2;
+  // Sinks consume DataStreams and forward them to files, sockets, external
+  // systems, or print them.
+  SINK = 3;
+}
+
+// Average updater is dynamic updating.
+enum StepUpdater {
+  DEFAULT = 0;
+  AVERAGE = 1;
+}
+
+enum ReliabilityLevel {
+  NONE = 0;
+  AT_LEAST_ONCE = 1;
+  EXACTLY_ONCE = 2;
+  EXACTLY_SAME = 3;
+}
+
+enum QueueCreationType {
+  RECREATE = 0;
+  RECONSTRUCT = 1;
+  RECREATE_AND_CLEAR = 2;
+}
+
+enum TransferQueueType {
+  STREAMING_QUEUE = 0;
+  MOCK_QUEUE = 1;
+}
+
+enum FlowControlType {
+  UNCONSUMED_MESSAGE = 0;
+  UNCONSUMED_BYTES = 1;
+  // No flow control if it's CLOSE type.
+  CLOSE = 2;
+}
+
+message FlowControlConfig {
+  FlowControlType flow_control_type = 1;
+  uint32 writer_consumed_step = 2;
+  uint32 reader_consumed_step = 3;
+  StepUpdater reader_step_updater = 4;
+  uint32 flow_control_seq_id_scale = 5;
+}
+
+message ElasticBufferConfig {
+  uint32 flush_buffer_size = 1;
+  uint32 file_cache_size = 2;
+  string file_directory = 3;
+  uint32 max_save_buffer_size = 4;
+  uint32 max_file_num = 5;
+}
+
+message StreamingConfig {
+  ReliabilityLevel reliability_level = 1;
+  uint32 ring_buffer_capacity = 2;
+  uint32 empty_message_interval = 3;
+  uint32 reconstruct_objects_timeOut_per_mb = 4;
+  uint32 reconstruct_objects_retry_times = 5;
+  uint32 full_queue_time_interval = 6;
+  string persistence_path = 7;
+  string job_name = 8;
+  string log_path = 9;
+  int32 log_level = 10;
+  string op_name = 11;
+  FlowControlConfig flow_control_config = 12;
+  bool elastic_buffer_enable = 13;
+  ElasticBufferConfig elastic_buffer_config = 14;
+  string raylet_socket_path = 15;
+  string worker_name = 16;
+  string persistence_cluster_name = 17;
+  string ray_pipe_batch_interval = 18;
+  NodeType role = 19;
+  uint32 checkpoint_id = 20;
+  string job_id = 21;
+  string plasma_socket_path = 22;
+  uint32 buffer_pool_size = 23;
+  uint32 buffer_pool_min_buffer_size = 24;
+  TransferQueueType queue_type = 25;
+  bool http_profiler_enable = 26;
+  uint32 reader_round_robin_sleep_time_us = 27;
+  uint32 event_driven_flow_control_interval = 28;
+}

@@ -20,7 +20,6 @@
 using namespace std::placeholders;
 
 namespace ray {
-namespace core {
 
 /// A mock C++ worker used by core_worker_test.cc to verify the task submission/execution
 /// interfaces in both single node and cross-nodes scenarios. As the raylet client can
@@ -33,11 +32,8 @@ namespace core {
 /// for more details on how this class is used.
 class MockWorker {
  public:
-  MockWorker(const std::string &store_socket,
-             const std::string &raylet_socket,
-             int node_manager_port,
-             const gcs::GcsClientOptions &gcs_options,
-             StartupToken startup_token) {
+  MockWorker(const std::string &store_socket, const std::string &raylet_socket,
+             int node_manager_port, const gcs::GcsClientOptions &gcs_options) {
     CoreWorkerOptions options;
     options.worker_type = WorkerType::WORKER;
     options.language = Language::PYTHON;
@@ -49,61 +45,63 @@ class MockWorker {
     options.node_ip_address = "127.0.0.1";
     options.node_manager_port = node_manager_port;
     options.raylet_ip_address = "127.0.0.1";
-    options.task_execution_callback = std::bind(
-        &MockWorker::ExecuteTask, this, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11);
+    options.task_execution_callback =
+        std::bind(&MockWorker::ExecuteTask, this, _1, _2, _3, _4, _5, _6, _7, _8, _9);
+    options.ref_counting_enabled = true;
+    options.num_workers = 1;
     options.metrics_agent_port = -1;
-    options.startup_token = startup_token;
     CoreWorkerProcess::Initialize(options);
   }
 
   void RunTaskExecutionLoop() { CoreWorkerProcess::RunTaskExecutionLoop(); }
 
  private:
-  Status ExecuteTask(
-      const rpc::Address &caller_address,
-      TaskType task_type,
-      const std::string task_name,
-      const RayFunction &ray_function,
-      const std::unordered_map<std::string, double> &required_resources,
-      const std::vector<std::shared_ptr<RayObject>> &args,
-      const std::vector<rpc::ObjectReference> &arg_refs,
-      const std::string &debugger_breakpoint,
-      const std::string &serialized_retry_exception_allowlist,
-      std::vector<std::pair<ObjectID, std::shared_ptr<RayObject>>> *returns,
-      std::vector<std::pair<ObjectID, std::shared_ptr<RayObject>>> *dynamic_returns) {
+  Status ExecuteTask(TaskType task_type, const std::string task_name,
+                     const RayFunction &ray_function,
+                     const std::unordered_map<std::string, double> &required_resources,
+                     const std::vector<std::shared_ptr<RayObject>> &args,
+                     const std::vector<ObjectID> &arg_reference_ids,
+                     const std::vector<ObjectID> &return_ids,
+                     const std::string &debugger_breakpoint,
+                     std::vector<std::shared_ptr<RayObject>> *results) {
     // Note that this doesn't include dummy object id.
-    const FunctionDescriptor function_descriptor = ray_function.GetFunctionDescriptor();
+    const ray::FunctionDescriptor function_descriptor =
+        ray_function.GetFunctionDescriptor();
     RAY_CHECK(function_descriptor->Type() ==
-              FunctionDescriptorType::kPythonFunctionDescriptor);
-    auto typed_descriptor = function_descriptor->As<PythonFunctionDescriptor>();
+              ray::FunctionDescriptorType::kPythonFunctionDescriptor);
+    auto typed_descriptor = function_descriptor->As<ray::PythonFunctionDescriptor>();
 
     if ("actor creation task" == typed_descriptor->ModuleName()) {
       return Status::OK();
     } else if ("GetWorkerPid" == typed_descriptor->ModuleName()) {
-      // Save the pid of current process to the return object.
-      std::string pid_string = std::to_string(static_cast<int>(getpid()));
-      auto data =
-          const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(pid_string.data()));
-      auto memory_buffer =
-          std::make_shared<LocalMemoryBuffer>(data, pid_string.size(), true);
-      RAY_CHECK(returns->size() == 1);
-      (*returns)[0].second = std::make_shared<RayObject>(
-          memory_buffer, nullptr, std::vector<rpc::ObjectReference>());
-      return Status::OK();
+      // Get mock worker pid
+      return GetWorkerPid(results);
     } else if ("MergeInputArgsAsOutput" == typed_descriptor->ModuleName()) {
       // Merge input args and write the merged content to each of return ids
-      return MergeInputArgsAsOutput(args, returns);
+      return MergeInputArgsAsOutput(args, return_ids, results);
     } else if ("WhileTrueLoop" == typed_descriptor->ModuleName()) {
-      return WhileTrueLoop();
+      return WhileTrueLoop(args, return_ids, results);
     } else {
       return Status::TypeError("Unknown function descriptor: " +
                                typed_descriptor->ModuleName());
     }
   }
 
-  Status MergeInputArgsAsOutput(
-      const std::vector<std::shared_ptr<RayObject>> &args,
-      std::vector<std::pair<ObjectID, std::shared_ptr<RayObject>>> *returns) {
+  Status GetWorkerPid(std::vector<std::shared_ptr<RayObject>> *results) {
+    // Save the pid of current process to the return object.
+    std::string pid_string = std::to_string(static_cast<int>(getpid()));
+    auto data =
+        const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(pid_string.data()));
+    auto memory_buffer =
+        std::make_shared<LocalMemoryBuffer>(data, pid_string.size(), true);
+    results->push_back(
+        std::make_shared<RayObject>(memory_buffer, nullptr, std::vector<ObjectID>()));
+    return Status::OK();
+  }
+
+  Status MergeInputArgsAsOutput(const std::vector<std::shared_ptr<RayObject>> &args,
+                                const std::vector<ObjectID> &return_ids,
+                                std::vector<std::shared_ptr<RayObject>> *results) {
     // Merge all the content from input args.
     std::vector<uint8_t> buffer;
     for (const auto &arg : args) {
@@ -124,15 +122,17 @@ class MockWorker {
         std::make_shared<LocalMemoryBuffer>(buffer.data(), buffer.size(), true);
 
     // Write the merged content to each of return ids.
-    for (size_t i = 0; i < returns->size(); i++) {
-      (*returns)[i].second = std::make_shared<RayObject>(
-          memory_buffer, nullptr, std::vector<rpc::ObjectReference>());
+    for (size_t i = 0; i < return_ids.size(); i++) {
+      results->push_back(
+          std::make_shared<RayObject>(memory_buffer, nullptr, std::vector<ObjectID>()));
     }
 
     return Status::OK();
   }
 
-  Status WhileTrueLoop() {
+  Status WhileTrueLoop(const std::vector<std::shared_ptr<RayObject>> &args,
+                       const std::vector<ObjectID> &return_ids,
+                       std::vector<std::shared_ptr<RayObject>> *results) {
     while (1) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
@@ -142,21 +142,33 @@ class MockWorker {
   int64_t prev_seq_no_ = 0;
 };
 
-}  // namespace core
 }  // namespace ray
 
 int main(int argc, char **argv) {
-  RAY_CHECK(argc >= 5);
+  RAY_CHECK(argc == 4);
   auto store_socket = std::string(argv[1]);
   auto raylet_socket = std::string(argv[2]);
   auto node_manager_port = std::stoi(std::string(argv[3]));
-  auto startup_token_str = std::string(argv[4]);
-  auto start = startup_token_str.find(std::string("=")) + 1;
-  auto startup_token = std::stoi(startup_token_str.substr(start));
 
-  ray::gcs::GcsClientOptions gcs_options("127.0.0.1:6379");
-  ray::core::MockWorker worker(
-      store_socket, raylet_socket, node_manager_port, gcs_options, startup_token);
+  ray::gcs::GcsClientOptions gcs_options("127.0.0.1", 6379, "");
+  ray::MockWorker worker(store_socket, raylet_socket, node_manager_port, gcs_options);
+
+  // Set up handler for SIGTERM to avoid crash in the test.
+  boost::asio::io_service io_service;
+  std::thread io_thread([&io_service]() {
+    boost::asio::io_service::work work(io_service);
+    io_service.run();
+  });
+
+  auto handler = [](const boost::system::error_code &error, int signal_number) {
+    RAY_LOG(INFO) << "worker process (pid=" << getpid()
+                  << ") received SIGTERM, shutting down...";
+    _exit(0);
+  };
+  boost::asio::signal_set signals(io_service);
+  signals.add(SIGTERM);
+  signals.async_wait(handler);
+
   worker.RunTaskExecutionLoop();
   return 0;
 }

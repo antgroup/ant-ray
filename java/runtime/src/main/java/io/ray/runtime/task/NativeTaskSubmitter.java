@@ -8,14 +8,18 @@ import io.ray.api.Ray;
 import io.ray.api.id.ActorId;
 import io.ray.api.id.ObjectId;
 import io.ray.api.id.PlacementGroupId;
+import io.ray.api.options.ActorCallOptions;
 import io.ray.api.options.ActorCreationOptions;
 import io.ray.api.options.CallOptions;
 import io.ray.api.options.PlacementGroupCreationOptions;
+import io.ray.api.placementgroup.Bundle;
 import io.ray.api.placementgroup.PlacementGroup;
 import io.ray.runtime.actor.NativeActorHandle;
 import io.ray.runtime.functionmanager.FunctionDescriptor;
 import io.ray.runtime.placementgroup.PlacementGroupImpl;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -45,15 +49,9 @@ public class NativeTaskSubmitter implements TaskSubmitter {
     if (options != null) {
       if (options.group != null) {
         PlacementGroupImpl group = (PlacementGroupImpl) options.group;
-        // bundleIndex == -1 indicates using any available bundle.
         Preconditions.checkArgument(
-            options.bundleIndex == -1
-                || options.bundleIndex >= 0 && options.bundleIndex < group.getBundles().size(),
-            String.format(
-                "Bundle index %s is invalid, the correct bundle index should be "
-                    + "either in the range of 0 to the number of bundles "
-                    + "or -1 which means put the task to any available bundles.",
-                options.bundleIndex));
+            options.bundleIndex >= 0,
+            String.format("Bundle index %s is invalid", options.bundleIndex));
       }
 
       if (StringUtils.isNotBlank(options.name)) {
@@ -78,7 +76,7 @@ public class NativeTaskSubmitter implements TaskSubmitter {
       FunctionDescriptor functionDescriptor,
       List<FunctionArg> args,
       int numReturns,
-      CallOptions options) {
+      ActorCallOptions options) {
     Preconditions.checkState(actor instanceof NativeActorHandle);
     List<byte[]> returnIds =
         nativeSubmitActorTask(
@@ -94,7 +92,6 @@ public class NativeTaskSubmitter implements TaskSubmitter {
     return returnIds.stream().map(ObjectId::new).collect(Collectors.toList());
   }
 
-  @Override
   public PlacementGroup createPlacementGroup(PlacementGroupCreationOptions creationOptions) {
     if (StringUtils.isNotBlank(creationOptions.name)) {
       PlacementGroup placementGroup = PlacementGroups.getPlacementGroup(creationOptions.name);
@@ -117,8 +114,22 @@ public class NativeTaskSubmitter implements TaskSubmitter {
   }
 
   @Override
-  public boolean waitPlacementGroupReady(PlacementGroupId id, int timeoutSeconds) {
-    return nativeWaitPlacementGroupReady(id.getBytes(), timeoutSeconds);
+  public boolean waitPlacementGroupReady(PlacementGroupId id, int timeoutMs) {
+    return nativeWaitPlacementGroupReady(id.getBytes(), timeoutMs);
+  }
+
+  @Override
+  public void addBundlesForPlacementGroup(PlacementGroupId id, List<Bundle> bundles) {
+    List<Map<String, Double>> bundleResource = new ArrayList<>();
+    for (Bundle x : bundles) {
+      bundleResource.add(x.resources);
+    }
+    nativeAddBundlesForPlacementGroup(id.getBytes(), bundleResource);
+  }
+
+  @Override
+  public void removeBundlesForPlacementGroup(PlacementGroupId id, List<Integer> bundleIndexes) {
+    nativeRemoveBundlesForPlacementGroup(id.getBytes(), bundleIndexes);
   }
 
   private static native List<byte[]> nativeSubmitTask(
@@ -140,7 +151,7 @@ public class NativeTaskSubmitter implements TaskSubmitter {
       int functionDescriptorHash,
       List<FunctionArg> args,
       int numReturns,
-      CallOptions callOptions);
+      ActorCallOptions callOptions);
 
   private static native byte[] nativeCreatePlacementGroup(
       PlacementGroupCreationOptions creationOptions);
@@ -148,5 +159,11 @@ public class NativeTaskSubmitter implements TaskSubmitter {
   private static native void nativeRemovePlacementGroup(byte[] placementGroupId);
 
   private static native boolean nativeWaitPlacementGroupReady(
-      byte[] placementGroupId, int timeoutSeconds);
+      byte[] placementGroupId, int timeoutMs);
+
+  private static native void nativeAddBundlesForPlacementGroup(
+      byte[] placementGroupId, List<Map<String, Double>> bundleResource);
+
+  private static native void nativeRemoveBundlesForPlacementGroup(
+      byte[] placementGroupId, List<Integer> bundleIndexes);
 }

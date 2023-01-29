@@ -1,22 +1,18 @@
-from typing import Optional
-
-
 def PublicAPI(*args, **kwargs):
     """Annotation for documenting public APIs.
 
-    Public APIs are classes and methods exposed to end users of Ray.
+    Public APIs are classes and methods exposed to end users of Ray. You
+    can expect these APIs to remain backwards compatible across minor Ray
+    releases (e.g., Ray 1.4 -> 1.8).
 
-    If ``stability="alpha"``, the API can be used by advanced users who are
-    tolerant to and expect breaking changes.
-
-    If ``stability="beta"``, the API is still public and can be used by early
+    If "stability" is beta, the API is still public and can be used by early
     users, but are subject to change.
 
-    If ``stability="stable"``, the APIs will remain backwards compatible across
-    minor Ray releases (e.g., Ray 1.4 -> 1.8).
+    If "stability" is alpha, the API can be used by advanced users who are
+    tolerant to and expect breaking changes.
 
     For a full definition of the stability levels, please refer to the
-    :ref:`Ray API Stability definitions <api-stability>`.
+    `Google stability level guidelines <https://google.aip.dev/181>`_
 
     Args:
         stability: One of {"stable", "beta", "alpha"}.
@@ -43,22 +39,21 @@ def PublicAPI(*args, **kwargs):
         stability = "stable"
 
     def wrap(obj):
+        if not obj.__doc__:
+            obj.__doc__ = ""
         if stability in ["alpha", "beta"]:
-            message = (
-                f"PublicAPI ({stability}): This API is in {stability} "
-                "and may change before becoming stable."
-            )
+            obj.__doc__ += (
+                f"\n    PublicAPI ({stability}): This API is in {stability} "
+                "and may change before becoming stable.")
         else:
-            message = "PublicAPI: This API is stable across Ray releases."
-
-        _append_doc(obj, message=message)
-        _mark_annotated(obj)
+            obj.__doc__ += \
+                "\n    PublicAPI: This API is stable across Ray releases."
         return obj
 
     return wrap
 
 
-def DeveloperAPI(*args, **kwargs):
+def DeveloperAPI(obj):
     """Annotation for documenting developer APIs.
 
     Developer APIs are lower-level methods explicitly exposed to advanced Ray
@@ -71,17 +66,12 @@ def DeveloperAPI(*args, **kwargs):
         ... def func(x):
         ...     return x
     """
-    if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
-        return DeveloperAPI()(args[0])
 
-    def wrap(obj):
-        _append_doc(
-            obj, message="DeveloperAPI: This API may change across minor Ray releases."
-        )
-        _mark_annotated(obj)
-        return obj
-
-    return wrap
+    if not obj.__doc__:
+        obj.__doc__ = ""
+    obj.__doc__ += \
+        "\n    DeveloperAPI: This API may change across minor Ray releases."
+    return obj
 
 
 def Deprecated(*args, **kwargs):
@@ -107,95 +97,19 @@ def Deprecated(*args, **kwargs):
     if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
         return Deprecated()(args[0])
 
-    message = (
-        "**DEPRECATED:** This API is deprecated and may be removed in a future "
-        "Ray release."
-    )
-
+    message = ("\n    DEPRECATED: This API is deprecated and may be removed "
+               "in future Ray releases.")
     if "message" in kwargs:
-        message += " " + kwargs["message"]
+        message = message + " " + kwargs["message"]
         del kwargs["message"]
 
     if kwargs:
         raise ValueError("Unknown kwargs: {}".format(kwargs.keys()))
 
     def inner(obj):
-        _append_doc(obj, message=message, directive="warning")
-        _mark_annotated(obj)
+        if not obj.__doc__:
+            obj.__doc__ = ""
+        obj.__doc__ += f"{message}"
         return obj
 
     return inner
-
-
-def _append_doc(obj, *, message: str, directive: Optional[str] = None) -> str:
-    if not obj.__doc__:
-        obj.__doc__ = ""
-
-    obj.__doc__ = obj.__doc__.rstrip()
-
-    indent = _get_indent(obj.__doc__)
-    obj.__doc__ += "\n\n"
-    if directive is not None:
-        obj.__doc__ += f"{' ' * indent}.. {directive}::\n"
-        obj.__doc__ += f"{' ' * (indent + 4)}{message}"
-    else:
-        obj.__doc__ += f"{' ' * indent}{message}"
-    obj.__doc__ += f"\n{' ' * indent}"
-
-
-def _get_indent(docstring: str) -> int:
-    """
-
-    Example:
-        >>> def f():
-        ...     '''Docstring summary.'''
-        >>> f.__doc__
-        'Docstring summary.'
-        >>> _get_indent(f.__doc__)
-        0
-
-        >>> def g(foo):
-        ...     '''Docstring summary.
-        ...
-        ...     Args:
-        ...         foo: Does bar.
-        ...     '''
-        >>> g.__doc__
-        'Docstring summary.\\n\\n    Args:\\n        foo: Does bar.\\n    '
-        >>> _get_indent(g.__doc__)
-        4
-
-        >>> class A:
-        ...     def h():
-        ...         '''Docstring summary.
-        ...
-        ...         Returns:
-        ...             None.
-        ...         '''
-        >>> A.h.__doc__
-        'Docstring summary.\\n\\n        Returns:\\n            None.\\n        '
-        >>> _get_indent(A.h.__doc__)
-        8
-    """
-    if not docstring:
-        return 0
-
-    non_empty_lines = list(filter(bool, docstring.splitlines()))
-    if len(non_empty_lines) == 1:
-        # Docstring contains summary only.
-        return 0
-
-    # The docstring summary isn't indented, so check the indentation of the second
-    # non-empty line.
-    return len(non_empty_lines[1]) - len(non_empty_lines[1].lstrip())
-
-
-def _mark_annotated(obj) -> None:
-    # Set magic token for check_api_annotations linter.
-    if hasattr(obj, "__name__"):
-        obj._annotated = obj.__name__
-
-
-def _is_annotated(obj) -> bool:
-    # Check the magic token exists and applies to this class (not a subclass).
-    return hasattr(obj, "_annotated") and obj._annotated == obj.__name__

@@ -1,0 +1,115 @@
+diff --git src/brpc/acceptor.cpp src/brpc/acceptor.cpp
+index 6273288..8636c48 100644
+--- src/brpc/acceptor.cpp
++++ src/brpc/acceptor.cpp
+@@ -23,7 +23,7 @@
+ #include "butil/time.h"                     // gettimeofday_us
+ #include "brpc/rdma/rdma_endpoint.h"
+ #include "brpc/acceptor.h"
+-
++#include "brpc/log.h"
+ 
+ namespace brpc {
+ 
+@@ -114,7 +114,7 @@ void Acceptor::StopAccept(int /*closewait_ms*/) {
+     // Currently `closewait_ms' is useless since we have to wait until 
+     // existing requests are finished. Otherwise, contexts depended by 
+     // the requests may be deleted and invalid.
+-
++    RPC_VLOG << "Acceptor::StopAccept() is called";
+     {
+         BAIDU_SCOPED_LOCK(_map_mutex);
+         if (_status != RUNNING) {
+@@ -123,6 +123,7 @@ void Acceptor::StopAccept(int /*closewait_ms*/) {
+         _status = STOPPING;
+     }
+ 
++    RPC_VLOG << "SetFailed for _acception_id " << _acception_id;
+     // Don't set _acception_id to 0 because BeforeRecycle needs it.
+     Socket::SetFailed(_acception_id);
+ 
+@@ -130,7 +131,8 @@ void Acceptor::StopAccept(int /*closewait_ms*/) {
+     // of code will be SetFailed directly in OnNewConnectionsUntilEAGAIN
+     std::vector<SocketId> erasing_ids;
+     ListConnections(&erasing_ids);
+-    
++
++    RPC_VLOG << "SetFailed for all existing connections";
+     for (size_t i = 0; i < erasing_ids.size(); ++i) {
+         SocketUniquePtr socket;
+         if (Socket::Address(erasing_ids[i], &socket) == 0) {
+@@ -140,14 +142,19 @@ void Acceptor::StopAccept(int /*closewait_ms*/) {
+                 // otherwise the sockets are often referenced by corresponding
+                 // objects and delay server's stopping which requires all
+                 // existing sockets to be recycled.
++                RPC_VLOG << "SetFailed() is called for socket " << erasing_ids[i];
+                 socket->SetFailed(ELOGOFF, "Server is stopping");
+             } else {
+                 // Message-oriented RPC connections. Just release the addtional
+                 // reference in the socket, which will be recycled when current
+                 // requests have been processed.
++                RPC_VLOG << "ReleaseAdditionalReference() is called for socket " << erasing_ids[i];
+                 socket->ReleaseAdditionalReference();
+             }
+         } // else: This socket already called `SetFailed' before
++        else {
++            RPC_VLOG << "SetFailed() has already been called previous for socket " << erasing_ids[i];
++        }
+     }
+ }
+ 
+@@ -162,6 +169,7 @@ int Acceptor::Initialize() {
+ 
+ // NOTE: Join() can happen before StopAccept()
+ void Acceptor::Join() {
++    RPC_VLOG << "Acceptor::Join() is called";
+     std::unique_lock<butil::Mutex> mu(_map_mutex);
+     if (_status != STOPPING && _status != RUNNING) {  // no need to join.
+         return;
+@@ -344,6 +352,7 @@ void Acceptor::BeforeRecycle(Socket* sock) {
+         _empty_cond.Broadcast();
+         return;
+     }
++    RPC_VLOG << "BeforeRecycle() is called for socket " << sock->id();
+     // If a Socket could not be addressed shortly after its creation, it
+     // was not added into `_socket_map'.
+     _socket_map.erase(sock->id());
+diff --git src/brpc/server.cpp src/brpc/server.cpp
+index e248463..fb25928 100644
+--- src/brpc/server.cpp
++++ src/brpc/server.cpp
+@@ -408,6 +408,7 @@ Server::Server(ProfilerLinker)
+ }
+ 
+ Server::~Server() {
++    RPC_VLOG << "Server::~Server()";
+     Stop(0);
+     Join();
+     ClearServices();
+@@ -1765,6 +1766,7 @@ void Server::RunUntilAskedToQuit() {
+     while (!IsAskedToQuit()) {
+         bthread_usleep(1000000L);
+     }
++    RPC_VLOG << "exits the loop in RunUntilAskedToQuit";
+     Stop(0/*not used now*/);
+     Join();
+ }
+diff --git src/brpc/stream.cpp src/brpc/stream.cpp
+index 9d4df7e..c346c9f 100644
+--- src/brpc/stream.cpp
++++ src/brpc/stream.cpp
+@@ -600,6 +600,14 @@ int Stream::SetHostSocket(Socket *host_socket) {
+         return -1;
+     }
+     _host_socket = ptr.release();
++    // NOTE(zhijunfu): Set this so that SetFailed() will be called when server shutdown,
++    // to make sure that references are properly cleared, this is a must for streaming
++    // connections, otherwise the server might block forever in Acceptor::Join().
++    // For more details see the comments in Acceptor::StopAccept().
++    // To verify if this works, start `streaming_echo_c++_server` in the example
++    // and then `streaming_echo_c++_client`, and then press Ctrl-C on the server
++    // and see if it terminates immediately without pressing Ctrl-C on the client.
++    _host_socket->fail_me_at_server_stop();
+     return 0;
+ }
+ 

@@ -1981,41 +1981,6 @@ class RayCall {
     return new PyTaskCaller<>(pyFunction, args);
   }
 
-  public static PyActorCreator actor(PyActorClass pyActorClass) {
-    Object[] args = new Object[]{};
-    return new PyActorCreator(pyActorClass, args);
-  }
-
-  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0) {
-    Object[] args = new Object[]{obj0};
-    return new PyActorCreator(pyActorClass, args);
-  }
-
-  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1) {
-    Object[] args = new Object[]{obj0, obj1};
-    return new PyActorCreator(pyActorClass, args);
-  }
-
-  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1, Object obj2) {
-    Object[] args = new Object[]{obj0, obj1, obj2};
-    return new PyActorCreator(pyActorClass, args);
-  }
-
-  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1, Object obj2, Object obj3) {
-    Object[] args = new Object[]{obj0, obj1, obj2, obj3};
-    return new PyActorCreator(pyActorClass, args);
-  }
-
-  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1, Object obj2, Object obj3, Object obj4) {
-    Object[] args = new Object[]{obj0, obj1, obj2, obj3, obj4};
-    return new PyActorCreator(pyActorClass, args);
-  }
-
-  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1, Object obj2, Object obj3, Object obj4, Object obj5) {
-    Object[] args = new Object[]{obj0, obj1, obj2, obj3, obj4, obj5};
-    return new PyActorCreator(pyActorClass, args);
-  }
-
   public static <R> CppTaskCaller<R> task(CppFunction<R> cppFunction) {
     Object[] args = new Object[]{};
     return new CppTaskCaller<>(cppFunction, args);
@@ -2049,6 +2014,41 @@ class RayCall {
   public static <R> CppTaskCaller<R> task(CppFunction<R> cppFunction, Object obj0, Object obj1, Object obj2, Object obj3, Object obj4, Object obj5) {
     Object[] args = new Object[]{obj0, obj1, obj2, obj3, obj4, obj5};
     return new CppTaskCaller<>(cppFunction, args);
+  }
+
+  public static PyActorCreator actor(PyActorClass pyActorClass) {
+    Object[] args = new Object[]{};
+    return new PyActorCreator(pyActorClass, args);
+  }
+
+  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0) {
+    Object[] args = new Object[]{obj0};
+    return new PyActorCreator(pyActorClass, args);
+  }
+
+  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1) {
+    Object[] args = new Object[]{obj0, obj1};
+    return new PyActorCreator(pyActorClass, args);
+  }
+
+  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1, Object obj2) {
+    Object[] args = new Object[]{obj0, obj1, obj2};
+    return new PyActorCreator(pyActorClass, args);
+  }
+
+  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1, Object obj2, Object obj3) {
+    Object[] args = new Object[]{obj0, obj1, obj2, obj3};
+    return new PyActorCreator(pyActorClass, args);
+  }
+
+  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1, Object obj2, Object obj3, Object obj4) {
+    Object[] args = new Object[]{obj0, obj1, obj2, obj3, obj4};
+    return new PyActorCreator(pyActorClass, args);
+  }
+
+  public static PyActorCreator actor(PyActorClass pyActorClass, Object obj0, Object obj1, Object obj2, Object obj3, Object obj4, Object obj5) {
+    Object[] args = new Object[]{obj0, obj1, obj2, obj3, obj4, obj5};
+    return new PyActorCreator(pyActorClass, args);
   }
 
   public static CppActorCreator actor(CppActorClass cppActorClass) {

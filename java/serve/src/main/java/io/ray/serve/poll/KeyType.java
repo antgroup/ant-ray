@@ -1,6 +1,6 @@
 package io.ray.serve.poll;
 
-import io.ray.serve.exception.RayServeException;
+import io.ray.serve.RayServeException;
 import java.io.Serializable;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
@@ -55,13 +55,13 @@ public class KeyType implements Serializable {
     if (longPollNamespace == null && StringUtils.isBlank(key)) {
       return "";
     }
+    if (StringUtils.isBlank(key)) {
+      return longPollNamespace.toString();
+    }
     if (longPollNamespace == null) {
       return key;
     }
-    if (StringUtils.isBlank(key)) {
-      return longPollNamespace.name();
-    }
-    return "(" + longPollNamespace.name() + "," + key + ")";
+    return "(" + longPollNamespace.toString() + ", " + key + ")";
   }
 
   @Override
@@ -83,9 +83,8 @@ public class KeyType implements Serializable {
       }
       return new KeyType(LongPollNamespace.parseFrom(fields[0]), fields[1].trim());
     }
-    LongPollNamespace longPollNamespace = LongPollNamespace.parseFrom(key);
-    if (null != longPollNamespace) {
-      return new KeyType(longPollNamespace, null);
+    if (key.contains(LongPollNamespace.class.getSimpleName())) {
+      return new KeyType(LongPollNamespace.parseFrom(key), null);
     }
     return new KeyType(null, key);
   }

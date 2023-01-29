@@ -70,4 +70,13 @@ public class WaitTest extends BaseTest {
       Assert.assertTrue(true);
     }
   }
+
+  @Test(groups = {"cluster"})
+  public void testGetApiServerAddress() {
+    String address = Ray.internal().getApiServerAddress();
+    Assert.assertNotNull(address);
+    String port = address.split(":")[1];
+    Assert.assertNotNull(port);
+    Assert.assertNotEquals(port, "0");
+  }
 }

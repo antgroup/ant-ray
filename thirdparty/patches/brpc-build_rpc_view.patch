@@ -1,0 +1,66 @@
+diff --git BUILD.bazel BUILD.bazel
+index 1ae29c5..68a7759 100644
+--- BUILD.bazel
++++ BUILD.bazel
+@@ -538,3 +538,29 @@ cc_binary(
+         ":brpc_idl_options_cc_proto",
+     ],
+ )
++
++proto_library(
++    name = "rpc_view_proto",
++    srcs = [
++        "//tools:rpc_view/view.proto",
++    ],
++)
++
++cc_proto_library(
++    name = "cc_rpc_view_proto",
++    deps = [
++        "//tools:rpc_view_proto",
++    ],
++)
++
++cc_binary(
++    name = "rpc_view",
++    srcs = ["//tools:rpc_view/rpc_view.cpp"],
++    copts = COPTS,
++    linkopts = LINKOPTS,
++    visibility = ["//visibility:public"],
++    deps = [
++        ":cc_rpc_view_proto",
++        ":brpc",
++    ],
++)
+diff --git tools/rpc_view/rpc_view.cpp tools/rpc_view/rpc_view.cpp
+index 51de915..202f7a0 100644
+--- tools/rpc_view/rpc_view.cpp
++++ tools/rpc_view/rpc_view.cpp
+@@ -20,7 +20,7 @@
+ #include <butil/logging.h>
+ #include <brpc/server.h>
+ #include <brpc/channel.h>
+-#include "view.pb.h"
++#include "tools/rpc_view/view.pb.h"
+ 
+ DEFINE_int32(port, 8888, "TCP Port of this server");
+ DEFINE_string(target, "", "The server to view");
+@@ -154,10 +154,14 @@ public:
+ 
+ int main(int argc, char* argv[]) {
+     GFLAGS_NS::ParseCommandLineFlags(&argc, &argv, true);
+-    if (FLAGS_target.empty() &&
+-        (argc != 2 || 
+-         GFLAGS_NS::SetCommandLineOption("target", argv[1]).empty())) {
+-        LOG(ERROR) << "Usage: ./rpc_view <ip>:<port>";
++    // NOTE(zhijunfu): we don't expect user to specify `FLAGS_target` on the command,
++    // and instead requires the target to be specified *after* rpc_view is started,
++    // this is because in our cases when rpc_view is started with API server, there
++    // might not be an available worker brpc server to connect to. This logic is
++    // different from the original rpc_view which requires user to specify server
++    // ip:port at startup time.
++    if (!FLAGS_target.empty()) {
++        LOG(ERROR) << "Usage: ./rpc_view";
+         return -1;
+     }
+     // This keeps ad-hoc creation of channels reuse previous connections.

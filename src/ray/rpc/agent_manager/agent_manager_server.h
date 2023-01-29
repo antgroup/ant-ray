@@ -23,8 +23,11 @@
 namespace ray {
 namespace rpc {
 
-#define RAY_AGENT_MANAGER_RPC_HANDLERS \
-  RPC_SERVICE_HANDLER(AgentManagerService, RegisterAgent, -1)
+#define RAY_AGENT_MANAGER_RPC_HANDLERS                         \
+  RPC_SERVICE_HANDLER(AgentManagerService, RegisterAgent, -1)  \
+  RPC_SERVICE_HANDLER(AgentManagerService, AgentHeartbeat, -1) \
+  RPC_SERVICE_HANDLER(AgentManagerService, GetWorkersInfo, -1) \
+  RPC_SERVICE_HANDLER(AgentManagerService, ReportLocalRuntimeResources, -1)
 
 /// Implementations of the `AgentManagerGrpcService`, check interface in
 /// `src/ray/protobuf/agent_manager.proto`.
@@ -38,9 +41,42 @@ class AgentManagerServiceHandler {
   /// \param[in] request The request message.
   /// \param[out] reply The reply message.
   /// \param[in] send_reply_callback The callback to be called when the request is done.
-  virtual void HandleRegisterAgent(RegisterAgentRequest request,
+  virtual void HandleRegisterAgent(const RegisterAgentRequest &request,
                                    RegisterAgentReply *reply,
                                    SendReplyCallback send_reply_callback) = 0;
+
+  /// Handle a `AgentHeartbeat` request.
+  /// The implementation can handle this request asynchronously. When handling is done,
+  /// the `send_reply_callback` should be called.
+  ///
+  /// \param[in] request The request message.
+  /// \param[out] reply The reply message.
+  /// \param[in] send_reply_callback The callback to be called when the request is done.
+  virtual void HandleAgentHeartbeat(const AgentHeartbeatRequest &request,
+                                    AgentHeartbeatReply *reply,
+                                    SendReplyCallback send_reply_callback) = 0;
+
+  /// Handle a `GetWorkersInfo` request.
+  /// The implementation can handle this request asynchronously. When handling is done,
+  /// the `send_reply_callback` should be called.
+  ///
+  /// \param[in] request The request message.
+  /// \param[out] reply The reply message.
+  /// \param[in] send_reply_callback The callback to be called when the request is done.
+  virtual void HandleGetWorkersInfo(const GetWorkersInfoRequest &request,
+                                    GetWorkersInfoReply *reply,
+                                    SendReplyCallback send_reply_callback) = 0;
+
+  /// Handle a `ReportLocalRuntimeResources` request.
+  /// The implementation can handle this request asynchronously. When handling is done,
+  /// the `send_reply_callback` should be called.
+  ///
+  /// \param[in] request The request message.
+  /// \param[out] reply The reply message.
+  /// \param[in] send_reply_callback The callback to be called when the request is done.
+  virtual void HandleReportLocalRuntimeResources(
+      const ReportLocalRuntimeResourcesRequest &request,
+      ReportLocalRuntimeResourcesReply *reply, SendReplyCallback send_reply_callback) = 0;
 };
 
 /// The `GrpcService` for `AgentManagerGrpcService`.

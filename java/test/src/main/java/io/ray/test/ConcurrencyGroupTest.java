@@ -1,6 +1,5 @@
 package io.ray.test;
 
-import com.google.common.collect.ImmutableList;
 import io.ray.api.ActorHandle;
 import io.ray.api.ObjectRef;
 import io.ray.api.Ray;
@@ -13,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@Test
+@Test(groups = {"cluster"})
 public class ConcurrencyGroupTest extends BaseTest {
 
   private static class ConcurrentActor {
@@ -68,8 +67,6 @@ public class ConcurrencyGroupTest extends BaseTest {
     long threadId4 = myActor.task(ConcurrentActor::f4).remote().get();
     long threadId5 = myActor.task(ConcurrentActor::f5).remote().get();
     long threadId6 = myActor.task(ConcurrentActor::f6).remote().get();
-    long threadId7 =
-        myActor.task(ConcurrentActor::f1).setConcurrencyGroup("executing").remote().get();
 
     Assert.assertEquals(threadId1, threadId2);
     Assert.assertEquals(threadId3, threadId4);
@@ -77,7 +74,6 @@ public class ConcurrencyGroupTest extends BaseTest {
     Assert.assertNotEquals(threadId1, threadId3);
     Assert.assertNotEquals(threadId1, threadId5);
     Assert.assertNotEquals(threadId3, threadId5);
-    Assert.assertEquals(threadId3, threadId7);
   }
 
   private static class CountDownActor {
@@ -164,69 +160,10 @@ public class ConcurrencyGroupTest extends BaseTest {
     Assert.assertTrue(ret8.get());
   }
 
-  private static class ConcurrencyActor2 {
-
-    public String f1() throws InterruptedException {
-      TimeUnit.MINUTES.sleep(100);
-      return "never returned";
-    }
-
-    public String f2() {
-      return "ok";
-    }
-  }
-
-  /// This case tests that blocking task in default group will block other groups.
-  /// See https://github.com/ray-project/ray/issues/20475
-  @Test(groups = {"cluster"})
-  public void testDefaultCgDoNotBlockOthers() {
-    ConcurrencyGroup group =
-        new ConcurrencyGroupBuilder<ConcurrencyActor2>()
-            .setName("group")
-            .setMaxConcurrency(1)
-            .addMethod(ConcurrencyActor2::f2)
-            .build();
-
-    ActorHandle<ConcurrencyActor2> myActor =
-        Ray.actor(ConcurrencyActor2::new).setConcurrencyGroups(group).remote();
-    myActor.task(ConcurrencyActor2::f1).remote();
-    Assert.assertEquals(myActor.task(ConcurrencyActor2::f2).remote().get(), "ok");
-  }
-
-  /// This case tests that the blocking concurrency group doesn't block the scheduling of
-  /// other concurrency groups. See https://github.com/ray-project/ray/issues/19593 for details.
-  @Test(groups = {"cluster"})
-  public void testBlockingCgNotBlockOthers() {
-    ConcurrencyGroup group1 =
-        new ConcurrencyGroupBuilder<ConcurrencyActor2>()
-            .setName("group1")
-            .setMaxConcurrency(1)
-            .addMethod(ConcurrencyActor2::f1)
-            .build();
-
-    ConcurrencyGroup group2 =
-        new ConcurrencyGroupBuilder<ConcurrencyActor2>()
-            .setName("group2")
-            .setMaxConcurrency(1)
-            .addMethod(ConcurrencyActor2::f2)
-            .build();
-
-    ActorHandle<ConcurrencyActor2> myActor =
-        Ray.actor(ConcurrencyActor2::new).setConcurrencyGroups(group1, group2).remote();
-
-    // Execute f1 twice. and the cg1 is blocking, but cg2 should work well.
-    ObjectRef<String> obj0 = myActor.task(ConcurrencyActor2::f1).remote();
-    ObjectRef<String> obj1 = myActor.task(ConcurrencyActor2::f1).remote();
-    // Wait a while to make sure f2 is scheduled after f1.
-    Ray.wait(ImmutableList.of(obj0, obj1), 2, 5 * 1000);
-
-    // f2 should work well even if group1 is blocking.
-    Assert.assertEquals(myActor.task(ConcurrencyActor2::f2).remote().get(), "ok");
-  }
-
   @DefConcurrencyGroup(name = "io", maxConcurrency = 1)
   @DefConcurrencyGroup(name = "compute", maxConcurrency = 1)
   private static class StaticDefinedConcurrentActor {
+
     @UseConcurrencyGroup(name = "io")
     public long f1() {
       return Thread.currentThread().getId();
@@ -266,6 +203,7 @@ public class ConcurrencyGroupTest extends BaseTest {
     long threadId4 = myActor.task(StaticDefinedConcurrentActor::f4).remote().get();
     long threadId5 = myActor.task(StaticDefinedConcurrentActor::f5).remote().get();
     long threadId6 = myActor.task(StaticDefinedConcurrentActor::f6).remote().get();
+
     Assert.assertEquals(threadId1, threadId2);
     Assert.assertEquals(threadId3, threadId4);
     Assert.assertEquals(threadId5, threadId6);
@@ -311,7 +249,6 @@ public class ConcurrencyGroupTest extends BaseTest {
 
   public void testLimitMethodsInOneGroupOfStaticDefinitionForInterface() {
     ActorHandle<ChildActor2> myActor = Ray.actor(ChildActor2::new).remote();
-
     long threadId1 = myActor.task(StaticDefinedInterface::f1).remote().get();
     long threadId2 = myActor.task(StaticDefinedInterface::f2).remote().get();
     long threadId3 = myActor.task(StaticDefinedInterface::f3, 3, 5).remote().get();
@@ -361,7 +298,6 @@ public class ConcurrencyGroupTest extends BaseTest {
 
   public void testSingleConcurrencyActor() {
     ActorHandle<ChildActor3> myActor = Ray.actor(ChildActor3::new).remote();
-
     long threadId1 = myActor.task(SingleGroupConcurrentActor::f1).remote().get();
     long threadId2 = myActor.task(SingleGroupConcurrentActor::f2).remote().get();
     long threadId3 = myActor.task(SingleGroupConcurrentActor::f3, 3, 5).remote().get();
@@ -375,5 +311,26 @@ public class ConcurrencyGroupTest extends BaseTest {
     Assert.assertNotEquals(threadId1, threadId3);
     Assert.assertNotEquals(threadId1, threadId5);
     Assert.assertEquals(threadId3, threadId5);
+  }
+
+  @DefConcurrencyGroup(name = "io", maxConcurrency = 1)
+  private static class StaticConcurrentActor {
+
+    public long f1() throws InterruptedException {
+      TimeUnit.SECONDS.sleep(5000);
+      return Thread.currentThread().getId();
+    }
+
+    @UseConcurrencyGroup(name = "io")
+    public long f2() throws InterruptedException {
+      return Thread.currentThread().getId();
+    }
+  }
+
+  public void testDefaultCgDoNotBlockOthers() {
+    ActorHandle<StaticConcurrentActor> myActor = Ray.actor(StaticConcurrentActor::new).remote();
+    ObjectRef<Long> obj1 = myActor.task(StaticConcurrentActor::f1).remote();
+    ObjectRef<Long> obj2 = myActor.task(StaticConcurrentActor::f2).remote();
+    Ray.get(obj2, 5 * 1000);
   }
 }

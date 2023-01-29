@@ -68,7 +68,7 @@ class error_code;
 // of 'msg' followed by the status.
 #define RAY_CHECK_OK_PREPEND(to_call, msg)                \
   do {                                                    \
-    ::ray::Status _s = (to_call);                         \
+    const ::ray::Status &_s = (to_call);                  \
     RAY_CHECK(_s.ok()) << (msg) << ": " << _s.ToString(); \
   } while (0)
 
@@ -78,6 +78,7 @@ class error_code;
 
 namespace ray {
 
+// Keep same with plasma which begin with 2x.
 enum class StatusCode : char {
   OK = 0,
   OutOfMemory = 1,
@@ -102,16 +103,32 @@ enum class StatusCode : char {
   ObjectAlreadySealed = 23,
   ObjectStoreFull = 24,
   TransientObjectStoreFull = 25,
-  // grpc status
-  // This represents UNAVAILABLE status code
-  // returned by grpc.
-  GrpcUnavailable = 26,
-  // This represents all other status codes
-  // returned by grpc that are not defined above.
-  GrpcUnknown = 27,
-  // Object store is both out of memory and
-  // out of disk.
-  OutOfDisk = 28,
+  TryAgain = 26,
+  // Schedule status
+  JobQuotaNotEnough = 31,
+  ResourcesNotEnough = 32,
+  InvalidJob = 33,
+  JobSuspended = 34,
+  JobNameConflict = 35,
+  ActorInBackoff = 36,
+  // The status code that GCS notifies raylet to exit through heartbeat reply.
+  // It means that the raylet should restart at current node.
+  ExitAndRestartNode = 39,
+  // Operate status
+  // The status code that GCS notifies raylet to exit through heartbeat reply.
+  // It means that the raylet should restart at other nodes.
+  ExitAndReplaceNode = 40,
+  // The status code that GCS notifies raylet to exit through heartbeat reply.
+  // It means that the raylet should not restart any more.
+  ExitNode = 41,
+  MigrationFailure = 42,
+
+  // These values will be transmitted to users as error codes. Their values have been
+  // fixed and cannot be modified.
+  NodegroupResourcesInsufficient = 100,
+  NodegroupRevisionExpired = 101,
+  NodegroupNotFound = 102,
+  Unschedulable = 103,
 };
 
 #if defined(__clang__)
@@ -175,16 +192,17 @@ class RAY_EXPORT Status {
     return Status(StatusCode::Interrupted, msg);
   }
 
-  static Status IntentionalSystemExit(const std::string &msg) {
-    return Status(StatusCode::IntentionalSystemExit, msg);
+  static Status IntentionalSystemExit() {
+    return Status(StatusCode::IntentionalSystemExit, "intentional system exit");
   }
 
-  static Status UnexpectedSystemExit(const std::string &msg) {
-    return Status(StatusCode::UnexpectedSystemExit, msg);
+  static Status UnexpectedSystemExit() {
+    return Status(StatusCode::UnexpectedSystemExit, "user code caused exit");
   }
 
-  static Status CreationTaskError(const std::string &msg) {
-    return Status(StatusCode::CreationTaskError, msg);
+  static Status CreationTaskError() {
+    return Status(StatusCode::CreationTaskError,
+                  "error raised in creation task, cause worker to exit");
   }
 
   static Status NotFound(const std::string &msg) {
@@ -219,25 +237,58 @@ class RAY_EXPORT Status {
     return Status(StatusCode::TransientObjectStoreFull, msg);
   }
 
-  static Status OutOfDisk(const std::string &msg) {
-    return Status(StatusCode::OutOfDisk, msg);
+  static Status TryAgain(const std::string &msg) {
+    return Status(StatusCode::TryAgain, msg);
   }
 
-  static Status GrpcUnavailable(const std::string &msg) {
-    return Status(StatusCode::GrpcUnavailable, msg);
+  static Status JobQuotaNotEnough(const std::string &msg) {
+    return Status(StatusCode::JobQuotaNotEnough, msg);
   }
 
-  static Status GrpcUnknown(const std::string &msg) {
-    return Status(StatusCode::GrpcUnknown, msg);
+  static Status ResourcesNotEnough(const std::string &msg) {
+    return Status(StatusCode::ResourcesNotEnough, msg);
   }
 
-  static StatusCode StringToCode(const std::string &str);
+  static Status InvalidJob(const std::string &msg) {
+    return Status(StatusCode::InvalidJob, msg);
+  }
+
+  static Status JobSuspended(const std::string &msg) {
+    return Status(StatusCode::JobSuspended, msg);
+  }
+
+  static Status JobNameConflict(const std::string &msg) {
+    return Status(StatusCode::JobNameConflict, msg);
+  }
+
+  static Status ActorInBackoff(const std::string &msg) {
+    return Status(StatusCode::ActorInBackoff, msg);
+  }
+
+  static Status ExitNode(const std::string &msg) {
+    return Status(StatusCode::ExitNode, msg);
+  }
+
+  static Status ExitAndReplaceNode(const std::string &msg) {
+    return Status(StatusCode::ExitAndReplaceNode, msg);
+  }
+
+  static Status ExitAndRestartNode(const std::string &msg) {
+    return Status(StatusCode::ExitAndRestartNode, msg);
+  }
+
+  static Status MigrationFailure(const std::string &msg) {
+    return Status(StatusCode::MigrationFailure, msg);
+  }
+
+  static Status Unschedulable(const std::string &msg) {
+    return Status(StatusCode::Unschedulable, msg);
+  }
 
   // Returns true iff the status indicates success.
   bool ok() const { return (state_ == NULL); }
 
   bool IsOutOfMemory() const { return code() == StatusCode::OutOfMemory; }
-  bool IsOutOfDisk() const { return code() == StatusCode::OutOfDisk; }
   bool IsKeyError() const { return code() == StatusCode::KeyError; }
   bool IsInvalid() const { return code() == StatusCode::Invalid; }
   bool IsIOError() const { return code() == StatusCode::IOError; }
@@ -269,10 +320,18 @@ class RAY_EXPORT Status {
   bool IsTransientObjectStoreFull() const {
     return code() == StatusCode::TransientObjectStoreFull;
   }
-  bool IsGrpcUnavailable() const { return code() == StatusCode::GrpcUnavailable; }
-  bool IsGrpcUnknown() const { return code() == StatusCode::GrpcUnknown; }
+  bool IsTryAgain() const { return code() == StatusCode::TryAgain; }
+  bool IsJobQuotaNotEnough() const { return code() == StatusCode::JobQuotaNotEnough; }
+  bool IsResourcesNotEnough() const { return code() == StatusCode::ResourcesNotEnough; }
+  bool IsInvalidJob() const { return code() == StatusCode::InvalidJob; }
+  bool IsJobSuspended() const { return code() == StatusCode::JobSuspended; }
+  bool IsJobNameConflict() const { return code() == StatusCode::JobNameConflict; }
+  bool IsActorInBackoff() const { return code() == StatusCode::ActorInBackoff; }
 
-  bool IsGrpcError() const { return IsGrpcUnknown() || IsGrpcUnavailable(); }
+  bool IsExitNode() const { return code() == StatusCode::ExitNode; }
+  bool IsExitAndReplaceNode() const { return code() == StatusCode::ExitAndReplaceNode; }
+  bool IsExitAndRestartNode() const { return code() == StatusCode::ExitAndRestartNode; }
+  bool IsUnschedulable() const { return code() == StatusCode::Unschedulable; }
 
   // Return a string representation of this status suitable for printing.
   // Returns the string "OK" for success.

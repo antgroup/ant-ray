@@ -1,0 +1,41 @@
+diff --git src/brpc/details/tcmalloc_extension.cpp src/brpc/details/tcmalloc_extension.cpp
+index 53df209..ffe039e 100644
+--- src/brpc/details/tcmalloc_extension.cpp
++++ src/brpc/details/tcmalloc_extension.cpp
+@@ -19,6 +19,7 @@
+ #include <dlfcn.h>                               // dlsym
+ #include <stdlib.h>                              // getenv
+ #include "butil/compiler_specific.h"
++#include "butil/logging.h"
+ #include "brpc/details/tcmalloc_extension.h"
+ 
+ namespace {
+@@ -28,6 +29,28 @@ static GetInstanceFn g_get_instance_fn = NULL;
+ static void InitGetInstanceFn() {
+     g_get_instance_fn = (GetInstanceFn)dlsym(
+         RTLD_NEXT, "_ZN15MallocExtension8instanceEv");
++    if (!g_get_instance_fn) {
++        // NOTE(zhijunfu): There are two constants that you can give to dlsym() instead of
++        // a module name:
++        // - RTLD_DEFAULT: search through every .so in the process in the order they
++        //   were loaded.
++        // - RTLD_NEXT: search through every .so that were loaded *after* the one calling
++        //   dlsym(), so if you call dlsym() in your main program using RTLD_NEXT, it will
++        //   look in any libraries loaded after your program started running. 
++        //
++        // For more cases RTLD_NEXT should be sufficient, but in some cases we need to
++        // call dlsym() in a .so, then it might not work correctly. One such case is
++        // that java worker loads libcore_worker_library_java.so in the java code,
++        // and libtcmalloc.so is loaded by using LD_PRELOAD, in this case the module
++        // that calls dlsym() is loaded *after* libtcmalloc.so, and using RTLD_NEXT
++        // here would not find the symbol, and we try again with RTLD_DEFAULT in
++        // this case.
++        g_get_instance_fn = (GetInstanceFn)dlsym(
++            RTLD_DEFAULT, "_ZN15MallocExtension8instanceEv");
++        LOG(INFO) << "MallocExtension symbol is not found with RTLD_NEXT"
++                  << ", and " << (g_get_instance_fn ? "is" : "not")
++                  << " found with RTLD_DEFAULT";
++    }
+ }
+ } // namespace
+ 

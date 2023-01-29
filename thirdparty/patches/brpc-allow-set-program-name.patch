@@ -1,0 +1,82 @@
+diff --git src/brpc/builtin/common.cpp src/brpc/builtin/common.cpp
+index 9cdc72f..5cf1c8f 100644
+--- src/brpc/builtin/common.cpp
++++ src/brpc/builtin/common.cpp
+@@ -339,8 +339,28 @@ static void CreateProgramName() {
+         s_program_name = s_cmdline;
+     }
+ }
++
++// If the program is explicitely set by user.
++static bool s_is_program_name_set = false;
++void SetProgramName(const char* name) {
++    if (!s_is_program_name_set &&
++        name != nullptr && strlen(name) > 0) {    
++        memcpy(s_cmdline, name, sizeof(s_cmdline) - 1);
++        
++        const ssize_t nr = butil::ParseCommandLine(s_cmdline, sizeof(s_cmdline) - 1, strlen(name), false);
++        if (nr > 0) {
++            s_cmdline[nr] = '\0';
++            s_program_name = s_cmdline;
++            LOG(INFO) << "SetProgramName: " << s_program_name;
++            s_is_program_name_set = true;            
++        }
++    }
++}
++
+ const char* GetProgramName() {
+-    pthread_once(&create_program_name_once, CreateProgramName);
++    if (!s_is_program_name_set) {
++        pthread_once(&create_program_name_once, CreateProgramName);
++    }
+     return s_program_name;
+ }
+ 
+diff --git src/brpc/builtin/common.h src/brpc/builtin/common.h
+index f4d6962..d956291 100644
+--- src/brpc/builtin/common.h
++++ src/brpc/builtin/common.h
+@@ -112,6 +112,14 @@ int FileChecksum(const char* file_path, unsigned char* checksum);
+ // Get name of current program.
+ const char* GetProgramName();
+ 
++// Set name of current program.
++// NOTE(zhijunfu): Set the real program name, this is not needed for most cases,
++// it's only requried when user changes process name (e.g. setproctitle() in python),
++// this allows user to pass in the real program name, otherwise profiling won't
++// work as it would not find the program. One such case is ray renames python
++// worker's name to something like "ray::IDLE".
++void SetProgramName(const char* name);
++
+ // Get checksum of current program image.
+ const char* GetProgramChecksum();
+ 
+diff --git src/butil/process_util.cc src/butil/process_util.cc
+index fcb41b9..f59a932 100644
+--- src/butil/process_util.cc
++++ src/butil/process_util.cc
+@@ -60,6 +60,11 @@ ssize_t ReadCommandLine(char* buf, size_t len, bool with_args) {
+     #error Not Implemented
+ #endif
+ 
++    return ParseCommandLine(buf, len, nr, with_args);
++}
++
++ssize_t ParseCommandLine(char* buf, size_t len, size_t nread, bool with_args) {
++    ssize_t nr = std::min(nread, len);
+     if (with_args) {
+         if ((size_t)nr == len) {
+             return len;
+diff --git src/butil/process_util.h src/butil/process_util.h
+index 6dc9a7d..9c8d526 100644
+--- src/butil/process_util.h
++++ src/butil/process_util.h
+@@ -32,6 +32,8 @@ namespace butil {
+ // NOTE: `buf' does not end with zero.
+ ssize_t ReadCommandLine(char* buf, size_t len, bool with_args);
+ 
++ssize_t ParseCommandLine(char* buf, size_t len, size_t nread, bool with_args);
++
+ } // namespace butil
+ 
+ #endif // BUTIL_PROCESS_UTIL_H

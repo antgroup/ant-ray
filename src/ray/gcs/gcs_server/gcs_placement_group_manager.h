@@ -13,17 +13,13 @@
 // limitations under the License.
 
 #pragma once
-#include <gtest/gtest_prod.h>
-
-#include <optional>
 #include <utility>
 
-#include "absl/container/btree_map.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "ray/common/asio/instrumented_io_context.h"
-#include "ray/common/bundle_spec.h"
 #include "ray/common/id.h"
+#include "ray/common/task/task_execution_spec.h"
 #include "ray/common/task/task_spec.h"
 #include "ray/gcs/gcs_server/gcs_init_data.h"
 #include "ray/gcs/gcs_server/gcs_node_manager.h"
@@ -31,7 +27,6 @@
 #include "ray/gcs/gcs_server/gcs_table_storage.h"
 #include "ray/gcs/pubsub/gcs_pub_sub.h"
 #include "ray/rpc/worker/core_worker_client.h"
-#include "ray/util/counter_map.h"
 #include "src/ray/protobuf/gcs_service.pb.h"
 
 namespace ray {
@@ -45,24 +40,14 @@ class GcsPlacementGroup {
   /// Create a GcsPlacementGroup by placement_group_table_data.
   ///
   /// \param placement_group_table_data Data of the placement_group (see gcs.proto).
-  explicit GcsPlacementGroup(
-      rpc::PlacementGroupTableData placement_group_table_data,
-      std::shared_ptr<CounterMap<rpc::PlacementGroupTableData::PlacementGroupState>>
-          counter)
-      : placement_group_table_data_(std::move(placement_group_table_data)),
-        counter_(counter) {
-    SetupStates();
-  }
+  explicit GcsPlacementGroup(rpc::PlacementGroupTableData placement_group_table_data)
+      : placement_group_table_data_(std::move(placement_group_table_data)) {}
 
   /// Create a GcsPlacementGroup by CreatePlacementGroupRequest.
   ///
   /// \param request Contains the placement group creation task specification.
-  explicit GcsPlacementGroup(
-      const ray::rpc::CreatePlacementGroupRequest &request,
-      std::string ray_namespace,
-      std::shared_ptr<CounterMap<rpc::PlacementGroupTableData::PlacementGroupState>>
-          counter)
-      : counter_(counter) {
+  explicit GcsPlacementGroup(const ray::rpc::CreatePlacementGroupRequest &request,
+                             std::string ray_namespace) {
     const auto &placement_group_spec = request.placement_group_spec();
     placement_group_table_data_.set_placement_group_id(
         placement_group_spec.placement_group_id());
@@ -79,21 +64,7 @@ class GcsPlacementGroup {
     placement_group_table_data_.set_creator_actor_dead(
         placement_group_spec.creator_actor_dead());
     placement_group_table_data_.set_is_detached(placement_group_spec.is_detached());
-    placement_group_table_data_.set_max_cpu_fraction_per_node(
-        placement_group_spec.max_cpu_fraction_per_node());
     placement_group_table_data_.set_ray_namespace(ray_namespace);
-    SetupStates();
-  }
-
-  ~GcsPlacementGroup() {
-    if (last_metric_state_ &&
-        last_metric_state_.value() != rpc::PlacementGroupTableData::REMOVED) {
-      RAY_LOG(DEBUG) << "Decrementing state at "
-                     << rpc::PlacementGroupTableData::PlacementGroupState_Name(
-                            last_metric_state_.value());
-      // Retain groups in the REMOVED state so we have a history of past groups.
-      counter_->Decrement(last_metric_state_.value());
-    }
   }
 
   /// Get the immutable PlacementGroupTableData of this placement group.
@@ -101,6 +72,9 @@ class GcsPlacementGroup {
 
   /// Get the mutable bundle of this placement group.
   rpc::Bundle *GetMutableBundle(int bundle_index);
+
+  /// Get the bundle of this placement group.
+  rpc::Bundle GetBundle(int bundle_index);
 
   /// Update the state of this placement_group.
   void UpdateState(rpc::PlacementGroupTableData::PlacementGroupState state);
@@ -118,13 +92,41 @@ class GcsPlacementGroup {
   std::string GetRayNamespace() const;
 
   /// Get the bundles of this placement_group (including unplaced).
-  std::vector<std::shared_ptr<const BundleSpecification>> &GetBundles() const;
+  std::vector<std::shared_ptr<BundleSpecification>> GetBundles() const;
+
+  /// Get all the exist bundle indexes of this placement_group.
+  std::vector<int> GetAllBundleIndexes() const;
+
+  /// Add a set of new bundles to this placement_group.
+  void AddBundles(const ray::rpc::AddPlacementGroupBundlesRequest &request);
+
+  /// Remove a set of old bundles from this placement_group.
+  void RemoveBundles(const std::vector<int> &bundle_indexes);
+
+  /// Remove node info associated with a set of bundles.
+  /// This will happen when removing bundles.
+  void RemoveNodeInfoFromBundles(const std::vector<int64_t> &bundle_indexes);
 
   /// Get the unplaced bundles of this placement group.
-  std::vector<std::shared_ptr<const BundleSpecification>> GetUnplacedBundles() const;
+  std::vector<std::shared_ptr<BundleSpecification>> GetUnplacedBundles() const;
 
   /// Check if there are unplaced bundles.
   bool HasUnplacedBundles() const;
+
+  /// Get all bundles that have been removed of this placement group.
+  std::vector<std::shared_ptr<BundleSpecification>> GetRemovedBundles() const;
+
+  /// Get all bundles that have been created of this placement group.
+  std::vector<std::shared_ptr<BundleSpecification>> GetCreatedBundles() const;
+
+  /// Get all bundles that have been marked `valid` of this placement group.
+  std::vector<std::shared_ptr<BundleSpecification>> GetAllValidBundles() const;
+
+  /// Get all bundles that have been marked `invalid` of this placement group.
+  std::vector<std::shared_ptr<BundleSpecification>> GetAllInvalidBundles() const;
+
+  /// Get all bundles that are being removed from this placement group.
+  std::vector<std::shared_ptr<BundleSpecification>> GetAllRemovingBundles() const;
 
   /// Get the Strategy
   rpc::PlacementStrategy GetStrategy() const;
@@ -152,63 +154,33 @@ class GcsPlacementGroup {
   /// Returns whether or not this is a detached placement group.
   bool IsDetached() const;
 
-  /// Returns the maximum CPU fraction per node for this placement group.
-  double GetMaxCpuFractionPerNode() const;
+  /// Get the creation time of current placement group.
+  ///
+  /// \return The creation time of `Nanosecond`.
+  int64_t CreationTime() const { return creation_time_; };
 
-  const rpc::PlacementGroupStats &GetStats() const;
+  /// Mark the placement group creation start.
+  const void MarkCreationStart();
 
-  rpc::PlacementGroupStats *GetMutableStats();
+  /// ANT-INTERNAL.
+  /// A helper field to log the debug info when reschedule occur.
+  uint64_t last_log_reschedule_debug_info_time_ms_ = 0;
+
+  /// Get the start scheduling time(ms) of current placement group.
+  uint64_t GetLastStartSchedulingTimeMs() const { return last_start_scheduling_time_ms_; }
+
+  /// Mark the placement group start scheduling.
+  void MarkSchedulingStarted();
 
  private:
-  FRIEND_TEST(GcsPlacementGroupManagerTest, TestPlacementGroupBundleCache);
-
-  /// Setup states other than placement_group_table_data_.
-  void SetupStates() {
-    auto stats = placement_group_table_data_.mutable_stats();
-    // The default value for the field is 0
-    if (stats->creation_request_received_ns() == 0) {
-      auto now = absl::GetCurrentTimeNanos();
-      stats->set_creation_request_received_ns(now);
-    }
-    // The default value for the field is 0
-    // Only set the state to the QUEUED when the state wasn't persisted before.
-    if (stats->scheduling_state() == 0) {
-      stats->set_scheduling_state(rpc::PlacementGroupStats::QUEUED);
-    }
-    RefreshMetrics();
-  }
-
-  /// Record metric updates if there have been any state changes.
-  void RefreshMetrics() {
-    auto cur_state = GetState();
-    if (last_metric_state_) {
-      RAY_LOG(DEBUG) << "Swapping state from "
-                     << rpc::PlacementGroupTableData::PlacementGroupState_Name(
-                            last_metric_state_.value())
-                     << " to "
-                     << rpc::PlacementGroupTableData::PlacementGroupState_Name(cur_state);
-      counter_->Swap(last_metric_state_.value(), cur_state);
-    } else {
-      RAY_LOG(DEBUG) << "Incrementing state at "
-                     << rpc::PlacementGroupTableData::PlacementGroupState_Name(cur_state);
-      counter_->Increment(cur_state);
-    }
-    last_metric_state_ = cur_state;
-  }
-
   /// The placement_group meta data which contains the task specification as well as the
   /// state of the gcs placement_group and so on (see gcs.proto).
   rpc::PlacementGroupTableData placement_group_table_data_;
-  /// Creating bundle specification requires heavy computation because it needs to compute
-  /// formatted strings for all resources (heavy string operations). To optimize the CPU
-  /// usage, we cache bundle specs.
-  mutable std::vector<std::shared_ptr<const BundleSpecification>> cached_bundle_specs_;
+  int64_t creation_time_;
 
-  /// Reference to the counter to use for placement group state metrics tracking.
-  std::shared_ptr<CounterMap<rpc::PlacementGroupTableData::PlacementGroupState>> counter_;
-
-  /// The last recorded metric state.
-  std::optional<rpc::PlacementGroupTableData::PlacementGroupState> last_metric_state_;
+  /// ANT-INTERNAL.
+  /// The start time of the latest schedule.
+  uint64_t last_start_scheduling_time_ms_ = 0;
 };
 
 /// GcsPlacementGroupManager is responsible for managing the lifecycle of all placement
@@ -216,7 +188,7 @@ class GcsPlacementGroup {
 /// The placementGroup will be added into queue and set the status as pending first and
 /// use SchedulePendingPlacementGroups(). The SchedulePendingPlacementGroups() will get
 /// the head of the queue and schedule it. If schedule success, using the
-/// SchedulePendingPlacementGroups() Immediately. else wait for a short time beforw using
+/// SchedulePendingPlacementGroups() Immediately. Else wait for a short time before using
 /// SchedulePendingPlacementGroups() next time.
 class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
  public:
@@ -226,39 +198,70 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
   /// \param scheduler Used to schedule placement group creation tasks.
   /// \param gcs_table_storage Used to flush placement group data to storage.
   /// \param gcs_resource_manager Reference of GcsResourceManager.
-  /// \param get_ray_namespace A callback to get the ray namespace.
   explicit GcsPlacementGroupManager(
       instrumented_io_context &io_context,
       std::shared_ptr<GcsPlacementGroupSchedulerInterface> scheduler,
       std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage,
       GcsResourceManager &gcs_resource_manager,
+      std::shared_ptr<gcs::GcsPubSub> gcs_pub_sub,
       std::function<std::string(const JobID &)> get_ray_namespace);
 
   ~GcsPlacementGroupManager() = default;
 
-  void HandleCreatePlacementGroup(rpc::CreatePlacementGroupRequest request,
+  void HandleCreatePlacementGroup(const rpc::CreatePlacementGroupRequest &request,
                                   rpc::CreatePlacementGroupReply *reply,
                                   rpc::SendReplyCallback send_reply_callback) override;
 
-  void HandleRemovePlacementGroup(rpc::RemovePlacementGroupRequest request,
+  void HandleAddPlacementGroupBundles(
+      const rpc::AddPlacementGroupBundlesRequest &request,
+      rpc::AddPlacementGroupBundlesReply *reply,
+      rpc::SendReplyCallback send_reply_callback) override;
+
+  void HandleRemovePlacementGroupBundles(
+      const rpc::RemovePlacementGroupBundlesRequest &request,
+      rpc::RemovePlacementGroupBundlesReply *reply,
+      rpc::SendReplyCallback send_reply_callback) override;
+
+  void HandleRemovePlacementGroup(const rpc::RemovePlacementGroupRequest &request,
                                   rpc::RemovePlacementGroupReply *reply,
                                   rpc::SendReplyCallback send_reply_callback) override;
 
-  void HandleGetPlacementGroup(rpc::GetPlacementGroupRequest request,
+  void HandleGetPlacementGroup(const rpc::GetPlacementGroupRequest &request,
                                rpc::GetPlacementGroupReply *reply,
                                rpc::SendReplyCallback send_reply_callback) override;
 
-  void HandleGetNamedPlacementGroup(rpc::GetNamedPlacementGroupRequest request,
+  void HandleGetNamedPlacementGroup(const rpc::GetNamedPlacementGroupRequest &request,
                                     rpc::GetNamedPlacementGroupReply *reply,
                                     rpc::SendReplyCallback send_reply_callback) override;
 
-  void HandleGetAllPlacementGroup(rpc::GetAllPlacementGroupRequest request,
+  void HandleGetAllPlacementGroup(const rpc::GetAllPlacementGroupRequest &request,
                                   rpc::GetAllPlacementGroupReply *reply,
                                   rpc::SendReplyCallback send_reply_callback) override;
   void HandleWaitPlacementGroupUntilReady(
-      rpc::WaitPlacementGroupUntilReadyRequest request,
+      const rpc::WaitPlacementGroupUntilReadyRequest &request,
       rpc::WaitPlacementGroupUntilReadyReply *reply,
       rpc::SendReplyCallback send_reply_callback) override;
+
+  /// Add some new bundles for the specific placement group.
+  ///
+  /// \param placement_group_id The placement group id whose bundles will be added.
+  /// \param request The rpc request including the new bundles will be added.
+  /// \param callback Will be invoked after the `bundles` field of the specific placement
+  /// group has been modified successfully or be invoked immediately if the state of the
+  /// placement group is `Pending` or `REMOVED`.
+  void AddBundlesForPlacementGroup(
+      const PlacementGroupID &placement_group_id,
+      const ray::rpc::AddPlacementGroupBundlesRequest &request, StatusCallback callback);
+
+  /// Remove exist bundles from the specific placement group.
+  ///
+  /// \param placement_group_id The placement group id whose bundles will be removed.
+  /// \param bundle_indexes The index of the bundles to be removed.
+  /// \param callback Will be invoked after the `bundles` field of the specific placement
+  /// group has been modified successfully.
+  void RemoveBundlesFromPlacementGroup(const PlacementGroupID &placement_group_id,
+                                       const std::vector<int> &bundle_indexes,
+                                       StatusCallback callback);
 
   /// Register a callback which will be invoked after successfully created.
   ///
@@ -279,8 +282,6 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
                               StatusCallback callback);
 
   /// Schedule placement_groups in the `pending_placement_groups_` queue.
-  /// The method handles all states of placement groups
-  /// (e.g., REMOVED states should be properly ignored within the method.)
   void SchedulePendingPlacementGroups();
 
   /// Get the placement_group ID for the named placement_group. Returns nil if the
@@ -295,19 +296,29 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
   /// an placement_group creation task is infeasible.
   ///
   /// \param placement_group The placement_group whose creation task is infeasible.
-  /// \param is_feasible whether the scheduler can be retry or not currently.
-  void OnPlacementGroupCreationFailed(std::shared_ptr<GcsPlacementGroup> placement_group,
-                                      ExponentialBackOff backoff,
-                                      bool is_feasible);
+  virtual void OnPlacementGroupCreationFailed(
+      std::shared_ptr<GcsPlacementGroup> placement_group);
 
   /// Handle placement_group creation task success. This should be called when the
   /// placement_group creation task has been scheduled successfully.
   ///
   /// \param placement_group The placement_group that has been created.
-  void OnPlacementGroupCreationSuccess(
+  virtual void OnPlacementGroupCreationSuccess(
       const std::shared_ptr<GcsPlacementGroup> &placement_group);
 
-  /// Remove the placement group of a given id.
+  /// Try to return bundle resources to gcs resource manager,
+  /// it will add the removing bundle to `waiting_removed_bundles_` and
+  /// wait to be returned in the future if try failed.
+  void TryReturnBundleResources(const std::shared_ptr<BundleSpecification> &bundle);
+
+  // Callback that will be invoked when receiving cluster resource changed.
+  void OnClusterResourcesChanged();
+
+  // Try to release bundle resource to gcs resource manager and job context.
+  bool TryReleasingBundleResources(const std::shared_ptr<BundleSpecification> &bundle,
+                                   bool release_job_resources = true);
+
+  /// TODO-SANG Fill it up.
   void RemovePlacementGroup(const PlacementGroupID &placement_group_id,
                             StatusCallback on_placement_group_removed);
 
@@ -316,12 +327,6 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
   ///
   /// \param node_id The specified node id.
   void OnNodeDead(const NodeID &node_id);
-
-  /// Handle a node register. This will try to reschedule all the infeasible
-  /// placement groups.
-  ///
-  /// \param node_id The specified node id.
-  void OnNodeAdd(const NodeID &node_id);
 
   /// Clean placement group that belongs to the job id if necessary.
   ///
@@ -338,21 +343,12 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
   /// \param job_id The job id where placement groups that need to be cleaned belong to.
   void CleanPlacementGroupIfNeededWhenJobDead(const JobID &job_id);
 
-  /// Clean placement group that belongs to the actor id if necessary.
-  ///
-  /// This interface is a part of automatic lifecycle management for placement groups.
-  /// When an actor is killed, this method should be invoked to clean up
-  /// placement groups that belong to the given actor.
-  ///
-  /// Calling this method doesn't mean placement groups that belong to the given actor
-  /// will be cleaned. Placement groups are cleaned only when the creator job AND actor
-  /// are both dead.
-  ///
-  /// NOTE: This method is idempotent.
-  ///
-  /// \param actor_id The actor id where placement groups that need to be cleaned belong
-  /// to.
-  void CleanPlacementGroupIfNeededWhenActorDead(const ActorID &actor_id);
+  /// ANT-INTERNAL.
+  /// Check whether the placement group's lefetime is done or not.
+  bool IsPlacementGroupLifetimeDone(const PlacementGroupID &placement_group_id);
+
+  /// Collect stats from gcs placement group manager in-memory data structures.
+  void CollectStats() const;
 
   /// Initialize with the gcs tables data synchronously.
   /// This should be called when GCS server restarts after a failure.
@@ -360,32 +356,76 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
   /// \param gcs_init_data.
   void Initialize(const GcsInitData &gcs_init_data);
 
+  /// Publish all bundles information.
+  /// Note: We should publish all bundles of this placement group every time to prevent
+  /// publish message loss.
+  ///
+  /// \param placement_group.
+  void PublishBundlesInfo(const std::shared_ptr<GcsPlacementGroup> &placement_group);
+
+  /// Check if there's any placement group scheduling going on.
+  bool IsSchedulingInProgress() const {
+    return scheduling_in_progress_id_ != PlacementGroupID::Nil();
+  }
+
+  std::vector<std::shared_ptr<GcsPlacementGroup>> GetAllPlacementGroupsInNode(
+      const NodeID &node_id);
+
+  const BundleLocationIndex &GetCommittedBundleLocationIndex() const;
+
   std::string DebugString() const;
 
-  /// Record internal metrics of the placement group manager.
-  void RecordMetrics() const;
+ protected:
+  virtual Status ReserveJobResources(
+      const PlacementGroupID &placement_group_id,
+      const std::vector<std::shared_ptr<BundleSpecification>> &bundles) {
+    return Status::OK();
+  }
+
+  // Return bundle resource to job context.
+  virtual void ReturnJobResources(
+      const JobID &job_id,
+      const std::vector<std::shared_ptr<BundleSpecification>> &bundles) {}
+
+  // Subtract job's acquired resources.
+  virtual void SubtractJobAcquiredResources(
+      const JobID &job_id,
+      const std::vector<std::shared_ptr<BundleSpecification>> &bundles) {}
+
+  // Return bundle resource to gcs resource manager.
+  virtual void ReturnBundleResources(
+      const std::vector<std::shared_ptr<BundleSpecification>> &bundles) {}
+
+  const absl::flat_hash_map<PlacementGroupID, std::shared_ptr<GcsPlacementGroup>>
+      &GetRegisteredPlacementGroups() const {
+    return registered_placement_groups_;
+  }
+
+  /// Check if this placement group is waiting for scheduling.
+  bool IsPlacmentGroupIDInPendingQueue(const PlacementGroupID &placement_group_id) const;
+
+  /// Reschedule this placement group if it still has unplaced bundles.
+  bool RescheduleIfStillHasUnplacedBundles(const PlacementGroupID &placement_group_id);
+
+  /// All registered placement_groups (pending placement_groups are also included).
+  absl::flat_hash_map<PlacementGroupID, std::shared_ptr<GcsPlacementGroup>>
+      registered_placement_groups_;
+
+  /// The pending placement_groups which will not be scheduled until there's a resource
+  /// change.
+  /// NOTE: When we remove placement group, we need to look for
+  /// `pending_placement_groups_` and delete the specific placement group, so we can't use
+  /// `std::priority_queue`.
+  std::deque<std::shared_ptr<GcsPlacementGroup>> pending_placement_groups_;
 
  private:
-  /// Push a placement group to pending queue.
-  ///
-  /// \param pg The placementgroup we are adding
-  /// \param rank The rank for this placement group. Semantically it's the time
-  /// this placement group to be scheduled. By default it'll be assigned to be
-  /// the current time. If you assign 0, it means it will be scheduled as a highest
-  /// priority.
-  /// \param exp_backer The exponential backoff. A default one will be given if
-  /// it's not set. This will be used to generate the deferred time for this pg.
-  void AddToPendingQueue(std::shared_ptr<GcsPlacementGroup> pg,
-                         std::optional<int64_t> rank = std::nullopt,
-                         std::optional<ExponentialBackOff> exp_backer = std::nullopt);
-  void RemoveFromPendingQueue(const PlacementGroupID &pg_id);
-
   /// Try to create placement group after a short time.
   void RetryCreatingPlacementGroup();
 
   /// Mark the manager that there's a placement group scheduling going on.
-  void MarkSchedulingStarted(const PlacementGroupID placement_group_id) {
-    scheduling_in_progress_id_ = placement_group_id;
+  void MarkSchedulingStarted(const std::shared_ptr<GcsPlacementGroup> &placement_group) {
+    placement_group->MarkSchedulingStarted();
+    scheduling_in_progress_id_ = placement_group->GetPlacementGroupID();
   }
 
   /// Mark the manager that there's no more placement group scheduling going on.
@@ -396,22 +436,14 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
     return scheduling_in_progress_id_ == placement_group_id;
   }
 
-  /// Check if there's any placement group scheduling going on.
-  bool IsSchedulingInProgress() const {
-    return scheduling_in_progress_id_ != PlacementGroupID::Nil();
-  }
-
   // Method that is invoked every second.
   void Tick();
 
   // Update placement group load information so that the autoscaler can use it.
   void UpdatePlacementGroupLoad();
 
-  /// Check if this placement group is waiting for scheduling.
-  bool IsInPendingQueue(const PlacementGroupID &placement_group_id) const;
-
-  /// Reschedule this placement group if it still has unplaced bundles.
-  bool RescheduleIfStillHasUnplacedBundles(const PlacementGroupID &placement_group_id);
+  // Detect whether the placement group schedules slow.
+  void DetectPlacementGroupSchedulingSlow();
 
   /// The io loop that is used to delay execution of tasks (e.g.,
   /// execute_after).
@@ -427,43 +459,26 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
   absl::flat_hash_map<PlacementGroupID, std::vector<StatusCallback>>
       placement_group_to_create_callbacks_;
 
-  /// All registered placement_groups (pending placement_groups are also included).
-  absl::flat_hash_map<PlacementGroupID, std::shared_ptr<GcsPlacementGroup>>
-      registered_placement_groups_;
-
-  /// The pending placement_groups which will not be scheduled until there's a
-  /// resource change. The pending queue is represented as an ordered map, where
-  /// the key is the time to schedule the pg and value if a pair containing the
-  /// actual placement group and a exp-backoff.
-  /// When error happens, we'll retry it later and this can be simply done by
-  /// inserting an element into the queue with a bigger key. With this, we don't
-  /// need to post retry job to io context. And when schedule pending placement
-  /// group, we always start with the one with the smallest key.
-  absl::btree_multimap<int64_t,
-                       std::pair<ExponentialBackOff, std::shared_ptr<GcsPlacementGroup>>>
-      pending_placement_groups_;
-
-  /// The infeasible placement_groups that can't be scheduled currently.
-  std::deque<std::shared_ptr<GcsPlacementGroup>> infeasible_placement_groups_;
-
+ protected:
   /// The scheduler to schedule all registered placement_groups.
   std::shared_ptr<gcs::GcsPlacementGroupSchedulerInterface>
       gcs_placement_group_scheduler_;
 
+ private:
   /// Used to update placement group information upon creation, deletion, etc.
   std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage_;
 
-  /// Counter of placement groups broken down by State.
-  std::shared_ptr<CounterMap<rpc::PlacementGroupTableData::PlacementGroupState>>
-      placement_group_state_counter_;
-
   /// The placement group id that is in progress of scheduling bundles.
   /// TODO(sang): Currently, only one placement group can be scheduled at a time.
-  /// We should probably support concurrenet creation (or batching).
+  /// We should probably support concurrent creation (or batching).
   PlacementGroupID scheduling_in_progress_id_ = PlacementGroupID::Nil();
 
+ protected:
   /// Reference of GcsResourceManager.
   GcsResourceManager &gcs_resource_manager_;
+
+ private:
+  std::shared_ptr<gcs::GcsPubSub> gcs_pub_sub_;
 
   /// Get ray namespace.
   std::function<std::string(const JobID &)> get_ray_namespace_;
@@ -473,6 +488,9 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
   absl::flat_hash_map<std::string, absl::flat_hash_map<std::string, PlacementGroupID>>
       named_placement_groups_;
 
+  /// The bundles that waiting to be destroyed and release resources.
+  std::list<std::shared_ptr<BundleSpecification>> waiting_removed_bundles_;
+
   // Debug info.
   enum CountType {
     CREATE_PLACEMENT_GROUP_REQUEST = 0,
@@ -481,14 +499,13 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
     GET_ALL_PLACEMENT_GROUP_REQUEST = 3,
     WAIT_PLACEMENT_GROUP_UNTIL_READY_REQUEST = 4,
     GET_NAMED_PLACEMENT_GROUP_REQUEST = 5,
-    SCHEDULING_PENDING_PLACEMENT_GROUP = 6,
-    CountType_MAX = 7,
+    ADD_PLACEMENT_GROUP_BUNDLES_REQUEST = 6,
+    REMOVE_PLACEMENT_GROUP_BUNDLES_REQUEST = 7,
+    CountType_MAX = 8,
   };
   uint64_t counts_[CountType::CountType_MAX] = {0};
 
-  FRIEND_TEST(GcsPlacementGroupManagerMockTest, PendingQueuePriorityReschedule);
-  FRIEND_TEST(GcsPlacementGroupManagerMockTest, PendingQueuePriorityFailed);
-  FRIEND_TEST(GcsPlacementGroupManagerMockTest, PendingQueuePriorityOrder);
+  PeriodicalRunner periodical_runner_;
 };
 
 }  // namespace gcs

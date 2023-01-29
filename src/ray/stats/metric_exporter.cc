@@ -24,8 +24,7 @@ void MetricPointExporter::ExportToPoints(
     const opencensus::stats::ViewData::DataMap<opencensus::stats::Distribution>
         &view_data,
     const opencensus::stats::MeasureDescriptor &measure_descriptor,
-    std::vector<std::string> &keys,
-    std::vector<MetricPoint> &points) {
+    std::vector<std::string> &keys, std::vector<MetricPoint> &points) {
   // Return if no raw data found in view map.
   if (view_data.size() == 0) {
     return;
@@ -56,15 +55,19 @@ void MetricPointExporter::ExportToPoints(
     }
   }
   hist_mean /= view_data.size();
-  MetricPoint mean_point = {
-      metric_name + ".mean", current_sys_time_ms(), hist_mean, tags, measure_descriptor};
-  MetricPoint max_point = {
-      metric_name + ".max", current_sys_time_ms(), hist_max, tags, measure_descriptor};
-  MetricPoint min_point = {
-      metric_name + ".min", current_sys_time_ms(), hist_min, tags, measure_descriptor};
+  MetricPoint mean_point = {metric_name + ".mean", current_sys_time_ms(), hist_mean, tags,
+                            measure_descriptor};
+  MetricPoint max_point = {metric_name + ".max", current_sys_time_ms(), hist_max, tags,
+                           measure_descriptor};
+  MetricPoint min_point = {metric_name + ".min", current_sys_time_ms(), hist_min, tags,
+                           measure_descriptor};
+  // NOTE: A plain point which keeps the original metric name and average value.
+  MetricPoint plain_point = {metric_name, current_sys_time_ms(), hist_mean, tags,
+                             measure_descriptor};
   points.push_back(std::move(mean_point));
   points.push_back(std::move(max_point));
   points.push_back(std::move(min_point));
+  points.push_back(std::move(plain_point));
 
   if (points.size() >= report_batch_size_) {
     metric_exporter_client_->ReportMetrics(points);
@@ -95,8 +98,8 @@ void MetricPointExporter::ExportViewData(
       ExportToPoints<int64_t>(view_data.int_data(), measure_descriptor, keys, points);
       break;
     case opencensus::stats::ViewData::Type::kDistribution:
-      ExportToPoints<opencensus::stats::Distribution>(
-          view_data.distribution_data(), measure_descriptor, keys, points);
+      ExportToPoints<opencensus::stats::Distribution>(view_data.distribution_data(),
+                                                      measure_descriptor, keys, points);
       break;
     default:
       RAY_LOG(FATAL) << "Unknown view data type.";
@@ -108,9 +111,8 @@ void MetricPointExporter::ExportViewData(
 
 OpenCensusProtoExporter::OpenCensusProtoExporter(const int port,
                                                  instrumented_io_context &io_service,
-                                                 const std::string address,
-                                                 const WorkerID &worker_id)
-    : client_call_manager_(io_service), worker_id_(worker_id) {
+                                                 const std::string address)
+    : client_call_manager_(io_service) {
   client_.reset(new rpc::MetricsAgentClient(address, port, client_call_manager_));
 };
 
@@ -121,7 +123,6 @@ void OpenCensusProtoExporter::ExportViewData(
   // The format can be found here
   // https://github.com/census-instrumentation/opencensus-proto/blob/master/src/opencensus/proto/metrics/v1/metrics.proto
   rpc::ReportOCMetricsRequest request_proto;
-  request_proto.set_worker_id(worker_id_.Binary());
 
   for (const auto &datum : data) {
     // Unpack the fields we need for in memory data structure.
@@ -206,7 +207,7 @@ void OpenCensusProtoExporter::ExportViewData(
       request_proto, [](const Status &status, const rpc::ReportOCMetricsReply &reply) {
         RAY_UNUSED(reply);
         if (!status.ok()) {
-          RAY_LOG_EVERY_N(WARNING, 10000)
+          RAY_LOG(WARNING)
               << "Export metrics to agent failed: " << status
               << ". This won't affect Ray, but you can lose metrics from the cluster.";
         }

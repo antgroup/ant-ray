@@ -64,9 +64,9 @@ message ClientTask {
   string name = 2;
   // A reference to the payload.
   bytes payload_id = 3;
-  // Positional parameters to pass to this call. Deprecated in favor of data field
+  // Positional parameters to pass to this call.
   repeated Arg args = 4;
-  // Keyword parameters to pass to this call. Deprecated in favor of data field
+  // Keyword parameters to pass to this call.
   map<string, Arg> kwargs = 5;
   // The ID of the client namespace associated with the Datapath stream
   // making this request.
@@ -77,13 +77,6 @@ message ClientTask {
   TaskOptions baseline_options = 8;
   // A namespace parameter.
   string namespace = 9;
-  // Serialized args and kwargs. Under the hood this should just be a pickled
-  // tuple containing (args, kwargs).
-  bytes data = 10;
-  // Identifies which chunk the serialized args and kwargs belong to
-  int32 chunk_id = 11;
-  // Total number of chunks
-  int32 total_chunks = 12;
 }
 
 message ClientTaskTicket {
@@ -108,14 +101,6 @@ message PutRequest {
   //
   // Empty if no late binding is possible, as in a normal put().
   bytes client_ref_id = 2;
-  // Identifies which chunk the data belongs to
-  int32 chunk_id = 3;
-  // Total number of chunks
-  int32 total_chunks = 4;
-  // Total size in bytes of the data being put
-  int64 total_size = 5;
-  // The owner of the put
-  bytes owner_id = 6;
 }
 
 message PutResponse {
@@ -132,33 +117,20 @@ message PutResponse {
 // Requests data from the server.
 message GetRequest {
   // The reference ID for the requested object data
-  repeated bytes ids = 4;
+  bytes id = 1;
   // Length of time to wait for data to be available, in seconds. Zero is no timeout.
   float timeout = 2;
   // Whether to schedule this as a callback on the server side.
   bool asynchronous = 3;
-  // The chunk_id to start retrieving data from, in case the request is interrupted
-  // after partial retrieval by a disconnect
-  int32 start_chunk_id = 5;
-
-  // Deprecated fields.
-  bytes id = 1 [deprecated = true];
 }
 
 message GetResponse {
   // Whether or not the data was successfully retrieved
   bool valid = 1;
-  // The data blob containing a list of serialized objects, on success.
-  // Total size and the order of objects match those in `GetRequest.ids`.
+  // The data blob, on success
   bytes data = 2;
   // An error blob (for example, an exception) on failure.
   bytes error = 3;
-  // Identifies which chunk the data belongs to
-  int32 chunk_id = 4;
-  // Total number of chunks
-  int32 total_chunks = 5;
-  // Total size in bytes of the data being retrieved
-  uint64 total_size = 6;
 }
 
 // Waits for data to be ready on the server, with a timeout.
@@ -169,7 +141,7 @@ message WaitRequest {
   int64 num_returns = 2;
   // How long to wait for these IDs to become ready.
   double timeout = 3;
-  // The Client namespace associated with the Datapath stream that holds these IDs.
+  // The Client nodegroup associated with the Datapath stream that holds these IDs.
   string client_id = 4;
 }
 
@@ -180,7 +152,7 @@ message WaitResponse {
 }
 
 message ClusterInfoType {
-  // Namespace the enum, as it collides in the overall package.
+  // Nodegroup the enum, as it collides in the overall package.
   enum TypeEnum {
     IS_INITIALIZED = 0;
     NODES = 1;
@@ -189,7 +161,6 @@ message ClusterInfoType {
     RUNTIME_CONTEXT = 4;
     TIMELINE = 5;
     PING = 6;
-    DASHBOARD_URL = 7;
   }
 }
 
@@ -242,7 +213,6 @@ message TerminateResponse {
 
 message KVExistsRequest {
   bytes key = 1;
-  optional bytes namespace = 2;
 }
 
 message KVExistsResponse {
@@ -251,19 +221,17 @@ message KVExistsResponse {
 
 message KVGetRequest {
   bytes key = 1;
-  optional bytes namespace = 2;
 }
 
 message KVGetResponse {
   // Not set when key does not exist.
-  optional bytes value = 1;
+  bytes value = 1;
 }
 
 message KVPutRequest {
   bytes key = 1;
   bytes value = 2;
   bool overwrite = 3;
-  optional bytes namespace = 4;
 }
 
 message KVPutResponse {
@@ -272,35 +240,22 @@ message KVPutResponse {
 
 message KVDelRequest {
   bytes key = 1;
-  bool del_by_prefix = 2;
-  optional bytes namespace = 3;
 }
 
 message KVDelResponse {
-  int32 deleted_num = 1;
 }
 
 message KVListRequest {
   bytes prefix = 1;
-  optional bytes namespace = 2;
 }
 
 message KVListResponse {
   repeated bytes keys = 1;
 }
 
-message ClientPinRuntimeEnvURIRequest {
-  string uri = 1;
-  int32 expiration_s = 2;
-}
-
-message ClientPinRuntimeEnvURIResponse {}
-
 message InitRequest {
   // job_config of ray.init
   bytes job_config = 1;
-  string ray_init_kwargs = 2;
-  int32 reconnect_grace_period = 3;
 }
 
 message InitResponse {
@@ -314,20 +269,13 @@ message PrepRuntimeEnvRequest {
 message PrepRuntimeEnvResponse {
 }
 
-message ClientListNamedActorsRequest {
-  bool all_namespaces = 1;
-}
-
-message ClientListNamedActorsResponse {
-  string actors_json = 1;
-}
-
 service RayletDriver {
   rpc Init(InitRequest) returns (InitResponse) {
   }
   rpc PrepRuntimeEnv(PrepRuntimeEnvRequest) returns (PrepRuntimeEnvResponse) {
   }
-  rpc GetObject(GetRequest) returns (stream GetResponse) {}
+  rpc GetObject(GetRequest) returns (GetResponse) {
+  }
   rpc PutObject(PutRequest) returns (PutResponse) {
   }
   rpc WaitObject(WaitRequest) returns (WaitResponse) {
@@ -348,11 +296,6 @@ service RayletDriver {
   }
   rpc KVExists(KVExistsRequest) returns (KVExistsResponse) {
   }
-  rpc ListNamedActors(ClientListNamedActorsRequest)
-      returns (ClientListNamedActorsResponse) {
-  }
-  rpc PinRuntimeEnvURI(ClientPinRuntimeEnvURIRequest)
-      returns (ClientPinRuntimeEnvURIResponse) {}
 }
 
 message ReleaseRequest {
@@ -382,20 +325,6 @@ message ConnectionInfoResponse {
   string protocol_version = 5;
 }
 
-message ConnectionCleanupRequest {
-  // Explicitly request that connection is cleaned up for graceful shutdown
-}
-
-message ConnectionCleanupResponse {
-  // Acknowledge cleanup request
-}
-
-message AcknowledgeRequest {
-  // Used to acknowledge that all requests up to the given req_id have been
-  // received
-  int32 req_id = 1;
-}
-
 message DataRequest {
   // An incrementing counter of request IDs on the Datapath,
   // to match requests with responses asynchronously.
@@ -407,11 +336,6 @@ message DataRequest {
     ConnectionInfoRequest connection_info = 5;
     InitRequest init = 6;
     PrepRuntimeEnvRequest prep_runtime_env = 7;
-    ConnectionCleanupRequest connection_cleanup = 8;
-    AcknowledgeRequest acknowledge = 9;
-    ClientTask task = 10;
-    TerminateRequest terminate = 11;
-    ClientListNamedActorsRequest list_named_actors = 12;
   }
 }
 
@@ -425,14 +349,7 @@ message DataResponse {
     ConnectionInfoResponse connection_info = 5;
     InitResponse init = 6;
     PrepRuntimeEnvResponse prep_runtime_env = 7;
-    ConnectionCleanupResponse connection_cleanup = 8;
-    ClientTaskTicket task_ticket = 10;
-    TerminateResponse terminate = 11;
-    ClientListNamedActorsResponse list_named_actors = 12;
   }
-  // tag 9 is skipped, since there is no AcknowledgeResponse
-  reserved 9;
-  reserved "acknowledge";
 }
 
 service RayletDataStreamer {

@@ -19,7 +19,6 @@
 #include <vector>
 
 #include "absl/container/flat_hash_map.h"
-#include "ray/common/file_system_monitor.h"
 #include "ray/common/status.h"
 #include "ray/object_manager/common.h"
 #include "ray/object_manager/plasma/common.h"
@@ -34,17 +33,17 @@ class CreateRequestQueue {
   using CreateObjectCallback = std::function<PlasmaError(
       bool fallback_allocator, PlasmaObject *result, bool *spilling_required)>;
 
-  CreateRequestQueue(ray::FileSystemMonitor &fs_monitor,
-                     int64_t oom_grace_period_s,
+  CreateRequestQueue(int64_t oom_grace_period_s,
                      ray::SpillObjectsCallback spill_objects_callback,
                      std::function<void()> trigger_global_gc,
                      std::function<int64_t()> get_time,
-                     std::function<std::string()> dump_debug_info_callback = nullptr)
-      : fs_monitor_(fs_monitor),
-        oom_grace_period_ns_(oom_grace_period_s * 1e9),
+                     std::function<std::string()> dump_debug_info_callback = nullptr,
+                     bool plasma_unlimited = RayConfig::instance().plasma_unlimited())
+      : oom_grace_period_ns_(oom_grace_period_s * 1e9),
         spill_objects_callback_(spill_objects_callback),
         trigger_global_gc_(trigger_global_gc),
         get_time_(get_time),
+        plasma_unlimited_(plasma_unlimited),
         dump_debug_info_callback_(dump_debug_info_callback) {}
 
   /// Add a request to the queue. The caller should use the returned request ID
@@ -57,12 +56,10 @@ class CreateRequestQueue {
   /// \param client The client that sent the request. This is used as a key to
   /// drop this request if the client disconnects.
   /// \param create_callback A callback to attempt to create the object.
-  /// \param object_size Object size in bytes.
   /// \return A request ID that can be used to get the result.
   uint64_t AddRequest(const ObjectID &object_id,
                       const std::shared_ptr<ClientInterface> &client,
-                      const CreateObjectCallback &create_callback,
-                      const size_t object_size);
+                      const CreateObjectCallback &create_callback);
 
   /// Get the result of a request.
   ///
@@ -88,15 +85,12 @@ class CreateRequestQueue {
   /// \param client The client that sent the request. This is used as a key to
   /// drop this request if the client disconnects.
   /// \param create_callback A callback to attempt to create the object.
-  /// \param object_size Object size in bytes.
   /// \return The result of the call. This will return an out-of-memory error
   /// if there are other requests queued or there is not enough space left in
   /// the object store, this will return an out-of-memory error.
   std::pair<PlasmaObject, PlasmaError> TryRequestImmediately(
-      const ObjectID &object_id,
-      const std::shared_ptr<ClientInterface> &client,
-      const CreateObjectCallback &create_callback,
-      size_t object_size);
+      const ObjectID &object_id, const std::shared_ptr<ClientInterface> &client,
+      const CreateObjectCallback &create_callback);
 
   /// Process requests in the queue.
   ///
@@ -113,22 +107,15 @@ class CreateRequestQueue {
   /// \param client The client that was disconnected.
   void RemoveDisconnectedClientRequests(const std::shared_ptr<ClientInterface> &client);
 
-  size_t NumPendingRequests() const { return queue_.size(); }
-
-  size_t NumPendingBytes() const { return num_bytes_pending_; }
-
  private:
   struct CreateRequest {
-    CreateRequest(const ObjectID &object_id,
-                  uint64_t request_id,
+    CreateRequest(const ObjectID &object_id, uint64_t request_id,
                   const std::shared_ptr<ClientInterface> &client,
-                  CreateObjectCallback create_callback,
-                  size_t object_size)
+                  CreateObjectCallback create_callback)
         : object_id(object_id),
           request_id(request_id),
           client(client),
-          create_callback(create_callback),
-          object_size(object_size) {}
+          create_callback(create_callback) {}
 
     // The ObjectID to create.
     const ObjectID object_id;
@@ -144,8 +131,6 @@ class CreateRequestQueue {
     // A callback to attempt to create the object.
     const CreateObjectCallback create_callback;
 
-    const size_t object_size;
-
     // The results of the creation call. These should be sent back to the
     // client once ready.
     PlasmaError error = PlasmaError::OK;
@@ -155,15 +140,11 @@ class CreateRequestQueue {
   /// Process a single request. Sets the request's error result to the error
   /// returned by the request handler inside. Returns OK if the request can be
   /// finished.
-  Status ProcessRequest(bool fallback_allocator,
-                        std::unique_ptr<CreateRequest> &request,
+  Status ProcessRequest(bool fallback_allocator, std::unique_ptr<CreateRequest> &request,
                         bool *spilling_required);
 
   /// Finish a queued request and remove it from the queue.
   void FinishRequest(std::list<std::unique_ptr<CreateRequest>>::iterator request_it);
-
-  /// Monitor the disk utilization.
-  ray::FileSystemMonitor &fs_monitor_;
 
   /// The next request ID to assign, so that the caller can get the results of
   /// a request by retrying. Start at 1 because 0 means "do not retry".
@@ -184,6 +165,9 @@ class CreateRequestQueue {
 
   /// A callback to return the current time.
   const std::function<int64_t()> get_time_;
+
+  /// Whether to use the fallback allocator when out of memory.
+  bool plasma_unlimited_;
 
   /// Sink for debug info.
   const std::function<std::string()> dump_debug_info_callback_;
@@ -211,8 +195,6 @@ class CreateRequestQueue {
 
   /// The time OOM timer first starts. It becomes -1 upon every creation success.
   int64_t oom_start_time_ns_ = -1;
-
-  size_t num_bytes_pending_ = 0;
 
   friend class CreateRequestQueueTest;
 };

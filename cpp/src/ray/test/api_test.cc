@@ -1,26 +1,11 @@
-// Copyright 2020-2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #include <gtest/gtest.h>
 #include <ray/api.h>
 
-#include <filesystem>
-#include <fstream>
 #include <future>
 #include <thread>
 
-#include "../config_internal.h"
+#include "boost/filesystem.hpp"
 #include "ray/util/logging.h"
 
 // using namespace ray;
@@ -100,17 +85,11 @@ class Counter {
   }
 };
 
-RAY_REMOTE(Counter::FactoryCreate,
-           &Counter::Plus1,
-           &Counter::Plus,
-           &Counter::Triple,
-           &Counter::Add,
-           &Counter::GetVal,
-           &Counter::GetIntVal,
-           &Counter::GetList);
+RAY_REMOTE(Counter::FactoryCreate, &Counter::Plus1, &Counter::Plus, &Counter::Triple,
+           &Counter::Add, &Counter::GetVal, &Counter::GetIntVal, &Counter::GetList);
 
 TEST(RayApiTest, LogTest) {
-  auto log_path = std::filesystem::current_path().string() + "/tmp/";
+  auto log_path = boost::filesystem::current_path().string() + "/tmp/";
   ray::RayLog::StartRayLog("cpp_worker", ray::RayLogLevel::DEBUG, log_path);
   std::array<std::string, 3> str_arr{"debug test", "info test", "warning test"};
   RAYLOG(DEBUG) << str_arr[0];
@@ -118,8 +97,8 @@ TEST(RayApiTest, LogTest) {
   RAYLOG(WARNING) << str_arr[2];
   RAY_CHECK(true);
 
-  for (auto &it : std::filesystem::directory_iterator(log_path)) {
-    if (!std::filesystem::is_directory(it)) {
+  for (auto &it : boost::filesystem::directory_iterator(log_path)) {
+    if (!boost::filesystem::is_directory(it)) {
       std::ifstream in(it.path().string(), std::ios::binary);
       std::string line;
       for (int i = 0; i < 3; i++) {
@@ -129,7 +108,7 @@ TEST(RayApiTest, LogTest) {
     }
   }
 
-  std::filesystem::remove_all(log_path);
+  boost::filesystem::remove_all(log_path);
 }
 
 TEST(RayApiTest, TaskOptionsCheckTest) {
@@ -150,7 +129,7 @@ TEST(RayApiTest, TaskOptionsCheckTest) {
 }
 
 TEST(RayApiTest, PutTest) {
-  ray::RayConfig config;
+  ray::RayConfigCpp config;
   config.local_mode = true;
   ray::Init(config);
 
@@ -160,7 +139,7 @@ TEST(RayApiTest, PutTest) {
 }
 
 TEST(RayApiTest, StaticGetTest) {
-  ray::RayConfig config;
+  ray::RayConfigCpp config;
   config.local_mode = true;
   ray::Init(config);
   /// `Get` member function
@@ -175,7 +154,7 @@ TEST(RayApiTest, StaticGetTest) {
 }
 
 TEST(RayApiTest, WaitTest) {
-  ray::RayConfig config;
+  ray::RayConfigCpp config;
   config.local_mode = true;
   ray::Init(config);
   auto r0 = ray::Task(Return1).Remote();
@@ -252,7 +231,7 @@ TEST(RayApiTest, CallWithObjectTest) {
 }
 
 TEST(RayApiTest, ActorTest) {
-  ray::RayConfig config;
+  ray::RayConfigCpp config;
   config.local_mode = true;
   ray::Init(config);
   auto actor = ray::Actor(Counter::FactoryCreate).Remote();
@@ -294,7 +273,7 @@ TEST(RayApiTest, ActorTest) {
 }
 
 TEST(RayApiTest, GetActorTest) {
-  ray::ActorHandle<Counter> actor =
+  ray::ActorHandleCpp<Counter> actor =
       ray::Actor(Counter::FactoryCreate).SetName("named_actor").Remote();
   auto named_actor_obj = actor.Task(&Counter::Add).Remote(1);
   EXPECT_EQ(1, *named_actor_obj.Get());
@@ -319,7 +298,7 @@ TEST(RayApiTest, CompareWithFuture) {
   int rt2 = f2.get();
 
   // Ray API
-  ray::RayConfig config;
+  ray::RayConfigCpp config;
   config.local_mode = true;
   ray::Init(config);
   auto f3 = ray::Task(Plus1).Remote(1);
@@ -333,32 +312,15 @@ TEST(RayApiTest, CompareWithFuture) {
 
 TEST(RayApiTest, CreateAndRemovePlacementGroup) {
   std::vector<std::unordered_map<std::string, double>> bundles{{{"CPU", 1}}};
-  ray::PlacementGroupCreationOptions options1{
-      "first_placement_group", bundles, ray::PlacementStrategy::PACK};
+  ray::PlacementGroupCreationOptionsCpp options1{"first_placement_group", bundles,
+                                                 ray::PlacementStrategyCpp::PACK};
   auto first_placement_group = ray::CreatePlacementGroup(options1);
   EXPECT_TRUE(first_placement_group.Wait(10));
 
   ray::RemovePlacementGroup(first_placement_group.GetID());
 }
 
-TEST(RayApiTest, DefaultActorLifetimeTest) {
-  ray::RayConfig config;
-  ray::internal::ConfigInternal::Instance().Init(config, 0, nullptr);
-  EXPECT_EQ(ray::rpc::JobConfig_ActorLifetime_NON_DETACHED,
-            ray::internal::ConfigInternal::Instance().default_actor_lifetime);
-  config.default_actor_lifetime = ray::ActorLifetime::DETACHED;
-  ray::internal::ConfigInternal::Instance().Init(config, 0, nullptr);
-  EXPECT_EQ(ray::rpc::JobConfig_ActorLifetime_DETACHED,
-            ray::internal::ConfigInternal::Instance().default_actor_lifetime);
-  std::string str = "--ray_default_actor_lifetime=NON_DETACHED";
-  char exec_name[] = {' '};
-  char *args[] = {exec_name, const_cast<char *>(str.c_str())};
-  ray::internal::ConfigInternal::Instance().Init(config, 2, args);
-  EXPECT_EQ(ray::rpc::JobConfig_ActorLifetime_NON_DETACHED,
-            ray::internal::ConfigInternal::Instance().default_actor_lifetime);
-  std::string str2 = "--ray_default_actor_lifetime=detached";
-  char *args2[] = {exec_name, const_cast<char *>(str2.c_str())};
-  ray::internal::ConfigInternal::Instance().Init(config, 2, args2);
-  EXPECT_EQ(ray::rpc::JobConfig_ActorLifetime_DETACHED,
-            ray::internal::ConfigInternal::Instance().default_actor_lifetime);
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

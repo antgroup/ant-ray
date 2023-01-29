@@ -51,6 +51,7 @@ public class LoggingUtil {
       rootLogger.add(builder.newAppenderRef("Console"));
 
       builder.add(appenderBuilder);
+      rootLogger.add(builder.newAppenderRef("LogToRollingFile"));
       builder.add(rootLogger);
       Configurator.reconfigure(builder.build());
 
@@ -68,15 +69,12 @@ public class LoggingUtil {
 
       ConfigurationBuilder<BuiltConfiguration> globalConfigBuilder =
           ConfigurationBuilderFactory.newConfigurationBuilder();
-
-      // TODO(qwang): We can use rayConfig.logLevel instead.
-      Level level = Level.toLevel(config.getString("ray.logging.level"));
-
       globalConfigBuilder.setStatusLevel(Level.INFO);
       globalConfigBuilder.setConfigurationName("DefaultLogger");
 
       /// Setup root logger for Java worker.
-      RootLoggerComponentBuilder rootLoggerBuilder = globalConfigBuilder.newAsyncRootLogger(level);
+      RootLoggerComponentBuilder rootLoggerBuilder =
+          globalConfigBuilder.newAsyncRootLogger(rayConfig.logLevel);
       rootLoggerBuilder.addAttribute("RingBufferSize", "1048576");
       final String javaWorkerLogName = "JavaWorkerLogToRollingFile";
       setupLogger(
@@ -90,6 +88,7 @@ public class LoggingUtil {
           maxBackupFiles);
       rootLoggerBuilder.add(globalConfigBuilder.newAppenderRef(javaWorkerLogName));
       globalConfigBuilder.add(rootLoggerBuilder);
+
       /// Setup user loggers.
       for (RayConfig.LoggerConf conf : rayConfig.loggers) {
         final String logPattern =
@@ -103,6 +102,7 @@ public class LoggingUtil {
             maxFileSize,
             maxBackupFiles);
       }
+
       Configurator.reconfigure(globalConfigBuilder.build());
     }
   }
@@ -132,6 +132,7 @@ public class LoggingUtil {
         globalConfigBuilder
             .newLayout("PatternLayout")
             .addAttribute("pattern", userLoggerConf.pattern);
+
     ComponentBuilder userLoggerTriggeringPolicy =
         globalConfigBuilder
             .newComponent("Policies")
@@ -143,6 +144,7 @@ public class LoggingUtil {
         globalConfigBuilder
             .newComponent("DefaultRolloverStrategy")
             .addAttribute("max", maxBackupFiles);
+
     final String logFileName =
         userLoggerConf.fileName.replace("%p", String.valueOf(SystemUtil.pid()));
     final String logPath = logDir + "/" + logFileName + ".log";

@@ -14,9 +14,9 @@
 
 #include "ray/gcs/gcs_server/gcs_heartbeat_manager.h"
 
-#include "ray/common/constants.h"
 #include "ray/common/ray_config.h"
 #include "ray/gcs/pb_util.h"
+#include "src/ray/protobuf/gcs.pb.h"
 
 namespace ray {
 namespace gcs {
@@ -27,13 +27,9 @@ GcsHeartbeatManager::GcsHeartbeatManager(
     : io_service_(io_service),
       on_node_death_callback_(std::move(on_node_death_callback)),
       num_heartbeats_timeout_(RayConfig::instance().num_heartbeats_timeout()),
-      gcs_failover_worker_reconnect_timeout_(
-          RayConfig::instance().gcs_failover_worker_reconnect_timeout()),
       periodical_runner_(io_service) {
   RAY_LOG(INFO) << "GcsHeartbeatManager start, num_heartbeats_timeout="
-                << num_heartbeats_timeout_ << ", initial_num_heartbeats_timeout="
-                << gcs_failover_worker_reconnect_timeout_;
-
+                << num_heartbeats_timeout_;
   io_service_thread_.reset(new std::thread([this] {
     SetThreadName("heartbeat");
     /// The asio work to keep io_service_ alive.
@@ -44,8 +40,8 @@ GcsHeartbeatManager::GcsHeartbeatManager(
 
 void GcsHeartbeatManager::Initialize(const GcsInitData &gcs_init_data) {
   for (const auto &item : gcs_init_data.Nodes()) {
-    if (item.second.state() == rpc::GcsNodeInfo::ALIVE) {
-      AddNodeInternal(item.second, gcs_failover_worker_reconnect_timeout_);
+    if (item.second.basic_gcs_node_info().state() == rpc::BasicGcsNodeInfo::ALIVE) {
+      heartbeats_.emplace(item.first, num_heartbeats_timeout_);
     }
   }
 }
@@ -71,42 +67,27 @@ void GcsHeartbeatManager::Stop() {
   }
 }
 
-void GcsHeartbeatManager::RemoveNode(const NodeID &node_id) {
-  io_service_.dispatch(
-      [this, node_id] {
-        node_map_.left.erase(node_id);
-        heartbeats_.erase(node_id);
-      },
-      "GcsHeartbeatManager::RemoveNode");
-}
-
-void GcsHeartbeatManager::AddNode(const rpc::GcsNodeInfo &node_info) {
-  AddNodeInternal(node_info, num_heartbeats_timeout_);
-}
-
-void GcsHeartbeatManager::AddNodeInternal(const rpc::GcsNodeInfo &node_info,
-                                          int64_t heartbeats_counts) {
-  auto node_id = NodeID::FromBinary(node_info.node_id());
-  auto node_addr = node_info.node_manager_address() + ":" +
-                   std::to_string(node_info.node_manager_port());
+void GcsHeartbeatManager::AddNode(const NodeID &node_id) {
   io_service_.post(
-      [this, node_id, node_addr, heartbeats_counts] {
-        node_map_.insert(NodeIDAddrBiMap::value_type(node_id, node_addr));
-        heartbeats_.emplace(node_id, heartbeats_counts);
-      },
+      [this, node_id] { heartbeats_.emplace(node_id, num_heartbeats_timeout_); },
       "GcsHeartbeatManager.AddNode");
 }
 
 void GcsHeartbeatManager::HandleReportHeartbeat(
-    rpc::ReportHeartbeatRequest request,
-    rpc::ReportHeartbeatReply *reply,
+    const rpc::ReportHeartbeatRequest &request, rpc::ReportHeartbeatReply *reply,
     rpc::SendReplyCallback send_reply_callback) {
   NodeID node_id = NodeID::FromBinary(request.heartbeat().node_id());
   auto iter = heartbeats_.find(node_id);
   if (iter == heartbeats_.end()) {
     // Reply the raylet with an error so the raylet can crash itself.
-    GCS_RPC_SEND_REPLY(
-        send_reply_callback, reply, Status::Disconnected("Node has been dead"));
+    GCS_RPC_SEND_REPLY(send_reply_callback, reply,
+                       Status::Disconnected("Node has been dead"));
+    return;
+  }
+
+  if (to_be_rejected_nodes_.contains(node_id)) {
+    // Reply the raylet with an error so the raylet can crash itself.
+    GCS_RPC_SEND_REPLY(send_reply_callback, reply, to_be_rejected_nodes_[node_id]);
     return;
   }
 
@@ -114,21 +95,55 @@ void GcsHeartbeatManager::HandleReportHeartbeat(
   GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
 }
 
+void GcsHeartbeatManager::HandleCheckAlive(const rpc::CheckAliveRequest &request,
+                                           rpc::CheckAliveReply *reply,
+                                           rpc::SendReplyCallback send_reply_callback) {
+  reply->set_seq(request.seq());
+  RAY_LOG(DEBUG) << "HandleCheckAlive " << request.seq();
+  GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
+}
+
 void GcsHeartbeatManager::DetectDeadNodes() {
-  std::vector<NodeID> dead_nodes;
-  for (auto &current : heartbeats_) {
-    current.second = current.second - 1;
-    if (current.second == 0) {
-      RAY_LOG(WARNING) << "Node timed out: " << current.first;
-      dead_nodes.push_back(current.first);
+  for (auto it = heartbeats_.begin(); it != heartbeats_.end();) {
+    auto current = it++;
+    current->second = current->second - 1;
+    if (current->second == 0) {
+      auto node_id = current->first;
+      RAY_LOG(WARNING) << "Node timed out: " << node_id;
+      heartbeats_.erase(current);
+      to_be_rejected_nodes_.erase(node_id);
+      if (on_node_death_callback_) {
+        on_node_death_callback_(node_id);
+      }
     }
   }
-  for (const auto &node_id : dead_nodes) {
-    RemoveNode(node_id);
-    if (on_node_death_callback_) {
-      on_node_death_callback_(node_id);
-    }
+}
+
+void GcsHeartbeatManager::HandleRejectNode(const rpc::RejectNodeRequest &request,
+                                           rpc::RejectNodeReply *reply,
+                                           rpc::SendReplyCallback send_reply_callback) {
+  NodeID node_id = NodeID::FromBinary(request.node_id());
+  auto type = request.reject_type();
+  RAY_LOG(INFO) << "Rejecting node, node_id=" << node_id
+                << ", type=" << rpc::NodeRejectType_Name(type);
+  if (type == rpc::NodeRejectType::EXIT_AND_REPLACE_NODE) {
+    RejectNode(node_id, Status::ExitAndReplaceNode("Exit and replace this node."));
+  } else if (type == rpc::NodeRejectType::EXIT_NODE) {
+    RejectNode(node_id, Status::ExitNode("Exit this node."));
+  } else {
+    RAY_LOG(ERROR) << "Unknown reject type: " << type;
   }
+  GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
+}
+
+void GcsHeartbeatManager::RejectNode(const NodeID &node_id, const Status &status) {
+  RAY_LOG(INFO) << "Rejecting node, node_id=" << node_id << ", type=" << status;
+  io_service_.post([this, node_id, status] {
+    if (heartbeats_.contains(node_id)) {
+      RAY_LOG(INFO) << "Adding node " << node_id << " to rejected nodes.";
+      to_be_rejected_nodes_[node_id] = status;
+    }
+  });
 }
 
 }  // namespace gcs

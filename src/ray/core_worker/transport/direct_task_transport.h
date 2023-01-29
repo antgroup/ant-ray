@@ -32,7 +32,6 @@
 #include "ray/rpc/worker/core_worker_client_pool.h"
 
 namespace ray {
-namespace core {
 
 typedef std::function<std::shared_ptr<WorkerLeaseInterface>(const std::string &ip_address,
                                                             int port)>
@@ -46,29 +45,23 @@ typedef std::function<std::shared_ptr<WorkerLeaseInterface>(const std::string &i
 // would always request a new worker lease. We need this to let raylet know about
 // direct actor creation task, and reconstruct the actor if it dies. Otherwise if
 // the actor creation task just reuses an existing worker, then raylet will not
-// be aware of the actor and is not able to manage it.  It is also keyed on
-// RuntimeEnvHash, because a worker can only run a task if the worker's RuntimeEnvHash
-// matches the RuntimeEnvHash required by the task spec.
-typedef int RuntimeEnvHash;
-using SchedulingKey =
-    std::tuple<SchedulingClass, std::vector<ObjectID>, ActorID, RuntimeEnvHash>;
+// be aware of the actor and is not able to manage it.
+using SchedulingKey = std::tuple<SchedulingClass, std::vector<ObjectID>, ActorID>;
 
 // This class is thread-safe.
 class CoreWorkerDirectTaskSubmitter {
  public:
   explicit CoreWorkerDirectTaskSubmitter(
-      rpc::Address rpc_address,
-      std::shared_ptr<WorkerLeaseInterface> lease_client,
+      rpc::Address rpc_address, std::shared_ptr<WorkerLeaseInterface> lease_client,
       std::shared_ptr<rpc::CoreWorkerClientPool> core_worker_client_pool,
       LeaseClientFactoryFn lease_client_factory,
       std::shared_ptr<LeasePolicyInterface> lease_policy,
       std::shared_ptr<CoreWorkerMemoryStore> store,
-      std::shared_ptr<TaskFinisherInterface> task_finisher,
-      NodeID local_raylet_id,
-      WorkerType worker_type,
-      int64_t lease_timeout_ms,
-      std::shared_ptr<ActorCreatorInterface> actor_creator,
+      std::shared_ptr<TaskFinisherInterface> task_finisher, NodeID local_raylet_id,
+      int64_t lease_timeout_ms, std::shared_ptr<ActorCreatorInterface> actor_creator,
       const JobID &job_id,
+      uint32_t max_tasks_in_flight_per_worker =
+          ::RayConfig::instance().max_tasks_in_flight_per_worker(),
       absl::optional<boost::asio::steady_timer> cancel_timer = absl::nullopt,
       uint64_t max_pending_lease_requests_per_scheduling_category =
           ::RayConfig::instance().max_pending_lease_requests_per_scheduling_category())
@@ -76,14 +69,14 @@ class CoreWorkerDirectTaskSubmitter {
         local_lease_client_(lease_client),
         lease_client_factory_(lease_client_factory),
         lease_policy_(std::move(lease_policy)),
-        resolver_(*store, *task_finisher, *actor_creator),
+        resolver_(store, task_finisher),
         task_finisher_(task_finisher),
         lease_timeout_ms_(lease_timeout_ms),
         local_raylet_id_(local_raylet_id),
-        worker_type_(worker_type),
-        actor_creator_(actor_creator),
+        actor_creator_(std::move(actor_creator)),
         client_cache_(core_worker_client_pool),
         job_id_(job_id),
+        max_tasks_in_flight_per_worker_(max_tasks_in_flight_per_worker),
         max_pending_lease_requests_per_scheduling_category_(
             max_pending_lease_requests_per_scheduling_category),
         cancel_retry_timer_(std::move(cancel_timer)) {}
@@ -99,28 +92,14 @@ class CoreWorkerDirectTaskSubmitter {
   /// \param[in] force_kill Whether to kill the worker executing the task.
   Status CancelTask(TaskSpecification task_spec, bool force_kill, bool recursive);
 
-  Status CancelRemoteTask(const ObjectID &object_id,
-                          const rpc::Address &worker_addr,
-                          bool force_kill,
-                          bool recursive);
+  Status CancelRemoteTask(const ObjectID &object_id, const rpc::Address &worker_addr,
+                          bool force_kill, bool recursive);
   /// Check that the scheduling_key_entries_ hashmap is empty by calling the private
   /// CheckNoSchedulingKeyEntries function after acquiring the lock.
   bool CheckNoSchedulingKeyEntriesPublic() {
     absl::MutexLock lock(&mu_);
     return scheduling_key_entries_.empty();
   }
-
-  int64_t GetNumTasksSubmitted() const { return num_tasks_submitted_; }
-
-  int64_t GetNumLeasesRequested() {
-    absl::MutexLock lock(&mu_);
-    return num_leases_requested_;
-  }
-
-  /// Report worker backlog information to the local raylet.
-  /// Since each worker only reports to its local rayet
-  /// we avoid double counting backlogs in autoscaler.
-  void ReportWorkerBacklog();
 
  private:
   /// Schedule more work onto an idle worker or return it back to the raylet if
@@ -130,13 +109,9 @@ class CoreWorkerDirectTaskSubmitter {
   /// \param[in] addr The address of the worker.
   /// \param[in] task_queue_key The scheduling class of the worker.
   /// \param[in] was_error Whether the task failed to be submitted.
-  /// \param[in] worker_exiting Whether the worker is exiting.
   /// \param[in] assigned_resources Resource ids previously assigned to the worker.
   void OnWorkerIdle(
-      const rpc::WorkerAddress &addr,
-      const SchedulingKey &task_queue_key,
-      bool was_error,
-      bool worker_exiting,
+      const rpc::WorkerAddress &addr, const SchedulingKey &task_queue_key, bool was_error,
       const google::protobuf::RepeatedPtrField<rpc::ResourceMapEntry> &assigned_resources)
       EXCLUSIVE_LOCKS_REQUIRED(mu_);
 
@@ -145,14 +120,6 @@ class CoreWorkerDirectTaskSubmitter {
   /// local raylet.
   std::shared_ptr<WorkerLeaseInterface> GetOrConnectLeaseClient(
       const rpc::Address *raylet_address) EXCLUSIVE_LOCKS_REQUIRED(mu_);
-
-  /// Report worker backlog information to the local raylet
-  void ReportWorkerBacklogInternal() EXCLUSIVE_LOCKS_REQUIRED(mu_);
-
-  /// Report backlog if the backlog size is changed for this scheduling key
-  /// since last report
-  void ReportWorkerBacklogIfNeeded(const SchedulingKey &scheduling_key)
-      EXCLUSIVE_LOCKS_REQUIRED(mu_);
 
   /// Request a new worker from the raylet if no such requests are currently in
   /// flight and there are tasks queued. If a raylet address is provided, then
@@ -171,25 +138,9 @@ class CoreWorkerDirectTaskSubmitter {
 
   /// Set up client state for newly granted worker lease.
   void AddWorkerLeaseClient(
-      const rpc::WorkerAddress &addr,
-      std::shared_ptr<WorkerLeaseInterface> lease_client,
+      const rpc::WorkerAddress &addr, std::shared_ptr<WorkerLeaseInterface> lease_client,
       const google::protobuf::RepeatedPtrField<rpc::ResourceMapEntry> &assigned_resources,
-      const SchedulingKey &scheduling_key,
-      const TaskID &task_id) EXCLUSIVE_LOCKS_REQUIRED(mu_);
-
-  /// This function takes care of returning a worker to the Raylet.
-  /// \param[in] addr The address of the worker.
-  /// \param[in] was_error Whether the task failed to be submitted.
-  /// \param[in] worker_exiting Whether the worker is exiting.
-  void ReturnWorker(const rpc::WorkerAddress addr,
-                    bool was_error,
-                    bool worker_exiting,
-                    const SchedulingKey &scheduling_key) EXCLUSIVE_LOCKS_REQUIRED(mu_);
-
-  /// Check that the scheduling_key_entries_ hashmap is empty.
-  inline bool CheckNoSchedulingKeyEntries() const EXCLUSIVE_LOCKS_REQUIRED(mu_) {
-    return scheduling_key_entries_.empty();
-  }
+      const SchedulingKey &scheduling_key) EXCLUSIVE_LOCKS_REQUIRED(mu_);
 
   /// Push a task to a specific worker.
   void PushNormalTask(const rpc::WorkerAddress &addr,
@@ -199,14 +150,10 @@ class CoreWorkerDirectTaskSubmitter {
                       const google::protobuf::RepeatedPtrField<rpc::ResourceMapEntry>
                           &assigned_resources);
 
-  /// Handles result from GetTaskFailureCause.
-  void HandleGetTaskFailureCause(
-      const Status &task_execution_status,
-      const bool is_actor,
-      const TaskID &task_id,
-      const rpc::WorkerAddress &addr,
-      const Status &get_task_failure_cause_reply_status,
-      const rpc::GetTaskFailureCauseReply &get_task_failure_cause_reply);
+  /// Check that the scheduling_key_entries_ hashmap is empty.
+  bool CheckNoSchedulingKeyEntries() const EXCLUSIVE_LOCKS_REQUIRED(mu_) {
+    return scheduling_key_entries_.empty();
+  }
 
   /// Address of our RPC server.
   rpc::Address rpc_address_;
@@ -239,9 +186,6 @@ class CoreWorkerDirectTaskSubmitter {
   /// if a remote raylet tells us to spill the task back to the local raylet.
   const NodeID local_raylet_id_;
 
-  /// The type of this core worker process.
-  const WorkerType worker_type_;
-
   /// Interface for actor creation.
   std::shared_ptr<ActorCreatorInterface> actor_creator_;
 
@@ -254,37 +198,43 @@ class CoreWorkerDirectTaskSubmitter {
   /// The ID of the job.
   const JobID job_id_;
 
+  // max_tasks_in_flight_per_worker_ limits the number of tasks that can be pipelined to a
+  // worker using a single lease.
+  const uint32_t max_tasks_in_flight_per_worker_;
+
   // Max number of pending lease requests per SchedulingKey.
   const uint64_t max_pending_lease_requests_per_scheduling_category_;
 
   /// A LeaseEntry struct is used to condense the metadata about a single executor:
   /// (1) The lease client through which the worker should be returned
   /// (2) The expiration time of a worker's lease.
-  /// (3) Whether the worker has assigned task to do.
-  /// (5) The resources assigned to the worker
-  /// (6) The SchedulingKey assigned to tasks that will be sent to the worker
-  /// (7) The task id used to obtain the worker lease.
+  /// (3) The number of tasks that are currently in flight to the worker
+  /// (4) The resources assigned to the worker
+  /// (5) The SchedulingKey assigned to tasks that will be sent to the worker
   struct LeaseEntry {
     std::shared_ptr<WorkerLeaseInterface> lease_client;
     int64_t lease_expiration_time;
-    bool is_busy = false;
+    uint32_t tasks_in_flight;
     google::protobuf::RepeatedPtrField<rpc::ResourceMapEntry> assigned_resources;
     SchedulingKey scheduling_key;
-    TaskID task_id;
 
     LeaseEntry(
         std::shared_ptr<WorkerLeaseInterface> lease_client = nullptr,
-        int64_t lease_expiration_time = 0,
+        int64_t lease_expiration_time = 0, uint32_t tasks_in_flight = 0,
         google::protobuf::RepeatedPtrField<rpc::ResourceMapEntry> assigned_resources =
             google::protobuf::RepeatedPtrField<rpc::ResourceMapEntry>(),
-        SchedulingKey scheduling_key =
-            std::make_tuple(0, std::vector<ObjectID>(), ActorID::Nil(), 0),
-        TaskID task_id = TaskID::Nil())
+        SchedulingKey scheduling_key = std::make_tuple(0, std::vector<ObjectID>(),
+                                                       ActorID::Nil()))
         : lease_client(lease_client),
           lease_expiration_time(lease_expiration_time),
+          tasks_in_flight(tasks_in_flight),
           assigned_resources(assigned_resources),
-          scheduling_key(scheduling_key),
-          task_id(task_id) {}
+          scheduling_key(scheduling_key) {}
+
+    // Check whether the pipeline to the worker associated with a LeaseEntry is full.
+    bool PipelineToWorkerFull(uint32_t max_tasks_in_flight_per_worker) const {
+      return tasks_in_flight == max_tasks_in_flight_per_worker;
+    }
   };
 
   // Map from worker address to a LeaseEntry struct containing the lease's metadata.
@@ -302,36 +252,25 @@ class CoreWorkerDirectTaskSubmitter {
     // room for more tasks in flight
     absl::flat_hash_set<rpc::WorkerAddress> active_workers =
         absl::flat_hash_set<rpc::WorkerAddress>();
-    // Keep track of how many workers have tasks to do.
-    uint32_t num_busy_workers = 0;
-    int64_t last_reported_backlog_size = 0;
+    // Keep track of how many tasks with this SchedulingKey are in flight, in total
+    uint32_t total_tasks_in_flight = 0;
 
     // Check whether it's safe to delete this SchedulingKeyEntry from the
     // scheduling_key_entries_ hashmap.
-    inline bool CanDelete() const {
+    bool CanDelete() const {
       if (pending_lease_requests.empty() && task_queue.empty() &&
-          active_workers.size() == 0 && num_busy_workers == 0) {
+          active_workers.size() == 0 && total_tasks_in_flight == 0) {
         return true;
       }
 
       return false;
     }
 
-    // Check whether all workers are busy.
-    inline bool AllWorkersBusy() const {
-      RAY_CHECK_LE(num_busy_workers, active_workers.size());
-      return num_busy_workers == active_workers.size();
-    }
-
-    // Get the current backlog size for this scheduling key
-    [[nodiscard]] inline int64_t BacklogSize() const {
-      if (task_queue.size() < pending_lease_requests.size()) {
-        // This can happen if worker is reused.
-        return 0;
-      }
-
-      // Subtract tasks with pending lease requests so we don't double count them.
-      return task_queue.size() - pending_lease_requests.size();
+    // Check whether the pipelines to the active workers associated with a
+    // SchedulingKeyEntry are all full.
+    bool AllPipelinesToWorkersFull(uint32_t max_tasks_in_flight_per_worker) const {
+      return total_tasks_in_flight ==
+             (active_workers.size() * max_tasks_in_flight_per_worker);
     }
   };
 
@@ -349,10 +288,6 @@ class CoreWorkerDirectTaskSubmitter {
 
   // Retries cancelation requests if they were not successful.
   absl::optional<boost::asio::steady_timer> cancel_retry_timer_;
-
-  int64_t num_tasks_submitted_ = 0;
-  int64_t num_leases_requested_ GUARDED_BY(mu_) = 0;
 };
 
-}  // namespace core
-}  // namespace ray
+};  // namespace ray

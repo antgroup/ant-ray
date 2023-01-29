@@ -1,0 +1,102 @@
+diff --git src/brpc/global.cpp src/brpc/global.cpp
+index 30c2f1a..986cf4d 100644
+--- src/brpc/global.cpp
++++ src/brpc/global.cpp
+@@ -255,7 +255,7 @@ static void* GlobalUpdate(void*) {
+             && fw.check_and_consume() > 0) {
+             long port = ReadPortOfDummyServer(DUMMY_SERVER_PORT_FILE);
+             if (port >= 0) {
+-                StartDummyServerAt(port);
++                StartDummyServerAt(port, nullptr);
+             }
+         }
+ 
+diff --git src/brpc/server.cpp src/brpc/server.cpp
+index fb25928..f8e8e7f 100644
+--- src/brpc/server.cpp
++++ src/brpc/server.cpp
+@@ -1818,7 +1818,7 @@ void Server::PrintTabsBody(std::ostream& os,
+ static pthread_mutex_t g_dummy_server_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static Server* g_dummy_server = NULL;
+ 
+-int StartDummyServerAt(int port, ProfilerLinker) {
++int StartDummyServerAt(int port, int *actual_port, ProfilerLinker) {
+     if (port < 0 || port >= 65536) {
+         LOG(ERROR) << "Invalid port=" << port;
+         return -1;
+@@ -1839,6 +1839,9 @@ int StartDummyServerAt(int port, ProfilerLinker) {
+             // fencing, but we only expose a function to test existence
+             // of g_dummy_server, everything should be fine.
+             g_dummy_server = dummy_server;
++            if (actual_port != nullptr) {
++                *actual_port = g_dummy_server->listen_address().port;
++            }
+             return 0;
+         }
+     }
+diff --git src/brpc/server.h src/brpc/server.h
+index b5a76cf..4df7fa2 100644
+--- src/brpc/server.h
++++ src/brpc/server.h
+@@ -716,11 +716,14 @@ void* thread_local_data();
+ bool IsDummyServerRunning();
+ 
+ // Start a dummy server listening at `port'. If a dummy server was already
+-// running, this function does nothing and fails.
++// running, this function does nothing and fails. If this function succeeds
++// and `actual_port` is not NULL, set its value as the actual port for the
++// server, this is useful when this function is called with `port` set to 0,
++// in this case OS will assign a port for the server.
+ // NOTE: The second parameter(ProfilerLinker) is for linking of profiling
+ // functions when corresponding macros are defined, just ignore it.
+ // Returns 0 on success, -1 otherwise.
+-int StartDummyServerAt(int port, ProfilerLinker = ProfilerLinker());
++int StartDummyServerAt(int port, int *actual_port, ProfilerLinker = ProfilerLinker());
+ 
+ } // namespace brpc
+ 
+diff --git src/butil/popen.cpp src/butil/popen.cpp
+index e806199..bb109d1 100644
+--- src/butil/popen.cpp
++++ src/butil/popen.cpp
+@@ -160,6 +160,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
+     if (pipe == NULL) {
+         return -1;
+     }
++    bool read_finished = false;
+     char buffer[1024];
+     for (;;) {
+         size_t nr = fread(buffer, 1, sizeof(buffer), pipe);
+@@ -168,6 +169,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
+         }
+         if (nr != sizeof(buffer)) {
+             if (feof(pipe)) {
++                read_finished = true;
+                 break;
+             } else if (ferror(pipe)) {
+                 LOG(ERROR) << "Encountered error while reading for the pipe";
+@@ -180,6 +182,16 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
+     const int wstatus = pclose(pipe);
+ 
+     if (wstatus < 0) {
++        if (read_finished) {
++            // pclose() would fail if SIGCHLD is ignored, so if fread() finished successfully
++            // in this case, we check if SIGCHLD is ignored, and treat it as success in this case.
++            struct sigaction act;
++            if (!sigaction(SIGCHLD, NULL, &act) && act.sa_handler == SIG_IGN) {
++                LOG(INFO) << "Ignoring pclose() failure because SIGCHLD is ignored and fread() succeeds,"
++                          << ", cmd: " << cmd;
++                return 0;
++            }
++        }
+         return wstatus;
+     }
+     if (WIFEXITED(wstatus)) {
+@@ -189,6 +201,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
+         os << "Child process was killed by signal "
+            << WTERMSIG(wstatus);
+     }
++    LOG(INFO) << "Command failured with ECHILD, cmd: " << cmd;
+     errno = ECHILD;
+     return -1;
+ }

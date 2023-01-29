@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package ray.rpc.example;
+
+import "src/ray/protobuf/brpc_stream.proto";
+
+// This file contains protobuf definitions for an example rpc service
+// which is based on brpc stream. This can be used as a reference when
+// implementing a brpc stream service.
+
+message EchoRequest {
+  // Request id which increases for each request.
+  uint64 id = 1;
+};
+
+message EchoReply {
+  // Id of the corresponding request.
+  uint64 id = 1;
+};
+
+// Note that replies are optional, and there's at most one reply for each request.
+service EchoStreamService {
+  rpc Echo(EchoRequest) returns (EchoReply);
+};
+
+// NOTE that to implement a brpc stream service, an enum value needs to be defined
+// in `StreamServiceType` in `brpc_stream.proto`, for this particular service the value
+// `ExampleServiceType` is defined.
+
+// This enum is needed by brpc stream. For each method in the stream rpc service,
+// a message type needs to be defined for the corresponding request/reply in that
+// method, so that receiver side can figure out the exact request message
+// based on this type, deserialize it accordingly, and invoke the corresponding
+// method.
+enum EchoStreamServiceMessageType {
+  // Echo request. This corresponds to `EchoRequest`.
+  EchoRequestMessage = 0;
+  // Echo reply. This corresponds to `EchoReply`.
+  EchoReplyMessage = 1;
+}

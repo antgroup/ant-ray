@@ -35,9 +35,9 @@ public class MultiDriverTest extends BaseTest {
     }
   }
 
+  @SuppressWarnings("all")
   public static void main(String[] args) throws IOException {
     Ray.init();
-
     List<ObjectRef<Integer>> pidObjectList = new ArrayList<>();
     // Submit some normal tasks and get the PIDs of workers which execute the tasks.
     for (int i = 0; i < NORMAL_TASK_COUNT_PER_DRIVER; ++i) {
@@ -55,8 +55,10 @@ public class MultiDriverTest extends BaseTest {
     // Write pids to stdout
     System.out.println(
         PID_LIST_PREFIX + pids.stream().map(String::valueOf).collect(Collectors.joining(",")));
+    Ray.shutdown();
   }
 
+  @Test(groups = {"cluster"})
   public void testMultiDrivers() throws InterruptedException, IOException {
     // This test case starts some driver processes. Each driver process submits some tasks and
     // collect the PIDs of the workers used by the driver. The drivers output the PID list
@@ -101,7 +103,7 @@ public class MultiDriverTest extends BaseTest {
   }
 
   private Process startDriver() throws IOException {
-    ProcessBuilder builder = TestUtils.buildDriver(MultiDriverTest.class, null);
+    ProcessBuilder builder = TestUtils.buildDriver(MultiDriverTest.class, null, false);
     builder.redirectError(Redirect.INHERIT);
     return builder.start();
   }

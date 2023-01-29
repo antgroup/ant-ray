@@ -1,6 +1,8 @@
+from libcpp cimport bool as c_bool
 from libcpp.string cimport string as c_string
 from libcpp.unordered_map cimport unordered_map
 from libcpp.vector cimport vector as c_vector
+from libcpp.pair cimport pair as c_pair
 
 cdef extern from "opencensus/tags/tag_key.h" nogil:
     cdef cppclass CTagKey "opencensus::tags::TagKey":
@@ -43,3 +45,16 @@ cdef extern from "ray/stats/metric.h" nogil:
                    const c_string &unit,
                    const c_vector[double] &boundaries,
                    const c_vector[CTagKey] &tag_keys)
+
+cdef extern from "<utility>" namespace "std" nogil:
+    cdef c_pair[T, U] make_pair[T, U](T&, U&)
+
+cdef extern from "ray/stats/stats.h" namespace "ray::stats" nogil:
+    cdef void Start(const c_vector[c_pair[CTagKey, c_string]] &global_tags,
+                    const int metrics_agent_port,
+                    const c_string &config_list,
+                    const c_bool callback_shutdown,
+                    const c_bool init_log,
+                    const c_string &app_name)
+
+    cdef void Shutdown()

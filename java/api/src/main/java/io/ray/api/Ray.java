@@ -1,10 +1,13 @@
 package io.ray.api;
 
+import io.ray.api.id.ActorId;
+import io.ray.api.id.UniqueId;
 import io.ray.api.runtime.RayRuntime;
 import io.ray.api.runtime.RayRuntimeFactory;
 import io.ray.api.runtimecontext.RuntimeContext;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 /** This class contains all public APIs of Ray. */
 public final class Ray extends RayCall {
@@ -30,7 +33,6 @@ public final class Ray extends RayCall {
   private static synchronized void init(RayRuntimeFactory factory) {
     if (runtime == null) {
       runtime = factory.createRayRuntime();
-      Runtime.getRuntime().addShutdownHook(new Thread(Ray::shutdown));
     }
   }
 
@@ -40,6 +42,20 @@ public final class Ray extends RayCall {
       internal().shutdown();
       runtime = null;
     }
+  }
+
+  /**
+   * Kill the current job. Note that this API doesn't guarantee the job must be killed. This API is
+   * not allowed in driver.
+   *
+   * @throws io.ray.api.exception.RayException if there's error when killing.
+   */
+  public static void killCurrentJob() {
+    runtime.killCurrentJob();
+  }
+
+  public static void reportEvent(EventSeverity severity, String label, String message) {
+    runtime.reportEvent(severity.getName(), label, message);
   }
 
   /**
@@ -59,21 +75,6 @@ public final class Ray extends RayCall {
    */
   public static <T> ObjectRef<T> put(T obj) {
     return internal().put(obj);
-  }
-
-  /**
-   * Store an object in the object store and assign its ownership to owner. This function is
-   * experimental.
-   *
-   * @param obj The Java object to be stored.
-   * @param owner The actor that should own this object. This allows creating objects with lifetimes
-   *     decoupled from that of the creating process. Note that the owner actor must be passed a
-   *     reference to the object prior to the object creator exiting, otherwise the reference will
-   *     still be lost.
-   * @return A ObjectRef instance that represents the in-store object.
-   */
-  public static <T> ObjectRef<T> put(T obj, BaseActorHandle owner) {
-    return internal().put(obj, owner);
   }
 
   /**
@@ -204,6 +205,61 @@ public final class Ray extends RayCall {
     return internal().getActor(name, namespace);
   }
 
+  /**
+   * Get a handle to the given actor id.
+   *
+   * @param actorId ActorId of the given actor.
+   */
+  public static <T> ActorHandle<T> getActorHandle(ActorId actorId) {
+    return (ActorHandle<T>) internal().getActorHandle(actorId);
+  }
+
+  /**
+   * If users want to use Ray API in their own threads, call this method to get the async context
+   * and then call {@link #setAsyncContext} at the beginning of the new thread.
+   *
+   * @return The async context.
+   */
+  public static Object getAsyncContext() {
+    return internal().getAsyncContext();
+  }
+
+  /**
+   * Set the async context for the current thread.
+   *
+   * @param asyncContext The async context to set.
+   */
+  public static void setAsyncContext(Object asyncContext) {
+    internal().setAsyncContext(asyncContext);
+  }
+
+  // TODO (kfstorm): add the `rollbackAsyncContext` API to allow rollbacking the async context of
+  // the current thread to the one before `setAsyncContext` is called.
+
+  // TODO (kfstorm): unify the `wrap*` methods.
+
+  /**
+   * If users want to use Ray API in their own threads, they should wrap their {@link Runnable}
+   * objects with this method.
+   *
+   * @param runnable The runnable to wrap.
+   * @return The wrapped runnable.
+   */
+  public static Runnable wrapRunnable(Runnable runnable) {
+    return internal().wrapRunnable(runnable);
+  }
+
+  /**
+   * If users want to use Ray API in their own threads, they should wrap their {@link Callable}
+   * objects with this method.
+   *
+   * @param callable The callable to wrap.
+   * @return The wrapped callable.
+   */
+  public static <T> Callable<T> wrapCallable(Callable<T> callable) {
+    return internal().wrapCallable(callable);
+  }
+
   /** Get the underlying runtime instance. */
   public static RayRuntime internal() {
     if (runtime == null) {
@@ -211,6 +267,36 @@ public final class Ray extends RayCall {
           "Ray has not been started yet. You can start Ray with 'Ray.init()'");
     }
     return runtime;
+  }
+
+  /** Use {@link #wrapRunnable(Runnable)} instead please. */
+  @Deprecated
+  public static Runnable asyncClosure(Runnable runnable) {
+    return wrapRunnable(runnable);
+  }
+
+  /**
+   * Update the resource for the specified client. Set the resource for the specific node.
+   *
+   * @deprecated Consider using placement groups instead
+   *     (docs.ray.io/en/master/placement-group.html). You can also specify resources at Ray start
+   *     time with the 'resources' field in the cluster autoscaler.
+   */
+  @Deprecated
+  public static void setResource(UniqueId nodeId, String resourceName, double capacity) {
+    internal().setResource(resourceName, capacity, nodeId);
+  }
+
+  /**
+   * Set the resource for local node.
+   *
+   * @deprecated Consider using placement groups instead
+   *     (docs.ray.io/en/master/placement-group.html). You can also specify resources at Ray start
+   *     time with the 'resources' field in the cluster autoscaler.
+   */
+  @Deprecated
+  public static void setResource(String resourceName, double capacity) {
+    internal().setResource(resourceName, capacity, UniqueId.NIL);
   }
 
   /** Get the runtime context. */
@@ -228,5 +314,24 @@ public final class Ray extends RayCall {
    */
   public static void exitActor() {
     runtime.exitActor();
+  }
+
+  /**
+   * Update the total resources that the current job can use.
+   *
+   * @param request Includes totalMemoryMb, totalCpus or totalGpus.
+   * @return true if the update is successful, else false. The update will succeed if the job is
+   *     alive and the total resources are greater than the resources being used by this job.
+   */
+  public static boolean updateJobTotalResources(UpdateJobTotalResourcesRequest request) {
+    boolean output = false;
+    try {
+      output =
+          internal()
+              .updateJobResourceRequirements(request.getMinResources(), request.getMaxResources());
+    } catch (Exception e) {
+      throw e;
+    }
+    return output;
   }
 }

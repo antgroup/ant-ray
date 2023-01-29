@@ -16,9 +16,6 @@
 
 #include <boost/asio.hpp>
 #include <boost/asio/deadline_timer.hpp>
-
-#include "absl/base/thread_annotations.h"
-#include "absl/synchronization/mutex.h"
 #include "ray/common/asio/instrumented_io_context.h"
 
 namespace ray {
@@ -34,24 +31,21 @@ class PeriodicalRunner {
 
   ~PeriodicalRunner();
 
-  void RunFnPeriodically(std::function<void()> fn,
-                         uint64_t period_ms,
-                         const std::string name = "UNKNOWN") LOCKS_EXCLUDED(mutex_);
+  void RunFnPeriodically(std::function<void()> fn, uint64_t period_ms,
+                         const std::string name = "UNKNOWN");
 
  private:
   void DoRunFnPeriodically(const std::function<void()> &fn,
                            boost::posix_time::milliseconds period,
-                           std::shared_ptr<boost::asio::deadline_timer> timer)
-      LOCKS_EXCLUDED(mutex_);
+                           boost::asio::deadline_timer &timer);
 
   void DoRunFnPeriodicallyInstrumented(const std::function<void()> &fn,
                                        boost::posix_time::milliseconds period,
-                                       std::shared_ptr<boost::asio::deadline_timer> timer,
-                                       const std::string name) LOCKS_EXCLUDED(mutex_);
+                                       boost::asio::deadline_timer &timer,
+                                       const std::string name);
 
   instrumented_io_context &io_service_;
-  mutable absl::Mutex mutex_;
-  std::vector<std::shared_ptr<boost::asio::deadline_timer>> timers_ GUARDED_BY(mutex_);
+  std::vector<std::shared_ptr<boost::asio::deadline_timer>> timers_;
 };
 
 }  // namespace ray

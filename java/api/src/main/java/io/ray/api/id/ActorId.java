@@ -39,6 +39,10 @@ public class ActorId extends BaseId implements Serializable {
     return new ActorId(b);
   }
 
+  public static ActorId fromHexString(String hex) {
+    return new ActorId(hexString2Bytes(hex));
+  }
+
   @Override
   public int size() {
     return LENGTH;

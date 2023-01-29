@@ -1,6 +1,5 @@
 .. _tune-reporter-doc:
 
-
 Console Output (Reporters)
 ==========================
 
@@ -23,11 +22,7 @@ By default, Tune reports experiment progress periodically to the command-line as
     | MyTrainable_a826b7bc | RUNNING  | 10.234.98.164:31112 | 0.729127  | 0.0748 | 0.1784 | 0.1797 | 1.7161 |          7.05715 |    14 |
     +----------------------+----------+---------------------+-----------+--------+--------+--------+--------+------------------+-------+
 
-Note that columns will be hidden if they are completely empty. The output can be configured in various ways by
-instantiating a ``CLIReporter`` instance (or ``JupyterNotebookReporter`` if you're using jupyter notebook).
-Here's an example:
-
-.. TODO: test these snippets
+Note that columns will be hidden if they are completely empty. The output can be configured in various ways by instantiating a ``CLIReporter`` instance (or ``JupyterNotebookReporter`` if you're using jupyter notebook). Here's an example:
 
 .. code-block:: python
 
@@ -38,26 +33,21 @@ Here's an example:
     # Add a custom metric column, in addition to the default metrics.
     # Note that this must be a metric that is returned in your training results.
     reporter.add_metric_column("custom_metric")
-    tuner = tune.Tuner(my_trainable, run_config=air.RunConfig(progress_reporter=reporter))
-    results = tuner.fit()
+    tune.run(my_trainable, progress_reporter=reporter)
 
 Extending ``CLIReporter`` lets you control reporting frequency. For example:
 
 .. code-block:: python
-
-    from ray.tune.experiment.trial import Trial
 
     class ExperimentTerminationReporter(CLIReporter):
         def should_report(self, trials, done=False):
             """Reports only on experiment termination."""
             return done
 
-    tuner = tune.Tuner(my_trainable, run_config=air.RunConfig(progress_reporter=ExperimentTerminationReporter()))
-    results = tuner.fit()
+    tune.run(my_trainable, progress_reporter=ExperimentTerminationReporter())
 
     class TrialTerminationReporter(CLIReporter):
         def __init__(self):
-            super(TrialTerminationReporter, self).__init__()
             self.num_terminated = 0
 
         def should_report(self, trials, done=False):
@@ -66,8 +56,7 @@ Extending ``CLIReporter`` lets you control reporting frequency. For example:
             self.num_terminated = len([t for t in trials if t.status == Trial.TERMINATED])
             return self.num_terminated > old_num_terminated
 
-    tuner = tune.Tuner(my_trainable, run_config=air.RunConfig(progress_reporter=TrialTerminationReporter()))
-    results = tuner.fit()
+    tune.run(my_trainable, progress_reporter=TrialTerminationReporter())
 
 The default reporting style can also be overridden more broadly by extending the ``ProgressReporter`` interface directly. Note that you can print to any output stream, file etc.
 
@@ -84,8 +73,7 @@ The default reporting style can also be overridden more broadly by extending the
             print(*sys_info)
             print("\n".join([str(trial) for trial in trials]))
 
-    tuner = tune.Tuner(my_trainable, run_config=air.RunConfig(progress_reporter=CustomReporter()))
-    results = tuner.fit()
+    tune.run(my_trainable, progress_reporter=CustomReporter())
 
 
 CLIReporter

@@ -14,18 +14,15 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
-#include <boost/bimap/unordered_set_of.hpp>
-
 #include "absl/container/flat_hash_map.h"
 #include "ray/common/asio/instrumented_io_context.h"
 #include "ray/common/asio/periodical_runner.h"
 #include "ray/common/id.h"
+#include "ray/gcs/accessor.h"
 #include "ray/gcs/gcs_server/gcs_init_data.h"
 #include "ray/rpc/client_call.h"
 #include "ray/rpc/gcs_server/gcs_rpc_server.h"
 #include "src/ray/protobuf/gcs.pb.h"
-#include "src/ray/protobuf/gcs_service.pb.h"
 
 namespace ray {
 namespace gcs {
@@ -44,9 +41,17 @@ class GcsHeartbeatManager : public rpc::HeartbeatInfoHandler {
       std::function<void(const NodeID &)> on_node_death_callback);
 
   /// Handle heartbeat rpc come from raylet.
-  void HandleReportHeartbeat(rpc::ReportHeartbeatRequest request,
+  void HandleReportHeartbeat(const rpc::ReportHeartbeatRequest &request,
                              rpc::ReportHeartbeatReply *reply,
                              rpc::SendReplyCallback send_reply_callback) override;
+
+  void HandleCheckAlive(const rpc::CheckAliveRequest &request,
+                        rpc::CheckAliveReply *reply,
+                        rpc::SendReplyCallback send_reply_callback) override;
+
+  void HandleRejectNode(const rpc::RejectNodeRequest &request,
+                        rpc::RejectNodeReply *reply,
+                        rpc::SendReplyCallback send_reply_callback) override;
 
   /// Initialize with the gcs tables data synchronously.
   /// This should be called when GCS server restarts after a failure.
@@ -63,17 +68,16 @@ class GcsHeartbeatManager : public rpc::HeartbeatInfoHandler {
   /// Register node to this detector.
   /// Only if the node has registered, its heartbeat data will be accepted.
   ///
-  /// \param node_info The node to be registered.
-  void AddNode(const rpc::GcsNodeInfo &node_info);
+  /// \param node_id ID of the node to be registered.
+  void AddNode(const NodeID &node_id);
 
-  /// Remove a node from this detector.
+  /// Reject node with the specified status.
   ///
-  /// \param node_id The node to be removed.
-  void RemoveNode(const NodeID &node_id);
+  /// \param node_id ID of the node to be registered.
+  /// \param status Status to be replied to the raylet along with heartbeat.
+  void RejectNode(const NodeID &node_id, const Status &status);
 
  protected:
-  void AddNodeInternal(const rpc::GcsNodeInfo &node_info, int64_t heartbeats_counts);
-
   /// Check that if any raylet is inactive due to no heartbeat for a period of time.
   /// If found any, mark it as dead.
   void DetectDeadNodes();
@@ -85,22 +89,16 @@ class GcsHeartbeatManager : public rpc::HeartbeatInfoHandler {
   /// The callback of node death.
   std::function<void(const NodeID &)> on_node_death_callback_;
   /// The number of heartbeats that can be missed before a node is removed.
-  const int64_t num_heartbeats_timeout_;
-  /// The heartbeat timeout when GCS restarts and waiting for raylet to
-  /// reconnect. Once connected, we'll use num_heartbeats_timeout_
-  const int64_t gcs_failover_worker_reconnect_timeout_;
+  int64_t num_heartbeats_timeout_;
   /// The runner to run function periodically.
   PeriodicalRunner periodical_runner_;
   /// For each Raylet that we receive a heartbeat from, the number of ticks
   /// that may pass before the Raylet will be declared dead.
   absl::flat_hash_map<NodeID, int64_t> heartbeats_;
+  /// Nodes to be rejected along with the reply of it's heartbeat.
+  absl::flat_hash_map<NodeID, Status> to_be_rejected_nodes_;
   /// Is the detect started.
   bool is_started_ = false;
-  /// A map of NodeId <-> ip:port of raylet
-  using NodeIDAddrBiMap =
-      boost::bimap<boost::bimaps::unordered_set_of<NodeID, std::hash<NodeID>>,
-                   boost::bimaps::unordered_set_of<std::string>>;
-  NodeIDAddrBiMap node_map_;
 };
 
 }  // namespace gcs

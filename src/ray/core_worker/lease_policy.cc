@@ -15,33 +15,37 @@
 #include "ray/core_worker/lease_policy.h"
 
 namespace ray {
-namespace core {
 
-std::pair<rpc::Address, bool> LocalityAwareLeasePolicy::GetBestNodeForTask(
-    const TaskSpecification &spec) {
+rpc::Address LocalityAwareLeasePolicy::GetBestNodeForTask(const TaskSpecification &spec) {
   if (spec.GetMessage().scheduling_strategy().scheduling_strategy_case() ==
       rpc::SchedulingStrategy::SchedulingStrategyCase::kSpreadSchedulingStrategy) {
     // The explicit spread scheduling strategy
     // has higher priority than locality aware scheduling.
-    return std::make_pair(fallback_rpc_address_, false);
+    return fallback_rpc_address_;
   }
 
-  if (spec.IsNodeAffinitySchedulingStrategy()) {
-    // The explicit node affinity scheduling strategy
-    // has higher priority than locality aware scheduling.
-    if (auto addr = node_addr_factory_(spec.GetNodeAffinitySchedulingStrategyNodeId())) {
-      return std::make_pair(addr.value(), false);
+  // The explicit node affinity scheduling strategy
+  // has higher priority than locality aware scheduling.
+  // But node anti-affinity use locality aware scheduling.
+  if (spec.IsNodeAffinitySchedulingStrategy() &&
+      !spec.GetSchedulingStrategy().node_affinity_scheduling_strategy().anti_affinity()) {
+    RAY_CHECK(
+        spec.GetSchedulingStrategy().node_affinity_scheduling_strategy().nodes_size() ==
+        1)
+        << "The node affinity nodes size must be 1.";
+    auto first_node = NodeID::FromBinary(
+        spec.GetSchedulingStrategy().node_affinity_scheduling_strategy().nodes(0));
+    if (auto addr = node_addr_factory_(first_node)) {
+      return addr.value();
     }
-    return std::make_pair(fallback_rpc_address_, false);
   }
 
-  // Pick node based on locality.
   if (auto node_id = GetBestNodeIdForTask(spec)) {
     if (auto addr = node_addr_factory_(node_id.value())) {
-      return std::make_pair(addr.value(), true);
+      return addr.value();
     }
   }
-  return std::make_pair(fallback_rpc_address_, false);
+  return fallback_rpc_address_;
 }
 
 /// Criteria for "best" node: The node with the most object bytes (from object_ids) local.
@@ -72,11 +76,9 @@ absl::optional<NodeID> LocalityAwareLeasePolicy::GetBestNodeIdForTask(
   return max_bytes_node;
 }
 
-std::pair<rpc::Address, bool> LocalLeasePolicy::GetBestNodeForTask(
-    const TaskSpecification &spec) {
+rpc::Address LocalLeasePolicy::GetBestNodeForTask(const TaskSpecification &spec) {
   // Always return the local node.
-  return std::make_pair(local_node_rpc_address_, false);
+  return local_node_rpc_address_;
 }
 
-}  // namespace core
 }  // namespace ray

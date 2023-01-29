@@ -1,25 +1,9 @@
-// Copyright 2020-2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #pragma once
 
 #include <ray/api/function_manager.h>
 #include <ray/api/serializer.h>
-
 #include <boost/dll.hpp>
 #include <memory>
-
 #include "absl/synchronization/mutex.h"
 #include "invocation_spec.h"
 #include "ray/common/id.h"
@@ -29,7 +13,6 @@
 namespace ray {
 
 namespace internal {
-
 /// Execute remote functions by networking stream.
 msgpack::sbuffer TaskExecutionHandler(const std::string &func_name,
                                       const ArgsBufferList &args_buffer,
@@ -50,8 +33,6 @@ BOOST_DLL_ALIAS(internal::InitRayRuntime, InitRayRuntime);
 
 namespace internal {
 
-using ray::core::RayFunction;
-
 class AbstractRayRuntime;
 
 class ActorContext {
@@ -68,30 +49,21 @@ class TaskExecutor {
   TaskExecutor() = default;
 
   static void Invoke(
-      const TaskSpecification &task_spec,
-      std::shared_ptr<msgpack::sbuffer> actor,
+      const TaskSpecification &task_spec, std::shared_ptr<msgpack::sbuffer> actor,
       AbstractRayRuntime *runtime,
       std::unordered_map<ActorID, std::unique_ptr<ActorContext>> &actor_contexts,
       absl::Mutex &actor_contexts_mutex);
 
   static Status ExecuteTask(
-      const rpc::Address &caller_address,
-      ray::TaskType task_type,
-      const std::string task_name,
+      ray::TaskType task_type, const std::string task_name,
       const RayFunction &ray_function,
       const std::unordered_map<std::string, double> &required_resources,
       const std::vector<std::shared_ptr<ray::RayObject>> &args,
-      const std::vector<rpc::ObjectReference> &arg_refs,
-      const std::string &debugger_breakpoint,
-      const std::string &serialized_retry_exception_allowlist,
-      std::vector<std::pair<ObjectID, std::shared_ptr<RayObject>>> *returns,
-      std::vector<std::pair<ObjectID, std::shared_ptr<RayObject>>> *dynamic_returns,
+      const std::vector<ObjectID> &arg_reference_ids,
+      const std::vector<ObjectID> &return_ids, const std::string &debugger_breakpoint,
+      std::vector<std::shared_ptr<ray::RayObject>> *results,
       std::shared_ptr<ray::LocalMemoryBuffer> &creation_task_exception_pb_bytes,
-      bool *is_retryable_error,
-      bool *is_application_error,
-      const std::vector<ConcurrencyGroup> &defined_concurrency_groups,
-      const std::string name_of_concurrency_group_to_execute,
-      bool is_reattempt);
+      bool *is_application_level_error);
 
   virtual ~TaskExecutor(){};
 

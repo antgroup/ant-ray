@@ -24,12 +24,10 @@ class AutoMLSearcherTest(unittest.TestCase):
 
     def testExpandSearchSpace(self):
         exp = {"test-exp": {"run": "f1", "config": {"a": {"d": "dummy"}}}}
-        space = SearchSpace(
-            [
-                DiscreteSpace("a.b.c", [1, 2]),
-                DiscreteSpace("a.d", ["a", "b"]),
-            ]
-        )
+        space = SearchSpace([
+            DiscreteSpace("a.b.c", [1, 2]),
+            DiscreteSpace("a.d", ["a", "b"]),
+        ])
         searcher = GridSearch(space, "reward")
         searcher.add_configurations(exp)
         trials = next_trials(searcher)
@@ -40,12 +38,10 @@ class AutoMLSearcherTest(unittest.TestCase):
 
     def testSearchRound(self):
         exp = {"test-exp": {"run": "f1", "config": {"a": {"d": "dummy"}}}}
-        space = SearchSpace(
-            [
-                DiscreteSpace("a.b.c", [1, 2]),
-                DiscreteSpace("a.d", ["a", "b"]),
-            ]
-        )
+        space = SearchSpace([
+            DiscreteSpace("a.b.c", [1, 2]),
+            DiscreteSpace("a.d", ["a", "b"]),
+        ])
         searcher = GridSearch(space, "reward")
         searcher.add_configurations(exp)
         trials = next_trials(searcher)
@@ -59,12 +55,10 @@ class AutoMLSearcherTest(unittest.TestCase):
 
     def testBestTrial(self):
         exp = {"test-exp": {"run": "f1", "config": {"a": {"d": "dummy"}}}}
-        space = SearchSpace(
-            [
-                DiscreteSpace("a.b.c", [1, 2]),
-                DiscreteSpace("a.d", ["a", "b"]),
-            ]
-        )
+        space = SearchSpace([
+            DiscreteSpace("a.b.c", [1, 2]),
+            DiscreteSpace("a.d", ["a", "b"]),
+        ])
         searcher = GridSearch(space, "reward")
         searcher.add_configurations(exp)
         trials = next_trials(searcher)
@@ -85,5 +79,4 @@ class AutoMLSearcherTest(unittest.TestCase):
 if __name__ == "__main__":
     import pytest
     import sys
-
     sys.exit(pytest.main(["-v", __file__]))

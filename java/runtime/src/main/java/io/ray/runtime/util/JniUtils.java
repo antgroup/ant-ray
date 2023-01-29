@@ -61,7 +61,7 @@ public class JniUtils {
   public static synchronized void loadLibrary(
       String destDir, String libraryName, boolean exportSymbols) {
     if (!loadedLibs.contains(libraryName)) {
-      LOGGER.debug("Loading native library {} in {}.", libraryName, destDir);
+      LOGGER.debug("Loading native library {}.", libraryName);
       // Load native library.
       String fileName = System.mapLibraryName(libraryName);
       final File file = BinaryFileUtil.getNativeFile(destDir, fileName);
@@ -71,8 +71,9 @@ public class JniUtils {
         // libraries.
         NativeLibrary.getInstance(file.getAbsolutePath());
       }
+      // This will bind jni libraries to classloader of caller class, i.e. JniUtils
       System.load(file.getAbsolutePath());
-      LOGGER.debug("Native library loaded.");
+      LOGGER.debug("Native library {} of {} loaded.", libraryName, file.getAbsolutePath());
       loadedLibs.add(libraryName);
     }
   }

@@ -1,0 +1,18 @@
+diff --git opencensus/stats/internal/view_descriptor.cc opencensus/stats/internal/view_descriptor.cc
+index 8bfa574..ece41ed 100644
+--- opencensus/stats/internal/view_descriptor.cc
++++ opencensus/stats/internal/view_descriptor.cc
+@@ -81,10 +81,11 @@ ViewDescriptor& ViewDescriptor::set_expiry_duration(
+ }
+ 
+ void ViewDescriptor::RegisterForExport() const {
+-  if (aggregation_window_.type() == AggregationWindow::Type::kCumulative) {
++  if (aggregation_window_.type() == AggregationWindow::Type::kCumulative
++      || aggregation_window_.type() == AggregationWindow::Type::kDelta) {
+     StatsExporterImpl::Get()->AddView(*this);
+   } else {
+-    std::cerr << "Only cumulative views may be registered for export.\n";
++    std::cerr << "Only cumulative and delta views may be registered for export.\n";
+   }
+ }
+ 

@@ -14,7 +14,7 @@
 
 #include "ray/raylet/worker.h"
 
-#include <boost/bind/bind.hpp>
+#include <boost/bind.hpp>
 
 #include "ray/raylet/format/node_manager_generated.h"
 #include "ray/raylet/raylet.h"
@@ -26,17 +26,12 @@ namespace ray {
 namespace raylet {
 
 /// A constructor responsible for initializing the state of a worker.
-Worker::Worker(const JobID &job_id,
-               const int runtime_env_hash,
-               const WorkerID &worker_id,
-               const Language &language,
-               rpc::WorkerType worker_type,
+Worker::Worker(const JobID &job_id, const int runtime_env_hash, const WorkerID &worker_id,
+               const Language &language, rpc::WorkerType worker_type,
                const std::string &ip_address,
                std::shared_ptr<ClientConnection> connection,
-               rpc::ClientCallManager &client_call_manager,
-               StartupToken startup_token)
+               rpc::ClientCallManager &client_call_manager)
     : worker_id_(worker_id),
-      startup_token_(startup_token),
       language_(language),
       worker_type_(worker_type),
       ip_address_(ip_address),
@@ -47,15 +42,21 @@ Worker::Worker(const JobID &job_id,
       runtime_env_hash_(runtime_env_hash),
       bundle_id_(std::make_pair(PlacementGroupID::Nil(), -1)),
       dead_(false),
+      actor_needs_restart_(false),
       blocked_(false),
       client_call_manager_(client_call_manager),
       is_detached_actor_(false) {}
 
 rpc::WorkerType Worker::GetWorkerType() const { return worker_type_; }
 
-void Worker::MarkDead() { dead_ = true; }
+void Worker::MarkDead(bool actor_needs_restart) {
+  dead_ = true;
+  actor_needs_restart_ = actor_needs_restart;
+}
 
 bool Worker::IsDead() const { return dead_; }
+
+bool Worker::ActorNeedsRestart() const { return actor_needs_restart_; }
 
 void Worker::MarkBlocked() { blocked_ = true; }
 
@@ -67,15 +68,19 @@ WorkerID Worker::WorkerId() const { return worker_id_; }
 
 Process Worker::GetProcess() const { return proc_; }
 
-StartupToken Worker::GetStartupToken() const { return startup_token_; }
-
 void Worker::SetProcess(Process proc) {
   RAY_CHECK(proc_.IsNull());  // this procedure should not be called multiple times
   proc_ = std::move(proc);
 }
 
-void Worker::SetStartupToken(StartupToken startup_token) {
-  startup_token_ = startup_token;
+Process Worker::GetShimProcess() const {
+  RAY_CHECK(worker_type_ != rpc::WorkerType::DRIVER);
+  return shim_proc_;
+}
+
+void Worker::SetShimProcess(Process proc) {
+  RAY_CHECK(shim_proc_.IsNull());  // this procedure should not be called multiple times
+  shim_proc_ = std::move(proc);
 }
 
 Language Worker::GetLanguage() const { return language_; }
@@ -96,37 +101,18 @@ int Worker::AssignedPort() const { return assigned_port_; }
 
 void Worker::SetAssignedPort(int port) { assigned_port_ = port; };
 
-void Worker::AsyncNotifyGCSRestart() {
-  if (rpc_client_) {
-    rpc::RayletNotifyGCSRestartRequest request;
-    rpc_client_->RayletNotifyGCSRestart(request, [](Status status, auto reply) {
-      if (!status.ok()) {
-        RAY_LOG(ERROR) << "Failed to notify worker about GCS restarting: "
-                       << status.ToString();
-      }
-    });
-  } else {
-    notify_gcs_restarted_ = true;
-  }
-}
-
 void Worker::Connect(int port) {
   RAY_CHECK(port > 0);
   port_ = port;
   rpc::Address addr;
   addr.set_ip_address(ip_address_);
   addr.set_port(port_);
-  rpc_client_ = std::make_unique<rpc::CoreWorkerClient>(addr, client_call_manager_);
-  Connect(rpc_client_);
+  addr.set_worker_id(worker_id_.Binary());
+  rpc_client_ = std::make_shared<rpc::CoreWorkerClient>(addr, client_call_manager_);
 }
 
 void Worker::Connect(std::shared_ptr<rpc::CoreWorkerClientInterface> rpc_client) {
   rpc_client_ = rpc_client;
-  if (notify_gcs_restarted_) {
-    // We need to send RPC to notify about the GCS restarts
-    AsyncNotifyGCSRestart();
-    notify_gcs_restarted_ = false;
-  }
 }
 
 void Worker::AssignTaskId(const TaskID &task_id) { assigned_task_id_ = task_id; }
@@ -158,6 +144,8 @@ void Worker::AssignActorId(const ActorID &actor_id) {
   actor_id_ = actor_id;
 }
 
+void Worker::ResetActorId() { actor_id_ = ActorID::Nil(); }
+
 const ActorID &Worker::GetActorId() const { return actor_id_; }
 
 const std::string Worker::GetTaskOrActorIdAsDebugString() const {
@@ -179,6 +167,39 @@ const std::shared_ptr<ClientConnection> Worker::Connection() const { return conn
 void Worker::SetOwnerAddress(const rpc::Address &address) { owner_address_ = address; }
 const rpc::Address &Worker::GetOwnerAddress() const { return owner_address_; }
 
+const ResourceIdSet &Worker::GetLifetimeResourceIds() const {
+  return lifetime_resource_ids_;
+}
+
+void Worker::ResetLifetimeResourceIds() { lifetime_resource_ids_.Clear(); }
+
+void Worker::SetLifetimeResourceIds(ResourceIdSet &resource_ids) {
+  lifetime_resource_ids_ = resource_ids;
+}
+
+const ResourceIdSet &Worker::GetTaskResourceIds() const { return task_resource_ids_; }
+
+void Worker::ResetTaskResourceIds() { task_resource_ids_.Clear(); }
+
+void Worker::SetTaskResourceIds(ResourceIdSet &resource_ids) {
+  task_resource_ids_ = resource_ids;
+}
+
+ResourceIdSet Worker::ReleaseTaskCpuResources() {
+  auto cpu_resources = task_resource_ids_.GetCpuResources();
+  // The "acquire" terminology is a bit confusing here. The resources are being
+  // "acquired" from the task_resource_ids_ object, and so the worker is losing
+  // some resources.
+  task_resource_ids_.Acquire(cpu_resources.ToResourceSet());
+  return cpu_resources;
+}
+
+void Worker::AcquireTaskCpuResources(const ResourceIdSet &cpu_resources) {
+  // The "release" terminology is a bit confusing here. The resources are being
+  // given back to the worker and so "released" by the caller.
+  task_resource_ids_.Release(cpu_resources);
+}
+
 void Worker::DirectActorCallArgWaitComplete(int64_t tag) {
   RAY_CHECK(port_ > 0);
   rpc::DirectActorCallArgWaitCompleteRequest request;
@@ -195,6 +216,28 @@ void Worker::DirectActorCallArgWaitComplete(int64_t tag) {
 const BundleID &Worker::GetBundleId() const { return bundle_id_; }
 
 void Worker::SetBundleId(const BundleID &bundle_id) { bundle_id_ = bundle_id; }
+
+void Worker::SetIsForActor(bool for_actor) { for_actor_ = for_actor; }
+
+double Worker::GetResourceViolation() {
+  if (resource_violation_ < 0) {  // The violation has not been calculated.
+    auto required_resources =
+        for_actor_ ? lifetime_allocated_instances_.get() : allocated_instances_.get();
+    FixedPoint required_memory = 0;
+    for (const auto &value :
+         required_resources->predefined_resources[PredefinedResources::MEM]) {
+      required_memory += value;
+    }
+    if (required_memory == 0) {
+      resource_violation_ = 0;
+    } else {
+      resource_violation_ =
+          runtime_resources_.GetResource(kMemory_ResourceLabel).ToDouble() /
+          required_memory.Double();
+    }
+  }
+  return resource_violation_;
+}
 
 }  // namespace raylet
 

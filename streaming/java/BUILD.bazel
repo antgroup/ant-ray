@@ -1,0 +1,219 @@
+load("@com_github_ray_project_ray//bazel:ray.bzl", "define_java_module")
+load("@rules_proto_grpc//java:defs.bzl", "java_proto_compile")
+
+exports_files([
+    "testng.xml",
+])
+
+all_modules = [
+    "streaming-state",
+    "streaming-api",
+    "streaming-common",
+]
+
+java_import(
+    name = "all_modules",
+    jars = [
+        "libio_ray_ray_" + module + ".jar"
+        for module in all_modules
+    ] + [
+        "libio_ray_ray_" + module + "-src.jar"
+        for module in all_modules
+    ] + [
+        "all_streaming_tests_deploy.jar",
+        "all_streaming_tests_deploy-src.jar",
+    ],
+    deps = [
+        ":io_ray_ray_" + module
+        for module in all_modules
+    ] + [
+        ":all_streaming_tests",
+    ],
+)
+
+define_java_module(
+    name = "streaming-api",
+    define_test_lib = True,
+    test_deps = [
+        "//java:io_ray_ray_api",
+        ":io_ray_ray_streaming-state",
+        ":io_ray_ray_streaming-api",
+        "@ray_streaming_maven//:com_google_guava_guava",
+        "@ray_streaming_maven//:org_apache_commons_commons_lang3",
+        "@ray_streaming_maven//:org_slf4j_slf4j_api",
+        "@ray_streaming_maven//:org_slf4j_slf4j_log4j12",
+        "@ray_streaming_maven//:org_testng_testng",
+        "@ray_streaming_maven//:io_ant_ray_state",
+        "@ray_streaming_maven//:io_ant_ray_fury",
+        "@ray_streaming_maven//:org_apache_arrow_arrow_vector",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":io_ray_ray_streaming-state",
+        "//java:io_ray_ray_api",
+        "//java:io_ray_ray_runtime",
+        "@ray_streaming_maven//:com_google_code_findbugs_jsr305",
+        "@ray_streaming_maven//:com_google_code_gson_gson",
+        "@ray_streaming_maven//:com_google_guava_guava",
+        "@ray_streaming_maven//:io_ant_ray_fury",
+        "@ray_streaming_maven//:io_ant_ray_state",
+        "@ray_streaming_maven//:org_apache_arrow_arrow_vector",
+        "@ray_streaming_maven//:org_apache_commons_commons_lang3",
+        "@ray_streaming_maven//:org_ow2_asm_asm",
+        "@ray_streaming_maven//:org_slf4j_slf4j_api",
+        "@ray_streaming_maven//:org_slf4j_slf4j_log4j12",
+    ],
+)
+
+define_java_module(
+    name = "streaming-common",
+    define_test_lib = True,
+    test_deps = [
+        ":io_ray_ray_streaming-common",
+        "@ray_streaming_maven//:org_slf4j_slf4j_api",
+        "@ray_streaming_maven//:org_slf4j_slf4j_log4j12",
+        "@ray_streaming_maven//:org_testng_testng",
+        "@ray_streaming_maven//:com_esotericsoftware_kryo",
+        "@ray_streaming_maven//:de_javakaffee_kryo_serializers",
+        "@ray_streaming_maven//:com_esotericsoftware_minlog_minlog",
+        "@ray_streaming_maven//:com_esotericsoftware_reflectasm_reflectasm",
+        "@ray_streaming_maven//:com_typesafe_config",
+        "@ray_streaming_maven//:org_objenesis_objenesis",
+        "@ray_streaming_maven//:joda_time_joda_time",
+        "@ray_streaming_maven//:com_google_guava_guava",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//java:io_ray_ray_runtime",
+        "@ray_streaming_maven//:com_esotericsoftware_kryo",
+        "@ray_streaming_maven//:com_esotericsoftware_minlog_minlog",
+        "@ray_streaming_maven//:com_esotericsoftware_reflectasm_reflectasm",
+        "@ray_streaming_maven//:com_google_guava_guava",
+        "@ray_streaming_maven//:com_google_protobuf_protobuf_java",
+        "@ray_streaming_maven//:com_typesafe_config",
+        "@ray_streaming_maven//:de_javakaffee_kryo_serializers",
+        "@ray_streaming_maven//:io_ant_ray_fury",
+        "@ray_streaming_maven//:joda_time_joda_time",
+        "@ray_streaming_maven//:org_objenesis_objenesis",
+        "@ray_streaming_maven//:org_slf4j_slf4j_api",
+        "@ray_streaming_maven//:org_slf4j_slf4j_log4j12",
+    ],
+)
+
+define_java_module(
+    name = "streaming-state",
+    define_test_lib = True,
+    test_deps = [
+        ":io_ray_ray_streaming-state",
+        "@ray_streaming_maven//:com_google_guava_guava",
+        "@ray_streaming_maven//:org_slf4j_slf4j_api",
+        "@ray_streaming_maven//:org_slf4j_slf4j_log4j12",
+        "@ray_streaming_maven//:org_testng_testng",
+        "@ray_streaming_maven//:org_mockito_mockito_all",
+        "@ray_streaming_maven//:de_ruedigermoeller_fst",
+        "@ray_streaming_maven//:org_apache_commons_commons_lang3",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@ray_streaming_maven//:com_google_guava_guava",
+        "@ray_streaming_maven//:de_ruedigermoeller_fst",
+        "@ray_streaming_maven//:log4j_log4j",
+        "@ray_streaming_maven//:org_apache_commons_commons_lang3",
+        "@ray_streaming_maven//:org_slf4j_slf4j_api",
+        "@ray_streaming_maven//:org_slf4j_slf4j_log4j12",
+    ],
+)
+
+java_binary(
+    name = "all_streaming_tests",
+    args = ["streaming/java/testng.xml"],
+    data = ["testng.xml"],
+    main_class = "org.testng.TestNG",
+    visibility = ["//visibility:public"],
+    runtime_deps = [
+        ":io_ray_ray_streaming-api_test",
+        ":io_ray_ray_streaming-common_test",
+        ":io_ray_ray_streaming-state_test",
+    ],
+)
+
+genrule(
+    name = "copy_pom_file",
+    srcs = [
+        "//streaming/java:io_ray_ray_" + module + "_pom"
+        for module in all_modules
+    ],
+    outs = ["copy_pom_file.out"],
+    cmd = """
+        WORK_DIR="$$(pwd)"
+        cp -f $(location //streaming/java:io_ray_ray_streaming-api_pom) "$$WORK_DIR/streaming/java/streaming-api/pom.xml"
+        cp -f $(location //streaming/java:io_ray_ray_streaming-state_pom) "$$WORK_DIR/streaming/java/streaming-state/pom.xml"
+        cp -f $(location //streaming/java:io_ray_ray_streaming-common_pom) "$$WORK_DIR/streaming/java/streaming-common/pom.xml"
+        date > $@
+    """,
+    local = 1,
+    tags = ["no-cache"],
+)
+
+# protobuf
+proto_library(
+    name = "common_proto",
+    srcs = ["streaming-common/src/main/java/io/ray/streaming/common/protobuf/common.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_google_protobuf//:any_proto",
+    ],
+)
+
+java_proto_compile(
+    name = "common_java_proto",
+    deps = [":common_proto"],
+)
+
+filegroup(
+    name = "all_java_proto",
+    srcs = [
+        ":common_java_proto",
+    ],
+)
+
+genrule(
+    name = "cp_java_generated",
+    srcs = [
+        ":all_java_proto",
+    ],
+    outs = ["cp_java_generated.out"],
+    cmd = """
+        set -x
+        WORK_DIR=$$(pwd)
+        GENERATED_DIR=$$WORK_DIR/streaming/java/streaming-common/src/main/java/io/ray/streaming/common/generated
+        rm -rf $$GENERATED_DIR
+        mkdir -p $$GENERATED_DIR
+        # Copy protobuf-generated files.
+        for f in $(locations //streaming/java:all_java_proto); do
+            unzip -o $$f -x META-INF/MANIFEST.MF -d $$WORK_DIR/streaming/java/streaming-common/src/main/java
+        done
+        rm -rf $$WORK_DIR/streaming/java/streaming-common/src/main/java/com/google/
+        echo $$(date) > $@
+    """,
+    local = 1,
+    tags = ["no-cache"],
+)
+
+# Generates the dependencies needed by maven.
+genrule(
+    name = "gen_maven_deps",
+    srcs = [
+        ":cp_java_generated",
+        ":copy_pom_file",
+    ],
+    outs = ["gen_maven_deps.out"],
+    cmd = """
+        set -x
+        WORK_DIR=$$(pwd)
+        echo $$(date) > $@
+    """,
+    local = 1,
+    tags = ["no-cache"],
+    visibility = ["//visibility:public"],
+)

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConcurrencyGroupBuilder<A> extends BaseConcurrencyGroupBuilder<A> {
-
   private String name;
 
   private int maxConcurrency;

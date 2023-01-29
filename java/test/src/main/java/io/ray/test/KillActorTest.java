@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableList;
 import io.ray.api.ActorHandle;
 import io.ray.api.ObjectRef;
 import io.ray.api.Ray;
-import io.ray.api.exception.RayActorException;
+import io.ray.runtime.exception.RayActorException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -15,7 +17,7 @@ public class KillActorTest extends BaseTest {
 
   @BeforeClass
   public void setUp() {
-    System.setProperty("ray.raylet.startup-token", "0");
+    System.setProperty("ray.job.num-java-workers-per-process", "1");
   }
 
   public static class HangActor {
@@ -29,6 +31,8 @@ public class KillActorTest extends BaseTest {
         Thread.sleep(1000);
       }
     }
+
+    public void returnVoid() {}
   }
 
   public static class KillerActor {
@@ -79,6 +83,64 @@ public class KillActorTest extends BaseTest {
     } else {
       Assert.assertEquals(actor.task(HangActor::ping).remote().get(), "pong");
     }
+  }
+
+  // Test if core worker rpc client can correctly handle cached/unsent tasks
+  // when the actor is disconnected.
+  public void testKillActorWithUnsentTasks() {
+    ActorHandle<HangActor> actor = Ray.actor(HangActor::new).remote();
+
+    // Queue a bunch of tasks
+    List<ObjectRef<String>> results = new ArrayList<>();
+    for (int i = 0; i < 10000; i++) {
+      results.add(actor.task(HangActor::ping).remote());
+    }
+
+    // Kill the actor immediately
+    actor.kill(/*noRestart=*/ true);
+
+    try {
+      // Sleep 1s here to make sure the driver has received the actor notification
+      // (of state RESTARTING or DEAD).
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+
+    boolean taskFailed = false;
+    for (ObjectRef<String> result : results) {
+      try {
+        Assert.assertEquals(result.get(), "pong");
+        if (taskFailed) {
+          Assert.fail("Subsequent tasks should also fail.");
+        }
+      } catch (RayActorException e) {
+        taskFailed = true;
+      }
+    }
+
+    Assert.expectThrows(RayActorException.class, () -> actor.task(HangActor::ping).remote().get());
+  }
+
+  // Test if core worker can correctly handle tasks submitted after the actor is dead.
+  public void testSubmittingTaskToDeadActor() {
+    ActorHandle<HangActor> actor = Ray.actor(HangActor::new).remote();
+    Assert.assertEquals(actor.task(HangActor::ping).remote().get(), "pong");
+
+    // Kill the actor immediately
+    actor.kill(/*noRestart=*/ true);
+
+    try {
+      // Sleep 1s here to make sure the driver has received the actor notification
+      // (of state DEAD).
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+
+    actor.task(HangActor::returnVoid).remote();
+
+    Assert.expectThrows(RayActorException.class, () -> actor.task(HangActor::ping).remote().get());
   }
 
   public void testLocalKill() {

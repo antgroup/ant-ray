@@ -38,8 +38,7 @@ RetriableLIFOWorkerKillingPolicy::SelectWorkerToKill(
 
   std::vector<std::shared_ptr<WorkerInterface>> sorted = workers;
 
-  std::sort(sorted.begin(),
-            sorted.end(),
+  std::sort(sorted.begin(), sorted.end(),
             [](std::shared_ptr<WorkerInterface> const &left,
                std::shared_ptr<WorkerInterface> const &right) -> bool {
               // First sort by retriable tasks and then by task time in descending order.
@@ -61,8 +60,7 @@ RetriableLIFOWorkerKillingPolicy::SelectWorkerToKill(
 }
 
 std::string WorkerKillingPolicy::WorkersDebugString(
-    const std::vector<std::shared_ptr<WorkerInterface>> &workers,
-    int32_t num_workers,
+    const std::vector<std::shared_ptr<WorkerInterface>> &workers, int32_t num_workers,
     const MemorySnapshot &system_memory) {
   std::stringstream result;
   int64_t index = 1;
@@ -86,6 +84,33 @@ std::string WorkerKillingPolicy::WorkersDebugString(
     }
   }
   return result.str();
+}
+
+/// ANT-INTERNAL
+ResourceViolationWorkerKillingPolicy::ResourceViolationWorkerKillingPolicy() {}
+
+const std::shared_ptr<WorkerInterface>
+ResourceViolationWorkerKillingPolicy::SelectWorkerToKill(
+    const std::vector<std::shared_ptr<WorkerInterface>> &workers,
+    const MemorySnapshot &system_memory) const {
+  if (workers.empty()) {
+    RAY_LOG_EVERY_MS(INFO, 5000) << "Worker list is empty. Nothing can be killed";
+    return nullptr;
+  }
+
+  std::vector<std::shared_ptr<WorkerInterface>> sorted = workers;
+
+  std::sort(sorted.begin(), sorted.end(),
+            [](std::shared_ptr<WorkerInterface> const &left,
+               std::shared_ptr<WorkerInterface> const &right) -> bool {
+              return left->GetResourceViolation() > right->GetResourceViolation();
+            });
+
+  const static int32_t max_to_print = 10;
+  RAY_LOG(INFO) << "The top 10 workers to be killed based on the worker killing policy:\n"
+                << WorkersDebugString(sorted, max_to_print, system_memory);
+
+  return sorted.front();
 }
 
 }  // namespace raylet

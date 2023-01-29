@@ -1,13 +1,13 @@
-import time
+from fastapi import FastAPI, Request
 
 import pytest
+
 import requests
-from ray.serve.drivers import DAGDriver
-from fastapi import FastAPI, Request
+
 from starlette.responses import RedirectResponse
 
-import ray
 from ray import serve
+from ray.serve.constants import ALL_HTTP_METHODS
 
 
 def test_path_validation(serve_instance):
@@ -38,17 +38,12 @@ def test_path_validation(serve_instance):
 
     D4.deploy()
 
-    # Allow duplicate route.
-    D4.options(name="test2").deploy()
+    # Reject duplicate route.
+    with pytest.raises(ValueError):
+        D4.options(name="test2").deploy()
 
 
-def test_routes_healthz(serve_instance):
-    resp = requests.get("http://localhost:8000/-/healthz")
-    assert resp.status_code == 200
-    assert resp.content == b"success"
-
-
-def test_routes_endpoint_legacy(serve_instance):
+def test_routes_endpoint(serve_instance):
     @serve.deployment
     class D1:
         pass
@@ -64,16 +59,16 @@ def test_routes_endpoint_legacy(serve_instance):
 
     assert len(routes) == 2, routes
     assert "/D1" in routes, routes
-    assert routes["/D1"] == "D1", routes
+    assert routes["/D1"] == ["D1", ALL_HTTP_METHODS], routes
     assert "/hello/world" in routes, routes
-    assert routes["/hello/world"] == "D2", routes
+    assert routes["/hello/world"] == ["D2", ALL_HTTP_METHODS], routes
 
     D1.delete()
 
     routes = requests.get("http://localhost:8000/-/routes").json()
     assert len(routes) == 1, routes
     assert "/hello/world" in routes, routes
-    assert routes["/hello/world"] == "D2", routes
+    assert routes["/hello/world"] == ["D2", ALL_HTTP_METHODS], routes
 
     D2.delete()
     routes = requests.get("http://localhost:8000/-/routes").json()
@@ -91,47 +86,7 @@ def test_routes_endpoint_legacy(serve_instance):
     routes = requests.get("http://localhost:8000/-/routes").json()
     assert len(routes) == 1, routes
     assert "/hello" in routes, routes
-    assert routes["/hello"] == "D3", routes
-
-
-def test_routes_endpoint(serve_instance):
-    @serve.deployment
-    class D1:
-        def __call__(self):
-            return "D1"
-
-    @serve.deployment
-    class D2:
-        def __call__(self):
-            return "D2"
-
-    dag = DAGDriver.bind({"/D1": D1.bind(), "/hello/world": D2.bind()})
-    serve.run(dag)
-
-    routes = requests.get("http://localhost:8000/-/routes").json()
-
-    assert len(routes) == 1, routes
-    assert "/" in routes, routes
-
-    assert requests.get("http://localhost:8000/D1").json() == "D1"
-    assert requests.get("http://localhost:8000/D1").status_code == 200
-    assert requests.get("http://localhost:8000/hello/world").json() == "D2"
-    assert requests.get("http://localhost:8000/hello/world").status_code == 200
-
-
-def test_deployment_without_route(serve_instance):
-    @serve.deployment(route_prefix=None)
-    class D:
-        def __call__(self, *args):
-            return "1"
-
-    D.deploy()
-    routes = requests.get("http://localhost:8000/-/routes").json()
-    assert len(routes) == 0
-
-    # make sure the deployment is not exposed under the default route
-    r = requests.get(f"http://localhost:8000/{D.name}")
-    assert r.status_code == 404
+    assert routes["/hello"] == ["D3", ALL_HTTP_METHODS], routes
 
 
 def test_deployment_options_default_route(serve_instance):
@@ -144,16 +99,16 @@ def test_deployment_options_default_route(serve_instance):
     routes = requests.get("http://localhost:8000/-/routes").json()
     assert len(routes) == 1
     assert "/1" in routes, routes
-    assert routes["/1"] == "1"
+    assert routes["/1"] == ["1", ALL_HTTP_METHODS]
 
     D1.options(name="2").deploy()
 
     routes = requests.get("http://localhost:8000/-/routes").json()
     assert len(routes) == 2
     assert "/1" in routes, routes
-    assert routes["/1"] == "1"
+    assert routes["/1"] == ["1", ALL_HTTP_METHODS]
     assert "/2" in routes, routes
-    assert routes["/2"] == "2"
+    assert routes["/2"] == ["2", ALL_HTTP_METHODS]
 
 
 def test_path_prefixing(serve_instance):
@@ -219,27 +174,6 @@ def test_path_prefixing(serve_instance):
     check_req("/hello/world/again/hi") == '"hi"'
 
 
-def test_multi_dag_with_wrong_route(serve_instance):
-    @serve.deployment
-    class D1:
-        def __call__(self):
-            return "D1"
-
-    @serve.deployment
-    class D2:
-        def __call__(self):
-            return "D2"
-
-    dag = DAGDriver.bind({"/D1": D1.bind(), "/hello/world": D2.bind()})
-
-    serve.run(dag)
-
-    assert requests.get("http://localhost:8000/D1").status_code == 200
-    assert requests.get("http://localhost:8000/hello/world").status_code == 200
-    assert requests.get("http://localhost:8000/not_exist").status_code == 404
-    assert requests.get("http://localhost:8000/").status_code == 404
-
-
 @pytest.mark.parametrize("base_path", ["", "subpath"])
 def test_redirect(serve_instance, base_path):
     app = FastAPI()
@@ -265,7 +199,8 @@ def test_redirect(serve_instance, base_path):
             root_path = request.scope.get("root_path")
             if root_path.endswith("/"):
                 root_path = root_path[:-1]
-            return RedirectResponse(url=root_path + app.url_path_for("redirect_root"))
+            return RedirectResponse(url=root_path +
+                                    app.url_path_for("redirect_root"))
 
     D.deploy()
 
@@ -283,32 +218,6 @@ def test_redirect(serve_instance, base_path):
     assert r.json() == "hello from /"
 
 
-def test_default_error_handling(serve_instance):
-    @serve.deployment
-    def f():
-        1 / 0
-
-    serve.run(f.bind())
-    r = requests.get("http://localhost:8000/f")
-    assert r.status_code == 500
-    assert "ZeroDivisionError" in r.text, r.text
-
-    @ray.remote(num_cpus=0)
-    def intentional_kill(actor_handle):
-        ray.kill(actor_handle, no_restart=False)
-
-    @serve.deployment
-    def h():
-        ray.get(intentional_kill.remote(ray.get_runtime_context().current_actor))
-        time.sleep(100)  # Don't return here to leave time for actor exit.
-
-    serve.run(h.bind())
-    r = requests.get("http://localhost:8000/h")
-    assert r.status_code == 500
-    assert "retries" in r.text, r.text
-
-
 if __name__ == "__main__":
     import sys
-
     sys.exit(pytest.main(["-v", "-s", __file__]))

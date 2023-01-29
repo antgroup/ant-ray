@@ -1,3 +1,5 @@
+import json
+import logging
 import os
 import signal
 import sys
@@ -8,19 +10,80 @@ import numpy as np
 import pytest
 
 import ray
-import ray._private.ray_constants as ray_constants
-import ray._private.utils
-from ray._private.ray_constants import DEBUG_AUTOSCALING_ERROR
-from ray._private.test_utils import (
-    Semaphore,
-    get_error_message,
-    get_log_batch,
-    init_error_pubsub,
-    run_string_as_driver_nonblocking,
-    wait_for_condition,
-)
-from ray.cluster_utils import cluster_not_supported
 from ray.experimental.internal_kv import _internal_kv_get
+import ray._private.utils
+from ray.util.placement_group import placement_group
+import ray.ray_constants as ray_constants
+from ray.cluster_utils import Cluster
+from ray.test_utils import (wait_for_condition, SignalActor, init_error_pubsub,
+                            get_error_message, Semaphore)
+
+
+def test_warning_for_infeasible_tasks(ray_start_regular, error_pubsub):
+    p = error_pubsub
+    # Check that we get warning messages for infeasible tasks.
+
+    @ray.remote(num_gpus=1)
+    def f():
+        pass
+
+    @ray.remote(resources={"Custom": 1})
+    class Foo:
+        pass
+
+    # This task is infeasible.
+    f.remote()
+    errors = get_error_message(p, 1, ray_constants.INFEASIBLE_TASK_ERROR)
+    assert len(errors) == 1
+    assert errors[0].type == ray_constants.INFEASIBLE_TASK_ERROR
+
+    # This actor placement task is infeasible.
+    Foo.remote()
+    errors = get_error_message(p, 1, ray_constants.INFEASIBLE_TASK_ERROR)
+    assert len(errors) == 1
+    assert errors[0].type == ray_constants.INFEASIBLE_TASK_ERROR
+
+    # Placement group cannot be made, but no warnings should occur.
+    total_cpus = ray.cluster_resources()["CPU"]
+
+    # Occupy one cpu by an actor
+    @ray.remote(num_cpus=1)
+    class A:
+        pass
+
+    a = A.remote()
+    print(a)
+
+    @ray.remote(num_cpus=total_cpus)
+    def g():
+        pass
+
+    pg = placement_group([{"CPU": total_cpus}], strategy="STRICT_PACK")
+    g.options(placement_group=pg).remote()
+
+    errors = get_error_message(
+        p, 1, ray_constants.INFEASIBLE_TASK_ERROR, timeout=5)
+    assert len(errors) == 0, errors
+
+
+def test_warning_for_infeasible_zero_cpu_actor(shutdown_only):
+    # Check that we cannot place an actor on a 0 CPU machine and that we get an
+    # infeasibility warning (even though the actor creation task itself
+    # requires no CPUs).
+
+    ray.init(num_cpus=0)
+    p = init_error_pubsub()
+
+    @ray.remote
+    class Foo:
+        pass
+
+    # The actor creation should be infeasible.
+    Foo.remote()
+    errors = get_error_message(p, 1, ray_constants.INFEASIBLE_TASK_ERROR)
+    assert len(errors) == 1
+    assert errors[0].type == ray_constants.INFEASIBLE_TASK_ERROR
+    p.close()
 
 
 def test_warning_for_too_many_actors(shutdown_only):
@@ -31,20 +94,20 @@ def test_warning_for_too_many_actors(shutdown_only):
 
     p = init_error_pubsub()
 
-    @ray.remote(num_cpus=0)
+    @ray.remote
     class Foo:
         def __init__(self):
             time.sleep(1000)
 
     # NOTE: We should save actor, otherwise it will be out of scope.
-    actor_group1 = [Foo.remote() for _ in range(num_cpus * 10)]
-    assert len(actor_group1) == num_cpus * 10
+    actor_group1 = [Foo.remote() for _ in range(num_cpus * 3)]
+    assert len(actor_group1) == num_cpus * 3
     errors = get_error_message(p, 1, ray_constants.WORKER_POOL_LARGE_ERROR)
     assert len(errors) == 1
     assert errors[0].type == ray_constants.WORKER_POOL_LARGE_ERROR
 
-    actor_group2 = [Foo.remote() for _ in range(num_cpus * 3)]
-    assert len(actor_group2) == num_cpus * 3
+    actor_group2 = [Foo.remote() for _ in range(num_cpus)]
+    assert len(actor_group2) == num_cpus
     errors = get_error_message(p, 1, ray_constants.WORKER_POOL_LARGE_ERROR)
     assert len(errors) == 1
     assert errors[0].type == ray_constants.WORKER_POOL_LARGE_ERROR
@@ -61,25 +124,23 @@ def test_warning_for_too_many_nested_tasks(shutdown_only):
     remote_wait = Semaphore.remote(value=0)
     nested_wait = Semaphore.remote(value=0)
 
-    ray.get(
-        [
-            remote_wait.locked.remote(),
-            nested_wait.locked.remote(),
-        ]
-    )
+    ray.get([
+        remote_wait.locked.remote(),
+        nested_wait.locked.remote(),
+    ])
 
-    @ray.remote(num_cpus=0.25)
+    @ray.remote
     def f():
         time.sleep(1000)
         return 1
 
-    @ray.remote(num_cpus=0.25)
+    @ray.remote
     def h(nested_waits):
         nested_wait.release.remote()
         ray.get(nested_waits)
         ray.get(f.remote())
 
-    @ray.remote(num_cpus=0.25)
+    @ray.remote
     def g(remote_waits, nested_waits):
         # Sleep so that the f tasks all get submitted to the scheduler after
         # the g tasks.
@@ -102,6 +163,81 @@ def test_warning_for_too_many_nested_tasks(shutdown_only):
     assert len(errors) == 1
     assert errors[0].type == ray_constants.WORKER_POOL_LARGE_ERROR
     p.close()
+
+
+def test_warning_for_many_duplicate_remote_functions_and_actors(shutdown_only):
+    ray.init(num_cpus=1)
+
+    @ray.remote
+    def create_remote_function():
+        @ray.remote
+        def g():
+            return 1
+
+        return ray.get(g.remote())
+
+    for _ in range(ray_constants.DUPLICATE_REMOTE_FUNCTION_THRESHOLD - 1):
+        ray.get(create_remote_function.remote())
+
+    import io
+    log_capture_string = io.StringIO()
+    ch = logging.StreamHandler(log_capture_string)
+
+    # TODO(rkn): It's terrible to have to rely on this implementation detail,
+    # the fact that the warning comes from ray._private.import_thread.logger.
+    # However, I didn't find a good way to capture the output for all loggers
+    # simultaneously.
+    ray._private.import_thread.logger.addHandler(ch)
+
+    ray.get(create_remote_function.remote())
+
+    start_time = time.time()
+    while time.time() < start_time + 10:
+        log_contents = log_capture_string.getvalue()
+        if len(log_contents) > 0:
+            break
+
+    ray._private.import_thread.logger.removeHandler(ch)
+
+    assert "remote function" in log_contents
+    assert "has been exported {} times.".format(
+        ray_constants.DUPLICATE_REMOTE_FUNCTION_THRESHOLD) in log_contents
+
+    # Now test the same thing but for actors.
+
+    @ray.remote
+    def create_actor_class():
+        # Require a GPU so that the actor is never actually created and we
+        # don't spawn an unreasonable number of processes.
+        @ray.remote(num_gpus=1)
+        class Foo:
+            pass
+
+        Foo.remote()
+
+    for _ in range(ray_constants.DUPLICATE_REMOTE_FUNCTION_THRESHOLD - 1):
+        ray.get(create_actor_class.remote())
+
+    log_capture_string = io.StringIO()
+    ch = logging.StreamHandler(log_capture_string)
+
+    # TODO(rkn): As mentioned above, it's terrible to have to rely on this
+    # implementation detail.
+    ray._private.import_thread.logger.addHandler(ch)
+
+    ray.get(create_actor_class.remote())
+
+    start_time = time.time()
+    while time.time() < start_time + 10:
+        log_contents = log_capture_string.getvalue()
+        if len(log_contents) > 0:
+            break
+
+    ray._private.import_thread.logger.removeHandler(ch)
+
+    assert "actor" in log_contents
+    assert "has been exported {} times.".format(
+        ray_constants.DUPLICATE_REMOTE_FUNCTION_THRESHOLD) in log_contents
 
 
 # Note that this test will take at least 10 seconds because it must wait for
@@ -131,26 +267,20 @@ def test_warning_for_dead_node(ray_start_cluster_2_nodes, error_pubsub):
     assert node_ids == warning_node_ids
 
 
-@pytest.mark.skipif(
-    sys.platform == "win32", reason="Killing process on Windows does not raise a signal"
-)
 def test_warning_for_dead_autoscaler(ray_start_regular, error_pubsub):
     # Terminate the autoscaler process.
-    from ray._private.worker import _global_node
-
-    autoscaler_process = _global_node.all_processes[ray_constants.PROCESS_TYPE_MONITOR][
-        0
-    ].process
+    from ray.worker import _global_node
+    autoscaler_process = _global_node.all_processes[
+        ray_constants.PROCESS_TYPE_MONITOR][0].process
     autoscaler_process.terminate()
 
     # Confirm that we receive an autoscaler failure error.
     errors = get_error_message(
-        error_pubsub, 1, ray_constants.MONITOR_DIED_ERROR, timeout=5
-    )
+        error_pubsub, 1, ray_constants.MONITOR_DIED_ERROR, timeout=5)
     assert len(errors) == 1
 
     # Confirm that the autoscaler failure error is stored.
-    error = _internal_kv_get(DEBUG_AUTOSCALING_ERROR)
+    error = _internal_kv_get(ray_constants.DEBUG_AUTOSCALING_ERROR)
     assert error is not None
 
 
@@ -158,43 +288,185 @@ def test_raylet_crash_when_get(ray_start_regular):
     def sleep_to_kill_raylet():
         # Don't kill raylet before default workers get connected.
         time.sleep(2)
-        ray._private.worker._global_node.kill_raylet()
+        ray.worker._global_node.kill_raylet()
 
     object_ref = ray.put(np.zeros(200 * 1024, dtype=np.uint8))
-    ray._private.internal_api.free(object_ref)
+    ray.internal.free(object_ref)
 
     thread = threading.Thread(target=sleep_to_kill_raylet)
     thread.start()
-    with pytest.raises(ray.exceptions.ObjectFreedError):
+    with pytest.raises(ray.exceptions.ObjectLostError):
         ray.get(object_ref)
     thread.join()
 
 
+def test_retry_system_level_error(ray_start_regular):
+    @ray.remote
+    class Counter:
+        def __init__(self):
+            self.value = 0
+
+        def increment(self):
+            self.value += 1
+            return self.value
+
+    @ray.remote(max_retries=1)
+    def func(counter):
+        count = counter.increment.remote()
+        if ray.get(count) == 1:
+            import os
+            os._exit(0)
+        else:
+            return 1
+
+    counter1 = Counter.remote()
+    r1 = func.remote(counter1)
+    assert ray.get(r1) == 1
+
+    counter2 = Counter.remote()
+    r2 = func.options(max_retries=0).remote(counter2)
+    with pytest.raises(ray.exceptions.WorkerCrashedError):
+        ray.get(r2)
+
+
+def test_retry_application_level_error(ray_start_regular):
+    @ray.remote
+    class Counter:
+        def __init__(self):
+            self.value = 0
+
+        def increment(self):
+            self.value += 1
+            return self.value
+
+    @ray.remote(max_retries=1, retry_exceptions=True)
+    def func(counter):
+        count = counter.increment.remote()
+        if ray.get(count) == 1:
+            raise ValueError()
+        else:
+            return 2
+
+    counter1 = Counter.remote()
+    r1 = func.remote(counter1)
+    assert ray.get(r1) == 2
+
+    counter2 = Counter.remote()
+    r2 = func.options(max_retries=0).remote(counter2)
+    with pytest.raises(ValueError):
+        ray.get(r2)
+
+    counter3 = Counter.remote()
+    r3 = func.options(retry_exceptions=False).remote(counter3)
+    with pytest.raises(ValueError):
+        ray.get(r3)
+
+
+def test_connect_with_disconnected_node(shutdown_only):
+    config = {
+        "num_heartbeats_timeout": 50,
+        "raylet_heartbeat_period_milliseconds": 10,
+    }
+    cluster = Cluster()
+    cluster.add_node(num_cpus=0, _system_config=config)
+    ray.init(address=cluster.address)
+    p = init_error_pubsub()
+    errors = get_error_message(p, 1, timeout=5)
+    print(errors)
+    assert len(errors) == 0
+    # This node is killed by SIGKILL, ray_monitor will mark it to dead.
+    dead_node = cluster.add_node(num_cpus=0)
+    cluster.remove_node(dead_node, allow_graceful=False)
+    errors = get_error_message(p, 1, ray_constants.REMOVED_NODE_ERROR)
+    assert len(errors) == 1
+    # This node is killed by SIGKILL, ray_monitor will mark it to dead.
+    dead_node = cluster.add_node(num_cpus=0)
+    cluster.remove_node(dead_node, allow_graceful=False)
+    errors = get_error_message(p, 1, ray_constants.REMOVED_NODE_ERROR)
+    assert len(errors) == 1
+    # This node is killed by SIGTERM, ray_monitor will not mark it again.
+    removing_node = cluster.add_node(num_cpus=0)
+    cluster.remove_node(removing_node, allow_graceful=True)
+    errors = get_error_message(p, 1, timeout=2)
+    assert len(errors) == 0
+    # There is no connection error to a dead node.
+    errors = get_error_message(p, 1, timeout=2)
+    assert len(errors) == 0
+    p.close()
+
+
 @pytest.mark.parametrize(
-    "ray_start_cluster",
-    [
-        {
-            "num_nodes": 1,
-            "num_cpus": 2,
-        },
-        {
-            "num_nodes": 2,
-            "num_cpus": 1,
-        },
-    ],
-    indirect=True,
-)
+    "ray_start_cluster_head", [{
+        "num_cpus": 5,
+        "object_store_memory": 10**8,
+    }],
+    indirect=True)
+def test_parallel_actor_fill_plasma_retry(ray_start_cluster_head):
+    @ray.remote
+    class LargeMemoryActor:
+        def some_expensive_task(self):
+            return np.zeros(10**8 // 2, dtype=np.uint8)
+
+    actors = [LargeMemoryActor.remote() for _ in range(5)]
+    for _ in range(5):
+        pending = [a.some_expensive_task.remote() for a in actors]
+        while pending:
+            [done], pending = ray.wait(pending, num_returns=1)
+
+
+def test_fill_object_store_exception(shutdown_only):
+    ray.init(
+        num_cpus=2,
+        object_store_memory=10**8,
+        _system_config={"automatic_object_spilling_enabled": False})
+
+    @ray.remote
+    def expensive_task():
+        return np.zeros((10**8) // 10, dtype=np.uint8)
+
+    with pytest.raises(ray.exceptions.RayTaskError) as e:
+        ray.get([expensive_task.remote() for _ in range(20)])
+        with pytest.raises(ray.exceptions.ObjectStoreFullError):
+            raise e.as_instanceof_cause()
+
+    @ray.remote
+    class LargeMemoryActor:
+        def some_expensive_task(self):
+            return np.zeros(10**8 + 2, dtype=np.uint8)
+
+        def test(self):
+            return 1
+
+    actor = LargeMemoryActor.remote()
+    with pytest.raises(ray.exceptions.RayTaskError):
+        ray.get(actor.some_expensive_task.remote())
+    # Make sure actor does not die
+    ray.get(actor.test.remote())
+
+    with pytest.raises(ray.exceptions.ObjectStoreFullError):
+        ray.put(np.zeros(10**8 + 2, dtype=np.uint8))
+
+
+@pytest.mark.parametrize(
+    "ray_start_cluster", [{
+        "num_nodes": 1,
+        "num_cpus": 2,
+    }, {
+        "num_nodes": 2,
+        "num_cpus": 1,
+    }],
+    indirect=True)
 def test_eviction(ray_start_cluster):
     @ray.remote
     def large_object():
         return np.zeros(10 * 1024 * 1024)
 
     obj = large_object.remote()
-    assert isinstance(ray.get(obj), np.ndarray)
+    assert (isinstance(ray.get(obj), np.ndarray))
     # Evict the object.
-    ray._private.internal_api.free([obj])
+    ray.internal.free([obj])
     # ray.get throws an exception.
-    with pytest.raises(ray.exceptions.ObjectFreedError):
+    with pytest.raises(ray.exceptions.ObjectLostError):
         ray.get(obj)
 
     @ray.remote
@@ -208,19 +480,14 @@ def test_eviction(ray_start_cluster):
 
 
 @pytest.mark.parametrize(
-    "ray_start_cluster",
-    [
-        {
-            "num_nodes": 2,
-            "num_cpus": 1,
-        },
-        {
-            "num_nodes": 1,
-            "num_cpus": 2,
-        },
-    ],
-    indirect=True,
-)
+    "ray_start_cluster", [{
+        "num_nodes": 2,
+        "num_cpus": 1,
+    }, {
+        "num_nodes": 1,
+        "num_cpus": 2,
+    }],
+    indirect=True)
 def test_serialized_id(ray_start_cluster):
     @ray.remote
     def small_object():
@@ -255,20 +522,15 @@ def test_serialized_id(ray_start_cluster):
     ray.get(get.remote([obj], True))
 
 
-@pytest.mark.xfail(cluster_not_supported, reason="cluster not supported")
-@pytest.mark.parametrize(
-    "use_actors,node_failure",
-    [(False, False), (False, True), (True, False), (True, True)],
-)
+@pytest.mark.parametrize("use_actors,node_failure",
+                         [(False, False), (False, True), (True, False),
+                          (True, True)])
 def test_fate_sharing(ray_start_cluster, use_actors, node_failure):
     config = {
         "num_heartbeats_timeout": 10,
         "raylet_heartbeat_period_milliseconds": 100,
-        "health_check_initial_delay_ms": 0,
-        "health_check_period_ms": 100,
-        "health_check_failure_threshold": 10,
     }
-    cluster = ray_start_cluster
+    cluster = Cluster()
     # Head node with no resources.
     cluster.add_node(num_cpus=0, _system_config=config)
     ray.init(address=cluster.address)
@@ -342,86 +604,178 @@ def test_fate_sharing(ray_start_cluster, use_actors, node_failure):
         test_process_failure(use_actors)
 
 
-def test_list_named_actors_timeout(monkeypatch, shutdown_only):
-    with monkeypatch.context() as m:
-        # defer for 3s
-        m.setenv(
-            "RAY_testing_asio_delay_us",
-            "ActorInfoGcsService.grpc_server.ListNamedActors=3000000:3000000",
-        )
-        ray.init(_system_config={"gcs_server_request_timeout_seconds": 1})
-
-        @ray.remote
-        class A:
-            pass
-
-        a = A.options(name="hi").remote()
-        print(a)
-        with pytest.raises(ray.exceptions.GetTimeoutError):
-            ray.util.list_named_actors()
-
-
-def test_raylet_node_manager_server_failure(ray_start_cluster_head, log_pubsub):
-    cluster = ray_start_cluster_head
-    redis_port = int(cluster.address.split(":")[1])
-    # Reuse redis port to make node manager grpc server fail to start.
-    with pytest.raises(Exception):
-        cluster.add_node(wait=False, node_manager_port=redis_port)
-
-    # wait for max 10 seconds.
-    def matcher(log_batch):
-        return log_batch["pid"] == "raylet" and any(
-            "Failed to start the grpc server." in line for line in log_batch["lines"]
-        )
-
-    match = get_log_batch(log_pubsub, 1, timeout=10, matcher=matcher)
-    assert len(match) > 0
-
-
-def test_gcs_server_crash_cluster(ray_start_cluster):
-    # Test the GCS server failures will crash the driver.
-    cluster = ray_start_cluster
-    GCS_RECONNECTION_TIMEOUT = 5
-    node = cluster.add_node(
-        num_cpus=0,
-        _system_config={"gcs_rpc_server_reconnect_timeout_s": GCS_RECONNECTION_TIMEOUT},
-    )
-
-    script = """
-import ray
-import time
-
-ray.init(address="auto")
-time.sleep(60)
-    """
-
+@pytest.mark.parametrize(
+    "ray_start_regular", [{
+        "_system_config": {
+            "ping_gcs_rpc_server_max_retries": 100
+        }
+    }],
+    indirect=True)
+def test_gcs_server_failiure_report(ray_start_regular, log_pubsub):
+    p = log_pubsub
     # Get gcs server pid to send a signal.
-    all_processes = node.all_processes
+    all_processes = ray.worker._global_node.all_processes
     gcs_server_process = all_processes["gcs_server"][0].process
     gcs_server_pid = gcs_server_process.pid
 
-    proc = run_string_as_driver_nonblocking(script)
-    # Wait long enough to start the driver.
-    time.sleep(5)
-    start = time.time()
-    print(gcs_server_pid)
-    os.kill(gcs_server_pid, signal.SIGKILL)
-    wait_for_condition(lambda: proc.poll() is None, timeout=10)
-    # Make sure the driver was exited within the timeout instead of hanging.
-    # * 2 for avoiding flakiness.
-    assert time.time() - start < GCS_RECONNECTION_TIMEOUT * 2
-    # Make sure all processes are cleaned up after GCS is crashed.
-    # Currently, not every process is fate shared with GCS.
-    # It seems like log monitor, ray client server, and Redis
-    # are not fate shared.
-    # TODO(sang): Fix it.
-    # wait_for_condition(lambda: not node.any_processes_alive())
+    os.kill(gcs_server_pid, signal.SIGBUS)
+    msg = None
+    cnt = 0
+    # wait for max 30 seconds.
+    while cnt < 3000 and not msg:
+        msg = p.get_message()
+        if msg is None:
+            time.sleep(0.01)
+            cnt += 1
+            continue
+        data = json.loads(ray._private.utils.decode(msg["data"]))
+        assert data["pid"] == "gcs_server"
+
+
+@pytest.mark.parametrize(
+    "ray_start_regular", [{
+        "_system_config": {
+            "task_retry_delay_ms": 500
+        }
+    }],
+    indirect=True)
+def test_async_actor_task_retries(ray_start_regular):
+    # https://github.com/ray-project/ray/issues/11683
+
+    signal = SignalActor.remote()
+
+    @ray.remote
+    class DyingActor:
+        def __init__(self):
+            print("DyingActor init called")
+            self.should_exit = False
+
+        def set_should_exit(self):
+            print("DyingActor.set_should_exit called")
+            self.should_exit = True
+
+        async def get(self, x, wait=False):
+            print(f"DyingActor.get called with x={x}, wait={wait}")
+            if self.should_exit:
+                os._exit(0)
+            if wait:
+                await signal.wait.remote()
+            return x
+
+    # Normal in order actor task retries should work
+    dying = DyingActor.options(
+        max_restarts=-1,
+        max_task_retries=-1,
+    ).remote()
+
+    assert ray.get(dying.get.remote(1)) == 1
+    ray.get(dying.set_should_exit.remote())
+    assert ray.get(dying.get.remote(42)) == 42
+
+    # Now let's try out of order retries:
+    # Task seqno 0 will return
+    # Task seqno 1 will be pending and retried later
+    # Task seqno 2 will return
+    # Task seqno 3 will crash the actor and retried later
+    dying = DyingActor.options(
+        max_restarts=-1,
+        max_task_retries=-1,
+    ).remote()
+
+    # seqno 0
+    ref_0 = dying.get.remote(0)
+    assert ray.get(ref_0) == 0
+    # seqno 1
+    ref_1 = dying.get.remote(1, wait=True)
+    # seqno 2
+    ref_2 = dying.set_should_exit.remote()
+    assert ray.get(ref_2) is None
+    # seqno 3, this will crash the actor because previous task set should exit
+    # to true.
+    ref_3 = dying.get.remote(3)
+
+    # At this point the actor should be restarted. The two pending tasks
+    # [ref_1, ref_3] should be retried, but not the completed tasks [ref_0,
+    # ref_2]. Critically, if ref_2 was retried, ref_3 can never return.
+    ray.get(signal.send.remote())
+    assert ray.get(ref_1) == 1
+    assert ray.get(ref_3) == 3
+
+
+def test_raylet_node_manager_server_failure(ray_start_cluster_head,
+                                            log_pubsub):
+    cluster = ray_start_cluster_head
+    redis_port = int(cluster.address.split(":")[1])
+    # Reuse redis port to make node manager grpc server fail to start.
+    try:
+        cluster.add_node(wait=False, node_manager_port=redis_port)
+    except Exception:
+        print("Timed out while waiting for node to startup.")
+    p = log_pubsub
+    cnt = 0
+    # wait for max 10 seconds.
+    found = False
+    while cnt < 1000 and not found:
+        msg = p.get_message()
+        if msg is None:
+            time.sleep(0.01)
+            cnt += 1
+            continue
+        data = json.loads(ray._private.utils.decode(msg["data"]))
+        if data["pid"] == "raylet":
+            found = any("Failed to start the grpc server." in line
+                        for line in data["lines"])
+    assert found
+
+
+def test_basic_l1fo_backoff(shutdown_only):
+    ray.init(
+        num_cpus=8,
+        job_config=ray.job_config.JobConfig(enable_l1_fault_tolerance=True))
+
+    # A helper to get the number of this actor restarts.
+    def _num_restarts(actor_id):
+        assert not actor_id.is_nil(), (
+            "This method should't be called inside Ray tasks.")
+        actor_info = ray.state.actors(actor_id.hex())
+        return actor_info["NumRestarts"]
+
+    @ray.remote
+    class MyActor:
+        def __init__(self, index):
+            if not ray.get_runtime_context().was_current_actor_reconstructed:
+                # First time to be created.
+                return
+            num_restarts = _num_restarts(ray.get_runtime_context().actor_id)
+            if index == 0 and num_restarts < 1000:
+                os._exit(-1)
+
+        def ready(self):
+            return True
+
+        def trigger_fo(self):
+            os._exit(-1)
+
+        def num_rounds(self):
+            return _num_restarts(ray.get_runtime_context().actor_id)
+
+    # Create 5 actors.
+    actors = [
+        MyActor.options(max_restarts=1000).remote(index)
+        for index in range(0, 5)
+    ]
+    ready_objs = [actor.ready.remote() for actor in actors]
+    ray.get(ready_objs)
+
+    # Kill one actor to trigger l1fo, and wait 1 minutes to check the rounds.
+    actors[0].trigger_fo.remote()
+    time.sleep(1 * 60)
+    logging.info("Starting to assert.")
+    # Note that we only trigger 6 rounds l1fo in 1 minute, but `NumRestarts`
+    # of actor is updated once the last round l1fo being starting.
+    assert _num_restarts(actors[0]._actor_id) == 7
 
 
 if __name__ == "__main__":
     import pytest
-
-    if os.environ.get("PARALLEL_CI"):
-        sys.exit(pytest.main(["-n", "auto", "--boxed", "-vs", __file__]))
-    else:
-        sys.exit(pytest.main(["-sv", __file__]))
+    sys.exit(pytest.main(["-v", __file__]))

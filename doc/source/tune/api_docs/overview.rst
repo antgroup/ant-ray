@@ -1,7 +1,7 @@
 .. _tune-api-ref:
 
-Ray Tune API
-============
+Tune API Reference
+==================
 
 .. tip:: We'd love to hear your feedback on using Tune - `get in touch <https://forms.gle/PTRvGLbKRdUfuzQo9>`_!
 
@@ -11,21 +11,20 @@ on `Github`_.
 .. _`GitHub`: https://github.com/ray-project/ray/issues
 
 .. toctree::
-    :maxdepth: 2
+   :maxdepth: 2
 
-    execution.rst
-    trainable.rst
-    search_space.rst
-    suggestion.rst
-    schedulers.rst
-    stoppers.rst
-    result_grid.rst
-    reporters.rst
-    syncing.rst
-    logging.rst
-    env.rst
-    sklearn.rst
-    integration.rst
-    internals.rst
-    client.rst
-    cli.rst
+   execution.rst
+   trainable.rst
+   reporters.rst
+   analysis.rst
+   search_space.rst
+   suggestion.rst
+   schedulers.rst
+   sklearn.rst
+   stoppers.rst
+   logging.rst
+   integration.rst
+   internals.rst
+   client.rst
+   cli.rst
+   scalability.rst

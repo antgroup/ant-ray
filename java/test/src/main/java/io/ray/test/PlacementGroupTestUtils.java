@@ -2,12 +2,11 @@ package io.ray.test;
 
 import io.ray.api.PlacementGroups;
 import io.ray.api.options.PlacementGroupCreationOptions;
+import io.ray.api.placementgroup.Bundle;
 import io.ray.api.placementgroup.PlacementGroup;
 import io.ray.api.placementgroup.PlacementStrategy;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /** A utils class for placement group test. */
 public class PlacementGroupTestUtils {
@@ -18,11 +17,11 @@ public class PlacementGroupTestUtils {
       PlacementStrategy strategy,
       Double resourceSize,
       String groupName) {
-    List<Map<String, Double>> bundles = new ArrayList<>();
+    List<Bundle> bundles = new ArrayList<>();
 
     for (int i = 0; i < bundleSize; i++) {
-      Map<String, Double> bundle = new HashMap<>();
-      bundle.put(resourceName, resourceSize);
+      Bundle bundle =
+          new Bundle.Builder().setResource(resourceName, resourceSize).setMemoryMb(50).build();
       bundles.add(bundle);
     }
     PlacementGroupCreationOptions.Builder builder =

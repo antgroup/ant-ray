@@ -15,9 +15,10 @@
 #pragma once
 
 #include "ray/common/asio/instrumented_io_context.h"
+#include "ray/rpc/brpc/server/server.h"
+#include "ray/rpc/brpc/server/stream_service.h"
 #include "ray/rpc/grpc_server.h"
 #include "ray/rpc/server_call.h"
-#include "src/ray/protobuf/core_worker.grpc.pb.h"
 #include "src/ray/protobuf/core_worker.pb.h"
 
 namespace ray {
@@ -26,46 +27,45 @@ class CoreWorker;
 
 namespace rpc {
 
+#define DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD DECLARE_VOID_GRPC_SERVICE_HANDLER_METHOD
+
 /// NOTE: See src/ray/core_worker/core_worker.h on how to add a new grpc handler.
-/// Disable gRPC server metrics since it incurs too high cardinality.
-#define RAY_CORE_WORKER_RPC_HANDLERS                                                     \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, PushTask, -1)           \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(                                           \
-      CoreWorkerService, DirectActorCallArgWaitComplete, -1)                             \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(                                           \
-      CoreWorkerService, RayletNotifyGCSRestart, -1)                                     \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, GetObjectStatus, -1)    \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(                                           \
-      CoreWorkerService, WaitForActorOutOfScope, -1)                                     \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, PubsubLongPolling, -1)  \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, PubsubCommandBatch, -1) \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(                                           \
-      CoreWorkerService, UpdateObjectLocationBatch, -1)                                  \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(                                           \
-      CoreWorkerService, GetObjectLocationsOwner, -1)                                    \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, KillActor, -1)          \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, CancelTask, -1)         \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, RemoteCancelTask, -1)   \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, GetCoreWorkerStats, -1) \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, LocalGC, -1)            \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, SpillObjects, -1)       \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(                                           \
-      CoreWorkerService, RestoreSpilledObjects, -1)                                      \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(                                           \
-      CoreWorkerService, DeleteSpilledObjects, -1)                                       \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, PlasmaObjectReady, -1)  \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, Exit, -1)               \
-  RPC_SERVICE_HANDLER_SERVER_METRICS_DISABLED(CoreWorkerService, AssignObjectOwner, -1)
+
+#define RAY_CORE_WORKER_RPC_HANDLERS                                      \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, PushTask)                       \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, DirectActorCallArgWaitComplete) \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, GetObjectStatus)                \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, WaitForActorOutOfScope)         \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, SubscribeForObjectEviction)     \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, PubsubLongPolling)              \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, WaitForRefRemoved)              \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, AddObjectLocationOwner)         \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, RemoveObjectLocationOwner)      \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, GetObjectLocationsOwner)        \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, KillActor)                      \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, CancelTask)                     \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, RemoteCancelTask)               \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, GetCoreWorkerStats)             \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, LocalGC)                        \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, SpillObjects)                   \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, RestoreSpilledObjects)          \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, DeleteSpilledObjects)           \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, AddSpilledUrl)                  \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, PlasmaObjectReady)              \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, RunOnUtilWorker)                \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, Exit)                           \
+  BRPC_SERVICE_HANDLER(CoreWorkerService, BatchAssignObjectOwner)
 
 #define RAY_CORE_WORKER_DECLARE_RPC_HANDLERS                              \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(PushTask)                       \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(DirectActorCallArgWaitComplete) \
-  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(RayletNotifyGCSRestart)         \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(GetObjectStatus)                \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(WaitForActorOutOfScope)         \
+  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(SubscribeForObjectEviction)     \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(PubsubLongPolling)              \
-  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(PubsubCommandBatch)             \
-  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(UpdateObjectLocationBatch)      \
+  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(WaitForRefRemoved)              \
+  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(AddObjectLocationOwner)         \
+  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(RemoveObjectLocationOwner)      \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(GetObjectLocationsOwner)        \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(KillActor)                      \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(CancelTask)                     \
@@ -75,9 +75,11 @@ namespace rpc {
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(SpillObjects)                   \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(RestoreSpilledObjects)          \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(DeleteSpilledObjects)           \
+  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(AddSpilledUrl)                  \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(PlasmaObjectReady)              \
+  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(RunOnUtilWorker)                \
   DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(Exit)                           \
-  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(AssignObjectOwner)
+  DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD(BatchAssignObjectOwner)
 
 /// Interface of the `CoreWorkerServiceHandler`, see `src/ray/protobuf/core_worker.proto`.
 class CoreWorkerServiceHandler {
@@ -88,14 +90,14 @@ class CoreWorkerServiceHandler {
   /// `send_reply_callback` should be called. See
   /// src/ray/rpc/node_manager/node_manager_client.h and
   /// src/ray/protobuf/node_manager.proto for a description of the
-  /// functionality of each handler.
-  ///
+  /// functionality of each handler. ///
   /// \param[in] request The request message.
   /// \param[out] reply The reply message.
   /// \param[in] send_reply_callback The callback to be called when the request is done.
   RAY_CORE_WORKER_DECLARE_RPC_HANDLERS
 };
 
+#if CORE_WORKER_USE_GRPC
 /// The `GrpcServer` for `CoreWorkerService`.
 class CoreWorkerGrpcService : public GrpcService {
  public:
@@ -123,6 +125,35 @@ class CoreWorkerGrpcService : public GrpcService {
   /// The service handler that actually handles the requests.
   CoreWorkerServiceHandler &service_handler_;
 };
+#else
+/// The `BrpcStreamService` for `CoreWorkerService`.
+class CoreWorkerBrpcStreamService : public BrpcStreamService {
+ public:
+  /// Constructor.
+  ///
+  /// \param[in] handler The service handler that actually handle the requests.
+  CoreWorkerBrpcStreamService(boost::asio::io_service &io_service,
+                              CoreWorkerServiceHandler &service_handler)
+      : BrpcStreamService(brpcpb::StreamServiceType::CoreWorkerServiceType),
+        io_service_(io_service),
+        service_handler_(service_handler){};
+
+ protected:
+  void InitMethodHandlers(
+      std::vector<std::shared_ptr<StreamServiceMethod>> *server_call_methods) override {
+    RAY_CORE_WORKER_RPC_HANDLERS
+  }
+
+ private:
+  boost::asio::io_service &io_service_;
+
+  /// The service handler that actually handle the requests.
+  CoreWorkerServiceHandler &service_handler_;
+};
+
+#endif
+
+#undef DECLARE_VOID_RPC_SERVICE_HANDLER_METHOD
 
 }  // namespace rpc
 }  // namespace ray

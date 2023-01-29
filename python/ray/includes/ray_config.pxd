@@ -9,7 +9,7 @@ cdef extern from "ray/common/ray_config.h" nogil:
         @staticmethod
         RayConfig &instance()
 
-        void initialize(const c_string& config_list)
+        void initialize(const c_string &config_list)
 
         int64_t ray_cookie() const
 
@@ -55,40 +55,19 @@ cdef extern from "ray/common/ray_config.h" nogil:
 
         int64_t max_direct_call_object_size() const
 
-        int64_t task_rpc_inlined_bytes_limit() const
+        c_bool put_small_object_in_memory_store() const
+
+        uint32_t max_tasks_in_flight_per_worker() const
 
         uint64_t metrics_report_interval_ms() const
 
         c_bool enable_timeline() const
 
+        c_bool automatic_object_deletion_enabled() const
+
         uint32_t max_grpc_message_size() const
 
-        c_bool record_ref_creation_sites() const
+        uint64_t agent_heartbeat_period_milliseconds() const
 
-        c_bool gcs_grpc_based_pubsub() const
-
-        c_bool start_python_importer_thread() const
-
-        c_bool use_ray_syncer() const
-
-        c_string REDIS_CA_CERT() const
-
-        c_string REDIS_CA_PATH() const
-
-        c_string REDIS_CLIENT_CERT() const
-
-        c_string REDIS_CLIENT_KEY() const
-
-        c_string REDIS_SERVER_NAME() const
-
-        c_bool pull_based_healthcheck() const
-
-        int64_t health_check_initial_delay_ms() const
-
-        int64_t health_check_period_ms() const
-
-        int64_t health_check_timeout_ms() const
-
-        int64_t health_check_failure_threshold() const
-
-        uint64_t memory_monitor_refresh_ms() const
+        # ANT-INTERNAL
+        c_string dump_to_json_str() const

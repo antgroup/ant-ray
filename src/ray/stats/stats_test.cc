@@ -22,23 +22,7 @@
 #include "absl/memory/memory.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "ray/stats/metric_defs.h"
-
-DEFINE_stats(test_hist,
-             "TestStats",
-             ("method", "method2"),
-             (1.0, 2.0, 3.0, 4.0),
-             ray::stats::HISTOGRAM);
-DEFINE_stats(test_2,
-             "TestStats",
-             ("method", "method2"),
-             (1.0),
-             ray::stats::COUNT,
-             ray::stats::SUM);
-DEFINE_stats(test, "TestStats", ("method"), (1.0), ray::stats::COUNT, ray::stats::SUM);
-DEFINE_stats(
-    test_declare, "TestStats2", ("tag1"), (1.0), ray::stats::COUNT, ray::stats::SUM);
-DECLARE_stats(test_declare);
+#include "ray/stats/util.h"
 
 namespace ray {
 
@@ -87,7 +71,7 @@ class StatsTest : public ::testing::Test {
     const stats::TagsType global_tags = {{stats::ResourceNameKey, "CPU"}};
     std::shared_ptr<stats::MetricExporterClient> exporter(
         new stats::StdoutExporterClient());
-    ray::stats::Init(global_tags, MetricsAgentPort, WorkerID::Nil(), exporter);
+    ray::stats::Init(global_tags, MetricsAgentPort, exporter);
     MockExporter::Register();
   }
 
@@ -95,13 +79,6 @@ class StatsTest : public ::testing::Test {
 
   void Shutdown() { ray::stats::Shutdown(); }
 };
-
-TEST_F(StatsTest, F) {
-  for (size_t i = 0; i < 20; ++i) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    stats::TestMetrics().Record(2345);
-  }
-}
 
 TEST_F(StatsTest, InitializationTest) {
   // Do initialization multiple times and make sure only the first initialization
@@ -112,9 +89,7 @@ TEST_F(StatsTest, InitializationTest) {
     std::shared_ptr<stats::MetricExporterClient> exporter(
         new stats::StdoutExporterClient());
     ray::stats::Init({{stats::LanguageKey, test_tag_value_that_shouldnt_be_applied}},
-                     MetricsAgentPort,
-                     WorkerID::Nil(),
-                     exporter);
+                     MetricsAgentPort, exporter);
   }
 
   auto &first_tag = ray::stats::StatsConfig::instance().GetGlobalTags()[0];
@@ -129,7 +104,7 @@ TEST_F(StatsTest, InitializationTest) {
   std::shared_ptr<stats::MetricExporterClient> exporter(
       new stats::StdoutExporterClient());
 
-  ray::stats::Init(global_tags, MetricsAgentPort, WorkerID::Nil(), exporter);
+  ray::stats::Init(global_tags, MetricsAgentPort, exporter);
   ASSERT_TRUE(ray::stats::StatsConfig::instance().IsInitialized());
   auto &new_first_tag = ray::stats::StatsConfig::instance().GetGlobalTags()[0];
   ASSERT_TRUE(new_first_tag.second == test_tag_value_that_shouldnt_be_applied);
@@ -137,9 +112,11 @@ TEST_F(StatsTest, InitializationTest) {
 
 TEST(Metric, MultiThreadMetricRegisterViewTest) {
   ray::stats::Shutdown();
+
   std::shared_ptr<stats::MetricExporterClient> exporter(
       new stats::StdoutExporterClient());
-  ray::stats::Init({}, MetricsAgentPort, WorkerID::Nil(), exporter);
+  ray::stats::Init({}, MetricsAgentPort, exporter);
+
   std::vector<std::thread> threads;
   const stats::TagKeyType tag1 = stats::TagKeyType::Register("k1");
   const stats::TagKeyType tag2 = stats::TagKeyType::Register("k2");
@@ -147,21 +124,15 @@ TEST(Metric, MultiThreadMetricRegisterViewTest) {
     threads.emplace_back([tag1, tag2, index]() {
       for (int i = 0; i < 100; i++) {
         stats::Count random_counter(
-            "ray.random.counter" + std::to_string(index) + std::to_string(i),
-            "",
-            "",
+            "ray.random.counter" + std::to_string(index) + std::to_string(i), "", "",
             {tag1, tag2});
         random_counter.Record(i);
         stats::Gauge random_gauge(
-            "ray.random.gauge" + std::to_string(index) + std::to_string(i),
-            "",
-            "",
+            "ray.random.gauge" + std::to_string(index) + std::to_string(i), "", "",
             {tag1, tag2});
         random_gauge.Record(i);
         stats::Sum random_sum(
-            "ray.random.sum" + std::to_string(index) + std::to_string(i),
-            "",
-            "",
+            "ray.random.sum" + std::to_string(index) + std::to_string(i), "", "",
             {tag1, tag2});
         random_sum.Record(i);
       }
@@ -170,6 +141,7 @@ TEST(Metric, MultiThreadMetricRegisterViewTest) {
   for (auto &thread : threads) {
     thread.join();
   }
+
   ray::stats::Shutdown();
 }
 
@@ -190,7 +162,7 @@ TEST_F(StatsTest, MultiThreadedInitializationTest) {
         unsigned int upper_bound = 100;
         unsigned int init_or_shutdown = (rand() % upper_bound);
         if (init_or_shutdown >= (upper_bound / 2)) {
-          ray::stats::Init(global_tags, MetricsAgentPort, WorkerID::Nil(), exporter);
+          ray::stats::Init(global_tags, MetricsAgentPort, exporter);
         } else {
           ray::stats::Shutdown();
         }
@@ -204,7 +176,7 @@ TEST_F(StatsTest, MultiThreadedInitializationTest) {
   ASSERT_FALSE(ray::stats::StatsConfig::instance().IsInitialized());
   std::shared_ptr<stats::MetricExporterClient> exporter(
       new stats::StdoutExporterClient());
-  ray::stats::Init(global_tags, MetricsAgentPort, WorkerID::Nil(), exporter);
+  ray::stats::Init(global_tags, MetricsAgentPort, exporter);
   ASSERT_TRUE(ray::stats::StatsConfig::instance().IsInitialized());
 }
 
@@ -225,17 +197,39 @@ TEST_F(StatsTest, TestShutdownTakesLongTime) {
   absl::Duration harvest_interval = absl::Milliseconds(kReportFlushInterval);
   ray::stats::StatsConfig::instance().SetReportInterval(report_interval);
   ray::stats::StatsConfig::instance().SetHarvestInterval(harvest_interval);
-  ray::stats::Init(global_tags, MetricsAgentPort, WorkerID::Nil(), exporter);
+  ray::stats::Init(global_tags, MetricsAgentPort, exporter);
   ray::stats::Shutdown();
 }
 
-TEST_F(StatsTest, STAT_DEF) {
-  ray::stats::Shutdown();
-  std::shared_ptr<stats::MetricExporterClient> exporter(
-      new stats::StdoutExporterClient());
-  ray::stats::Init({}, MetricsAgentPort, WorkerID::Nil(), exporter);
-  STATS_test.Record(1.0);
-  STATS_test_declare.Record(1.0, "Test");
+TEST(UtilTest, TestPercentile) {
+  {
+    int p99_value, p95_value, p90_value;
+    ray::stats::Percentile p(1000, [&p99_value](double value) { p99_value = value; },
+                             [&p95_value](double value) { p95_value = value; },
+                             [&p90_value](double value) { p90_value = value; });
+    RAY_LOG(INFO) << p.DebugString();
+    for (int i = 0; i < 1000; i++) {
+      p.Record(i);
+    }
+    ASSERT_EQ(990, p99_value);
+    ASSERT_EQ(950, p95_value);
+    ASSERT_EQ(900, p90_value);
+  }
+
+  {
+    /// Test window, a new window should be used after callback called.
+    int result;
+    ray::stats::Percentile p(1000, [&result](double value) { result = value; },
+                             [](double value) {}, [](double value) {});
+    for (int i = 0; i < 1000; i++) {
+      p.Record(i);
+    }
+    ASSERT_EQ(990, result);
+    for (int i = 0; i > -1000; i--) {
+      p.Record(i);
+    }
+    ASSERT_EQ(-9, result);
+  }
 }
 
 }  // namespace ray

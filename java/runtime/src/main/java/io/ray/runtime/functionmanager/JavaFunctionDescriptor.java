@@ -3,13 +3,10 @@ package io.ray.runtime.functionmanager;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import io.ray.runtime.generated.Common.Language;
-import java.io.Serializable;
 import java.util.List;
 
 /** Represents metadata of Java function. */
-public final class JavaFunctionDescriptor implements FunctionDescriptor, Serializable {
-
-  private static final long serialVersionUID = -2137471820857197094L;
+public final class JavaFunctionDescriptor implements FunctionDescriptor {
 
   /** Function's class name. */
   public final String className;

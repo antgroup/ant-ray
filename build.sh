@@ -11,4 +11,4 @@ fi
 BAZEL_SH="${SHELL}" exec \
   "${PYTHON3_BIN_PATH}" -c \
   "import runpy, sys; runpy.run_path(sys.argv.pop(), run_name='__api__')" \
-  build "$@" "${0%/*}"/python/setup.py
+  build "$@" "${0%/*}"/python/setup.py "${0%/*}"/streaming/python/setup.py

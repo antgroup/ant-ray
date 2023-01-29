@@ -1,5 +1,6 @@
 package io.ray.runtime.functionmanager;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import io.ray.api.function.RayFunc;
 import io.ray.runtime.util.LambdaUtils;
@@ -8,24 +9,18 @@ import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Stream;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,7 +28,7 @@ import org.objectweb.asm.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Manages functions in the current worker. */
+/** Manages functions. */
 public class FunctionManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FunctionManager.class);
@@ -46,11 +41,11 @@ public class FunctionManager {
    */
   // If the cache is not thread local, we'll need a lock to protect it,
   // which means competition is highly possible.
-  private static final ThreadLocal<WeakHashMap<Class<? extends RayFunc>, JavaFunctionDescriptor>>
-      RAY_FUNC_CACHE = ThreadLocal.withInitial(WeakHashMap::new);
+  private static final ThreadLocal<HashMap<Class<? extends RayFunc>, JavaFunctionDescriptor>>
+      RAY_FUNC_CACHE = ThreadLocal.withInitial(HashMap::new);
 
-  /** The table that manages functions. */
-  private final JobFunctionTable jobFunctionTable;
+  /** The functions that belong to this job. */
+  private JobFunctionTable jobFunctionTable;
 
   /** The resource path which we can load the job's jar resources. */
   private final List<String> codeSearchPath;
@@ -61,12 +56,11 @@ public class FunctionManager {
    * @param codeSearchPath The specified job resource that can store the job's resources.
    */
   public FunctionManager(List<String> codeSearchPath) {
+    Preconditions.checkNotNull(codeSearchPath);
     this.codeSearchPath = codeSearchPath;
-    jobFunctionTable = createJobFunctionTable();
-  }
-
-  public ClassLoader getClassLoader() {
-    return jobFunctionTable.classLoader;
+    if (!codeSearchPath.isEmpty()) {
+      LOGGER.debug("Created FunctionManager from code search path {}", codeSearchPath);
+    }
   }
 
   /**
@@ -97,69 +91,78 @@ public class FunctionManager {
    * @return A RayFunction object.
    */
   public RayFunction getFunction(JavaFunctionDescriptor functionDescriptor) {
+    if (jobFunctionTable == null) {
+      synchronized (this) {
+        if (jobFunctionTable == null) {
+          jobFunctionTable = createJobFunctionTable();
+        }
+      }
+    }
     return jobFunctionTable.getFunction(functionDescriptor);
   }
 
-  /** A helper that creates function table. */
   private JobFunctionTable createJobFunctionTable() {
     ClassLoader classLoader;
-    if (codeSearchPath == null || codeSearchPath.isEmpty()) {
+    if (codeSearchPath.isEmpty()) {
       classLoader = getClass().getClassLoader();
     } else {
       URL[] urls =
           codeSearchPath.stream()
-              .filter(p -> StringUtils.isNotBlank(p) && Files.exists(Paths.get(p)))
+              .filter(StringUtils::isNotBlank)
               .flatMap(
                   p -> {
                     try {
-                      if (!Files.isDirectory(Paths.get(p))) {
-                        if (!p.endsWith(".jar")) {
-                          return Stream.of(
-                              Paths.get(p).getParent().toAbsolutePath().toUri().toURL());
-                        } else {
-                          return Stream.of(Paths.get(p).toAbsolutePath().toUri().toURL());
-                        }
-                      } else {
-                        List<URL> subUrls = new ArrayList<>();
+                      List<URL> subUrls = new ArrayList<>();
+                      if (!Files.isDirectory(Paths.get(p)) && p.endsWith(".jar")) {
                         subUrls.add(Paths.get(p).toAbsolutePath().toUri().toURL());
-                        Collection<File> jars =
-                            FileUtils.listFiles(
-                                new File(p),
-                                new RegexFileFilter(".*\\.jar"),
-                                DirectoryFileFilter.DIRECTORY);
-                        for (File jar : jars) {
-                          subUrls.add(jar.toPath().toUri().toURL());
+                      } else {
+                        Path dir = Paths.get(p);
+                        if (!Files.isDirectory(dir)) {
+                          dir = dir.getParent();
                         }
-                        return subUrls.stream();
+                        subUrls.add(dir.toAbsolutePath().toUri().toURL());
+                        File[] jars = dir.toFile().listFiles((d, name) -> name.endsWith(".jar"));
+                        if (jars != null) {
+                          for (File jar : jars) {
+                            subUrls.add(jar.toPath().toUri().toURL());
+                          }
+                        }
                       }
-                    } catch (MalformedURLException e) {
-                      throw new RuntimeException(String.format("Illegal %s resource path", p));
+                      return subUrls.stream();
+                    } catch (Exception e) {
+                      throw new RuntimeException(String.format("Illegal '%s' resource path", p));
                     }
                   })
               .toArray(URL[]::new);
       classLoader = new URLClassLoader(urls);
-      LOGGER.debug("Resource loaded from path {}.", urls);
+      LOGGER.info("Resource loaded for from path '{}'.", urls);
     }
 
     return new JobFunctionTable(classLoader);
   }
 
-  /** Manages all functions that belong to one job. */
+  /** Manages all functions that belong to one driver. */
   static class JobFunctionTable {
 
     /** The job's corresponding class loader. */
     final ClassLoader classLoader;
+
+    private final List<URL> paths;
     /** Functions per class, per function name + type descriptor. */
-    ConcurrentMap<String, Map<Pair<String, String>, Pair<RayFunction, Boolean>>> functions;
+    ConcurrentMap<String, Map<Pair<String, String>, RayFunction>> functions;
 
     JobFunctionTable(ClassLoader classLoader) {
       this.classLoader = classLoader;
+      if (classLoader instanceof URLClassLoader) {
+        this.paths = Arrays.asList(((URLClassLoader) classLoader).getURLs());
+      } else {
+        this.paths = new ArrayList<>();
+      }
       this.functions = new ConcurrentHashMap<>();
     }
 
     RayFunction getFunction(JavaFunctionDescriptor descriptor) {
-      Map<Pair<String, String>, Pair<RayFunction, Boolean>> classFunctions =
-          functions.get(descriptor.className);
+      Map<Pair<String, String>, RayFunction> classFunctions = functions.get(descriptor.className);
       if (classFunctions == null) {
         synchronized (this) {
           classFunctions = functions.get(descriptor.className);
@@ -170,7 +173,7 @@ public class FunctionManager {
         }
       }
       final Pair<String, String> key = ImmutablePair.of(descriptor.name, descriptor.signature);
-      RayFunction func = classFunctions.get(key).getLeft();
+      RayFunction func = classFunctions.get(key);
       if (func == null) {
         if (classFunctions.containsKey(key)) {
           throw new RuntimeException(
@@ -178,19 +181,24 @@ public class FunctionManager {
                   "RayFunction %s is overloaded, the signature can't be empty.",
                   descriptor.toString()));
         } else {
-          throw new RuntimeException(
-              String.format("RayFunction %s not found", descriptor.toString()));
+          String msg;
+          if (!paths.isEmpty()) {
+            msg = String.format("RayFunction %s not found from paths %s", descriptor, paths);
+          } else {
+            msg =
+                String.format(
+                    "RayFunction %s not found from classloader %s", descriptor, classLoader);
+          }
+          throw new RuntimeException(msg);
         }
       }
       return func;
     }
 
     /** Load all functions from a class. */
-    Map<Pair<String, String>, Pair<RayFunction, Boolean>> loadFunctionsForClass(String className) {
+    Map<Pair<String, String>, RayFunction> loadFunctionsForClass(String className) {
       // If RayFunction is null, the function is overloaded.
-      // The value of this map is a pair of <rayFunction, isDefault>.
-      // The `isDefault` is used to mark if the method is a marked as default keyword.
-      Map<Pair<String, String>, Pair<RayFunction, Boolean>> map = new HashMap<>();
+      Map<Pair<String, String>, RayFunction> map = new HashMap<>();
       try {
         Class clazz = Class.forName(className, true, classLoader);
         List<Executable> executables = new ArrayList<>();
@@ -223,29 +231,27 @@ public class FunctionManager {
           RayFunction rayFunction =
               new RayFunction(
                   e, classLoader, new JavaFunctionDescriptor(className, methodName, signature));
-          final boolean isDefault = e instanceof Method && ((Method) e).isDefault();
-          map.put(
-              ImmutablePair.of(methodName, signature), ImmutablePair.of(rayFunction, isDefault));
-          // For cross language call java function with signature "{length_of_arguments}" or just
-          // empty "".
-          // TODO: more robust signature type matching
-          // https://github.com/ray-project/ray/issues/21380.
-          String[] crossLangSignatures = {"", String.format("%s", type.getArgumentTypes().length)};
-          for (String crossLangSignature : crossLangSignatures) {
-            final Pair<String, String> crossLangDescriptor =
-                ImmutablePair.of(methodName, crossLangSignature);
-            /// default method is not overloaded, so we should filter it.
-            if (map.containsKey(crossLangDescriptor) && !map.get(crossLangDescriptor).getRight()) {
-              map.put(
-                  crossLangDescriptor,
-                  ImmutablePair.of(null, false)); // Mark this function as overloaded.
-            } else {
-              map.put(crossLangDescriptor, ImmutablePair.of(rayFunction, isDefault));
-            }
+          map.put(ImmutablePair.of(methodName, signature), rayFunction);
+          // For cross language call java function without signature
+          final Pair<String, String> emptyDescriptor = ImmutablePair.of(methodName, "");
+          if (map.containsKey(emptyDescriptor)) {
+            map.put(emptyDescriptor, null); // Mark this function as overloaded.
+          } else {
+            map.put(emptyDescriptor, rayFunction);
           }
         }
       } catch (Exception e) {
-        throw new RuntimeException("Failed to load functions from class " + className, e);
+        String msg;
+        if (!paths.isEmpty()) {
+          msg =
+              String.format("Failed to load functions of class %s from paths %s", className, paths);
+        } else {
+          msg =
+              String.format(
+                  "Failed to load functions of class %s from classloader %s",
+                  className, classLoader);
+        }
+        throw new RuntimeException(msg, e);
       }
       return map;
     }

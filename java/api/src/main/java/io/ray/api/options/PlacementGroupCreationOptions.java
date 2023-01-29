@@ -1,7 +1,11 @@
 package io.ray.api.options;
 
 import io.ray.api.Ray;
+import io.ray.api.placementgroup.Bundle;
 import io.ray.api.placementgroup.PlacementStrategy;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,12 +29,20 @@ public class PlacementGroupCreationOptions {
       throw new IllegalArgumentException(
           "Bundles cannot be empty or bundle's resource must be positive.");
     }
+
     if (strategy == null) {
       throw new IllegalArgumentException(
           "`PlacementStrategy` must be specified when creating a new placement group.");
     }
+    // Convert user definition map to a internal HashMap in case the user
+    // definition map don't support `put` operation like google `ImmutableMap`;
+    List<Map<String, Double>> internalBundles = new ArrayList<>();
+    for (Map<String, Double> bundle : bundles) {
+      internalBundles.add(new HashMap<>(bundle));
+    }
+
     this.name = name;
-    this.bundles = bundles;
+    this.bundles = internalBundles;
     this.strategy = strategy;
   }
 
@@ -61,10 +73,36 @@ public class PlacementGroupCreationOptions {
      * resources on the raylet side.
      *
      * @param bundles The Pre-allocated resource list.
-     * @return self
+     * @return self.
+     * @deprecated This method is no longer recommended to create a new bundle, use {@link
+     *     Builder#setBundles(Collection)} instead.
      */
     public Builder setBundles(List<Map<String, Double>> bundles) {
       this.bundles = bundles;
+      return this;
+    }
+
+    /**
+     * Set the Pre-allocated resource list. Bundle is a collection of resources used to reserve
+     * resources on the raylet side.
+     *
+     * @param bundles The Pre-allocated resource list.
+     * @return self.
+     */
+    public Builder setBundles(Collection<Bundle> bundles) {
+      if (!(bundles instanceof List)) {
+        throw new IllegalArgumentException(
+            "The collection of `Bundles` must be extended from List!");
+      }
+
+      List<Bundle> userBundles = (List<Bundle>) bundles;
+      List<Map<String, Double>> realBundles = new ArrayList<>();
+      // Notice: we can't use for-each API here or the order of the bundles will be lost.
+      for (int i = 0; i < userBundles.size(); i++) {
+        realBundles.add(userBundles.get(i).resources);
+      }
+
+      this.bundles = realBundles;
       return this;
     }
 

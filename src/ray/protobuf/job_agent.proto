@@ -17,24 +17,49 @@ syntax = "proto3";
 package ray.rpc;
 option cc_enable_arenas = true;
 
+import "src/ray/protobuf/gcs.proto";
 import "src/ray/protobuf/agent_manager.proto";
 
 message InitializeJobEnvRequest {
   // The job description in JSON.
   string job_description = 1;
+  // Start driver or not.
+  bool start_driver = 2;
+  // Job data.
+  JobTableData job_data = 3;
 }
 
 message InitializeJobEnvReply {
   // The status of job env initialization.
   AgentRpcStatus status = 1;
+  // The stats of job env initialization.
+  string stats = 2;
   // The error message in InitializeJobEnv.
-  string error_message = 2;
+  string error_message = 3;
   // The driver pid of job.
-  int32 driver_pid = 3;
+  int32 driver_pid = 4;
+  // The driver cmmand line.
+  string driver_cmdline = 5;
+}
+
+message CleanJobEnvRequest {
+  // The job id for cleaning job env.
+  bytes job_id = 1;
+  // Process ID of the driver running this job.
+  // If not on the same node as the driver, the value
+  // will be 0.
+  int64 driver_pid = 2;
+}
+
+message CleanJobEnvReply {
+  // The status of cleaning job env.
+  AgentRpcStatus status = 1;
 }
 
 // Service for communicating with the job_agent.py process on a remote node.
 service JobAgentService {
   // Initialize job env.
   rpc InitializeJobEnv(InitializeJobEnvRequest) returns (InitializeJobEnvReply);
+  // Clean job env.
+  rpc CleanJobEnv(CleanJobEnvRequest) returns (CleanJobEnvReply);
 }

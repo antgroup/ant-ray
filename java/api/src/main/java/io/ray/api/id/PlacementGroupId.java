@@ -42,6 +42,12 @@ public class PlacementGroupId extends BaseId implements Serializable {
     return new PlacementGroupId(b);
   }
 
+  public JobId getJobId() {
+    byte[] bytes = getBytes();
+    ByteBuffer bf = ByteBuffer.wrap(bytes, UNIQUE_BYTES_LENGTH, JobId.LENGTH);
+    return JobId.fromByteBuffer(bf);
+  }
+
   @Override
   public int size() {
     return LENGTH;

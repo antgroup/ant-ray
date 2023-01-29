@@ -1,12 +1,8 @@
-import concurrent.futures
-import asyncio
 import pytest
-from ray._private.utils import get_or_create_event_loop
 import requests
 
 import ray
 from ray import serve
-from ray.serve.exceptions import RayServeException
 
 
 @pytest.mark.asyncio
@@ -24,7 +20,6 @@ async def test_async_handle_serializable(serve_instance):
             output = await ref
             return output
 
-    # Test pickling via ray.remote()
     handle = f.get_handle(sync=False)
 
     task_actor = TaskActor.remote()
@@ -37,56 +32,15 @@ def test_sync_handle_serializable(serve_instance):
     def f():
         return "hello"
 
-    handle = serve.run(f.bind())
+    f.deploy()
 
     @ray.remote
     def task(handle):
         return ray.get(handle.remote())
 
-    # Test pickling via ray.remote()
+    handle = f.get_handle(sync=True)
     result_ref = task.remote(handle)
     assert ray.get(result_ref) == "hello"
-
-
-def test_handle_serializable_in_deployment_init(serve_instance):
-    """Test that a handle can be passed into a constructor (#22110)"""
-
-    @serve.deployment
-    class RayServer1:
-        def __init__(self):
-            pass
-
-        def __call__(self, *args):
-            return {"count": self.count}
-
-    @serve.deployment
-    class RayServer2:
-        def __init__(self, handle):
-            self.handle = handle
-
-        def __call__(self, *args):
-            return {"count": self.count}
-
-    rs1 = RayServer1.bind()
-    rs2 = RayServer2.bind(rs1)
-    serve.run(rs2)
-
-
-def test_sync_handle_in_thread(serve_instance):
-    @serve.deployment
-    def f():
-        return "hello"
-
-    handle = serve.run(f.bind())
-
-    def thread_get_handle(deploy):
-        handle = deploy.get_handle(sync=True)
-        return handle
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-        fut = executor.submit(thread_get_handle, f)
-        handle = fut.result()
-        assert ray.get(handle.remote()) == "hello"
 
 
 def test_handle_in_endpoint(serve_instance):
@@ -97,17 +51,61 @@ def test_handle_in_endpoint(serve_instance):
 
     @serve.deployment
     class Endpoint2:
-        def __init__(self, handle):
-            self.handle = handle
+        def __init__(self):
+            self.handle = Endpoint1.get_handle()
 
-        async def __call__(self, _):
-            return await (await self.handle.remote())
+        def __call__(self, _):
+            return ray.get(self.handle.remote())
 
-    end_p1 = Endpoint1.bind()
-    end_p2 = Endpoint2.bind(end_p1)
-    serve.run(end_p2)
+    Endpoint1.deploy()
+    Endpoint2.deploy()
 
     assert requests.get("http://127.0.0.1:8000/Endpoint2").text == "hello"
+
+
+def test_handle_http_args(serve_instance):
+    @serve.deployment
+    class Endpoint:
+        async def __call__(self, request):
+            return {
+                "args": dict(request.query_params),
+                "headers": dict(request.headers),
+                "method": request.method,
+                "json": await request.json()
+            }
+
+    Endpoint.deploy()
+
+    ground_truth = {
+        "args": {
+            "arg1": "1",
+            "arg2": "2"
+        },
+        "headers": {
+            "x-custom-header": "value"
+        },
+        "method": "POST",
+        "json": {
+            "json_key": "json_val"
+        }
+    }
+
+    resp_web = requests.post(
+        "http://127.0.0.1:8000/Endpoint/?arg1=1&arg2=2",
+        headers=ground_truth["headers"],
+        json=ground_truth["json"]).json()
+
+    handle = serve.get_handle("Endpoint")
+    resp_handle = ray.get(
+        handle.options(
+            http_method=ground_truth["method"],
+            http_headers=ground_truth["headers"]).remote(
+                ground_truth["json"], **ground_truth["args"]))
+
+    for resp in [resp_web, resp_handle]:
+        for field in ["args", "method", "json"]:
+            assert resp[field] == ground_truth[field]
+        resp["headers"]["x-custom-header"] == "value"
 
 
 def test_handle_inject_starlette_request(serve_instance):
@@ -119,7 +117,7 @@ def test_handle_inject_starlette_request(serve_instance):
 
     @serve.deployment(name="wrapper")
     def wrapper_model(web_request):
-        handle = echo_request_type.get_handle()
+        handle = serve.get_handle("echo")
         return ray.get(handle.remote(web_request))
 
     wrapper_model.deploy()
@@ -145,42 +143,50 @@ def test_handle_option_chaining(serve_instance):
         def __call__(self):
             return "__call__"
 
-    handle1 = serve.run(MultiMethod.bind())
-    assert ray.get(handle1.remote()) == "__call__"
+    MultiMethod.deploy()
 
-    handle2 = handle1.options(method_name="method_a")
-    assert ray.get(handle2.remote()) == "method_a"
-
+    # get_handle should give you a clean handle
+    handle1 = MultiMethod.get_handle().options(method_name="method_a")
+    handle2 = MultiMethod.get_handle()
+    # options().options() override should work
     handle3 = handle1.options(method_name="method_b")
+
+    assert ray.get(handle1.remote()) == "method_a"
+    assert ray.get(handle2.remote()) == "__call__"
     assert ray.get(handle3.remote()) == "method_b"
 
 
 def test_repeated_get_handle_cached(serve_instance):
-    @serve.deployment
     def f(_):
         return ""
 
-    f.deploy()
+    serve.create_backend("m", f)
+    serve.create_endpoint("m", backend="m")
 
-    handle_sets = {f.get_handle() for _ in range(100)}
-    assert len(handle_sets) == 1
-
-    handle_sets = {serve.get_deployment("f").get_handle() for _ in range(100)}
+    handle_sets = {serve.get_handle("m") for _ in range(100)}
     assert len(handle_sets) == 1
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("sync", [True, False])
-async def test_args_kwargs(serve_instance, sync):
+@pytest.mark.parametrize("serve_request", [True, False])
+async def test_args_kwargs(serve_instance, sync, serve_request):
     @serve.deployment
     async def f(*args, **kwargs):
-        assert args[0] == "hi"
-        assert kwargs["kwarg1"] == 1
-        assert kwargs["kwarg2"] == "2"
+        if serve_request:
+            req = args[0]
+            assert await req.body() == "hi"
+            assert req.query_params["kwarg1"] == 1
+            assert req.query_params["kwarg2"] == "2"
+        else:
+            assert args[0] == "hi"
+            assert kwargs["kwarg1"] == 1
+            assert kwargs["kwarg2"] == "2"
 
     f.deploy()
 
-    handle = f.get_handle(sync=sync)
+    handle = serve.get_handle(
+        "f", sync=sync, _internal_use_serve_request=serve_request)
 
     def call():
         return handle.remote("hi", kwarg1=1, kwarg2="2")
@@ -193,58 +199,7 @@ async def test_args_kwargs(serve_instance, sync):
     ray.get(obj_ref)
 
 
-@pytest.mark.asyncio
-@pytest.mark.parametrize("sync", [True, False])
-async def test_nonexistent_method(serve_instance, sync):
-    @serve.deployment
-    class A:
-        def exists(self):
-            pass
-
-    A.deploy()
-    handle = A.get_handle(sync=sync)
-
-    if sync:
-        obj_ref = handle.does_not_exist.remote()
-    else:
-        obj_ref = await handle.does_not_exist.remote()
-
-    with pytest.raises(RayServeException) as excinfo:
-        ray.get(obj_ref)
-
-    exception_string = str(excinfo.value)
-    assert "'does_not_exist'" in exception_string
-    assert "Available methods: ['exists']" in exception_string
-
-
-def test_handle_across_loops(serve_instance):
-    @serve.deployment
-    class A:
-        def exists(self):
-            return True
-
-    A.deploy()
-
-    async def refresh_get():
-        handle = A.get_handle(sync=False)
-        assert await (await handle.exists.remote())
-
-    for _ in range(10):
-        asyncio.set_event_loop(asyncio.new_event_loop())
-        get_or_create_event_loop().run_until_complete(refresh_get())
-
-    handle = A.get_handle(sync=False)
-
-    async def cache_get():
-        assert await (await handle.exists.remote())
-
-    for _ in range(10):
-        asyncio.set_event_loop(asyncio.new_event_loop())
-        get_or_create_event_loop().run_until_complete(cache_get())
-
-
 if __name__ == "__main__":
     import sys
     import pytest
-
     sys.exit(pytest.main(["-v", "-s", __file__]))

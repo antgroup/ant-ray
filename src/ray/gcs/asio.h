@@ -38,7 +38,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/asio/error.hpp>
-#include <boost/bind/bind.hpp>
+#include <boost/bind.hpp>
 #include <iostream>
 #include <string>
 
@@ -55,7 +55,9 @@ class RedisAsioClient {
   /// \param redis_async_context The redis async context used to execute redis commands
   /// for this client.
   RedisAsioClient(instrumented_io_context &io_service,
-                  ray::gcs::RedisAsyncContext &redis_async_context);
+                  ray::gcs::RedisAsyncContext *redis_async_context);
+  ray::Status init();
+  ~RedisAsioClient();
 
   void operate();
 
@@ -65,10 +67,10 @@ class RedisAsioClient {
   void cleanup();
 
  private:
-  ray::gcs::RedisAsyncContext &redis_async_context_;
-
-  instrumented_io_context &io_service_;
+  ray::gcs::RedisAsyncContext *redis_async_context_;
   boost::asio::ip::tcp::socket socket_;
+  // Whether the socket is assigned with a file descriptor;
+  bool socket_assigned_;
   // Hiredis wanted to add a read operation to the event loop
   // but the read might not have happened yet
   bool read_requested_;

@@ -4,13 +4,9 @@ import asyncio
 import concurrent.futures
 import functools
 import logging
-import threading
 from typing import Callable, Any, Union
 
 import ray
-import ray.core.generated.ray_client_pb2 as ray_client_pb2
-import cython
-import ray.util.client as client
 
 logger = logging.getLogger(__name__)
 
@@ -37,18 +33,12 @@ def _set_future_helper(
 
 cdef class ObjectRef(BaseID):
 
-    def __cinit__(self):
+    def __init__(self, id, skip_adding_local_ref=False):
+        check_id(id)
+        self.data = CObjectID.FromBinary(<c_string>id)
         self.in_core_worker = False
 
-    def __init__(
-            self, id, owner_addr="", call_site_data="",
-            skip_adding_local_ref=False):
-        self._set_id(id)
-        self.owner_addr = owner_addr
-        self.in_core_worker = False
-        self.call_site_data = call_site_data
-
-        worker = ray._private.worker.global_worker
+        worker = ray.worker.global_worker
         # TODO(edoakes): We should be able to remove the in_core_worker flag.
         # But there are still some dummy object refs being created outside the
         # context of a core worker.
@@ -60,7 +50,7 @@ cdef class ObjectRef(BaseID):
     def __dealloc__(self):
         if self.in_core_worker:
             try:
-                worker = ray._private.worker.global_worker
+                worker = ray.worker.global_worker
                 worker.core_worker.remove_object_ref_reference(self)
             except Exception as e:
                 # There is a strange error in rllib that causes the above to
@@ -73,7 +63,10 @@ cdef class ObjectRef(BaseID):
                 pass
 
     cdef CObjectID native(self):
-        return self.data
+        return <CObjectID>self.data
+
+    def size(self):
+        return CObjectID.Size()
 
     def binary(self):
         return self.data.Binary()
@@ -84,27 +77,14 @@ cdef class ObjectRef(BaseID):
     def is_nil(self):
         return self.data.IsNil()
 
-    cdef size_t hash(self):
-        return self.data.Hash()
-
     def task_id(self):
         return TaskID(self.data.TaskId().Binary())
 
     def job_id(self):
         return self.task_id().job_id()
 
-    def owner_address(self):
-        return self.owner_addr
-
-    def call_site(self):
-        return decode(self.call_site_data)
-
-    def size(self):
-        return CObjectID.Size()
-
-    def _set_id(self, id):
-        check_id(id)
-        self.data = CObjectID.FromBinary(<c_string>id)
+    cdef size_t hash(self):
+        return self.data.Hash()
 
     @classmethod
     def nil(cls):
@@ -151,6 +131,6 @@ cdef class ObjectRef(BaseID):
         The callback should take the result as the only argument. The result
         can be an exception object in case of task error.
         """
-        core_worker = ray._private.worker.global_worker.core_worker
+        core_worker = ray.worker.global_worker.core_worker
         core_worker.set_get_async_callback(self, py_callback)
         return self

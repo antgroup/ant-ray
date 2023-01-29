@@ -1,0 +1,27 @@
+diff --git src/brpc/server.cpp src/brpc/server.cpp
+index f8e8e7f..37aec38 100644
+--- src/brpc/server.cpp
++++ src/brpc/server.cpp
+@@ -1111,14 +1111,22 @@ int Server::StartInternal(const butil::EndPoint& endpoint,
+         LOG(INFO) << server_info.str() << '.';
+ 
+         if (_options.has_builtin_services) {
++#if defined(OS_LINUX)
++            // Avoid calling this on MAC, as resolving hostname to ip may take 5s
++            // (dns timeout) if the hostname is not valid with dns.
+             LOG(INFO) << "Check out http://" << butil::my_hostname() << ':'
+                     << http_port << " in web browser.";
++#endif
+         } else {
+             LOG(WARNING) << "Builtin services are disabled according to "
+                 "ServerOptions.has_builtin_services";
+         }
+         // For trackme reporting
++#if defined(OS_LINUX)
++    // Avoid calling this on MAC, as resolving hostname to ip may take 5s
++    // (dns timeout) if the hostname is not valid with dns.
+         SetTrackMeAddress(butil::EndPoint(butil::my_ip(), http_port));
++#endif
+     }
+     revert_server.release();
+     return 0;

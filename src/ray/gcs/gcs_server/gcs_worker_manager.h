@@ -14,9 +14,8 @@
 
 #pragma once
 
-#include "ray/gcs/gcs_client/gcs_client.h"
-#include "ray/gcs/gcs_client/usage_stats_client.h"
-#include "ray/gcs/gcs_server/gcs_kv_manager.h"
+#include <list>
+#include "ray/gcs/gcs_server/gcs_init_data.h"
 #include "ray/gcs/gcs_server/gcs_table_storage.h"
 #include "ray/gcs/pubsub/gcs_pub_sub.h"
 #include "ray/rpc/gcs_server/gcs_rpc_server.h"
@@ -27,45 +26,57 @@ namespace gcs {
 /// This implementation class of `WorkerInfoHandler`.
 class GcsWorkerManager : public rpc::WorkerInfoHandler {
  public:
-  explicit GcsWorkerManager(std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage,
-                            std::shared_ptr<GcsPublisher> &gcs_publisher)
-      : gcs_table_storage_(gcs_table_storage), gcs_publisher_(gcs_publisher) {}
+  explicit GcsWorkerManager(
+      std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage,
+      std::shared_ptr<gcs::GcsPubSub> &gcs_pub_sub,
+      std::function<std::shared_ptr<rpc::JobTableData>(const JobID &)> get_job_info_func)
+      : gcs_table_storage_(gcs_table_storage),
+        gcs_pub_sub_(gcs_pub_sub),
+        get_job_info_func_(get_job_info_func) {}
 
-  void HandleReportWorkerFailure(rpc::ReportWorkerFailureRequest request,
+  void HandleReportWorkerFailure(const rpc::ReportWorkerFailureRequest &request,
                                  rpc::ReportWorkerFailureReply *reply,
                                  rpc::SendReplyCallback send_reply_callback) override;
 
-  void HandleGetWorkerInfo(rpc::GetWorkerInfoRequest request,
+  void HandleGetWorkerInfo(const rpc::GetWorkerInfoRequest &request,
                            rpc::GetWorkerInfoReply *reply,
                            rpc::SendReplyCallback send_reply_callback) override;
 
-  void HandleGetAllWorkerInfo(rpc::GetAllWorkerInfoRequest request,
+  void HandleGetAllWorkerInfo(const rpc::GetAllWorkerInfoRequest &request,
                               rpc::GetAllWorkerInfoReply *reply,
                               rpc::SendReplyCallback send_reply_callback) override;
 
-  void HandleAddWorkerInfo(rpc::AddWorkerInfoRequest request,
+  void HandleAddWorkerInfo(const rpc::AddWorkerInfoRequest &request,
                            rpc::AddWorkerInfoReply *reply,
                            rpc::SendReplyCallback send_reply_callback) override;
 
   void AddWorkerDeadListener(
       std::function<void(std::shared_ptr<WorkerTableData>)> listener);
 
-  void SetUsageStatsClient(UsageStatsClient *usage_stats_client) {
-    usage_stats_client_ = usage_stats_client;
-  }
+  /// Initialize with the gcs tables data synchronously.
+  /// This should be called when GCS server restarts after a failure.
+  ///
+  /// \param gcs_init_data.
+  void Initialize(const GcsInitData &gcs_init_data);
+
+  void AddDeadWorkerToCache(const std::shared_ptr<WorkerTableData> &worker_data);
+
+  void EvictOneDeadWorker();
+
+  void EvictExpiredWorkers();
 
  private:
   std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage_;
-  std::shared_ptr<GcsPublisher> gcs_publisher_;
-  UsageStatsClient *usage_stats_client_;
+  std::shared_ptr<gcs::GcsPubSub> gcs_pub_sub_;
+  std::function<std::shared_ptr<rpc::JobTableData>(const JobID &)> get_job_info_func_;
   std::vector<std::function<void(std::shared_ptr<WorkerTableData>)>>
       worker_dead_listeners_;
 
-  /// Tracks the number of occurences of worker crash due to system error
-  int32_t worker_crash_system_error_count_ = 0;
-
-  /// Tracks the number of occurences of worker crash due to OOM
-  int32_t worker_crash_oom_count_ = 0;
+  /// All dead workers.
+  absl::flat_hash_map<WorkerID, std::shared_ptr<WorkerTableData>> dead_workers_;
+  /// The dead workers are sorted according to the timestamp, and the oldest is at the
+  /// head of the list.
+  std::list<std::pair<WorkerID, int64_t>> sorted_dead_worker_list_;
 };
 
 }  // namespace gcs

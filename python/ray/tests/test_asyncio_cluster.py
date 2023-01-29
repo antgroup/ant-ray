@@ -6,10 +6,9 @@ import pytest
 import numpy as np
 
 import ray
-from ray.cluster_utils import Cluster, cluster_not_supported
+from ray.cluster_utils import Cluster
 
 
-@pytest.mark.xfail(cluster_not_supported, reason="cluster not supported")
 @pytest.mark.asyncio
 async def test_asyncio_cluster_wait():
     cluster = Cluster()
@@ -31,10 +30,5 @@ async def test_asyncio_cluster_wait():
 
 
 if __name__ == "__main__":
-    import os
     import pytest
-
-    if os.environ.get("PARALLEL_CI"):
-        sys.exit(pytest.main(["-n", "auto", "--boxed", "-vs", __file__]))
-    else:
-        sys.exit(pytest.main(["-sv", __file__]))
+    sys.exit(pytest.main(["-v", __file__]))

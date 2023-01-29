@@ -3,7 +3,6 @@ package io.ray.api.options;
 import io.ray.api.Ray;
 import io.ray.api.concurrencygroup.ConcurrencyGroup;
 import io.ray.api.placementgroup.PlacementGroup;
-import io.ray.api.runtimeenv.RuntimeEnv;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,21 +10,24 @@ import java.util.Map;
 
 /** The options for creating actor. */
 public class ActorCreationOptions extends BaseTaskOptions {
+
   public static final int NO_RESTART = 0;
-  public static final int INFINITE_RESTART = -1;
+  public static final int INFINITE_RESTART = (int) Math.pow(2, 30);
 
   public final String name;
   public ActorLifetime lifetime;
   public final int maxRestarts;
-  public final int maxTaskRetries;
   public final List<String> jvmOptions;
   public final int maxConcurrency;
+  public final String serializedRuntimeEnv;
   public final PlacementGroup group;
   public final int bundleIndex;
+  public final long memoryMb;
+  public final boolean enableTaskFastFail;
   public final List<ConcurrencyGroup> concurrencyGroups;
-  public final String serializedRuntimeEnv;
-  public final String namespace;
-  public final int maxPendingCalls;
+  public final Map<String, String> extendedProperties;
+  public final Map<String, String> labels;
+  public final SchedulingStrategy schedulingStrategy;
   public final boolean isAsync;
 
   private ActorCreationOptions(
@@ -33,29 +35,33 @@ public class ActorCreationOptions extends BaseTaskOptions {
       ActorLifetime lifetime,
       Map<String, Double> resources,
       int maxRestarts,
-      int maxTaskRetries,
       List<String> jvmOptions,
       int maxConcurrency,
+      String serializedRuntimeEnv,
       PlacementGroup group,
       int bundleIndex,
+      long memoryMb,
       List<ConcurrencyGroup> concurrencyGroups,
-      String serializedRuntimeEnv,
-      String namespace,
-      int maxPendingCalls,
+      boolean enableTaskFastFail,
+      Map<String, String> extendedProperties,
+      Map<String, String> labels,
+      SchedulingStrategy schedulingStrategy,
       boolean isAsync) {
     super(resources);
     this.name = name;
     this.lifetime = lifetime;
     this.maxRestarts = maxRestarts;
-    this.maxTaskRetries = maxTaskRetries;
     this.jvmOptions = jvmOptions;
     this.maxConcurrency = maxConcurrency;
+    this.serializedRuntimeEnv = serializedRuntimeEnv;
     this.group = group;
     this.bundleIndex = bundleIndex;
+    this.memoryMb = memoryMb;
     this.concurrencyGroups = concurrencyGroups;
-    this.serializedRuntimeEnv = serializedRuntimeEnv;
-    this.namespace = namespace;
-    this.maxPendingCalls = maxPendingCalls;
+    this.enableTaskFastFail = enableTaskFastFail;
+    this.extendedProperties = extendedProperties;
+    this.labels = labels;
+    this.schedulingStrategy = schedulingStrategy;
     this.isAsync = isAsync;
   }
 
@@ -65,16 +71,18 @@ public class ActorCreationOptions extends BaseTaskOptions {
     private ActorLifetime lifetime = null;
     private Map<String, Double> resources = new HashMap<>();
     private int maxRestarts = 0;
-    private int maxTaskRetries = 0;
     private List<String> jvmOptions = new ArrayList<>();
     private int maxConcurrency = 1;
+    private String serializedRuntimeEnv = "{}";
     private PlacementGroup group;
     private int bundleIndex;
-    private List<ConcurrencyGroup> concurrencyGroups = new ArrayList<>();
-    private RuntimeEnv runtimeEnv = null;
-    private String namespace = null;
-    private int maxPendingCalls = -1;
+    private long memoryMb = 0;
+    private boolean enableTaskFastFail = false;
     private boolean isAsync = false;
+    private List<ConcurrencyGroup> concurrencyGroups = new ArrayList<>();
+    private Map<String, String> extendedProperties = new HashMap<>();
+    private Map<String, String> labels = new HashMap<>();
+    private SchedulingStrategy schedulingStrategy;
 
     /**
      * Set the actor name of a named actor. This named actor is accessible in this namespace by this
@@ -92,6 +100,23 @@ public class ActorCreationOptions extends BaseTaskOptions {
     /** Declare the lifetime of this actor. */
     public Builder setLifetime(ActorLifetime lifetime) {
       this.lifetime = lifetime;
+      return this;
+    }
+
+    /**
+     * Set the memory resource requirement to reserve for the lifetime of this actor. It will assign
+     * a sole worker process for this actor if this method is called. This method can be called
+     * multiple times. If the same resource is set multiple times, the latest quantity will be used.
+     *
+     * @param memoryMb memory size in mb
+     * @return self
+     */
+    public Builder setMemoryMb(long memoryMb) {
+      if (memoryMb <= 0 || memoryMb % 50 != 0) {
+        throw new IllegalArgumentException(
+            "The value of memoryMb (" + memoryMb + ") must be multiple of 50M.");
+      }
+      this.memoryMb = memoryMb;
       return this;
     }
 
@@ -136,19 +161,6 @@ public class ActorCreationOptions extends BaseTaskOptions {
     }
 
     /**
-     * This specifies the maximum number of times that the actor task can be resubmitted. The
-     * minimum valid value is 0 (default), which indicates that the actor task can't be resubmited.
-     * A value of -1 indicates that an actor task can be resubmited indefinitely.
-     *
-     * @param maxTaskRetries max number of actor task retries
-     * @return self
-     */
-    public Builder setMaxTaskRetries(int maxTaskRetries) {
-      this.maxTaskRetries = maxTaskRetries;
-      return this;
-    }
-
-    /**
      * Set the JVM options for the Java worker that this actor is running in.
      *
      * <p>Note, if this is set, this actor won't share Java worker with other actors or tasks.
@@ -157,7 +169,7 @@ public class ActorCreationOptions extends BaseTaskOptions {
      * @return self
      */
     public Builder setJvmOptions(List<String> jvmOptions) {
-      this.jvmOptions = jvmOptions;
+      this.jvmOptions.addAll(jvmOptions);
       return this;
     }
 
@@ -174,37 +186,12 @@ public class ActorCreationOptions extends BaseTaskOptions {
       if (maxConcurrency <= 0) {
         throw new IllegalArgumentException("maxConcurrency must be greater than 0.");
       }
-
       this.maxConcurrency = maxConcurrency;
       return this;
     }
 
-    /**
-     * Set the max number of pending calls allowed on the actor handle. When this value is exceeded,
-     * ray.exceptions.PendingCallsLimitExceededException will be thrown for further tasks. Note that
-     * this limit is counted per handle. -1 means that the number of pending calls is unlimited.
-     *
-     * @param maxPendingCalls The maximum number of pending calls for this actor.
-     * @return self
-     */
-    public Builder setMaxPendingCalls(int maxPendingCalls) {
-      if (maxPendingCalls < -1 || maxPendingCalls == 0) {
-        throw new IllegalArgumentException(
-            "maxPendingCalls must be greater than 0, or -1 to disable.");
-      }
-
-      this.maxPendingCalls = maxPendingCalls;
-      return this;
-    }
-
-    /**
-     * Mark the creating actor as async. If the Python actor is/is not async but it's marked
-     * async/not async in Java, it will result in RayActorError errors
-     *
-     * @return self
-     */
-    public Builder setAsync(boolean isAsync) {
-      this.isAsync = isAsync;
+    public Builder setSerializedRuntimeEnv(String serializedRuntimeEnv) {
+      this.serializedRuntimeEnv = serializedRuntimeEnv;
       return this;
     }
 
@@ -216,8 +203,51 @@ public class ActorCreationOptions extends BaseTaskOptions {
      * @return self
      */
     public Builder setPlacementGroup(PlacementGroup group, int bundleIndex) {
+      if (this.schedulingStrategy != null) {
+        throw new IllegalArgumentException(
+            "The placement group and actor affinity strategy can't be both set.");
+      }
       this.group = group;
       this.bundleIndex = bundleIndex;
+      return this;
+    }
+
+    /**
+     * If enabled, tasks of this actor will fail immediately when the actor is temporarily
+     * unavailable. E.g., when there is a network issue, or when the actor is restarting.
+     *
+     * @param enabled Whether to enable this option.
+     * @return self
+     */
+    public Builder setEnableTaskFastFail(boolean enabled) {
+      this.enableTaskFastFail = enabled;
+      return this;
+    }
+
+    /**
+     * Mark the creating actor as async.
+     *
+     * @return self
+     */
+    public Builder setAsync(boolean enabled) {
+      this.isAsync = enabled;
+      return this;
+    }
+
+    /**
+     * Set several extended key-value information to this actor, and these fields will be stored
+     * into GCS eventually.
+     *
+     * @param extendedProperties customer extended information.
+     * @return self
+     */
+    public Builder setExtendedProperties(Map<String, String> extendedProperties) {
+      this.extendedProperties = extendedProperties;
+      return this;
+    }
+
+    public Builder setExtendedProperties(String key, String value) {
+      this.extendedProperties.put(key, value);
       return this;
     }
 
@@ -227,15 +257,17 @@ public class ActorCreationOptions extends BaseTaskOptions {
           lifetime,
           resources,
           maxRestarts,
-          maxTaskRetries,
           jvmOptions,
           maxConcurrency,
+          serializedRuntimeEnv,
           group,
           bundleIndex,
+          memoryMb,
           concurrencyGroups,
-          runtimeEnv != null ? runtimeEnv.serializeToRuntimeEnvInfo() : "",
-          namespace,
-          maxPendingCalls,
+          enableTaskFastFail,
+          extendedProperties,
+          labels,
+          schedulingStrategy,
           isAsync);
     }
 
@@ -245,13 +277,28 @@ public class ActorCreationOptions extends BaseTaskOptions {
       return this;
     }
 
-    public Builder setRuntimeEnv(RuntimeEnv runtimeEnv) {
-      this.runtimeEnv = runtimeEnv;
+    /** Set the labels for this actor. */
+    public Builder setLabel(String key, String value) {
+      this.labels.put(key, value);
       return this;
     }
 
-    public Builder setNamespace(String namespace) {
-      this.namespace = namespace;
+    /** Set the labels for this actor. */
+    public Builder setLabels(Map<String, String> labels) {
+      if (labels == null) {
+        return this;
+      }
+      this.labels.putAll(labels);
+      return this;
+    }
+
+    /** Add actor affinity match expression for this actor. */
+    public Builder setSchedulingStrategy(SchedulingStrategy schedulingStrategy) {
+      if (this.group != null) {
+        throw new IllegalArgumentException(
+            "The placement group and scheduling strategy can't be set at the same time.");
+      }
+      this.schedulingStrategy = schedulingStrategy;
       return this;
     }
   }

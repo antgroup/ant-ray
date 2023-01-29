@@ -8,13 +8,13 @@ External library integrations (tune.integration)
     :depth: 1
 
 
-Comet (tune.integration.comet)
--------------------------------------------
+.. _tune-integration-docker:
 
-:ref:`See also here <tune-comet-ref>`.
+Docker (tune.integration.docker)
+--------------------------------
 
-.. autoclass:: ray.air.integrations.comet.CometLoggerCallback
-    :noindex:
+.. autofunction:: ray.tune.integration.docker.DockerSyncer
+
 
 .. _tune-integration-keras:
 
@@ -25,16 +25,21 @@ Keras (tune.integration.keras)
 
 .. autoclass:: ray.tune.integration.keras.TuneReportCheckpointCallback
 
+.. _tune-integration-kubernetes:
+
+Kubernetes (tune.integration.kubernetes)
+----------------------------------------
+
+.. autofunction:: ray.tune.integration.kubernetes.NamespacedKubernetesSyncer
 
 .. _tune-integration-mlflow:
 
 MLflow (tune.integration.mlflow)
 --------------------------------
 
-:ref:`See also here <tune-mlflow-ref>`.
+:ref:`See also here <tune-mlflow>`.
 
-.. autoclass:: ray.air.integrations.mlflow.MLflowLoggerCallback
-    :noindex:
+.. autoclass:: ray.tune.integration.mlflow.MLflowLoggerCallback
 
 .. autofunction:: ray.tune.integration.mlflow.mlflow_mixin
 
@@ -58,17 +63,35 @@ PyTorch Lightning (tune.integration.pytorch_lightning)
 
 .. autoclass:: ray.tune.integration.pytorch_lightning.TuneReportCheckpointCallback
 
+.. _tune-integration-torch:
+
+Torch (tune.integration.torch)
+------------------------------
+
+.. autofunction:: ray.tune.integration.torch.DistributedTrainableCreator
+
+.. autofunction:: ray.tune.integration.torch.distributed_checkpoint_dir
+
+.. autofunction:: ray.tune.integration.torch.is_distributed_trainable
+
+
+.. _tune-integration-horovod:
+
+Horovod (tune.integration.horovod)
+----------------------------------
+
+.. autofunction:: ray.tune.integration.horovod.DistributedTrainableCreator
+
 .. _tune-integration-wandb:
 
 Weights and Biases (tune.integration.wandb)
 -------------------------------------------
 
-:ref:`See also here <tune-wandb-ref>`.
+:ref:`See also here <tune-wandb>`.
 
-.. autoclass:: ray.air.integrations.wandb.WandbLoggerCallback
-    :noindex:
+.. autoclass:: ray.tune.integration.wandb.WandbLoggerCallback
 
-.. autofunction:: ray.air.integrations.wandb.setup_wandb
+.. autofunction:: ray.tune.integration.wandb.wandb_mixin
 
 
 .. _tune-integration-xgboost:
@@ -79,13 +102,3 @@ XGBoost (tune.integration.xgboost)
 .. autoclass:: ray.tune.integration.xgboost.TuneReportCallback
 
 .. autoclass:: ray.tune.integration.xgboost.TuneReportCheckpointCallback
-
-
-.. _tune-integration-lightgbm:
-
-LightGBM (tune.integration.lightgbm)
-------------------------------------
-
-.. autoclass:: ray.tune.integration.lightgbm.TuneReportCallback
-
-.. autoclass:: ray.tune.integration.lightgbm.TuneReportCheckpointCallback

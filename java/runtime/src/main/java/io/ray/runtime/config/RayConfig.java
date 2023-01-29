@@ -2,17 +2,18 @@ package io.ray.runtime.config;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
+import com.typesafe.config.ConfigValue;
 import io.ray.api.id.JobId;
 import io.ray.api.options.ActorLifetime;
-import io.ray.api.runtimeenv.RuntimeEnvConfig;
-import io.ray.api.runtimeenv.types.RuntimeEnvName;
 import io.ray.runtime.generated.Common.WorkerType;
-import io.ray.runtime.runtimeenv.RuntimeEnvImpl;
 import io.ray.runtime.util.NetworkUtil;
+import io.ray.runtime.util.ResourceUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,11 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 /** Configurations of Ray runtime. See `ray.default.conf` for the meaning of each field. */
 public class RayConfig {
-
   public static final String DEFAULT_CONFIG_FILE = "ray.default.conf";
   public static final String CUSTOM_CONFIG_FILE = "ray.conf";
 
@@ -34,13 +33,15 @@ public class RayConfig {
   /** IP of this node. if not provided, IP will be automatically detected. */
   public final String nodeIp;
 
+  public final String nodeName;
+
   public final WorkerType workerMode;
   public final RunMode runMode;
   private JobId jobId;
   public String sessionDir;
   public String logDir;
 
-  private String bootstrapAddress;
+  private String redisAddress;
   public final String redisPassword;
 
   // RPC socket name of object store.
@@ -51,17 +52,18 @@ public class RayConfig {
   // Listening port for node manager.
   public int nodeManagerPort;
 
-  public int startupToken;
+  public final String logLevel;
 
-  public int runtimeEnvHash;
-
-  public RuntimeEnvImpl runtimeEnvImpl = null;
+  public final String rayLogLevel;
 
   public final ActorLifetime defaultActorLifetime;
 
   public static class LoggerConf {
+
     public final String loggerName;
+
     public final String fileName;
+
     public final String pattern;
 
     public LoggerConf(String loggerName, String fileName, String pattern) {
@@ -77,14 +79,54 @@ public class RayConfig {
 
   public final List<String> headArgs;
 
+  public final int numWorkersPerProcess;
+  public final long javaWorkerProcessDefaultMemoryMb;
+  public final int numInitialJavaWorkerProcesses;
+  public final long totalMemoryMb;
+  public final long maxTotalMemoryMb;
+  public final float javaHeapFraction;
+  public final boolean longRunning;
+  public final boolean enableL1FaultTolerance;
+  public final String serializedRuntimeEnv;
+
+  public final boolean returnTaskException;
+
   public final String namespace;
 
   public final List<String> jvmOptionsForJavaWorker;
+  public final Map<String, String> workerEnv;
+
+  public final boolean actorTaskBackPressureEnabled;
+  public final long maxPendingCalls;
+
+  public final boolean markJobStateAsFailedWHenKilling;
+
+  public final boolean gcsTaskSchedulingEnabled;
 
   private void validate() {
     if (workerMode == WorkerType.WORKER) {
       Preconditions.checkArgument(
-          bootstrapAddress != null, "Bootstrap address must be set in worker mode.");
+          redisAddress != null, "Redis address must be set in worker mode.");
+    }
+
+    Preconditions.checkArgument(
+        numWorkersPerProcess > 0, "numWorkersPerProcess must be greater than 0.");
+
+    if (workerMode == WorkerType.DRIVER) {
+      if (gcsTaskSchedulingEnabled) {
+        Preconditions.checkArgument(numInitialJavaWorkerProcesses >= 0);
+        Preconditions.checkArgument(
+            ResourceUtil.isMultipleOfMemoryUnit(javaWorkerProcessDefaultMemoryMb * 1024 * 1024),
+            "javaWorkerProcessDefaultMemoryMb must be a multiple of 50.");
+
+        long minimumMemoryMb =
+            Math.max(
+                numInitialJavaWorkerProcesses * javaWorkerProcessDefaultMemoryMb,
+                ResourceUtil.MEMORY_RESOURCE_UNIT_BYTES / (1024 * 1024));
+        Preconditions.checkArgument(
+            totalMemoryMb >= minimumMemoryMb,
+            "totalMemoryMb should be at least " + String.valueOf(minimumMemoryMb));
+      }
     }
   }
 
@@ -109,7 +151,7 @@ public class RayConfig {
     boolean isDriver = workerMode == WorkerType.DRIVER;
     // Run mode.
     if (config.hasPath("ray.local-mode")) {
-      runMode = config.getBoolean("ray.local-mode") ? RunMode.LOCAL : RunMode.CLUSTER;
+      runMode = config.getBoolean("ray.local-mode") ? RunMode.SINGLE_PROCESS : RunMode.CLUSTER;
     } else {
       runMode = config.getEnum(RunMode.class, "ray.run-mode");
     }
@@ -117,15 +159,14 @@ public class RayConfig {
     if (config.hasPath("ray.node-ip")) {
       nodeIp = config.getString("ray.node-ip");
     } else {
-      if (SystemUtils.IS_OS_LINUX) {
-        nodeIp = NetworkUtil.getIpAddress(null);
-      } else {
-        /// We use a localhost on MacOS or Windows to avid security popups.
-        /// See the related issue https://github.com/ray-project/ray/issues/18730
-        nodeIp = NetworkUtil.localhostIp();
-      }
+      nodeIp = NetworkUtil.getIpAddress(null);
     }
-
+    // Node name
+    if (config.hasPath("ray.node-name")) {
+      nodeName = config.getString("ray.node-name");
+    } else {
+      nodeName = "";
+    }
     // Job id.
     String jobId = config.getString("ray.job.id");
     if (!jobId.isEmpty()) {
@@ -145,10 +186,19 @@ public class RayConfig {
     }
 
     defaultActorLifetime = config.getEnum(ActorLifetime.class, "ray.job.default-actor-lifetime");
-    Preconditions.checkState(defaultActorLifetime != null);
 
     // jvm options for java workers of this job.
     jvmOptionsForJavaWorker = config.getStringList("ray.job.jvm-options");
+    validateJvmOptionsForJavaWorker();
+
+    ImmutableMap.Builder<String, String> workerEnvBuilder = ImmutableMap.builder();
+    Config workerEnvConfig = config.getConfig("ray.job.worker-env");
+    if (workerEnvConfig != null) {
+      for (Map.Entry<String, ConfigValue> entry : workerEnvConfig.entrySet()) {
+        workerEnvBuilder.put(entry.getKey(), workerEnvConfig.getString(entry.getKey()));
+      }
+    }
+    workerEnv = workerEnvBuilder.build();
     updateSessionDir(null);
 
     // Object store socket name.
@@ -161,16 +211,17 @@ public class RayConfig {
       rayletSocketName = config.getString("ray.raylet.socket-name");
     }
 
-    // Bootstrap configurations.
-    String bootstrapAddress = config.getString("ray.address");
-    if (StringUtils.isNotBlank(bootstrapAddress)) {
-      setBootstrapAddress(bootstrapAddress);
+    // Redis configurations.
+    String redisAddress = config.getString("ray.address");
+    if (StringUtils.isNotBlank(redisAddress)) {
+      setRedisAddress(redisAddress);
     } else {
       // We need to start gcs using `RunManager` for local cluster
-      this.bootstrapAddress = null;
+      this.redisAddress = null;
     }
 
     redisPassword = config.getString("ray.redis.password");
+
     // Raylet node manager port.
     if (config.hasPath("ray.raylet.node-manager-port")) {
       nodeManagerPort = config.getInt("ray.raylet.node-manager-port");
@@ -188,62 +239,42 @@ public class RayConfig {
     if (StringUtils.isEmpty(codeSearchPathString)) {
       codeSearchPathString = System.getProperty("java.class.path");
     }
-    codeSearchPath = Arrays.asList(codeSearchPathString.split(":"));
 
-    startupToken = config.getInt("ray.raylet.startup-token");
-
-    /// Driver needn't this config item.
-    if (workerMode == WorkerType.WORKER && config.hasPath("ray.internal.runtime-env-hash")) {
-      runtimeEnvHash = config.getInt("ray.internal.runtime-env-hash");
+    /**
+     * If the result of `System.getProperty("java.class.path");` is null, then the
+     * `codeSearchPathString` will be null as well, so that `split` will throw NPE. So we filter the
+     * null case here.
+     */
+    if (!StringUtils.isEmpty(codeSearchPathString)) {
+      codeSearchPath = Arrays.asList(codeSearchPathString.split(":"));
+    } else {
+      codeSearchPath = ImmutableList.of();
     }
 
-    {
-      /// Runtime Env env-vars
-      Map<String, String> envVars = new HashMap<>();
-      List<String> jarUrls = null;
-      final String envVarsPath = "ray.job.runtime-env.env-vars";
-      if (config.hasPath(envVarsPath)) {
-        Config envVarsConfig = config.getConfig(envVarsPath);
-        envVarsConfig
-            .entrySet()
-            .forEach(
-                (entry) -> {
-                  envVars.put(entry.getKey(), ((String) entry.getValue().unwrapped()));
-                });
-      }
+    numWorkersPerProcess = config.getInt("ray.job.num-java-workers-per-process");
 
-      /// Runtime env jars
-      final String jarsPath = "ray.job.runtime-env.jars";
-      if (config.hasPath(jarsPath)) {
-        jarUrls = config.getStringList(jarsPath);
-      }
+    javaWorkerProcessDefaultMemoryMb =
+        config.getLong("ray.job.java-worker-process-default-memory-mb");
 
-      /// Runtime env config
-      RuntimeEnvConfig runtimeEnvConfig = null;
-      final String timeoutPath = "ray.job.runtime-env.config.setup-timeout-seconds";
-      if (config.hasPath(timeoutPath)) {
-        runtimeEnvConfig = new RuntimeEnvConfig();
-        runtimeEnvConfig.setSetupTimeoutSeconds(config.getInt(timeoutPath));
-      }
-      final String eagerInstallPath = "ray.job.runtime-env.config.eager-install";
-      if (config.hasPath(eagerInstallPath)) {
-        if (runtimeEnvConfig == null) {
-          runtimeEnvConfig = new RuntimeEnvConfig();
-        }
-        runtimeEnvConfig.setEagerInstall(config.getBoolean(eagerInstallPath));
-      }
+    numInitialJavaWorkerProcesses = config.getInt("ray.job.num-initial-java-worker-processes");
 
-      runtimeEnvImpl = new RuntimeEnvImpl();
-      if (!envVars.isEmpty()) {
-        runtimeEnvImpl.set(RuntimeEnvName.ENV_VARS, envVars);
-      }
-      if (!jarUrls.isEmpty()) {
-        runtimeEnvImpl.set(RuntimeEnvName.JARS, jarUrls);
-      }
-      if (runtimeEnvConfig != null) {
-        runtimeEnvImpl.setConfig(runtimeEnvConfig);
-      }
-    }
+    totalMemoryMb = config.getLong("ray.job.total-memory-mb");
+
+    maxTotalMemoryMb = config.getLong("ray.job.max-total-memory-mb");
+
+    javaHeapFraction = (float) config.getDouble("ray.job.java-heap-fraction");
+
+    longRunning = config.getBoolean("ray.job.long-running");
+
+    enableL1FaultTolerance = config.getBoolean("ray.job.enable-l1-fault-tolerance");
+
+    serializedRuntimeEnv = config.getString("ray.job.serialized-runtime-env");
+
+    returnTaskException = config.getBoolean("ray.task.return_task_exception");
+
+    logLevel = config.getString("ray.job.logging-level");
+
+    rayLogLevel = config.getString("ray.logging.level");
 
     {
       loggers = new ArrayList<>();
@@ -251,6 +282,7 @@ public class RayConfig {
       for (Config loggerConfig : loggerConfigs) {
         Preconditions.checkState(loggerConfig.hasPath("name"));
         Preconditions.checkState(loggerConfig.hasPath("file-name"));
+
         final String name = loggerConfig.getString("name");
         final String fileName = loggerConfig.getString("file-name");
         final String pattern =
@@ -261,18 +293,25 @@ public class RayConfig {
 
     headArgs = config.getStringList("ray.head-args");
 
+    actorTaskBackPressureEnabled = config.getBoolean("ray.job.actor-task-back-pressure-enabled");
+    maxPendingCalls = config.getLong("ray.job.max-pending-calls");
+    markJobStateAsFailedWHenKilling =
+        config.getBoolean("ray.job.mark_job_state_as_failed_when_killing");
+    gcsTaskSchedulingEnabled = !("false".equals(System.getenv("RAY_GCS_TASK_SCHEDULING_ENABLED")));
+
     // Validate config.
     validate();
   }
 
-  public void setBootstrapAddress(String bootstrapAddress) {
-    Preconditions.checkNotNull(bootstrapAddress);
-    Preconditions.checkState(this.bootstrapAddress == null, "Bootstrap address was already set");
-    this.bootstrapAddress = bootstrapAddress;
+  public void setRedisAddress(String redisAddress) {
+    Preconditions.checkNotNull(redisAddress);
+    Preconditions.checkState(this.redisAddress == null, "Redis address was already set");
+
+    this.redisAddress = redisAddress;
   }
 
-  public String getBootstrapAddress() {
-    return this.bootstrapAddress;
+  public String getRedisAddress() {
+    return redisAddress;
   }
 
   public void setJobId(JobId jobId) {
@@ -285,10 +324,6 @@ public class RayConfig {
 
   public int getNodeManagerPort() {
     return nodeManagerPort;
-  }
-
-  public int getStartupToken() {
-    return startupToken;
   }
 
   public void setSessionDir(String sessionDir) {
@@ -309,8 +344,8 @@ public class RayConfig {
     dynamic.put("ray.raylet.socket-name", rayletSocketName);
     dynamic.put("ray.object-store.socket-name", objectStoreSocketName);
     dynamic.put("ray.raylet.node-manager-port", nodeManagerPort);
-    dynamic.put("ray.address", bootstrapAddress);
-    dynamic.put("ray.raylet.startup-token", startupToken);
+    dynamic.put("ray.address", redisAddress);
+    dynamic.put("ray.job.code-search-path", codeSearchPath);
     Config toRender = ConfigFactory.parseMap(dynamic).withFallback(config);
     return toRender.root().render(ConfigRenderOptions.concise());
   }
@@ -352,5 +387,34 @@ public class RayConfig {
     }
     config = config.withFallback(ConfigFactory.load(DEFAULT_CONFIG_FILE));
     return new RayConfig(config.withOnlyPath("ray"));
+  }
+
+  private void validateJvmOptionsForJavaWorker() {
+    if (jvmOptionsForJavaWorker == null || jvmOptionsForJavaWorker.isEmpty()) {
+      return;
+    }
+
+    /// Flag to indicate if user set xmx.
+    boolean setXmx = false;
+    /// Flag to indicate if user set other jvm memory options except xmx.
+    boolean setOtherMemOptions = false;
+
+    for (String item : jvmOptionsForJavaWorker) {
+      Preconditions.checkNotNull(item);
+      String optionStr = item.trim();
+      if (StringUtils.startsWithIgnoreCase(optionStr, "-Xmx")) {
+        setXmx = true;
+      } else if (StringUtils.startsWithIgnoreCase(optionStr, "-Xms")
+          || StringUtils.startsWithIgnoreCase(optionStr, "-Xmn")
+          || StringUtils.startsWithIgnoreCase(optionStr, "-Xss")
+          || StringUtils.contains(optionStr, "MaxDirectMemorySize")) {
+        setOtherMemOptions = true;
+      }
+    }
+
+    if (setOtherMemOptions) {
+      Preconditions.checkState(
+          setXmx, "You shouldn't set other jvm memory options without setting xmx first.");
+    }
   }
 }

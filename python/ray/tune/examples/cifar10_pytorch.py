@@ -1,5 +1,5 @@
 # flake8: noqa
-# fmt: off
+# yapf: disable
 
 # __import_begin__
 from functools import partial
@@ -9,15 +9,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from filelock import FileLock
 from torch.utils.data import random_split
 import torchvision
 import torchvision.transforms as transforms
-from typing import Dict
 import ray
 from ray import tune
-from ray.air import session
-from ray.air.checkpoint import Checkpoint
 from ray.tune.schedulers import ASHAScheduler
 # __import_end__
 
@@ -29,15 +25,11 @@ def load_data(data_dir="./data"):
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
 
-    # We add FileLock here because multiple workers will want to
-    # download data, and this may cause overwrites since
-    # DataLoader is not threadsafe.
-    with FileLock(os.path.expanduser("~/.data.lock")):
-        trainset = torchvision.datasets.CIFAR10(
-            root=data_dir, train=True, download=True, transform=transform)
+    trainset = torchvision.datasets.CIFAR10(
+        root=data_dir, train=True, download=True, transform=transform)
 
-        testset = torchvision.datasets.CIFAR10(
-            root=data_dir, train=False, download=True, transform=transform)
+    testset = torchvision.datasets.CIFAR10(
+        root=data_dir, train=False, download=True, transform=transform)
 
     return trainset, testset
 # __load_data_end__
@@ -66,7 +58,7 @@ class Net(nn.Module):
 
 
 # __train_begin__
-def train_cifar(config):
+def train_cifar(config, checkpoint_dir=None, data_dir=None):
     net = Net(config["l1"], config["l2"])
 
     device = "cpu"
@@ -79,15 +71,14 @@ def train_cifar(config):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=config["lr"], momentum=0.9)
 
-    # Load existing checkpoint through `session.get_checkpoint()` API.
-    if session.get_checkpoint():
-        loaded_checkpoint = session.get_checkpoint()
-        with loaded_checkpoint.as_directory() as loaded_checkpoint_dir:
-            model_state, optimizer_state = torch.load(os.path.join(loaded_checkpoint_dir, "checkpoint.pt"))
-            net.load_state_dict(model_state)
-            optimizer.load_state_dict(optimizer_state)
+    # The `checkpoint_dir` parameter gets passed by Ray Tune when a checkpoint
+    # should be restored.
+    if checkpoint_dir:
+        checkpoint = os.path.join(checkpoint_dir, "checkpoint")
+        model_state, optimizer_state = torch.load(checkpoint)
+        net.load_state_dict(model_state)
+        optimizer.load_state_dict(optimizer_state)
 
-    data_dir = os.path.abspath("./data")
     trainset, testset = load_data(data_dir)
 
     test_abs = int(len(trainset) * 0.8)
@@ -150,31 +141,20 @@ def train_cifar(config):
                 val_steps += 1
 
         # Here we save a checkpoint. It is automatically registered with
-        # Ray Tune and will potentially be accessed through in ``session.get_checkpoint()``
-        # in future iterations.
-        # Note to save a file like checkpoint, you still need to put it under a directory
-        # to construct an AIR checkpoint.
-        os.makedirs("my_model", exist_ok=True)  # ok to overwrite the previous one.
-        path = os.path.join("my_model", "checkpoint.pt")
-        torch.save(
-            (net.state_dict(), optimizer.state_dict()), path)
-        checkpoint = Checkpoint.from_directory("my_model")
-        session.report({"loss": (val_loss / val_steps), "accuracy": correct / total}, checkpoint=checkpoint)
+        # Ray Tune and will potentially be passed as the `checkpoint_dir`
+        # parameter in future iterations.
+        with tune.checkpoint_dir(step=epoch) as checkpoint_dir:
+            path = os.path.join(checkpoint_dir, "checkpoint")
+            torch.save(
+                (net.state_dict(), optimizer.state_dict()), path)
+
+        tune.report(loss=(val_loss / val_steps), accuracy=correct / total)
     print("Finished Training")
 # __train_end__
 
 
 # __test_acc_begin__
-def test_best_model(config: Dict, checkpoint: "ray.air.Checkpoint"):
-    best_trained_model = Net(config["l1"], config["l2"])
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    best_trained_model.to(device)
-
-    with checkpoint.as_directory() as checkpoint_dir:
-        checkpoint_path = os.path.join(checkpoint_dir, "checkpoint.pt")
-        model_state, optimizer_state = torch.load(checkpoint_path)
-        best_trained_model.load_state_dict(model_state)
-
+def test_accuracy(net, device="cpu"):
     trainset, testset = load_data()
 
     testloader = torch.utils.data.DataLoader(
@@ -186,18 +166,19 @@ def test_best_model(config: Dict, checkpoint: "ray.air.Checkpoint"):
         for data in testloader:
             images, labels = data
             images, labels = images.to(device), labels.to(device)
-            outputs = best_trained_model(images)
+            outputs = net(images)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-
-    print("Best trial test set accuracy: {}".format(correct / total))
-
+    return correct / total
 # __test_acc_end__
+
 
 # __main_begin__
 def main(num_samples=10, max_num_epochs=10, gpus_per_trial=2):
+    data_dir = os.path.abspath("./data")
+    load_data(data_dir)  # Download data for all trials before starting the run
     config = {
         "l1": tune.sample_from(lambda _: 2 ** np.random.randint(2, 9)),
         "l2": tune.sample_from(lambda _: 2 ** np.random.randint(2, 9)),
@@ -208,27 +189,38 @@ def main(num_samples=10, max_num_epochs=10, gpus_per_trial=2):
         max_t=max_num_epochs,
         grace_period=1,
         reduction_factor=2)
-
-    tuner = tune.Tuner(
-        tune.with_resources(
-        tune.with_parameters(train_cifar), resources={"cpu": 2, "gpu": gpus_per_trial}),
-        tune_config=tune.TuneConfig(metric="loss",
+    result = tune.run(
+        tune.with_parameters(train_cifar, data_dir=data_dir),
+        resources_per_trial={"cpu": 2, "gpu": gpus_per_trial},
+        config=config,
+        metric="loss",
         mode="min",
         num_samples=num_samples,
-        scheduler=scheduler),
-        param_space=config,
+        scheduler=scheduler
     )
-    results = tuner.fit()
-    best_result = results.get_best_result("loss", "min")
-    print("Best trial config: {}".format(best_result.config))
+
+    best_trial = result.get_best_trial("loss", "min", "last")
+    print("Best trial config: {}".format(best_trial.config))
     print("Best trial final validation loss: {}".format(
-        best_result.metrics["loss"]))
+        best_trial.last_result["loss"]))
     print("Best trial final validation accuracy: {}".format(
-        best_result.metrics["accuracy"]))
+        best_trial.last_result["accuracy"]))
 
-    test_best_model(best_result.config, best_result.checkpoint)
+    best_trained_model = Net(best_trial.config["l1"], best_trial.config["l2"])
+    device = "cpu"
+    if torch.cuda.is_available():
+        device = "cuda:0"
+        if gpus_per_trial > 1:
+            best_trained_model = nn.DataParallel(best_trained_model)
+    best_trained_model.to(device)
 
+    checkpoint_path = os.path.join(best_trial.checkpoint.value, "checkpoint")
 
+    model_state, optimizer_state = torch.load(checkpoint_path)
+    best_trained_model.load_state_dict(model_state)
+
+    test_acc = test_accuracy(best_trained_model, device)
+    print("Best trial test set accuracy: {}".format(test_acc))
 # __main_end__
 
 
@@ -238,16 +230,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--smoke-test", action="store_true", help="Finish quickly for testing")
-    parser.add_argument(
-        "--ray-address",
-        help="Address of Ray cluster for seamless distributed execution.",
-        required=False)
     args, _ = parser.parse_known_args()
 
     if args.smoke_test:
         ray.init(num_cpus=2)
         main(num_samples=1, max_num_epochs=1, gpus_per_trial=0)
     else:
-        ray.init(args.ray_address)
         # Change this to activate training on GPUs
         main(num_samples=10, max_num_epochs=10, gpus_per_trial=0)

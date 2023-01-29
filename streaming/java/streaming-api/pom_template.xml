@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    {auto_gen_header}
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>ray-streaming</artifactId>
+    <groupId>io.ant-ray</groupId>
+    <version>3.3-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>streaming-api</artifactId>
+  <name>ray streaming api</name>
+  <description>ray streaming api</description>
+
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <!-- put generated_bzl_deps front so we can override those dependencies in later
+     dependencies declaration -->
+    {generated_bzl_deps}
+
+    <dependency>
+      <groupId>io.ant-ray</groupId>
+      <artifactId>ray-api</artifactId>
+      <version>${ray.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ant-ray</groupId>
+      <artifactId>ray-runtime</artifactId>
+      <version>${ray.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ant-ray</groupId>
+      <artifactId>streaming-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ant-ray</groupId>
+      <artifactId>state</artifactId>
+      <version>2.6.7-SNAPSHOT</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.ant-ray</groupId>
+      <artifactId>fury</artifactId>
+      <version>0.6.4</version>
+      <exclusions>
+        <!-- arrow used netty version is conflict with tbase -->
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+      <dependency>
+      <groupId>io.ant-ray</groupId>
+      <artifactId>streaming-common</artifactId>
+      <version>3.3-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+</project>

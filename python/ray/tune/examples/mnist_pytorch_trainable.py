@@ -8,9 +8,10 @@ import torch
 import torch.optim as optim
 
 import ray
-from ray import air, tune
+from ray import tune
 from ray.tune.schedulers import ASHAScheduler
-from ray.tune.examples.mnist_pytorch import train, test, get_data_loaders, ConvNet
+from ray.tune.examples.mnist_pytorch import (train, test, get_data_loaders,
+                                             ConvNet)
 
 # Change these values if you want the training to run quicker or slower.
 EPOCH_SIZE = 512
@@ -19,16 +20,18 @@ TEST_SIZE = 256
 # Training settings
 parser = argparse.ArgumentParser(description="PyTorch MNIST Example")
 parser.add_argument(
-    "--use-gpu", action="store_true", default=False, help="enables CUDA training"
-)
-parser.add_argument("--ray-address", type=str, help="The Redis address of the cluster.")
+    "--use-gpu",
+    action="store_true",
+    default=False,
+    help="enables CUDA training")
 parser.add_argument(
-    "--smoke-test", action="store_true", help="Finish quickly for testing"
-)
+    "--ray-address", type=str, help="The Redis address of the cluster.")
+parser.add_argument(
+    "--smoke-test", action="store_true", help="Finish quickly for testing")
 
 
 # Below comments are for documentation purposes only.
-# fmt: off
+# yapf: disable
 # __trainable_example_begin__
 class TrainMNIST(tune.Trainable):
     def setup(self, config):
@@ -57,36 +60,32 @@ class TrainMNIST(tune.Trainable):
 
 
 # __trainable_example_end__
-# fmt: on
+# yapf: enable
 
 if __name__ == "__main__":
     args = parser.parse_args()
     ray.init(address=args.ray_address, num_cpus=6 if args.smoke_test else None)
     sched = ASHAScheduler()
-
-    tuner = tune.Tuner(
-        tune.with_resources(TrainMNIST, resources={"cpu": 3, "gpu": int(args.use_gpu)}),
-        run_config=air.RunConfig(
-            stop={
-                "mean_accuracy": 0.95,
-                "training_iteration": 3 if args.smoke_test else 20,
-            },
-            checkpoint_config=air.CheckpointConfig(
-                checkpoint_at_end=True, checkpoint_frequency=3
-            ),
-        ),
-        tune_config=tune.TuneConfig(
-            metric="mean_accuracy",
-            mode="max",
-            scheduler=sched,
-            num_samples=1 if args.smoke_test else 20,
-        ),
-        param_space={
+    analysis = tune.run(
+        TrainMNIST,
+        metric="mean_accuracy",
+        mode="max",
+        scheduler=sched,
+        stop={
+            "mean_accuracy": 0.95,
+            "training_iteration": 3 if args.smoke_test else 20,
+        },
+        resources_per_trial={
+            "cpu": 3,
+            "gpu": int(args.use_gpu)
+        },
+        num_samples=1 if args.smoke_test else 20,
+        checkpoint_at_end=True,
+        checkpoint_freq=3,
+        config={
             "args": args,
             "lr": tune.uniform(0.001, 0.1),
             "momentum": tune.uniform(0.1, 0.9),
-        },
-    )
-    results = tuner.fit()
+        })
 
-    print("Best config is:", results.get_best_result().config)
+    print("Best config is:", analysis.best_config)

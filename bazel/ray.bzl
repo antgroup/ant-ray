@@ -21,7 +21,11 @@ COPTS_WITHOUT_LOG = select({
     ],
 })
 
-COPTS = COPTS_WITHOUT_LOG
+_COPTS = ["-DRAY_USE_SPDLOG"] + COPTS_WITHOUT_LOG
+
+# ANT-INTERNAL: Use DBOOST_UUID_COMPAT_PRE_1_71_MD5 to fix MD5 bug
+# Reference : https://github.com/boostorg/uuid/pull/109
+COPTS = _COPTS + ["-DBOOST_UUID_COMPAT_PRE_1_71_MD5"]
 
 PYX_COPTS = select({
     "//:msvc-cl": [
@@ -101,6 +105,7 @@ def copy_to_workspace(name, srcs, dstdir = ""):
         name = name,
         srcs = srcs,
         outs = [name + ".out"],
+        # Keep this Bash script equivalent to the batch script below (or take out the batch script)
         cmd = r"""
             mkdir -p -- {dstdir}
             for f in {locations}; do
@@ -112,8 +117,21 @@ def copy_to_workspace(name, srcs, dstdir = ""):
             locations = src_locations,
             dstdir = "." + ("/" + dstdir.replace("\\", "/")).rstrip("/") + "/",
         ),
+        # Keep this batch script equivalent to the Bash script above (or take out the batch script)
+        cmd_bat = """
+            (
+                if not exist {dstdir} mkdir {dstdir}
+            ) && (
+                for %f in ({locations}) do @(
+                    (if exist {dstdir}%~nxf del /f /q {dstdir}%~nxf) &&
+                    copy /B /Y %f {dstdir} >NUL
+                )
+            ) && >$@ echo %TIME%
+        """.replace("\r", "").replace("\n", " ").format(
+            locations = src_locations,
+            dstdir = "." + ("\\" + dstdir.replace("/", "\\")).rstrip("\\") + "\\",
+        ),
         local = 1,
-        tags = ["no-cache"],
     )
 
 def native_java_binary(module_name, name, native_binary_name):
@@ -169,3 +187,15 @@ def native_java_library(module_name, name, native_library_name):
         }),
         visibility = ["//visibility:public"],
     )
+
+def if_linux_x86_64(a):
+    return select({
+        "@bazel_tools//src/conditions:linux_x86_64": a,
+        "//conditions:default": [],
+    })
+
+def if_darwin(a):
+    return select({
+        "@bazel_tools//src/conditions:darwin": a,
+        "//conditions:default": [],
+    })

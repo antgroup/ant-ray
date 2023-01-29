@@ -21,36 +21,50 @@
 namespace ray {
 namespace gcs {
 
-GlobalStateAccessor::GlobalStateAccessor(const GcsClientOptions &gcs_client_options) {
-  gcs_client_ = std::make_unique<GcsClient>(gcs_client_options);
-  io_service_ = std::make_unique<instrumented_io_context>();
+GlobalStateAccessor::GlobalStateAccessor(const std::string &redis_address,
+                                         const std::string &redis_password) {
+  RAY_LOG(DEBUG) << "Redis server address = " << redis_address;
+  redis_address_ = redis_address;
+  std::vector<std::string> address;
+  boost::split(address, redis_address, boost::is_any_of(":"));
+  RAY_CHECK(address.size() == 2);
+  redis_ip_address_ = address[0];
+  GcsClientOptions options;
+  options.server_ip_ = address[0];
+  options.server_port_ = std::stoi(address[1]);
+  options.password_ = redis_password;
+  // Only synchronous connection is needed.
+  options.enable_sync_conn_ = true;
+  options.enable_async_conn_ = false;
+  options.enable_subscribe_conn_ = false;
+  gcs_client_.reset(new ServiceBasedGcsClient(options, false));
+
+  io_service_.reset(new instrumented_io_context());
 
   std::promise<bool> promise;
-  thread_io_service_ = std::make_unique<std::thread>([this, &promise] {
+  thread_io_service_.reset(new std::thread([this, &promise] {
     SetThreadName("global.accessor");
     std::unique_ptr<boost::asio::io_service::work> work(
         new boost::asio::io_service::work(*io_service_));
     promise.set_value(true);
     io_service_->run();
-  });
+  }));
   promise.get_future().get();
 }
 
 GlobalStateAccessor::~GlobalStateAccessor() { Disconnect(); }
 
 bool GlobalStateAccessor::Connect() {
-  absl::WriterMutexLock lock(&mutex_);
   if (!is_connected_) {
     is_connected_ = true;
     return gcs_client_->Connect(*io_service_).ok();
+  } else {
+    RAY_LOG(DEBUG) << "Duplicated connection for GlobalStateAccessor.";
+    return true;
   }
-  RAY_LOG(DEBUG) << "Duplicated connection for GlobalStateAccessor.";
-  return true;
 }
 
 void GlobalStateAccessor::Disconnect() {
-  absl::WriterMutexLock lock(&mutex_);
-  RAY_LOG(DEBUG) << "Global state accessor disconnect";
   if (is_connected_) {
     io_service_->stop();
     thread_io_service_->join();
@@ -59,36 +73,46 @@ void GlobalStateAccessor::Disconnect() {
   }
 }
 
+std::string GlobalStateAccessor::GetApiServerAddress() {
+  rpc::ApiServerAddress address;
+  const auto api_server_address = gcs_client_->GetApiServerAddress();
+  address.set_ip(api_server_address.first);
+  address.set_port(api_server_address.second);
+  return address.SerializeAsString();
+}
+
 std::vector<std::string> GlobalStateAccessor::GetAllJobInfo() {
   std::vector<std::string> job_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->Jobs().AsyncGetAll(
-        TransformForMultiItemCallback<rpc::JobTableData>(job_table_data, promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->Jobs().AsyncGetAll(
+      TransformForMultiItemCallback<rpc::JobTableData>(job_table_data, promise)));
   promise.get_future().get();
   return job_table_data;
 }
 
 JobID GlobalStateAccessor::GetNextJobID() {
   std::promise<JobID> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->Jobs().AsyncGetNextJobID(
-        [&promise](const JobID &job_id) { promise.set_value(job_id); }));
-  }
+  RAY_CHECK_OK(gcs_client_->Jobs().AsyncGetNextJobID(
+      [&promise](const JobID &job_id) { promise.set_value(job_id); }));
   return promise.get_future().get();
 }
 
 std::vector<std::string> GlobalStateAccessor::GetAllNodeInfo() {
   std::vector<std::string> node_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->Nodes().AsyncGetAll(
-        TransformForMultiItemCallback<rpc::GcsNodeInfo>(node_table_data, promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->FullNodeInfo().AsyncGetAll(
+      TransformForMultiItemCallback<rpc::GcsNodeInfo>(node_table_data, promise)));
+  promise.get_future().get();
+  return node_table_data;
+}
+
+std::vector<std::string> GlobalStateAccessor::GetAllNodeInfoByNodegroup(
+    const std::string &nodegroup_id) {
+  std::vector<std::string> node_table_data;
+  std::promise<bool> promise;
+  RAY_CHECK_OK(gcs_client_->FullNodeInfo().AsyncGetAll(
+      TransformForMultiItemCallback<rpc::GcsNodeInfo>(node_table_data, promise),
+      nodegroup_id));
   promise.get_future().get();
   return node_table_data;
 }
@@ -96,14 +120,38 @@ std::vector<std::string> GlobalStateAccessor::GetAllNodeInfo() {
 std::vector<std::string> GlobalStateAccessor::GetAllProfileInfo() {
   std::vector<std::string> profile_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->Stats().AsyncGetAll(
-        TransformForMultiItemCallback<rpc::ProfileTableData>(profile_table_data,
-                                                             promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->Stats().AsyncGetAll(
+      TransformForMultiItemCallback<rpc::ProfileTableData>(profile_table_data, promise)));
   promise.get_future().get();
   return profile_table_data;
+}
+
+std::vector<std::string> GlobalStateAccessor::GetAllObjectInfo() {
+  std::vector<std::string> object_table_data;
+  std::promise<bool> promise;
+  RAY_CHECK_OK(gcs_client_->Objects().AsyncGetAll(
+      TransformForMultiItemCallback<rpc::ObjectLocationInfo>(object_table_data,
+                                                             promise)));
+  promise.get_future().get();
+  return object_table_data;
+}
+
+std::unique_ptr<std::string> GlobalStateAccessor::GetObjectInfo(
+    const ObjectID &object_id) {
+  std::unique_ptr<std::string> object_info;
+  std::promise<bool> promise;
+  auto on_done = [&object_info, &promise](
+                     const Status &status,
+                     const boost::optional<rpc::ObjectLocationInfo> &result) {
+    RAY_CHECK_OK(status);
+    if (result) {
+      object_info.reset(new std::string(result->SerializeAsString()));
+    }
+    promise.set_value(true);
+  };
+  RAY_CHECK_OK(gcs_client_->Objects().AsyncGetLocations(object_id, on_done));
+  promise.get_future().get();
+  return object_info;
 }
 
 std::string GlobalStateAccessor::GetNodeResourceInfo(const NodeID &node_id) {
@@ -123,10 +171,7 @@ std::string GlobalStateAccessor::GetNodeResourceInfo(const NodeID &node_id) {
         }
         promise.set_value();
       };
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetResources(node_id, on_done));
-  }
+  RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetResources(node_id, on_done));
   promise.get_future().get();
   return node_resource_map.SerializeAsString();
 }
@@ -134,37 +179,48 @@ std::string GlobalStateAccessor::GetNodeResourceInfo(const NodeID &node_id) {
 std::vector<std::string> GlobalStateAccessor::GetAllAvailableResources() {
   std::vector<std::string> available_resources;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllAvailableResources(
-        TransformForMultiItemCallback<rpc::AvailableResources>(available_resources,
-                                                               promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllAvailableResources(
+      TransformForMultiItemCallback<rpc::AvailableResources>(available_resources,
+                                                             promise)));
   promise.get_future().get();
   return available_resources;
+}
+
+std::unique_ptr<std::string> GlobalStateAccessor::GetResourceUsage(
+    const NodeID &node_id) {
+  std::unique_ptr<std::string> node_resources_data;
+  std::promise<bool> promise;
+  RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetResourceUsage(
+      node_id, TransformForOptionalItemCallback<rpc::ResourcesData>(node_resources_data,
+                                                                    promise)));
+  promise.get_future().get();
+  return node_resources_data;
 }
 
 std::unique_ptr<std::string> GlobalStateAccessor::GetAllResourceUsage() {
   std::unique_ptr<std::string> resource_batch_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllResourceUsage(
-        TransformForItemCallback<rpc::ResourceUsageBatchData>(resource_batch_data,
-                                                              promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllResourceUsage(
+      TransformForItemCallback<rpc::ResourceUsageBatchData>(resource_batch_data,
+                                                            promise)));
   promise.get_future().get();
   return resource_batch_data;
+}
+
+std::vector<std::string> GlobalStateAccessor::GetClusterResources() {
+  std::vector<std::string> cluster_resources;
+  std::promise<bool> promise;
+  RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetClusterResources(
+      TransformForMultiItemCallback<rpc::NodeResources>(cluster_resources, promise)));
+  promise.get_future().get();
+  return cluster_resources;
 }
 
 std::vector<std::string> GlobalStateAccessor::GetAllActorInfo() {
   std::vector<std::string> actor_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->Actors().AsyncGetAll(
-        TransformForMultiItemCallback<rpc::ActorTableData>(actor_table_data, promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->Actors().AsyncGetAll(
+      TransformForMultiItemCallback<rpc::ActorTableData>(actor_table_data, promise)));
   promise.get_future().get();
   return actor_table_data;
 }
@@ -172,13 +228,9 @@ std::vector<std::string> GlobalStateAccessor::GetAllActorInfo() {
 std::unique_ptr<std::string> GlobalStateAccessor::GetActorInfo(const ActorID &actor_id) {
   std::unique_ptr<std::string> actor_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->Actors().AsyncGet(
-        actor_id,
-        TransformForOptionalItemCallback<rpc::ActorTableData>(actor_table_data,
-                                                              promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->Actors().AsyncGet(
+      actor_id,
+      TransformForOptionalItemCallback<rpc::ActorTableData>(actor_table_data, promise)));
   promise.get_future().get();
   return actor_table_data;
 }
@@ -187,13 +239,9 @@ std::unique_ptr<std::string> GlobalStateAccessor::GetWorkerInfo(
     const WorkerID &worker_id) {
   std::unique_ptr<std::string> worker_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->Workers().AsyncGet(
-        worker_id,
-        TransformForOptionalItemCallback<rpc::WorkerTableData>(worker_table_data,
-                                                               promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->Workers().AsyncGet(
+      worker_id, TransformForOptionalItemCallback<rpc::WorkerTableData>(worker_table_data,
+                                                                        promise)));
   promise.get_future().get();
   return worker_table_data;
 }
@@ -201,11 +249,8 @@ std::unique_ptr<std::string> GlobalStateAccessor::GetWorkerInfo(
 std::vector<std::string> GlobalStateAccessor::GetAllWorkerInfo() {
   std::vector<std::string> worker_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->Workers().AsyncGetAll(
-        TransformForMultiItemCallback<rpc::WorkerTableData>(worker_table_data, promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->Workers().AsyncGetAll(
+      TransformForMultiItemCallback<rpc::WorkerTableData>(worker_table_data, promise)));
   promise.get_future().get();
   return worker_table_data;
 }
@@ -214,14 +259,11 @@ bool GlobalStateAccessor::AddWorkerInfo(const std::string &serialized_string) {
   auto data_ptr = std::make_shared<rpc::WorkerTableData>();
   data_ptr->ParseFromString(serialized_string);
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(
-        gcs_client_->Workers().AsyncAdd(data_ptr, [&promise](const Status &status) {
-          RAY_CHECK_OK(status);
-          promise.set_value(true);
-        }));
-  }
+  RAY_CHECK_OK(
+      gcs_client_->Workers().AsyncAdd(data_ptr, [&promise](const Status &status) {
+        RAY_CHECK_OK(status);
+        promise.set_value(true);
+      }));
   promise.get_future().get();
   return true;
 }
@@ -229,12 +271,9 @@ bool GlobalStateAccessor::AddWorkerInfo(const std::string &serialized_string) {
 std::vector<std::string> GlobalStateAccessor::GetAllPlacementGroupInfo() {
   std::vector<std::string> placement_group_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->PlacementGroups().AsyncGetAll(
-        TransformForMultiItemCallback<rpc::PlacementGroupTableData>(
-            placement_group_table_data, promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->PlacementGroups().AsyncGetAll(
+      TransformForMultiItemCallback<rpc::PlacementGroupTableData>(
+          placement_group_table_data, promise)));
   promise.get_future().get();
   return placement_group_table_data;
 }
@@ -243,53 +282,86 @@ std::unique_ptr<std::string> GlobalStateAccessor::GetPlacementGroupInfo(
     const PlacementGroupID &placement_group_id) {
   std::unique_ptr<std::string> placement_group_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->PlacementGroups().AsyncGet(
-        placement_group_id,
-        TransformForOptionalItemCallback<rpc::PlacementGroupTableData>(
-            placement_group_table_data, promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->PlacementGroups().AsyncGet(
+      placement_group_id, TransformForOptionalItemCallback<rpc::PlacementGroupTableData>(
+                              placement_group_table_data, promise)));
   promise.get_future().get();
   return placement_group_table_data;
+}
+
+bool GlobalStateAccessor::UpdateJobResourceRequirements(
+    const JobID &job_id,
+    const std::unordered_map<std::string, double> &min_resource_requirements,
+    const std::unordered_map<std::string, double> &max_resource_requirements) {
+  auto promise = std::make_shared<std::promise<Status>>();
+  RAY_CHECK_OK(gcs_client_->Jobs().AsyncUpdateJobResourceRequirements(
+      job_id, min_resource_requirements, max_resource_requirements,
+      [promise](const Status &status) { promise->set_value(status); }));
+  auto future = promise->get_future();
+  auto status = future.wait_for(std::chrono::milliseconds(5000));
+  if (status == std::future_status::ready) {
+    auto update_status = future.get();
+    if (update_status.ok()) {
+      return true;
+    } else {
+      throw std::runtime_error(update_status.ToString());
+    }
+  }
+  return false;
 }
 
 std::unique_ptr<std::string> GlobalStateAccessor::GetPlacementGroupByName(
     const std::string &placement_group_name, const std::string &ray_namespace) {
   std::unique_ptr<std::string> placement_group_table_data;
   std::promise<bool> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->PlacementGroups().AsyncGetByName(
-        placement_group_name,
-        ray_namespace,
-        TransformForOptionalItemCallback<rpc::PlacementGroupTableData>(
-            placement_group_table_data, promise)));
-  }
+  RAY_CHECK_OK(gcs_client_->PlacementGroups().AsyncGetByName(
+      placement_group_name, ray_namespace,
+
+      TransformForOptionalItemCallback<rpc::PlacementGroupTableData>(
+          placement_group_table_data, promise)));
   promise.get_future().get();
   return placement_group_table_data;
 }
 
-std::unique_ptr<std::string> GlobalStateAccessor::GetInternalKV(const std::string &ns,
-                                                                const std::string &key) {
-  absl::ReaderMutexLock lock(&mutex_);
-  std::string value;
+std::pair<bool, std::string> GlobalStateAccessor::PutJobData(const JobID &job_id,
+                                                             const std::string &key,
+                                                             const std::string &data) {
+  std::promise<bool> promise;
+  if (data.size() > RayConfig::instance().max_job_result_size()) {
+    std::ostringstream ss;
+    ss << "Job result exceeds max allowed size: " << data.size() << " > "
+       << RayConfig::instance().max_job_result_size() << ", job id = " << job_id;
+    RAY_LOG(INFO) << ss.str();
+    return std::make_pair(false, ss.str());
+  }
+  RAY_CHECK_OK(gcs_client_->Jobs().AsyncPutData(job_id, key, data,
+                                                [&promise](const Status &status) {
+                                                  RAY_CHECK_OK(status);
+                                                  promise.set_value(true);
+                                                }));
+  promise.get_future().get();
+  return std::make_pair(true, "");
+}
 
-  Status status = gcs_client_->InternalKV().Get(ns, key, value);
-  return status.ok() ? std::make_unique<std::string>(value) : nullptr;
+std::string GlobalStateAccessor::GetJobData(const JobID &job_id, const std::string &key) {
+  std::promise<std::string> promise;
+  RAY_CHECK_OK(gcs_client_->Jobs().AsyncGetData(
+      job_id, key,
+      [&promise](const Status &status, const boost::optional<std::string> &data) {
+        RAY_CHECK_OK(status);
+        promise.set_value(*data);
+      }));
+  return promise.get_future().get();
 }
 
 std::string GlobalStateAccessor::GetSystemConfig() {
   std::promise<std::string> promise;
-  {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->Nodes().AsyncGetInternalConfig(
-        [&promise](const Status &status,
-                   const boost::optional<std::string> &stored_raylet_config) {
-          RAY_CHECK_OK(status);
-          promise.set_value(*stored_raylet_config);
-        }));
-  }
+  RAY_CHECK_OK(gcs_client_->Nodes().AsyncGetInternalConfig(
+      [&promise](const Status &status,
+                 const boost::optional<std::string> &stored_raylet_config) {
+        RAY_CHECK_OK(status);
+        promise.set_value(*stored_raylet_config);
+      }));
   auto future = promise.get_future();
   if (future.wait_for(std::chrono::seconds(
           RayConfig::instance().gcs_server_request_timeout_seconds())) !=
@@ -304,14 +376,11 @@ ray::Status GlobalStateAccessor::GetNodeToConnectForDriver(
   auto start_ms = current_time_ms();
   while (true) {
     std::promise<std::pair<Status, std::vector<rpc::GcsNodeInfo>>> promise;
-    {
-      absl::ReaderMutexLock lock(&mutex_);
-      RAY_CHECK_OK(gcs_client_->Nodes().AsyncGetAll(
-          [&promise](Status status, std::vector<rpc::GcsNodeInfo> &&nodes) {
-            promise.set_value(std::pair<Status, std::vector<rpc::GcsNodeInfo>>(
-                status, std::move(nodes)));
-          }));
-    }
+    RAY_CHECK_OK(gcs_client_->FullNodeInfo().AsyncGetAll(
+        [&promise](Status status, const std::vector<rpc::GcsNodeInfo> &nodes) {
+          promise.set_value(
+              std::pair<Status, std::vector<rpc::GcsNodeInfo>>(status, nodes));
+        }));
     auto result = promise.get_future().get();
     auto status = result.first;
     if (!status.ok()) {
@@ -320,42 +389,35 @@ ray::Status GlobalStateAccessor::GetNodeToConnectForDriver(
 
     // Deal with alive nodes only
     std::vector<rpc::GcsNodeInfo> nodes;
-    std::copy_if(result.second.begin(),
-                 result.second.end(),
-                 std::back_inserter(nodes),
+    std::copy_if(result.second.begin(), result.second.end(), std::back_inserter(nodes),
                  [](const rpc::GcsNodeInfo &node) {
-                   return node.state() == rpc::GcsNodeInfo::ALIVE;
+                   return node.basic_gcs_node_info().state() ==
+                          rpc::BasicGcsNodeInfo::ALIVE;
                  });
 
     if (nodes.empty()) {
-      status = Status::NotFound("GCS has started but no raylets have registered yet.");
+      status = Status::NotFound("Redis has started but no raylets have registered yet.");
     } else {
       int relevant_client_index = -1;
       int head_node_client_index = -1;
-      std::pair<std::string, int> gcs_address;
-      {
-        absl::WriterMutexLock lock(&mutex_);
-        gcs_address = gcs_client_->GetGcsServerAddress();
-      }
-
       for (int i = 0; i < static_cast<int>(nodes.size()); i++) {
         const auto &node = nodes[i];
-        std::string ip_address = node.node_manager_address();
+        std::string ip_address = node.basic_gcs_node_info().node_manager_address();
         if (ip_address == node_ip_address) {
           relevant_client_index = i;
           break;
         }
         // TODO(kfstorm): Do we need to replace `node_ip_address` with
         // `get_node_ip_address()`?
-        if ((ip_address == "127.0.0.1" && gcs_address.first == node_ip_address) ||
-            ip_address == gcs_address.first) {
+        if ((ip_address == "127.0.0.1" && redis_ip_address_ == node_ip_address) ||
+            ip_address == redis_ip_address_) {
           head_node_client_index = i;
         }
       }
 
       if (relevant_client_index < 0 && head_node_client_index >= 0) {
         RAY_LOG(INFO) << "This node has an IP address of " << node_ip_address
-                      << ", while we can not find the matched Raylet address. "
+                      << ", while we can not found the matched Raylet address. "
                       << "This maybe come from when you connect the Ray cluster "
                       << "with a different IP address or connect a container.";
         relevant_client_index = head_node_client_index;
@@ -363,14 +425,14 @@ ray::Status GlobalStateAccessor::GetNodeToConnectForDriver(
       if (relevant_client_index < 0) {
         std::ostringstream oss;
         oss << "This node has an IP address of " << node_ip_address << ", and Ray "
-            << "expects this IP address to be either the GCS address or one of"
-            << " the Raylet addresses. Connected to GCS at " << gcs_address.first
+            << "expects this IP address to be either the Redis address or one of"
+            << " the Raylet addresses. Connected to Redis at " << redis_address_
             << " and found raylets at ";
         for (size_t i = 0; i < nodes.size(); i++) {
           if (i > 0) {
             oss << ", ";
           }
-          oss << nodes[i].node_manager_address();
+          oss << nodes[i].basic_gcs_node_info().node_manager_address();
         }
         oss << " but none of these match this node's IP " << node_ip_address
             << ". Are any of these actually a different IP address for the same node?"
@@ -388,9 +450,9 @@ ray::Status GlobalStateAccessor::GetNodeToConnectForDriver(
       return status;
     }
     RAY_LOG(WARNING) << "Some processes that the driver needs to connect to have "
-                        "not registered with GCS, so retrying. Have you run "
+                        "not registered with Redis, so retrying. Have you run "
                         "'ray start' on this node?";
-    // Some of the information may not be in GCS yet, so wait a little bit.
+    // Some of the information may not be in Redis yet, so wait a little bit.
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 }

@@ -1,12 +1,14 @@
 package io.ray.runtime.util;
 
 import com.google.common.base.Preconditions;
+import io.ray.api.Ray;
 import io.ray.api.concurrencygroup.ConcurrencyGroup;
 import io.ray.api.concurrencygroup.annotations.DefConcurrencyGroup;
 import io.ray.api.concurrencygroup.annotations.DefConcurrencyGroups;
 import io.ray.api.concurrencygroup.annotations.UseConcurrencyGroup;
 import io.ray.api.function.RayFuncR;
 import io.ray.runtime.ConcurrencyGroupImpl;
+import io.ray.runtime.RayRuntimeInternal;
 import io.ray.runtime.functionmanager.JavaFunctionDescriptor;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
@@ -15,14 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/// TODO(qwang): cache this.
+/// TODO: cache this.
 public final class ConcurrencyGroupUtils {
 
   public static List<ConcurrencyGroup> extractConcurrencyGroupsByAnnotations(
       RayFuncR<?> actorConstructorLambda) {
     SerializedLambda serializedLambda = LambdaUtils.getSerializedLambda(actorConstructorLambda);
-    Class<?> actorClz =
-        MethodUtils.getReturnTypeFromSignature(serializedLambda.getInstantiatedMethodType());
+    Class<?> actorClz = getReturnTypeFromSignature(serializedLambda.getInstantiatedMethodType());
 
     /// Extract the concurrency groups definition.
     ArrayList<ConcurrencyGroup> ret = new ArrayList<ConcurrencyGroup>();
@@ -90,5 +91,27 @@ public final class ConcurrencyGroupUtils {
       }
     }
     return ret;
+  }
+
+  private static Class<?> getReturnTypeFromSignature(String signature) {
+    final int startIndex = signature.indexOf(')');
+    final int endIndex = signature.lastIndexOf(';');
+
+    final String className = signature.substring(startIndex + 2, endIndex).replace('/', '.');
+    Class<?> actorClz;
+    try {
+      try {
+        actorClz = Class.forName(className);
+      } catch (ClassNotFoundException e) {
+        /// This code path indicates that here might be in another thread of a worker.
+        /// So try to load the class from URLClassLoader of this worker.
+        ClassLoader cl =
+            ((RayRuntimeInternal) Ray.internal()).getWorkerContext().getCurrentClassLoader();
+        actorClz = Class.forName(className, true, cl);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return actorClz;
   }
 }

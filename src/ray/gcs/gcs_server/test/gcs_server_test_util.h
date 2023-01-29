@@ -21,9 +21,11 @@
 #include "ray/common/task/task.h"
 #include "ray/common/task/task_util.h"
 #include "ray/common/test_util.h"
-#include "ray/gcs/gcs_client/accessor.h"
+#include "ray/gcs/gcs_client/service_based_accessor.h"
 #include "ray/gcs/gcs_server/gcs_actor_manager.h"
+#include "ray/gcs/gcs_server/gcs_actor_schedule_strategy.h"
 #include "ray/gcs/gcs_server/gcs_actor_scheduler.h"
+#include "ray/gcs/gcs_server/gcs_job_manager.h"
 #include "ray/gcs/gcs_server/gcs_node_manager.h"
 #include "ray/gcs/gcs_server/gcs_placement_group_manager.h"
 #include "ray/gcs/gcs_server/gcs_placement_group_scheduler.h"
@@ -60,10 +62,8 @@ struct GcsServerMocker {
   class MockRayletClient : public RayletClientInterface {
    public:
     /// WorkerLeaseInterface
-    ray::Status ReturnWorker(int worker_port,
-                             const WorkerID &worker_id,
-                             bool disconnect_worker,
-                             bool worker_exiting) override {
+    ray::Status ReturnWorker(int worker_port, const WorkerID &worker_id,
+                             bool disconnect_worker) override {
       if (disconnect_worker) {
         num_workers_disconnected++;
       } else {
@@ -72,28 +72,12 @@ struct GcsServerMocker {
       return Status::OK();
     }
 
-    void GetTaskFailureCause(
-        const TaskID &task_id,
-        const ray::rpc::ClientCallback<ray::rpc::GetTaskFailureCauseReply> &callback)
-        override {
-      ray::rpc::GetTaskFailureCauseReply reply;
-      callback(Status::OK(), reply);
-      num_get_task_failure_causes += 1;
-    }
-
-    std::shared_ptr<grpc::Channel> GetChannel() const override { return nullptr; }
-
-    void ReportWorkerBacklog(
-        const WorkerID &worker_id,
-        const std::vector<rpc::WorkerBacklogReport> &backlog_reports) override {}
-
     /// WorkerLeaseInterface
     void RequestWorkerLease(
-        const rpc::TaskSpec &spec,
-        bool grant_or_reject,
+        const ray::TaskSpecification &resource_spec, bool grant_or_reject,
         const rpc::ClientCallback<rpc::RequestWorkerLeaseReply> &callback,
-        const int64_t backlog_size,
-        const bool is_selected_based_on_locality) override {
+        const int64_t backlog_size = -1,
+        const UniqueID &worker_process_id = UniqueID::Nil()) override {
       num_workers_requested += 1;
       callbacks.push_back(callback);
     }
@@ -118,17 +102,10 @@ struct GcsServerMocker {
       return GrantWorkerLease("", 0, WorkerID::FromRandom(), node_id, NodeID::Nil());
     }
 
-    void GetResourceLoad(
-        const ray::rpc::ClientCallback<ray::rpc::GetResourceLoadReply> &) override {}
-
     // Trigger reply to RequestWorkerLease.
-    bool GrantWorkerLease(const std::string &address,
-                          int port,
-                          const WorkerID &worker_id,
-                          const NodeID &raylet_id,
-                          const NodeID &retry_at_raylet_id,
-                          Status status = Status::OK(),
-                          bool rejected = false) {
+    bool GrantWorkerLease(const std::string &address, int port, const WorkerID &worker_id,
+                          const NodeID &raylet_id, const NodeID &retry_at_raylet_id,
+                          Status status = Status::OK()) {
       rpc::RequestWorkerLeaseReply reply;
       if (!retry_at_raylet_id.IsNil()) {
         reply.mutable_retry_at_raylet_address()->set_ip_address(address);
@@ -141,16 +118,6 @@ struct GcsServerMocker {
         reply.mutable_worker_address()->set_raylet_id(raylet_id.Binary());
         reply.mutable_worker_address()->set_worker_id(worker_id.Binary());
       }
-      if (rejected) {
-        reply.set_rejected(true);
-        auto resources_data = reply.mutable_resources_data();
-        resources_data->set_node_id(raylet_id.Binary());
-        resources_data->set_resources_normal_task_changed(true);
-        auto &normal_task_map = *(resources_data->mutable_resources_normal_task());
-        normal_task_map[kMemory_ResourceLabel] = double(std::numeric_limits<int>::max());
-        resources_data->set_resources_normal_task_timestamp(absl::GetCurrentTimeNanos());
-      }
-
       if (callbacks.size() == 0) {
         return false;
       } else {
@@ -188,7 +155,7 @@ struct GcsServerMocker {
 
     /// ResourceReserveInterface
     void PrepareBundleResources(
-        const std::vector<std::shared_ptr<const BundleSpecification>> &bundle_specs,
+        const BundleSpecification &bundle_spec,
         const ray::rpc::ClientCallback<ray::rpc::PrepareBundleResourcesReply> &callback)
         override {
       num_lease_requested += 1;
@@ -197,7 +164,7 @@ struct GcsServerMocker {
 
     /// ResourceReserveInterface
     void CommitBundleResources(
-        const std::vector<std::shared_ptr<const BundleSpecification>> &bundle_specs,
+        const BundleSpecification &bundle_spec,
         const ray::rpc::ClientCallback<ray::rpc::CommitBundleResourcesReply> &callback)
         override {
       num_commit_requested += 1;
@@ -206,7 +173,7 @@ struct GcsServerMocker {
 
     /// ResourceReserveInterface
     void CancelResourceReserve(
-        const BundleSpecification &bundle_spec,
+        BundleSpecification &bundle_spec,
         const ray::rpc::ClientCallback<ray::rpc::CancelResourceReserveReply> &callback)
         override {
       num_return_requested += 1;
@@ -220,8 +187,8 @@ struct GcsServerMocker {
     }
 
     // Trigger reply to PrepareBundleResources.
-    bool GrantPrepareBundleResources(bool success = true,
-                                     const Status &status = Status::OK()) {
+    bool GrantPrepareBundleResources(bool success = true) {
+      Status status = Status::OK();
       rpc::PrepareBundleResourcesReply reply;
       reply.set_success(success);
       if (lease_callbacks.size() == 0) {
@@ -235,13 +202,16 @@ struct GcsServerMocker {
     }
 
     // Trigger reply to CommitBundleResources.
-    bool GrantCommitBundleResources(bool success = true,
-                                    const Status &status = Status::OK()) {
+    bool GrantCommitBundleResources(bool success = true) {
+      Status status = Status::OK();
       rpc::CommitBundleResourcesReply reply;
       if (commit_callbacks.size() == 0) {
         return false;
       } else {
         auto callback = commit_callbacks.front();
+        if (!success) {
+          status = Status::Invalid("");
+        }
         callback(status, reply);
         commit_callbacks.pop_front();
         return true;
@@ -264,9 +234,7 @@ struct GcsServerMocker {
 
     /// PinObjectsInterface
     void PinObjectIDs(
-        const rpc::Address &caller_address,
-        const std::vector<ObjectID> &object_ids,
-        const ObjectID &generator_id,
+        const rpc::Address &caller_address, const std::vector<ObjectID> &object_ids,
         const ray::rpc::ClientCallback<ray::rpc::PinObjectIDsReply> &callback) override {}
 
     /// DependencyWaiterInterface
@@ -277,6 +245,10 @@ struct GcsServerMocker {
 
     void GetSystemConfig(const ray::rpc::ClientCallback<ray::rpc::GetSystemConfigReply>
                              &callback) override {}
+
+    void GetGcsServerAddress(
+        const ray::rpc::ClientCallback<ray::rpc::GetGcsServerAddressReply> &callback)
+        override {}
 
     /// ResourceUsageInterface
     void RequestResourceReport(
@@ -291,14 +263,14 @@ struct GcsServerMocker {
       RAY_CHECK(false) << "Unused";
     };
 
-    /// ShutdownRaylet
-    void ShutdownRaylet(
-        const NodeID &node_id,
-        bool graceful,
-        const rpc::ClientCallback<rpc::ShutdownRayletReply> &callback) override{};
+    void StopTasksAndBanNewTasks(
+        const JobID &job_id,
+        const rpc::ClientCallback<ray::rpc::StopTasksAndBanNewTasksReply> &callback)
+        override {}
 
-    void NotifyGCSRestart(
-        const rpc::ClientCallback<rpc::NotifyGCSRestartReply> &callback) override{};
+    void LiftNewTasksBan(
+        const JobID &job_id,
+        const rpc::ClientCallback<ray::rpc::LiftNewTasksBanReply> &callback) override {}
 
     ~MockRayletClient() {}
 
@@ -307,7 +279,6 @@ struct GcsServerMocker {
     int num_workers_disconnected = 0;
     int num_leases_canceled = 0;
     int num_release_unused_workers = 0;
-    int num_get_task_failure_causes = 0;
     NodeID node_id = NodeID::FromRandom();
     std::list<rpc::ClientCallback<rpc::RequestWorkerLeaseReply>> callbacks = {};
     std::list<rpc::ClientCallback<rpc::CancelWorkerLeaseReply>> cancel_callbacks = {};
@@ -354,20 +325,14 @@ struct GcsServerMocker {
   class MockedGcsPlacementGroupScheduler : public gcs::GcsPlacementGroupScheduler {
    public:
     using gcs::GcsPlacementGroupScheduler::GcsPlacementGroupScheduler;
-
-    size_t GetWaitingRemovedBundlesSize() { return waiting_removed_bundles_.size(); }
-
-   protected:
-    friend class GcsPlacementGroupSchedulerTest;
-    FRIEND_TEST(GcsPlacementGroupSchedulerTest, TestCheckingWildcardResource);
   };
+
   class MockedGcsActorTable : public gcs::GcsActorTable {
    public:
     MockedGcsActorTable(std::shared_ptr<gcs::StoreClient> store_client)
         : GcsActorTable(store_client) {}
 
-    Status Put(const ActorID &key,
-               const rpc::ActorTableData &value,
+    Status Put(const ActorID &key, const rpc::ActorTableData &value,
                const gcs::StatusCallback &callback) override {
       auto status = Status::OK();
       callback(status);
@@ -380,14 +345,32 @@ struct GcsServerMocker {
         std::make_shared<gcs::InMemoryStoreClient>(main_io_service_);
   };
 
-  class MockedNodeInfoAccessor : public gcs::NodeInfoAccessor {
+  class MockedGcsActorTaskSpecTable : public gcs::GcsActorTaskSpecTable {
+   public:
+    MockedGcsActorTaskSpecTable(std::shared_ptr<gcs::StoreClient> store_client)
+        : GcsActorTaskSpecTable(store_client) {}
+
+    Status Put(const ActorID &key, const rpc::TaskSpec &value,
+               const gcs::StatusCallback &callback) override {
+      auto status = Status::OK();
+      callback(status);
+      return status;
+    }
+
+   private:
+    instrumented_io_context main_io_service_;
+    std::shared_ptr<gcs::StoreClient> store_client_ =
+        std::make_shared<gcs::InMemoryStoreClient>(main_io_service_);
+  };
+
+  class MockedNodeInfoAccessor : public gcs::FullNodeInfoAccessor {
    public:
     Status RegisterSelf(const rpc::GcsNodeInfo &local_node_info,
                         const gcs::StatusCallback &callback) override {
       return Status::NotImplemented("");
     }
 
-    Status DrainSelf() override { return Status::NotImplemented(""); }
+    Status UnregisterSelf() override { return Status::NotImplemented(""); }
 
     const NodeID &GetSelfId() const override {
       static NodeID node_id;
@@ -404,16 +387,16 @@ struct GcsServerMocker {
       return Status::NotImplemented("");
     }
 
-    Status AsyncDrainNode(const NodeID &node_id,
-                          const gcs::StatusCallback &callback) override {
+    Status AsyncUnregister(const NodeID &node_id,
+                           const gcs::StatusCallback &callback) override {
       if (callback) {
         callback(Status::OK());
       }
       return Status::OK();
     }
 
-    Status AsyncGetAll(
-        const gcs::MultiItemCallback<rpc::GcsNodeInfo> &callback) override {
+    Status AsyncGetAll(const gcs::MultiItemCallback<rpc::GcsNodeInfo> &callback,
+                       const std::string &nodegroup_id = "") override {
       if (callback) {
         callback(Status::OK(), {});
       }
@@ -431,8 +414,8 @@ struct GcsServerMocker {
       return nullptr;
     }
 
-    const absl::flat_hash_map<NodeID, rpc::GcsNodeInfo> &GetAll() const override {
-      static absl::flat_hash_map<NodeID, rpc::GcsNodeInfo> node_info_list;
+    const std::unordered_map<NodeID, rpc::GcsNodeInfo> &GetAll() const override {
+      static std::unordered_map<NodeID, rpc::GcsNodeInfo> node_info_list;
       return node_info_list;
     }
 
@@ -443,8 +426,41 @@ struct GcsServerMocker {
       return Status::NotImplemented("");
     }
 
-    void AsyncResubscribe() override {}
+    void AsyncResubscribe(bool is_pubsub_server_restarted) override {}
   };
+
+  class MockGcsPubSub : public gcs::GcsPubSub {
+   public:
+    MockGcsPubSub(std::shared_ptr<gcs::RedisClient> redis_client)
+        : GcsPubSub(redis_client) {}
+
+    Status Publish(const std::string &channel, const std::string &id,
+                   const std::string &data, const gcs::StatusCallback &done) override {
+      return Status::OK();
+    }
+  };
+};
+
+using gcs::GcsInitData;
+class MockGcsInitData : public GcsInitData {
+ public:
+  using GcsInitData::GcsInitData;
+  std::unordered_map<JobID, rpc::JobTableData> &MutableJobs() { return job_table_data_; }
+  std::unordered_map<NodeID, rpc::GcsNodeInfo> &MutableNodes() {
+    return node_table_data_;
+  }
+  std::unordered_map<ObjectID, rpc::ObjectLocationInfo> &MutableObjects() {
+    return object_table_data_;
+  }
+  std::unordered_map<NodeID, rpc::ResourceMap> &MutableClusterResources() {
+    return resource_table_data_;
+  }
+  std::unordered_map<NodegroupID, rpc::NodegroupData> &MutableNodegroups() {
+    return nodegroup_table_data_;
+  }
+  std::unordered_map<ActorID, rpc::ActorTableData> &MutableActors() {
+    return actor_table_data_;
+  }
 };
 
 }  // namespace ray

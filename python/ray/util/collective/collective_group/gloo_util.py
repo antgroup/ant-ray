@@ -1,23 +1,19 @@
 """Code to wrap some GLOO API calls."""
-import asyncio
-import time
-from typing import List
-
 import numpy
-
-import ray
-import ray.experimental.internal_kv as internal_kv
-from ray._private.gcs_utils import GcsClient
-from ray.util.collective.types import ReduceOp, torch_available
-from ray.util.queue import _QueueActor
-
+import asyncio
 try:
     import pygloo
 except ImportError:
-    raise ImportError(
-        "Can not import pygloo. Please run 'pip install pygloo' to install pygloo."
-    )
+    raise ImportError("Can not import pygloo."
+                      "Please run 'pip install pygloo' to install pygloo.")
 
+import time
+
+import ray
+from ray.util.collective.types import ReduceOp, torch_available
+from ray.util.queue import _QueueActor
+
+import ray.experimental.internal_kv as internal_kv
 
 GLOO_REDUCE_OP_MAP = {
     ReduceOp.SUM: pygloo.ReduceOp.SUM,
@@ -46,7 +42,6 @@ NUMPY_GLOO_DTYPE_MAP = {
 
 if torch_available():
     import torch
-
     TORCH_GLOO_DTYPE_MAP = {
         torch.int: pygloo.glooDataType_t.glooInt32,
         torch.uint8: pygloo.glooDataType_t.glooUint8,
@@ -84,8 +79,8 @@ def create_gloo_context(rank, world_size):
     """Create a GLOO context using GLOO APIs.
 
     Args:
-        rank: the rank of this process.
-        world_size: the number of processes of this collective group.
+        rank (int): the rank of this process.
+        world_size (int): the number of processes of this collective group.
 
     Returns:
         context (pygloo.Context): a GLOO context.
@@ -98,13 +93,14 @@ def get_gloo_reduce_op(reduce_op):
     """Map the reduce op to GLOO reduce op type.
 
     Args:
-        reduce_op: ReduceOp Enum (SUM/PRODUCT/MIN/MAX).
+        reduce_op (ReduceOp): ReduceOp Enum (SUM/PRODUCT/MIN/MAX).
 
     Returns:
         (pygloo.ReduceOp): the mapped GLOO reduce op.
     """
     if reduce_op not in GLOO_REDUCE_OP_MAP:
-        raise RuntimeError("Gloo does not support reduce op: '{}'.".format(reduce_op))
+        raise RuntimeError(
+            "Gloo does not support reduce op: '{}'.".format(reduce_op))
     return GLOO_REDUCE_OP_MAP[reduce_op]
 
 
@@ -117,10 +113,10 @@ def get_gloo_tensor_dtype(tensor):
             if not tensor.is_cuda:
                 return TORCH_GLOO_DTYPE_MAP[tensor.dtype]
             else:
-                raise ValueError(
-                    "Expect torch CPU tensor. Got {}.".format(tensor.device)
-                )
-    raise ValueError("Unsupported tensor type. Got: {}.".format(type(tensor)))
+                raise ValueError("Expect torch CPU tensor. "
+                                 "Got {}.".format(tensor.device))
+    raise ValueError("Unsupported tensor type. "
+                     "Got: {}.".format(type(tensor)))
 
 
 def get_numpy_tensor_dtype(tensor):
@@ -130,11 +126,9 @@ def get_numpy_tensor_dtype(tensor):
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             return TORCH_NUMPY_DTYPE_MAP[tensor.dtype]
-    raise ValueError(
-        "Unsupported tensor type. Got: {}. Supported "
-        "CPU tensor types are: torch.Tensor, "
-        "numpy.ndarray.".format(type(tensor))
-    )
+    raise ValueError("Unsupported tensor type. Got: {}. Supported "
+                     "CPU tensor types are: torch.Tensor, "
+                     "numpy.ndarray.".format(type(tensor)))
 
 
 def get_tensor_ptr(tensor):
@@ -144,15 +138,12 @@ def get_tensor_ptr(tensor):
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             if tensor.is_cuda:
-                raise RuntimeError(
-                    "Torch tensor must be on CPU when using GLOO collectives."
-                )
+                raise RuntimeError("Torch tensor must be on CPU "
+                                   "when using GLOO collectives.")
             return tensor.data_ptr()
-    raise ValueError(
-        "Unsupported tensor type. Got: {}. Supported "
-        "CPU tensor types are: torch.Tensor, "
-        "numpy.ndarray.".format(type(tensor))
-    )
+    raise ValueError("Unsupported tensor type. Got: {}. Supported "
+                     "CPU tensor types are: torch.Tensor, "
+                     "numpy.ndarray.".format(type(tensor)))
 
 
 def get_tensor_n_elements(tensor):
@@ -162,12 +153,12 @@ def get_tensor_n_elements(tensor):
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             return torch.numel(tensor)
-    raise ValueError("Unsupported tensor type. Got: {}.".format(type(tensor)))
+    raise ValueError("Unsupported tensor type. "
+                     "Got: {}.".format(type(tensor)))
 
 
 def get_gloo_store_path(store_name):
     from ray._private.utils import get_ray_temp_dir
-
     store_path = f"{get_ray_temp_dir()}_collective/gloo/{store_name}"
     return store_path
 
@@ -181,7 +172,8 @@ def get_tensor_device(tensor):
         else:
             return "cuda"
     else:
-        raise RuntimeError("Unrecognized tensor type: '{}'.".format(type(tensor)))
+        raise RuntimeError("Unrecognized tensor type: "
+                           "'{}'.".format(type(tensor)))
 
 
 def get_tensor_shape(tensor):
@@ -191,11 +183,9 @@ def get_tensor_shape(tensor):
     if torch_available():
         if isinstance(tensor, torch.Tensor):
             return list(tensor.size())
-    raise ValueError(
-        "Unsupported tensor type. Got: {}. Supported "
-        "CPU tensor types are: torch.Tensor, "
-        "numpy.ndarray.".format(type(tensor))
-    )
+    raise ValueError("Unsupported tensor type. Got: {}. Supported "
+                     "CPU tensor types are: torch.Tensor, "
+                     "numpy.ndarray.".format(type(tensor)))
 
 
 def copy_tensor(dst_tensor, src_tensor):
@@ -209,21 +199,19 @@ def copy_tensor(dst_tensor, src_tensor):
         None
     """
     copied = True
-    if isinstance(dst_tensor, numpy.ndarray) and isinstance(src_tensor, numpy.ndarray):
+    if isinstance(dst_tensor, numpy.ndarray) \
+            and isinstance(src_tensor, numpy.ndarray):
         numpy.copyto(dst_tensor, src_tensor)
     elif torch_available():
         if isinstance(dst_tensor, torch.Tensor) and isinstance(
-            src_tensor, torch.Tensor
-        ):
+                src_tensor, torch.Tensor):
             dst_tensor.copy_(src_tensor)
         elif isinstance(dst_tensor, torch.Tensor) and isinstance(
-            src_tensor, numpy.ndarray
-        ):
+                src_tensor, numpy.ndarray):
             t = torch.Tensor(src_tensor)
             dst_tensor.copy_(t)
         elif isinstance(dst_tensor, numpy.ndarray) and isinstance(
-            src_tensor, torch.Tensor
-        ):
+                src_tensor, torch.Tensor):
             t = src_tensor.numpy()
             numpy.copyto(dst_tensor, t)
         else:
@@ -231,12 +219,9 @@ def copy_tensor(dst_tensor, src_tensor):
     else:
         copied = False
     if not copied:
-        raise ValueError(
-            "Unsupported tensor type. Got: {} and {}. Supported "
-            "CPU tensor types are: torch.Tensor, numpy.ndarray.".format(
-                type(dst_tensor), type(src_tensor)
-            )
-        )
+        raise ValueError("Unsupported tensor type. Got: {} and {}. Supported "
+                         "CPU tensor types are: torch.Tensor, numpy.ndarray."
+                         .format(type(dst_tensor), type(src_tensor)))
 
 
 # Note(Hao): this requires Ray >= 1.2.0,
@@ -269,39 +254,30 @@ class SignalActor:
 # The custom store which is implementated in Ray internal kv storage, helping
 # to store the rank meta information when setting up the gloo collective group.
 class RayInternalKvStore:
-    def __init__(self, group_name: str):
-        self._group_name = group_name
-        self._job_id = ray.get_runtime_context().job_id
-        gcs_address = ray._private.worker._global_node.gcs_address
-        self._gcs_client = GcsClient(address=gcs_address, nums_reconnect_retry=10)
-        internal_kv._initialize_internal_kv(self._gcs_client)
+    def __init__(self):
+        # ANT-INTERNAL: In Ray1.4, internal_kv API doesn't need gcs_client.
+        # gcs_address = ray.worker._global_node.gcs_address
+        # self._gcs_client = GcsClient(
+        #     address=gcs_address, nums_reconnect_retry=0)
+        # internal_kv._initialize_internal_kv(self._gcs_client)
+        pass
 
     def set(self, key: str, data: bytes) -> bool:
-        key = self.__concat_key_with_prefixes(key)
+        key = "{}-{}".format(ray.get_runtime_context().job_id.hex(), key)
         ret = internal_kv._internal_kv_put(key, data)
         return ret
 
     def get(self, key: str) -> bytes:
-        key = self.__concat_key_with_prefixes(key)
+        key = "{}-{}".format(ray.get_runtime_context().job_id.hex(), key)
         ret = internal_kv._internal_kv_get(key)
         return ret
 
-    def delete(self, key: str) -> int:
-        key = self.__concat_key_with_prefixes(key)
-        ret = internal_kv._internal_kv_del(key)
-        return ret
-
-    def del_keys(self, keys: List[str]) -> List[int]:
-        results = []
-        for key in keys:
-            results.append(self.delete(key))
-        return results
-
-    def wait(self, keys: List[str]):
+    def wait(self, keys: list):
         while True:
             all_exist = True
             for key in keys:
-                key = self.__concat_key_with_prefixes(key)
+                key = "{}-{}".format(ray.get_runtime_context().job_id.hex(),
+                                     key)
                 result = internal_kv._internal_kv_exists(key)
                 if not result:
                     all_exist = False
@@ -309,8 +285,3 @@ class RayInternalKvStore:
             if all_exist:
                 return True
             time.sleep(1)
-
-    def __concat_key_with_prefixes(self, original_key):
-        """Concat the necessary prefixes and key for isolation purpose for
-        different jobs and different groups."""
-        return f"{self._job_id.hex()}-{self._group_name}-{original_key}"

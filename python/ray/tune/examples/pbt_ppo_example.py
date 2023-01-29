@@ -11,10 +11,8 @@ computationally demanding example.
 
 import random
 
-from ray import air, tune
-from ray.rllib.algorithms.ppo import PPO
+from ray import tune
 from ray.tune.schedulers import PopulationBasedTraining
-
 
 if __name__ == "__main__":
 
@@ -41,26 +39,23 @@ if __name__ == "__main__":
             "sgd_minibatch_size": lambda: random.randint(128, 16384),
             "train_batch_size": lambda: random.randint(2000, 160000),
         },
-        custom_explore_fn=explore,
-    )
+        custom_explore_fn=explore)
 
-    tuner = tune.Tuner(
-        PPO,
-        run_config=air.RunConfig(
-            name="pbt_humanoid_test",
-        ),
-        tune_config=tune.TuneConfig(
-            scheduler=pbt,
-            num_samples=8,
-            metric="episode_reward_mean",
-            mode="max",
-        ),
-        param_space={
+    analysis = tune.run(
+        "PPO",
+        name="pbt_humanoid_test",
+        scheduler=pbt,
+        num_samples=8,
+        metric="episode_reward_mean",
+        mode="max",
+        config={
             "env": "Humanoid-v1",
             "kl_coeff": 1.0,
             "num_workers": 8,
             "num_gpus": 1,
-            "model": {"free_log_std": True},
+            "model": {
+                "free_log_std": True
+            },
             # These params are tuned from a fixed starting value.
             "lambda": 0.95,
             "clip_param": 0.2,
@@ -68,9 +63,7 @@ if __name__ == "__main__":
             # These params start off randomly drawn from a set.
             "num_sgd_iter": tune.choice([10, 20, 30]),
             "sgd_minibatch_size": tune.choice([128, 512, 2048]),
-            "train_batch_size": tune.choice([10000, 20000, 40000]),
-        },
-    )
-    results = tuner.fit()
+            "train_batch_size": tune.choice([10000, 20000, 40000])
+        })
 
-    print("best hyperparameters: ", results.get_best_result().config)
+    print("best hyperparameters: ", analysis.best_config)

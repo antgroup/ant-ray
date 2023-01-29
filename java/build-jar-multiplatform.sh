@@ -8,7 +8,8 @@ set -e
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 WORKSPACE_DIR="${ROOT_DIR}/.."
 JAVA_DIRS_PATH=('java')
-RAY_JAVA_MODULES=('api' 'runtime' 'serve')
+RAY_JAVA_MODULES=('api' 'runtime')
+RAY_STREAMING_JAVA_MODULES=()
 JAR_BASE_DIR="$WORKSPACE_DIR"/.jar
 mkdir -p "$JAR_BASE_DIR"
 cd "$WORKSPACE_DIR/java"
@@ -25,6 +26,23 @@ check_java_version() {
   fi
 }
 
+# Retry in case of OOM
+function bazel_build_with_retry()
+{
+  # build ray with retry
+  i=0
+  job_num=6
+  set +e
+  while [ "$i" -lt "3" ]; do
+    i=$((i+1))
+    bazel build "$1" --jobs=${job_num} -k
+    job_num=$((job_num-2))
+  done
+  set -e
+  # Execute again to check return value.
+  bazel build "$1" --jobs=1 -k
+}
+
 build_jars() {
   local platform="$1"
   local bazel_build="${2:-true}"
@@ -37,16 +55,20 @@ build_jars() {
     bazel build cp_java_generated
     if [[ $bazel_build == "true" ]]; then
       echo "Starting building java native dependencies for $p"
-      bazel build gen_maven_deps
+      bazel_build_with_retry "gen_maven_deps"
       echo "Finished building java native dependencies for $p"
     fi
     echo "Start building jars for $p"
-    mvn -T16 clean package install -Dmaven.test.skip=true -Dcheckstyle.skip
-    mvn -T16 source:jar -Dmaven.test.skip=true -Dcheckstyle.skip
+    if [ -z "$RAY_JAVA_VERSION_TO_BE_RELEASED" ]; then
+    echo "RAY_JAVA_VERSION_TO_BE_RELEASED should be specified when deploying."
+    fi
+    mvn versions:set -DnewVersion="${RAY_JAVA_VERSION_TO_BE_RELEASED}"
+    mvn -B -T16 clean package install -Dmaven.test.skip=true -Dcheckstyle.skip
+    mvn -B -T16 source:jar -Dmaven.test.skip=true -Dcheckstyle.skip
     echo "Finished building jars for $p"
   done
   copy_jars "$JAR_DIR"
-  # ray runtime jar is in a dir specifed by maven-jar-plugin
+  # ray runtime jar and streaming runtime jar are in a dir specifed by maven-jar-plugin
   cp -f "$WORKSPACE_DIR"/build/java/ray*.jar "$JAR_DIR"
   echo "Finished building jar for $platform"
 }
@@ -57,8 +79,12 @@ copy_jars() {
   for module in "${RAY_JAVA_MODULES[@]}"; do
     cp -f "$WORKSPACE_DIR"/java/"$module"/target/*jar "$JAR_DIR"
   done
-  # ray runtime jar is in a dir specifed by maven-jar-plugin
+  for module in "${RAY_STREAMING_JAVA_MODULES[@]}"; do
+    cp -f "$WORKSPACE_DIR"/streaming/java/"$module"/target/*jar "$JAR_DIR"
+  done
+  # ray runtime jar and streaming runtime jar are in a dir specifed by maven-jar-plugin
   cp -f "$WORKSPACE_DIR"/build/java/ray*.jar "$JAR_DIR"
+  # cp -f "$WORKSPACE_DIR"/streaming/build/java/streaming*.jar "$JAR_DIR"
 }
 
 # This function assuem all dependencies are installed already.
@@ -79,12 +105,10 @@ build_jars_multiplatform() {
       return
     fi
   fi
-  if download_jars "ray-runtime-$version.jar"; then
-    prepare_native
-    build_jars multiplatform false
-  else
-    echo "download_jars failed, skip building multiplatform jars"
-  fi
+  download_jars "ray-runtime-$version.jar"
+#  download_jars "ray-runtime-$version.jar" "streaming-runtime-$version.jar"
+  prepare_native
+  build_jars multiplatform false
 }
 
 # Download darwin/windows ray-related jar from s3
@@ -98,7 +122,18 @@ download_jars() {
       if [[ "$os" == "windows" ]]; then
         continue
       fi
-      local url="https://ray-wheels.s3-us-west-2.amazonaws.com/jars/$TRAVIS_BRANCH/$TRAVIS_COMMIT/$os/$f"
+
+      # These env vars are exported from the upstream aci jobs
+      # which produce the output jars.
+      export ray_runtime_jar_linux
+      export ray_runtime_jar_darwin
+      if [[ "$os" == "linux" ]]; then
+        url=$ray_runtime_jar_linux
+      fi
+      if [[ "$os" == "darwin" ]]; then
+        url=$ray_runtime_jar_darwin
+      fi
+
       mkdir -p "$JAR_BASE_DIR/$os"
       local dest_file="$JAR_BASE_DIR/$os/$f"
       echo "Jar url: $url"
@@ -131,6 +166,11 @@ prepare_native() {
     mkdir -p "$native_dir"
     rm -rf "$native_dir"
     mv "native/$os" "$native_dir"
+#    jar xf "streaming-runtime-$version.jar" "native/$os"
+#    local native_dir="$WORKSPACE_DIR/streaming/java/streaming-runtime/native_dependencies/native/$os"
+#    mkdir -p "$native_dir"
+#    rm -rf "$native_dir"
+#    mv "native/$os" "$native_dir"
   done
 }
 
@@ -140,6 +180,7 @@ native_files_exist() {
   for os in 'darwin' 'linux'; do
     native_dirs=()
     native_dirs+=("$WORKSPACE_DIR/java/runtime/native_dependencies/native/$os")
+#    native_dirs+=("$WORKSPACE_DIR/streaming/java/streaming-runtime/native_dependencies/native/$os")
     for native_dir in "${native_dirs[@]}"; do
       if [ ! -d "$native_dir" ]; then
         echo "$native_dir doesn't exist"
@@ -165,7 +206,11 @@ deploy_jars() {
   if native_files_exist; then
     (
       cd "$WORKSPACE_DIR/java"
-      mvn -T16 install deploy -Dmaven.test.skip=true -Dcheckstyle.skip -Prelease -Dgpg.skip="${GPG_SKIP:-true}"
+      if [ -z "$RAY_JAVA_VERSION_TO_BE_RELEASED" ]; then
+        echo "RAY_JAVA_VERSION_TO_BE_RELEASED should be specified when deploying."
+      fi
+      mvn versions:set -DnewVersion="${RAY_JAVA_VERSION_TO_BE_RELEASED}"
+      mvn -B -T16 install deploy -Dmaven.test.skip=true -Dcheckstyle.skip -Prelease -Dgpg.skip="${GPG_SKIP:-true}"
     )
     echo "Finished deploying jars"
   else

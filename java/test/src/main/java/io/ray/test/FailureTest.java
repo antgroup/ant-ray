@@ -3,27 +3,97 @@ package io.ray.test;
 import io.ray.api.ActorHandle;
 import io.ray.api.ObjectRef;
 import io.ray.api.Ray;
-import io.ray.api.exception.RayActorException;
-import io.ray.api.exception.RayTaskException;
-import io.ray.api.exception.RayWorkerException;
-import io.ray.api.exception.UnreconstructableException;
+import io.ray.api.exception.RayException;
 import io.ray.api.function.RayFunc0;
 import io.ray.api.id.ObjectId;
+import io.ray.runtime.exception.RayActorException;
+import io.ray.runtime.exception.RayTaskException;
+import io.ray.runtime.exception.RayWorkerException;
+import io.ray.runtime.exception.UnreconstructableException;
+import io.ray.runtime.util.SystemUtil;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 @Test(groups = {"cluster"})
 public class FailureTest extends BaseTest {
-
   private static final String EXCEPTION_MESSAGE = "Oops";
 
   @BeforeClass
   public void setUp() {
-    System.setProperty("ray.raylet.startup-token", "0");
+    // This is needed by `testGetThrowsQuicklyWhenFoundException`.
+    // Set one worker per process. Otherwise, if `badFunc2` and `slowFunc` run in the same
+    // process, `sleep` will delay `System.exit`.
+    System.setProperty("ray.job.num-java-workers-per-process", "1");
+  }
+
+  @DataProvider
+  public static Object[][] parameters() {
+    return new Object[][] {
+      {false, null}, {false, false}, {false, true}, {true, null}, {true, false}, {true, true}
+    };
+  }
+
+  // The first parameter is actor-level, the second is task-level.
+  private static boolean testSetDifferentCombinations(boolean actorLevel, Boolean taskLevel)
+      throws IOException {
+    // Test enableTaskFastFail flag on the task level, task won't retry when the actor
+    // exits.
+    // if it's not set, the actor task will retry max_retries times.
+    ActorHandle<SlowActor> actor =
+        Ray.actor(SlowActor::new).setMaxRestarts(1).setEnableTaskFastFail(actorLevel).remote();
+    int pid = actor.task(SlowActor::getPid).remote().get();
+    Runtime.getRuntime().exec("kill -9 " + pid);
+    int counter = 0;
+    while (true) {
+      ObjectRef<Integer> newPidObject1;
+      if (taskLevel != null) {
+        newPidObject1 =
+            actor.task(SlowActor::getPid).setEnableTaskFastFail(taskLevel.booleanValue()).remote();
+      } else {
+        newPidObject1 = actor.task(SlowActor::getPid).remote();
+      }
+      try {
+        // Driver process will be blocked until actor is running. The object will exist,
+        // because task isn't killed. but the actor running, the object won't be got, So
+        // counter = 1. Otherwise, if enable task fast fail, trying to get object must
+        // fail because the task is killed, so object is killed too.
+        Integer newPid = newPidObject1.get();
+        if (newPid != pid) {
+          break;
+        }
+      } catch (RayException e) {
+        counter += 1;
+      }
+    }
+
+    // The goal of test is used to prove that task will retry though we have set the
+    // enable_task_fast_fail flag for actor.
+    if ((taskLevel == null && actorLevel == false)
+        || (taskLevel != null && taskLevel.booleanValue() == false)) {
+      return (counter == 1);
+    } else {
+      return counter > 100;
+    }
+  }
+
+  @Test(
+      groups = {"cluster"},
+      dataProvider = "parameters")
+  public void testFastFail(boolean actorLevel, Boolean taskLevel) {
+    // For actor-level, default of enable_task_fast_fail is false.
+    // For task-level, default of enable_task_fast_fail is null.
+    // Task-level has higher priority than actor-level if task-level is set.
+    try {
+      Assert.assertTrue(testSetDifferentCombinations(actorLevel, taskLevel));
+    } catch (IOException e) {
+      return;
+    }
   }
 
   public static int badFunc() {
@@ -49,7 +119,6 @@ public class FailureTest extends BaseTest {
   }
 
   public static class BadActor {
-
     public BadActor(boolean failOnCreation) {
       if (failOnCreation) {
         throw new RuntimeException(EXCEPTION_MESSAGE);
@@ -67,14 +136,17 @@ public class FailureTest extends BaseTest {
   }
 
   public static class SlowActor {
-    public SlowActor(ActorHandle<SignalActor> signalActor) {
-      if (Ray.getRuntimeContext().wasCurrentActorRestarted()) {
-        signalActor.task(SignalActor::waitSignal).remote().get();
+    public SlowActor() {
+      try {
+        // This is to slow down the restarting process and make the test case more stable.
+        TimeUnit.SECONDS.sleep(2);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
     }
 
-    public String ping() {
-      return "pong";
+    public int getPid() {
+      return SystemUtil.pid();
     }
   }
 
@@ -149,26 +221,48 @@ public class FailureTest extends BaseTest {
     }
   }
 
-  public void testActorTaskFastFail() throws IOException, InterruptedException {
-    ActorHandle<SignalActor> signalActor = SignalActor.create();
-    // NOTE(kfstorm): Currently, `max_task_retries` is always 0 for actors created in Java.
-    // Once `max_task_retries` is configurable in Java, we'd better set it to 0 explicitly to show
-    // the test scenario.
+  public void testActorTaskFastFail() throws IOException {
     ActorHandle<SlowActor> actor =
-        Ray.actor(SlowActor::new, signalActor).setMaxRestarts(1).remote();
-    actor.task(SlowActor::ping).remote().get();
-    actor.kill(/*noRestart=*/ false);
+        Ray.actor(SlowActor::new).setMaxRestarts(1).setEnableTaskFastFail(true).remote();
+    int pid = actor.task(SlowActor::getPid).remote().get();
+    Runtime.getRuntime().exec("kill -9 " + pid);
 
-    // Wait for a while so that now the driver knows the actor is in RESTARTING state.
-    Thread.sleep(1000);
-    // An actor task should fail quickly until the actor is restarted.
-    Assert.expectThrows(RayActorException.class, () -> actor.task(SlowActor::ping).remote().get());
+    // Send tasks until the caller finds out that the actor is unavailable.
+    boolean[] exceptionOccurred = new boolean[] {false};
+    while (!exceptionOccurred[0]) {
+      // Make sure the task execution finishes or the exception throws quickly.
+      TestUtils.executeWithinTime(
+          () -> {
+            try {
+              actor.task(SlowActor::getPid).remote().get();
+            } catch (RayActorException e) {
+              exceptionOccurred[0] = true;
+            }
+          },
+          500);
+    }
 
-    signalActor.task(SignalActor::sendSignal).remote().get();
-    // Wait for a while so that now the driver knows the actor is in ALIVE state.
-    Thread.sleep(1000);
-    // An actor task should succeed.
-    actor.task(SlowActor::ping).remote().get();
+    // The actor is still restarting. Send more tasks and all of them should fail quickly
+    // until the actor is restarted.
+    int failedCount = 0;
+    while (true) {
+      ObjectRef<Integer> newPidObject = actor.task(SlowActor::getPid).remote();
+      int newPid = 0;
+      long startTime = System.currentTimeMillis();
+      try {
+        newPid = newPidObject.get();
+      } catch (RayException e) {
+        failedCount++;
+      }
+      if (newPid != 0) {
+        Assert.assertNotEquals(pid, newPid);
+        break;
+      } else {
+        long endTime = System.currentTimeMillis();
+        Assert.assertTrue(endTime - startTime <= 500);
+      }
+    }
+    Assert.assertTrue(failedCount > 0);
   }
 
   public void testGetThrowsQuicklyWhenFoundException() {
@@ -179,8 +273,7 @@ public class FailureTest extends BaseTest {
       ObjectRef<Integer> obj1 = Ray.task(badFunc).remote();
       ObjectRef<Integer> obj2 = Ray.task(FailureTest::slowFunc).remote();
       TestUtils.executeWithinTime(
-          () ->
-              Assert.expectThrows(RuntimeException.class, () -> Ray.get(Arrays.asList(obj1, obj2))),
+          () -> Assert.expectThrows(RayException.class, () -> Ray.get(Arrays.asList(obj1, obj2))),
           5000);
     }
   }
@@ -190,16 +283,14 @@ public class FailureTest extends BaseTest {
         Assert.expectThrows(
             RayTaskException.class,
             () -> {
-              Ray.put(new RayTaskException(10008, "localhost", "xxx", new RayActorException()))
-                  .get();
+              Ray.put(new RayTaskException("xxx", new RayActorException())).get();
             });
     Assert.assertEquals(ex1.getCause().getClass(), RayActorException.class);
     RayTaskException ex2 =
         Assert.expectThrows(
             RayTaskException.class,
             () -> {
-              Ray.put(new RayTaskException(10008, "localhost", "xxx", new RayWorkerException()))
-                  .get();
+              Ray.put(new RayTaskException("xxx", new RayWorkerException())).get();
             });
     Assert.assertEquals(ex2.getCause().getClass(), RayWorkerException.class);
 
@@ -208,10 +299,7 @@ public class FailureTest extends BaseTest {
         Assert.expectThrows(
             RayTaskException.class,
             () -> {
-              Ray.put(
-                      new RayTaskException(
-                          10008, "localhost", "xxx", new UnreconstructableException(objectId)))
-                  .get();
+              Ray.put(new RayTaskException("xxx", new UnreconstructableException(objectId))).get();
             });
     Assert.assertEquals(ex3.getCause().getClass(), UnreconstructableException.class);
     Assert.assertEquals(((UnreconstructableException) ex3.getCause()).objectId, objectId);

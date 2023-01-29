@@ -1,27 +1,19 @@
+from filelock import FileLock
+from threading import RLock
 import json
-import logging
 import os
 import socket
-from threading import RLock
+import logging
 
-from filelock import FileLock
-
-from ray.autoscaler._private.local.config import (
-    LOCAL_CLUSTER_NODE_TYPE,
-    bootstrap_local,
-    get_lock_path,
-    get_state_path,
-)
 from ray.autoscaler.node_provider import NodeProvider
-from ray.autoscaler.tags import (
-    NODE_KIND_HEAD,
-    NODE_KIND_WORKER,
-    STATUS_UP_TO_DATE,
-    TAG_RAY_NODE_KIND,
-    TAG_RAY_NODE_NAME,
-    TAG_RAY_NODE_STATUS,
-    TAG_RAY_USER_NODE_TYPE,
-)
+from ray.autoscaler.tags import (TAG_RAY_NODE_KIND, NODE_KIND_WORKER,
+                                 NODE_KIND_HEAD, TAG_RAY_USER_NODE_TYPE,
+                                 TAG_RAY_NODE_NAME, TAG_RAY_NODE_STATUS,
+                                 STATUS_UP_TO_DATE)
+from ray.autoscaler._private.local.config import bootstrap_local
+from ray.autoscaler._private.local.config import get_lock_path
+from ray.autoscaler._private.local.config import get_state_path
+from ray.autoscaler._private.local.config import LOCAL_CLUSTER_NODE_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +24,6 @@ filelock_logger.setLevel(logging.WARNING)
 class ClusterState:
     def __init__(self, lock_path, save_path, provider_config):
         self.lock = RLock()
-        os.makedirs(os.path.dirname(lock_path), exist_ok=True)
         self.file_lock = FileLock(lock_path)
         self.save_path = save_path
 
@@ -41,39 +32,36 @@ class ClusterState:
                 if os.path.exists(self.save_path):
                     workers = json.loads(open(self.save_path).read())
                     head_config = workers.get(provider_config["head_ip"])
-                    if (
-                        not head_config
-                        or head_config.get("tags", {}).get(TAG_RAY_NODE_KIND)
-                        != NODE_KIND_HEAD
-                    ):
+                    if (not head_config or
+                            head_config.get("tags", {}).get(TAG_RAY_NODE_KIND)
+                            != NODE_KIND_HEAD):
                         workers = {}
                         logger.info("Head IP changed - recreating cluster.")
                 else:
                     workers = {}
-                logger.info(
-                    "ClusterState: Loaded cluster state: {}".format(list(workers))
-                )
+                logger.info("ClusterState: "
+                            "Loaded cluster state: {}".format(list(workers)))
                 for worker_ip in provider_config["worker_ips"]:
                     if worker_ip not in workers:
                         workers[worker_ip] = {
-                            "tags": {TAG_RAY_NODE_KIND: NODE_KIND_WORKER},
+                            "tags": {
+                                TAG_RAY_NODE_KIND: NODE_KIND_WORKER
+                            },
                             "state": "terminated",
                         }
                     else:
-                        assert (
-                            workers[worker_ip]["tags"][TAG_RAY_NODE_KIND]
-                            == NODE_KIND_WORKER
-                        )
+                        assert (workers[worker_ip]["tags"][TAG_RAY_NODE_KIND]
+                                == NODE_KIND_WORKER)
                 if provider_config["head_ip"] not in workers:
                     workers[provider_config["head_ip"]] = {
-                        "tags": {TAG_RAY_NODE_KIND: NODE_KIND_HEAD},
+                        "tags": {
+                            TAG_RAY_NODE_KIND: NODE_KIND_HEAD
+                        },
                         "state": "terminated",
                     }
                 else:
-                    assert (
-                        workers[provider_config["head_ip"]]["tags"][TAG_RAY_NODE_KIND]
-                        == NODE_KIND_HEAD
-                    )
+                    assert (workers[provider_config["head_ip"]]["tags"][
+                        TAG_RAY_NODE_KIND] == NODE_KIND_HEAD)
                 # Relevant when a user reduces the number of workers
                 # without changing the headnode.
                 list_of_node_ips = list(provider_config["worker_ips"])
@@ -92,9 +80,8 @@ class ClusterState:
 
                 assert len(workers) == len(provider_config["worker_ips"]) + 1
                 with open(self.save_path, "w") as f:
-                    logger.debug(
-                        "ClusterState: Writing cluster state: {}".format(workers)
-                    )
+                    logger.debug("ClusterState: "
+                                 "Writing cluster state: {}".format(workers))
                     f.write(json.dumps(workers))
 
     def get(self):
@@ -111,10 +98,9 @@ class ClusterState:
                 workers = self.get()
                 workers[worker_id] = info
                 with open(self.save_path, "w") as f:
-                    logger.info(
-                        "ClusterState: "
-                        "Writing cluster state: {}".format(list(workers))
-                    )
+                    logger.info("ClusterState: "
+                                "Writing cluster state: {}".format(
+                                    list(workers)))
                     f.write(json.dumps(workers))
 
 
@@ -140,8 +126,7 @@ class OnPremCoordinatorState(ClusterState):
                     nodes = {}
                 logger.info(
                     "OnPremCoordinatorState: "
-                    "Loaded on prem coordinator state: {}".format(nodes)
-                )
+                    "Loaded on prem coordinator state: {}".format(nodes))
 
                 # Filter removed node ips.
                 for node_ip in list(nodes):
@@ -158,8 +143,7 @@ class OnPremCoordinatorState(ClusterState):
                 with open(self.save_path, "w") as f:
                     logger.info(
                         "OnPremCoordinatorState: "
-                        "Writing on prem coordinator state: {}".format(nodes)
-                    )
+                        "Writing on prem coordinator state: {}".format(nodes))
                     f.write(json.dumps(nodes))
 
 
@@ -195,10 +179,8 @@ class LocalNodeProvider(NodeProvider):
         else:
             # LocalNodeProvider with a coordinator server.
             self.state = OnPremCoordinatorState(
-                "/tmp/coordinator.lock",
-                "/tmp/coordinator.state",
-                provider_config["list_of_node_ips"],
-            )
+                "/tmp/coordinator.lock", "/tmp/coordinator.state",
+                provider_config["list_of_node_ips"])
             self.use_coordinator = True
 
     def non_terminated_nodes(self, tag_filters):
@@ -257,9 +239,9 @@ class LocalNodeProvider(NodeProvider):
         with self.state.file_lock:
             workers = self.state.get()
             for node_id, info in workers.items():
-                if info["state"] == "terminated" and (
-                    self.use_coordinator or info["tags"][TAG_RAY_NODE_KIND] == node_type
-                ):
+                if (info["state"] == "terminated"
+                        and (self.use_coordinator
+                             or info["tags"][TAG_RAY_NODE_KIND] == node_type)):
                     info["tags"] = tags
                     info["state"] = "running"
                     self.state.put(node_id, info)
@@ -278,7 +260,8 @@ class LocalNodeProvider(NodeProvider):
         return bootstrap_local(cluster_config)
 
 
-def record_local_head_state_if_needed(local_provider: LocalNodeProvider) -> None:
+def record_local_head_state_if_needed(
+        local_provider: LocalNodeProvider) -> None:
     """This function is called on the Ray head from StandardAutoscaler.reset
     to record the head node's own existence in the cluster state file.
 
@@ -296,7 +279,7 @@ def record_local_head_state_if_needed(local_provider: LocalNodeProvider) -> None
             TAG_RAY_NODE_KIND: NODE_KIND_HEAD,
             TAG_RAY_USER_NODE_TYPE: LOCAL_CLUSTER_NODE_TYPE,
             TAG_RAY_NODE_NAME: "ray-{}-head".format(cluster_name),
-            TAG_RAY_NODE_STATUS: STATUS_UP_TO_DATE,
+            TAG_RAY_NODE_STATUS: STATUS_UP_TO_DATE
         }
         # Mark the head node as created in the cluster state file.
         local_provider.create_node(node_config={}, tags=head_tags, count=1)

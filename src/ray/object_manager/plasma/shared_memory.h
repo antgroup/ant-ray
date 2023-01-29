@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <utility>
 
 #include "ray/object_manager/plasma/compat.h"
 #include "ray/util/macros.h"
@@ -26,8 +25,6 @@ class ClientMmapTableEntry {
   uint8_t *pointer_;
   /// The length of the memory-mapped file.
   size_t length_;
-
-  void MaybeMadviseDontdump();
 
   RAY_DISALLOW_COPY_AND_ASSIGN(ClientMmapTableEntry);
 };

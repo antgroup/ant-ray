@@ -14,8 +14,13 @@
 
 #pragma once
 
+#include "kmonitor/client/KMonitor.h"
+#include "kmonitor/client/KMonitorFactory.h"
+#include "kmonitor/client/StatisticsType.h"
+#include "kmonitor/client/core/MetricsTags.h"
 #include "ray/rpc/metrics_agent_client.h"
 #include "ray/stats/metric.h"
+#include "ray/util/opentsdb_client.h"
 
 namespace ray {
 namespace stats {
@@ -52,6 +57,37 @@ class MetricExporterDecorator : public MetricExporterClient {
   std::shared_ptr<MetricExporterClient> exporter_;
 };
 
+class OpentsdbExporterClient
+    : public MetricExporterDecorator,
+      public std::enable_shared_from_this<OpentsdbExporterClient> {
+ public:
+  OpentsdbExporterClient(std::shared_ptr<MetricExporterClient> exporter,
+                         std::shared_ptr<OpentsdbClient> opentsdb_client,
+                         uint32_t max_pending_num = 100)
+      : MetricExporterDecorator(exporter),
+        opentsdb_client_(opentsdb_client),
+        max_pending_num_(max_pending_num) {
+    http_thread_ = std::thread([this] {
+      boost::asio::io_context::work work(io_service_);
+      io_service_.run();
+    });
+  }
+  void ReportMetrics(const std::vector<MetricPoint> &points) override;
+  ~OpentsdbExporterClient() {
+    io_service_.stop();
+    if (http_thread_.joinable()) {
+      http_thread_.join();
+    }
+  }
+
+ private:
+  std::shared_ptr<OpentsdbClient> opentsdb_client_;
+  boost::asio::io_service io_service_;
+  std::thread http_thread_;
+  std::atomic<uint32_t> num_pending_requests_ = {0};
+  uint32_t max_pending_num_;
+};
+
 class MetricsAgentExporter : public MetricExporterDecorator {
  public:
   MetricsAgentExporter(std::shared_ptr<MetricExporterClient> exporter);
@@ -59,6 +95,28 @@ class MetricsAgentExporter : public MetricExporterDecorator {
   ~MetricsAgentExporter() {}
 
   void ReportMetrics(const std::vector<MetricPoint> &points) override;
+};
+
+struct KMonitorConfig {
+  std::string tenant_name;
+  std::string service_name;
+  std::string global_tags;
+  std::string sink_address;
+  std::string sink_period;
+  std::string sink_queue_capacity;
+};
+
+class KMonitorExporterClient : public MetricExporterDecorator {
+ public:
+  KMonitorExporterClient(KMonitorConfig &config,
+                         std::shared_ptr<MetricExporterClient> exporter);
+
+  ~KMonitorExporterClient();
+
+  void ReportMetrics(const std::vector<MetricPoint> &points) override;
+
+ private:
+  kmonitor::KMonitor *kMonitor_{nullptr};
 };
 
 }  // namespace stats

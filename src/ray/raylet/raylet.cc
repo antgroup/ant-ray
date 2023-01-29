@@ -14,8 +14,10 @@
 
 #include "ray/raylet/raylet.h"
 
+#include <ray/gcs/gcs_client/service_based_gcs_client.h>
+
 #include <boost/asio.hpp>
-#include <boost/bind/bind.hpp>
+#include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <iostream>
 
@@ -25,8 +27,7 @@
 namespace {
 
 const std::vector<std::string> GenerateEnumNames(const char *const *enum_names_ptr,
-                                                 int start_index,
-                                                 int end_index) {
+                                                 int start_index, int end_index) {
   std::vector<std::string> enum_names;
   for (int i = 0; i < start_index; ++i) {
     enum_names.push_back("EmptyMessageType");
@@ -55,47 +56,69 @@ namespace ray {
 
 namespace raylet {
 
-Raylet::Raylet(instrumented_io_context &main_service,
-               const std::string &socket_name,
-               const std::string &node_ip_address,
-               const std::string &node_name,
+Raylet::Raylet(instrumented_io_context &main_service, const std::string &socket_name,
+               const std::string &node_ip_address, const std::string &redis_address,
+               int redis_port, const std::string &redis_password,
                const NodeManagerConfig &node_manager_config,
                const ObjectManagerConfig &object_manager_config,
-               std::shared_ptr<gcs::GcsClient> gcs_client,
-               int metrics_export_port)
+               std::shared_ptr<gcs::GcsClient> gcs_client, int metrics_export_port)
     : main_service_(main_service),
-      self_node_id_(
-          !RayConfig::instance().OVERRIDE_NODE_ID_FOR_TESTING().empty()
-              ? NodeID::FromHex(RayConfig::instance().OVERRIDE_NODE_ID_FOR_TESTING())
-              : NodeID::FromRandom()),
+      self_node_id_(GenerateNodeIdFromIpAddress(node_ip_address)),
       gcs_client_(gcs_client),
-      node_manager_(main_service,
-                    self_node_id_,
-                    node_name,
-                    node_manager_config,
-                    object_manager_config,
-                    gcs_client_),
+      object_directory_(
+          RayConfig::instance().ownership_based_object_directory_enabled()
+              ? std::dynamic_pointer_cast<ObjectDirectoryInterface>(
+                    std::make_shared<OwnershipBasedObjectDirectory>(
+                        main_service, gcs_client_,
+
+                        [this](const ObjectID &obj_id) {
+                          rpc::ObjectReference ref;
+                          ref.set_object_id(obj_id.Binary());
+                          node_manager_.MarkObjectsAsFailed(
+                              ErrorType::OBJECT_UNRECONSTRUCTABLE, {ref}, JobID::Nil());
+                        }
+
+                        ))
+              : std::dynamic_pointer_cast<ObjectDirectoryInterface>(
+                    std::make_shared<ObjectDirectory>(main_service, gcs_client_))),
+      node_manager_(main_service, self_node_id_, node_manager_config,
+                    object_manager_config, gcs_client_, object_directory_),
       socket_name_(socket_name),
       acceptor_(main_service, ParseUrlEndpoint(socket_name)),
       socket_(main_service) {
-  self_node_info_.set_node_id(self_node_id_.Binary());
-  self_node_info_.set_state(GcsNodeInfo::ALIVE);
-  self_node_info_.set_node_manager_address(node_ip_address);
-  self_node_info_.set_node_name(node_name);
+  self_node_info_.set_pid(getpid());
+  self_node_info_.set_brpc_port(node_manager_config.brpc_port);
+  self_node_info_.mutable_basic_gcs_node_info()->set_node_id(self_node_id_.Binary());
+  self_node_info_.mutable_basic_gcs_node_info()->set_state(rpc::BasicGcsNodeInfo::ALIVE);
+  self_node_info_.mutable_basic_gcs_node_info()->set_node_manager_address(
+      node_ip_address);
+  self_node_info_.mutable_basic_gcs_node_info()->set_node_name(
+      node_manager_config.node_name);
   self_node_info_.set_raylet_socket_name(socket_name);
   self_node_info_.set_object_store_socket_name(object_manager_config.store_socket_name);
-  self_node_info_.set_object_manager_port(node_manager_.GetObjectManagerPort());
-  self_node_info_.set_node_manager_port(node_manager_.GetServerPort());
-  self_node_info_.set_node_manager_hostname(boost::asio::ip::host_name());
+  self_node_info_.mutable_basic_gcs_node_info()->set_object_manager_port(
+      node_manager_.GetObjectManagerPort());
+  self_node_info_.mutable_basic_gcs_node_info()->set_node_manager_port(
+      node_manager_.GetServerPort());
+  self_node_info_.mutable_basic_gcs_node_info()->set_node_manager_hostname(
+      boost::asio::ip::host_name());
   self_node_info_.set_metrics_export_port(metrics_export_port);
-  auto resource_map = node_manager_config.resource_config.ToResourceMap();
-  self_node_info_.mutable_resources_total()->insert(resource_map.begin(),
-                                                    resource_map.end());
+
+  // === ANT-INTERNAL below ===
+  self_node_info_.set_start_time(current_sys_time_seconds());
+  auto mutable_resources_total = self_node_info_.mutable_resources_total();
+  auto resource_map = node_manager_config.resource_config.GetResourceMap();
+  mutable_resources_total->insert(resource_map.begin(), resource_map.end());
+
+  self_node_info_.set_shape_group(node_manager_config.shape_group);
+  self_node_info_.set_pod_name(node_manager_config.pod_name);
+  self_node_info_.set_machine_id(node_manager_config.machine_id);
 }
 
 Raylet::~Raylet() {}
 
 void Raylet::Start() {
+  // Register to GCS.
   RAY_CHECK_OK(RegisterGcs());
 
   // Start listening for clients.
@@ -103,33 +126,40 @@ void Raylet::Start() {
 }
 
 void Raylet::Stop() {
-  RAY_CHECK_OK(gcs_client_->Nodes().DrainSelf());
+  RAY_CHECK_OK(gcs_client_->FullNodeInfo().UnregisterSelf());
   node_manager_.Stop();
   acceptor_.close();
 }
 
 ray::Status Raylet::RegisterGcs() {
   auto register_callback = [this](const Status &status) {
-    RAY_CHECK_OK(status);
-    RAY_LOG(INFO) << "Raylet of id, " << self_node_id_
-                  << " started. Raylet consists of node_manager and object_manager."
-                  << " node_manager address: " << self_node_info_.node_manager_address()
-                  << ":" << self_node_info_.node_manager_port()
-                  << " object_manager address: " << self_node_info_.node_manager_address()
-                  << ":" << self_node_info_.object_manager_port()
-                  << " hostname: " << self_node_info_.node_manager_address();
-    RAY_CHECK_OK(node_manager_.RegisterGcs());
+    if (status.ok()) {
+      RAY_LOG(INFO) << "Raylet of id, " << self_node_id_
+                    << " started. Raylet consists of node_manager and object_manager."
+                    << " node_manager address: "
+                    << self_node_info_.basic_gcs_node_info().node_manager_address() << ":"
+                    << self_node_info_.basic_gcs_node_info().node_manager_port()
+                    << " object_manager address: "
+                    << self_node_info_.basic_gcs_node_info().node_manager_address() << ":"
+                    << self_node_info_.basic_gcs_node_info().object_manager_port()
+                    << " hostname: "
+                    << self_node_info_.basic_gcs_node_info().node_manager_address()
+                    << " node_name: " << self_node_info_.basic_gcs_node_info().node_name()
+                    << " shape_group: " << self_node_info_.shape_group()
+                    << " pod_name: " << self_node_info_.pod_name()
+                    << " machine_id: " << self_node_info_.machine_id();
+      RAY_CHECK_OK(node_manager_.RegisterGcs());
+    }
   };
 
   RAY_RETURN_NOT_OK(
-      gcs_client_->Nodes().RegisterSelf(self_node_info_, register_callback));
+      gcs_client_->FullNodeInfo().RegisterSelf(self_node_info_, register_callback));
   return Status::OK();
 }
 
 void Raylet::DoAccept() {
-  acceptor_.async_accept(
-      socket_,
-      boost::bind(&Raylet::HandleAccept, this, boost::asio::placeholders::error));
+  acceptor_.async_accept(socket_, boost::bind(&Raylet::HandleAccept, this,
+                                              boost::asio::placeholders::error));
 }
 
 void Raylet::HandleAccept(const boost::system::error_code &error) {
@@ -143,14 +173,17 @@ void Raylet::HandleAccept(const boost::system::error_code &error) {
                                             const std::vector<uint8_t> &message) {
       node_manager_.ProcessClientMessage(client, message_type, message.data());
     };
+    flatbuffers::FlatBufferBuilder fbb;
+    protocol::DisconnectClientBuilder builder(fbb);
+    builder.add_disconnect_type(static_cast<int>(rpc::WorkerExitType::SYSTEM_ERROR_EXIT));
+    fbb.Finish(builder.Finish());
+    std::vector<uint8_t> message_data(fbb.GetBufferPointer(),
+                                      fbb.GetBufferPointer() + fbb.GetSize());
     // Accept a new local client and dispatch it to the node manager.
     auto new_connection = ClientConnection::Create(
-        client_handler,
-        message_handler,
-        std::move(socket_),
-        "worker",
+        client_handler, message_handler, std::move(socket_), "worker",
         node_manager_message_enum,
-        static_cast<int64_t>(protocol::MessageType::DisconnectClient));
+        static_cast<int64_t>(protocol::MessageType::DisconnectClient), message_data);
   }
   // We're ready to accept another client.
   DoAccept();

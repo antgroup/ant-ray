@@ -6,18 +6,19 @@ import os
 import numpy as np
 import torch
 import torch.optim as optim
-from ray.tune.examples.mnist_pytorch import train, test, ConvNet, get_data_loaders
+from torchvision import datasets
+from ray.tune.examples.mnist_pytorch import train, test, ConvNet,\
+    get_data_loaders
 
-from ray import air, tune
-from ray.air import session
-from ray.air.checkpoint import Checkpoint
+from ray import tune
 from ray.tune.schedulers import PopulationBasedTraining
+from ray.tune.trial import ExportFormat
 
 # __tutorial_imports_end__
 
 
 # __train_begin__
-def train_convnet(config):
+def train_convnet(config, checkpoint_dir=None):
     # Create our data loaders, model, and optmizer.
     step = 0
     train_loader, test_loader = get_data_loaders()
@@ -25,66 +26,46 @@ def train_convnet(config):
     optimizer = optim.SGD(
         model.parameters(),
         lr=config.get("lr", 0.01),
-        momentum=config.get("momentum", 0.9),
-    )
+        momentum=config.get("momentum", 0.9))
 
-    # If `session.get_checkpoint()` is not None, then we are resuming from a checkpoint.
+    # If checkpoint_dir is not None, then we are resuming from a checkpoint.
     # Load model state and iteration step from checkpoint.
-    if session.get_checkpoint():
+    if checkpoint_dir:
         print("Loading from checkpoint.")
-        loaded_checkpoint = session.get_checkpoint()
-        with loaded_checkpoint.as_directory() as loaded_checkpoint_dir:
-            path = os.path.join(loaded_checkpoint_dir, "checkpoint.pt")
-            checkpoint = torch.load(path)
-            model.load_state_dict(checkpoint["model"])
-            step = checkpoint["step"]
+        path = os.path.join(checkpoint_dir, "checkpoint")
+        checkpoint = torch.load(path)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        step = checkpoint["step"]
 
     while True:
         train(model, optimizer, train_loader)
         acc = test(model, test_loader)
-        checkpoint = None
         if step % 5 == 0:
             # Every 5 steps, checkpoint our current state.
             # First get the checkpoint directory from tune.
-            # Need to create a directory under current working directory
-            # to construct an AIR Checkpoint object from.
-            os.makedirs("my_model", exist_ok=True)
-            torch.save(
-                {
+            with tune.checkpoint_dir(step=step) as checkpoint_dir:
+                # Then create a checkpoint file in this directory.
+                path = os.path.join(checkpoint_dir, "checkpoint")
+                # Save state to checkpoint file.
+                # No need to save optimizer for SGD.
+                torch.save({
                     "step": step,
-                    "model": model.state_dict(),
-                },
-                "my_model/checkpoint.pt",
-            )
-            checkpoint = Checkpoint.from_directory("my_model")
-
+                    "model_state_dict": model.state_dict(),
+                    "mean_accuracy": acc
+                }, path)
         step += 1
-        session.report({"mean_accuracy": acc}, checkpoint=checkpoint)
+        tune.report(mean_accuracy=acc)
 
 
 # __train_end__
 
-
-def test_best_model(results: tune.ResultGrid):
-    """Test the best model given output of tuner.fit()."""
-    with results.get_best_result().checkpoint.as_directory() as best_checkpoint_path:
-        best_model = ConvNet()
-        best_checkpoint = torch.load(
-            os.path.join(best_checkpoint_path, "checkpoint.pt")
-        )
-        best_model.load_state_dict(best_checkpoint["model"])
-        # Note that test only runs on a small random set of the test data, thus the
-        # accuracy may be different from metrics shown in tuning process.
-        test_acc = test(best_model, get_data_loaders()[1])
-        print("best model accuracy: ", test_acc)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--smoke-test", action="store_true", help="Finish quickly for testing"
-    )
+        "--smoke-test", action="store_true", help="Finish quickly for testing")
     args, _ = parser.parse_known_args()
+
+    datasets.MNIST("~/data", train=True, download=True)
 
     # __pbt_begin__
     scheduler = PopulationBasedTraining(
@@ -95,8 +76,7 @@ if __name__ == "__main__":
             "lr": lambda: np.random.uniform(0.0001, 1),
             # allow perturbations within this set of categorical values
             "momentum": [0.8, 0.9, 0.99],
-        },
-    )
+        })
 
     # __pbt_end__
 
@@ -116,29 +96,31 @@ if __name__ == "__main__":
 
     stopper = CustomStopper()
 
-    tuner = tune.Tuner(
+    analysis = tune.run(
         train_convnet,
-        run_config=air.RunConfig(
-            name="pbt_test",
-            stop=stopper,
-            verbose=1,
-            checkpoint_config=air.CheckpointConfig(
-                checkpoint_score_attribute="mean_accuracy",
-                num_to_keep=4,
-            ),
-        ),
-        tune_config=tune.TuneConfig(
-            scheduler=scheduler,
-            metric="mean_accuracy",
-            mode="max",
-            num_samples=4,
-        ),
-        param_space={
+        name="pbt_test",
+        scheduler=scheduler,
+        metric="mean_accuracy",
+        mode="max",
+        verbose=1,
+        stop=stopper,
+        export_formats=[ExportFormat.MODEL],
+        checkpoint_score_attr="mean_accuracy",
+        keep_checkpoints_num=4,
+        num_samples=4,
+        config={
             "lr": tune.uniform(0.001, 1),
             "momentum": tune.uniform(0.001, 1),
-        },
-    )
-    results = tuner.fit()
+        })
     # __tune_end__
 
-    test_best_model(results)
+    best_trial = analysis.best_trial
+    best_checkpoint_path = analysis.best_checkpoint
+    best_model = ConvNet()
+    best_checkpoint = torch.load(
+        os.path.join(best_checkpoint_path, "checkpoint"))
+    best_model.load_state_dict(best_checkpoint["model_state_dict"])
+    # Note that test only runs on a small random set of the test data, thus the
+    # accuracy may be different from metrics shown in tuning process.
+    test_acc = test(best_model, get_data_loaders()[1])
+    print("best model accuracy: ", test_acc)

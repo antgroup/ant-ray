@@ -1,12 +1,11 @@
 # flake8: noqa
-# fmt: off
+# yapf: disable
 
 # __import_lightning_begin__
 import math
 
 import torch
 import pytorch_lightning as pl
-from filelock import FileLock
 from torch.utils.data import DataLoader, random_split
 from torch.nn import functional as F
 from torchvision.datasets import MNIST
@@ -15,8 +14,11 @@ import os
 # __import_lightning_end__
 
 # __import_tune_begin__
+import shutil
+import tempfile
 from pytorch_lightning.loggers import TensorBoardLogger
-from ray import air, tune
+from pytorch_lightning.utilities.cloud_io import load as pl_load
+from ray import tune
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler, PopulationBasedTraining
 from ray.tune.integration.pytorch_lightning import TuneReportCallback, \
@@ -99,8 +101,7 @@ class LightningMNISTClassifier(pl.LightningModule):
             transforms.ToTensor(),
             transforms.Normalize((0.1307, ), (0.3081, ))
         ])
-        with FileLock(os.path.expanduser("~/.data.lock")):
-            return MNIST(data_dir, train=True, download=True, transform=transform)
+        return MNIST(data_dir, train=True, download=True, transform=transform)
 
     def prepare_data(self):
         mnist_train = self.download_data(self.data_dir)
@@ -121,34 +122,22 @@ class LightningMNISTClassifier(pl.LightningModule):
 
 def train_mnist(config):
     model = LightningMNISTClassifier(config)
-    trainer = pl.Trainer(max_epochs=10, enable_progress_bar=False)
+    trainer = pl.Trainer(max_epochs=10, show_progress_bar=False)
 
     trainer.fit(model)
 # __lightning_end__
 
-# __no_tune_train_begin__
-def train_mnist_no_tune():
-    config = {
-        "layer_1_size": 128,
-        "layer_2_size": 256,
-        "lr": 1e-3,
-        "batch_size": 64
-    }
-    train_mnist(config)
-# __no_tune_train_end__
-
 
 # __tune_train_begin__
-def train_mnist_tune(config, num_epochs=10, num_gpus=0, data_dir="~/data"):
-    data_dir = os.path.expanduser(data_dir)
+def train_mnist_tune(config, data_dir=None, num_epochs=10, num_gpus=0):
     model = LightningMNISTClassifier(config, data_dir)
     trainer = pl.Trainer(
         max_epochs=num_epochs,
         # If fractional GPUs passed in, convert to int.
         gpus=math.ceil(num_gpus),
         logger=TensorBoardLogger(
-            save_dir=os.getcwd(), name="", version="."),
-        enable_progress_bar=False,
+            save_dir=tune.get_trial_dir(), name="", version="."),
+        progress_bar_refresh_rate=0,
         callbacks=[
             TuneReportCallback(
                 {
@@ -164,18 +153,17 @@ def train_mnist_tune(config, num_epochs=10, num_gpus=0, data_dir="~/data"):
 # __tune_train_checkpoint_begin__
 def train_mnist_tune_checkpoint(config,
                                 checkpoint_dir=None,
+                                data_dir=None,
                                 num_epochs=10,
-                                num_gpus=0,
-                                data_dir="~/data"):
-    data_dir = os.path.expanduser(data_dir)
-    kwargs = {
-        "max_epochs": num_epochs,
+                                num_gpus=0):
+    trainer = pl.Trainer(
+        max_epochs=num_epochs,
         # If fractional GPUs passed in, convert to int.
-        "gpus": math.ceil(num_gpus),
-        "logger": TensorBoardLogger(
-            save_dir=os.getcwd(), name="", version="."),
-        "enable_progress_bar": False,
-        "callbacks": [
+        gpus=math.ceil(num_gpus),
+        logger=TensorBoardLogger(
+            save_dir=tune.get_trial_dir(), name="", version="."),
+        progress_bar_refresh_rate=0,
+        callbacks=[
             TuneReportCheckpointCallback(
                 metrics={
                     "loss": "ptl/val_loss",
@@ -183,22 +171,30 @@ def train_mnist_tune_checkpoint(config,
                 },
                 filename="checkpoint",
                 on="validation_end")
-        ]
-    }
-
+        ])
     if checkpoint_dir:
-        kwargs["resume_from_checkpoint"] = os.path.join(
-            checkpoint_dir, "checkpoint")
-
-    model = LightningMNISTClassifier(config=config, data_dir=data_dir)
-    trainer = pl.Trainer(**kwargs)
+        # Currently, this leads to errors:
+        # model = LightningMNISTClassifier.load_from_checkpoint(
+        #     os.path.join(checkpoint, "checkpoint"))
+        # Workaround:
+        ckpt = pl_load(
+            os.path.join(checkpoint_dir, "checkpoint"),
+            map_location=lambda storage, loc: storage)
+        model = LightningMNISTClassifier._load_model_state(
+            ckpt, config=config, data_dir=data_dir)
+        trainer.current_epoch = ckpt["epoch"]
+    else:
+        model = LightningMNISTClassifier(config=config, data_dir=data_dir)
 
     trainer.fit(model)
 # __tune_train_checkpoint_end__
 
 
 # __tune_asha_begin__
-def tune_mnist_asha(num_samples=10, num_epochs=10, gpus_per_trial=0, data_dir="~/data"):
+def tune_mnist_asha(num_samples=10, num_epochs=10, gpus_per_trial=0):
+    data_dir = os.path.expanduser("~/data")
+    LightningMNISTClassifier.download_data(data_dir)
+
     config = {
         "layer_1_size": tune.choice([32, 64, 128]),
         "layer_2_size": tune.choice([64, 128, 256]),
@@ -215,31 +211,34 @@ def tune_mnist_asha(num_samples=10, num_epochs=10, gpus_per_trial=0, data_dir="~
         parameter_columns=["layer_1_size", "layer_2_size", "lr", "batch_size"],
         metric_columns=["loss", "mean_accuracy", "training_iteration"])
 
-    train_fn_with_parameters = tune.with_parameters(train_mnist_tune,
-                                                    num_epochs=num_epochs,
-                                                    num_gpus=gpus_per_trial,
-                                                    data_dir=data_dir)
-    resources_per_trial = {"cpu": 1, "gpu": gpus_per_trial}
+    analysis = tune.run(
+        tune.with_parameters(
+            train_mnist_tune,
+            data_dir=data_dir,
+            num_epochs=num_epochs,
+            num_gpus=gpus_per_trial),
+        resources_per_trial={
+            "cpu": 1,
+            "gpu": gpus_per_trial
+        },
+        metric="loss",
+        mode="min",
+        config=config,
+        num_samples=num_samples,
+        scheduler=scheduler,
+        progress_reporter=reporter,
+        name="tune_mnist_asha")
 
-    tuner = tune.Tuner(tune.with_resources(train_fn_with_parameters, resources=resources_per_trial),
-        tune_config=tune.TuneConfig(metric="loss",
-        mode="min", num_samples=num_samples,
-        scheduler=scheduler,),
-        run_config=air.RunConfig(name="tune_mnist_asha", progress_reporter=reporter,),
-
-        param_space=config,
-
-
-        )
-    results = tuner.fit()
-
-    print("Best hyperparameters found were: ", results.get_best_result().config)
+    print("Best hyperparameters found were: ", analysis.best_config)
 
 # __tune_asha_end__
 
 
 # __tune_pbt_begin__
-def tune_mnist_pbt(num_samples=10, num_epochs=10, gpus_per_trial=0, data_dir="~/data"):
+def tune_mnist_pbt(num_samples=10, num_epochs=10, gpus_per_trial=0):
+    data_dir = os.path.expanduser("~/data")
+    LightningMNISTClassifier.download_data(data_dir)
+
     config = {
         "layer_1_size": tune.choice([32, 64, 128]),
         "layer_2_size": tune.choice([64, 128, 256]),
@@ -258,29 +257,25 @@ def tune_mnist_pbt(num_samples=10, num_epochs=10, gpus_per_trial=0, data_dir="~/
         parameter_columns=["layer_1_size", "layer_2_size", "lr", "batch_size"],
         metric_columns=["loss", "mean_accuracy", "training_iteration"])
 
-    tuner = tune.Tuner(
-        tune.with_resources(
+    analysis = tune.run(
         tune.with_parameters(
             train_mnist_tune_checkpoint,
+            data_dir=data_dir,
             num_epochs=num_epochs,
-            num_gpus=gpus_per_trial,
-            data_dir=data_dir),
-        resources={
+            num_gpus=gpus_per_trial),
+        resources_per_trial={
             "cpu": 1,
             "gpu": gpus_per_trial
-        }),
-        tune_config=tune.TuneConfig(metric="loss",
-        mode="min", num_samples=num_samples,
-        scheduler=scheduler,),
-        run_config=air.RunConfig(name="tune_mnist_pbt", progress_reporter=reporter,),
+        },
+        metric="loss",
+        mode="min",
+        config=config,
+        num_samples=num_samples,
+        scheduler=scheduler,
+        progress_reporter=reporter,
+        name="tune_mnist_pbt")
 
-        param_space=config,
-
-
-        )
-    results = tuner.fit()
-
-    print("Best hyperparameters found were: ", results.get_best_result().config)
+    print("Best hyperparameters found were: ", analysis.best_config)
 
 # __tune_pbt_end__
 
@@ -291,20 +286,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--smoke-test", action="store_true", help="Finish quickly for testing")
-    parser.add_argument(
-        "--data-dir",
-        type=str,
-        default="~/data/",
-        help="Set the path of the dataset."
-    )
     args, _ = parser.parse_known_args()
-    data_dir = args.data_dir
 
     if args.smoke_test:
-        tune_mnist_asha(num_samples=1, num_epochs=6, gpus_per_trial=0, data_dir=data_dir)
-        tune_mnist_pbt(num_samples=1, num_epochs=6, gpus_per_trial=0, data_dir=data_dir)
+        tune_mnist_asha(num_samples=1, num_epochs=6, gpus_per_trial=0)
+        tune_mnist_pbt(num_samples=1, num_epochs=6, gpus_per_trial=0)
     else:
         # ASHA scheduler
-        tune_mnist_asha(num_samples=10, num_epochs=10, gpus_per_trial=0, data_dir=data_dir)
+        tune_mnist_asha(num_samples=10, num_epochs=10, gpus_per_trial=0)
         # Population based training
-        tune_mnist_pbt(num_samples=10, num_epochs=10, gpus_per_trial=0, data_dir=data_dir)
+        tune_mnist_pbt(num_samples=10, num_epochs=10, gpus_per_trial=0)

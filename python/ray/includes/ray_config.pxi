@@ -1,10 +1,11 @@
-from libcpp.string cimport string as c_string
+import base64
 from ray.includes.ray_config cimport RayConfig
 
 cdef class Config:
     @staticmethod
     def initialize(c_string config_list):
-        return RayConfig.instance().initialize(config_list)
+        decoded_config_list = base64.b64decode(config_list)
+        RayConfig.instance().initialize(decoded_config_list)
 
     @staticmethod
     def ray_cookie():
@@ -94,6 +95,14 @@ cdef class Config:
         return RayConfig.instance().maximum_gcs_deletion_batch_size()
 
     @staticmethod
+    def put_small_object_in_memory_store():
+        return RayConfig.instance().put_small_object_in_memory_store()
+
+    @staticmethod
+    def max_tasks_in_flight_per_worker():
+        return RayConfig.instance().max_tasks_in_flight_per_worker()
+
+    @staticmethod
     def metrics_report_interval_ms():
         return RayConfig.instance().metrics_report_interval_ms()
 
@@ -102,61 +111,13 @@ cdef class Config:
         return RayConfig.instance().enable_timeline()
 
     @staticmethod
+    def automatic_object_deletion_enabled():
+        return RayConfig.instance().automatic_object_deletion_enabled()
+
+    @staticmethod
     def max_grpc_message_size():
         return RayConfig.instance().max_grpc_message_size()
 
     @staticmethod
-    def record_ref_creation_sites():
-        return RayConfig.instance().record_ref_creation_sites()
-
-    @staticmethod
-    def start_python_importer_thread():
-        return RayConfig.instance().start_python_importer_thread()
-
-    @staticmethod
-    def use_ray_syncer():
-        return RayConfig.instance().use_ray_syncer()
-
-    @staticmethod
-    def REDIS_CA_CERT():
-        return RayConfig.instance().REDIS_CA_CERT()
-
-    @staticmethod
-    def REDIS_CA_PATH():
-        return RayConfig.instance().REDIS_CA_PATH()
-
-    @staticmethod
-    def REDIS_CLIENT_CERT():
-        return RayConfig.instance().REDIS_CLIENT_CERT()
-
-    @staticmethod
-    def REDIS_CLIENT_KEY():
-        return RayConfig.instance().REDIS_CLIENT_KEY()
-
-    @staticmethod
-    def REDIS_SERVER_NAME():
-        return RayConfig.instance().REDIS_SERVER_NAME()
-
-    @staticmethod
-    def pull_based_healthcheck():
-        return RayConfig.instance().pull_based_healthcheck()
-
-    @staticmethod
-    def health_check_initial_delay_ms():
-        return RayConfig.instance().health_check_initial_delay_ms()
-
-    @staticmethod
-    def health_check_period_ms():
-        return RayConfig.instance().health_check_period_ms()
-
-    @staticmethod
-    def health_check_timeout_ms():
-        return RayConfig.instance().health_check_timeout_ms()
-
-    @staticmethod
-    def health_check_failure_threshold():
-        return RayConfig.instance().health_check_failure_threshold()
-
-    @staticmethod
-    def memory_monitor_refresh_ms():
-        return (RayConfig.instance().memory_monitor_refresh_ms())
+    def agent_heartbeat_period_milliseconds():
+        return RayConfig.instance().agent_heartbeat_period_milliseconds()

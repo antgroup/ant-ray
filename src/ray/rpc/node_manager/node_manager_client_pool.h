@@ -40,7 +40,6 @@ class NodeManagerClientPool {
 
   /// Return an existing NodeManagerWorkerClient if exists, and connect to one if it does
   /// not. The returned pointer is borrowed, and expected to be used briefly.
-  /// The function is guaranteed to return the non-nullptr.
   shared_ptr<ray::RayletClientInterface> GetOrConnectByAddress(
       const rpc::Address &address);
 

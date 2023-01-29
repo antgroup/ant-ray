@@ -1,16 +1,3 @@
-// Copyright 2020-2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #include "task_executor.h"
 
@@ -20,8 +7,6 @@
 
 #include "../../util/function_helper.h"
 #include "../abstract_ray_runtime.h"
-#include "ray/util/event.h"
-#include "ray/util/event_label.h"
 
 namespace ray {
 
@@ -72,15 +57,12 @@ void InitRayRuntime(std::shared_ptr<RayRuntime> runtime) {
 
 namespace internal {
 
-using ray::core::CoreWorkerProcess;
-
 std::shared_ptr<msgpack::sbuffer> TaskExecutor::current_actor_ = nullptr;
 
 /// TODO(qicosmos): Need to add more details of the error messages, such as object id,
 /// task id etc.
 std::pair<Status, std::shared_ptr<msgpack::sbuffer>> GetExecuteResult(
-    const std::string &func_name,
-    const ArgsBufferList &args_buffer,
+    const std::string &func_name, const ArgsBufferList &args_buffer,
     msgpack::sbuffer *actor_ptr) {
   try {
     EntryFuntion entry_function;
@@ -98,14 +80,10 @@ std::pair<Status, std::shared_ptr<msgpack::sbuffer>> GetExecuteResult(
   } catch (RayIntentionalSystemExitException &e) {
     RAY_LOG(ERROR) << "Ray intentional system exit while executing function(" << func_name
                    << ").";
-    return std::make_pair(ray::Status::IntentionalSystemExit(""), nullptr);
+    return std::make_pair(ray::Status::IntentionalSystemExit(), nullptr);
   } catch (const std::exception &e) {
-#ifdef _WIN32
-    auto exception_name = std::string(typeid(e).name());
-#else
     auto exception_name =
         std::string(abi::__cxa_demangle(typeid(e).name(), nullptr, nullptr, nullptr));
-#endif
     std::string err_msg = "An exception was thrown while executing function(" +
                           func_name + "): " + exception_name + ": " + e.what();
     RAY_LOG(ERROR) << err_msg;
@@ -119,23 +97,14 @@ std::pair<Status, std::shared_ptr<msgpack::sbuffer>> GetExecuteResult(
 }
 
 Status TaskExecutor::ExecuteTask(
-    const rpc::Address &caller_address,
-    ray::TaskType task_type,
-    const std::string task_name,
-    const RayFunction &ray_function,
+    ray::TaskType task_type, const std::string task_name, const RayFunction &ray_function,
     const std::unordered_map<std::string, double> &required_resources,
     const std::vector<std::shared_ptr<ray::RayObject>> &args_buffer,
-    const std::vector<rpc::ObjectReference> &arg_refs,
-    const std::string &debugger_breakpoint,
-    const std::string &serialized_retry_exception_allowlist,
-    std::vector<std::pair<ObjectID, std::shared_ptr<RayObject>>> *returns,
-    std::vector<std::pair<ObjectID, std::shared_ptr<RayObject>>> *dynamic_returns,
+    const std::vector<ObjectID> &arg_reference_ids,
+    const std::vector<ObjectID> &return_ids, const std::string &debugger_breakpoint,
+    std::vector<std::shared_ptr<ray::RayObject>> *results,
     std::shared_ptr<ray::LocalMemoryBuffer> &creation_task_exception_pb_bytes,
-    bool *is_retryable_error,
-    bool *is_application_error,
-    const std::vector<ConcurrencyGroup> &defined_concurrency_groups,
-    const std::string name_of_concurrency_group_to_execute,
-    bool is_reattempt) {
+    bool *is_application_level_error) {
   RAY_LOG(DEBUG) << "Execute task type: " << TaskType_Name(task_type)
                  << " name:" << task_name;
   RAY_CHECK(ray_function.GetLanguage() == ray::Language::CPP);
@@ -145,19 +114,26 @@ Status TaskExecutor::ExecuteTask(
   auto typed_descriptor = function_descriptor->As<ray::CppFunctionDescriptor>();
   std::string func_name = typed_descriptor->FunctionName();
   bool cross_lang = !typed_descriptor->Caller().empty();
-  // TODO(Clark): Support retrying application-level errors for C++.
-  // TODO(Clark): Support exception allowlist for retrying application-level
-  // errors for C++.
-  *is_retryable_error = false;
-  *is_application_error = false;
 
   Status status{};
   std::shared_ptr<msgpack::sbuffer> data = nullptr;
   ArgsBufferList ray_args_buffer;
   for (size_t i = 0; i < args_buffer.size(); i++) {
     auto &arg = args_buffer.at(i);
+    std::string meta_str = "";
+    if (arg->GetMetadata() != nullptr) {
+      meta_str = std::string((const char *)arg->GetMetadata()->Data(),
+                             arg->GetMetadata()->Size());
+    }
     msgpack::sbuffer sbuf;
-    if (cross_lang) {
+    if (meta_str == METADATA_STR_RAW) {
+      // TODO(zhiyu) In order to minimize the modification,
+      // there is an extra serialization here, but the performance will be a little worse.
+      // This code can be optimized later to improve performance
+      const auto &raw_buffer = Serializer::Serialize(
+          reinterpret_cast<const char *>(arg->GetData()->Data()), arg->GetData()->Size());
+      sbuf.write(raw_buffer.data(), raw_buffer.size());
+    } else if (cross_lang) {
       sbuf.write((const char *)(arg->GetData()->Data()) + XLANG_HEADER_LEN,
                  arg->GetData()->Size() - XLANG_HEADER_LEN);
     } else {
@@ -188,17 +164,11 @@ Status TaskExecutor::ExecuteTask(
   if (!status.ok()) {
     if (status.IsIntentionalSystemExit()) {
       return status;
-    } else {
-      RAY_EVENT(ERROR, EL_RAY_CPP_TASK_FAILED)
-              .WithField("task_type", TaskType_Name(task_type))
-              .WithField("function_name", func_name)
-          << "C++ task failed: " << status.ToString();
     }
 
     std::string meta_str = std::to_string(ray::rpc::ErrorType::TASK_EXECUTION_EXCEPTION);
     meta_buffer = std::make_shared<ray::LocalMemoryBuffer>(
         reinterpret_cast<uint8_t *>(&meta_str[0]), meta_str.size(), true);
-    *is_application_error = true;
 
     msgpack::sbuffer buf;
     if (cross_lang) {
@@ -214,11 +184,11 @@ Status TaskExecutor::ExecuteTask(
     data = std::make_shared<msgpack::sbuffer>(std::move(buf));
   }
 
+  results->resize(return_ids.size(), nullptr);
   if (task_type != ray::TaskType::ACTOR_CREATION_TASK) {
     size_t data_size = data->size();
-    auto &result_id = (*returns)[0].first;
-    auto result_ptr = &(*returns)[0].second;
-    int64_t task_output_inlined_bytes = 0;
+    auto &result_id = return_ids[0];
+    auto result_ptr = &(*results)[0];
 
     if (cross_lang && meta_buffer == nullptr) {
       meta_buffer = std::make_shared<ray::LocalMemoryBuffer>(
@@ -226,13 +196,8 @@ Status TaskExecutor::ExecuteTask(
     }
 
     size_t total = cross_lang ? (XLANG_HEADER_LEN + data_size) : data_size;
-    RAY_CHECK_OK(CoreWorkerProcess::GetCoreWorker().AllocateReturnObject(
-        result_id,
-        total,
-        meta_buffer,
-        std::vector<ray::ObjectID>(),
-        &task_output_inlined_bytes,
-        result_ptr));
+    RAY_CHECK_OK(ray::CoreWorkerProcess::GetCoreWorker().AllocateReturnObject(
+        result_id, total, meta_buffer, std::vector<ray::ObjectID>(), result_ptr));
 
     auto result = *result_ptr;
     if (result != nullptr) {
@@ -254,21 +219,14 @@ Status TaskExecutor::ExecuteTask(
       }
     }
 
-    RAY_CHECK_OK(CoreWorkerProcess::GetCoreWorker().SealReturnObject(
-        result_id,
-        result,
-        /*generator_id=*/ObjectID::Nil()));
-  } else {
-    if (!status.ok()) {
-      return ray::Status::CreationTaskError("");
-    }
+    RAY_CHECK_OK(
+        ray::CoreWorkerProcess::GetCoreWorker().SealReturnObject(result_id, result));
   }
   return ray::Status::OK();
 }
 
 void TaskExecutor::Invoke(
-    const TaskSpecification &task_spec,
-    std::shared_ptr<msgpack::sbuffer> actor,
+    const TaskSpecification &task_spec, std::shared_ptr<msgpack::sbuffer> actor,
     AbstractRayRuntime *runtime,
     std::unordered_map<ActorID, std::unique_ptr<ActorContext>> &actor_contexts,
     absl::Mutex &actor_contexts_mutex) {
@@ -292,8 +250,8 @@ void TaskExecutor::Invoke(
   std::shared_ptr<msgpack::sbuffer> data;
   try {
     if (actor) {
-      auto result = TaskExecutionHandler(
-          typed_descriptor->FunctionName(), args_buffer, actor.get());
+      auto result = TaskExecutionHandler(typed_descriptor->FunctionName(), args_buffer,
+                                         actor.get());
       data = std::make_shared<msgpack::sbuffer>(std::move(result));
       runtime->Put(std::move(data), task_spec.ReturnId(0));
     } else {

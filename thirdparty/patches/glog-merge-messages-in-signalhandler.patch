@@ -1,0 +1,191 @@
+From f7d8fca5f364e87f5a2a4faac15a5922f0cbff94 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E4=B9=85=E9=BE=99?= <guyang.sgy@antfin.com>
+Date: Wed, 13 Apr 2022 19:54:13 +0800
+Subject: [PATCH] merge messages in signalhandler
+
+---
+ src/signalhandler.cc | 91 ++++++++++++++++++++++++----------------------------
+ 1 file changed, 42 insertions(+), 49 deletions(-)
+
+diff --git src/signalhandler.cc src/signalhandler.cc
+index 9554718..fe9859b 100644
+--- src/signalhandler.cc
++++ src/signalhandler.cc
+@@ -36,7 +36,10 @@
+ #include "symbolize.h"
+ #include "glog/logging.h"
+ 
++#include <iomanip>
++#include <iostream>
+ #include <signal.h>
++#include <sstream>
+ #include <time.h>
+ #ifdef HAVE_UCONTEXT_H
+ # include <ucontext.h>
+@@ -156,24 +159,19 @@ void (*g_failure_writer)(const char* data, int size) = WriteToStderr;
+ 
+ // Dumps time information.  We don't dump human-readable time information
+ // as localtime() is not guaranteed to be async signal safe.
+-void DumpTimeInfo() {
++void DumpTimeInfo(std::ostringstream &oss) {
+   time_t time_in_sec = time(NULL);
+-  char buf[256];  // Big enough for time info.
+-  MinimalFormatter formatter(buf, sizeof(buf));
+-  formatter.AppendString("*** Aborted at ");
+-  formatter.AppendUint64(time_in_sec, 10);
+-  formatter.AppendString(" (unix time)");
+-  formatter.AppendString(" try \"date -d @");
+-  formatter.AppendUint64(time_in_sec, 10);
+-  formatter.AppendString("\" if you are using GNU date ***\n");
+-  g_failure_writer(buf, formatter.num_bytes_written());
++  oss << "*** Aborted at " << time_in_sec << " (unix time)"
++      << " try \"date -d @" << time_in_sec
++      << "\" if you are using GNU date ***\n";
+ }
+ 
+-// TODO(hamaji): Use signal instead of sigaction?
++// TOOD(hamaji): Use signal instead of sigaction?
+ #ifdef HAVE_SIGACTION
+ 
+ // Dumps information about the signal to STDERR.
+-void DumpSignalInfo(int signal_number, siginfo_t *siginfo) {
++void DumpSignalInfo(int signal_number, siginfo_t *siginfo,
++                    std::ostringstream &oss) {
+   // Get the signal name.
+   const char* signal_name = NULL;
+   for (size_t i = 0; i < ARRAYSIZE(kFailureSignals); ++i) {
+@@ -182,45 +180,41 @@ void DumpSignalInfo(int signal_number, siginfo_t *siginfo) {
+     }
+   }
+ 
+-  char buf[256];  // Big enough for signal info.
+-  MinimalFormatter formatter(buf, sizeof(buf));
+-
+-  formatter.AppendString("*** ");
++  oss << "*** ";
+   if (signal_name) {
+-    formatter.AppendString(signal_name);
++    oss << signal_name;
+   } else {
+     // Use the signal number if the name is unknown.  The signal name
+     // should be known, but just in case.
+-    formatter.AppendString("Signal ");
+-    formatter.AppendUint64(signal_number, 10);
++    oss << "Signal ";
++    oss << signal_number;
+   }
+-  formatter.AppendString(" (@0x");
+-  formatter.AppendUint64(reinterpret_cast<uintptr_t>(siginfo->si_addr), 16);
+-  formatter.AppendString(")");
+-  formatter.AppendString(" received by PID ");
+-  formatter.AppendUint64(getpid(), 10);
+-  formatter.AppendString(" (TID 0x");
++  oss << " (@0x";
++  oss << std::hex << reinterpret_cast<uintptr_t>(siginfo->si_addr);
++  oss << ")";
++  oss << " received by PID ";
++  oss << getpid();
++  oss << " (TID 0x";
+   // We assume pthread_t is an integral number or a pointer, rather
+   // than a complex struct.  In some environments, pthread_self()
+   // returns an uint64 but in some other environments pthread_self()
+   // returns a pointer.  Hence we use C-style cast here, rather than
+   // reinterpret/static_cast, to support both types of environments.
+-  formatter.AppendUint64((uintptr_t)pthread_self(), 16);
+-  formatter.AppendString(") ");
++  oss << std::hex << (uintptr_t)pthread_self();
++  oss << std::hex << ") ";
+   // Only linux has the PID of the signal sender in si_pid.
+ #ifdef OS_LINUX
+-  formatter.AppendString("from PID ");
+-  formatter.AppendUint64(siginfo->si_pid, 10);
+-  formatter.AppendString("; ");
++  oss << "from PID ";
++  oss << siginfo->si_pid;
++  oss << "; ";
+ #endif
+-  formatter.AppendString("stack trace: ***\n");
+-  g_failure_writer(buf, formatter.num_bytes_written());
++  oss << "stack trace: ***\n";
+ }
+ 
+ #endif  // HAVE_SIGACTION
+ 
+ // Dumps information about the stack frame to STDERR.
+-void DumpStackFrameInfo(const char* prefix, void* pc) {
++void DumpStackFrameInfo(const char *prefix, void *pc, std::ostringstream &oss) {
+   // Get the symbol name.
+   const char *symbol = "(unknown)";
+   char symbolized[1024];  // Big enough for a sane symbol.
+@@ -230,18 +224,15 @@ void DumpStackFrameInfo(const char* prefix, void* pc) {
+                 symbolized, sizeof(symbolized))) {
+     symbol = symbolized;
+   }
+-
+-  char buf[1024];  // Big enough for stack frame info.
+-  MinimalFormatter formatter(buf, sizeof(buf));
+-
+-  formatter.AppendString(prefix);
+-  formatter.AppendString("@ ");
+-  const int width = 2 * sizeof(void*) + 2;  // + 2  for "0x".
+-  formatter.AppendHexWithPadding(reinterpret_cast<uintptr_t>(pc), width);
+-  formatter.AppendString(" ");
+-  formatter.AppendString(symbol);
+-  formatter.AppendString("\n");
+-  g_failure_writer(buf, formatter.num_bytes_written());
++  oss << prefix;
++  oss << "@ ";
++  const int width = 2 * sizeof(void *) + 2; // + 2  for "0x".
++  std::ostringstream tmp_oss;
++  tmp_oss << "0x" << std::hex << reinterpret_cast<uintptr_t>(pc);
++  oss << std::setw(width) << tmp_oss.str();
++  oss << " ";
++  oss << symbol;
++  oss << "\n";
+ }
+ 
+ // Invoke the default signal handler.
+@@ -275,6 +266,7 @@ void FailureSignalHandler(int signal_number,
+                           void *ucontext)
+ #endif
+ {
++  std::ostringstream oss;
+   // First check if we've already entered the function.  We use an atomic
+   // compare and swap operation for platforms that support it.  For other
+   // platforms, we use a naive method that could lead to a subtle race.
+@@ -312,12 +304,12 @@ void FailureSignalHandler(int signal_number,
+   // mixing alarm() and sleep() can be a bad idea.
+ 
+   // First dump time info.
+-  DumpTimeInfo();
++  DumpTimeInfo(oss);
+ 
+ #if !defined(OS_WINDOWS)
+   // Get the program counter from ucontext.
+   void *pc = GetPC(ucontext);
+-  DumpStackFrameInfo("PC: ", pc);
++  DumpStackFrameInfo("PC: ", pc, oss);
+ #endif
+ 
+ #ifdef HAVE_STACKTRACE
+@@ -326,14 +318,15 @@ void FailureSignalHandler(int signal_number,
+   // +1 to exclude this function.
+   const int depth = GetStackTrace(stack, ARRAYSIZE(stack), 1);
+ # ifdef HAVE_SIGACTION
+-  DumpSignalInfo(signal_number, signal_info);
++  DumpSignalInfo(signal_number, signal_info, oss);
+ # endif
+   // Dump the stack traces.
+   for (int i = 0; i < depth; ++i) {
+-    DumpStackFrameInfo("    ", stack[i]);
++    DumpStackFrameInfo("    ", stack[i], oss);
+   }
+ #endif
+ 
++  g_failure_writer(oss.str().c_str(), oss.str().length());
+   // *** TRANSITION ***
+   //
+   // BEFORE this point, all code must be async-termination-safe!
+-- 
+1.9.5
+

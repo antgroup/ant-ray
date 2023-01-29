@@ -24,30 +24,26 @@ namespace ray {
 namespace rpc {
 
 /// NOTE: See src/ray/core_worker/core_worker.h on how to add a new grpc handler.
-#define RAY_NODE_MANAGER_RPC_HANDLERS                                 \
-  RPC_SERVICE_HANDLER(NodeManagerService, UpdateResourceUsage, -1)    \
-  RPC_SERVICE_HANDLER(NodeManagerService, RequestResourceReport, -1)  \
-  RPC_SERVICE_HANDLER(NodeManagerService, GetResourceLoad, -1)        \
-  RPC_SERVICE_HANDLER(NodeManagerService, NotifyGCSRestart, -1)       \
-  RPC_SERVICE_HANDLER(NodeManagerService, RequestWorkerLease, -1)     \
-  RPC_SERVICE_HANDLER(NodeManagerService, ReportWorkerBacklog, -1)    \
-  RPC_SERVICE_HANDLER(NodeManagerService, ReturnWorker, -1)           \
-  RPC_SERVICE_HANDLER(NodeManagerService, ReleaseUnusedWorkers, -1)   \
-  RPC_SERVICE_HANDLER(NodeManagerService, CancelWorkerLease, -1)      \
-  RPC_SERVICE_HANDLER(NodeManagerService, PinObjectIDs, -1)           \
-  RPC_SERVICE_HANDLER(NodeManagerService, GetNodeStats, -1)           \
-  RPC_SERVICE_HANDLER(NodeManagerService, GlobalGC, -1)               \
-  RPC_SERVICE_HANDLER(NodeManagerService, FormatGlobalMemoryInfo, -1) \
-  RPC_SERVICE_HANDLER(NodeManagerService, PrepareBundleResources, -1) \
-  RPC_SERVICE_HANDLER(NodeManagerService, CommitBundleResources, -1)  \
-  RPC_SERVICE_HANDLER(NodeManagerService, CancelResourceReserve, -1)  \
-  RPC_SERVICE_HANDLER(NodeManagerService, RequestObjectSpillage, -1)  \
-  RPC_SERVICE_HANDLER(NodeManagerService, ReleaseUnusedBundles, -1)   \
-  RPC_SERVICE_HANDLER(NodeManagerService, GetSystemConfig, -1)        \
-  RPC_SERVICE_HANDLER(NodeManagerService, ShutdownRaylet, -1)         \
-  RPC_SERVICE_HANDLER(NodeManagerService, GetTasksInfo, -1)           \
-  RPC_SERVICE_HANDLER(NodeManagerService, GetObjectsInfo, -1)         \
-  RPC_SERVICE_HANDLER(NodeManagerService, GetTaskFailureCause, -1)
+#define RAY_NODE_MANAGER_RPC_HANDLERS                                  \
+  RPC_SERVICE_HANDLER(NodeManagerService, UpdateResourceUsage, -1)     \
+  RPC_SERVICE_HANDLER(NodeManagerService, RequestResourceReport, -1)   \
+  RPC_SERVICE_HANDLER(NodeManagerService, RequestWorkerLease, -1)      \
+  RPC_SERVICE_HANDLER(NodeManagerService, ReturnWorker, -1)            \
+  RPC_SERVICE_HANDLER(NodeManagerService, ReleaseUnusedWorkers, -1)    \
+  RPC_SERVICE_HANDLER(NodeManagerService, CancelWorkerLease, -1)       \
+  RPC_SERVICE_HANDLER(NodeManagerService, PinObjectIDs, -1)            \
+  RPC_SERVICE_HANDLER(NodeManagerService, GetNodeStats, -1)            \
+  RPC_SERVICE_HANDLER(NodeManagerService, GlobalGC, -1)                \
+  RPC_SERVICE_HANDLER(NodeManagerService, FormatGlobalMemoryInfo, -1)  \
+  RPC_SERVICE_HANDLER(NodeManagerService, PrepareBundleResources, -1)  \
+  RPC_SERVICE_HANDLER(NodeManagerService, CommitBundleResources, -1)   \
+  RPC_SERVICE_HANDLER(NodeManagerService, CancelResourceReserve, -1)   \
+  RPC_SERVICE_HANDLER(NodeManagerService, RequestObjectSpillage, -1)   \
+  RPC_SERVICE_HANDLER(NodeManagerService, ReleaseUnusedBundles, -1)    \
+  RPC_SERVICE_HANDLER(NodeManagerService, GetSystemConfig, -1)         \
+  RPC_SERVICE_HANDLER(NodeManagerService, GetGcsServerAddress, -1)     \
+  RPC_SERVICE_HANDLER(NodeManagerService, StopTasksAndBanNewTasks, -1) \
+  RPC_SERVICE_HANDLER(NodeManagerService, LiftNewTasksBan, -1)
 
 /// Interface of the `NodeManagerService`, see `src/ray/protobuf/node_manager.proto`.
 class NodeManagerServiceHandler {
@@ -63,101 +59,86 @@ class NodeManagerServiceHandler {
   /// \param[out] reply The reply message.
   /// \param[in] send_reply_callback The callback to be called when the request is done.
 
-  virtual void HandleUpdateResourceUsage(rpc::UpdateResourceUsageRequest request,
+  virtual void HandleUpdateResourceUsage(const rpc::UpdateResourceUsageRequest &request,
                                          rpc::UpdateResourceUsageReply *reply,
                                          rpc::SendReplyCallback send_reply_callback) = 0;
 
   virtual void HandleRequestResourceReport(
-      rpc::RequestResourceReportRequest request,
+      const rpc::RequestResourceReportRequest &request,
       rpc::RequestResourceReportReply *reply,
       rpc::SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleGetResourceLoad(rpc::GetResourceLoadRequest request,
-                                     rpc::GetResourceLoadReply *reply,
-                                     rpc::SendReplyCallback send_reply_callback) = 0;
-
-  virtual void HandleNotifyGCSRestart(rpc::NotifyGCSRestartRequest request,
-                                      rpc::NotifyGCSRestartReply *reply,
-                                      rpc::SendReplyCallback send_reply_callback) = 0;
-
-  virtual void HandleRequestWorkerLease(RequestWorkerLeaseRequest request,
+  virtual void HandleRequestWorkerLease(const RequestWorkerLeaseRequest &request,
                                         RequestWorkerLeaseReply *reply,
                                         SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleReportWorkerBacklog(ReportWorkerBacklogRequest request,
-                                         ReportWorkerBacklogReply *reply,
-                                         SendReplyCallback send_reply_callback) = 0;
-
-  virtual void HandleReturnWorker(ReturnWorkerRequest request,
+  virtual void HandleReturnWorker(const ReturnWorkerRequest &request,
                                   ReturnWorkerReply *reply,
                                   SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleReleaseUnusedWorkers(ReleaseUnusedWorkersRequest request,
+  virtual void HandleReleaseUnusedWorkers(const ReleaseUnusedWorkersRequest &request,
                                           ReleaseUnusedWorkersReply *reply,
                                           SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleShutdownRaylet(ShutdownRayletRequest request,
-                                    ShutdownRayletReply *reply,
-                                    SendReplyCallback send_reply_callback) = 0;
-
-  virtual void HandleCancelWorkerLease(rpc::CancelWorkerLeaseRequest request,
+  virtual void HandleCancelWorkerLease(const rpc::CancelWorkerLeaseRequest &request,
                                        rpc::CancelWorkerLeaseReply *reply,
                                        rpc::SendReplyCallback send_reply_callback) = 0;
 
   virtual void HandlePrepareBundleResources(
-      rpc::PrepareBundleResourcesRequest request,
+      const rpc::PrepareBundleResourcesRequest &request,
       rpc::PrepareBundleResourcesReply *reply,
       rpc::SendReplyCallback send_reply_callback) = 0;
 
   virtual void HandleCommitBundleResources(
-      rpc::CommitBundleResourcesRequest request,
+      const rpc::CommitBundleResourcesRequest &request,
       rpc::CommitBundleResourcesReply *reply,
       rpc::SendReplyCallback send_reply_callback) = 0;
 
   virtual void HandleCancelResourceReserve(
-      rpc::CancelResourceReserveRequest request,
+      const rpc::CancelResourceReserveRequest &request,
       rpc::CancelResourceReserveReply *reply,
       rpc::SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandlePinObjectIDs(PinObjectIDsRequest request,
+  virtual void HandlePinObjectIDs(const PinObjectIDsRequest &request,
                                   PinObjectIDsReply *reply,
                                   SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleGetNodeStats(GetNodeStatsRequest request,
+  virtual void HandleGetNodeStats(const GetNodeStatsRequest &request,
                                   GetNodeStatsReply *reply,
                                   SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleGlobalGC(GlobalGCRequest request,
-                              GlobalGCReply *reply,
+  virtual void HandleGlobalGC(const GlobalGCRequest &request, GlobalGCReply *reply,
                               SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleFormatGlobalMemoryInfo(FormatGlobalMemoryInfoRequest request,
+  virtual void HandleFormatGlobalMemoryInfo(const FormatGlobalMemoryInfoRequest &request,
                                             FormatGlobalMemoryInfoReply *reply,
                                             SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleRequestObjectSpillage(RequestObjectSpillageRequest request,
+  virtual void HandleRequestObjectSpillage(const RequestObjectSpillageRequest &request,
                                            RequestObjectSpillageReply *reply,
                                            SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleReleaseUnusedBundles(ReleaseUnusedBundlesRequest request,
+  virtual void HandleReleaseUnusedBundles(const ReleaseUnusedBundlesRequest &request,
                                           ReleaseUnusedBundlesReply *reply,
                                           SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleGetSystemConfig(GetSystemConfigRequest request,
+  virtual void HandleGetSystemConfig(const GetSystemConfigRequest &request,
                                      GetSystemConfigReply *reply,
                                      SendReplyCallback send_reply_callback) = 0;
 
-  virtual void HandleGetTasksInfo(GetTasksInfoRequest request,
-                                  GetTasksInfoReply *reply,
-                                  SendReplyCallback send_reply_callback) = 0;
-
-  virtual void HandleGetObjectsInfo(GetObjectsInfoRequest request,
-                                    GetObjectsInfoReply *reply,
-                                    SendReplyCallback send_reply_callback) = 0;
-
-  virtual void HandleGetTaskFailureCause(GetTaskFailureCauseRequest request,
-                                         GetTaskFailureCauseReply *reply,
+  virtual void HandleGetGcsServerAddress(const GetGcsServerAddressRequest &request,
+                                         GetGcsServerAddressReply *reply,
                                          SendReplyCallback send_reply_callback) = 0;
+
+  // === ANT-INTERNAL below ===
+
+  virtual void HandleStopTasksAndBanNewTasks(
+      const StopTasksAndBanNewTasksRequest &request, StopTasksAndBanNewTasksReply *reply,
+      SendReplyCallback send_reply_callback) = 0;
+
+  virtual void HandleLiftNewTasksBan(const LiftNewTasksBanRequest &request,
+                                     LiftNewTasksBanReply *reply,
+                                     SendReplyCallback send_reply_callback) = 0;
 };
 
 /// The `GrpcService` for `NodeManagerService`.

@@ -1,0 +1,141 @@
+diff --git src/brpc/input_messenger.cpp src/brpc/input_messenger.cpp
+index f33e626..892d88d 100644
+--- src/brpc/input_messenger.cpp
++++ src/brpc/input_messenger.cpp
+@@ -181,7 +181,8 @@ static void QueueMessage(InputMessageBase* to_run_msg,
+                           BTHREAD_ATTR_PTHREAD :
+                           BTHREAD_ATTR_NORMAL) | BTHREAD_NOSIGNAL;
+     tmp.keytable_pool = keytable_pool;
+-    if (bthread_start_background(
++    if (!bthread_get_in_place_execution() &&
++        bthread_start_background(
+             &th, &tmp, ProcessInputMessage, to_run_msg) == 0) {
+         ++*num_bthread_created;
+     } else {
+diff --git src/brpc/server.cpp src/brpc/server.cpp
+index 2087cbc..e248463 100644
+--- src/brpc/server.cpp
++++ src/brpc/server.cpp
+@@ -142,7 +142,8 @@ ServerOptions::ServerOptions()
+     , http_master_service(NULL)
+     , health_reporter(NULL)
+     , rtmp_service(NULL)
+-    , redis_service(NULL) {
++    , redis_service(NULL)
++    , in_place_execution(false) {
+     if (s_ncore > 0) {
+         num_threads = s_ncore + 1;
+     }
+@@ -960,6 +961,8 @@ int Server::StartInternal(const butil::EndPoint& endpoint,
+         bthread_setconcurrency(_options.num_threads);
+     }
+ 
++    bthread_set_in_place_execution(_options.in_place_execution);
++
+     for (MethodMap::iterator it = _method_map.begin();
+         it != _method_map.end(); ++it) {
+         if (it->second.is_builtin_service) {
+diff --git src/brpc/server.h src/brpc/server.h
+index 0974ce1..b5a76cf 100644
+--- src/brpc/server.h
++++ src/brpc/server.h
+@@ -249,6 +249,14 @@ struct ServerOptions {
+     // Default: ""
+     std::string server_info_name;
+ 
++    // If |in_place_execution| is true, execution_queue_execute would call 
++    // execute immediately instead of starting a bthread if possible
++    //
++    // Note: Running callbacks in place might cause the dead lock issue, you
++    // should be very careful turning this flag on.
++    //
++    // Default: false
++    bool in_place_execution;
+ private:
+     // SSLOptions is large and not often used, allocate it on heap to
+     // prevent ServerOptions from being bloated in most cases.
+diff --git src/brpc/stream.cpp src/brpc/stream.cpp
+index d8466d2..69d412e 100644
+--- src/brpc/stream.cpp
++++ src/brpc/stream.cpp
+@@ -463,7 +463,8 @@ int Stream::OnReceived(const StreamFrameMeta& fm, butil::IOBuf *buf, Socket* soc
+         if (!fm.has_continuation()) {
+             butil::IOBuf *tmp = _pending_buf;
+             _pending_buf = NULL;
+-            if (bthread::execution_queue_execute(_consumer_queue, tmp) != 0) {
++            bthread::TaskOptions options(false, bthread_get_in_place_execution());
++            if (bthread::execution_queue_execute(_consumer_queue, tmp, &options) != 0) {
+                 CHECK(false) << "Fail to push into channel";
+                 delete tmp;
+                 Close();
+diff --git src/bthread/bthread.cpp src/bthread/bthread.cpp
+index bcffaa4..c951593 100644
+--- src/bthread/bthread.cpp
++++ src/bthread/bthread.cpp
+@@ -30,7 +30,8 @@
+ 
+ namespace bthread {
+ 
+-DEFINE_int32(bthread_concurrency, 8 + BTHREAD_EPOLL_THREAD_NUM,
++// NOTE(zhijunfu): reduce pthread count from 8 + 1 to 1 + 1.
++DEFINE_int32(bthread_concurrency, 1 + BTHREAD_EPOLL_THREAD_NUM,
+              "Number of pthread workers");
+ 
+ DEFINE_int32(bthread_min_concurrency, 0,
+@@ -38,6 +39,10 @@ DEFINE_int32(bthread_min_concurrency, 0,
+             " The laziness is disabled when this value is non-positive,"
+             " and workers will be created eagerly according to -bthread_concurrency and bthread_setconcurrency(). ");
+ 
++DEFINE_int32(bthread_in_place_execution, false,
++             "If this is true, execution_queue_execute would call execute immediately"
++             " instead of starting a bthread if possible");
++
+ static bool never_set_bthread_concurrency = true;
+ 
+ static bool validate_bthread_concurrency(const char*, int32_t val) {
+@@ -313,6 +318,14 @@ int bthread_setconcurrency(int num) {
+     return (num == bthread::FLAGS_bthread_concurrency ? 0 : EPERM);
+ }
+ 
++bool bthread_get_in_place_execution() {
++    return bthread::FLAGS_bthread_in_place_execution;
++}
++
++void bthread_set_in_place_execution(bool in_place) {
++   bthread::FLAGS_bthread_in_place_execution = in_place; 
++}
++
+ int bthread_about_to_quit() {
+     bthread::TaskGroup* g = bthread::tls_task_group;
+     if (g != NULL) {
+diff --git src/bthread/bthread.h src/bthread/bthread.h
+index c5fa4c6..3070b34 100644
+--- src/bthread/bthread.h
++++ src/bthread/bthread.h
+@@ -155,6 +155,12 @@ extern int bthread_yield(void);
+ // Interruptible by bthread_interrupt().
+ extern int bthread_usleep(uint64_t microseconds);
+ 
++// Get `in_place_if_possible` flag for TaskOptions.
++extern bool bthread_get_in_place_execution();
++
++// Set `in_place_if_possible` flag for TaskOptions.
++extern void bthread_set_in_place_execution(bool in_place);
++
+ // ---------------------------------------------
+ // Functions for mutex handling.
+ // ---------------------------------------------
+diff --git src/bthread/types.h src/bthread/types.h
+index d56368f..76ea5a5 100644
+--- src/bthread/types.h
++++ src/bthread/types.h
+@@ -139,6 +139,7 @@ static const size_t BTHREAD_EPOLL_THREAD_NUM = 1;
+ static const bthread_t BTHREAD_ATOMIC_INIT = 0;
+ 
+ // Min/Max number of work pthreads.
+-static const int BTHREAD_MIN_CONCURRENCY = 3 + BTHREAD_EPOLL_THREAD_NUM;
++// NOTE(zhijunfu): reduce the minimum pthread number from 3 + 1 to 1 + 1.
++static const int BTHREAD_MIN_CONCURRENCY = 1 + BTHREAD_EPOLL_THREAD_NUM;
+ static const int BTHREAD_MIN_CONCURRENCY = 3 + BTHREAD_EPOLL_THREAD_NUM;
+ static const int BTHREAD_MAX_CONCURRENCY = 1024;
+ 

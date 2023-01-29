@@ -34,7 +34,7 @@ public class PlacementGroupDemo {
 
   public static void createAndRemovePlacementGroup() {
     // Construct a list of bundles.
-    Map<String, Double> bundle = ImmutableMap.of("CPU", 1.0);
+    Map<String, Double> bundle = ImmutableMap.of("CPU", 1.0, "memory", 1.0);
     List<Map<String, Double>> bundles = ImmutableList.of(bundle);
 
     // Make a creation option with bundles and strategy.
@@ -64,7 +64,7 @@ public class PlacementGroupDemo {
 
   public static void runNormalTaskWithPlacementGroup() {
     // Construct a list of bundles.
-    Map<String, Double> bundle = ImmutableMap.of("CPU", 2.0);
+    Map<String, Double> bundle = ImmutableMap.of("CPU", 2.0, "memory", 1.0);
     List<Map<String, Double>> bundles = ImmutableList.of(bundle);
 
     // Create a placement group and make sure its creation is successful.
@@ -97,7 +97,7 @@ public class PlacementGroupDemo {
 
   public static void createNonGlobalNamedPlacementGroup() {
     // Create a placement group with a job-scope-unique name.
-    Map<String, Double> bundle = ImmutableMap.of("CPU", 1.0);
+    Map<String, Double> bundle = ImmutableMap.of("CPU", 1.0, "memory", 1.0);
     List<Map<String, Double>> bundles = ImmutableList.of(bundle);
 
     PlacementGroupCreationOptions options =
@@ -121,8 +121,8 @@ public class PlacementGroupDemo {
   }
 
   public static void strictPackExample() {
-    Map<String, Double> bundle1 = ImmutableMap.of("GPU", 2.0);
-    Map<String, Double> bundle2 = ImmutableMap.of("extra_resource", 2.0);
+    Map<String, Double> bundle1 = ImmutableMap.of("GPU", 2.0, "memory", 1.0);
+    Map<String, Double> bundle2 = ImmutableMap.of("extra_resource", 2.0, "memory", 1.0);
     List<Map<String, Double>> bundles = ImmutableList.of(bundle1, bundle2);
 
     PlacementGroupCreationOptions options =

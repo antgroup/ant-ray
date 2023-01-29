@@ -60,7 +60,8 @@ TEST_F(RedisAsioTest, TestRedisCommands) {
   ASSERT_TRUE(ac->err == 0);
   ray::gcs::RedisAsyncContext redis_async_context(ac);
 
-  RedisAsioClient client(io_service, redis_async_context);
+  RedisAsioClient client(io_service, &redis_async_context);
+  RAY_CHECK_OK(client.init());
 
   redisAsyncSetConnectCallback(ac, ConnectCallback);
   redisAsyncSetDisconnectCallback(ac, DisconnectCallback);
@@ -78,8 +79,7 @@ TEST_F(RedisAsioTest, TestRedisCommands) {
           ->PingPort(std::string("127.0.0.1"), TEST_REDIS_SERVER_PORTS.front() + 987)
           .ok());
   ASSERT_TRUE(shard_context
-                  ->Connect(std::string("127.0.0.1"),
-                            TEST_REDIS_SERVER_PORTS.front(),
+                  ->Connect(std::string("127.0.0.1"), TEST_REDIS_SERVER_PORTS.front(),
                             /*sharding=*/true,
                             /*password=*/std::string())
                   .ok());
@@ -93,8 +93,7 @@ TEST_F(RedisAsioTest, TestRedisCommands) {
 
 int main(int argc, char **argv) {
   InitShutdownRAII ray_log_shutdown_raii(ray::RayLog::StartRayLog,
-                                         ray::RayLog::ShutDownRayLog,
-                                         argv[0],
+                                         ray::RayLog::ShutDownRayLog, argv[0],
                                          ray::RayLogLevel::INFO,
                                          /*log_dir=*/"");
   ::testing::InitGoogleTest(&argc, argv);

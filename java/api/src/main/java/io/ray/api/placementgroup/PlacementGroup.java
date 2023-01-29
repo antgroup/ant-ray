@@ -54,4 +54,20 @@ public interface PlacementGroup {
    * @return True if the placement group is created. False otherwise.
    */
   boolean wait(int timeoutSeconds);
+
+  /**
+   * Add new bundles to this placement group. Note that the new bundles will append to the end of
+   * the existing bundles.
+   *
+   * @param bundles New bundles that will be added to this placement group.
+   */
+  void addBundles(List<Bundle> bundles);
+
+  /**
+   * Remove bundles from this placement group. Existing actors and tasks in these bundles will be
+   * killed. And future attempts to use these bundles will cause exceptions.
+   *
+   * @param bundleIndexes Indexes of the bundles that will be removed from this placement group.
+   */
+  void removeBundles(List<Integer> bundleIndexes);
 }

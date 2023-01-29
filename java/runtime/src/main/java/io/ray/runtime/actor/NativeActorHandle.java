@@ -8,7 +8,7 @@ import io.ray.api.BaseActorHandle;
 import io.ray.api.Ray;
 import io.ray.api.id.ActorId;
 import io.ray.api.id.ObjectId;
-import io.ray.runtime.AbstractRayRuntime;
+import io.ray.runtime.RayRuntimeInternal;
 import io.ray.runtime.generated.Common.Language;
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,8 +32,11 @@ public abstract class NativeActorHandle implements BaseActorHandle, Externalizab
   /** ID of the actor. */
   byte[] actorId;
 
-  /** ID of the actor handle. */
   byte[] actorHandleId = new byte[ObjectId.LENGTH];
+
+  public ObjectId getActorHandleId() {
+    return new ObjectId(actorHandleId);
+  }
 
   private Language language;
 
@@ -47,10 +50,6 @@ public abstract class NativeActorHandle implements BaseActorHandle, Externalizab
   /** Required by FST. */
   NativeActorHandle() {
     // Note there is no need to add local reference here since this is only used for FST.
-  }
-
-  public ObjectId getActorHandleId() {
-    return new ObjectId(actorHandleId);
   }
 
   public static NativeActorHandle create(byte[] actorId) {
@@ -117,13 +116,18 @@ public abstract class NativeActorHandle implements BaseActorHandle, Externalizab
 
   private static final class NativeActorHandleReference
       extends FinalizableWeakReference<NativeActorHandle> {
+
     private final AtomicBoolean removed;
+
+    private final byte[] workerId;
+
     private final byte[] actorId;
 
     public NativeActorHandleReference(NativeActorHandle handle) {
       super(handle, REFERENCE_QUEUE);
       this.actorId = handle.actorId;
-      AbstractRayRuntime runtime = (AbstractRayRuntime) Ray.internal();
+      RayRuntimeInternal runtime = (RayRuntimeInternal) Ray.internal();
+      this.workerId = runtime.getWorkerContext().getCurrentWorkerId().getBytes();
       this.removed = new AtomicBoolean(false);
       REFERENCES.add(this);
     }
@@ -134,7 +138,7 @@ public abstract class NativeActorHandle implements BaseActorHandle, Externalizab
         REFERENCES.remove(this);
         // It's possible that GC is executed after the runtime is shutdown.
         if (Ray.isInitialized()) {
-          nativeRemoveActorHandleReference(actorId);
+          nativeRemoveActorHandleReference(workerId, actorId);
         }
       }
     }
@@ -150,5 +154,5 @@ public abstract class NativeActorHandle implements BaseActorHandle, Externalizab
 
   private static native byte[] nativeDeserialize(byte[] data);
 
-  private static native void nativeRemoveActorHandleReference(byte[] actorId);
+  private static native void nativeRemoveActorHandleReference(byte[] workerId, byte[] actorId);
 }

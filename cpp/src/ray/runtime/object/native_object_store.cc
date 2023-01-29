@@ -1,16 +1,3 @@
-// Copyright 2020-2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #include "native_object_store.h"
 
@@ -26,17 +13,13 @@
 namespace ray {
 namespace internal {
 
-using ray::core::CoreWorkerProcess;
-
 void NativeObjectStore::PutRaw(std::shared_ptr<msgpack::sbuffer> data,
                                ObjectID *object_id) {
   auto &core_worker = CoreWorkerProcess::GetCoreWorker();
   auto buffer = std::make_shared<::ray::LocalMemoryBuffer>(
       reinterpret_cast<uint8_t *>(data->data()), data->size(), true);
   auto status = core_worker.Put(
-      ::ray::RayObject(buffer, nullptr, std::vector<rpc::ObjectReference>()),
-      {},
-      object_id);
+      ::ray::RayObject(buffer, nullptr, std::vector<ObjectID>()), {}, object_id);
   if (!status.ok()) {
     throw RayException("Put object error");
   }
@@ -49,9 +32,7 @@ void NativeObjectStore::PutRaw(std::shared_ptr<msgpack::sbuffer> data,
   auto buffer = std::make_shared<::ray::LocalMemoryBuffer>(
       reinterpret_cast<uint8_t *>(data->data()), data->size(), true);
   auto status = core_worker.Put(
-      ::ray::RayObject(buffer, nullptr, std::vector<rpc::ObjectReference>()),
-      {},
-      object_id);
+      ::ray::RayObject(buffer, nullptr, std::vector<ObjectID>()), {}, object_id);
   if (!status.ok()) {
     throw RayException("Put object error");
   }
@@ -76,11 +57,7 @@ void NativeObjectStore::CheckException(const std::string &meta_str,
     throw RayWorkerException(std::move(data_str));
   } else if (meta_str == std::to_string(ray::rpc::ErrorType::ACTOR_DIED)) {
     throw RayActorException(std::move(data_str));
-  } else if (meta_str == std::to_string(ray::rpc::ErrorType::OBJECT_UNRECONSTRUCTABLE) ||
-             meta_str == std::to_string(ray::rpc::ErrorType::OBJECT_LOST) ||
-             meta_str == std::to_string(ray::rpc::ErrorType::OWNER_DIED) ||
-             meta_str == std::to_string(ray::rpc::ErrorType::OBJECT_DELETED)) {
-    // TODO: Differentiate object errors.
+  } else if (meta_str == std::to_string(ray::rpc::ErrorType::OBJECT_UNRECONSTRUCTABLE)) {
     throw UnreconstructableException(std::move(data_str));
   } else if (meta_str == std::to_string(ray::rpc::ErrorType::TASK_EXECUTION_EXCEPTION)) {
     throw RayTaskException(std::move(data_str));
@@ -101,25 +78,35 @@ std::vector<std::shared_ptr<msgpack::sbuffer>> NativeObjectStore::GetRaw(
   for (size_t i = 0; i < results.size(); i++) {
     const auto &meta = results[i]->GetMetadata();
     const auto &data_buffer = results[i]->GetData();
+    std::string meta_str = "";
     if (meta != nullptr) {
-      std::string meta_str((char *)meta->Data(), meta->Size());
+      meta_str = std::string((char *)meta->Data(), meta->Size());
       CheckException(meta_str, data_buffer);
     }
-
-    auto sbuffer = std::make_shared<msgpack::sbuffer>(data_buffer->Size());
-    sbuffer->write(reinterpret_cast<const char *>(data_buffer->Data()),
-                   data_buffer->Size());
-    result_sbuffers.push_back(sbuffer);
+    if (meta_str == METADATA_STR_RAW) {
+      // TODO(zhiyu) In order to minimize the modification,
+      // there is an extra serialization here, but the performance will be a little worse.
+      // This code can be optimized later to improve performance
+      auto raw_buffer = Serializer::Serialize(
+          reinterpret_cast<const char *>(data_buffer->Data()), data_buffer->Size());
+      auto sbuffer = std::make_shared<msgpack::sbuffer>(raw_buffer.size());
+      sbuffer->write(raw_buffer.data(), raw_buffer.size());
+      result_sbuffers.push_back(sbuffer);
+    } else {
+      auto sbuffer = std::make_shared<msgpack::sbuffer>(data_buffer->Size());
+      sbuffer->write(reinterpret_cast<const char *>(data_buffer->Data()),
+                     data_buffer->Size());
+      result_sbuffers.push_back(sbuffer);
+    }
   }
   return result_sbuffers;
 }
 
 std::vector<bool> NativeObjectStore::Wait(const std::vector<ObjectID> &ids,
-                                          int num_objects,
-                                          int timeout_ms) {
+                                          int num_objects, int timeout_ms) {
   std::vector<bool> results;
   auto &core_worker = CoreWorkerProcess::GetCoreWorker();
-  // TODO(SongGuyang): Support `fetch_local` option in API.
+  // TODO(guyang.sgy): Support `fetch_local` option in API.
   // Simply set `fetch_local` to be true.
   ::ray::Status status = core_worker.Wait(ids, num_objects, timeout_ms, &results, true);
   if (!status.ok()) {

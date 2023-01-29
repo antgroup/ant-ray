@@ -1,6 +1,5 @@
 /// This is an example of Ray C++ application. Please visit
-/// `https://docs.ray.io/en/master/ray-core/walkthrough.html#installation`
-/// for more details.
+/// `https://docs.ray.io/en/master/index.html` for more details.
 
 /// including the `<ray/api.h>` header
 #include <ray/api.h>
@@ -30,7 +29,8 @@ RAY_REMOTE(Counter::FactoryCreate, &Counter::Add);
 
 int main(int argc, char **argv) {
   /// initialization
-  ray::Init();
+  ray::RayConfigCpp config;
+  ray::Init(config, argc, argv);
 
   /// put and get object
   auto object = ray::Put(100);
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
   std::cout << "task_result = " << task_result << std::endl;
 
   /// actor
-  ray::ActorHandle<Counter> actor = ray::Actor(Counter::FactoryCreate).Remote(0);
+  ray::ActorHandleCpp<Counter> actor = ray::Actor(Counter::FactoryCreate).Remote(0);
   /// actor task
   auto actor_object = actor.Task(&Counter::Add).Remote(3);
   int actor_task_result = *(ray::Get(actor_object));

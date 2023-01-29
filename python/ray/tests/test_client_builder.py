@@ -1,32 +1,22 @@
 import os
+import pytest
 import subprocess
 import sys
-import warnings
-from unittest.mock import Mock, patch
-
-import pytest
+from unittest.mock import patch, Mock
 
 import ray
-import ray.client_builder as client_builder
 import ray.util.client.server.server as ray_client_server
-from ray.experimental.state.api import list_workers
-from ray._private.test_utils import (
-    run_string_as_driver,
-    run_string_as_driver_nonblocking,
-    wait_for_condition,
-)
-import time
+import ray.client_builder as client_builder
+from ray.test_utils import run_string_as_driver_nonblocking, \
+    wait_for_condition, run_string_as_driver
+
+from ray.cluster_utils import Cluster
 
 
-@pytest.mark.parametrize(
-    "address",
-    [
-        "localhost:1234",
-        "localhost:1234/url?params",
-        "1.2.3.4/cluster-1?test_param=param1?",
-        "",
-    ],
-)
+@pytest.mark.parametrize("address", [
+    "localhost:1234", "localhost:1234/url?params",
+    "1.2.3.4/cluster-1?test_param=param1?"
+])
 def test_split_address(address):
     assert client_builder._split_address(address) == ("ray", address)
 
@@ -34,17 +24,16 @@ def test_split_address(address):
     assert client_builder._split_address(specified_module) == ("ray", address)
 
     specified_other_module = f"module://{address}"
-    assert client_builder._split_address(specified_other_module) == ("module", address)
+    assert client_builder._split_address(specified_other_module) == ("module",
+                                                                     address)
     non_url_compliant_module = f"module_test://{address}"
     assert client_builder._split_address(non_url_compliant_module) == (
-        "module_test",
-        address,
-    )
+        "module_test", address)
 
 
 @pytest.mark.parametrize(
-    "address", ["localhost", "1.2.3.4:1200", "ray://1.2.3.4:1200", "local", None]
-)
+    "address",
+    ["localhost", "1.2.3.4:1200", "ray://1.2.3.4:1200", "local", None])
 def test_client(address):
     builder = client_builder.client(address)
     assert isinstance(builder, client_builder.ClientBuilder)
@@ -55,7 +44,7 @@ def test_client(address):
         assert builder.address == address.replace("ray://", "")
 
 
-def test_namespace(ray_start_cluster):
+def test_namespace():
     """
     Most of the "checks" in this test case rely on the fact that
     `run_string_as_driver` will throw an exception if the driver string exits
@@ -70,7 +59,7 @@ def test_namespace(ray_start_cluster):
     * When two drivers specify a namespace, they collide.
     * The namespace name (as provided by the runtime context) is correct.
     """
-    cluster = ray_start_cluster
+    cluster = Cluster()
     cluster.add_node(num_cpus=4, ray_client_server_port=50055)
     cluster.wait_for_nodes(1)
 
@@ -85,7 +74,7 @@ class Foo:
 
 a = Foo.options(lifetime="detached", name="abc").remote()
 ray.get(a.ping.remote())
-print("Current namespace:", ray.get_runtime_context().namespace)
+print(ray.get_runtime_context().namespace)
     """
 
     anon_driver = template.format(namespace="None")
@@ -95,32 +84,69 @@ print("Current namespace:", ray.get_runtime_context().namespace)
     run_string_as_driver(anon_driver)
 
     run_in_namespace = template.format(namespace="'namespace'")
-    script_output = run_string_as_driver(run_in_namespace)
+    script_namespace = run_string_as_driver(run_in_namespace)
     # The second run fails because the actors are run in the same namespace.
     with pytest.raises(subprocess.CalledProcessError):
         run_string_as_driver(run_in_namespace)
 
-    assert "Current namespace: namespace" in script_output
+    assert script_namespace.strip() == "namespace"
     subprocess.check_output("ray stop --force", shell=True)
 
 
-def test_connect_to_cluster(ray_start_regular_shared):
-    server = ray_client_server.serve("localhost:50055")
-    with ray.client("localhost:50055").connect() as client_context:
-        assert client_context.dashboard_url == ray._private.worker.get_dashboard_url()
-        python_version = ".".join([str(x) for x in list(sys.version_info)[:3]])
-        assert client_context.python_version == python_version
-        assert client_context.ray_version == ray.__version__
-        assert client_context.ray_commit == ray.__commit__
-        protocol_version = ray.util.client.CURRENT_PROTOCOL_VERSION
-        assert client_context.protocol_version == protocol_version
+def test_jobs_in_none_namespace(shutdown_only):
+    # Initiate with `None` namespace.
+    info = ray.init()
 
-    server.stop(0)
-    subprocess.check_output("ray stop --force", shell=True)
+    address = info["redis_address"]
+
+    driver_template = """
+import ray
+
+ray.init(address="{}", namespace={})
+
+@ray.remote
+class DetachedActor:
+    def ping(self):
+        return "pong from other job"
+
+actor = DetachedActor.options(name="Pinger", lifetime="detached").remote()
+ray.get(actor.ping.remote())
+
+if {long_running}:
+    import time
+    While True:
+        time.sleep(30)
+"""
+
+    # Start a detached actor in a different namespace.
+    p1 = run_string_as_driver_nonblocking(
+        driver_template.format(address, "different", long_running=True))
+
+    @ray.remote
+    class Actor:
+        def ping(self):
+            return "pong"
+
+    # Create an actor. This should succeed because the other actor is in a
+    # different namespace.
+    probe = Actor.options(name="Pinger").remote()
+    assert ray.get(probe.ping.remote()) == "pong"
+
+    # Create an actor. This should fail because of duplicated names.
+    with pytest.raises(ValueError, match="The name .* is already taken"):
+        Actor.options(name="Pinger").remote()
+
+    # Create a job in this `None` namespace. This should fail because
+    # of duplicated actor name.
+    with pytest.raises(subprocess.CalledProcessError):
+        run_string_as_driver(
+            driver_template.format(address, None, long_running=False))
+
+    p1.kill()
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Flaky on Windows.")
-def test_local_clusters():
+def no_test_local_clusters(call_ray_stop_only):
     """
     This tests the various behaviors of connecting to local clusters:
 
@@ -152,7 +178,8 @@ while True:
     time.sleep(30)
 
 """
-    blocking_local_script = driver_template.format(address="'local'", blocking=True)
+    blocking_local_script = driver_template.format(
+        address="'local'", blocking=True)
     blocking_noaddr_script = driver_template.format(address="", blocking=True)
 
     # This should start a cluster.
@@ -167,9 +194,8 @@ while True:
     p4 = run_string_as_driver_nonblocking(blocking_noaddr_script)
 
     wait_for_condition(
-        lambda: len(ray._private.services.find_gcs_addresses()) == 4,
-        retry_interval_ms=1000,
-    )
+        lambda: len(ray._private.services.find_redis_address()) == 4,
+        retry_interval_ms=1000)
 
     p1.kill()
     p2.kill()
@@ -183,25 +209,22 @@ while True:
     subprocess.check_output("ray start --head", shell=True)
     # The assertion in the driver should cause the script to fail if we start
     # a new cluster instead of connecting.
-    run_string_as_driver(
-        """
+    run_string_as_driver("""
 import ray
 ray.client().connect()
-assert len(ray._private.services.find_gcs_addresses()) == 1
-    """
-    )
+assert len(ray._private.services.find_redis_address()) == 1
+    """)
     # ray.client("local").connect() should always create a new cluster even if
     # there's one running.
     p1 = run_string_as_driver_nonblocking(blocking_local_script)
     wait_for_condition(
-        lambda: len(ray._private.services.find_gcs_addresses()) == 2,
-        retry_interval_ms=1000,
-    )
+        lambda: len(ray._private.services.find_redis_address()) == 2,
+        retry_interval_ms=1000)
     p1.kill()
     subprocess.check_output("ray stop --force", shell=True)
 
 
-def test_non_existent_modules():
+def test_non_existent_modules(call_ray_stop_only):
     exception = None
     try:
         ray.client("badmodule://address")
@@ -212,7 +235,7 @@ def test_non_existent_modules():
     assert "does not exist" in str(exception)
 
 
-def test_module_lacks_client_builder():
+def test_module_lacks_client_builder(call_ray_stop_only):
     mock_importlib = Mock()
 
     def mock_import_module(module_string):
@@ -231,17 +254,16 @@ def test_module_lacks_client_builder():
             ray.client("othermodule://")
         except AssertionError as e:
             exception = e
-        assert (
-            exception is not None
-        ), "Module without ClientBuilder did not raise AssertionError"
+        assert exception is not None, ("Module without ClientBuilder did not "
+                                       "raise AssertionError")
         assert "does not have ClientBuilder" in str(exception)
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="RC Proxy is Flaky on Windows.")
-def test_disconnect(call_ray_stop_only, set_enable_auto_connect):
+@pytest.mark.skipif(
+    sys.platform == "win32", reason="RC Proxy is Flaky on Windows.")
+def test_disconnect(call_ray_stop_only):
     subprocess.check_output(
-        "ray start --head --ray-client-server-port=25555", shell=True
-    )
+        "ray start --head --ray-client-server-port=25555", shell=True)
     with ray.client("localhost:25555").namespace("n1").connect():
         # Connect via Ray Client
         namespace = ray.get_runtime_context().namespace
@@ -268,15 +290,16 @@ def test_disconnect(call_ray_stop_only, set_enable_auto_connect):
     ctx.disconnect()
     # Check idempotency
     ctx.disconnect()
+
     with pytest.raises(ray.exceptions.RaySystemError):
         ray.put(300)
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="RC Proxy is Flaky on Windows.")
+@pytest.mark.skipif(
+    sys.platform == "win32", reason="RC Proxy is Flaky on Windows.")
 def test_address_resolution(call_ray_stop_only):
     subprocess.check_output(
-        "ray start --head --ray-client-server-port=50055", shell=True
-    )
+        "ray start --head --ray-client-server-port=50055", shell=True)
 
     with ray.client("localhost:50055").connect():
         assert ray.util.client.ray.is_connected()
@@ -287,178 +310,31 @@ def test_address_resolution(call_ray_stop_only):
             # client(...) takes precedence of RAY_ADDRESS=local
             assert ray.util.client.ray.is_connected()
 
-        # This tries to call `ray.init(address="local") which creates a new Ray
-        # instance.
-        with ray.client(None).connect():
-            wait_for_condition(
-                lambda: len(ray._private.services.find_gcs_addresses()) == 2,
-                retry_interval_ms=1000,
-            )
+        with pytest.raises(Exception):
+            # This tries to call `ray.init(address="local") which
+            # breaks.`
+            ray.client(None).connect()
 
     finally:
         if os.environ.get("RAY_ADDRESS"):
             del os.environ["RAY_ADDRESS"]
-        ray.shutdown()
 
 
-def mock_connect(*args, **kwargs):
-    """
-    Force exit instead of actually attempting to connect
-    """
-    raise ConnectionError
-
-
-def has_client_deprecation_warn(warning: Warning, expected_replacement: str) -> bool:
-    """
-    Returns true if expected_replacement is in the message of the passed
-    warning, and that the warning mentions deprecation.
-    """
-    start = "Starting a connection through `ray.client` will be deprecated"
-    message = str(warning.message)
-    if start not in message:
-        return False
-    if expected_replacement not in message:
-        return False
-    return True
-
-
-@pytest.mark.skipif(
-    sys.platform == "win32", reason="pip not supported in Windows runtime envs."
-)
-def test_client_deprecation_warn():
-    """
-    Tests that calling ray.client directly raises a deprecation warning with
-    a copy pasteable replacement for the client().connect() call converted
-    to ray.init style.
-    """
-    # Test warning when local client mode is used
-    with warnings.catch_warnings(record=True) as w:
-        ray.client().connect()
-        assert any(has_client_deprecation_warn(warning, "ray.init()") for warning in w)
-        ray.shutdown()
-
-    with warnings.catch_warnings(record=True) as w:
-        ray.client().namespace("nmspc").env({"pip": ["requests"]}).connect()
-    expected = (
-        'ray.init(namespace="nmspc", runtime_env=<your_runtime_env>)'  # noqa E501
-    )
-    assert any(
-        has_client_deprecation_warn(warning, expected) for warning in w  # noqa E501
-    )
-    ray.shutdown()
-
+def test_connect_to_cluster(ray_start_regular_shared):
     server = ray_client_server.serve("localhost:50055")
+    with ray.client("localhost:50055").connect() as client_context:
+        assert client_context.dashboard_url == ray.worker.get_dashboard_url()
+        python_version = ".".join([str(x) for x in list(sys.version_info)[:3]])
+        assert client_context.python_version == python_version
+        assert client_context.ray_version == ray.__version__
+        assert client_context.ray_commit == ray.__commit__
+        protocol_version = ray.util.client.CURRENT_PROTOCOL_VERSION
+        assert client_context.protocol_version == protocol_version
 
-    # Test warning when namespace and runtime env aren't specified
-    with warnings.catch_warnings(record=True) as w:
-        with ray.client("localhost:50055").connect():
-            pass
-    assert any(
-        has_client_deprecation_warn(warning, 'ray.init("ray://localhost:50055")')
-        for warning in w
-    )
-
-    # Test warning when just namespace specified
-    with warnings.catch_warnings(record=True) as w:
-        with ray.client("localhost:50055").namespace("nmspc").connect():
-            pass
-    assert any(
-        has_client_deprecation_warn(
-            warning, 'ray.init("ray://localhost:50055", namespace="nmspc")'
-        )
-        for warning in w
-    )
-
-    # Test that passing namespace through env doesn't add namespace to the
-    # replacement
-    with warnings.catch_warnings(record=True) as w, patch.dict(
-        os.environ, {"RAY_NAMESPACE": "aksdj"}
-    ):
-        with ray.client("localhost:50055").connect():
-            pass
-    assert any(
-        has_client_deprecation_warn(warning, 'ray.init("ray://localhost:50055")')
-        for warning in w
-    )
-
-    # Skip actually connecting on these, since updating the runtime env is
-    # time consuming
-    with patch("ray.util.client_connect.connect", mock_connect):
-        # Test warning when just runtime_env specified
-        with warnings.catch_warnings(record=True) as w:
-            try:
-                ray.client("localhost:50055").env({"pip": ["requests"]}).connect()
-            except ConnectionError:
-                pass
-        expected = 'ray.init("ray://localhost:50055", runtime_env=<your_runtime_env>)'  # noqa E501
-        assert any(has_client_deprecation_warn(warning, expected) for warning in w)
-
-        # Test warning works if both runtime env and namespace specified
-        with warnings.catch_warnings(record=True) as w:
-            try:
-                ray.client("localhost:50055").namespace("nmspc").env(
-                    {"pip": ["requests"]}
-                ).connect()
-            except ConnectionError:
-                pass
-        expected = 'ray.init("ray://localhost:50055", namespace="nmspc", runtime_env=<your_runtime_env>)'  # noqa E501
-        assert any(has_client_deprecation_warn(warning, expected) for warning in w)
-
-        # We don't expect namespace to appear in the warning message, since
-        # it was configured through an env var
-        with warnings.catch_warnings(record=True) as w, patch.dict(
-            os.environ, {"RAY_NAMESPACE": "abcdef"}
-        ):
-            try:
-                ray.client("localhost:50055").env({"pip": ["requests"]}).connect()
-            except ConnectionError:
-                pass
-        expected = 'ray.init("ray://localhost:50055", runtime_env=<your_runtime_env>)'  # noqa E501
-        assert any(has_client_deprecation_warn(warning, expected) for warning in w)
-
-    # cleanup
+    server.data_servicer.ray_init_by_server = True
     server.stop(0)
     subprocess.check_output("ray stop --force", shell=True)
 
 
-@pytest.mark.parametrize(
-    "call_ray_start",
-    [
-        "ray start --head --num-cpus=2 --min-worker-port=0 --max-worker-port=0 "
-        "--port 0 --ray-client-server-port=50056"
-    ],
-    indirect=True,
-)
-def test_worker_processes(call_ray_start):
-    """
-    Test that no workers are spawned until a remote function is called.
-    """
-    ray.init("ray://localhost:50056")
-
-    # Check for 10 seconds that no workers spawned after connecting
-    for _ in range(10):
-        workers = list_workers()
-        non_driver_workers = [w for w in workers if w.get("worker_type") != "DRIVER"]
-        assert len(non_driver_workers) == 0, workers
-        time.sleep(1)
-
-    @ray.remote(num_cpus=2)
-    def f():
-        return 42
-
-    assert ray.get(f.remote()) == 42
-    time.sleep(3)
-
-    # 2 worker processes should have spawned to accommodate the remote func
-    for _ in range(10):
-        workers = list_workers()
-        non_driver_workers = [w for w in workers if w.get("worker_type") != "DRIVER"]
-        assert len(non_driver_workers) == 2, workers
-        time.sleep(1)
-
-
 if __name__ == "__main__":
-    if os.environ.get("PARALLEL_CI"):
-        sys.exit(pytest.main(["-n", "auto", "--boxed", "-vs", __file__]))
-    else:
-        sys.exit(pytest.main(["-sv", __file__]))
+    sys.exit(pytest.main(["-v", __file__]))

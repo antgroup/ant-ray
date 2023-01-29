@@ -1,0 +1,159 @@
+namespace ray.streaming.queue.flatbuf;
+
+enum MessageType:long {
+  // Notify consumed.
+  // Downstream -> Upstream
+  StreamingQueueNotificationMsg,
+  // Try to pull data from peer
+  // Downstream -> Upstream
+  StreamingQueuePullRequestMsg,
+  // Response to pull request
+  // Upstream -> Downstream
+  StreamingQueuePullResponseMsg,
+  // Data message
+  // Upstream -> Downstream
+  StreamingQueueDataMsg,
+  // Local Data message, used when collocate.
+  StreamingQueueLocalDataMsg,
+  // Get the last msg id received by downstream
+  // Upstream -> Downstream
+  StreamingQueueGetLastMsgId,
+  // Response to get last msg id request
+  StreamingQueueGetLastMsgIdRsp,
+  // Get hostname of downstream queue
+  // Upstream -> Downstream
+  StreamingQueueGetHostnameMsg,
+  // Response to get Hostname request
+  StreamingQueueGetHostnameRspMsg,
+  // Upstream -> Downstream
+  StreamingQueueStartLoggingMsg,
+  // Reponse to start logging request
+  StreamingQueueStartLoggingRspMsg,
+  // For test
+  StreamingQueueTestInitMsg,
+  StreamingQueueTestCheckStatusRspMsg,
+}
+
+enum StreamingQueueError:int {
+  OK,
+  QUEUE_NOT_EXIST,
+  DATA_LOST,
+  NO_VALID_DATA,
+}
+
+table CommonMsg {
+  src_actor_id : string;
+  dst_actor_id : string;
+  queue_id : string;
+}
+
+table StreamingQueueNotificationMsg {
+  common : CommonMsg;
+  msg_id : ulong;
+  bundle_id : ulong;
+}
+
+table StreamingQueuePullRequestMsg {
+  common : CommonMsg;
+  checkpoint_id: ulong;
+  msg_id : ulong;
+}
+
+table StreamingQueuePullResponseMsg {
+  common : CommonMsg;
+  seq_id : ulong;
+  msg_id : ulong;
+  count : ulong;
+  err_code : StreamingQueueError;
+  is_upstream_first_pull : bool;
+}
+
+enum ResendReason:int {
+  PULLED,
+  RECONNECTED,
+}
+
+table StreamingQueueDataMsg {
+  common : CommonMsg;
+  seq_id : ulong;
+  msg_id_start : ulong;
+  msg_id_end : ulong;
+  timestamp : ulong;
+  buffer_count: ulong;
+  buffer_length : [ulong];
+  resend: bool;
+  resend_id: ulong;
+  reason: ResendReason;
+}
+
+table StreamingQueueLocalDataMsg {
+  common : CommonMsg;
+  seq_id : ulong;
+  msg_id_start : ulong;
+  msg_id_end : ulong;
+  timestamp : ulong;
+  data_offset: ulong;
+  data_size: ulong;
+  resend: bool;
+  resend_id: ulong;
+  reason: ResendReason;
+  // The plasma store object id used for collocate data share
+  object_id : string;
+}
+
+table StreamingQueueGetLastMsgId {
+  common : CommonMsg;
+}
+
+table StreamingQueueGetLastMsgIdRsp {
+  common : CommonMsg;
+  seq_id : ulong;
+  msg_id : ulong;
+  err_code : StreamingQueueError;
+}
+
+table StreamingQueueGetHostnameMsg {
+  common : CommonMsg;
+}
+
+table StreamingQueueGetHostnameRspMsg {
+  common : CommonMsg;
+  ip : string;
+  err_code : StreamingQueueError;
+}
+
+table StreamingQueueStartLoggingMsg {
+  common : CommonMsg;
+  seq_id : ulong;
+  msg_id : ulong;
+  barrier_id : ulong;
+}
+
+table StreamingQueueStartLoggingRspMsg {
+  common : CommonMsg;
+  err_code : StreamingQueueError;
+}
+
+// for test
+enum StreamingQueueTestRole:int {
+  WRITER,
+  READER,
+}
+
+table StreamingQueueTestInitMsg {
+  role : StreamingQueueTestRole;
+  src_actor_id : string;
+  dst_actor_id : string;
+  actor_handle : string;
+  queue_ids : [string];
+  rescale_queue_ids : [string];
+  test_suite_name : string;
+  test_name : string;
+  param : ulong;
+  plasma_store_socket : string;
+}
+
+table StreamingQueueTestCheckStatusRspMsg {
+  test_name : string;
+  status : bool;
+}

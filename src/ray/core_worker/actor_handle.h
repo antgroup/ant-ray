@@ -15,6 +15,7 @@
 #pragma once
 
 #include <gtest/gtest_prod.h>
+#include <optional>
 
 #include "ray/common/id.h"
 #include "ray/common/task/task_util.h"
@@ -24,34 +25,27 @@
 #include "src/ray/protobuf/gcs.pb.h"
 
 namespace ray {
-namespace core {
 
 class ActorHandle {
  public:
-  ActorHandle(rpc::ActorHandle inner)
+  ActorHandle(ray::rpc::ActorHandle inner)
       : inner_(inner), actor_cursor_(ObjectID::FromBinary(inner_.actor_cursor())) {}
 
   // Constructs a new ActorHandle as part of the actor creation process.
-  ActorHandle(const ActorID &actor_id,
-              const TaskID &owner_id,
-              const rpc::Address &owner_address,
-              const JobID &job_id,
-              const ObjectID &initial_cursor,
-              const Language actor_language,
-              const FunctionDescriptor &actor_creation_task_function_descriptor,
-              const std::string &extension_data,
-              int64_t max_task_retries,
-              const std::string &name,
-              const std::string &ray_namespace,
-              int32_t max_pending_calls,
-              bool execute_out_of_order = false);
+  ActorHandle(const ActorID &actor_id, const TaskID &owner_id,
+              const rpc::Address &owner_address, const JobID &job_id,
+              const ObjectID &initial_cursor, const Language actor_language,
+              const ray::FunctionDescriptor &actor_creation_task_function_descriptor,
+              const std::string &extension_data, int64_t max_task_retries,
+              const std::string &name, const std::string &ray_namespace,
+              bool enable_task_fast_fail = false);
 
   /// Constructs an ActorHandle from a serialized string.
   explicit ActorHandle(const std::string &serialized);
 
-  /// Constructs an ActorHandle from a rpc::ActorTableData and a rpc::TaskSpec message.
-  ActorHandle(const rpc::ActorTableData &actor_table_data,
-              const rpc::TaskSpec &task_spec);
+  /// Constructs an ActorHandle from a gcs::ActorTableData message.
+  ActorHandle(const rpc::ActorTableData &actor_table_data, const std::string &name,
+              const std::string &ray_namespace);
 
   ActorID GetActorID() const { return ActorID::FromBinary(inner_.actor_id()); };
 
@@ -65,8 +59,8 @@ class ActorHandle {
 
   Language ActorLanguage() const { return inner_.actor_language(); };
 
-  FunctionDescriptor ActorCreationTaskFunctionDescriptor() const {
-    return FunctionDescriptorBuilder::FromProto(
+  ray::FunctionDescriptor ActorCreationTaskFunctionDescriptor() const {
+    return ray::FunctionDescriptorBuilder::FromProto(
         inner_.actor_creation_task_function_descriptor());
   };
 
@@ -77,7 +71,9 @@ class ActorHandle {
   /// \param[in] builder Task spec builder.
   /// \param[in] new_cursor Actor dummy object. This is legacy code needed for
   /// raylet-based actor restart.
-  void SetActorTaskSpec(TaskSpecBuilder &builder, const ObjectID new_cursor);
+  /// \param[in] enable_task_fast_fail Set the flag of enable_task_fast_fail for task
+  void SetActorTaskSpec(TaskSpecBuilder &builder, const ObjectID new_cursor,
+                        std::optional<bool> enable_task_fast_fail = std::nullopt);
 
   /// Reset the actor task spec fields of an existing task so that the task can
   /// be re-executed.
@@ -96,13 +92,9 @@ class ActorHandle {
 
   std::string GetNamespace() const;
 
-  int32_t MaxPendingCalls() const { return inner_.max_pending_calls(); }
-
-  bool ExecuteOutOfOrder() const { return inner_.execute_out_of_order(); }
-
  private:
   // Protobuf-defined persistent state of the actor handle.
-  const rpc::ActorHandle inner_;
+  const ray::rpc::ActorHandle inner_;
 
   /// The unique id of the dummy object returned by the previous task.
   /// TODO: This can be removed once we schedule actor tasks by task counter
@@ -118,5 +110,4 @@ class ActorHandle {
   FRIEND_TEST(ZeroNodeTest, TestActorHandle);
 };
 
-}  // namespace core
 }  // namespace ray

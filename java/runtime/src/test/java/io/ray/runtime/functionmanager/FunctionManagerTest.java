@@ -2,12 +2,13 @@ package io.ray.runtime.functionmanager;
 
 import io.ray.api.function.RayFunc0;
 import io.ray.api.function.RayFunc1;
-import io.ray.api.id.JobId;
 import io.ray.runtime.functionmanager.FunctionManager.JobFunctionTable;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -61,8 +62,6 @@ public class FunctionManagerTest {
     }
   }
 
-  private static final JobId JOB_ID = JobId.fromInt(1);
-
   private static RayFunc0<Object> fooFunc;
   private static RayFunc1<ChildClass, Object> childClassBarFunc;
   private static RayFunc0<ChildClass> childClassConstructor;
@@ -95,7 +94,7 @@ public class FunctionManagerTest {
 
   @Test
   public void testGetFunctionFromRayFunc() {
-    final FunctionManager functionManager = new FunctionManager(null);
+    final FunctionManager functionManager = new FunctionManager(new ArrayList<>());
     // Test normal function.
     RayFunction func = functionManager.getFunction(fooFunc);
     Assert.assertFalse(func.isConstructor());
@@ -114,7 +113,7 @@ public class FunctionManagerTest {
 
   @Test
   public void testGetFunctionFromFunctionDescriptor() {
-    final FunctionManager functionManager = new FunctionManager(null);
+    final FunctionManager functionManager = new FunctionManager(new ArrayList<>());
     // Test normal function.
     RayFunction func = functionManager.getFunction(fooDescriptor);
     Assert.assertFalse(func.isConstructor());
@@ -142,7 +141,7 @@ public class FunctionManagerTest {
 
   @Test
   public void testInheritance() {
-    final FunctionManager functionManager = new FunctionManager(null);
+    final FunctionManager functionManager = new FunctionManager(new ArrayList<>());
     // Check inheritance can work and FunctionManager can find method in parent class.
     fooDescriptor =
         new JavaFunctionDescriptor(ParentClass.class.getName(), "foo", "()Ljava/lang/Object;");
@@ -178,15 +177,24 @@ public class FunctionManagerTest {
   @Test
   public void testLoadFunctionTableForClass() {
     JobFunctionTable functionTable = new JobFunctionTable(getClass().getClassLoader());
-    Map<Pair<String, String>, Pair<RayFunction, Boolean>> res =
+    Map<Pair<String, String>, RayFunction> functions =
         functionTable.loadFunctionsForClass(ChildClass.class.getName());
-    // The result should be 5 entries:
+
+    // Jacoco (test coverage tool) will automatically insert some methods in every class,
+    // filter them out.
+    Map<Pair<String, String>, RayFunction> res = new HashMap<>();
+    for (Map.Entry entry : functions.entrySet()) {
+      if (!((Pair<String, String>) entry.getKey()).getLeft().equals("$jacocoInit")) {
+        res.put((Pair<String, String>) entry.getKey(), (RayFunction) entry.getValue());
+      }
+    }
+
+    // The result should be 4 entries:
     //   1, the constructor with signature
     //   2, the constructor without signature
     //   3, bar with signature
     //   4, bar without signature
-    //   5, bar with the number of signature acting as signature field (xlang)
-    Assert.assertEquals(res.size(), 16);
+    Assert.assertEquals(res.size(), 11);
     Assert.assertTrue(
         res.containsKey(
             ImmutablePair.of(childClassBarDescriptor.name, childClassBarDescriptor.signature)));
@@ -207,7 +215,7 @@ public class FunctionManagerTest {
                 overloadFunctionDescriptorDouble.signature)));
     Assert.assertTrue(res.containsKey(ImmutablePair.of(overloadFunctionDescriptorInt.name, "")));
     Pair<String, String> overloadKey = ImmutablePair.of(overloadFunctionDescriptorInt.name, "");
-    RayFunction func = res.get(overloadKey).getLeft();
+    RayFunction func = res.get(overloadKey);
     // The function is overloaded.
     Assert.assertTrue(res.containsKey(overloadKey));
     Assert.assertNull(func);

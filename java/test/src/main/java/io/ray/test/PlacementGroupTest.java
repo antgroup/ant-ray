@@ -8,6 +8,8 @@ import io.ray.api.Ray;
 import io.ray.api.WaitResult;
 import io.ray.api.exception.RayException;
 import io.ray.api.id.ActorId;
+import io.ray.api.options.PlacementGroupCreationOptions;
+import io.ray.api.placementgroup.Bundle;
 import io.ray.api.placementgroup.PlacementGroup;
 import io.ray.api.placementgroup.PlacementGroupState;
 import io.ray.api.placementgroup.PlacementStrategy;
@@ -18,7 +20,6 @@ import org.testng.annotations.Test;
 /**
  * TODO: Currently, Java doesn't support multi-node tests so we can't test all strategy temporarily.
  */
-@Test
 public class PlacementGroupTest extends BaseTest {
 
   public static class Counter {
@@ -40,34 +41,23 @@ public class PlacementGroupTest extends BaseTest {
 
   // This test just creates a placement group with one bundle.
   // It's not comprehensive to test all placement group test cases.
+  @Test
   public void testCreateAndCallActor() {
-    PlacementGroup placementGroup =
-        PlacementGroupTestUtils.createSpecifiedSimpleGroup(
-            "CPU", 2, PlacementStrategy.PACK, 1.0, false);
+    PlacementGroup placementGroup = PlacementGroupTestUtils.createSimpleGroup();
     Assert.assertTrue(placementGroup.wait(60));
     Assert.assertEquals(placementGroup.getName(), "unnamed_group");
 
     // Test creating an actor from a constructor.
-    ActorHandle<Counter> firstActor =
+    ActorHandle<Counter> actor =
         Ray.actor(Counter::new, 1)
+            .setMemoryMb(50)
             .setResource("CPU", 1.0)
             .setPlacementGroup(placementGroup, 0)
             .remote();
-    Assert.assertNotEquals(firstActor.getId(), ActorId.NIL);
+    Assert.assertNotEquals(actor.getId(), ActorId.NIL);
 
     // Test calling an actor.
-    Assert.assertEquals(firstActor.task(Counter::getValue).remote().get(), Integer.valueOf(1));
-
-    // Test creating an actor without specifying which bundle to use.
-    ActorHandle<Counter> secondActor =
-        Ray.actor(Counter::new, 1)
-            .setResource("CPU", 1.0)
-            .setPlacementGroup(placementGroup)
-            .remote();
-    Assert.assertNotEquals(secondActor.getId(), ActorId.NIL);
-
-    // Test calling an actor.
-    Assert.assertEquals(secondActor.task(Counter::getValue).remote().get(), Integer.valueOf(1));
+    Assert.assertEquals(actor.task(Counter::getValue).remote().get(), Integer.valueOf(1));
   }
 
   @Test(groups = {"cluster"})
@@ -141,7 +131,7 @@ public class PlacementGroupTest extends BaseTest {
   }
 
   @Test(groups = {"cluster"})
-  public void testCheckBundleIndex() {
+  public void testCheckBundleIndexWhenCreatingActor() {
     PlacementGroup placementGroup = PlacementGroupTestUtils.createSimpleGroup();
     Assert.assertTrue(placementGroup.wait(60));
 
@@ -152,6 +142,13 @@ public class PlacementGroupTest extends BaseTest {
       ++exceptionCount;
     }
     Assert.assertEquals(exceptionCount, 1);
+
+    try {
+      Ray.actor(Counter::new, 1).setPlacementGroup(placementGroup, -1).remote();
+    } catch (IllegalArgumentException e) {
+      ++exceptionCount;
+    }
+    Assert.assertEquals(exceptionCount, 2);
   }
 
   @Test(expectedExceptions = {IllegalArgumentException.class})
@@ -204,18 +201,19 @@ public class PlacementGroupTest extends BaseTest {
             "non-exist-resource", 1, PlacementStrategy.PACK, 1.0, pgName);
 
     // Make sure its creation will failed.
-    Assert.assertFalse(nonExistPlacementGroup.wait(60));
+    Assert.assertFalse(nonExistPlacementGroup.wait(5));
 
     // Submit a normal task that required a non-exist placement group resources and make sure its
     // scheduling will timeout.
     ObjectRef<String> obj =
         Ray.task(Counter::ping)
             .setPlacementGroup(nonExistPlacementGroup, 0)
+            .setMemoryMb(50)
             .setResource("CPU", 1.0)
             .remote();
 
     List<ObjectRef<String>> waitList = ImmutableList.of(obj);
-    WaitResult<String> waitResult = Ray.wait(waitList, 1, 30 * 1000);
+    WaitResult<String> waitResult = Ray.wait(waitList, 1, 5 * 1000);
     Assert.assertEquals(1, waitResult.getUnready().size());
 
     // Create a placement group and make sure its creation will successful.
@@ -227,15 +225,7 @@ public class PlacementGroupTest extends BaseTest {
     Assert.assertEquals(
         Ray.task(Counter::ping)
             .setPlacementGroup(placementGroup, 0)
-            .setResource("CPU", 1.0)
-            .remote()
-            .get(),
-        "pong");
-
-    // Submit a normal task without specifying which bundle to use.
-    Assert.assertEquals(
-        Ray.task(Counter::ping)
-            .setPlacementGroup(placementGroup)
+            .setMemoryMb(50)
             .setResource("CPU", 1.0)
             .remote()
             .get(),
@@ -243,5 +233,69 @@ public class PlacementGroupTest extends BaseTest {
 
     // Make sure it will not affect the previous normal task.
     Assert.assertEquals(Ray.task(Counter::ping).remote().get(), "pong");
+  }
+
+  @Test(groups = {"cluster"})
+  public void testAddAndRemoveBundles() {
+    // NOTE: We have already tested most cases in python API,
+    // so, we just need to test the basic API here.
+    // Create a infeasible placement group firstly.
+    Bundle bundle =
+        new Bundle.Builder().setResource("Non-existent-resource", 1.0).setMemoryMb(50).build();
+    List<Bundle> bundles = ImmutableList.of(bundle);
+    PlacementGroupCreationOptions options =
+        new PlacementGroupCreationOptions.Builder()
+            .setBundles(bundles)
+            .setStrategy(PlacementStrategy.SPREAD)
+            .build();
+
+    PlacementGroup infeasiblePlacementGroup = PlacementGroups.createPlacementGroup(options);
+    Assert.assertFalse(infeasiblePlacementGroup.wait(4));
+
+    // Remove this infeasible placement group.
+    PlacementGroups.removePlacementGroup(infeasiblePlacementGroup.getId());
+
+    PlacementGroup removedPlacementGroup =
+        PlacementGroups.getPlacementGroup((infeasiblePlacementGroup).getId());
+    Assert.assertEquals(removedPlacementGroup.getState(), PlacementGroupState.REMOVED);
+
+    // Create a feasible placement group that can be scheduled immediately.
+    PlacementGroup placementGroup = PlacementGroupTestUtils.createSimpleGroup();
+    Assert.assertTrue(placementGroup.wait(5));
+
+    // Add a new bundle for the placement group.
+    Bundle newBundle = new Bundle.Builder().setCpu(1.0).setMemoryMb(50).build();
+    List<Bundle> newBundles = ImmutableList.of(newBundle);
+    placementGroup.addBundles(newBundles);
+
+    // Wait for the add bundles operation done.
+    Assert.assertTrue(placementGroup.wait(4));
+
+    // Schedule an actor with the second new bundle.
+    ActorHandle<Counter> actor =
+        Ray.actor(Counter::new, 1)
+            .setMemoryMb(50)
+            .setResource("CPU", 1.0)
+            .setPlacementGroup(placementGroup, 1)
+            .remote();
+    Assert.assertNotEquals(actor.getId(), ActorId.NIL);
+    Assert.assertEquals(actor.task(Counter::getValue).remote().get(), Integer.valueOf(1));
+
+    // Remove the second bundle.
+    placementGroup.removeBundles(ImmutableList.of(1));
+
+    // Wait for the remove bundles operation done.
+    Assert.assertTrue(placementGroup.wait(4));
+
+    // Scheduler another actor with the removed bundles
+    // and make sure it will throw a runtime exception.
+    Assert.expectThrows(
+        IllegalArgumentException.class,
+        () ->
+            Ray.actor(Counter::new, 1)
+                .setMemoryMb(50)
+                .setResource("CPU", 1.0)
+                .setPlacementGroup(placementGroup, 1)
+                .remote());
   }
 }

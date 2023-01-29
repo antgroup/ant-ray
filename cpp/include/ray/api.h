@@ -1,22 +1,10 @@
-// Copyright 2020-2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #pragma once
 
 #include <ray/api/actor_creator.h>
 #include <ray/api/actor_handle.h>
 #include <ray/api/actor_task_caller.h>
+#include <ray/api/event_severity.h>
 #include <ray/api/function_manager.h>
 #include <ray/api/logging.h>
 #include <ray/api/object_ref.h>
@@ -24,7 +12,6 @@
 #include <ray/api/ray_remote.h>
 #include <ray/api/ray_runtime.h>
 #include <ray/api/ray_runtime_holder.h>
-#include <ray/api/runtime_env.h>
 #include <ray/api/task_caller.h>
 #include <ray/api/wait_result.h>
 
@@ -36,12 +23,12 @@
 namespace ray {
 
 /// Initialize Ray runtime with config.
-void Init(ray::RayConfig &config);
+void Init(ray::RayConfigCpp &config);
 
 /// Initialize Ray runtime with config and command-line arguments.
 /// If a parameter is explicitly set in command-line arguments, the parameter value will
 /// be overwritten.
-void Init(ray::RayConfig &config, int argc, char **argv);
+void Init(ray::RayConfigCpp &config, int argc, char **argv);
 
 /// Initialize Ray runtime with default config.
 void Init();
@@ -84,14 +71,13 @@ std::vector<std::shared_ptr<T>> Get(const std::vector<ray::ObjectRef<T>> &object
 /// \return Two arrays, one containing locally available objects, one containing the
 /// rest.
 template <typename T>
-WaitResult<T> Wait(const std::vector<ray::ObjectRef<T>> &objects,
-                   int num_objects,
+WaitResult<T> Wait(const std::vector<ray::ObjectRef<T>> &objects, int num_objects,
                    int timeout_ms);
 
 /// Create a `TaskCaller` for calling remote function.
-/// It is used for normal task, such as ray::Task(Plus1).Remote(1),
-/// ray::Task(Plus).Remote(1, 2).
+/// It is used for normal task, such as ray::Task(Plus1, 1), ray::Task(Plus, 1, 2).
 /// \param[in] func The function to be remote executed.
+/// \param[in] args The function arguments passed by a value or ObjectRef.
 /// \return TaskCaller.
 template <typename F>
 ray::internal::TaskCaller<F> Task(F func);
@@ -119,7 +105,7 @@ ray::internal::ActorCreator<JavaActorClass> Actor(JavaActorClass func);
 /// \return An ActorHandle to the actor if the actor of specified name exists or an
 /// empty optional object.
 template <typename T>
-boost::optional<ActorHandle<T>> GetActor(const std::string &actor_name);
+boost::optional<ActorHandleCpp<T>> GetActor(const std::string &actor_name);
 
 /// Get a handle to a named actor in the given namespace.
 /// The actor must have been created with name specified.
@@ -129,8 +115,18 @@ boost::optional<ActorHandle<T>> GetActor(const std::string &actor_name);
 /// \return An ActorHandle to the actor if the actor of specified name exists in
 /// specifiled namespace or an empty optional object.
 template <typename T>
-boost::optional<ActorHandle<T>> GetActor(const std::string &actor_name,
-                                         const std::string &ray_namespace);
+boost::optional<ActorHandleCpp<T>> GetActor(const std::string &actor_name,
+                                            const std::string &ray_namespace);
+
+/// Get a handle to a named xlang actor in the given namespace.
+/// The actor must have been created with name specified.
+///
+/// \param[in] actor_name The name of the named actor.
+/// \param[in] namespace The namespace of the actor.
+/// \return An ActorHandle to the actor if the actor of specified name exists in
+/// specifiled namespace or an empty optional object.
+boost::optional<ActorHandleXlang> GetActor(const std::string &actor_name,
+                                           const std::string &ray_namespace = "");
 
 /// Intentionally exit the current actor.
 /// It is used to disconnect an actor and exit the worker.
@@ -146,7 +142,7 @@ std::vector<std::shared_ptr<T>> Get(const std::vector<std::string> &ids);
 /// \param[in] create_options Creation options of the placement group.
 /// \return A PlacementGroup to the created placement group.
 PlacementGroup CreatePlacementGroup(
-    const ray::PlacementGroupCreationOptions &create_options);
+    const ray::PlacementGroupCreationOptionsCpp &create_options);
 
 /// Remove a placement group by id.
 ///
@@ -163,6 +159,9 @@ PlacementGroup GetPlacementGroup(const std::string &name);
 
 /// Returns true if the current actor was restarted, otherwise false.
 bool WasCurrentActorRestarted();
+
+void ReportEvent(const EventSeverity &severity, const std::string &label,
+                 const std::string &msg);
 
 /// Get the namespace of this job.
 std::string GetNamespace();
@@ -184,12 +183,7 @@ inline ray::ObjectRef<T> Put(const T &obj) {
   auto buffer =
       std::make_shared<msgpack::sbuffer>(ray::internal::Serializer::Serialize(obj));
   auto id = ray::internal::GetRayRuntime()->Put(buffer);
-  auto ref = ObjectRef<T>(id);
-  // The core worker will add an initial ref to the put ID to
-  // keep it in scope. Now that we've created the frontend
-  // ObjectRef, remove this initial ref.
-  ray::internal::GetRayRuntime()->RemoveLocalReference(id);
-  return ref;
+  return ray::ObjectRef<T>(id);
 }
 
 template <typename T>
@@ -217,8 +211,7 @@ inline std::vector<std::shared_ptr<T>> Get(const std::vector<ray::ObjectRef<T>> 
 }
 
 template <typename T>
-inline WaitResult<T> Wait(const std::vector<ray::ObjectRef<T>> &objects,
-                          int num_objects,
+inline WaitResult<T> Wait(const std::vector<ray::ObjectRef<T>> &objects, int num_objects,
                           int timeout_ms) {
   auto object_ids = ObjectRefsToObjectIDs<T>(objects);
   auto results =
@@ -236,10 +229,16 @@ inline WaitResult<T> Wait(const std::vector<ray::ObjectRef<T>> &objects,
 }
 
 inline ray::internal::ActorCreator<PyActorClass> Actor(PyActorClass func) {
-  ray::internal::RemoteFunctionHolder remote_func_holder(func.module_name,
-                                                         func.function_name,
-                                                         func.class_name,
-                                                         ray::internal::LangType::PYTHON);
+  ray::internal::RemoteFunctionHolder remote_func_holder(
+      func.module_name, func.function_name, func.class_name,
+      ray::internal::LangType::PYTHON);
+  return {ray::internal::GetRayRuntime().get(), std::move(remote_func_holder)};
+}
+
+inline ray::internal::ActorCreator<JavaActorClass> Actor(JavaActorClass func) {
+  ray::internal::RemoteFunctionHolder remote_func_holder(
+      func.module_name, func.function_name, func.class_name,
+      ray::internal::LangType::JAVA);
   return {ray::internal::GetRayRuntime().get(), std::move(remote_func_holder)};
 }
 
@@ -254,14 +253,6 @@ template <typename R>
 inline ray::internal::TaskCaller<JavaFunction<R>> Task(JavaFunction<R> func) {
   ray::internal::RemoteFunctionHolder remote_func_holder(
       "", func.function_name, func.class_name, ray::internal::LangType::JAVA);
-  return {ray::internal::GetRayRuntime().get(), std::move(remote_func_holder)};
-}
-
-inline ray::internal::ActorCreator<JavaActorClass> Actor(JavaActorClass func) {
-  ray::internal::RemoteFunctionHolder remote_func_holder(func.module_name,
-                                                         func.function_name,
-                                                         func.class_name,
-                                                         ray::internal::LangType::JAVA);
   return {ray::internal::GetRayRuntime().get(), std::move(remote_func_holder)};
 }
 
@@ -281,19 +272,24 @@ inline ray::internal::TaskCaller<F> Task(F func) {
 template <typename F>
 inline ray::internal::ActorCreator<F> Actor(F create_func) {
   auto func_name = internal::FunctionManager::Instance().GetFunctionName(create_func);
-  ray::internal::RemoteFunctionHolder remote_func_holder(std::move(func_name));
+  // Cpp actor don't need class_name, But java/python calls cpp actor need class name
+  // param.
+  auto class_name = internal::FunctionManager::GetClassNameByFuncName(func_name);
+  ray::internal::RemoteFunctionHolder remote_func_holder(
+      "", std::move(func_name), std::move(class_name), internal::LangType::CPP);
   return ray::internal::ActorCreator<F>(ray::internal::GetRayRuntime().get(),
                                         std::move(remote_func_holder));
 }
 
+// Get the cpp actor handle by name.
 template <typename T>
-boost::optional<ActorHandle<T>> GetActor(const std::string &actor_name) {
+boost::optional<ActorHandleCpp<T>> GetActor(const std::string &actor_name) {
   return GetActor<T>(actor_name, "");
 }
 
 template <typename T>
-boost::optional<ActorHandle<T>> GetActor(const std::string &actor_name,
-                                         const std::string &ray_namespace) {
+boost::optional<ActorHandleCpp<T>> GetActor(const std::string &actor_name,
+                                            const std::string &ray_namespace) {
   if (actor_name.empty()) {
     return {};
   }
@@ -303,13 +299,28 @@ boost::optional<ActorHandle<T>> GetActor(const std::string &actor_name,
     return {};
   }
 
-  return ActorHandle<T>(actor_id);
+  return ActorHandleCpp<T>(actor_id);
+}
+
+// Get the cross-language actor handle by name.
+inline boost::optional<ActorHandleXlang> GetActor(const std::string &actor_name,
+                                                  const std::string &ray_namespace) {
+  if (actor_name.empty()) {
+    return {};
+  }
+
+  auto actor_id = ray::internal::GetRayRuntime()->GetActorId(actor_name, ray_namespace);
+  if (actor_id.empty()) {
+    return {};
+  }
+
+  return ActorHandleXlang(actor_id);
 }
 
 inline void ExitActor() { ray::internal::GetRayRuntime()->ExitActor(); }
 
 inline PlacementGroup CreatePlacementGroup(
-    const ray::PlacementGroupCreationOptions &create_options) {
+    const ray::PlacementGroupCreationOptionsCpp &create_options) {
   return ray::internal::GetRayRuntime()->CreatePlacementGroup(create_options);
 }
 
@@ -332,6 +343,21 @@ inline PlacementGroup GetPlacementGroup(const std::string &name) {
 inline bool WasCurrentActorRestarted() {
   return ray::internal::GetRayRuntime()->WasCurrentActorRestarted();
 }
+
+inline void ReportEvent(const EventSeverity &severity, const std::string &label,
+                        const std::string &msg) {
+  ray::internal::GetRayRuntime()->ReportEvent(
+      ray::internal::GetEventSeverityString(severity), label, msg);
+}
+
+// ANT-INTERNAL
+/** Get a job data directory. The directory will be created when this method run first
+ * time. */
+inline std::string GetJobDataDir() {
+  return ray::internal::GetRayRuntime()->GetJobDataDir();
+}
+
+void RunTaskExecutionLoop();
 
 inline std::string GetNamespace() {
   return ray::internal::GetRayRuntime()->GetNamespace();

@@ -1,16 +1,3 @@
-// Copyright 2020-2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #pragma once
 
@@ -30,8 +17,6 @@
 
 namespace ray {
 namespace internal {
-
-using ray::core::WorkerContext;
 
 class RayIntentionalSystemExitException : public RayException {
  public:
@@ -54,8 +39,7 @@ class AbstractRayRuntime : public RayRuntime {
 
   std::vector<std::shared_ptr<msgpack::sbuffer>> Get(const std::vector<std::string> &ids);
 
-  std::vector<bool> Wait(const std::vector<std::string> &ids,
-                         int num_objects,
+  std::vector<bool> Wait(const std::vector<std::string> &ids, int num_objects,
                          int timeout_ms);
 
   std::string Call(const RemoteFunctionHolder &remote_function_holder,
@@ -82,9 +66,9 @@ class AbstractRayRuntime : public RayRuntime {
   void ExitActor();
 
   ray::PlacementGroup CreatePlacementGroup(
-      const ray::PlacementGroupCreationOptions &create_options);
+      const ray::PlacementGroupCreationOptionsCpp &create_options);
   void RemovePlacementGroup(const std::string &group_id);
-  bool WaitPlacementGroupReady(const std::string &group_id, int64_t timeout_seconds);
+  bool WaitPlacementGroupReady(const std::string &group_id, int timeout_seconds);
 
   const TaskID &GetCurrentTaskId();
 
@@ -103,14 +87,31 @@ class AbstractRayRuntime : public RayRuntime {
 
   bool WasCurrentActorRestarted();
 
+  void ReportEvent(const std::string &severity, const std::string &label,
+                   const std::string &msg);
+
   virtual std::vector<PlacementGroup> GetAllPlacementGroups();
   virtual PlacementGroup GetPlacementGroupById(const std::string &id);
   virtual PlacementGroup GetPlacementGroup(const std::string &name);
+  virtual std::string GetOwnershipInfo(const std::string &object_id);
+  rpc::Address GetOwnershipInfoInternal(const std::string &object_id);
+  virtual void RegisterOwnershipInfoAndResolveFuture(const std::string &object_id_str,
+                                                     const std::string &outer_object_id,
+                                                     const std::string &owner_addr);
+  void RegisterOwnershipInfoAndResolveFutureInternal(const std::string &object_id,
+                                                     const std::string &outer_object_id,
+                                                     const rpc::Address &owner_addr);
 
-  std::string GetNamespace();
   std::string SerializeActorHandle(const std::string &actor_id);
   std::string DeserializeAndRegisterActorHandle(
       const std::string &serialized_actor_handle);
+
+  // ANT-INTERNAL
+  /** Get a job data directory. The directory will be created when this method run first
+   * time. */
+  virtual std::string GetJobDataDir();
+
+  std::string GetNamespace();
 
  protected:
   std::unique_ptr<TaskSubmitter> task_submitter_;

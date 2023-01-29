@@ -1,16 +1,3 @@
-// Copyright 2020-2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #include "local_mode_object_store.h"
 
@@ -27,7 +14,7 @@ namespace ray {
 namespace internal {
 LocalModeObjectStore::LocalModeObjectStore(LocalModeRayRuntime &local_mode_ray_tuntime)
     : local_mode_ray_tuntime_(local_mode_ray_tuntime) {
-  memory_store_ = std::make_unique<CoreWorkerMemoryStore>();
+  memory_store_ = std::make_unique<::ray::CoreWorkerMemoryStore>();
 }
 
 void LocalModeObjectStore::PutRaw(std::shared_ptr<msgpack::sbuffer> data,
@@ -41,7 +28,7 @@ void LocalModeObjectStore::PutRaw(std::shared_ptr<msgpack::sbuffer> data,
   auto buffer = std::make_shared<::ray::LocalMemoryBuffer>(
       reinterpret_cast<uint8_t *>(data->data()), data->size(), true);
   auto status = memory_store_->Put(
-      ::ray::RayObject(buffer, nullptr, std::vector<rpc::ObjectReference>()), object_id);
+      ::ray::RayObject(buffer, nullptr, std::vector<ObjectID>()), object_id);
   if (!status) {
     throw RayException("Put object error");
   }
@@ -59,12 +46,9 @@ std::shared_ptr<msgpack::sbuffer> LocalModeObjectStore::GetRaw(const ObjectID &o
 std::vector<std::shared_ptr<msgpack::sbuffer>> LocalModeObjectStore::GetRaw(
     const std::vector<ObjectID> &ids, int timeout_ms) {
   std::vector<std::shared_ptr<::ray::RayObject>> results;
-  ::ray::Status status = memory_store_->Get(ids,
-                                            (int)ids.size(),
-                                            timeout_ms,
-                                            local_mode_ray_tuntime_.GetWorkerContext(),
-                                            false,
-                                            &results);
+  ::ray::Status status =
+      memory_store_->Get(ids, (int)ids.size(), timeout_ms,
+                         local_mode_ray_tuntime_.GetWorkerContext(), false, &results);
   if (!status.ok()) {
     throw RayException("Get object error: " + status.ToString());
   }
@@ -82,18 +66,15 @@ std::vector<std::shared_ptr<msgpack::sbuffer>> LocalModeObjectStore::GetRaw(
 }
 
 std::vector<bool> LocalModeObjectStore::Wait(const std::vector<ObjectID> &ids,
-                                             int num_objects,
-                                             int timeout_ms) {
+                                             int num_objects, int timeout_ms) {
   absl::flat_hash_set<ObjectID> memory_object_ids;
   for (const auto &object_id : ids) {
     memory_object_ids.insert(object_id);
   }
   absl::flat_hash_set<ObjectID> ready;
-  ::ray::Status status = memory_store_->Wait(memory_object_ids,
-                                             num_objects,
-                                             timeout_ms,
-                                             local_mode_ray_tuntime_.GetWorkerContext(),
-                                             &ready);
+  ::ray::Status status =
+      memory_store_->Wait(memory_object_ids, num_objects, timeout_ms,
+                          local_mode_ray_tuntime_.GetWorkerContext(), &ready);
   if (!status.ok()) {
     throw RayException("Wait object error: " + status.ToString());
   }

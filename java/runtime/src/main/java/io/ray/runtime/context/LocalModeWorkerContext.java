@@ -6,7 +6,6 @@ import io.ray.api.id.ActorId;
 import io.ray.api.id.JobId;
 import io.ray.api.id.TaskId;
 import io.ray.api.id.UniqueId;
-import io.ray.api.runtimeenv.RuntimeEnv;
 import io.ray.runtime.generated.Common.Address;
 import io.ray.runtime.generated.Common.TaskSpec;
 import io.ray.runtime.generated.Common.TaskType;
@@ -17,7 +16,9 @@ import java.util.Random;
 public class LocalModeWorkerContext implements WorkerContext {
 
   private final JobId jobId;
+
   private ThreadLocal<TaskSpec> currentTask = new ThreadLocal<>();
+
   private final ThreadLocal<UniqueId> currentWorkerId = new ThreadLocal<>();
 
   public LocalModeWorkerContext(JobId jobId) {
@@ -49,21 +50,36 @@ public class LocalModeWorkerContext implements WorkerContext {
   @Override
   public ActorId getCurrentActorId() {
     TaskSpec taskSpec = currentTask.get();
-    checkTaskSpecNotNull(taskSpec);
+    if (taskSpec == null) {
+      return ActorId.NIL;
+    }
     return LocalModeTaskSubmitter.getActorId(taskSpec);
   }
 
   @Override
+  public String getCurrentNodeName() {
+    return null;
+  }
+
+  @Override
+  public ClassLoader getCurrentClassLoader() {
+    return null;
+  }
+
+  @Override
+  public void setCurrentClassLoader(ClassLoader currentClassLoader) {}
+
+  @Override
   public TaskType getCurrentTaskType() {
     TaskSpec taskSpec = currentTask.get();
-    checkTaskSpecNotNull(taskSpec);
+    Preconditions.checkNotNull(taskSpec, "Current task is not set.");
     return taskSpec.getType();
   }
 
   @Override
   public TaskId getCurrentTaskId() {
     TaskSpec taskSpec = currentTask.get();
-    checkTaskSpecNotNull(taskSpec);
+    Preconditions.checkState(taskSpec != null);
     return TaskId.fromBytes(taskSpec.getTaskId().toByteArray());
   }
 
@@ -72,18 +88,11 @@ public class LocalModeWorkerContext implements WorkerContext {
     return Address.getDefaultInstance();
   }
 
-  @Override
-  public RuntimeEnv getCurrentRuntimeEnv() {
-    throw new RuntimeException("Not implemented.");
-  }
-
   public void setCurrentTask(TaskSpec taskSpec) {
     currentTask.set(taskSpec);
   }
 
-  private static void checkTaskSpecNotNull(TaskSpec taskSpec) {
-    Preconditions.checkNotNull(
-        taskSpec,
-        "Current task is not set. Maybe you invoked this API in a user-created thread not managed by Ray. Invoking this API in a user-created thread is not supported yet in local mode. You can switch to cluster mode.");
+  public TaskSpec getCurrentTask() {
+    return currentTask.get();
   }
 }

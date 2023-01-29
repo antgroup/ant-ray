@@ -11,53 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-// --------------------------------------------------------------
-//
-// RAY_LOG_EVERY_N and RAY_LOG_EVERY_MS are adapted from
-// https://github.com/google/glog/blob/master/src/glog/logging.h.in
-//
-// Copyright (c) 2008, Google Inc.
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are
-// met:
-//
-//     * Redistributions of source code must retain the above copyright
-// notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above
-// copyright notice, this list of conditions and the following disclaimer
-// in the documentation and/or other materials provided with the
-// distribution.
-//     * Neither the name of Google Inc. nor the names of its
-// contributors may be used to endorse or promote products derived from
-// this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <gtest/gtest_prod.h>
-
-#include <atomic>
-#include <chrono>
 #include <functional>
 #include <iostream>
-#include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
 
 #if defined(_WIN32)
 #ifndef _WINDOWS_
@@ -85,10 +45,11 @@ enum { ERROR = 0 };
 #endif
 
 namespace ray {
-class StackTrace {
-  /// This dumps the current stack trace information.
-  friend std::ostream &operator<<(std::ostream &os, const StackTrace &stack_trace);
-};
+/// In order to use the get stacktrace method in other non-glog scenarios, we
+/// have added a patch to allow glog to return the current call stack information
+/// through the internal interface. This function `GetCallTrace` is a wrapper
+/// providing a new detection function for debug or something like that.
+std::string GetCallTrace();
 
 enum class RayLogLevel {
   TRACE = -2,
@@ -215,16 +176,14 @@ class RayLogBase {
 
   // By default, this class is a null log because it return false here.
   virtual bool IsEnabled() const { return false; };
-
-  // This function to judge whether current log is fatal or not.
-  virtual bool IsFatal() const { return false; };
-
+  // This function to judge whether expose current log for trouble shooting.
+  virtual bool IsExposed() const { return false; };
   template <typename T>
   RayLogBase &operator<<(const T &t) {
     if (IsEnabled()) {
       Stream() << t;
     }
-    if (IsFatal()) {
+    if (IsExposed()) {
       ExposeStream() << t;
     }
     return *this;
@@ -234,11 +193,6 @@ class RayLogBase {
   virtual std::ostream &Stream() { return std::cerr; };
   virtual std::ostream &ExposeStream() { return std::cerr; };
 };
-
-/// Callback function which will be triggered to expose fatal log.
-/// The first argument: a string representing log type or label.
-/// The second argument: log content.
-using FatalLogCallback = std::function<void(const std::string &, const std::string &)>;
 
 class RayLog : public RayLogBase {
  public:
@@ -251,8 +205,7 @@ class RayLog : public RayLogBase {
   /// \return True if logging is enabled and false otherwise.
   virtual bool IsEnabled() const;
 
-  virtual bool IsFatal() const;
-
+  virtual bool IsExposed() const;
   /// The init function of ray log for a program which should be called only once.
   ///
   /// \parem appName The app name which starts the log.
@@ -263,8 +216,12 @@ class RayLog : public RayLogBase {
                           const std::string &logDir = "");
 
   /// The shutdown function of ray log which should be used with StartRayLog as a pair.
-  /// If `StartRayLog` wasn't called before, it will be no-op.
   static void ShutDownRayLog();
+
+  static void SetEventCallback(
+      std::function<void(std::string, std::string, std::string)> report_event) {
+    report_event_callback_ = report_event;
+  }
 
   /// Uninstall the signal actions installed by InstallFailureSignalHandler.
   static void UninstallSignalAction();
@@ -276,55 +233,33 @@ class RayLog : public RayLogBase {
   static bool IsLevelEnabled(RayLogLevel log_level);
 
   /// Install the failure signal handler to output call stack when crash.
-  ///
-  /// \param argv0 This is the argv[0] supplied to main(). It enables an alternative way
-  /// to locate the object file containing debug symbols for ELF format executables. If
-  /// this is left as nullptr, symbolization can fail in some cases. More details in:
-  /// https://github.com/abseil/abseil-cpp/blob/master/absl/debugging/symbolize_elf.inc
-  /// \parem call_previous_handler Whether to call the previous signal handler. See
-  /// important caveats:
-  /// https://github.com/abseil/abseil-cpp/blob/7e446075d4aff4601c1e7627c7c0be2c4833a53a/absl/debugging/failure_signal_handler.h#L76-L88
-  /// This is currently used to enable signal handler from both Python and C++ in Python
-  /// worker.
-  static void InstallFailureSignalHandler(const char *argv0,
-                                          bool call_previous_handler = false);
+  /// If glog is not installed, this function won't do anything.
+  static void InstallFailureSignalHandler();
+  // Get the log level from environment variable.
 
-  /// Install the terminate handler to output call stack when std::terminate() is called
-  /// (e.g. unhandled exception).
-  static void InstallTerminateHandler();
-
-  /// To check failure signal handler enabled or not.
+  // To check failure signal handler enabled or not.
   static bool IsFailureSignalHandlerEnabled();
 
-  /// Get the log level from environment variable.
   static RayLogLevel GetLogLevelFromEnv();
 
   static std::string GetLogFormatPattern();
 
   static std::string GetLoggerName();
 
-  /// Add callback functions that will be triggered to expose fatal log.
-  static void AddFatalLogCallbacks(
-      const std::vector<FatalLogCallback> &expose_log_callbacks);
+ public:
+  static std::function<void(std::string, std::string, std::string)>
+      report_event_callback_;
 
  private:
-  FRIEND_TEST(PrintLogTest, TestRayLogEveryNOrDebug);
-  FRIEND_TEST(PrintLogTest, TestRayLogEveryN);
   // Hide the implementation of log provider by void *.
   // Otherwise, lib user may define the same macro to use the correct header file.
   void *logging_provider_;
   /// True if log messages should be logged and false if they should be ignored.
   bool is_enabled_;
-  /// log level.
-  RayLogLevel severity_;
-  /// Whether current log is fatal or not.
-  bool is_fatal_ = false;
-  /// String stream of exposed log content.
-  std::shared_ptr<std::ostringstream> expose_osstream_ = nullptr;
-  /// Whether or not the log is initialized.
-  static std::atomic<bool> initialized_;
-  /// Callback functions which will be triggered to expose fatal log.
-  static std::vector<FatalLogCallback> fatal_log_callbacks_;
+  /// True if log messages should be exposed for troubleshooting and false if they should
+  /// be ignored.
+  bool is_exposed_ = false;
+  std::ostringstream *osstream_ = nullptr;
   static RayLogLevel severity_threshold_;
   // In InitGoogleLogging, it simply keeps the pointer.
   // We need to make sure the app name passed to InitGoogleLogging exist.
@@ -350,6 +285,7 @@ class RayLog : public RayLogBase {
 };
 
 // This class make RAY_CHECK compilation pass to change the << operator to void.
+// This class is copied from glog.
 class Voidify {
  public:
   Voidify() {}

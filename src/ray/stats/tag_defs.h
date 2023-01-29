@@ -20,42 +20,52 @@
 using TagKeyType = opencensus::tags::TagKey;
 using TagsType = std::vector<std::pair<opencensus::tags::TagKey, std::string>>;
 
-extern const TagKeyType ComponentKey;
+static const TagKeyType ClusterNameKey = TagKeyType::Register("ClusterName");
 
-extern const TagKeyType JobNameKey;
+static const TagKeyType ComponentKey = TagKeyType::Register("Component");
 
-extern const TagKeyType CustomKey;
+static const TagKeyType JobNameKey = TagKeyType::Register("JobName");
 
-extern const TagKeyType NodeAddressKey;
+static const TagKeyType JobIdKey = TagKeyType::Register("JobId");
 
-extern const TagKeyType VersionKey;
+static const TagKeyType WorkerTypeKey = TagKeyType::Register("WorkerType");
 
-extern const TagKeyType LanguageKey;
+static const TagKeyType CustomKey = TagKeyType::Register("CustomKey");
 
-extern const TagKeyType WorkerPidKey;
+static const TagKeyType NodeAddressKey = TagKeyType::Register("NodeAddress");
 
-extern const TagKeyType DriverPidKey;
+static const TagKeyType VersionKey = TagKeyType::Register("Version");
 
-extern const TagKeyType ResourceNameKey;
+static const TagKeyType LanguageKey = TagKeyType::Register("Language");
 
-extern const TagKeyType ActorIdKey;
+static const TagKeyType WorkerPidKey = TagKeyType::Register("WorkerPid");
 
-extern const TagKeyType WorkerIdKey;
+static const TagKeyType DriverPidKey = TagKeyType::Register("DriverPid");
 
-extern const TagKeyType JobIdKey;
+static const TagKeyType ResourceNameKey = TagKeyType::Register("ResourceName");
 
-extern const TagKeyType SessionNameKey;
+static const TagKeyType ValueTypeKey = TagKeyType::Register("ValueType");
 
-extern const TagKeyType NameKey;
+static const TagKeyType ActorIdKey = TagKeyType::Register("ActorId");
 
-// Object store memory location tag constants
-extern const TagKeyType LocationKey;
-constexpr char kObjectLocMmapShm[] = "MMAP_SHM";
-constexpr char kObjectLocMmapDisk[] = "MMAP_DISK";
-constexpr char kObjectLocSpilled[] = "SPILLED";
-constexpr char kObjectLocWorkerHeap[] = "WORKER_HEAP";
+static const TagKeyType PlacementGroupIdKey = TagKeyType::Register("PlacementGroupId");
 
-// Object store memory sealed/unsealed tag
-extern const TagKeyType ObjectStateKey;
-constexpr char kObjectSealed[] = "SEALED";
-constexpr char kObjectUnsealed[] = "UNSEALED";
+static const TagKeyType WorkerIdKey = TagKeyType::Register("WorkerId");
+
+static const TagKeyType FunctionKey = TagKeyType::Register("Function");
+
+static const TagKeyType ActorStateKey = TagKeyType::Register("ActorState");
+
+static const TagKeyType TaskStateKey = TagKeyType::Register("TaskState");
+
+static const TagKeyType WorkerStateKey = TagKeyType::Register("WorkerState");
+
+static const TagKeyType LeasedWorkerTypeKey = TagKeyType::Register("LeasedWorkerType");
+
+static const TagKeyType WorkerNodeAddressKey = TagKeyType::Register("WorkerNodeAddress");
+
+static const TagKeyType EventLabelKey = TagKeyType::Register("EventLabel");
+
+static const TagKeyType EventSourceTypeKey = TagKeyType::Register("EventSourceType");
+
+static const TagKeyType EventSeverityTypeKey = TagKeyType::Register("EventSeverity");

@@ -4,16 +4,13 @@
 
 import aiohttp
 import asyncio
-import logging
 import time
 import requests
-
-import numpy as np
 
 import ray
 from ray import serve
 
-logger = logging.getLogger(__file__)
+import numpy as np
 
 NUM_CLIENTS = 8
 CALLS_PER_BATCH = 100
@@ -34,12 +31,8 @@ async def timeit(name, fn, multiplier=1):
             count += 1
         end = time.time()
         stats.append(multiplier * count / (end - start))
-    logger.info(
-        "\t{} {} +- {} requests/s".format(
-            name, round(np.mean(stats), 2), round(np.std(stats), 2)
-        )
-    )
-    return round(np.mean(stats), 2)
+    print("\t{} {} +- {} requests/s".format(name, round(np.mean(stats), 2),
+                                            round(np.std(stats), 2)))
 
 
 async def fetch(session, data):
@@ -61,44 +54,26 @@ class Client:
             await fetch(self.session, data)
 
 
-async def trial(
-    result_json,
-    intermediate_handles,
-    num_replicas,
-    max_batch_size,
-    max_concurrent_queries,
-    data_size,
-):
-    trial_key_base = (
-        f"replica:{num_replicas}/batch_size:{max_batch_size}/"
-        f"concurrent_queries:{max_concurrent_queries}/"
-        f"data_size:{data_size}/intermediate_handle:{intermediate_handles}"
-    )
-
-    logger.info(
-        f"intermediate_handles={intermediate_handles},"
-        f"num_replicas={num_replicas},"
-        f"max_batch_size={max_batch_size},"
-        f"max_concurrent_queries={max_concurrent_queries},"
-        f"data_size={data_size}"
-    )
+async def trial(intermediate_handles, num_replicas, max_batch_size,
+                max_concurrent_queries, data_size):
+    print(f"intermediate_handles={intermediate_handles},"
+          f"num_replicas={num_replicas},"
+          f"max_batch_size={max_batch_size},"
+          f"max_concurrent_queries={max_concurrent_queries},"
+          f"data_size={data_size}:")
 
     deployment_name = "api"
     if intermediate_handles:
         deployment_name = "downstream"
 
-        @serve.deployment(name="api", max_concurrent_queries=1000)
+        @serve.deployment("api", max_concurrent_queries=1000)
         class ForwardActor:
             def __init__(self):
-                self.handle = None
+                self.handle = serve.get_deployment(deployment_name).get_handle(
+                    sync=False)
 
-            async def __call__(self, req):
-                if self.handle is None:
-                    self.handle = serve.get_deployment(deployment_name).get_handle(
-                        sync=False
-                    )
-                obj_ref = await self.handle.remote(req)
-                return await obj_ref
+            async def __call__(self, _):
+                return await self.handle.remote()
 
         ForwardActor.deploy()
         routes = requests.get("http://localhost:8000/-/routes").json()
@@ -107,9 +82,8 @@ async def trial(
     @serve.deployment(
         name=deployment_name,
         num_replicas=num_replicas,
-        max_concurrent_queries=max_concurrent_queries,
-    )
-    class D:
+        max_concurrent_queries=max_concurrent_queries)
+    class Backend:
         @serve.batch(max_batch_size=max_batch_size)
         async def batch(self, reqs):
             return [b"ok"] * len(reqs)
@@ -120,7 +94,7 @@ async def trial(
             else:
                 return b"ok"
 
-    D.deploy()
+    Backend.deploy()
     routes = requests.get("http://localhost:8000/-/routes").json()
     assert f"/{deployment_name}" in routes, routes
 
@@ -137,13 +111,10 @@ async def trial(
             for _ in range(CALLS_PER_BATCH):
                 await fetch(session, data)
 
-        single_client_avg_tps = await timeit(
+        await timeit(
             "single client {} data".format(data_size),
             single_client,
-            multiplier=CALLS_PER_BATCH,
-        )
-        key = "num_client:1/" + trial_key_base
-        result_json.update({key: single_client_avg_tps})
+            multiplier=CALLS_PER_BATCH)
 
     clients = [Client.remote() for _ in range(NUM_CLIENTS)]
     ray.get([client.ready.remote() for client in clients])
@@ -151,42 +122,26 @@ async def trial(
     async def many_clients():
         ray.get([a.do_queries.remote(CALLS_PER_BATCH, data) for a in clients])
 
-    multi_client_avg_tps = await timeit(
+    await timeit(
         "{} clients {} data".format(len(clients), data_size),
         many_clients,
-        multiplier=CALLS_PER_BATCH * len(clients),
-    )
-    key = f"num_client:{len(clients)}/" + trial_key_base
-    result_json.update({key: multi_client_avg_tps})
-
-    logger.info(result_json)
+        multiplier=CALLS_PER_BATCH * len(clients))
 
 
 async def main():
-    result_json = {}
+    ray.init(log_to_driver=False)
+    serve.start()
     for intermediate_handles in [False, True]:
         for num_replicas in [1, 8]:
-            for max_batch_size, max_concurrent_queries in [
-                (1, 1),
-                (1, 10000),
-                (10000, 10000),
-            ]:
+            for max_batch_size, max_concurrent_queries in [(1, 1), (1, 10000),
+                                                           (10000, 10000)]:
                 # TODO(edoakes): large data causes broken pipe errors.
                 for data_size in ["small"]:
-                    await trial(
-                        result_json,
-                        intermediate_handles,
-                        num_replicas,
-                        max_batch_size,
-                        max_concurrent_queries,
-                        data_size,
-                    )
-    return result_json
+                    await trial(intermediate_handles, num_replicas,
+                                max_batch_size, max_concurrent_queries,
+                                data_size)
 
 
 if __name__ == "__main__":
-    ray.init()
-    serve.start()
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+    loop = asyncio.get_event_loop()
     loop.run_until_complete(main())

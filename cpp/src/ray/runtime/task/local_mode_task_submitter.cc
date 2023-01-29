@@ -1,16 +1,3 @@
-// Copyright 2020-2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #include "local_mode_task_submitter.h"
 
@@ -32,7 +19,7 @@ LocalModeTaskSubmitter::LocalModeTaskSubmitter(
 
 ObjectID LocalModeTaskSubmitter::Submit(InvocationSpec &invocation,
                                         const ActorCreationOptions &options) {
-  /// TODO(SongGuyang): Make the information of TaskSpecification more reasonable
+  /// TODO(Guyang Song): Make the infomation of TaskSpecification more reasonable
   /// We just reuse the TaskSpecification class and make the single process mode work.
   /// Maybe some infomation of TaskSpecification are not reasonable or invalid.
   /// We will enhance this after implement the cluster mode.
@@ -47,44 +34,28 @@ ObjectID LocalModeTaskSubmitter::Submit(InvocationSpec &invocation,
   TaskSpecBuilder builder;
   std::string task_name =
       invocation.name.empty() ? functionDescriptor->DefaultTaskName() : invocation.name;
-
   // TODO (Alex): Properly set the depth here?
-  builder.SetCommonTaskSpec(task_id,
-                            task_name,
-                            rpc::Language::CPP,
-                            functionDescriptor,
+  builder.SetCommonTaskSpec(task_id, task_name, rpc::Language::CPP, functionDescriptor,
                             local_mode_ray_tuntime_.GetCurrentJobID(),
-                            local_mode_ray_tuntime_.GetCurrentTaskId(),
-                            0,
-                            local_mode_ray_tuntime_.GetCurrentTaskId(),
-                            address,
-                            1,
-                            /*returns_dynamic=*/false,
-                            required_resources,
-                            required_placement_resources,
-                            "",
+                            local_mode_ray_tuntime_.GetCurrentTaskId(), 0,
+                            local_mode_ray_tuntime_.GetCurrentTaskId(), address, 1,
+                            required_resources, required_placement_resources, "",
                             /*depth=*/0);
   if (invocation.task_type == TaskType::NORMAL_TASK) {
   } else if (invocation.task_type == TaskType::ACTOR_CREATION_TASK) {
     invocation.actor_id = local_mode_ray_tuntime_.GetNextActorID();
     rpc::SchedulingStrategy scheduling_strategy;
     scheduling_strategy.mutable_default_scheduling_strategy();
-    builder.SetActorCreationTaskSpec(invocation.actor_id,
-                                     /*serialized_actor_handle=*/"",
-                                     scheduling_strategy,
-                                     options.max_restarts,
-                                     /*max_task_retries=*/0,
-                                     {},
-                                     options.max_concurrency);
+    builder.SetActorCreationTaskSpec(invocation.actor_id, /*serialized_actor_handle=*/"",
+                                     scheduling_strategy, options.max_restarts,
+                                     /*max_task_retries=*/0, {}, options.max_concurrency);
   } else if (invocation.task_type == TaskType::ACTOR_TASK) {
     const TaskID actor_creation_task_id =
         TaskID::ForActorCreationTask(invocation.actor_id);
     const ObjectID actor_creation_dummy_object_id =
         ObjectID::FromIndex(actor_creation_task_id, 1);
-    builder.SetActorTaskSpec(invocation.actor_id,
-                             actor_creation_dummy_object_id,
-                             ObjectID(),
-                             invocation.actor_counter);
+    builder.SetActorTaskSpec(invocation.actor_id, actor_creation_dummy_object_id,
+                             ObjectID(), invocation.actor_counter, false);
   } else {
     throw RayException("unknown task type");
   }
@@ -104,23 +75,23 @@ ObjectID LocalModeTaskSubmitter::Submit(InvocationSpec &invocation,
   AbstractRayRuntime *runtime = &local_mode_ray_tuntime_;
   if (invocation.task_type == TaskType::ACTOR_CREATION_TASK ||
       invocation.task_type == TaskType::ACTOR_TASK) {
-    /// TODO(SongGuyang): Handle task dependencies.
+    /// TODO(Guyang Song): Handle task dependencies.
     /// Execute actor task directly in the main thread because we must guarantee the actor
     /// task executed by calling order.
-    TaskExecutor::Invoke(
-        task_specification, actor, runtime, actor_contexts_, actor_contexts_mutex_);
+    TaskExecutor::Invoke(task_specification, actor, runtime, actor_contexts_,
+                         actor_contexts_mutex_);
   } else {
-    boost::asio::post(
-        *thread_pool_.get(),
-        std::bind(
-            [actor, mutex, runtime, this](TaskSpecification &ts) {
-              if (mutex) {
-                absl::MutexLock lock(mutex.get());
-              }
-              TaskExecutor::Invoke(
-                  ts, actor, runtime, this->actor_contexts_, this->actor_contexts_mutex_);
-            },
-            std::move(task_specification)));
+    boost::asio::post(*thread_pool_.get(),
+                      std::bind(
+                          [actor, mutex, runtime, this](TaskSpecification &ts) {
+                            if (mutex) {
+                              absl::MutexLock lock(mutex.get());
+                            }
+                            TaskExecutor::Invoke(ts, actor, runtime,
+                                                 this->actor_contexts_,
+                                                 this->actor_contexts_mutex_);
+                          },
+                          std::move(task_specification)));
   }
   return return_object_id;
 }
@@ -158,11 +129,10 @@ ActorID LocalModeTaskSubmitter::GetActor(const std::string &actor_name,
 }
 
 ray::PlacementGroup LocalModeTaskSubmitter::CreatePlacementGroup(
-    const ray::PlacementGroupCreationOptions &create_options) {
+    const ray::PlacementGroupCreationOptionsCpp &create_options) {
   ray::PlacementGroup placement_group{
-      PlacementGroupID::Of(local_mode_ray_tuntime_.GetCurrentJobID()).Binary(),
-      create_options};
-  placement_group.SetWaitCallbak([this](const std::string &id, int64_t timeout_seconds) {
+      ray::BaseID<ray::PlacementGroupID>::FromRandom().Binary(), create_options};
+  placement_group.SetWaitCallbak([this](const std::string &id, int timeout_seconds) {
     return WaitPlacementGroupReady(id, timeout_seconds);
   });
   placement_groups_.emplace(placement_group.GetID(), placement_group);

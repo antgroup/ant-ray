@@ -1,0 +1,1176 @@
+# Bazel build
+# C/C++ documentation: https://docs.bazel.build/versions/master/be/c-cpp.html
+
+load("@com_github_google_flatbuffers//:build_defs.bzl", "flatbuffer_cc_library")
+load("@com_github_grpc_grpc//bazel:cython_library.bzl", "pyx_library")
+load("@com_github_ray_project_ray//bazel:ray.bzl", "flatbuffer_py_library", "if_linux_x86_64")
+load("@rules_proto_grpc//python:defs.bzl", "python_proto_compile")
+
+COPTS = [
+    "-DRAY_USE_GLOG",
+    "-DSTREAMING_USE_KMONITOR",
+    "-DUSE_SPD_LOG",
+]
+
+streaming_opts = COPTS + if_linux_x86_64(["-DUSE_PANGU"])
+
+FLATC_ARGS = [
+    "--gen-object-api",
+    "--gen-mutable",
+    "--scoped-enums",
+]
+
+flatbuffer_cc_library(
+    name = "streaming_queue_fbs",
+    srcs = ["queue/streaming_queue.fbs"],
+    flatc_args = FLATC_ARGS,
+    out_prefix = "queue/",
+)
+
+proto_library(
+    name = "streaming_proto",
+    srcs = ["protobuf/streaming.proto"],
+    visibility = ["//visibility:public"],
+)
+
+cc_proto_library(
+    name = "streaming_cc_proto",
+    deps = [":streaming_proto"],
+)
+
+# ray shared lib
+cc_binary(
+    name = "ray_util.so",
+    linkshared = 1,
+    visibility = ["//visibility:public"],
+    deps = ["//:ray_util"],
+)
+
+cc_binary(
+    name = "ray_common.so",
+    linkshared = 1,
+    visibility = ["//visibility:public"],
+    deps = ["//:ray_common"],
+)
+
+cc_binary(
+    name = "stats_lib.so",
+    linkshared = 1,
+    visibility = ["//visibility:public"],
+    deps = ["//:stats_lib"],
+)
+
+cc_binary(
+    name = "plasma_client.so",
+    linkshared = 1,
+    visibility = ["//visibility:public"],
+    deps = ["//:plasma_client"],
+)
+
+cc_binary(
+    name = "core_worker_lib.so",
+    linkshared = 1,
+    deps = ["//:core_worker_lib"],
+)
+
+cc_binary(
+    name = "raylet_lib.so",
+    linkshared = 1,
+    deps = ["//:raylet_lib"],
+)
+
+cc_binary(
+    name = "exported_streaming_internal.so",
+    copts = streaming_opts,
+    linkshared = 1,
+    deps = ["//:exported_streaming_internal"],
+)
+
+cc_library(
+    name = "streaming_util",
+    srcs = glob(
+        ["util/*.cc"],
+        exclude = ["util/logging.cc"],
+    ),
+    hdrs = glob(
+        ["util/*.h"],
+        exclude = ["util/logging.h"],
+    ),
+    copts = streaming_opts,
+    includes = ["util/"],
+    linkopts = if_linux_x86_64(["-lz"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "exported_streaming_internal.so",
+        "nginx_memory_pool",
+        ":ray_common.so",
+        ":ray_util.so",
+        ":raylet_lib.so",
+        ":streaming_logging",
+        "@boost//:any",
+        "@boost//:asio",
+        "@boost//:circular_buffer",
+    ] + if_linux_x86_64(["pangu_sdk"]),
+)
+
+cc_library(
+    name = "streaming_buffer_pool",
+    srcs = glob(["buffer_pool/*.cc"]),
+    hdrs = glob(["buffer_pool/*.h"]),
+    copts = streaming_opts,
+    includes = [
+        ".",
+        "buffer_pool/",
+    ],
+    deps = [
+        ":streaming_common",
+        ":streaming_util",
+    ],
+)
+
+cc_library(
+    name = "streaming_logging",
+    srcs = ["util/logging.cc"],
+    hdrs = ["util/logging.h"],
+    copts = streaming_opts,
+    includes = ["util/"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":ray_util.so",
+        "@com_github_spdlog//:spdlog",
+    ],
+)
+
+cc_library(
+    name = "streaming_message",
+    srcs = glob(["message/*.cc"]),
+    hdrs = glob(["message/*.h"]),
+    copts = streaming_opts,
+    includes = ["message/"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":ray_common.so",
+        ":streaming_buffer_pool",
+        ":streaming_common",
+        ":streaming_conf",
+        ":streaming_logging",
+        "@boost//:circular_buffer",
+    ],
+)
+
+cc_library(
+    name = "streaming_common",
+    srcs = glob(["common/*.cc"]),
+    hdrs = glob(["common/*.h"]),
+    copts = streaming_opts,
+    visibility = ["//visibility:public"],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "streaming_flow_control",
+    srcs = glob(["flow_control/*.cc"]),
+    hdrs = glob(["flow_control/*.h"]),
+    copts = streaming_opts,
+    includes = ["flow_control/"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_channel",
+    ],
+)
+
+cc_library(
+    name = "streaming_channel",
+    srcs = glob(["channel/*.cc"]),
+    hdrs = glob(["channel/*.h"]),
+    copts = streaming_opts,
+    includes = ["channel/"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_buffer_pool",
+        ":streaming_common",
+        ":streaming_logging",
+        ":streaming_message",
+        ":streaming_queue",
+        ":streaming_util",
+    ],
+)
+
+cc_library(
+    name = "streaming_reliability",
+    srcs = glob(["reliability/barrier_helper.cc"]),
+    hdrs = glob(["reliability/barrier_helper.h"]),
+    copts = streaming_opts,
+    includes = [
+        ".",
+        "reliability/",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_channel",
+        ":streaming_common",
+        ":streaming_logging",
+        ":streaming_message",
+        ":streaming_persistence",
+        ":streaming_util",
+    ],
+)
+
+cc_library(
+    name = "streaming_persistence",
+    srcs = glob(["reliability/persistence.cc"]),
+    hdrs = glob(["reliability/persistence.h"]),
+    copts = streaming_opts,
+    includes = [
+        ".",
+        "reliability/",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_common",
+        ":streaming_logging",
+        ":streaming_message",
+        ":streaming_util",
+    ],
+)
+
+cc_library(
+    name = "streaming_metrics",
+    srcs = glob(["metrics/*.cc"]),
+    hdrs = glob([
+        "metrics/*.h",
+    ]),
+    copts = streaming_opts,
+    includes = ["metrics/"],
+    linkstatic = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":stats_lib.so",
+        ":streaming_conf",
+        ":streaming_util",
+        "@com_antfin_kmonitor_client//:kmonitor_client",
+    ],
+)
+
+cc_library(
+    name = "streaming_conf",
+    srcs = glob(["conf/*.cc"]),
+    hdrs = glob(["conf/*.h"]),
+    copts = streaming_opts,
+    includes = [
+        ".",
+        "conf/",
+        "format/",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_cc_proto",
+        ":streaming_logging",
+        ":streaming_util",
+    ],
+)
+
+cc_library(
+    name = "elastic_buffer",
+    srcs = glob(["elasticbuffer/*.cc"]),
+    hdrs = glob(["elasticbuffer/*.h"]),
+    copts = streaming_opts,
+    includes = [
+        ".",
+        "elasticbuffer/",
+    ],
+    linkopts = if_linux_x86_64(["-lz"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_conf",
+        ":streaming_util",
+    ],
+)
+
+cc_library(
+    name = "streaming_queue",
+    srcs = glob(["queue/*.cc"]),
+    hdrs = glob(["queue/*.h"]),
+    copts = ["-Wno-unused-function"] + streaming_opts,
+    includes = [
+        ".",
+        "queue/",
+    ],
+    linkstatic = 0,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":core_worker_lib.so",
+        ":elastic_buffer",
+        ":raylet_lib.so",
+        ":streaming_buffer_pool",
+        ":streaming_common",
+        ":streaming_conf",
+        ":streaming_persistence",
+        ":streaming_queue_fbs",
+        ":streaming_util",
+        "//:plasma_client",
+    ],
+)
+
+cc_library(
+    name = "streaming_api",
+    srcs = glob(["api/*.cc"]),
+    hdrs = glob(["api/*.h"]),
+    copts = streaming_opts,
+    includes = [
+        ".",
+        "api/",
+    ],
+    linkstatic = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_common",
+        ":streaming_logging",
+        ":streaming_util",
+        "//:ray_common",  # ray::MurmurHash64A is no reference, so we need import this library.
+        "@boost//:dll",
+    ],
+    # alwayslink would generate a .lo file that cant not be linked by others.
+    #alwayslink = True,
+)
+
+cc_binary(
+    name = "libstreaming_api.so",
+    linkopts = [
+        "-shared",
+        "-fvisibility=hidden",
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": [
+            "-Wl,-exported_symbols_list,$(location :streaming_exported_symbols.lds)",
+        ],
+        "@bazel_tools//src/conditions:windows": [
+        ],
+        "//conditions:default": [
+            "-Wl,--version-script,$(location :streaming_version_script.lds)",
+        ],
+    }),
+    linkshared = True,
+    linkstatic = True,
+    visibility = ["//visibility:__subpackages__"],
+    deps = [
+        ":streaming_api",
+        ":streaming_exported_symbols.lds",
+        ":streaming_version_script.lds",
+    ],
+)
+
+cc_library(
+    name = "streaming_runtime",
+    srcs = glob(
+        ["runtime/*.cc"],
+        exclude = ["runtime/worker_main.cc"],
+    ),
+    hdrs = glob(["runtime/*.h"]),
+    copts = streaming_opts,
+    includes = [
+        ".",
+        "runtime/",
+    ],
+    linkstatic = 0,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_api",
+        "//cpp:ray_api",
+    ],
+    alwayslink = True,
+)
+
+cc_binary(
+    name = "streaming_runtime.so",
+    linkopts = ["-shared"],
+    linkshared = 1,
+    visibility = ["//visibility:public"],
+    deps = [":streaming_runtime"],
+)
+
+cc_library(
+    name = "function_example",
+    srcs = glob(
+        ["test/example/*.cc"],
+    ),
+    hdrs = glob(["test/example/*.h"]),
+    copts = streaming_opts,
+    includes = [
+        ".",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_api",
+        #"//:ray_common", # Util links to ID class, so here is static link to ray_common.
+    ],
+    alwayslink = True,
+)
+
+cc_binary(
+    name = "function_example.so",
+    linkopts = ["-shared"],
+    linkshared = 1,
+    visibility = ["//visibility:public"],
+    deps = [":function_example"],
+)
+
+cc_binary(
+    name = "worker_main",
+    srcs = [
+        "runtime/worker_main.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [
+        ":streaming_runtime",
+    ],
+)
+
+cc_library(
+    name = "streaming_lib_static",
+    copts = streaming_opts,
+    linkopts = if_linux_x86_64(["-lz"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_lib",
+        "//:core_worker_lib",
+        "//:ray_common",
+        "//:ray_util",
+        "//:raylet_lib",
+    ],
+)
+
+cc_library(
+    name = "streaming_lib",
+    srcs = glob(["*.cc"]),
+    hdrs = glob([
+        "*.h",
+        "rescale/*.h",
+    ]),
+    copts = streaming_opts,
+    includes = [
+        ".",
+        "rescale/",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_buffer_pool",
+        ":streaming_channel",
+        ":streaming_common",
+        ":streaming_flow_control",
+        ":streaming_message",
+        ":streaming_metrics",
+        ":streaming_reliability",
+    ],
+)
+
+test_common_deps = [
+    "//:exported_streaming_internal",
+    ":streaming_lib",
+    "//:ray_common",
+    "//:ray_util",
+    "//:core_worker_lib",
+    "@com_google_googletest//:gtest",
+]
+
+cc_binary(
+    name = "libstreaming_java.so",
+    srcs = glob([
+        "lib/java/*.h",
+        "lib/java/*.cc",
+    ]),
+    includes = [
+        "jni",
+        "streaming/src",
+        "streaming/src/lib/java",
+    ],
+    linkshared = 1,
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":streaming_lib",
+        "//:ray_util",
+        "@bazel_tools//tools/jdk:jni",
+    ],
+)
+
+genrule(
+    name = "streaming-jni-darwin-compat",
+    srcs = [":libstreaming_java.so"],
+    outs = ["libstreaming_java.dylib"],
+    cmd = "cp $< $@",
+    output_to_bindir = 1,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "streaming_java",
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": [":libstreaming_java.dylib"],
+        "//conditions:default": [":libstreaming_java.so"],
+    }),
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "libpangu_api_so",
+    outs = ["libpangu_api.so"],
+    cmd = """
+        wget -q http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci/pangu-client/libpangu_api.so
+        cp -f libpangu_api.so $@
+    """,
+)
+
+cc_import(
+    name = "pangu-client",
+    shared_library = ":libpangu_api_so",
+)
+
+cc_library(
+    name = "pangu_sdk",
+    srcs = glob([
+        "thirdparty/zdfs/env/*.cc",
+        "thirdparty/zdfs/util/*.cc",
+    ]),
+    hdrs = glob([
+        "thirdparty/zdfs/env/*.h",
+        "thirdparty/zdfs/util/*.h",
+    ]),
+    includes = [
+        "thirdparty/zdfs/",
+    ],
+    linkstatic = True,
+    deps = [] + if_linux_x86_64([":pangu-client"]),
+)
+
+cc_library(
+    name = "nginx_memory_pool",
+    srcs = glob([
+        "thirdparty/nginx/*.cc",
+    ]),
+    hdrs = glob([
+        "thirdparty/nginx/*.h",
+    ]),
+    includes = [
+        "thirdparty/nginx/",
+    ],
+)
+
+cc_library(
+    name = "streaming_test_lib",
+    srcs = ["test/test_utils.cc"],
+    hdrs = glob(["test/*.h"]),
+    includes = [
+        "test/",
+        "test/it/",
+    ],
+    linkstatic = True,
+    deps = test_common_deps,
+)
+
+cc_binary(
+    name = "nginx_mpool_test",
+    srcs = [
+        "thirdparty/nginx/test/ngx_mpool_test.cc",
+    ],
+    deps = [
+        ":nginx_memory_pool",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_binary(
+    name = "bundle_meta_info",
+    srcs = [
+        "test/bundle_meta_info.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_message_ring_buffer_tests",
+    srcs = [
+        "test/streaming_message_ring_buffer_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "operator_test",
+    srcs = [
+        "test/function_test.h",
+        "test/operator_tests.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [
+        ":streaming_api",
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "runtime_task_test",
+    srcs = [
+        "test/function_test.h",
+        "test/runtime_task_tests.cc",
+    ],
+    args = ["$(locations :function_example.so)"],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [
+        ":function_example.so",
+        ":streaming_runtime",
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "graph_test",
+    srcs = [
+        "test/graph_test.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [
+        ":streaming_runtime",
+    ],
+)
+
+cc_test(
+    name = "buffer_pool_tests",
+    srcs = [
+        "test/buffer_pool_tests.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [":streaming_test_lib"],
+)
+
+cc_test(
+    name = "message_serialization_tests",
+    srcs = [
+        "test/message_serialization_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_message",
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "persistence_tests",
+    srcs = [
+        "test/persistence_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_message",
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_barrier_merge_tests",
+    srcs = [
+        "test/streaming_barrier_merge_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_asio_tests",
+    srcs = [
+        "test/streaming_asio_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "config_parser_test",
+    srcs = [
+        "test/config_parser_test.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_perf_tests",
+    srcs = [
+        "test/streaming_perf_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_utility_tests",
+    srcs = [
+        "test/streaming_utility_tests.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_log_tests",
+    srcs = [
+        "test/streaming_log_tests.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [
+        ":streaming_logging",
+        "//:ray_util",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_binary(
+    name = "pangu_env_test",
+    srcs = [
+        "thirdparty/zdfs/example/pangu_env_test.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_lib",
+    ] + if_linux_x86_64([":pangu_sdk"]),
+)
+
+cc_binary(
+    name = "pangu",
+    srcs = [
+        "thirdparty/zdfs/example/pangu.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_lib",
+    ] + if_linux_x86_64([":pangu_sdk"]),
+)
+
+cc_test(
+    name = "streaming_queue_tests",
+    srcs = [
+        "test/streaming_queue_tests.cc",
+        "test/streaming_queue_tests_base.h",
+    ],
+    args = [
+        "$(location //:raylet)",
+        "$(location streaming_test_worker)",
+        "$(location //:gcs_server)",
+        "$(location //:redis-cli)",
+        "$(location //:redis-server)",
+    ],
+    copts = COPTS,
+    data = [
+        "streaming_test_worker",
+        "//:gcs_server",
+        "//:raylet",
+        "//:redis-cli",
+        "//:redis-server",
+    ],
+    tags = ["cluster_mode_test"],
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_writer_tests_with_streamingqueue",
+    size = "large",
+    srcs = [
+        "test/streaming_queue_tests_base.h",
+        "test/streaming_writer_tests_with_streamingqueue.cc",
+    ],
+    args = [
+        "$(location //:raylet)",
+        "$(location streaming_test_worker)",
+        "$(location //:gcs_server)",
+        "$(location //:redis-cli)",
+        "$(location //:redis-server)",
+    ],
+    copts = COPTS,
+    data = [
+        "streaming_test_worker",
+        "//:gcs_server",
+        "//:raylet",
+        "//:redis-cli",
+        "//:redis-server",
+    ],
+    tags = ["cluster_mode_test"],
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_queue_fo_tests",
+    srcs = [
+        "test/streaming_queue_fo_tests.cc",
+    ],
+    args = [
+        "$(location //:raylet)",
+        "$(location //:gcs_server)",
+        "$(location //:redis-cli)",
+        "$(location //:redis-server)",
+        "$(location streaming_test_worker)",
+    ],
+    copts = COPTS,
+    data = [
+        "streaming_test_worker",
+        "//:gcs_server",
+        "//:raylet",
+        "//:redis-cli",
+        "//:redis-server",
+    ],
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_binary(
+    name = "streaming_test_worker",
+    srcs = [
+        "test/direct_call_workers.cc",
+        "test/it/streaming_exactly_same_writer_tests.cc",
+        "test/it/streaming_exactly_same_writer_tests.h",
+        "test/it/streaming_queue_tests.cc",
+        "test/it/streaming_queue_tests.h",
+        "test/it/streaming_rescale_writer_tests.cc",
+        "test/it/streaming_rescale_writer_tests.h",
+        "test/it/streaming_test_suite.cc",
+        "test/it/streaming_test_suite.h",
+        "test/it/streaming_writer_tests.cc",
+        "test/it/streaming_writer_tests.h",
+    ],
+    copts = streaming_opts + [
+        "-Itest/",
+        "-Itest/it/",
+    ],
+    includes = [
+        "test/",
+        "test/it/",
+    ],
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "elastic_buffer_tests",
+    srcs = [
+        "test/elastic_buffer_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":elastic_buffer",
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_elastic_buffer_tests",
+    srcs = [
+        "test/streaming_elastic_buffer_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":elastic_buffer",
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "event_service_tests",
+    srcs = [
+        "test/event_service_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "barrier_helper_tests",
+    srcs = [
+        "test/barrier_helper_tests.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = 1,
+    deps = [
+        ":streaming_reliability",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "reliability_helper_tests",
+    srcs = [
+        "test/reliability_helper_tests.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = 1,
+    deps = [
+        ":streaming_test_lib",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "common_transfer_tests",
+    srcs = [
+        "test/streaming_report_timer_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "dynamic_step_tests",
+    srcs = [
+        "test/streaming_dynamic_step_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "http_profiler_tests",
+    srcs = [
+        "test/http_profiler_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_queue_message_tests",
+    srcs = [
+        "test/streaming_queue_message_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "data_reader_tests",
+    srcs = [
+        "test/data_reader_tests.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [
+        ":streaming_channel",
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "data_writer_tests",
+    srcs = [
+        "test/data_writer_tests.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [
+        ":streaming_channel",
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "mock_transfer_tests",
+    srcs = [
+        "test/mock_transfer_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "streaming_queue_mock_tests",
+    srcs = [
+        "test/streaming_queue_mock_tests.cc",
+    ],
+    copts = streaming_opts,
+    includes = [
+        "src",
+    ],
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "collocate_plasma_tests",
+    srcs = [
+        "test/collocate_plasma_tests.cc",
+        "test/streaming_queue_tests_base.h",
+    ],
+    args = [
+        "$(location //:raylet)",
+        "$(location //:gcs_server)",
+        "$(location //:redis-cli)",
+        "$(location //:redis-server)",
+    ],
+    copts = COPTS,
+    data = [
+        "//:gcs_server",
+        "//:raylet",
+        "//:redis-cli",
+        "//:redis-server",
+    ],
+    tags = ["cluster_mode_test"],
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "async_wal_tests",
+    srcs = [
+        "test/async_wal_tests.cc",
+    ],
+    copts = streaming_opts,
+    deps = [
+        ":streaming_test_lib",
+    ],
+)
+
+cc_test(
+    name = "cyclic_tests",
+    srcs = [
+        "test/cyclic_tests.cc",
+    ],
+    copts = streaming_opts,
+    linkstatic = True,
+    deps = [
+        ":streaming_channel",
+        ":streaming_test_lib",
+    ],
+)
+
+python_proto_compile(
+    name = "remote_call_py_proto",
+    deps = ["@com_alipay_ray_streaming//runtime:remote_call_proto"],
+)
+
+python_proto_compile(
+    name = "common_py_proto",
+    deps = ["//streaming/java:common_proto"],
+)
+
+python_proto_compile(
+    name = "streaming_python_proto",
+    deps = [":streaming_proto"],
+)
+
+filegroup(
+    name = "all_py_proto",
+    srcs = [
+        ":common_py_proto",
+        ":remote_call_py_proto",
+        ":streaming_python_proto",
+    ],
+)
+
+genrule(
+    name = "cp_streaming_py_generated",
+    srcs = [
+        ":all_py_proto",
+    ],
+    outs = [
+        "cp_streaming_py_generated.out",
+    ],
+    cmd = """
+        set -e
+        set -x
+        WORK_DIR=$$(pwd)
+        # Copy flatbuffer-generated files.
+        GENERATED_DIR="$$WORK_DIR/streaming/python/raystreaming/generated"
+        rm -rf $$GENERATED_DIR
+        mkdir -p $$GENERATED_DIR
+        touch $$GENERATED_DIR/__init__.py
+        # Copy protobuf-generated files.
+        for f in $(locations //streaming/src:all_py_proto); do
+            cp -f $$f $$GENERATED_DIR
+        done
+        sed -i -E 's/from streaming.src.protobuf/from ./' "$$GENERATED_DIR/remote_call_pb2.py"
+        echo $$(date) > $@
+    """,
+    local = 1,
+    visibility = ["//visibility:public"],
+)
+
+# This dummy test is used for building tests only.
+# Because `bazel coverage` currently doesn't support
+# building without running.
+cc_test(
+    name = "dummy_test_for_build_only",
+    srcs = [
+        "test/dummy_test_for_build_only.cc",
+    ],
+    deps = [
+        ":async_wal_tests",
+        ":barrier_helper_tests",
+        ":buffer_pool_tests",
+        ":collocate_plasma_tests",
+        ":common_transfer_tests",
+        ":cyclic_tests",
+        ":data_reader_tests",
+        ":data_writer_tests",
+        ":dynamic_step_tests",
+        ":elastic_buffer_tests",
+        ":event_service_tests",
+        ":http_profiler_tests",
+        ":message_serialization_tests",
+        ":mock_transfer_tests",
+        ":persistence_tests",
+        ":reliability_helper_tests",
+        ":streaming_asio_tests",
+        ":streaming_barrier_merge_tests",
+        ":streaming_elastic_buffer_tests",
+        ":streaming_log_tests",
+        ":streaming_message_ring_buffer_tests",
+        ":streaming_perf_tests",
+        ":streaming_queue_fo_tests",
+        ":streaming_queue_message_tests",
+        ":streaming_queue_mock_tests",
+        ":streaming_queue_tests",
+        ":streaming_utility_tests",
+    ],
+)

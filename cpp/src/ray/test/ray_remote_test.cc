@@ -150,7 +150,8 @@ TEST(RayApiTest, ReferenceArgs) {
   auto r3 = ray::Task(Concat3).Remote(str, str2);
   EXPECT_EQ(*(r2.Get()), *(r3.Get()));
 
-  ray::ActorHandle<DummyObject> actor = ray::Actor(DummyObject::FactoryCreate).Remote(1);
+  ray::ActorHandleCpp<DummyObject> actor =
+      ray::Actor(DummyObject::FactoryCreate).Remote(1);
   auto r4 = actor.Task(&DummyObject::Concat1).Remote("a", "b");
   auto r5 = actor.Task(&DummyObject::Concat2).Remote(str, "b");
   EXPECT_EQ(*(r4.Get()), *(r5.Get()));
@@ -219,4 +220,14 @@ TEST(RayApiTest, ExceptionTask) {
   /// Normal task Exception.
   auto r4 = ray::Task(ExceptionFunc).Remote(2);
   EXPECT_THROW(r4.Get(), ray::internal::RayTaskException);
+}
+
+TEST(RayApiTest, GetClassNameByFuncNameTest) {
+  using ray::internal::FunctionManager;
+  EXPECT_EQ(FunctionManager::GetClassNameByFuncName("RAY_FUNC(Counter::FactoryCreate)"),
+            "Counter");
+  EXPECT_EQ(FunctionManager::GetClassNameByFuncName("Counter::FactoryCreate"), "Counter");
+  EXPECT_EQ(FunctionManager::GetClassNameByFuncName("FactoryCreate"), "");
+  EXPECT_EQ(FunctionManager::GetClassNameByFuncName(""), "");
+  EXPECT_EQ(FunctionManager::GetClassNameByFuncName("::FactoryCreate"), "");
 }

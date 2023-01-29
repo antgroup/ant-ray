@@ -1,6 +1,6 @@
-load("//bazel:ray.bzl", "define_java_module")
-load("//bazel:ray.bzl", "native_java_binary")
-load("//bazel:ray.bzl", "native_java_library")
+load("@com_github_ray_project_ray//bazel:ray.bzl", "define_java_module")
+load("@com_github_ray_project_ray//bazel:ray.bzl", "native_java_binary")
+load("@com_github_ray_project_ray//bazel:ray.bzl", "native_java_library")
 load("@rules_proto_grpc//java:defs.bzl", "java_proto_compile")
 load(
     "@com_github_johnynek_bazel_jar_jar//:jar_jar.bzl",
@@ -80,16 +80,15 @@ define_java_module(
     visibility = ["//visibility:public"],
     deps = [
         ":io_ray_ray_api",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
-        "@maven//:com_github_java_json_tools_json_schema_validator",
         "@maven//:com_google_code_gson_gson",
         "@maven//:com_google_guava_guava",
         "@maven//:com_google_protobuf_protobuf_java",
-        "@maven//:com_google_protobuf_protobuf_java_util",
         "@maven//:com_lmax_disruptor",
         "@maven//:com_typesafe_config",
+        "@maven//:commons_codec_commons_codec",
         "@maven//:commons_io_commons_io",
         "@maven//:de_ruedigermoeller_fst",
+        "@maven//:javax_xml_bind_jaxb_api",
         "@maven//:net_java_dev_jna_jna",
         "@maven//:org_apache_commons_commons_lang3",
         "@maven//:org_apache_logging_log4j_log4j_api",
@@ -100,13 +99,12 @@ define_java_module(
         "@maven//:org_slf4j_slf4j_api",
         "@maven//:org_testng_testng",
         "@maven//:org_yaml_snakeyaml",
+        "@maven//:redis_clients_jedis",
     ],
 )
 
 define_java_module(
     name = "test",
-    # (WangTaoTheTonic)For cpp x-lang tests. See //cpp:cluster_mode_xlang_test.
-    visibility = ["//cpp:__subpackages__"],
     deps = [
         ":io_ray_ray_api",
         ":io_ray_ray_runtime",
@@ -135,6 +133,7 @@ define_java_module(
         "@maven//:com_google_code_gson_gson",
         "@maven//:com_google_guava_guava",
         "@maven//:com_lmax_disruptor",
+        "@maven//:com_taobao_monitor_kmonitor_client",
         "@maven//:commons_io_commons_io",
         "@maven//:org_apache_commons_commons_lang3",
         "@maven//:org_apache_logging_log4j_log4j_api",
@@ -160,10 +159,8 @@ define_java_module(
         "@maven//:com_google_code_gson_gson",
         "@maven//:com_google_guava_guava",
         "@maven//:com_google_protobuf_protobuf_java",
-        "@maven//:commons_io_commons_io",
         "@maven//:org_apache_commons_commons_lang3",
         "@maven//:org_apache_httpcomponents_client5_httpclient5",
-        "@maven//:org_apache_httpcomponents_client5_httpclient5_fluent",
         "@maven//:org_apache_httpcomponents_core5_httpcore5",
         "@maven//:org_slf4j_slf4j_api",
         "@maven//:org_testng_testng",
@@ -181,8 +178,11 @@ define_java_module(
     ],
 )
 
-java_library(
-    name = "all_tests_lib",
+java_binary(
+    name = "all_tests",
+    args = ["java/testng.xml"],
+    data = ["testng.xml"],
+    main_class = "org.testng.TestNG",
     runtime_deps = [
         ":io_ray_ray_performance_test",
         ":io_ray_ray_runtime_test",
@@ -191,54 +191,9 @@ java_library(
     ],
 )
 
-java_test(
-    name = "all_tests",
-    testonly = True,
-    args = ["java/testng.xml"],
-    data = [
-        "testng.xml",
-        ":ray_java_pkg",
-        "//:ray_pkg",
-    ],
-    main_class = "org.testng.TestNG",
-    resources = [
-        "//cpp:counter.so",
-        "//cpp:plus.so",
-    ],
-    tags = ["local"],
-    runtime_deps = [
-        ":all_tests_lib",
-    ],
-)
-
-# 0. `cp testng_custom_template.xml testng_custom.xml`
-# 1. Specify test class/method in `testng_custom.xml`
-# 2. `bazel test //java:custom_test --test_output=streamed`
-java_test(
-    name = "custom_test",
-    args = ["java/testng_custom.xml"],
-    data = [
-        "testng_custom.xml",
-        ":ray_java_pkg",
-        "//:ray_pkg",
-    ],
-    main_class = "org.testng.TestNG",
-    tags = ["local"],
-    runtime_deps = [
-        ":all_tests_lib",
-    ],
-)
-
-# We'd better make resource files can be accessed from 3rd party library.
-# More detail please see https://github.com/ray-project/ray/pull/21641.
 java_proto_compile(
     name = "common_java_proto",
     deps = ["@com_github_ray_project_ray//src/ray/protobuf:common_proto"],
-)
-
-java_proto_compile(
-    name = "runtime_env_common_java_proto",
-    deps = ["@com_github_ray_project_ray//src/ray/protobuf:runtime_env_common_proto"],
 )
 
 java_proto_compile(
@@ -248,7 +203,7 @@ java_proto_compile(
 
 java_proto_compile(
     name = "serve_java_proto",
-    deps = ["@com_github_ray_project_ray//src/ray/protobuf:serve_proto"],
+    deps = ["@//src/ray/protobuf:serve_proto"],
 )
 
 filegroup(
@@ -256,11 +211,12 @@ filegroup(
     srcs = [
         ":common_java_proto",
         ":gcs_java_proto",
-        ":runtime_env_common_java_proto",
     ],
 )
 
 native_java_library("runtime", "core_worker_library_java", "//:libcore_worker_library_java.so")
+
+# native_java_binary("runtime", "profiler_library", "//:profiler_library")
 
 filegroup(
     name = "java_native_deps",
@@ -334,8 +290,34 @@ genrule(
     outs = ["copy_pom_file.out"],
     cmd = """
         WORK_DIR="$$(pwd)"
+
+        # === ANT-INTERNAL below
+        # The pom automatically generated by bazel will ignore '_',
+        # causing '2.14.0_message_nolookup' to be parsed into '2.14.0',
+        # so we need to replace it back.
+        OS_NAME="linux"
+        case "$${OSTYPE}" in
+          darwin*) OS_NAME="darwin";;
+          *) ;;
+        esac
+        if [ $$OS_NAME = "darwin" ]; then
+            sed -i "" "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_api_pom)
+            sed -i "" "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_runtime_pom)
+            sed -i "" "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_test_pom)
+            sed -i "" "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_performance_test_pom)
+            sed -i "" "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_serve_pom)
+        else
+            sed -i "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_api_pom)
+            sed -i "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_runtime_pom)
+            sed -i "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_test_pom)
+            sed -i "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_performance_test_pom)
+            sed -i "/log4j-core/{n;s/2.14.0</2.14.0_message_nolookup</;}" $(location //java:io_ray_ray_serve_pom)
+        fi
+        # === ANT-INTERNAL above
+
         cp -f $(location //java:io_ray_ray_api_pom) "$$WORK_DIR/java/api/pom.xml"
         cp -f $(location //java:io_ray_ray_runtime_pom) "$$WORK_DIR/java/runtime/pom.xml"
+
         cp -f $(location //java:io_ray_ray_test_pom) "$$WORK_DIR/java/test/pom.xml"
         cp -f $(location //java:io_ray_ray_performance_test_pom) "$$WORK_DIR/java/performance_test/pom.xml"
         cp -f $(location //java:io_ray_ray_serve_pom) "$$WORK_DIR/java/serve/pom.xml"
@@ -353,7 +335,8 @@ java_binary(
     runtime_deps = [
         "//java:io_ray_ray_api",
         "//java:io_ray_ray_runtime",
-        "//java:io_ray_ray_serve",
+        # TODO(mubai) add streaming runtime dependency
+        # TODO(chuhan.ly) add ray-serve
     ],
 )
 
@@ -375,6 +358,7 @@ genrule(
     srcs = [
         "//java:ray_dist_shaded.jar",
         "//java:gen_maven_deps",
+        "//streaming/java:gen_maven_deps",
     ],
     outs = ["ray_java_pkg.out"],
     cmd = """

@@ -33,35 +33,38 @@ Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentTaskType(JNIEnv 
 /*
  * Class:     io_ray_runtime_context_NativeWorkerContext
  * Method:    nativeGetCurrentTaskId
- * Signature: ()Ljava/nio/ByteBuffer;
+ * Signature: (J)V
  */
-JNIEXPORT jobject JNICALL
-Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentTaskId(JNIEnv *, jclass);
+JNIEXPORT void JNICALL
+Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentTaskId(JNIEnv *, jclass,
+                                                                       jlong);
 
 /*
  * Class:     io_ray_runtime_context_NativeWorkerContext
  * Method:    nativeGetCurrentJobId
- * Signature: ()Ljava/nio/ByteBuffer;
+ * Signature: (J)V
  */
-JNIEXPORT jobject JNICALL
-Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentJobId(JNIEnv *, jclass);
+JNIEXPORT void JNICALL
+Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentJobId(JNIEnv *, jclass,
+                                                                      jlong);
 
 /*
  * Class:     io_ray_runtime_context_NativeWorkerContext
  * Method:    nativeGetCurrentWorkerId
- * Signature: ()Ljava/nio/ByteBuffer;
+ * Signature: (J)V
  */
-JNIEXPORT jobject JNICALL
-Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentWorkerId(JNIEnv *,
-                                                                         jclass);
+JNIEXPORT void JNICALL
+Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentWorkerId(JNIEnv *, jclass,
+                                                                         jlong);
 
 /*
  * Class:     io_ray_runtime_context_NativeWorkerContext
  * Method:    nativeGetCurrentActorId
- * Signature: ()Ljava/nio/ByteBuffer;
+ * Signature: (J)V
  */
-JNIEXPORT jobject JNICALL
-Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentActorId(JNIEnv *, jclass);
+JNIEXPORT void JNICALL
+Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentActorId(JNIEnv *, jclass,
+                                                                        jlong);
 
 /*
  * Class:     io_ray_runtime_context_NativeWorkerContext
@@ -73,12 +76,12 @@ Java_io_ray_runtime_context_NativeWorkerContext_nativeGetRpcAddress(JNIEnv *, jc
 
 /*
  * Class:     io_ray_runtime_context_NativeWorkerContext
- * Method:    nativeGetSerializedRuntimeEnv
+ * Method:    nativeGetCurrentNodeName
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_io_ray_runtime_context_NativeWorkerContext_nativeGetSerializedRuntimeEnv(JNIEnv *,
-                                                                              jclass);
+Java_io_ray_runtime_context_NativeWorkerContext_nativeGetCurrentNodeName(JNIEnv *,
+                                                                         jclass);
 
 #ifdef __cplusplus
 }

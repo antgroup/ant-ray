@@ -15,6 +15,7 @@
 #pragma once
 
 #include "ray/common/id.h"
+#include "ray/common/nodegroup_id.h"
 #include "ray/gcs/callback.h"
 #include "ray/gcs/gcs_server/gcs_table_storage.h"
 #include "src/ray/protobuf/gcs.pb.h"
@@ -40,33 +41,56 @@ class GcsInitData {
   void AsyncLoad(const EmptyCallback &on_done);
 
   /// Get job metadata.
-  const absl::flat_hash_map<JobID, rpc::JobTableData> &Jobs() const {
+  const std::unordered_map<JobID, rpc::JobTableData> &Jobs() const {
     return job_table_data_;
   }
 
   /// Get node metadata.
-  const absl::flat_hash_map<NodeID, rpc::GcsNodeInfo> &Nodes() const {
+  const std::unordered_map<NodeID, rpc::GcsNodeInfo> &Nodes() const {
     return node_table_data_;
   }
 
+  /// Get object location metadata.
+  const std::unordered_map<ObjectID, rpc::ObjectLocationInfo> &Objects() const {
+    return object_table_data_;
+  }
+
   /// Get resource metadata.
-  const absl::flat_hash_map<NodeID, rpc::ResourceMap> &ClusterResources() const {
+  const std::unordered_map<NodeID, rpc::ResourceMap> &ClusterResources() const {
     return resource_table_data_;
   }
 
+  /// Get nodegroup metadata.
+  const std::unordered_map<NodegroupID, rpc::NodegroupData> &Nodegroups() const {
+    return nodegroup_table_data_;
+  }
+
   /// Get actor metadata.
-  const absl::flat_hash_map<ActorID, rpc::ActorTableData> &Actors() const {
+  const std::unordered_map<ActorID, rpc::ActorTableData> &Actors() const {
     return actor_table_data_;
   }
 
-  const absl::flat_hash_map<ActorID, rpc::TaskSpec> &ActorTaskSpecs() const {
+  const std::unordered_map<ActorID, rpc::TaskSpec> &ActorTaskSpecs() const {
     return actor_task_spec_table_data_;
   }
 
+  const std::unordered_map<UniqueID, rpc::GcsWorkerProcessRuntimeResourceTableData>
+      &WorkerProcessRuntimeResources() const {
+    return worker_process_runtime_resource_table_data_;
+  }
+
   /// Get placement group metadata.
-  const absl::flat_hash_map<PlacementGroupID, rpc::PlacementGroupTableData>
+  const std::unordered_map<PlacementGroupID, rpc::PlacementGroupTableData>
       &PlacementGroups() const {
     return placement_group_table_data_;
+  }
+
+  const std::unordered_set<std::string> &FrozenNodes() const {
+    return frozen_nodes_table_data_;
+  }
+
+  const std::unordered_map<WorkerID, rpc::WorkerTableData> &Workers() const {
+    return worker_table_data_;
   }
 
  private:
@@ -79,6 +103,13 @@ class GcsInitData {
   ///
   /// \param on_done The callback when node metadata is loaded successfully.
   void AsyncLoadNodeTableData(const EmptyCallback &on_done);
+
+  /// Load object locations metadata from the store into memory asynchronously.
+  ///
+  /// \param on_done The callback when object location metadata is loaded successfully.
+  void AsyncLoadObjectTableData(const EmptyCallback &on_done);
+
+  void AsyncLoadNodegroupTableData(const EmptyCallback &on_done);
 
   /// Load resource metadata from the store into memory asynchronously.
   ///
@@ -97,27 +128,44 @@ class GcsInitData {
 
   void AsyncLoadActorTaskSpecTableData(const EmptyCallback &on_done);
 
+  void AsyncLoadWorkerProcessRuntimeResourceTableData(const EmptyCallback &on_done);
+
+  void AsyncLoadFrozenNodesTableData(const EmptyCallback &on_done);
+  void AsyncLoadWorkerTableData(const EmptyCallback &on_done);
+
  protected:
   /// The gcs table storage.
   std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage_;
 
   /// Job metadata.
-  absl::flat_hash_map<JobID, rpc::JobTableData> job_table_data_;
+  std::unordered_map<JobID, rpc::JobTableData> job_table_data_;
 
   /// Node metadata.
-  absl::flat_hash_map<NodeID, rpc::GcsNodeInfo> node_table_data_;
+  std::unordered_map<NodeID, rpc::GcsNodeInfo> node_table_data_;
+
+  /// Object location metadata.
+  std::unordered_map<ObjectID, rpc::ObjectLocationInfo> object_table_data_;
 
   /// Resource metadata.
-  absl::flat_hash_map<NodeID, rpc::ResourceMap> resource_table_data_;
+  std::unordered_map<NodeID, rpc::ResourceMap> resource_table_data_;
+
+  std::unordered_map<NodegroupID, rpc::NodegroupData> nodegroup_table_data_;
 
   /// Placement group metadata.
-  absl::flat_hash_map<PlacementGroupID, rpc::PlacementGroupTableData>
+  std::unordered_map<PlacementGroupID, rpc::PlacementGroupTableData>
       placement_group_table_data_;
 
   /// Actor metadata.
-  absl::flat_hash_map<ActorID, rpc::ActorTableData> actor_table_data_;
+  std::unordered_map<ActorID, rpc::ActorTableData> actor_table_data_;
 
-  absl::flat_hash_map<ActorID, rpc::TaskSpec> actor_task_spec_table_data_;
+  std::unordered_map<ActorID, rpc::TaskSpec> actor_task_spec_table_data_;
+
+  std::unordered_map<UniqueID, rpc::GcsWorkerProcessRuntimeResourceTableData>
+      worker_process_runtime_resource_table_data_;
+
+  std::unordered_set<std::string> frozen_nodes_table_data_;
+
+  std::unordered_map<WorkerID, rpc::WorkerTableData> worker_table_data_;
 };
 
 }  // namespace gcs

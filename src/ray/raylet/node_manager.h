@@ -22,27 +22,24 @@
 #include "ray/common/memory_monitor.h"
 #include "ray/common/task/task.h"
 #include "ray/common/ray_object.h"
-#include "ray/common/ray_syncer/ray_syncer.h"
 #include "ray/common/client_connection.h"
 #include "ray/common/task/task_common.h"
-#include "ray/common/task/task_util.h"
 #include "ray/common/task/scheduling_resources.h"
-#include "ray/pubsub/subscriber.h"
 #include "ray/object_manager/object_manager.h"
 #include "ray/raylet/agent_manager.h"
+#include "ray/raylet/job_manager.h"
 #include "ray/raylet_client/raylet_client.h"
+#include "ray/common/runtime_env_manager.h"
 #include "ray/raylet/local_object_manager.h"
 #include "ray/raylet/scheduling/scheduling_ids.h"
 #include "ray/raylet/scheduling/cluster_resource_scheduler.h"
 #include "ray/raylet/scheduling/cluster_task_manager.h"
 #include "ray/raylet/scheduling/cluster_task_manager_interface.h"
 #include "ray/raylet/dependency_manager.h"
-#include "ray/raylet/local_task_manager.h"
 #include "ray/raylet/wait_manager.h"
 #include "ray/raylet/worker_pool.h"
 #include "ray/rpc/worker/core_worker_client_pool.h"
 #include "ray/util/ordered_set.h"
-#include "ray/util/throttler.h"
 #include "ray/common/asio/instrumented_io_context.h"
 #include "ray/common/bundle_spec.h"
 #include "ray/raylet/placement_group_resource_manager.h"
@@ -52,20 +49,31 @@ namespace ray {
 
 namespace raylet {
 
+using rpc::ActorTableData;
+using rpc::BasicGcsNodeInfo;
 using rpc::ErrorType;
 using rpc::GcsNodeInfo;
 using rpc::HeartbeatTableData;
 using rpc::JobTableData;
+using rpc::NodegroupData;
 using rpc::ResourceUsageBatchData;
 
 struct NodeManagerConfig {
   /// The node's resource configuration.
-  ResourceRequest resource_config;
+  ResourceSet resource_config;
   /// The IP address this node manager is running on.
   std::string node_manager_address;
+  /// The hostname this node manager is running on.
+  std::string node_manager_hostname = boost::asio::ip::host_name();
+  /// The name of this node, should be unique.
+  /// If node_name is set, when GCS receives raylet registers, GCS will kill the old
+  /// node which has the same name.
+  std::string node_name;
   /// The port to use for listening to incoming connections. If this is 0 then
   /// the node manager will choose its own port.
   int node_manager_port;
+  /// The port to use for brpc server.
+  int brpc_port;
   /// The lowest port number that workers started will bind on.
   /// If this is set to 0, workers will bind on random ports.
   int min_worker_port;
@@ -90,18 +98,20 @@ struct NodeManagerConfig {
   std::string agent_command;
   /// The time between reports resources in milliseconds.
   uint64_t report_resources_period_ms;
+  /// Whether to enable fair queueing between task classes in raylet.
+  bool fair_queueing_enabled;
+  /// Whether to enable automatic object deletion for object spilling.
+  bool automatic_object_deletion_enabled;
   /// The store socket name.
   std::string store_socket_name;
   /// The path to the ray temp dir.
   std::string temp_dir;
-  /// The path of this ray log dir.
+  /// The path to the ray log dir.
   std::string log_dir;
   /// The path of this ray session dir.
   std::string session_dir;
   /// The path of this ray resource dir.
   std::string resource_dir;
-  /// If true make Ray debugger available externally.
-  int ray_debugger_external;
   /// The raylet config list of this node.
   std::string raylet_config;
   // The time between record metrics in milliseconds, or 0 to disable.
@@ -110,6 +120,22 @@ struct NodeManagerConfig {
   int max_io_workers;
   // The minimum object size that can be spilled by each spill operation.
   int64_t min_spilling_size;
+  // Whether to the raylet should push resource reports to GCS or wait for GCS to pull the
+  // reports from raylets.
+  bool pull_based_resource_reporting;
+
+  // ======== ANT-INTERNAL fields =========
+
+  /// The string template of python executable interpreter path.
+  std::string per_job_python_env_path;
+  /// The string template of job dir.
+  std::string job_dir_template;
+  /// The shape group that the node belongs to.
+  std::string shape_group;
+  /// The name of pod that the node belongs to.
+  std::string pod_name;
+  /// The ID of the physical machine on which this node is deployed.
+  std::string machine_id;
 };
 
 class HeartbeatSender {
@@ -141,20 +167,53 @@ class HeartbeatSender {
   uint64_t last_heartbeat_at_ms_;
 };
 
-class NodeManager : public rpc::NodeManagerServiceHandler,
-                    public syncer::ReporterInterface,
-                    public syncer::ReceiverInterface {
+class NodeManagerL1Handler {
+ public:
+  /// Create NodeManagerL1Handler.
+  NodeManagerL1Handler() {}
+
+  ~NodeManagerL1Handler() = default;
+
+  /// Handles the event that a job ban new tasks.
+  ///
+  /// \param job_id ID of the job.
+  /// \return Void.
+  void HandleJobBanNewTasks(const JobID &job_id, const int64_t &timestamp);
+
+  /// Handles the event that a job lift new tasks ban.
+  ///
+  /// \param job_id ID of the job.
+  /// \return Void.
+  void HandleJobLiftNewTasksBan(const JobID &job_id, const int64_t &timestamp);
+
+  /// If given job is banning new tasks.
+  ///
+  /// \param job_id ID of the job.
+  /// \return true if given job is waiting for actors to stop.
+  bool IsJobBanningNewTasks(const JobID &job_id);
+
+ private:
+  /// This map tracks whether job is prohibiting new tasks.
+  /// Only used when L1 fault tolerance is enabled.
+  absl::flat_hash_map<JobID, bool> job_ban_new_tasks_flags_;
+  /// When `job_ban_new_tasks_flags_` contains job id, this map tracks timestamps of early
+  /// ban. Otherwise it tracks timestamps of early lift ban. If a job is not contained in
+  /// this job, it means the ban/lift ban order is correct. Only used when L1 fault
+  /// tolerance is enabled.
+  absl::flat_hash_map<JobID, int64_t> job_ban_new_tasks_ts_;
+};
+
+class NodeManager : public rpc::NodeManagerServiceHandler {
  public:
   /// Create a node manager.
   ///
   /// \param resource_config The initial set of node resources.
   /// \param object_manager A reference to the local object manager.
-  NodeManager(instrumented_io_context &io_service,
-              const NodeID &self_node_id,
-              const std::string &self_node_name,
+  NodeManager(instrumented_io_context &io_service, const NodeID &self_node_id,
               const NodeManagerConfig &config,
               const ObjectManagerConfig &object_manager_config,
-              std::shared_ptr<gcs::GcsClient> gcs_client);
+              std::shared_ptr<gcs::GcsClient> gcs_client,
+              std::shared_ptr<ObjectDirectoryInterface> object_directory_);
 
   /// Process a new client connection.
   ///
@@ -171,8 +230,7 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// \param message_data A pointer to the message data.
   /// \return Void.
   void ProcessClientMessage(const std::shared_ptr<ClientConnection> &client,
-                            int64_t message_type,
-                            const uint8_t *message_data);
+                            int64_t message_type, const uint8_t *message_data);
 
   /// Subscribe to the relevant GCS tables and set up handlers.
   ///
@@ -190,16 +248,8 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// Record metrics.
   void RecordMetrics();
 
-  /// Report worker OOM kill stats
-  void ReportWorkerOOMKillStats();
-
   /// Get the port of the node manager rpc server.
   int GetServerPort() const { return node_manager_server_.GetPort(); }
-
-  void ConsumeSyncMessage(std::shared_ptr<const syncer::RaySyncMessage> message) override;
-
-  std::optional<syncer::RaySyncMessage> CreateSyncMessage(
-      int64_t after_version, syncer::MessageType message_type) const override;
 
   int GetObjectManagerPort() const { return object_manager_.GetServerPort(); }
 
@@ -221,26 +271,19 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// Stop this node manager.
   void Stop();
 
-  /// Query all of local core worker states.
+  /// Freeze/Unfreeze this node manager.
+  void Freeze();
+  void Unfreeze();
+
+  /// \brief check whether this node is forzen
+  bool IsNodeFrozen(const NodeID &node_id) const;
+
+  /// Returns workers sorted by resource violation (runtime memory over required memory),
+  /// in descending order.
   ///
-  /// \param on_replied A callback that's called when each of query RPC is replied.
-  /// \param send_reply_callback A reply callback that will be called when all
-  /// RPCs are replied.
-  /// \param include_memory_info If true, it requires every object ref information
-  /// from all workers.
-  /// \param include_task_info If true, it requires every task metadata information
-  /// from all workers.
-  /// \param limit A maximum number of task/object entries to return from each core
-  /// worker.
-  /// \param on_all_replied A callback that's called when every worker replies.
-  void QueryAllWorkerStates(
-      const std::function<void(const ray::Status &status,
-                               const rpc::GetCoreWorkerStatsReply &r)> &on_replied,
-      rpc::SendReplyCallback &send_reply_callback,
-      bool include_memory_info,
-      bool include_task_info,
-      int64_t limit,
-      const std::function<void()> &on_all_replied);
+  /// \return the list of sorted workers
+  const std::vector<std::shared_ptr<WorkerInterface>>
+  WorkersWithLargestResourceViolation() const;
 
  private:
   /// Methods for handling nodes.
@@ -254,7 +297,7 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   ///
   /// \param data Data associated with the new node.
   /// \return Void.
-  void NodeAdded(const GcsNodeInfo &data);
+  void NodeAdded(const BasicGcsNodeInfo &data);
 
   /// Handler for the removal of a GCS node.
   /// \param node_id Id of the removed node.
@@ -266,7 +309,7 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// \param createUpdatedResources Created or updated resources.
   /// \return Whether the update is applied.
   bool ResourceCreateUpdated(const NodeID &node_id,
-                             const ResourceRequest &createUpdatedResources);
+                             const ResourceSet &createUpdatedResources);
 
   /// Handler for the deletion of a resource in the GCS
   /// \param node_id ID of the node that deleted resources.
@@ -280,12 +323,12 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// \return Void.
   void TryLocalInfeasibleTaskScheduling();
 
-  /// Fill out the normal task resource report.
-  void FillNormalTaskResourceUsage(rpc::ResourcesData &resources_data);
-
   /// Fill out the resource report. This can be called by either method to transport the
   /// report to GCS.
   void FillResourceReport(rpc::ResourcesData &resources_data);
+
+  /// Report resource usage to the GCS.
+  void ReportResourceUsage();
 
   /// Write out debug state to a file.
   void DumpDebugState() const;
@@ -294,12 +337,22 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// to eagerly evict all plasma copies of the object from the cluster.
   void FlushObjectsToFree();
 
-  /// Handler for a resource usage notification from the GCS.
+  /// Get profiling information from the object manager and push it to the GCS.
   ///
-  /// \param id The ID of the node manager that sent the resources data.
+  /// \return Void.
+  void GetObjectManagerProfileInfo();
+
+  /// Handler for a heartbeat notification from the GCS.
+  ///
+  /// \param id The ID of the node manager that sent the heartbeat.
   /// \param data The resources data including load information.
   /// \return Whether the node resource usage is updated.
   bool UpdateResourceUsage(const NodeID &id, const rpc::ResourcesData &data);
+
+  /// Handler for a resource usage batch notification from the GCS
+  ///
+  /// \param resource_usage_batch The batch of resource usage data.
+  void ResourceUsageBatchReceived(const ResourceUsageBatchData &resource_usage_batch);
 
   /// Handle a worker finishing its assigned task.
   ///
@@ -309,6 +362,15 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// returned to idle.
   bool FinishAssignedTask(const std::shared_ptr<WorkerInterface> &worker_ptr);
 
+  /// Helper function to produce actor table data for a newly created actor.
+  ///
+  /// \param task_spec RayTask specification of the actor creation task that created the
+  /// actor.
+  /// \param worker The port that the actor is listening on.
+  /// \param worker_pid The process id of the actor.
+  std::shared_ptr<ActorTableData> CreateActorTableDataFromCreationTask(
+      const TaskSpecification &task_spec, int port, const WorkerID &worker_id,
+      uint32_t worker_pid);
   /// Handle a worker finishing an assigned actor creation task.
   /// \param worker The worker that finished the task.
   /// \param task The actor task or actor creation task.
@@ -329,8 +391,7 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// \return Void.
   void AsyncResolveObjects(const std::shared_ptr<ClientConnection> &client,
                            const std::vector<rpc::ObjectReference> &required_object_refs,
-                           const TaskID &current_task_id,
-                           bool ray_get,
+                           const TaskID &current_task_id, bool ray_get,
                            bool mark_worker_blocked);
 
   /// Handle end of a blocking object get. This could be a task assigned to a
@@ -345,8 +406,7 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   ///                           blocked in AsyncResolveObjects().
   /// \return Void.
   void AsyncResolveObjectsFinish(const std::shared_ptr<ClientConnection> &client,
-                                 const TaskID &current_task_id,
-                                 bool was_blocked);
+                                 const TaskID &current_task_id, bool was_blocked);
 
   /// Handle a direct call task that is blocked. Note that this callback may
   /// arrive after the worker lease has been returned to the node manager.
@@ -362,27 +422,18 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// \param worker Shared ptr to the worker, or nullptr if lost.
   void HandleDirectCallTaskUnblocked(const std::shared_ptr<WorkerInterface> &worker);
 
-  /// Kill a worker.
-  ///
-  /// \param worker The worker to kill.
-  /// \param force true to kill immediately, false to give time for the worker to
-  /// clean up and exit gracefully.
-  /// \return Void.
-  void KillWorker(std::shared_ptr<WorkerInterface> worker, bool force = false);
-
   /// Destroy a worker.
   /// We will disconnect the worker connection first and then kill the worker.
   ///
   /// \param worker The worker to destroy.
   /// \param disconnect_type The reason why this worker process is disconnected.
-  /// \param disconnect_detail The detailed reason for a given exit.
   /// \param force true to destroy immediately, false to give time for the worker to
   /// clean up and exit gracefully.
   /// \return Void.
-  void DestroyWorker(std::shared_ptr<WorkerInterface> worker,
-                     rpc::WorkerExitType disconnect_type,
-                     const std::string &disconnect_detail,
-                     bool force = false);
+  void DestroyWorker(
+      std::shared_ptr<WorkerInterface> worker,
+      rpc::WorkerExitType disconnect_type = rpc::WorkerExitType::SYSTEM_ERROR_EXIT,
+      bool force = false);
 
   /// When a job finished, loop over all of the queued tasks for that job and
   /// treat them as failed.
@@ -403,6 +454,13 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// \param object_id The object that has been evicted locally.
   /// \return Void.
   void HandleObjectMissing(const ObjectID &object_id);
+
+  /// Handles the event that a job is submitted.
+  ///
+  /// \param job_id ID of the submitted job.
+  /// \param job_data Data associated with the started job.
+  /// \return Void
+  void HandleJobSubmitted(const JobID &job_id, const JobTableData &job_data);
 
   /// Handles the event that a job is started.
   ///
@@ -504,119 +562,118 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   void ProcessSubscribePlasmaReady(const std::shared_ptr<ClientConnection> &client,
                                    const uint8_t *message_data);
 
-  void HandleUpdateResourceUsage(rpc::UpdateResourceUsageRequest request,
+  void HandleUpdateResourceUsage(const rpc::UpdateResourceUsageRequest &request,
                                  rpc::UpdateResourceUsageReply *reply,
                                  rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `RequestResourceReport` request.
-  void HandleRequestResourceReport(rpc::RequestResourceReportRequest request,
+  void HandleRequestResourceReport(const rpc::RequestResourceReportRequest &request,
                                    rpc::RequestResourceReportReply *reply,
                                    rpc::SendReplyCallback send_reply_callback) override;
 
-  /// Handle a `GetResourceLoad` request.
-  void HandleGetResourceLoad(rpc::GetResourceLoadRequest request,
-                             rpc::GetResourceLoadReply *reply,
-                             rpc::SendReplyCallback send_reply_callback) override;
-
   /// Handle a `PrepareBundleResources` request.
-  void HandlePrepareBundleResources(rpc::PrepareBundleResourcesRequest request,
+  void HandlePrepareBundleResources(const rpc::PrepareBundleResourcesRequest &request,
                                     rpc::PrepareBundleResourcesReply *reply,
                                     rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `CommitBundleResources` request.
-  void HandleCommitBundleResources(rpc::CommitBundleResourcesRequest request,
+  void HandleCommitBundleResources(const rpc::CommitBundleResourcesRequest &request,
                                    rpc::CommitBundleResourcesReply *reply,
                                    rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `ResourcesReturn` request.
-  void HandleCancelResourceReserve(rpc::CancelResourceReserveRequest request,
+  void HandleCancelResourceReserve(const rpc::CancelResourceReserveRequest &request,
                                    rpc::CancelResourceReserveReply *reply,
                                    rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `WorkerLease` request.
-  void HandleRequestWorkerLease(rpc::RequestWorkerLeaseRequest request,
+  void HandleRequestWorkerLease(const rpc::RequestWorkerLeaseRequest &request,
                                 rpc::RequestWorkerLeaseReply *reply,
                                 rpc::SendReplyCallback send_reply_callback) override;
 
-  /// Handle a `ReportWorkerBacklog` request.
-  void HandleReportWorkerBacklog(rpc::ReportWorkerBacklogRequest request,
-                                 rpc::ReportWorkerBacklogReply *reply,
-                                 rpc::SendReplyCallback send_reply_callback) override;
+  /// An overloaded function for the HandleRequestWorkerLease above with an additional
+  /// params. We use an overloadded function so we don't need to change the base
+  /// interface.
+  ///
+  /// \param waiting_for_job_env_initialized If true, we'll check job env initialization
+  /// before handling this request. If job env is not ready when request arrives, this
+  /// request will be stashed for a while, waiting for job env to be ready. When timeout
+  /// is reached and job env is still not ready, this request will be handled again with
+  /// waiting_for_job_env_initialized=false.
+  void HandleRequestWorkerLease(const rpc::RequestWorkerLeaseRequest &request,
+                                rpc::RequestWorkerLeaseReply *reply,
+                                rpc::SendReplyCallback send_reply_callback,
+                                bool waiting_for_job_env_initialized = true);
 
   /// Handle a `ReturnWorker` request.
-  void HandleReturnWorker(rpc::ReturnWorkerRequest request,
+  void HandleReturnWorker(const rpc::ReturnWorkerRequest &request,
                           rpc::ReturnWorkerReply *reply,
                           rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `ReleaseUnusedWorkers` request.
-  void HandleReleaseUnusedWorkers(rpc::ReleaseUnusedWorkersRequest request,
+  void HandleReleaseUnusedWorkers(const rpc::ReleaseUnusedWorkersRequest &request,
                                   rpc::ReleaseUnusedWorkersReply *reply,
                                   rpc::SendReplyCallback send_reply_callback) override;
 
-  /// Handle a `ShutdownRaylet` request.
-  void HandleShutdownRaylet(rpc::ShutdownRayletRequest request,
-                            rpc::ShutdownRayletReply *reply,
-                            rpc::SendReplyCallback send_reply_callback) override;
-
   /// Handle a `ReturnWorker` request.
-  void HandleCancelWorkerLease(rpc::CancelWorkerLeaseRequest request,
+  void HandleCancelWorkerLease(const rpc::CancelWorkerLeaseRequest &request,
                                rpc::CancelWorkerLeaseReply *reply,
                                rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `PinObjectIDs` request.
-  void HandlePinObjectIDs(rpc::PinObjectIDsRequest request,
+  void HandlePinObjectIDs(const rpc::PinObjectIDsRequest &request,
                           rpc::PinObjectIDsReply *reply,
                           rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `NodeStats` request.
-  void HandleGetNodeStats(rpc::GetNodeStatsRequest request,
+  void HandleGetNodeStats(const rpc::GetNodeStatsRequest &request,
                           rpc::GetNodeStatsReply *reply,
                           rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `GlobalGC` request.
-  void HandleGlobalGC(rpc::GlobalGCRequest request,
-                      rpc::GlobalGCReply *reply,
+  void HandleGlobalGC(const rpc::GlobalGCRequest &request, rpc::GlobalGCReply *reply,
                       rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `FormatGlobalMemoryInfo`` request.
-  void HandleFormatGlobalMemoryInfo(rpc::FormatGlobalMemoryInfoRequest request,
+  void HandleFormatGlobalMemoryInfo(const rpc::FormatGlobalMemoryInfoRequest &request,
                                     rpc::FormatGlobalMemoryInfoReply *reply,
                                     rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `RequestObjectSpillage` request.
-  void HandleRequestObjectSpillage(rpc::RequestObjectSpillageRequest request,
+  void HandleRequestObjectSpillage(const rpc::RequestObjectSpillageRequest &request,
                                    rpc::RequestObjectSpillageReply *reply,
                                    rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `ReleaseUnusedBundles` request.
-  void HandleReleaseUnusedBundles(rpc::ReleaseUnusedBundlesRequest request,
+  void HandleReleaseUnusedBundles(const rpc::ReleaseUnusedBundlesRequest &request,
                                   rpc::ReleaseUnusedBundlesReply *reply,
                                   rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle a `GetSystemConfig` request.
-  void HandleGetSystemConfig(rpc::GetSystemConfigRequest request,
+  void HandleGetSystemConfig(const rpc::GetSystemConfigRequest &request,
                              rpc::GetSystemConfigReply *reply,
                              rpc::SendReplyCallback send_reply_callback) override;
 
-  /// Handle a `GetTasksInfo` request.
-  void HandleGetTasksInfo(rpc::GetTasksInfoRequest request,
-                          rpc::GetTasksInfoReply *reply,
-                          rpc::SendReplyCallback send_reply_callback) override;
-
-  /// Handle a `GetTaskFailureCause` request.
-  void HandleGetTaskFailureCause(rpc::GetTaskFailureCauseRequest request,
-                                 rpc::GetTaskFailureCauseReply *reply,
+  /// Handle a `GetGcsServerAddress` request.
+  void HandleGetGcsServerAddress(const rpc::GetGcsServerAddressRequest &request,
+                                 rpc::GetGcsServerAddressReply *reply,
                                  rpc::SendReplyCallback send_reply_callback) override;
 
-  /// Handle a `GetObjectsInfo` request.
-  void HandleGetObjectsInfo(rpc::GetObjectsInfoRequest request,
-                            rpc::GetObjectsInfoReply *reply,
-                            rpc::SendReplyCallback send_reply_callback) override;
+  // === ANT-INTERNAL below ===
 
-  /// Handle a `NotifyGCSRestart` request
-  void HandleNotifyGCSRestart(rpc::NotifyGCSRestartRequest request,
-                              rpc::NotifyGCSRestartReply *reply,
-                              rpc::SendReplyCallback send_reply_callback) override;
+  /// Handle a `StopTasksAndBanNewTasks` request.
+  void HandleStopTasksAndBanNewTasks(const rpc::StopTasksAndBanNewTasksRequest &request,
+                                     rpc::StopTasksAndBanNewTasksReply *reply,
+                                     rpc::SendReplyCallback send_reply_callback) override;
+
+  /// Handle a `LiftNewTasksBan` request.
+  void HandleLiftNewTasksBan(const rpc::LiftNewTasksBanRequest &request,
+                             rpc::LiftNewTasksBanReply *reply,
+                             rpc::SendReplyCallback send_reply_callback) override;
+
+  /// Dump node meta data(e.g. namespace info)
+  void DumpNodeMetaData() const;
+  // === ANT-INTERNAL above ===
 
   /// Trigger local GC on each worker of this raylet.
   void DoLocalGC(bool triggered_by_global_gc = false);
@@ -631,18 +688,20 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// Whether a task is an actor creation task.
   bool IsActorCreationTask(const TaskID &task_id);
 
-  /// Return back all the bundle resource.
-  ///
-  /// \param bundle_spec: Specification of bundle whose resources will be returned.
-  /// \return Whether the resource is returned successfully.
-  bool ReturnBundleResources(const BundleSpecification &bundle_spec);
+  /// Handle the update of nodegroup.
+  void NodegroupUpdated(const NodegroupData &nodegroup_data);
+
+  void OnPlacementGroupBundlesChanged(
+      const rpc::PlacementGroupBundlesChangedNotification &notification);
+
+  /// Initialize job evn.
+  void InitializeJobEnv(const rpc::JobTableData &job_data);
 
   /// Publish the infeasible task error to GCS so that drivers can subscribe to it and
   /// print.
   ///
   /// \param task RayTask that is infeasible
   void PublishInfeasibleTaskError(const RayTask &task) const;
-
   /// Get pointers to objects stored in plasma. They will be
   /// released once the returned references go out of scope.
   ///
@@ -659,77 +718,105 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   ///
   /// \param Output parameter. `resource_load` and `resource_load_by_shape` are the only
   /// fields used.
-  void FillResourceUsage(rpc::ResourcesData &data);
+  void FillResourceUsage(
+      rpc::ResourcesData &data,
+      const std::shared_ptr<SchedulingResources> &last_reported_resources = nullptr,
+      bool need_whole_report = false);
 
+  /// Cancel all tasks associated with a placement group bundle index.
+  ///
+  /// Note: This method will only cancel tasks from `tasks_to_schedule_` and
+  /// `infeasible_tasks_` when the bundle of the placement group has been removed. \param
+  /// placement_group_id.
+  void CancelTaskWithPlacementGroup(const PlacementGroupID &placement_group_id,
+                                    int64_t bundle_index);
   /// Disconnect a client.
   ///
   /// \param client The client that sent the message.
   /// \param disconnect_type The reason to disconnect the specified client.
-  /// \param disconnect_detail Disconnection information in details.
   /// \param client_error_message Extra error messages about this disconnection
   /// \return Void.
-  void DisconnectClient(const std::shared_ptr<ClientConnection> &client,
-                        rpc::WorkerExitType disconnect_type,
-                        const std::string &disconnect_detail,
-                        const rpc::RayException *creation_task_exception = nullptr);
+  void DisconnectClient(
+      const std::shared_ptr<ClientConnection> &client,
+      rpc::WorkerExitType disconnect_type = rpc::WorkerExitType::SYSTEM_ERROR_EXIT,
+      const std::shared_ptr<rpc::RayException> &creation_task_exception = nullptr);
 
-  bool TryLocalGC();
+  /// === ANT-INTERNAL below ===
 
-  /// Creates the callback used in the memory monitor.
-  MemoryUsageRefreshCallback CreateMemoryUsageRefreshCallback();
+  /// Cancel all actors associated with the specified job.
+  ///
+  /// \param job_id ID of the job.
+  void CancelAndRemoveTasksForJob(const JobID &job_id);
+
+  /// Check if there are enough available resources for the given input. If yes, we will
+  /// reserve the given amount of resources from this node.
+  bool TryReserveResources(const ResourceSet &required_resource);
+
+  /// Calculate normal task resources.
+  ResourceSet CalcNormalTaskResources() const;
+
+  void FillNormalTaskResourceUsage(rpc::ResourcesData &resource_data,
+                                   bool need_whole_report = false);
+
+  /// Check if there are enough available resources for the given input.
+  bool IsLocallySchedulable(const RayTask &task);
+
+  void OnFrozenNodeUpdated(const std::unordered_set<std::string> &frozen_node_set);
+
+  bool IsHostInNodegroup(const std::string &host_name,
+                         const std::string &namespace_id) const;
+
+  bool IsNodeSchedulable(const std::string &binary_node_id,
+                         const ScheduleContext &schedule_context) const;
+
+  void AsyncScheduleAndDispatchTasks();
+
+  /// === ANT-INTERNAL above ===
+
+  /// Delete URI in local node.
+  ///
+  /// \param uri The URI of the resource.
+  void DeleteLocalURI(const std::string &uri, std::function<void(bool)> cb);
+
+  void OnJobEnvInitialized(const JobID &job_id, const Status &status);
 
   /// Creates the detail message for the worker that is killed due to memory running low.
   const std::string CreateOomKillMessageDetails(
-      const std::shared_ptr<WorkerInterface> &worker,
-      const NodeID &node_id,
-      const MemorySnapshot &system_memory,
-      float usage_threshold) const;
+      const std::shared_ptr<WorkerInterface> &worker, const NodeID &node_id,
+      const MemorySnapshot &system_memory, float usage_threshold) const;
 
   /// Creates the suggestion message for the worker that is killed due to memory running
   /// low.
   const std::string CreateOomKillMessageSuggestions(
       const std::shared_ptr<WorkerInterface> &worker) const;
 
-  /// Stores the failure reason for the task. The entry will be cleaned up by a periodic
-  /// function post TTL.
-  void SetTaskFailureReason(const TaskID &task_id,
-                            const rpc::RayErrorInfo &failure_reason);
-
-  /// Checks the expiry time of the task failures and garbage collect them.
-  void GCTaskFailureReason();
+  /// Creates the callback used in the memory monitor.
+  MemoryUsageRefreshCallback CreateMemoryUsageRefreshCallback();
 
   /// ID of this node.
   NodeID self_node_id_;
-  /// The user-given identifier or name of this node.
-  std::string self_node_name_;
   instrumented_io_context &io_service_;
-  /// A client connection to the GCS.
-  std::shared_ptr<gcs::GcsClient> gcs_client_;
   /// Class to send heartbeat to GCS.
   std::unique_ptr<HeartbeatSender> heartbeat_sender_;
-  /// A pool of workers.
-  WorkerPool worker_pool_;
-  /// The `ClientCallManager` object that is shared by all `NodeManagerClient`s
-  /// as well as all `CoreWorkerClient`s.
-  rpc::ClientCallManager client_call_manager_;
-  /// Pool of RPC client connections to core workers.
-  rpc::CoreWorkerClientPool worker_rpc_pool_;
-  /// The raylet client to initiate the pubsub to core workers (owners).
-  /// It is used to subscribe objects to evict.
-  std::unique_ptr<pubsub::SubscriberInterface> core_worker_subscriber_;
-  /// The object table. This is shared between the object manager and node
-  /// manager.
-  std::unique_ptr<IObjectDirectory> object_directory_;
   /// Manages client requests for object transfers and availability.
   ObjectManager object_manager_;
   /// A Plasma object store client. This is used for creating new objects in
   /// the object store (e.g., for actor tasks that can't be run because the
   /// actor died) and to pin objects that are in scope in the cluster.
   plasma::PlasmaClient store_client_;
+  /// A client connection to the GCS.
+  std::shared_ptr<gcs::GcsClient> gcs_client_;
+  /// The object table. This is shared with the object manager.
+  std::shared_ptr<ObjectDirectoryInterface> object_directory_;
   /// The runner to run function periodically.
   PeriodicalRunner periodical_runner_;
   /// The period used for the resources report timer.
   uint64_t report_resources_period_ms_;
+  /// The time that the last resource report was sent at. Used to make sure we are
+  /// keeping up with resource reports.
+  uint64_t last_resource_report_at_ms_;
+  /// Whether to enable fair queueing between task classes in raylet.
+  bool fair_queueing_enabled_;
   /// Incremented each time we encounter a potential resource deadlock condition.
   /// This is reset to zero when the condition is cleared.
   int resource_deadlock_warned_ = 0;
@@ -737,9 +824,14 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   bool recorded_metrics_ = false;
   /// The path to the ray temp dir.
   std::string temp_dir_;
+  uint64_t last_whole_resource_usage_report_at_ms_;
   /// Initial node manager configuration.
   const NodeManagerConfig initial_config_;
 
+  /// The actor worker assignment manager.
+  std::shared_ptr<ActorWorkerAssignmentManager> actor_worker_assignment_manager_;
+  /// A pool of workers.
+  WorkerPool worker_pool_;
   /// A manager to resolve objects needed by queued tasks and workers that
   /// called `ray.get` or `ray.wait`.
   DependencyManager dependency_manager_;
@@ -747,7 +839,7 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// A manager for wait requests.
   WaitManager wait_manager_;
 
-  std::shared_ptr<AgentManager> agent_manager_;
+  std::unique_ptr<AgentManager> agent_manager_;
 
   /// The RPC server.
   rpc::GrpcServer node_manager_server_;
@@ -759,19 +851,26 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   std::unique_ptr<rpc::AgentManagerServiceHandler> agent_manager_service_handler_;
   rpc::AgentManagerGrpcService agent_manager_service_;
 
+  /// The `ClientCallManager` object that is shared by all `NodeManagerClient`s
+  /// as well as all `CoreWorkerClient`s.
+  rpc::ClientCallManager client_call_manager_;
+
+  /// Pool of RPC client connections to core workers.
+  rpc::CoreWorkerClientPool worker_rpc_pool_;
+
   /// Manages all local objects that are pinned (primary
   /// copies), freed, and/or spilled.
   LocalObjectManager local_object_manager_;
 
-  /// Map from node ids to addresses of the remote node managers.
-  absl::flat_hash_map<NodeID, std::pair<std::string, int32_t>>
-      remote_node_manager_addresses_;
+  /// Map from node ids to node info of the remote node managers.
+  absl::flat_hash_map<NodeID, std::shared_ptr<rpc::BasicGcsNodeInfo>> remote_node_info_;
 
   /// Map of workers leased out to direct call clients.
-  absl::flat_hash_map<WorkerID, std::shared_ptr<WorkerInterface>> leased_workers_;
+  std::unordered_map<WorkerID, std::shared_ptr<WorkerInterface>> leased_workers_;
 
-  /// Optional extra information about why the task failed.
-  absl::flat_hash_map<TaskID, ray::TaskFailureEntry> task_failure_reasons_;
+  /// Map from owner worker ID to a list of worker IDs that the owner has a
+  /// lease on.
+  absl::flat_hash_map<WorkerID, std::vector<WorkerID>> leased_workers_by_owner_;
 
   /// Whether to trigger global GC in the next resource usage report. This will broadcast
   /// a global GC message to all raylets except for this one.
@@ -781,39 +880,40 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// on all local workers of this raylet.
   bool should_local_gc_ = false;
 
-  /// When plasma storage usage is high, we'll run gc to reduce it.
-  double high_plasma_storage_usage_ = 1.0;
+  /// The last time local gc was run.
+  int64_t last_local_gc_ns_ = 0;
 
-  /// the timestampe local gc run
-  uint64_t local_gc_run_time_ns_;
+  /// The interval in nanoseconds between local GC automatic triggers.
+  const int64_t local_gc_interval_ns_;
 
-  /// Throttler for local gc
-  Throttler local_gc_throttler_;
-
-  /// Throttler for global gc
-  Throttler global_gc_throttler_;
+  /// The min interval in nanoseconds between local GC runs (auto + memory pressure
+  /// triggered).
+  const int64_t local_gc_min_interval_ns_;
 
   /// Target being evicted or null if no target
   std::shared_ptr<WorkerInterface> high_memory_eviction_target_;
-
-  /// Seconds to initialize a local gc
-  const uint64_t local_gc_interval_ns_;
 
   /// These two classes make up the new scheduler. ClusterResourceScheduler is
   /// responsible for maintaining a view of the cluster state w.r.t resource
   /// usage. ClusterTaskManager is responsible for queuing, spilling back, and
   /// dispatching tasks.
-  std::shared_ptr<ClusterResourceScheduler> cluster_resource_scheduler_;
-  std::shared_ptr<LocalTaskManager> local_task_manager_;
+  std::shared_ptr<ClusterResourceSchedulerInterface> cluster_resource_scheduler_;
   std::shared_ptr<ClusterTaskManagerInterface> cluster_task_manager_;
 
   absl::flat_hash_map<ObjectID, std::unique_ptr<RayObject>> pinned_objects_;
+
+  // NOTE: We only need the invalid bundle indexs of the placement group in raylet end.
+  absl::flat_hash_map<PlacementGroupID, std::vector<int32_t>>
+      placement_group_invalid_bundle_index_;
 
   // TODO(swang): Evict entries from these caches.
   /// Cache for the WorkerTable in the GCS.
   absl::flat_hash_set<WorkerID> failed_workers_cache_;
   /// Cache for the NodeTable in the GCS.
   absl::flat_hash_set<NodeID> failed_nodes_cache_;
+
+  /// Cache resources changed nodes.
+  absl::flat_hash_set<NodeID> resources_changed_nodes_cache_;
 
   /// Concurrency for the following map
   mutable absl::Mutex plasma_object_notification_lock_;
@@ -829,12 +929,6 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// Last time metrics are recorded.
   uint64_t last_metrics_recorded_at_ms_;
 
-  /// The number of workers killed due to memory above threshold since last report.
-  uint64_t number_workers_killed_by_oom_ = 0;
-
-  /// The number of workers killed not by memory above threshold since last report.
-  uint64_t number_workers_killed_ = 0;
-
   /// Number of tasks that are received and scheduled.
   uint64_t metrics_num_task_scheduled_;
 
@@ -844,24 +938,67 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// Number of tasks that are spilled back to other nodes.
   uint64_t metrics_num_task_spilled_back_;
 
-  /// Managers all bundle-related operations.
   std::shared_ptr<PlacementGroupResourceManager> placement_group_resource_manager_;
 
-  /// Next resource broadcast seq no. Non-incrementing sequence numbers
-  /// indicate network issues (dropped/duplicated/ooo packets, etc).
-  int64_t next_resource_seq_no_;
+  /// Manage all runtime env locally
+  RuntimeEnvManager runtime_env_manager_;
 
-  /// Whether or not if the node draining process has already received.
-  bool is_node_drained_ = false;
+  // === ANT-INTERNAL below ===
 
-  /// Ray syncer for synchronization
-  syncer::RaySyncer ray_syncer_;
+  /// The l1 fault tolerance handler.
+  /// Only used when L1 fault tolerance is enabled.
+  NodeManagerL1Handler l1_handler;
 
-  /// Resource message updated
-  absl::flat_hash_map<NodeID, rpc::ResourcesData> resource_message_udpated_;
+  /// The hosts that each nodegroup has.
+  /// Key: nodegroup ID. Value: set of hosts this nodegroup has.
+  std::unordered_map<std::string, std::unordered_set<std::string>> nodegroup_hosts_;
+  /// The time of each nodegroup's most recent update.
+  std::unordered_map<std::string, uint64_t> nodegroup_updated_timestamps_;
 
-  /// RaySyncerService for gRPC
-  syncer::RaySyncerService ray_syncer_service_;
+  /// The job manager.
+  std::shared_ptr<JobManager> job_manager_ = std::make_shared<JobManager>();
+
+  // === ANT-INTERNAL below ===
+
+  // Used for metrics
+  std::unique_ptr<boost::asio::deadline_timer> timer_;
+  std::function<void(const boost::system::error_code &error)> timer_callback_;
+  boost::posix_time::milliseconds timer_interval_;
+
+  /// Timer to reschedule `INFEASIBLE` and `READY` tasks.
+  boost::asio::steady_timer pending_tasks_reschedule_timer_;
+
+  std::unordered_set<std::string> frozen_node_set_;
+
+  struct WorkerRequestContext {
+    const rpc::RequestWorkerLeaseRequest request;
+    rpc::RequestWorkerLeaseReply *reply;
+    rpc::SendReplyCallback send_reply_callback;
+  };
+
+  // Key: TaskID, Value: WorkerRequestContext
+  std::unordered_map<TaskID, WorkerRequestContext> waiting_for_env_worker_requests_;
+
+  struct CommitBundleResourcesRequestContext {
+    ~CommitBundleResourcesRequestContext() {
+      if (timer) {
+        timer->cancel();
+      }
+    }
+
+    std::function<void(bool)> callback;
+    std::shared_ptr<boost::asio::deadline_timer> timer;
+  };
+  std::unordered_map<BundleID, std::shared_ptr<CommitBundleResourcesRequestContext>,
+                     pair_hash>
+      commit_bundle_resources_requests_;
+
+  // Whether this node eligible for resource overcommit.
+  bool overcommit_enabled_ = RayConfig::instance().runtime_resource_scheduling_enabled();
+
+  RuntimeResourceScheduleOptions schedule_options_;
+
+  int schedule_and_dispatch_times_ = 0;
 
   /// Monitors and reports node memory usage and whether it is above threshold.
   std::unique_ptr<MemoryMonitor> memory_monitor_;

@@ -66,3 +66,19 @@ service ObjectManagerService {
   // Tell remote object manager to free some objects
   rpc FreeObjects(FreeObjectsRequest) returns (FreeObjectsReply);
 }
+
+// ANT-INTERNAL
+
+// This enum is needed by brpc stream. For each method in the stream rpc service,
+// a message type needs to be defined for the corresponding request/reply in that
+// method, so that receiver side can figure out the exact request message
+// based on this type, deserialize it accordingly, and invoke the corresponding
+// method.
+enum ObjectManagerServiceMessageType {
+  PushRequestMessage = 0;
+  PullRequestMessage = 1;
+  FreeObjectsRequestMessage = 2;
+  PushReplyMessage = 3;
+  PullReplyMessage = 4;
+  FreeObjectsReplyMessage = 5;
+}

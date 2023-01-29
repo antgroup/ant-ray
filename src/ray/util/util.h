@@ -14,25 +14,35 @@
 
 #pragma once
 
+#include <pthread.h>
+
+#include <algorithm>
+#include <boost/algorithm/hex.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/uuid/detail/md5.hpp>
 #include <chrono>
+#include <fstream>
+#include <iostream>
 #include <iterator>
-#include <memory>
 #include <mutex>
 #include <random>
 #include <sstream>
 #include <string>
 #include <thread>
 #include <unordered_map>
-
-#include "absl/container/flat_hash_map.h"
-#include "absl/random/random.h"
-#include "ray/util/logging.h"
-#include "ray/util/macros.h"
-#include "ray/util/process.h"
+#ifdef __linux__
+#include <sys/prctl.h>
+#endif
 
 #ifdef _WIN32
 #include <process.h>  // to ensure getpid() on Windows
 #endif
+
+#include <signal.h>
+
+#include <atomic>
+
+#include "ray/util/logging.h"
 
 // Portable code for unreachable
 #if defined(_MSC_VER)
@@ -73,20 +83,6 @@ inline std::string StringToHex(const std::string &str) {
   return result;
 }
 
-// Append append_str to the begining of each line of str.
-inline std::string AppendToEachLine(const std::string &str,
-                                    const std::string &append_str) {
-  std::stringstream ss;
-  ss << append_str;
-  for (char c : str) {
-    ss << c;
-    if (c == '\n') {
-      ss << append_str;
-    }
-  }
-  return ss.str();
-}
-
 /// Return the number of milliseconds since the steady clock epoch. NOTE: The
 /// returned timestamp may be used for accurately measuring intervals but has
 /// no relation to wall clock time. It must not be used for synchronization
@@ -115,6 +111,18 @@ inline int64_t current_sys_time_us() {
       std::chrono::duration_cast<std::chrono::microseconds>(
           std::chrono::system_clock::now().time_since_epoch());
   return mu_since_epoch.count();
+}
+
+inline double current_sys_time_seconds() {
+  int64_t microseconds_in_seconds = 1000000;
+  return static_cast<double>(current_sys_time_us()) / microseconds_in_seconds;
+}
+
+inline int64_t current_sys_time_ns() {
+  std::chrono::nanoseconds ns_since_epoch =
+      std::chrono::duration_cast<std::chrono::nanoseconds>(
+          std::chrono::system_clock::now().time_since_epoch());
+  return ns_since_epoch.count();
 }
 
 inline std::string GenerateUUIDV4() {
@@ -158,7 +166,8 @@ std::vector<std::string> ParseCommandLine(
     const std::string &cmdline, CommandLineSyntax syntax = CommandLineSyntax::System);
 
 /// A helper function to combine command-line arguments in a platform-compatible manner.
-/// The result of this function is intended to be suitable for the shell used by popen().
+/// The result of this function is intended to be suitable for the shell used by
+/// popen().
 ///
 /// \param cmdline The command-line arguments to combine.
 ///
@@ -188,7 +197,7 @@ ParseUrlEndpoint(const std::string &endpoint, int default_port = 0);
 ///   num_objects: 9,
 ///   offset: 8388878
 /// }
-std::shared_ptr<absl::flat_hash_map<std::string, std::string>> ParseURL(std::string url);
+std::shared_ptr<std::unordered_map<std::string, std::string>> ParseURL(std::string url);
 
 class InitShutdownRAII {
  public:
@@ -202,7 +211,7 @@ class InitShutdownRAII {
   /// \param shutdown_func The shutdown function.
   /// \param args The arguments for the init function.
   template <class InitFunc, class... Args>
-  InitShutdownRAII(InitFunc init_func, ShutdownFunc shutdown_func, Args &&...args)
+  InitShutdownRAII(InitFunc init_func, ShutdownFunc shutdown_func, Args &&... args)
       : shutdown_(shutdown_func) {
     init_func(args...);
   }
@@ -227,19 +236,49 @@ struct EnumClassHash {
 
 /// unordered_map for enum class type.
 template <typename Key, typename T>
-using EnumUnorderedMap = absl::flat_hash_map<Key, T, EnumClassHash>;
+using EnumUnorderedMap = std::unordered_map<Key, T, EnumClassHash>;
 
 /// A helper function to fill random bytes into the `data`.
 /// Warning: this is not fork-safe, we need to re-seed after that.
 template <typename T>
 void FillRandom(T *data) {
   RAY_CHECK(data != nullptr);
+  auto randomly_seeded_mersenne_twister = []() {
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    // To increase the entropy, mix in a number of time samples instead of a single one.
+    // This avoids the possibility of duplicate seeds for many workers that start in
+    // close succession.
+    for (int i = 0; i < 128; i++) {
+      std::this_thread::sleep_for(std::chrono::microseconds(10));
+      seed += std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    }
+    std::mt19937 seeded_engine(seed);
+    return seeded_engine;
+  };
 
-  thread_local absl::BitGen generator;
+  // NOTE(pcm): The right way to do this is to have one std::mt19937 per
+  // thread (using the thread_local keyword), but that's not supported on
+  // older versions of macOS (see https://stackoverflow.com/a/29929949)
+  static std::mutex random_engine_mutex;
+  std::lock_guard<std::mutex> lock(random_engine_mutex);
+  static std::mt19937 generator = randomly_seeded_mersenne_twister();
+  std::uniform_int_distribution<uint32_t> dist(0, std::numeric_limits<uint8_t>::max());
   for (size_t i = 0; i < data->size(); i++) {
-    (*data)[i] = static_cast<uint8_t>(
-        absl::Uniform(generator, 0, std::numeric_limits<uint8_t>::max()));
+    (*data)[i] = static_cast<uint8_t>(dist(generator));
   }
+}
+
+template <class InputIterator, typename Func>
+std::string StrJoin(InputIterator first, InputIterator last, Func func,
+                    const std::string &delim, const std::string &arround = "") {
+  std::string a = arround;
+  while (first != last) {
+    a += func(first);
+    first++;
+    if (first != last) a += delim;
+  }
+  a += arround;
+  return a;
 }
 
 inline void SetThreadName(const std::string &thread_name) {
@@ -249,6 +288,72 @@ inline void SetThreadName(const std::string &thread_name) {
   pthread_setname_np(pthread_self(), thread_name.substr(0, 15).c_str());
 #endif
 }
+
+inline std::string MD5Digest(const std::string &s) {
+  boost::uuids::detail::md5 hash;
+  boost::uuids::detail::md5::digest_type digest;
+  hash.process_bytes(s.data(), s.size());
+  hash.get_digest(digest);
+  const auto char_digest = reinterpret_cast<const char *>(&digest);
+  std::string result = "";
+  boost::algorithm::hex_lower(
+      char_digest, char_digest + sizeof(boost::uuids::detail::md5::digest_type),
+      std::back_inserter(result));
+  return result;
+}
+
+inline std::unordered_map<std::string, std::string> LoadPropertiesFromFile(
+    const std::string &filename) {
+  std::unordered_map<std::string, std::string> properties;
+  std::ifstream load_file(filename);
+  if (load_file.is_open()) {
+    std::string line;
+    while (std::getline(load_file, line)) {
+      if (line.empty()) {
+        continue;
+      }
+      std::vector<std::string> ret_vect;
+      boost::split(ret_vect, line, boost::is_any_of("="));
+      if (ret_vect.size() < 2) {
+        continue;
+      }
+      RAY_LOG(DEBUG) << "Load key => " << ret_vect[0] << ", value => " << ret_vect[1];
+      properties[ret_vect[0]] = ret_vect[1];
+    }
+    load_file.close();
+  } else {
+    RAY_LOG(WARNING) << "File " << filename << " not found.";
+  }
+  return properties;
+}
+
+/// If the origin str starts with the pattern str with case ignored.
+inline bool StartsWithIgnoreCase(const std::string &origin, const std::string &pattern) {
+  const auto pattern_size = pattern.size();
+  if (pattern_size == 0 || origin.size() < pattern_size) {
+    return false;
+  }
+
+  return std::equal(origin.begin(), origin.begin() + pattern_size, pattern.begin(),
+                    pattern.end(), [](char a, char b) {
+                      return std::tolower(static_cast<unsigned char>(a)) ==
+                             std::tolower(static_cast<unsigned char>(b));
+                    });
+}
+
+inline bool StartsWith(const std::string &text, const std::string &prefix) {
+  return prefix.empty() || (text.size() >= prefix.size() &&
+                            memcmp(text.data(), prefix.data(), prefix.size()) == 0);
+}
+
+inline bool EndsWith(const std::string &text, const std::string &suffix) {
+  return suffix.empty() || (text.size() >= suffix.size() &&
+                            memcmp(text.data() + (text.size() - suffix.size()),
+                                   suffix.data(), suffix.size()) == 0);
+}
+
+/// Block SIGINT and SIGTERM so they will be handled by the main thread.
+void BlockSignal();
 
 inline std::string GetThreadName() {
 #if defined(__linux__)
@@ -269,7 +374,7 @@ template <typename T>
 class ThreadPrivate {
  public:
   template <typename... Ts>
-  explicit ThreadPrivate(Ts &&...ts) : t_(std::forward<Ts>(ts)...) {}
+  explicit ThreadPrivate(Ts &&... ts) : t_(std::forward<Ts>(ts)...) {}
 
   T &operator*() {
     ThreadCheck();
@@ -321,52 +426,6 @@ class ThreadPrivate {
   mutable std::thread::id id_;
   mutable std::mutex mutex_;
 };
-
-class ExponentialBackOff {
- public:
-  ExponentialBackOff() = default;
-  ExponentialBackOff(const ExponentialBackOff &) = default;
-  ExponentialBackOff(ExponentialBackOff &&) = default;
-  ExponentialBackOff &operator=(const ExponentialBackOff &) = default;
-  ExponentialBackOff &operator=(ExponentialBackOff &&) = default;
-
-  /// Construct an exponential back off counter.
-  ///
-  /// \param[in] initial_value The start value for this counter
-  /// \param[in] multiplier The multiplier for this counter.
-  /// \param[in] max_value The maximum value for this counter. By default it's
-  ///    infinite double.
-  ExponentialBackOff(uint64_t initial_value,
-                     double multiplier,
-                     uint64_t max_value = std::numeric_limits<uint64_t>::max())
-      : curr_value_(initial_value),
-        initial_value_(initial_value),
-        max_value_(max_value),
-        multiplier_(multiplier) {
-    RAY_CHECK(multiplier > 0.0) << "Multiplier must be greater than 0";
-  }
-
-  uint64_t Next() {
-    auto ret = curr_value_;
-    curr_value_ = curr_value_ * multiplier_;
-    curr_value_ = std::min(curr_value_, max_value_);
-    return ret;
-  }
-
-  uint64_t Current() { return curr_value_; }
-
-  void Reset() { curr_value_ = initial_value_; }
-
- private:
-  uint64_t curr_value_;
-  uint64_t initial_value_;
-  uint64_t max_value_;
-  double multiplier_;
-};
-
-/// Return true if the raylet is failed. This util function is only meant to be used by
-/// core worker modules.
-bool IsRayletFailed(const std::string &raylet_pid);
 
 /// Teriminate the process without cleaning up the resources.
 void QuickExit();

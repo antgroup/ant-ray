@@ -4,9 +4,11 @@ import io.ray.api.BaseActorHandle;
 import io.ray.api.id.ActorId;
 import io.ray.api.id.ObjectId;
 import io.ray.api.id.PlacementGroupId;
+import io.ray.api.options.ActorCallOptions;
 import io.ray.api.options.ActorCreationOptions;
 import io.ray.api.options.CallOptions;
 import io.ray.api.options.PlacementGroupCreationOptions;
+import io.ray.api.placementgroup.Bundle;
 import io.ray.api.placementgroup.PlacementGroup;
 import io.ray.runtime.functionmanager.FunctionDescriptor;
 import java.util.List;
@@ -57,7 +59,7 @@ public interface TaskSubmitter {
       FunctionDescriptor functionDescriptor,
       List<FunctionArg> args,
       int numReturns,
-      CallOptions options);
+      ActorCallOptions options);
 
   /**
    * Create a placement group.
@@ -78,10 +80,26 @@ public interface TaskSubmitter {
    * Wait for the placement group to be ready within the specified time.
    *
    * @param id Id of placement group.
-   * @param timeoutSeconds Timeout in seconds.
+   * @param timeoutMs Timeout in milliseconds.
    * @return True if the placement group is created. False otherwise.
    */
-  boolean waitPlacementGroupReady(PlacementGroupId id, int timeoutSeconds);
+  boolean waitPlacementGroupReady(PlacementGroupId id, int timeoutMs);
+
+  /**
+   * Add new bundles for one placement group.
+   *
+   * @param id Id of the placement group.
+   * @param bundles New bundles that will be added to this placement group.
+   */
+  void addBundlesForPlacementGroup(PlacementGroupId id, List<Bundle> bundles);
+
+  /**
+   * Remove bundles from one placement group.
+   *
+   * @param id Id of the placement group.
+   * @param bundleIndexes Bundle indexes that will be removed from this placement group.
+   */
+  void removeBundlesForPlacementGroup(PlacementGroupId id, List<Integer> bundleIndexes);
 
   BaseActorHandle getActor(ActorId actorId);
 }

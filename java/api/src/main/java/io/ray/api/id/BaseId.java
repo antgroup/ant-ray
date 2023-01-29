@@ -8,8 +8,8 @@ import javax.xml.bind.DatatypeConverter;
 public abstract class BaseId implements Serializable {
   private static final long serialVersionUID = 8588849129675565761L;
   private final byte[] id;
-  private transient int hashCodeCache = 0;
-  private transient Boolean isNilCache = null;
+  private volatile int hashCodeCache = 0;
+  private volatile Boolean isNilCache = null;
 
   /** Create a BaseId instance according to the input byte array. */
   protected BaseId(byte[] id) {
@@ -34,7 +34,7 @@ public abstract class BaseId implements Serializable {
     return ByteBuffer.wrap(id);
   }
 
-  /** Returns true if this id is nil. */
+  /** Returns True if this id is nil. */
   public boolean isNil() {
     if (isNilCache == null) {
       boolean localIsNil = true;
@@ -84,7 +84,7 @@ public abstract class BaseId implements Serializable {
     return DatatypeConverter.printHexBinary(id).toLowerCase();
   }
 
-  protected static byte[] hexString2Bytes(String hex) {
+  public static byte[] hexString2Bytes(String hex) {
     return DatatypeConverter.parseHexBinary(hex);
   }
 

@@ -14,30 +14,34 @@
 
 #include "ray/raylet/scheduling/scheduling_policy.h"
 
+#include <float.h>
+#include <cstdint>
 #include <functional>
-
-#include "ray/util/container_util.h"
 
 namespace ray {
 
 namespace raylet_scheduling_policy {
 namespace {
 
-bool IsGPURequest(const ResourceRequest &resource_request) {
-  return resource_request.Has(ResourceID::GPU());
+bool IsGPURequest(const TaskRequest &task_request) {
+  if (task_request.predefined_resources.size() <= GPU) {
+    return false;
+  }
+  return task_request.predefined_resources[GPU].demand > 0;
 }
 
 bool DoesNodeHaveGPUs(const NodeResources &resources) {
-  return resources.total.Has(ResourceID::GPU());
+  if (resources.predefined_resources.size() <= GPU) {
+    return false;
+  }
+  return resources.predefined_resources[GPU].total > 0;
 }
 }  // namespace
 
-scheduling::NodeID SchedulingPolicy::SpreadPolicy(
-    const ResourceRequest &resource_request,
-    bool force_spillback,
-    bool require_available,
-    std::function<bool(scheduling::NodeID)> is_node_available) {
-  std::vector<scheduling::NodeID> round;
+int64_t SchedulingPolicy::SpreadPolicy(const TaskRequest &task_request,
+                                       bool force_spillback, bool require_available,
+                                       std::function<bool(int64_t)> is_node_available) {
+  std::vector<int64_t> round;
   round.reserve(nodes_.size());
   for (const auto &pair : nodes_) {
     round.emplace_back(pair.first);
@@ -47,13 +51,14 @@ scheduling::NodeID SchedulingPolicy::SpreadPolicy(
   size_t round_index = spread_scheduling_next_index_;
   for (size_t i = 0; i < round.size(); ++i, ++round_index) {
     const auto &node_id = round[round_index % round.size()];
-    const auto &node = map_find_or_die(nodes_, node_id);
+    auto it = nodes_.find(node_id);
+    RAY_CHECK(it != nodes_.end());
+    const auto &node = it->second;
     if (node_id == local_node_id_ && force_spillback) {
       continue;
     }
-    if (!is_node_available(node_id) ||
-        !node.GetLocalView().IsFeasible(resource_request) ||
-        !node.GetLocalView().IsAvailable(resource_request, true)) {
+    if (!is_node_available(node_id) || !node.GetLocalView().IsFeasible(task_request) ||
+        !node.GetLocalView().IsAvailable(task_request)) {
       continue;
     }
 
@@ -61,26 +66,23 @@ scheduling::NodeID SchedulingPolicy::SpreadPolicy(
     return node_id;
   }
 
-  return HybridPolicy(
-      resource_request, 0, force_spillback, require_available, is_node_available);
+  return HybridPolicy(task_request, 0, force_spillback, require_available,
+                      is_node_available);
 }
 
-scheduling::NodeID SchedulingPolicy::HybridPolicyWithFilter(
-    const ResourceRequest &resource_request,
-    float spread_threshold,
-    bool force_spillback,
-    bool require_available,
-    std::function<bool(scheduling::NodeID)> is_node_available,
+int64_t SchedulingPolicy::HybridPolicyWithFilter(
+    const TaskRequest &task_request, float spread_threshold, bool force_spillback,
+    bool require_available, std::function<bool(int64_t)> is_node_available,
     NodeFilter node_filter) {
   // Step 1: Generate the traversal order. We guarantee that the first node is local, to
   // encourage local scheduling. The rest of the traversal order should be globally
   // consistent, to encourage using "warm" workers.
-  std::vector<scheduling::NodeID> round;
+  std::vector<int64_t> round;
   round.reserve(nodes_.size());
   const auto local_it = nodes_.find(local_node_id_);
   RAY_CHECK(local_it != nodes_.end());
   auto predicate = [node_filter, &is_node_available](
-                       scheduling::NodeID node_id, const NodeResources &node_resources) {
+                       int64_t node_id, const NodeResources &node_resources) {
     if (!is_node_available(node_id)) {
       return false;
     }
@@ -115,7 +117,7 @@ scheduling::NodeID SchedulingPolicy::HybridPolicyWithFilter(
   // place.
   std::sort(round.begin() + start_index, round.end());
 
-  scheduling::NodeID best_node_id = scheduling::NodeID::Nil();
+  int64_t best_node_id = -1;
   float best_utilization_score = INFINITY;
   bool best_is_available = false;
 
@@ -126,28 +128,13 @@ scheduling::NodeID SchedulingPolicy::HybridPolicyWithFilter(
     const auto &it = nodes_.find(node_id);
     RAY_CHECK(it != nodes_.end());
     const auto &node = it->second;
-    if (!node.GetLocalView().IsFeasible(resource_request)) {
+    if (!node.GetLocalView().IsFeasible(task_request)) {
       continue;
     }
 
-    bool ignore_pull_manager_at_capacity = false;
-    if (node_id == local_node_id_) {
-      // It's okay if the local node's pull manager is at
-      // capacity because we will eventually spill the task
-      // back from the waiting queue if its args cannot be
-      // pulled.
-      ignore_pull_manager_at_capacity = true;
-    }
-    bool is_available = node.GetLocalView().IsAvailable(resource_request,
-                                                        ignore_pull_manager_at_capacity);
+    bool is_available = node.GetLocalView().IsAvailable(task_request);
     float critical_resource_utilization =
         node.GetLocalView().CalculateCriticalResourceUtilization();
-    RAY_LOG(DEBUG) << "Node " << node_id.ToInt() << " is "
-                   << (is_available ? "available" : "not available") << " for request "
-                   << resource_request.DebugString()
-                   << " with critical resource utilization "
-                   << critical_resource_utilization << " based on local view "
-                   << node.GetLocalView().DebugString();
     if (critical_resource_utilization < spread_threshold) {
       critical_resource_utilization = 0;
     }
@@ -179,72 +166,84 @@ scheduling::NodeID SchedulingPolicy::HybridPolicyWithFilter(
   return best_node_id;
 }
 
-scheduling::NodeID SchedulingPolicy::HybridPolicy(
-    const ResourceRequest &resource_request,
-    float spread_threshold,
-    bool force_spillback,
-    bool require_available,
-    std::function<bool(scheduling::NodeID)> is_node_available,
-    bool scheduler_avoid_gpu_nodes) {
-  if (!scheduler_avoid_gpu_nodes || IsGPURequest(resource_request)) {
-    return HybridPolicyWithFilter(resource_request,
-                                  spread_threshold,
-                                  force_spillback,
-                                  require_available,
-                                  std::move(is_node_available));
+int64_t SchedulingPolicy::HybridPolicy(const TaskRequest &task_request,
+                                       float spread_threshold, bool force_spillback,
+                                       bool require_available,
+                                       std::function<bool(int64_t)> is_node_available,
+                                       bool scheduler_avoid_gpu_nodes) {
+  if (!scheduler_avoid_gpu_nodes || IsGPURequest(task_request)) {
+    return HybridPolicyWithFilter(task_request, spread_threshold, force_spillback,
+                                  require_available, std::move(is_node_available));
   }
 
   // Try schedule on non-GPU nodes.
-  auto best_node_id = HybridPolicyWithFilter(resource_request,
-                                             spread_threshold,
-                                             force_spillback,
-                                             /*require_available*/ true,
-                                             is_node_available,
-                                             NodeFilter::kNonGpu);
-  if (!best_node_id.IsNil()) {
+  auto best_node_id = HybridPolicyWithFilter(
+      task_request, spread_threshold, force_spillback,
+      /*require_available*/ true, is_node_available, NodeFilter::kNonGpu);
+  if (best_node_id != -1) {
     return best_node_id;
   }
 
   // If we cannot find any available node from non-gpu nodes, fallback to the original
   // scheduling
-  return HybridPolicyWithFilter(resource_request,
-                                spread_threshold,
-                                force_spillback,
-                                require_available,
-                                is_node_available);
+  return HybridPolicyWithFilter(task_request, spread_threshold, force_spillback,
+                                require_available, is_node_available);
 }
 
-scheduling::NodeID SchedulingPolicy::RandomPolicy(
-    const ResourceRequest &resource_request,
-    std::function<bool(scheduling::NodeID)> is_node_available) {
-  scheduling::NodeID best_node = scheduling::NodeID::Nil();
-  if (nodes_.empty()) {
-    return best_node;
-  }
-
-  std::uniform_int_distribution<int> distribution(0, nodes_.size() - 1);
-  int idx = distribution(gen_);
-  auto iter = std::next(nodes_.begin(), idx);
-  for (size_t i = 0; i < nodes_.size(); ++i) {
-    // TODO(scv119): if there are a lot of nodes died or can't fulfill the resource
-    // requirement, the distribution might not be even.
-    const auto &node_id = iter->first;
-    const auto &node = iter->second;
-    if (is_node_available(node_id) && node.GetLocalView().IsFeasible(resource_request) &&
-        node.GetLocalView().IsAvailable(resource_request,
-                                        /*ignore_pull_manager_at_capacity*/ true)) {
-      best_node = iter->first;
+int64_t SchedulingPolicy::GetBestNodeByResourceUtilization(
+    const absl::flat_hash_set<int64_t> &node_ids, float spread_threshold) {
+  int64_t best_node_id = -1;
+  float minimum_utilization = FLT_MAX;
+  for (const auto &node_id : node_ids) {
+    const auto &it = nodes_.find(node_id);
+    if (it == nodes_.end()) {
+      continue;
+    }
+    float utilization = it->second.GetLocalView().CalculateCriticalResourceUtilization();
+    if (utilization < spread_threshold) {
+      best_node_id = node_id;
       break;
     }
-    ++iter;
-    if (iter == nodes_.end()) {
-      iter = nodes_.begin();
+    if (utilization < minimum_utilization) {
+      minimum_utilization = utilization;
+      best_node_id = node_id;
     }
   }
-  RAY_LOG(DEBUG) << "RandomPolicy, best_node = " << best_node.ToInt()
-                 << ", # nodes = " << nodes_.size()
-                 << ", resource_request = " << resource_request.DebugString();
-  return best_node;
+  return best_node_id;
+}
+
+int64_t SchedulingPolicy::NodeAffinityPolicy(
+    const TaskRequest &task_request, float spread_threshold, bool force_spillback,
+    bool require_available, std::function<bool(int64_t)> is_node_available,
+    const absl::flat_hash_set<int64_t> &node_ids, bool soft, bool anti_affinity) {
+  absl::flat_hash_set<int64_t> available_nodes;
+  if (!anti_affinity) {
+    for (const auto &node_id : node_ids) {
+      if (nodes_.contains(node_id) && is_node_available(node_id) &&
+          nodes_.at(node_id).GetLocalView().IsAvailable(task_request)) {
+        available_nodes.emplace(node_id);
+      }
+    }
+  } else {
+    for (const auto &[node_id, node] : nodes_) {
+      if (!node_ids.contains(node_id)) {
+        if (is_node_available(node_id) && node.GetLocalView().IsAvailable(task_request)) {
+          available_nodes.emplace(node_id);
+        }
+      }
+    }
+  }
+
+  int64_t best_node_id =
+      GetBestNodeByResourceUtilization(available_nodes, spread_threshold);
+
+  if (soft && best_node_id == -1) {
+    return HybridPolicy(task_request, spread_threshold, force_spillback,
+                        require_available, is_node_available,
+                        /*scheduler_avoid_gpu_nodes=*/false);
+  }
+
+  return best_node_id;
 }
 
 }  // namespace raylet_scheduling_policy

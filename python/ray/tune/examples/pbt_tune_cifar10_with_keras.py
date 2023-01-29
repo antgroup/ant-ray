@@ -16,13 +16,13 @@ import argparse
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.layers import Input, Dense, Dropout, Flatten
-from tensorflow.keras.layers import Convolution2D, MaxPooling2D
-from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.python.keras.datasets import cifar10
+from tensorflow.python.keras.layers import Input, Dense, Dropout, Flatten
+from tensorflow.python.keras.layers import Convolution2D, MaxPooling2D
+from tensorflow.python.keras.models import Model, load_model
+from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
 
-from ray import air, tune
+from ray import tune
 from ray.tune import Trainable
 from ray.tune.schedulers import PopulationBasedTraining
 
@@ -55,16 +55,14 @@ class Cifar10Model(Trainable):
             strides=1,
             padding="same",
             activation="relu",
-            kernel_initializer="he_normal",
-        )(y)
+            kernel_initializer="he_normal")(y)
         y = Convolution2D(
             filters=64,
             kernel_size=3,
             strides=1,
             padding="same",
             activation="relu",
-            kernel_initializer="he_normal",
-        )(y)
+            kernel_initializer="he_normal")(y)
         y = MaxPooling2D(pool_size=2, strides=2, padding="same")(y)
 
         y = Convolution2D(
@@ -73,16 +71,14 @@ class Cifar10Model(Trainable):
             strides=1,
             padding="same",
             activation="relu",
-            kernel_initializer="he_normal",
-        )(y)
+            kernel_initializer="he_normal")(y)
         y = Convolution2D(
             filters=128,
             kernel_size=3,
             strides=1,
             padding="same",
             activation="relu",
-            kernel_initializer="he_normal",
-        )(y)
+            kernel_initializer="he_normal")(y)
         y = MaxPooling2D(pool_size=2, strides=2, padding="same")(y)
 
         y = Convolution2D(
@@ -91,21 +87,20 @@ class Cifar10Model(Trainable):
             strides=1,
             padding="same",
             activation="relu",
-            kernel_initializer="he_normal",
-        )(y)
+            kernel_initializer="he_normal")(y)
         y = Convolution2D(
             filters=256,
             kernel_size=3,
             strides=1,
             padding="same",
             activation="relu",
-            kernel_initializer="he_normal",
-        )(y)
+            kernel_initializer="he_normal")(y)
         y = MaxPooling2D(pool_size=2, strides=2, padding="same")(y)
 
         y = Flatten()(y)
         y = Dropout(self.config.get("dropout", 0.5))(y)
-        y = Dense(units=10, activation="softmax", kernel_initializer="he_normal")(y)
+        y = Dense(
+            units=10, activation="softmax", kernel_initializer="he_normal")(y)
 
         model = Model(inputs=x, outputs=y, name="model1")
         return model
@@ -116,11 +111,12 @@ class Cifar10Model(Trainable):
         model = self._build_model(x_train.shape[1:])
 
         opt = tf.keras.optimizers.Adadelta(
-            lr=self.config.get("lr", 1e-4), decay=self.config.get("decay", 1e-4)
-        )
+            lr=self.config.get("lr", 1e-4),
+            decay=self.config.get("decay", 1e-4))
         model.compile(
-            loss="categorical_crossentropy", optimizer=opt, metrics=["accuracy"]
-        )
+            loss="categorical_crossentropy",
+            optimizer=opt,
+            metrics=["accuracy"])
         self.model = model
 
     def step(self):
@@ -156,8 +152,9 @@ class Cifar10Model(Trainable):
         batch_size = self.config.get("batch_size", 64)
         gen = aug_gen.flow(x_train, y_train, batch_size=batch_size)
         self.model.fit_generator(
-            generator=gen, epochs=self.config.get("epochs", 1), validation_data=None
-        )
+            generator=gen,
+            epochs=self.config.get("epochs", 1),
+            validation_data=None)
 
         # loss, accuracy
         _, accuracy = self.model.evaluate(x_test, y_test, verbose=0)
@@ -183,8 +180,7 @@ class Cifar10Model(Trainable):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--smoke-test", action="store_true", help="Finish quickly for testing"
-    )
+        "--smoke-test", action="store_true", help="Finish quickly for testing")
     args, _ = parser.parse_known_args()
 
     space = {
@@ -198,39 +194,28 @@ if __name__ == "__main__":
         space["lr"] = 10**-4
         space["dropout"] = 0.5
 
-    perturbation_interval = 10
     pbt = PopulationBasedTraining(
         time_attr="training_iteration",
-        perturbation_interval=perturbation_interval,
+        perturbation_interval=10,
         hyperparam_mutations={
             "dropout": lambda _: np.random.uniform(0, 1),
-        },
-    )
+        })
 
-    tuner = tune.Tuner(
-        tune.with_resources(
-            Cifar10Model,
-            resources={"cpu": 1, "gpu": 1},
-        ),
-        run_config=air.RunConfig(
-            name="pbt_cifar10",
-            stop={
-                "mean_accuracy": 0.80,
-                "training_iteration": 30,
-            },
-            checkpoint_config=air.CheckpointConfig(
-                checkpoint_frequency=perturbation_interval,
-                checkpoint_score_attribute="mean_accuracy",
-                num_to_keep=2,
-            ),
-        ),
-        tune_config=tune.TuneConfig(
-            scheduler=pbt,
-            num_samples=4,
-            metric="mean_accuracy",
-            mode="max",
-        ),
-        param_space=space,
+    analysis = tune.run(
+        Cifar10Model,
+        name="pbt_cifar10",
+        scheduler=pbt,
+        resources_per_trial={
+            "cpu": 1,
+            "gpu": 1
+        },
+        stop={
+            "mean_accuracy": 0.80,
+            "training_iteration": 30,
+        },
+        config=space,
+        num_samples=4,
+        metric="mean_accuracy",
+        mode="max",
     )
-    results = tuner.fit()
-    print("Best hyperparameters found were: ", results.get_best_result().config)
+    print("Best hyperparameters found were: ", analysis.best_config)

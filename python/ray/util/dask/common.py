@@ -4,6 +4,7 @@ from operator import getitem
 import uuid
 
 import ray
+from ray.util.client.common import ClientObjectRef
 
 from dask.base import quote
 from dask.core import get as get_sync
@@ -46,7 +47,7 @@ def unpack_object_refs(*args):
     object_refs_token = uuid.uuid4().hex
 
     def _unpack(expr):
-        if isinstance(expr, ray.ObjectRef):
+        if isinstance(expr, (ray.ObjectRef, ClientObjectRef)):
             token = expr.hex()
             repack_dsk[token] = (getitem, object_refs_token, len(object_refs))
             object_refs.append(expr)
@@ -58,7 +59,8 @@ def unpack_object_refs(*args):
         if typ in (list, tuple, set):
             repack_task = (typ, [_unpack(i) for i in expr])
         elif typ in (dict, OrderedDict):
-            repack_task = (typ, [[_unpack(k), _unpack(v)] for k, v in expr.items()])
+            repack_task = (typ,
+                           [[_unpack(k), _unpack(v)] for k, v in expr.items()])
         elif is_dataclass(expr):
             repack_task = (
                 apply,
@@ -66,10 +68,8 @@ def unpack_object_refs(*args):
                 (),
                 (
                     dict,
-                    [
-                        [f.name, _unpack(getattr(expr, f.name))]
-                        for f in dataclass_fields(expr)
-                    ],
+                    [[f.name, _unpack(getattr(expr, f.name))]
+                     for f in dataclass_fields(expr)],
                 ),
             )
         else:

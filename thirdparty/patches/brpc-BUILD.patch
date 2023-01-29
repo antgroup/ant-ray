@@ -1,0 +1,36 @@
+diff --git BUILD BUILD
+index 9523f58d..edd33aee 100644
+--- BUILD
++++ BUILD
+@@ -304,6 +304,7 @@ objc_library(
+         "src/butil/threading/thread_restrictions.h",
+         "src/butil/threading/thread_id_name_manager.h",
+         "src/butil/type_traits.h",
++        "src/butil/third_party/murmurhash3/murmurhash3.h",
+     ],
+     non_arc_srcs = [
+         "src/butil/mac/bundle_locations.mm",
+diff --git src/brpc/server.cpp src/brpc/server.cpp
+index 225445e9..737a0fae 100644
+--- src/brpc/server.cpp
++++ src/brpc/server.cpp
+@@ -75,6 +75,7 @@
+ #include "brpc/rtmp.h"
+ #include "brpc/builtin/common.h"               // GetProgramName
+ #include "brpc/details/tcmalloc_extension.h"
++#include "brpc/redis.h"
+
+ inline std::ostream& operator<<(std::ostream& os, const timeval& tm) {
+     const char old_fill = os.fill();
+diff --git src/brpc/server.h src/brpc/server.h
+index e7687ad2..ae6a4f58 100644
+--- src/brpc/server.h
++++ src/brpc/server.h
+@@ -40,7 +40,6 @@
+ #include "brpc/health_reporter.h"
+ #include "brpc/adaptive_max_concurrency.h"
+ #include "brpc/http2.h"
+-#include "brpc/redis.h"
+
+ namespace brpc {
+

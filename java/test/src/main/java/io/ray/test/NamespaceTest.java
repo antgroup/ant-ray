@@ -2,7 +2,6 @@ package io.ray.test;
 
 import io.ray.api.ActorHandle;
 import io.ray.api.Ray;
-import io.ray.api.options.ActorLifetime;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
@@ -95,7 +94,7 @@ public class NamespaceTest {
 
   private static void startDriver() throws InterruptedException {
     Ray.init();
-    ActorHandle<A> a = Ray.actor(A::new).setLifetime(ActorLifetime.DETACHED).setName("a").remote();
+    ActorHandle<A> a = Ray.actor(A::new).setName("a").remote();
     Assert.assertEquals("hello", a.task(A::hello).remote().get());
     /// Because we don't support long running job yet, so sleep to don't destroy
     /// it for a while. Otherwise the actor created in this job will be destroyed
@@ -109,26 +108,17 @@ public class NamespaceTest {
     Process driver = null;
     try {
       Ray.init();
-      ProcessBuilder builder = TestUtils.buildDriver(driverClass, null);
+      ProcessBuilder builder = TestUtils.buildDriver(driverClass, null, false);
       builder.redirectError(ProcessBuilder.Redirect.INHERIT);
       driver = builder.start();
       TestUtils.waitForCondition(() -> Ray.getActor("a", "test1").isPresent(), 10000);
       // Wait for driver to start.
-      driver.waitFor(10, TimeUnit.SECONDS);
+      TimeUnit.SECONDS.sleep(3);
       runnable.run();
     } finally {
-      Ray.shutdown();
-    }
-  }
-
-  public void testSpecifyNamespaceForActor() {
-    System.setProperty("ray.job.namespace", "namespace1");
-    try {
-      Ray.init();
-      ActorHandle<GetNamespaceActor> actor =
-          Ray.actor(GetNamespaceActor::new).setName("a", "namespace2").remote();
-      Assert.assertFalse(Ray.getActor("a").isPresent());
-    } finally {
+      if (driver != null) {
+        driver.waitFor(1, TimeUnit.SECONDS);
+      }
       Ray.shutdown();
     }
   }

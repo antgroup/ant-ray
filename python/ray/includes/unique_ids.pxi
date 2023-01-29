@@ -6,8 +6,6 @@ See https://github.com/ray-project/ray/issues/3721.
 
 # WARNING: Any additional ID types defined in this file must be added to the
 # _ID_TYPES list at the bottom of this file.
-
-import logging
 import os
 
 from ray.includes.unique_ids cimport (
@@ -26,8 +24,6 @@ from ray.includes.unique_ids cimport (
 
 import ray
 from ray._private.utils import decode
-
-logger = logging.getLogger(__name__)
 
 
 def check_id(b, size=kUniqueIDSize):
@@ -244,9 +240,6 @@ cdef class JobID(BaseID):
     def size(cls):
         return CJobID.Size()
 
-    def int(self):
-        return self.data.ToInt()
-
     def binary(self):
         return self.data.Binary()
 
@@ -258,6 +251,9 @@ cdef class JobID(BaseID):
 
     def is_nil(self):
         return self.data.IsNil()
+
+    def is_submitted_from_dashboard(self):
+        return self.data.IsSubmittedFromDashboard()
 
     cdef size_t hash(self):
         return self.data.Hash()
@@ -272,9 +268,12 @@ cdef class WorkerID(UniqueID):
         return <CWorkerID>self.data
 
 cdef class ActorID(BaseID):
-
     def __init__(self, id):
-        self._set_id(id)
+        check_id(id, CActorID.Size())
+        self.data = CActorID.FromBinary(<c_string>id)
+
+    cdef CActorID native(self):
+        return <CActorID>self.data
 
     @classmethod
     def of(cls, job_id, parent_task_id, parent_task_counter):
@@ -296,13 +295,6 @@ cdef class ActorID(BaseID):
     def size(cls):
         return CActorID.Size()
 
-    def size(self):
-        return CActorID.Size()
-
-    def _set_id(self, id):
-        check_id(id, CActorID.Size())
-        self.data = CActorID.FromBinary(<c_string>id)
-
     @property
     def job_id(self):
         return JobID(self.data.JobId().Binary())
@@ -313,14 +305,14 @@ cdef class ActorID(BaseID):
     def hex(self):
         return decode(self.data.Hex())
 
+    def size(self):
+        return CActorID.Size()
+
     def is_nil(self):
         return self.data.IsNil()
 
     cdef size_t hash(self):
         return self.data.Hash()
-
-    cdef CActorID native(self):
-        return <CActorID>self.data
 
 
 cdef class FunctionID(UniqueID):
@@ -362,7 +354,8 @@ cdef class PlacementGroupID(BaseID):
     @classmethod
     def of(cls, job_id):
         assert isinstance(job_id, JobID)
-        return cls(CPlacementGroupID.Of(CJobID.FromBinary(job_id.binary())).Binary())
+        return cls(CPlacementGroupID.Of(CJobID.FromBinary(job_id.binary()))
+                   .Binary())
 
     @classmethod
     def nil(cls):

@@ -51,8 +51,7 @@ class WorkerKillingPolicy {
   ///
   /// \return the debug string.
   static std::string WorkersDebugString(
-      const std::vector<std::shared_ptr<WorkerInterface>> &workers,
-      int32_t num_workers,
+      const std::vector<std::shared_ptr<WorkerInterface>> &workers, int32_t num_workers,
       const MemorySnapshot &system_memory);
 };
 
@@ -60,6 +59,15 @@ class WorkerKillingPolicy {
 class RetriableLIFOWorkerKillingPolicy : public WorkerKillingPolicy {
  public:
   RetriableLIFOWorkerKillingPolicy();
+  const std::shared_ptr<WorkerInterface> SelectWorkerToKill(
+      const std::vector<std::shared_ptr<WorkerInterface>> &workers,
+      const MemorySnapshot &system_memory) const;
+};
+
+/// ANT-INTERNAL
+class ResourceViolationWorkerKillingPolicy : public WorkerKillingPolicy {
+ public:
+  ResourceViolationWorkerKillingPolicy();
   const std::shared_ptr<WorkerInterface> SelectWorkerToKill(
       const std::vector<std::shared_ptr<WorkerInterface>> &workers,
       const MemorySnapshot &system_memory) const;

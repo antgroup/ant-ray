@@ -1,22 +1,16 @@
 package io.ray.serve;
 
-import io.ray.serve.controller.ServeController;
 import io.ray.serve.generated.EndpointInfo;
 import io.ray.serve.generated.EndpointSet;
 import io.ray.serve.poll.LongPollRequest;
-import io.ray.serve.util.ServeProtoUtil;
+import io.ray.serve.poll.LongPollResult;
 import java.util.Map;
 
 public class DummyServeController implements ServeController {
+
   private Map<String, EndpointInfo> endpoints;
 
-  private byte[] longPollResult;
-
-  private String rootUrl;
-
-  public DummyServeController(String rootUrl) {
-    this.rootUrl = rootUrl;
-  }
+  private LongPollResult longPollResult;
 
   @Override
   public byte[] getAllEndpoints() {
@@ -25,27 +19,17 @@ public class DummyServeController implements ServeController {
     return builder.build().toByteArray();
   }
 
-  public boolean setEndpoints(byte[] endpoints) {
-    this.endpoints = ServeProtoUtil.parseEndpointSet(endpoints);
-    return true;
+  public void setEndpoints(Map<String, EndpointInfo> endpoints) {
+    this.endpoints = endpoints;
   }
 
-  public boolean setLongPollResult(byte[] longPollResult) {
+  public boolean setLongPollResult(LongPollResult longPollResult) {
     this.longPollResult = longPollResult;
     return true;
   }
 
   @Override
-  public byte[] listenForChange(LongPollRequest longPollRequest) {
+  public LongPollResult listenForChange(LongPollRequest longPollRequest) {
     return longPollResult;
-  }
-
-  @Override
-  public String getRootUrl() {
-    return rootUrl;
-  }
-
-  public void setRootUrl(String rootUrl) {
-    this.rootUrl = rootUrl;
   }
 }

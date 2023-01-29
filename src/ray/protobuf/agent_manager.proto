@@ -17,6 +17,8 @@ option cc_enable_arenas = true;
 
 package ray.rpc;
 
+import "src/ray/protobuf/common.proto";
+
 enum AgentRpcStatus {
   // OK.
   AGENT_RPC_STATUS_OK = 0;
@@ -25,7 +27,7 @@ enum AgentRpcStatus {
 }
 
 message RegisterAgentRequest {
-  int32 agent_id = 1;
+  int32 agent_pid = 1;
   int32 agent_port = 2;
   string agent_ip_address = 3;
 }
@@ -34,6 +36,40 @@ message RegisterAgentReply {
   AgentRpcStatus status = 1;
 }
 
+message AgentHeartbeatRequest {
+}
+
+message AgentHeartbeatReply {
+  AgentRpcStatus status = 1;
+}
+
+message WorkerBasicInfo {
+  int32 pid = 1;
+  string language = 2;
+  string job_name = 3;
+  string job_id = 4;
+}
+
+message GetWorkersInfoRequest {
+}
+
+message GetWorkersInfoReply {
+  AgentRpcStatus status = 1;
+  repeated WorkerBasicInfo worker_info_list = 2;
+}
+
+message ReportLocalRuntimeResourcesRequest {
+  repeated WorkerRuntimeStat worker_stat_list = 1;
+}
+
+message ReportLocalRuntimeResourcesReply {
+  AgentRpcStatus status = 1;
+}
+
 service AgentManagerService {
   rpc RegisterAgent(RegisterAgentRequest) returns (RegisterAgentReply);
+  rpc AgentHeartbeat(AgentHeartbeatRequest) returns (AgentHeartbeatReply);
+  rpc GetWorkersInfo(GetWorkersInfoRequest) returns (GetWorkersInfoReply);
+  rpc ReportLocalRuntimeResources(ReportLocalRuntimeResourcesRequest)
+      returns (ReportLocalRuntimeResourcesReply);
 }

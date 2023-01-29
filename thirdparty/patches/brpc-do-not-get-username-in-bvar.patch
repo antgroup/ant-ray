@@ -1,0 +1,28 @@
+diff --git src/bvar/default_variables.cpp src/bvar/default_variables.cpp
+index 9743492..c79ac5f 100644
+--- src/bvar/default_variables.cpp
++++ src/bvar/default_variables.cpp
+@@ -665,13 +665,16 @@ BVAR_DEFINE_PROC_STAT_FIELD2(ppid, "ppid");
+ BVAR_DEFINE_PROC_STAT_FIELD2(pgrp, "pgrp");
+ 
+ static void get_username(std::ostream& os, void*) {
+-    char buf[32];
+-    if (getlogin_r(buf, sizeof(buf)) == 0) {
+-        buf[sizeof(buf)-1] = '\0';
+-        os << buf;
+-    } else {
+-        os << "unknown (" << berror() << ')' ;
+-    }
++    /// To avoid this issue:
++    /// https://aone.alipay.com/issue/34060937?from=ak&from=ak&
++    os << "unknown (" << berror() << ')' ;
++//    char buf[32];
++//    if (getlogin_r(buf, sizeof(buf)) == 0) {
++//        buf[sizeof(buf)-1] = '\0';
++//        os << buf;
++//    } else {
++//        os << "unknown (" << berror() << ')' ;
++//    }
+ }
+ 
+ PassiveStatus<std::string> g_username(

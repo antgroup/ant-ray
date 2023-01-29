@@ -28,7 +28,6 @@ def torch_available():
 
 class Backend(object):
     """A class to represent different backends."""
-
     NCCL = "nccl"
     MPI = "mpi"
     GLOO = "gloo"
@@ -37,9 +36,8 @@ class Backend(object):
     def __new__(cls, name: str):
         backend = getattr(Backend, name.upper(), Backend.UNRECOGNIZED)
         if backend == Backend.UNRECOGNIZED:
-            raise ValueError(
-                "Unrecognized backend: '{}'. Only NCCL is supported".format(name)
-            )
+            raise ValueError("Unrecognized backend: '{}'. "
+                             "Only NCCL is supported".format(name))
         if backend == Backend.MPI:
             raise RuntimeError("Ray does not support MPI backend.")
         return backend
@@ -103,7 +101,6 @@ class ReduceScatterOptions:
 class SendOptions:
     dst_rank = 0
     dst_gpu_index = 0
-    n_elements = 0
     timeout_ms = unset_timeout_ms
 
 
@@ -111,5 +108,4 @@ class SendOptions:
 class RecvOptions:
     src_rank = 0
     src_gpu_index = 0
-    n_elements = 0
     unset_timeout_ms = unset_timeout_ms

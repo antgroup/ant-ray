@@ -21,12 +21,11 @@ public class ConcurrencyGroupImpl implements ConcurrencyGroup {
     this.name = name;
     this.maxConcurrency = maxConcurrency;
     // Convert methods to function descriptors for actor method concurrency groups.
-    funcs.forEach(
-        func -> {
-          RayFunction rayFunc =
-              ((AbstractRayRuntime) Ray.internal()).getFunctionManager().getFunction(func);
-          functionDescriptors.add(rayFunc.getFunctionDescriptor());
-        });
+    for (RayFunc func : funcs) {
+      RayFunction rayFunc =
+          ((RayRuntimeInternal) Ray.internal()).getFunctionManager().getFunction(func);
+      functionDescriptors.add(rayFunc.getFunctionDescriptor());
+    }
   }
 
   public ConcurrencyGroupImpl(String name, int maxConcurrency) {
@@ -44,9 +43,5 @@ public class ConcurrencyGroupImpl implements ConcurrencyGroup {
 
   public List<FunctionDescriptor> getFunctionDescriptors() {
     return functionDescriptors;
-  }
-
-  public String getName() {
-    return name;
   }
 }

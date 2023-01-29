@@ -10,7 +10,7 @@ public class SystemConfig {
   private static Gson gson = new Gson();
 
   /// A cache to avoid duplicated reading via JNI.
-  private static HashMap<String, Object> cachedConfigs = new HashMap<>();
+  private static HashMap<String, Object> cachedConfigs = new HashMap<>(1024);
 
   public static synchronized Object get(String key) {
     if (cachedConfigs.containsKey(key)) {

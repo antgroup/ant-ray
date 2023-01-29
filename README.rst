@@ -9,129 +9,307 @@
 .. image:: https://img.shields.io/badge/Discuss-Ask%20Questions-blue
     :target: https://discuss.ray.io/
 
-.. image:: https://img.shields.io/twitter/follow/raydistributed.svg?style=social&logo=twitter
-    :target: https://twitter.com/raydistributed
-
 |
 
-Ray is a unified framework for scaling AI and Python applications. Ray consists of a core distributed runtime and a toolkit of libraries (Ray AIR) for simplifying ML compute:
 
-.. image:: https://github.com/ray-project/ray/raw/master/doc/source/images/what-is-ray-padded.svg
+**Ray provides a simple, universal API for building distributed applications.**
 
-..
-  https://docs.google.com/drawings/d/1Pl8aCYOsZCo61cmp57c7Sja6HhIygGCvSZLi_AuBuqo/edit
+Ray is packaged with the following libraries for accelerating machine learning workloads:
 
-Learn more about `Ray AIR`_ and its libraries:
-
-- `Datasets`_: Distributed Data Preprocessing
-- `Train`_: Distributed Training
 - `Tune`_: Scalable Hyperparameter Tuning
 - `RLlib`_: Scalable Reinforcement Learning
-- `Serve`_: Scalable and Programmable Serving
+- `RaySGD <https://docs.ray.io/en/master/raysgd/raysgd.html>`__: Distributed Training Wrappers
+- `Ray Serve`_: Scalable and Programmable Serving
 
-Or more about `Ray Core`_ and its key abstractions:
-
-- `Tasks`_: Stateless functions executed in the cluster.
-- `Actors`_: Stateful worker processes created in the cluster.
-- `Objects`_: Immutable values accessible across the cluster.
-
-Ray runs on any machine, cluster, cloud provider, and Kubernetes, and features a growing
-`ecosystem of community integrations`_.
+There are also many `community integrations <https://docs.ray.io/en/master/ray-libraries.html>`_ with Ray, including `Dask`_, `MARS`_, `Modin`_, `Horovod`_, `Hugging Face`_, `Scikit-learn`_, and others. Check out the `full list of Ray distributed libraries here <https://docs.ray.io/en/master/ray-libraries.html>`_.
 
 Install Ray with: ``pip install ray``. For nightly wheels, see the
-`Installation page <https://docs.ray.io/en/latest/installation.html>`__.
+`Installation page <https://docs.ray.io/en/master/installation.html>`__.
 
-.. _`Serve`: https://docs.ray.io/en/latest/serve/index.html
-.. _`Datasets`: https://docs.ray.io/en/latest/data/dataset.html
-.. _`Workflow`: https://docs.ray.io/en/latest/workflows/concepts.html
-.. _`Train`: https://docs.ray.io/en/latest/train/train.html
-.. _`Tune`: https://docs.ray.io/en/latest/tune/index.html
-.. _`RLlib`: https://docs.ray.io/en/latest/rllib/index.html
-.. _`ecosystem of community integrations`: https://docs.ray.io/en/latest/ray-overview/ray-libraries.html
+.. _`Modin`: https://github.com/modin-project/modin
+.. _`Hugging Face`: https://huggingface.co/transformers/main_classes/trainer.html#transformers.Trainer.hyperparameter_search
+.. _`MARS`: https://docs.ray.io/en/master/mars-on-ray.html
+.. _`Dask`: https://docs.ray.io/en/master/dask-on-ray.html
+.. _`Horovod`: https://horovod.readthedocs.io/en/stable/ray_include.html
+.. _`Scikit-learn`: joblib.html
 
 
-Why Ray?
---------
 
-Today's ML workloads are increasingly compute-intensive. As convenient as they are, single-node development environments such as your laptop cannot scale to meet these demands.
+Quick Start
+-----------
 
-Ray is a unified way to scale Python and AI applications from a laptop to a cluster.
+Execute Python functions in parallel.
 
-With Ray, you can seamlessly scale the same code from a laptop to a cluster. Ray is designed to be general-purpose, meaning that it can performantly run any kind of workload. If your application is written in Python, you can scale it with Ray, no other infrastructure required.
+.. code-block:: python
+
+    import ray
+    ray.init()
+
+    @ray.remote
+    def f(x):
+        return x * x
+
+    futures = [f.remote(i) for i in range(4)]
+    print(ray.get(futures))
+
+To use Ray's actor model:
+
+.. code-block:: python
+
+
+    import ray
+    ray.init()
+
+    @ray.remote
+    class Counter(object):
+        def __init__(self):
+            self.n = 0
+
+        def increment(self):
+            self.n += 1
+
+        def read(self):
+            return self.n
+
+    counters = [Counter.remote() for i in range(4)]
+    [c.increment.remote() for c in counters]
+    futures = [c.read.remote() for c in counters]
+    print(ray.get(futures))
+
+
+Ray programs can run on a single machine, and can also seamlessly scale to large clusters. To execute the above Ray script in the cloud, just download `this configuration file <https://github.com/ray-project/ray/blob/master/python/ray/autoscaler/aws/example-full.yaml>`__, and run:
+
+``ray submit [CLUSTER.YAML] example.py --start``
+
+Read more about `launching clusters <https://docs.ray.io/en/master/cluster/index.html>`_.
+
+Tune Quick Start
+----------------
+
+.. image:: https://github.com/ray-project/ray/raw/master/doc/source/images/tune-wide.png
+
+`Tune`_ is a library for hyperparameter tuning at any scale.
+
+- Launch a multi-node distributed hyperparameter sweep in less than 10 lines of code.
+- Supports any deep learning framework, including PyTorch, `PyTorch Lightning <https://github.com/williamFalcon/pytorch-lightning>`_, TensorFlow, and Keras.
+- Visualize results with `TensorBoard <https://www.tensorflow.org/tensorboard>`__.
+- Choose among scalable SOTA algorithms such as `Population Based Training (PBT)`_, `Vizier's Median Stopping Rule`_, `HyperBand/ASHA`_.
+- Tune integrates with many optimization libraries such as `Facebook Ax <http://ax.dev>`_, `HyperOpt <https://github.com/hyperopt/hyperopt>`_, and `Bayesian Optimization <https://github.com/fmfn/BayesianOptimization>`_ and enables you to scale them transparently.
+
+To run this example, you will need to install the following:
+
+.. code-block:: bash
+
+    $ pip install "ray[tune]"
+
+
+This example runs a parallel grid search to optimize an example objective function.
+
+.. code-block:: python
+
+
+    from ray import tune
+
+
+    def objective(step, alpha, beta):
+        return (0.1 + alpha * step / 100)**(-1) + beta * 0.1
+
+
+    def training_function(config):
+        # Hyperparameters
+        alpha, beta = config["alpha"], config["beta"]
+        for step in range(10):
+            # Iterative training function - can be any arbitrary training procedure.
+            intermediate_score = objective(step, alpha, beta)
+            # Feed the score back back to Tune.
+            tune.report(mean_loss=intermediate_score)
+
+
+    analysis = tune.run(
+        training_function,
+        config={
+            "alpha": tune.grid_search([0.001, 0.01, 0.1]),
+            "beta": tune.choice([1, 2, 3])
+        })
+
+    print("Best config: ", analysis.get_best_config(metric="mean_loss", mode="min"))
+
+    # Get a dataframe for analyzing trial results.
+    df = analysis.results_df
+
+If TensorBoard is installed, automatically visualize all trial results:
+
+.. code-block:: bash
+
+    tensorboard --logdir ~/ray_results
+
+.. _`Tune`: https://docs.ray.io/en/master/tune.html
+.. _`Population Based Training (PBT)`: https://docs.ray.io/en/master/tune-schedulers.html#population-based-training-pbt
+.. _`Vizier's Median Stopping Rule`: https://docs.ray.io/en/master/tune-schedulers.html#median-stopping-rule
+.. _`HyperBand/ASHA`: https://docs.ray.io/en/master/tune-schedulers.html#asynchronous-hyperband
+
+RLlib Quick Start
+-----------------
+
+.. image:: https://github.com/ray-project/ray/raw/master/doc/source/images/rllib-wide.jpg
+
+`RLlib`_ is an open-source library for reinforcement learning built on top of Ray that offers both high scalability and a unified API for a variety of applications.
+
+.. code-block:: bash
+
+  pip install tensorflow  # or tensorflow-gpu
+  pip install "ray[rllib]"
+
+.. code-block:: python
+
+    import gym
+    from gym.spaces import Discrete, Box
+    from ray import tune
+
+    class SimpleCorridor(gym.Env):
+        def __init__(self, config):
+            self.end_pos = config["corridor_length"]
+            self.cur_pos = 0
+            self.action_space = Discrete(2)
+            self.observation_space = Box(0.0, self.end_pos, shape=(1, ))
+
+        def reset(self):
+            self.cur_pos = 0
+            return [self.cur_pos]
+
+        def step(self, action):
+            if action == 0 and self.cur_pos > 0:
+                self.cur_pos -= 1
+            elif action == 1:
+                self.cur_pos += 1
+            done = self.cur_pos >= self.end_pos
+            return [self.cur_pos], 1 if done else 0, done, {}
+
+    tune.run(
+        "PPO",
+        config={
+            "env": SimpleCorridor,
+            "num_workers": 4,
+            "env_config": {"corridor_length": 5}})
+
+.. _`RLlib`: https://docs.ray.io/en/master/rllib.html
+
+
+Ray Serve Quick Start
+---------------------
+
+.. image:: https://raw.githubusercontent.com/ray-project/ray/master/doc/source/serve/logo.svg
+  :width: 400
+
+`Ray Serve`_ is a scalable model-serving library built on Ray. It is:
+
+- Framework Agnostic: Use the same toolkit to serve everything from deep
+  learning models built with frameworks like PyTorch or Tensorflow & Keras
+  to Scikit-Learn models or arbitrary business logic.
+- Python First: Configure your model serving with pure Python code - no more
+  YAMLs or JSON configs.
+- Performance Oriented: Turn on batching, pipelining, and GPU acceleration to
+  increase the throughput of your model.
+- Composition Native: Allow you to create "model pipelines" by composing multiple
+  models together to drive a single prediction.
+- Horizontally Scalable: Serve can linearly scale as you add more machines. Enable
+  your ML-powered service to handle growing traffic.
+
+To run this example, you will need to install the following:
+
+.. code-block:: bash
+
+    $ pip install scikit-learn
+    $ pip install "ray[serve]"
+
+This example runs serves a scikit-learn gradient boosting classifier.
+
+.. code-block:: python
+
+    from ray import serve
+    import pickle
+    import requests
+    from sklearn.datasets import load_iris
+    from sklearn.ensemble import GradientBoostingClassifier
+
+    # Train model
+    iris_dataset = load_iris()
+    model = GradientBoostingClassifier()
+    model.fit(iris_dataset["data"], iris_dataset["target"])
+
+    # Define Ray Serve model,
+    class BoostingModel:
+        def __init__(self):
+            self.model = model
+            self.label_list = iris_dataset["target_names"].tolist()
+
+        def __call__(self, flask_request):
+            payload = flask_request.json["vector"]
+            print("Worker: received flask request with data", payload)
+
+            prediction = self.model.predict([payload])[0]
+            human_name = self.label_list[prediction]
+            return {"result": human_name}
+
+
+    # Deploy model
+    client = serve.start()
+    client.create_backend("iris:v1", BoostingModel)
+    client.create_endpoint("iris_classifier", backend="iris:v1", route="/iris")
+
+    # Query it!
+    sample_request_input = {"vector": [1.2, 1.0, 1.1, 0.9]}
+    response = requests.get("http://localhost:8000/iris", json=sample_request_input)
+    print(response.text)
+    # Result:
+    # {
+    #  "result": "versicolor"
+    # }
+
+
+.. _`Ray Serve`: https://docs.ray.io/en/master/serve/index.html
 
 More Information
 ----------------
 
 - `Documentation`_
-- `Ray Architecture whitepaper`_
-- `Ray AIR Technical whitepaper`_
-- `Exoshuffle: large-scale data shuffle in Ray`_
-- `Ownership: a distributed futures system for fine-grained tasks`_
+- `Tutorial`_
+- `Blog`_
+- `Ray 1.0 Architecture whitepaper`_ **(new)**
+- `Ray Design Patterns`_ **(new)**
 - `RLlib paper`_
+- `RLlib flow paper`_
 - `Tune paper`_
 
 *Older documents:*
 
 - `Ray paper`_
 - `Ray HotOS paper`_
-- `Ray Architecture v1 whitepaper`_
+- `Blog (old)`_
 
-.. _`Ray AIR`: https://docs.ray.io/en/latest/ray-air/getting-started.html
-.. _`Ray Core`: https://docs.ray.io/en/latest/ray-core/walkthrough.html
-.. _`Tasks`: https://docs.ray.io/en/latest/ray-core/tasks.html
-.. _`Actors`: https://docs.ray.io/en/latest/ray-core/actors.html
-.. _`Objects`: https://docs.ray.io/en/latest/ray-core/objects.html
-.. _`Documentation`: http://docs.ray.io/en/latest/index.html
-.. _`Ray Architecture v1 whitepaper`: https://docs.google.com/document/d/1lAy0Owi-vPz2jEqBSaHNQcy2IBSDEHyXNOQZlGuj93c/preview
-.. _`Ray Architecture whitepaper`: https://docs.google.com/document/d/1tBw9A4j62ruI5omIJbMxly-la5w4q_TjyJgJL_jN2fI/preview
-.. _`Ray AIR Technical whitepaper`: https://docs.google.com/document/d/1bYL-638GN6EeJ45dPuLiPImA8msojEDDKiBx3YzB4_s/preview
-.. _`Exoshuffle: large-scale data shuffle in Ray`: https://arxiv.org/abs/2203.05072
-.. _`Ownership: a distributed futures system for fine-grained tasks`: https://www.usenix.org/system/files/nsdi21-wang.pdf
+.. _`Documentation`: http://docs.ray.io/en/master/index.html
+.. _`Tutorial`: https://github.com/ray-project/tutorial
+.. _`Blog (old)`: https://ray-project.github.io/
+.. _`Blog`: https://medium.com/distributed-computing-with-ray
+.. _`Ray 1.0 Architecture whitepaper`: https://docs.google.com/document/d/1lAy0Owi-vPz2jEqBSaHNQcy2IBSDEHyXNOQZlGuj93c/preview
+.. _`Ray Design Patterns`: https://docs.google.com/document/d/167rnnDFIVRhHhK4mznEIemOtj63IOhtIPvSYaPgI4Fg/edit
 .. _`Ray paper`: https://arxiv.org/abs/1712.05889
 .. _`Ray HotOS paper`: https://arxiv.org/abs/1703.03924
 .. _`RLlib paper`: https://arxiv.org/abs/1712.09381
+.. _`RLlib flow paper`: https://arxiv.org/abs/2011.12719
 .. _`Tune paper`: https://arxiv.org/abs/1807.05118
 
 Getting Involved
 ----------------
 
-.. list-table::
-   :widths: 25 50 25 25
-   :header-rows: 1
+- `Forum`_: For discussions about development, questions about usage, and feature requests.
+- `GitHub Issues`_: For reporting bugs.
+- `Twitter`_: Follow updates on Twitter.
+- `Meetup Group`_: Join our meetup group.
+- `StackOverflow`_: For questions about how to use Ray.
 
-   * - Platform
-     - Purpose
-     - Estimated Response Time
-     - Support Level
-   * - `Discourse Forum`_
-     - For discussions about development and questions about usage.
-     - < 1 day
-     - Community
-   * - `GitHub Issues`_
-     - For reporting bugs and filing feature requests.
-     - < 2 days
-     - Ray OSS Team
-   * - `Slack`_
-     - For collaborating with other Ray users.
-     - < 2 days
-     - Community
-   * - `StackOverflow`_
-     - For asking questions about how to use Ray.
-     - 3-5 days
-     - Community
-   * - `Meetup Group`_
-     - For learning about Ray projects and best practices.
-     - Monthly
-     - Ray DevRel
-   * - `Twitter`_
-     - For staying up-to-date on new features.
-     - Daily
-     - Ray DevRel
-
-.. _`Discourse Forum`: https://discuss.ray.io/
+.. _`Forum`: https://discuss.ray.io/
 .. _`GitHub Issues`: https://github.com/ray-project/ray/issues
 .. _`StackOverflow`: https://stackoverflow.com/questions/tagged/ray
 .. _`Meetup Group`: https://www.meetup.com/Bay-Area-Ray-Meetup/
 .. _`Twitter`: https://twitter.com/raydistributed
-.. _`Slack`: https://forms.gle/9TSdDYUgxYs8SA9e8
-

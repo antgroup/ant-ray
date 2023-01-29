@@ -7,6 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class GpuResourceTest {
+
   private static class GpuActor {
     public List<Long> getGpuResourceFunc() {
       return Ray.getRuntimeContext().getGpuIds();

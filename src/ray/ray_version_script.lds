@@ -15,6 +15,7 @@ VERSION_1.0 {
         *ray*Buffer*;
         *ray*LocalMemoryBuffer*;
         # util
+        *ray*Http*;
         *ray*RayLog*;
         *ray*RayLogLevel*;
         # id
@@ -25,18 +26,21 @@ VERSION_1.0 {
         *ray*ObjectID*;
         *ray*ObjectReference*;
         # Others
-        *ray*metrics*;
-        *ray*rpc*;
-        *ray*gcs*;
-        *ray*stats*;
+        *ray*WorkerContext*;
         *ray*CoreWorker*;
-        *ray*PeriodicalRunner*;
-        *ray*internal*;
         *PyInit*;
         *init_raylet*;
         *Java*;
         *JNI_*;
+        *ray*rpc*;
+        *butil*;
+        *ray*metrics*;
+        *opencensus*;
+        *ray*stats*;
+        *bthread*;
+        *ray*streaming*;
         *aligned_free*;
         *aligned_malloc*;
+        *Gcs*;
     local: *;
 };

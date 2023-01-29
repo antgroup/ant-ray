@@ -1,41 +1,20 @@
-// Copyright 2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include "config_internal.h"
 
 #include <boost/dll/runtime_symbol_info.hpp>
-#include <charconv>
-#include <filesystem>
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
 #include "absl/strings/str_split.h"
-#include "nlohmann/json.hpp"
 
 ABSL_FLAG(std::string, ray_address, "", "The address of the Ray cluster to connect to.");
 
 /// absl::flags does not provide a IsDefaultValue method, so use a non-empty dummy default
 /// value to support empty redis password.
-ABSL_FLAG(std::string,
-          ray_redis_password,
-          "absl::flags dummy default value",
+ABSL_FLAG(std::string, ray_redis_password, "absl::flags dummy default value",
           "Prevents external clients without the password from connecting to Redis "
           "if provided.");
 
-ABSL_FLAG(std::string,
-          ray_code_search_path,
-          "",
+ABSL_FLAG(std::string, ray_code_search_path, "",
           "A list of directories or files of dynamic libraries that specify the "
           "search path for user code. Only searching the top level under a directory. "
           "':' is used as the separator.");
@@ -44,14 +23,10 @@ ABSL_FLAG(std::string, ray_job_id, "", "Assigned job id.");
 
 ABSL_FLAG(int32_t, ray_node_manager_port, 0, "The port to use for the node manager.");
 
-ABSL_FLAG(std::string,
-          ray_raylet_socket_name,
-          "",
+ABSL_FLAG(std::string, ray_raylet_socket_name, "",
           "It will specify the socket name used by the raylet if provided.");
 
-ABSL_FLAG(std::string,
-          ray_plasma_store_socket_name,
-          "",
+ABSL_FLAG(std::string, ray_plasma_store_socket_name, "",
           "It will specify the socket name used by the plasma store if provided.");
 
 ABSL_FLAG(std::string, ray_session_dir, "", "The path of this session.");
@@ -60,54 +35,47 @@ ABSL_FLAG(std::string, ray_logs_dir, "", "Logs dir for workers.");
 
 ABSL_FLAG(std::string, ray_node_ip_address, "", "The ip address for this node.");
 
-ABSL_FLAG(std::string,
-          ray_head_args,
-          "",
+ABSL_FLAG(std::string, ray_head_args, "",
           "The command line args to be appended as parameters of the `ray start` "
           "command. It takes effect only if Ray head is started by a driver. Run `ray "
           "start --help` for details.");
 
-ABSL_FLAG(int64_t,
-          startup_token,
-          -1,
-          "The startup token assigned to this worker process by the raylet.");
-
-ABSL_FLAG(std::string,
-          ray_default_actor_lifetime,
-          "",
+ABSL_FLAG(std::string, ray_job_default_actor_lifetime, "",
           "The default actor lifetime type, `detached` or `non_detached`.");
 
-ABSL_FLAG(std::string, ray_runtime_env, "", "The serialized runtime env.");
+ABSL_FLAG(std::string, ray_job_namespace, "",
+          "The namespace of job. If not set,"
+          " a unique value will be randomly generated.");
 
-ABSL_FLAG(int,
-          ray_runtime_env_hash,
-          -1,
-          "The computed hash of the runtime env for this worker.");
+ABSL_FLAG(int64_t, ray_job_total_memory_mb, 0, "ANT-INTERNAL: Total memory used by job");
 
-using json = nlohmann::json;
+ABSL_FLAG(int64_t, ray_job_max_total_memory_mb, 0,
+          "ANT-INTERNAL: Max total memory used by job");
+
+ABSL_FLAG(std::string, ray_job_worker_env, "",
+          "ANT-INTERNAL: The environment variables with json format to be set on worker "
+          "processes.");
 
 namespace ray {
 namespace internal {
 
 rpc::JobConfig_ActorLifetime ParseDefaultActorLifetimeType(
-    const std::string &default_actor_lifetime_origin) {
-  std::string default_actor_lifetime;
-  default_actor_lifetime.resize(default_actor_lifetime_origin.size());
-  transform(default_actor_lifetime_origin.begin(),
-            default_actor_lifetime_origin.end(),
-            default_actor_lifetime.begin(),
-            ::tolower);
-  RAY_CHECK(default_actor_lifetime == "non_detached" ||
-            default_actor_lifetime == "detached")
+    const std::string &default_actor_lifetime_string) {
+  if (default_actor_lifetime_string.empty() ||
+      default_actor_lifetime_string == "non_detached") {
+    return rpc::JobConfig_ActorLifetime_NON_DETACHED;
+  }
+  RAY_CHECK(default_actor_lifetime_string == "detached")
       << "The default_actor_lifetime_string config must be `detached` or `non_detached`.";
-  return default_actor_lifetime == "non_detached"
-             ? rpc::JobConfig_ActorLifetime_NON_DETACHED
-             : rpc::JobConfig_ActorLifetime_DETACHED;
+  return rpc::JobConfig_ActorLifetime_DETACHED;
 }
 
-void ConfigInternal::Init(RayConfig &config, int argc, char **argv) {
+void ConfigInternal::Init(RayConfigCpp &config, int argc, char **argv) {
+  java_worker_process_default_memory_mb = config.java_worker_process_default_memory_mb;
+  java_heap_fraction = config.java_heap_fraction;
+  num_java_workers_per_process = config.num_java_workers_per_process;
   if (!config.address.empty()) {
-    SetBootstrapAddress(config.address);
+    SetRedisAddress(config.address);
   }
   run_mode = config.local_mode ? RunMode::SINGLE_PROCESS : RunMode::CLUSTER;
   if (!config.code_search_path.empty()) {
@@ -119,11 +87,11 @@ void ConfigInternal::Init(RayConfig &config, int argc, char **argv) {
   if (!config.head_args.empty()) {
     head_args = config.head_args;
   }
-  if (config.default_actor_lifetime == ActorLifetime::DETACHED) {
-    default_actor_lifetime = rpc::JobConfig_ActorLifetime_DETACHED;
+  if (!config.default_actor_lifetime.empty()) {
+    default_actor_lifetime = ParseDefaultActorLifetimeType(config.default_actor_lifetime);
   }
-  if (config.runtime_env) {
-    runtime_env = config.runtime_env;
+  if (!config.job_worker_env.empty()) {
+    job_worker_env = config.job_worker_env;
   }
 
   if (argc != 0 && argv != nullptr) {
@@ -132,11 +100,13 @@ void ConfigInternal::Init(RayConfig &config, int argc, char **argv) {
 
     if (!FLAGS_ray_code_search_path.CurrentValue().empty()) {
       // Code search path like this "/path1/xxx.so:/path2".
-      code_search_path = absl::StrSplit(
-          FLAGS_ray_code_search_path.CurrentValue(), ':', absl::SkipEmpty());
+      RAY_LOG(INFO) << "The code search path is "
+                    << FLAGS_ray_code_search_path.CurrentValue();
+      code_search_path = absl::StrSplit(FLAGS_ray_code_search_path.CurrentValue(), ':',
+                                        absl::SkipEmpty());
     }
     if (!FLAGS_ray_address.CurrentValue().empty()) {
-      SetBootstrapAddress(FLAGS_ray_address.CurrentValue());
+      SetRedisAddress(FLAGS_ray_address.CurrentValue());
     }
     // Don't rewrite `ray_redis_password` when it is not set in the command line.
     if (FLAGS_ray_redis_password.CurrentValue() !=
@@ -146,7 +116,7 @@ void ConfigInternal::Init(RayConfig &config, int argc, char **argv) {
     if (!FLAGS_ray_job_id.CurrentValue().empty()) {
       job_id = FLAGS_ray_job_id.CurrentValue();
     }
-    node_manager_port = absl::GetFlag<int32_t>(FLAGS_ray_node_manager_port);
+    node_manager_port = absl::GetFlag(FLAGS_ray_node_manager_port);
     if (!FLAGS_ray_raylet_socket_name.CurrentValue().empty()) {
       raylet_socket_name = FLAGS_ray_raylet_socket_name.CurrentValue();
     }
@@ -167,24 +137,24 @@ void ConfigInternal::Init(RayConfig &config, int argc, char **argv) {
           absl::StrSplit(FLAGS_ray_head_args.CurrentValue(), ' ', absl::SkipEmpty());
       head_args.insert(head_args.end(), args.begin(), args.end());
     }
-    startup_token = absl::GetFlag<int64_t>(FLAGS_startup_token);
-    if (!FLAGS_ray_default_actor_lifetime.CurrentValue().empty()) {
-      default_actor_lifetime =
-          ParseDefaultActorLifetimeType(FLAGS_ray_default_actor_lifetime.CurrentValue());
+    if (!FLAGS_ray_job_default_actor_lifetime.CurrentValue().empty()) {
+      default_actor_lifetime = ParseDefaultActorLifetimeType(
+          FLAGS_ray_job_default_actor_lifetime.CurrentValue());
     }
-    if (!FLAGS_ray_runtime_env.CurrentValue().empty()) {
-      runtime_env = RuntimeEnv::Deserialize(FLAGS_ray_runtime_env.CurrentValue());
+    if (!FLAGS_ray_job_worker_env.CurrentValue().empty()) {
+      job_worker_env = FLAGS_ray_job_worker_env.CurrentValue();
     }
-    runtime_env_hash = absl::GetFlag<int>(FLAGS_ray_runtime_env_hash);
+    job_total_memory_mb = absl::GetFlag(FLAGS_ray_job_total_memory_mb);
+    max_job_total_memory_mb = absl::GetFlag(FLAGS_ray_job_max_total_memory_mb);
   }
-  worker_type = config.is_worker_ ? WorkerType::WORKER : WorkerType::DRIVER;
+  worker_type = config.is_worker ? WorkerType::WORKER : WorkerType::DRIVER;
   if (worker_type == WorkerType::DRIVER && run_mode == RunMode::CLUSTER) {
-    if (bootstrap_ip.empty()) {
+    if (redis_ip.empty()) {
       auto ray_address_env = std::getenv("RAY_ADDRESS");
       if (ray_address_env) {
         RAY_LOG(DEBUG) << "Initialize Ray cluster address to \"" << ray_address_env
                        << "\" from environment variable \"RAY_ADDRESS\".";
-        SetBootstrapAddress(ray_address_env);
+        SetRedisAddress(ray_address_env);
       }
     }
     if (code_search_path.empty()) {
@@ -199,33 +169,27 @@ void ConfigInternal::Init(RayConfig &config, int argc, char **argv) {
       // driver.
       std::vector<std::string> absolute_path;
       for (const auto &path : code_search_path) {
-        absolute_path.emplace_back(std::filesystem::absolute(path).string());
+        absolute_path.emplace_back(boost::filesystem::absolute(path).string());
       }
       code_search_path = absolute_path;
     }
   }
   if (worker_type == WorkerType::DRIVER) {
-    ray_namespace =
-        config.ray_namespace.empty() ? GenerateUUIDV4() : config.ray_namespace;
-  }
-
-  auto job_config_json_string = std::getenv("RAY_JOB_CONFIG_JSON_ENV_VAR");
-  if (job_config_json_string) {
-    json job_config_json = json::parse(job_config_json_string);
-    runtime_env = RuntimeEnv::Deserialize(job_config_json.at("runtime_env").dump());
-    job_config_metadata = job_config_json.at("metadata")
-                              .get<std::unordered_map<std::string, std::string>>();
-    RAY_CHECK(job_config_json.size() == 2);
+    ray_namespace = config.ray_namespace;
+    if (!FLAGS_ray_job_namespace.CurrentValue().empty()) {
+      ray_namespace = FLAGS_ray_job_namespace.CurrentValue();
+    }
+    if (ray_namespace.empty()) {
+      ray_namespace = GenerateUUIDV4();
+    }
   }
 };
 
-void ConfigInternal::SetBootstrapAddress(std::string_view address) {
+void ConfigInternal::SetRedisAddress(const std::string address) {
   auto pos = address.find(':');
   RAY_CHECK(pos != std::string::npos);
-  bootstrap_ip = address.substr(0, pos);
-  auto ret = std::from_chars(
-      address.data() + pos + 1, address.data() + address.size(), bootstrap_port);
-  RAY_CHECK(ret.ec == std::errc());
+  redis_ip = address.substr(0, pos);
+  redis_port = std::stoi(address.substr(pos + 1, address.length()));
 }
 
 void ConfigInternal::UpdateSessionDir(const std::string dir) {
@@ -236,5 +200,6 @@ void ConfigInternal::UpdateSessionDir(const std::string dir) {
     logs_dir = session_dir + "/logs";
   }
 }
+
 }  // namespace internal
 }  // namespace ray

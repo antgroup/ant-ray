@@ -1,0 +1,30 @@
+# module name
+name: ray
+# build configuration
+build:
+  # build command
+  cmd: sh -x ./deploy.sh
+  # output files, path match rule see: https://docs.python.org/3/library/glob.html#glob.glob
+  output:
+    # bin
+    bin:
+      # cmake
+      - 'build/streaming/src/bundle_meta_info'
+      - 'build/streaming/src/pangu'
+      # bazel
+      - bazel-bin/streaming/src/bundle_meta_info
+      - bazel-bin/streaming/src/pangu
+      - bazel-bin/external/com_github_brpc_brpc/rpc_view
+      # job manager & job agent
+      - python/ray/job
+    # python whl package, format is name: package path
+    whl:
+      ray: 'python/dist/ray*.whl'
+      # bazel only
+      pyarrow: 'python/dist/pyarrow-*.whl'
+run:
+  env:
+    RAY_BACKEND_LOG_LEVEL: info
+  ray_params:
+    plasma_store_socket_name: ${RAY_TEMP_DIR}/sockets/plasma_store
+    raylet_socket_name: ${RAY_TEMP_DIR}/sockets/raylet

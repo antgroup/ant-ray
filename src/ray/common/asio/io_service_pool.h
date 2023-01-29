@@ -17,7 +17,6 @@
 #include <atomic>
 #include <boost/asio.hpp>
 #include <thread>
-
 #include "ray/common/asio/instrumented_io_context.h"
 
 namespace ray {

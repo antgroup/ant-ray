@@ -10,16 +10,18 @@
 #
 
 import argparse
-import os
-
-from filelock import FileLock
 from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras import Model
 from tensorflow.keras.datasets.mnist import load_data
 
-from ray import air, tune
+from ray import tune
 
 MAX_TRAIN_BATCH = 10
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--smoke-test", action="store_true", help="Finish quickly for testing")
+args, _ = parser.parse_known_args()
 
 
 class MyModel(Model):
@@ -41,32 +43,29 @@ class MNISTTrainable(tune.Trainable):
     def setup(self, config):
         # IMPORTANT: See the above note.
         import tensorflow as tf
-
-        # Use FileLock to avoid race conditions.
-        with FileLock(os.path.expanduser("~/.tune.lock")):
-            (x_train, y_train), (x_test, y_test) = load_data()
+        (x_train, y_train), (x_test, y_test) = load_data()
         x_train, x_test = x_train / 255.0, x_test / 255.0
 
         # Add a channels dimension
         x_train = x_train[..., tf.newaxis]
         x_test = x_test[..., tf.newaxis]
         self.train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-        self.train_ds = self.train_ds.shuffle(10000).batch(config.get("batch", 32))
+        self.train_ds = self.train_ds.shuffle(10000).batch(
+            config.get("batch", 32))
 
-        self.test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
+        self.test_ds = tf.data.Dataset.from_tensor_slices((x_test,
+                                                           y_test)).batch(32)
 
         self.model = MyModel(hiddens=config.get("hiddens", 128))
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
         self.optimizer = tf.keras.optimizers.Adam()
         self.train_loss = tf.keras.metrics.Mean(name="train_loss")
         self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(
-            name="train_accuracy"
-        )
+            name="train_accuracy")
 
         self.test_loss = tf.keras.metrics.Mean(name="test_loss")
         self.test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(
-            name="test_accuracy"
-        )
+            name="test_accuracy")
 
         @tf.function
         def train_step(images, labels):
@@ -75,8 +74,7 @@ class MNISTTrainable(tune.Trainable):
                 loss = self.loss_object(labels, predictions)
             gradients = tape.gradient(loss, self.model.trainable_variables)
             self.optimizer.apply_gradients(
-                zip(gradients, self.model.trainable_variables)
-            )
+                zip(gradients, self.model.trainable_variables))
 
             self.train_loss(loss)
             self.train_accuracy(labels, predictions)
@@ -112,41 +110,18 @@ class MNISTTrainable(tune.Trainable):
             "loss": self.train_loss.result().numpy(),
             "accuracy": self.train_accuracy.result().numpy() * 100,
             "test_loss": self.test_loss.result().numpy(),
-            "mean_accuracy": self.test_accuracy.result().numpy() * 100,
+            "mean_accuracy": self.test_accuracy.result().numpy() * 100
         }
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--smoke-test", action="store_true", help="Finish quickly for testing"
-    )
-    parser.add_argument(
-        "--server-address",
-        type=str,
-        default=None,
-        required=False,
-        help="The address of server to connect to if using Ray Client.",
-    )
-    args, _ = parser.parse_known_args()
-
-    if args.server_address and not args.smoke_test:
-        import ray
-
-        ray.init(f"ray://{args.server_address}")
-
-    tuner = tune.Tuner(
+    load_data()  # we download data on the driver to avoid race conditions.
+    analysis = tune.run(
         MNISTTrainable,
-        tune_config=tune.TuneConfig(
-            metric="test_loss",
-            mode="min",
-        ),
-        run_config=air.RunConfig(
-            stop={"training_iteration": 5 if args.smoke_test else 50},
-            verbose=1,
-        ),
-        param_space={"hiddens": tune.grid_search([32, 64, 128])},
-    )
-    results = tuner.fit()
+        metric="test_loss",
+        mode="min",
+        stop={"training_iteration": 5 if args.smoke_test else 50},
+        verbose=1,
+        config={"hiddens": tune.grid_search([32, 64, 128])})
 
-    print("Best hyperparameters found were: ", results.get_best_result().config)
+    print("Best hyperparameters found were: ", analysis.best_config)

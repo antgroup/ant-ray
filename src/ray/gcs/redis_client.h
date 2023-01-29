@@ -30,16 +30,16 @@ class RedisContext;
 
 class RedisClientOptions {
  public:
-  RedisClientOptions(const std::string &ip,
-                     int port,
-                     const std::string &password,
-                     bool enable_sharding_conn = false,
-                     bool enable_ssl = false)
+  RedisClientOptions(const std::string &ip, int port, const std::string &password,
+                     bool enable_sharding_conn = true, bool enable_sync_conn = true,
+                     bool enable_async_conn = true, bool enable_subscribe_conn = true)
       : server_ip_(ip),
         server_port_(port),
         password_(password),
         enable_sharding_conn_(enable_sharding_conn),
-        enable_ssl_(enable_ssl) {}
+        enable_sync_conn_(enable_sync_conn),
+        enable_async_conn_(enable_async_conn),
+        enable_subscribe_conn_(enable_subscribe_conn) {}
 
   // Redis server address
   std::string server_ip_;
@@ -49,10 +49,12 @@ class RedisClientOptions {
   std::string password_;
 
   // Whether we enable sharding for accessing data.
-  bool enable_sharding_conn_ = false;
+  bool enable_sharding_conn_{true};
 
-  // Whether to use tls/ssl for redis connection
-  bool enable_ssl_ = false;
+  // Whether to establish connection of contexts.
+  bool enable_sync_conn_;
+  bool enable_async_conn_;
+  bool enable_subscribe_conn_;
 };
 
 /// \class RedisClient
@@ -83,6 +85,8 @@ class RedisClient {
   /// Disconnect with Redis. Non-thread safe.
   void Disconnect();
 
+  void SetSubscribeCallback(std::function<void()> callback_function);
+
   std::vector<std::shared_ptr<RedisContext>> GetShardContexts() {
     return shard_contexts_;
   }
@@ -105,8 +109,6 @@ class RedisClient {
 
   // The following contexts write to the data shard
   std::vector<std::shared_ptr<RedisContext>> shard_contexts_;
-  std::vector<std::unique_ptr<RedisAsioClient>> shard_asio_async_clients_;
-  std::unique_ptr<RedisAsioClient> asio_async_auxiliary_client_;
   // The following context writes everything to the primary shard
   std::shared_ptr<RedisContext> primary_context_;
 };

@@ -1,7 +1,6 @@
 package io.ray.api.options;
 
 import io.ray.api.placementgroup.PlacementGroup;
-import io.ray.api.runtimeenv.RuntimeEnv;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,25 +8,24 @@ import java.util.Map;
 public class CallOptions extends BaseTaskOptions {
 
   public final String name;
+  public final boolean ignoreReturn;
   public final PlacementGroup group;
   public final int bundleIndex;
-  public final String concurrencyGroupName;
-  private final String serializedRuntimeEnvInfo;
+  private final SchedulingStrategy schedulingStrategy;
 
   private CallOptions(
       String name,
       Map<String, Double> resources,
+      boolean ignoreReturn,
       PlacementGroup group,
       int bundleIndex,
-      String concurrencyGroupName,
-      RuntimeEnv runtimeEnv) {
+      SchedulingStrategy schedulingStrategy) {
     super(resources);
     this.name = name;
+    this.ignoreReturn = ignoreReturn;
     this.group = group;
     this.bundleIndex = bundleIndex;
-    this.concurrencyGroupName = concurrencyGroupName;
-    this.serializedRuntimeEnvInfo =
-        runtimeEnv == null ? "" : runtimeEnv.serializeToRuntimeEnvInfo();
+    this.schedulingStrategy = schedulingStrategy;
   }
 
   /** This inner class for building CallOptions. */
@@ -37,8 +35,22 @@ public class CallOptions extends BaseTaskOptions {
     private Map<String, Double> resources = new HashMap<>();
     private PlacementGroup group;
     private int bundleIndex;
-    private String concurrencyGroupName = "";
-    private RuntimeEnv runtimeEnv = null;
+
+    private boolean ignoreReturn;
+    private SchedulingStrategy schedulingStrategy;
+
+    /**
+     * Set the memory resource requirement for resource. It will assign a sole worker process for
+     * this task if this method is called. This method can be called multiple times. If the same
+     * resource is set multiple times, the latest quantity will be used.
+     *
+     * @param value memory size in mb
+     * @return self
+     */
+    public Builder setMemoryMb(long value) {
+      this.resources.put("memory", (double) value * 1024 * 1024);
+      return this;
+    }
 
     /**
      * Set a name for this task.
@@ -76,6 +88,11 @@ public class CallOptions extends BaseTaskOptions {
       return this;
     }
 
+    public Builder setIgnoreReturn(boolean returnVoid) {
+      this.ignoreReturn = returnVoid;
+      return this;
+    }
+
     /**
      * Set the placement group to place this actor in.
      *
@@ -84,23 +101,31 @@ public class CallOptions extends BaseTaskOptions {
      * @return self
      */
     public Builder setPlacementGroup(PlacementGroup group, int bundleIndex) {
+      if (this.schedulingStrategy != null) {
+        throw new IllegalArgumentException(
+            "The placement group and scheduling strategy can't be set at the same time.");
+      }
       this.group = group;
       this.bundleIndex = bundleIndex;
       return this;
     }
 
-    public Builder setConcurrencyGroupName(String concurrencyGroupName) {
-      this.concurrencyGroupName = concurrencyGroupName;
-      return this;
-    }
-
-    public Builder setRuntimeEnv(RuntimeEnv runtimeEnv) {
-      this.runtimeEnv = runtimeEnv;
+    /** Add node affinity match expression for this task. */
+    public Builder setSchedulingStrategy(SchedulingStrategy schedulingStrategy) {
+      if (this.group != null) {
+        throw new IllegalArgumentException(
+            "The placement group and scheduling strategy can't be set at the same time.");
+      }
+      if (schedulingStrategy instanceof ActorAffinitySchedulingStrategy) {
+        throw new IllegalArgumentException(
+            "The actor affinity scheduling strategy can not be used to normal tasks.");
+      }
+      this.schedulingStrategy = schedulingStrategy;
       return this;
     }
 
     public CallOptions build() {
-      return new CallOptions(name, resources, group, bundleIndex, concurrencyGroupName, runtimeEnv);
+      return new CallOptions(name, resources, ignoreReturn, group, bundleIndex, schedulingStrategy);
     }
   }
 }

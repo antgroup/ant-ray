@@ -1,4 +1,4 @@
-// Copyright 2020 The Ray Authors.
+// Copyright 2017 The Ray Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,17 +17,16 @@
 #include <stdio.h>
 
 #include <boost/asio/generic/basic_endpoint.hpp>
-#include <boost/process/child.hpp>
 #include <chrono>
-#include <thread>
+#include <cstdlib>
+#include <iostream>
 
 #include "gtest/gtest.h"
 #include "ray/util/logging.h"
-#include "ray/util/process.h"
+#include "ray/util/view_point.h"
 
-using namespace std::chrono_literals;
-
-static const char *argv0 = NULL;
+static std::string argv0;
+static std::string argv1;
 
 namespace ray {
 
@@ -108,23 +107,6 @@ TEST(UtilTest, ParseCommandLineTest) {
   ASSERT_EQ(ParseCommandLine(R"(x' a \b')", win32), ArgList({R"(x')", R"(a)", R"(\b')"}));
 }
 
-TEST(UtilTest, ExponentialBackOffTest) {
-  auto exp = ExponentialBackOff(1, 2, 9);
-  ASSERT_EQ(1, exp.Next());
-  ASSERT_EQ(2, exp.Next());
-  ASSERT_EQ(4, exp.Next());
-  ASSERT_EQ(8, exp.Next());
-  ASSERT_EQ(9, exp.Next());
-  ASSERT_EQ(9, exp.Next());
-  exp.Reset();
-  ASSERT_EQ(1, exp.Next());
-  ASSERT_EQ(2, exp.Next());
-  ASSERT_EQ(4, exp.Next());
-  ASSERT_EQ(8, exp.Next());
-  ASSERT_EQ(9, exp.Next());
-  ASSERT_EQ(9, exp.Next());
-}
-
 TEST(UtilTest, ParseURLTest) {
   const std::string url = "http://abc?num_objects=9&offset=8388878&size=8388878";
   auto parsed_url = *ParseURL(url);
@@ -190,27 +172,50 @@ TEST(UtilTest, CreateCommandLineTest) {
   }
 }
 
-TEST(UtilTest, IsProcessAlive) {
-  namespace bp = boost::process;
-  bp::child c("bash");
-  auto pid = c.id();
-  c.join();
-  for (int i = 0; i < 5; ++i) {
-    if (IsProcessAlive(pid)) {
-      std::this_thread::sleep_for(1s);
-    } else {
-      break;
+TEST(UtilTest, LoadProperties) {
+  auto conf_map = LoadPropertiesFromFile(argv1);
+  ASSERT_EQ("kepler", conf_map["ray.ceresdb.server.user"]);
+  ASSERT_EQ("raychild", conf_map["ray.ceresdb.server.limiteruser"]);
+  ASSERT_EQ("5000", conf_map["ray.ceresdb.server.port"]);
+}
+
+TEST(UtilTest, Md5test) { ASSERT_EQ("c4ca4238a0b923820dcc509a6f75849b", MD5Digest("1")); }
+
+TEST(UtilTest, ViewPoint) {
+  {
+    INSTALL_VIEW_POINT("LEVEL_1");
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+      INSTALL_VIEW_POINT("LEVEL_2");
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        INSTALL_VIEW_POINT("LEVEL_3");
+      }
     }
   }
-  RAY_CHECK(!IsProcessAlive(pid));
+  {
+    INSTALL_VIEW_POINT("LEVEL_21");
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+      INSTALL_VIEW_POINT("LEVEL_22");
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        INSTALL_VIEW_POINT("LEVEL_23");
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+      INSTALL_VIEW_POINT("LEVEL_24");
+    }
+  }
 }
 
 }  // namespace ray
 
 int main(int argc, char **argv) {
-  argv0 = argv[0];
+  RAY_CHECK(argc >= 2);
+  argv0 = std::string(argv[0]);
+  argv1 = std::string(argv[1]);
   int result = 0;
-  if (argc > 1 && strcmp(argv[1], "--println") == 0) {
+  if (argc > 1 && argv1 == "--println") {
     // If we're given this special command, emit each argument on a new line
     for (int i = 2; i < argc; ++i) {
       fprintf(stdout, "%s\n", argv[i]);

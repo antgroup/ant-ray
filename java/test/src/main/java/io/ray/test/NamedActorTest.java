@@ -2,6 +2,7 @@ package io.ray.test;
 
 import io.ray.api.ActorHandle;
 import io.ray.api.Ray;
+import io.ray.api.id.ActorId;
 import java.util.Optional;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -53,5 +54,18 @@ public class NamedActorTest extends BaseTest {
   @Test
   public void testGetNonExistingNamedActor() {
     Assert.assertTrue(!Ray.getActor("non_existing_actor").isPresent());
+  }
+
+  @Test
+  public void testGetHandleBytheGivenActorId() {
+    String name = "named-actor-counter";
+    // Create an actor.
+    ActorHandle<Counter> actor = Ray.actor(Counter::new).setName(name).remote();
+    // Get Id of the actor.
+    ActorId actorid = actor.getId();
+    Assert.assertEquals(Ray.getActorHandle(actorid).getId(), actorid);
+    ActorHandle<Counter> actor1 = Ray.getActorHandle(actorid);
+    // Invote the function by the actorhandle
+    Assert.assertEquals(actor1.task(Counter::increment).remote().get(), Integer.valueOf(1));
   }
 }

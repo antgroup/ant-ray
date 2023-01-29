@@ -18,6 +18,7 @@
 
 #include <unordered_set>
 
+#include "ray/common/common_protocol.h"
 #include "ray/common/id.h"
 #include "ray/util/logging.h"
 #include "src/ray/protobuf/common.pb.h"

@@ -7,7 +7,6 @@ import io.ray.api.ObjectRef;
 import io.ray.api.PyActorHandle;
 import io.ray.api.WaitResult;
 import io.ray.api.concurrencygroup.ConcurrencyGroup;
-import io.ray.api.exception.RuntimeEnvException;
 import io.ray.api.function.CppActorClass;
 import io.ray.api.function.CppActorMethod;
 import io.ray.api.function.CppFunction;
@@ -19,17 +18,19 @@ import io.ray.api.function.RayFuncR;
 import io.ray.api.id.ActorId;
 import io.ray.api.id.PlacementGroupId;
 import io.ray.api.id.UniqueId;
+import io.ray.api.kv.KvStore;
+import io.ray.api.options.ActorCallOptions;
 import io.ray.api.options.ActorCreationOptions;
 import io.ray.api.options.CallOptions;
 import io.ray.api.options.PlacementGroupCreationOptions;
-import io.ray.api.parallelactor.ParallelActorContext;
+import io.ray.api.placementgroup.Bundle;
 import io.ray.api.placementgroup.PlacementGroup;
 import io.ray.api.runtimecontext.ResourceValue;
 import io.ray.api.runtimecontext.RuntimeContext;
-import io.ray.api.runtimeenv.RuntimeEnv;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 /** Base interface of a Ray runtime. */
 public interface RayRuntime {
@@ -44,19 +45,6 @@ public interface RayRuntime {
    * @return A ObjectRef instance that represents the in-store object.
    */
   <T> ObjectRef<T> put(T obj);
-
-  /**
-   * Store an object in the object store, and assign its ownership to owner. This function is
-   * experimental.
-   *
-   * @param obj The Java object to be stored.
-   * @param owner The actor that should own this object. This allows creating objects with lifetimes
-   *     decoupled from that of the creating process. Note that the owner actor must be passed a
-   *     reference to the object prior to the object creator exiting, otherwise the reference will
-   *     still be lost.
-   * @return A ObjectRef instance that represents the in-store object.
-   */
-  <T> ObjectRef<T> put(T obj, BaseActorHandle owner);
 
   /**
    * Get an object from the object store.
@@ -110,6 +98,10 @@ public interface RayRuntime {
   <T> WaitResult<T> wait(
       List<ObjectRef<T>> waitList, int numReturns, int timeoutMs, boolean fetchLocal);
 
+  /** This method is going to be deprecated. Use {@link #free(List, boolean)} instead. */
+  @Deprecated
+  void free(List<ObjectRef<?>> objectRefs, boolean localOnly, boolean deleteCreatingTasks);
+
   /**
    * Free a list of objects from Plasma Store.
    *
@@ -117,6 +109,15 @@ public interface RayRuntime {
    * @param localOnly Whether only free objects for local object store or not.
    */
   void free(List<ObjectRef<?>> objectRefs, boolean localOnly);
+
+  /**
+   * Set the resource for the specific node.
+   *
+   * @param resourceName The name of resource.
+   * @param capacity The capacity of the resource.
+   * @param nodeId The node that we want to set its resource.
+   */
+  void setResource(String resourceName, double capacity, UniqueId nodeId);
 
   <T extends BaseActorHandle> T getActorHandle(ActorId actorId);
 
@@ -168,9 +169,10 @@ public interface RayRuntime {
    * @param actor A handle to the actor.
    * @param func The remote function to run, it must be a method of the given actor.
    * @param args The arguments of the remote function.
+   * @param options The options for this call.
    * @return The result object.
    */
-  ObjectRef callActor(ActorHandle<?> actor, RayFunc func, Object[] args, CallOptions options);
+  ObjectRef callActor(ActorHandle<?> actor, RayFunc func, Object[] args, ActorCallOptions options);
 
   /**
    * Invoke a remote Python function on an actor.
@@ -178,19 +180,17 @@ public interface RayRuntime {
    * @param pyActor A handle to the actor.
    * @param pyActorMethod The actor method.
    * @param args Arguments of the function.
+   * @param options The options for this call.
    * @return The result object.
    */
-  ObjectRef callActor(PyActorHandle pyActor, PyActorMethod pyActorMethod, Object[] args);
+  ObjectRef callActor(
+      PyActorHandle pyActor, PyActorMethod pyActorMethod, Object[] args, ActorCallOptions options);
 
-  /**
-   * Invoke a remote Cpp function on an actor.
-   *
-   * @param cppActor A handle to the actor.
-   * @param cppActorMethod The actor method.
-   * @param args Arguments of the function.
-   * @return The result object.
-   */
-  ObjectRef callActor(CppActorHandle cppActor, CppActorMethod cppActorMethod, Object[] args);
+  ObjectRef callActor(
+      CppActorHandle cppActor,
+      CppActorMethod cppActorMethod,
+      Object[] args,
+      ActorCallOptions options);
 
   /**
    * Create an actor on a remote node.
@@ -214,14 +214,6 @@ public interface RayRuntime {
    */
   PyActorHandle createActor(PyActorClass pyActorClass, Object[] args, ActorCreationOptions options);
 
-  /**
-   * Create a Cpp actor on a remote node.
-   *
-   * @param cppActorClass The Cpp actor class.
-   * @param args Arguments of the actor constructor.
-   * @param options The options for creating actor.
-   * @return A handle to the actor.
-   */
   CppActorHandle createActor(
       CppActorClass cppActorClass, Object[] args, ActorCreationOptions options);
 
@@ -235,6 +227,26 @@ public interface RayRuntime {
 
   RuntimeContext getRuntimeContext();
 
+  Object getAsyncContext();
+
+  void setAsyncContext(Object asyncContext);
+
+  /**
+   * Wrap a {@link Runnable} with necessary context capture.
+   *
+   * @param runnable The runnable to wrap.
+   * @return The wrapped runnable.
+   */
+  Runnable wrapRunnable(Runnable runnable);
+
+  /**
+   * Wrap a {@link Callable} with necessary context capture.
+   *
+   * @param callable The callable to wrap.
+   * @return The wrapped callable.
+   */
+  <T> Callable<T> wrapCallable(Callable<T> callable);
+
   /** Intentionally exit the current actor. */
   void exitActor();
 
@@ -245,10 +257,8 @@ public interface RayRuntime {
    */
   Map<String, List<ResourceValue>> getAvailableResourceIds();
 
-  /** Get the namespace of this job. */
+  /** /** Get the namespace of this job. */
   String getNamespace();
-
-  UniqueId getCurrentNodeId();
 
   /**
    * Get a placement group by id.
@@ -285,22 +295,70 @@ public interface RayRuntime {
    * Wait for the placement group to be ready within the specified time.
    *
    * @param id Id of placement group.
-   * @param timeoutSeconds Timeout in seconds.
+   * @param timeoutMs Timeout in milliseconds.
    * @return True if the placement group is created. False otherwise.
    */
-  boolean waitPlacementGroupReady(PlacementGroupId id, int timeoutSeconds);
+  boolean waitPlacementGroupReady(PlacementGroupId id, int timeoutMs);
+
+  /**
+   * Add new bundles for one placement group.
+   *
+   * @param id Id of the placement group.
+   * @param bundles New bundles that will be added to this placement group.
+   */
+  void addBundlesForPlacementGroup(PlacementGroupId id, List<Bundle> bundles);
+
+  /**
+   * Remove bundles from one placement group.
+   *
+   * @param id Id of the placement group.
+   * @param bundleIndexes Bundle indexes that will be removed from this placement group.
+   */
+  void removeBundlesForPlacementGroup(PlacementGroupId id, List<Integer> bundleIndexes);
+
+  void killCurrentJob();
+
+  // ======== ANT-INTERNAL below ========
+
+  void reportEvent(String severity, String label, String message);
+
+  /**
+   * Update the total resources that the current job can use. The valid keys are totalMemoryMb,
+   * totalCpus, totalGpus.
+   *
+   * @param minResourceRequirements The minimum resources that the current job can use.
+   * @param maxResourceRequirements The maximum resources that the current job can use.
+   * @return true if the update is successful, else false. The update will succeed if the job is
+   *     alive and the total resources are greater than the resources being used by this job.
+   */
+  boolean updateJobResourceRequirements(
+      Map<String, Double> minResourceRequirements, Map<String, Double> maxResourceRequirements);
+
+  /**
+   * Put the result string to GCS. The result can be retrieved from dashboard.
+   *
+   * @param result Any job result string, the length will be limited by GCS.
+   */
+  void putJobResult(String result);
+
+  /**
+   * Get the result string from GCS.
+   *
+   * @return The job result string put by putJobResult.
+   */
+  String getJobResult();
 
   /** Create concurrency group instance at runtime. */
   ConcurrencyGroup createConcurrencyGroup(String name, int maxConcurrency, List<RayFunc> funcs);
 
   List<ConcurrencyGroup> extractConcurrencyGroups(RayFuncR<?> actorConstructorLambda);
 
-  /** Create runtime env instance at runtime. */
-  RuntimeEnv createRuntimeEnv();
+  /**
+   * Get the address of the api server.
+   *
+   * @return The address of the api server, format is `${ip}:${port}`.
+   */
+  String getApiServerAddress();
 
-  /** Deserialize runtime env instance at runtime. */
-  RuntimeEnv deserializeRuntimeEnv(String serializedRuntimeEnv) throws RuntimeEnvException;
-
-  /// Get the parallel actor context at runtime.
-  ParallelActorContext getParallelActorContext();
+  KvStore kv();
 }

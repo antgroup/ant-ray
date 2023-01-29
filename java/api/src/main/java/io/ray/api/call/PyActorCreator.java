@@ -14,8 +14,14 @@ public class PyActorCreator extends BaseActorCreator<PyActorCreator> {
     this.args = args;
   }
 
-  public PyActorCreator setAsync(boolean isAsync) {
-    builder.setAsync(isAsync);
+  /// Set the serialized runtime env for the python actor.
+  public PyActorCreator setSerializedRuntimeEnv(String serializedRuntimeEnv) {
+    builder.setSerializedRuntimeEnv(serializedRuntimeEnv);
+    return this;
+  }
+
+  public PyActorCreator setAsync(boolean enabled) {
+    builder.setAsync(enabled);
     return this;
   }
 

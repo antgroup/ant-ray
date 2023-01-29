@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package ray.rpc.brpcpb;
+
+// Refer to `brpc.fbs` for the foramt of brpc stream message on the wire.
+
+// This is necessary to generate the rpc service.
+option cc_generic_services = true;
+
+// This enum is needed by brpc stream. For a brpc stream service, a message type
+// MUST be defined for that service.
+enum StreamServiceType {
+  // refer to `dummy.proto` for details of the service.
+  ExampleServiceType = 0;
+  // refer to `core_worker.proto` for details of the service.
+  CoreWorkerServiceType = 1;
+  ObjectManagerServiceType = 2;
+}
+
+message CreateStreamRequest {
+  // Type of the service to connect to for this connection.
+  StreamServiceType service_type = 1;
+}
+
+message CreateStreamReply {
+}
+
+// Service to create a brpc stream.
+service StreamCreationService {
+  rpc CreateStream(CreateStreamRequest) returns (CreateStreamReply);
+}

@@ -1,31 +1,40 @@
 package io.ray.test;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.Gson;
 import io.ray.api.ActorHandle;
 import io.ray.api.CppActorHandle;
 import io.ray.api.ObjectRef;
 import io.ray.api.PyActorHandle;
 import io.ray.api.Ray;
-import io.ray.api.exception.CrossLanguageException;
 import io.ray.api.exception.RayException;
+import io.ray.api.exception.RayTimeoutException;
 import io.ray.api.function.CppActorClass;
 import io.ray.api.function.CppActorMethod;
 import io.ray.api.function.CppFunction;
 import io.ray.api.function.PyActorClass;
 import io.ray.api.function.PyActorMethod;
 import io.ray.api.function.PyFunction;
+import io.ray.api.options.ActorAffinityMatchExpression;
+import io.ray.api.options.ActorAffinitySchedulingStrategy;
 import io.ray.runtime.actor.NativeActorHandle;
+import io.ray.runtime.exception.CrossLanguageException;
+import io.ray.runtime.generated.Common.Language;
 import io.ray.runtime.serializer.RayExceptionSerializer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -34,6 +43,21 @@ public class CrossLanguageInvocationTest extends BaseTest {
 
   private static final String PYTHON_MODULE = "test_cross_language_invocation";
   private static final String[] CPP_LIBRARYS = {"counter", "plus"};
+
+  private static class JavaCounter {
+
+    private int value;
+
+    // Constructor
+    public JavaCounter(int initValue) {
+      this.value = initValue;
+    }
+
+    // return value
+    public int getValue() {
+      return value;
+    }
+  }
 
   @BeforeClass
   public void beforeClass() {
@@ -46,8 +70,7 @@ public class CrossLanguageInvocationTest extends BaseTest {
 
     // Write the test Python file to the temp dir.
     InputStream in =
-        CrossLanguageInvocationTest.class.getResourceAsStream(
-            File.separator + PYTHON_MODULE + ".py");
+        CrossLanguageInvocationTest.class.getResourceAsStream("/" + PYTHON_MODULE + ".py");
     File pythonFile = new File(tempDir.getAbsolutePath() + File.separator + PYTHON_MODULE + ".py");
     try {
       FileUtils.copyInputStreamToFile(in, pythonFile);
@@ -57,9 +80,7 @@ public class CrossLanguageInvocationTest extends BaseTest {
 
     // Write the test Cpp files to the temp dir.
     for (String lib : CPP_LIBRARYS) {
-      in =
-          CrossLanguageInvocationTest.class.getResourceAsStream(
-              File.separator + "cpp" + File.separator + lib + ".so");
+      in = CrossLanguageInvocationTest.class.getResourceAsStream("/" + lib + ".so");
       File cppFile = new File(tempDir.getAbsolutePath() + File.separator + lib + ".so");
       try {
         FileUtils.copyInputStreamToFile(in, cppFile);
@@ -185,19 +206,25 @@ public class CrossLanguageInvocationTest extends BaseTest {
           actor.task(PyActorMethod.of("increase", byte[].class), "1".getBytes()).remote();
       Assert.assertEquals(res.get(), "2".getBytes());
     }
+
     {
       PyActorHandle actor =
-          Ray.actor(PyActorClass.of(PYTHON_MODULE, "SyncCounter"), "1".getBytes())
+          Ray.actor(PyActorClass.of(PYTHON_MODULE, "NonAsyncCounter"), "1".getBytes())
               .setAsync(false)
               .remote();
       actor.task(PyActorMethod.of("block_task", byte[].class)).remote();
       ObjectRef<byte[]> res =
           actor.task(PyActorMethod.of("increase", byte[].class), "1".getBytes()).remote();
+
       Supplier<Boolean> getValue =
           () -> {
-            if (equals(res.get() == "2".getBytes())) {
-              return true;
-            } else {
+            try {
+              if (equals(res.get() == "2".getBytes())) {
+                return true;
+              } else {
+                return false;
+              }
+            } catch (CrossLanguageException e) {
               return false;
             }
           };
@@ -207,17 +234,16 @@ public class CrossLanguageInvocationTest extends BaseTest {
 
   @Test
   public void testCallingCppFunction() {
-    // Test calling a simple C++ function.
     ObjectRef<Integer> res = Ray.task(CppFunction.of("Plus", Integer.class), 1, 2).remote();
     Assert.assertEquals(res.get(), Integer.valueOf(3));
-    // Test calling a C++ function that returns a large object.
+
     ObjectRef<int[]> res1 =
         Ray.task(CppFunction.of("ReturnLargeArray", int[].class), new int[100000]).remote();
     Assert.assertEquals(res1.get().length, 100000);
-    // Test calling a C++ function with String type input/output.
+
     ObjectRef<String> res2 = Ray.task(CppFunction.of("Echo", String.class), "CallCpp").remote();
     Assert.assertEquals(res2.get(), "CallCpp");
-    // Test calling a C++ function that throws an exception.
+
     Assert.expectThrows(
         Exception.class,
         () -> {
@@ -228,9 +254,38 @@ public class CrossLanguageInvocationTest extends BaseTest {
 
   @Test
   public void testCallingCppActor() {
-    CppActorHandle actor = Ray.actor(CppActorClass.of("CreateCounter", "Counter")).remote();
+    String actorName = "actor_name";
+    CppActorHandle actor =
+        Ray.actor(CppActorClass.of("RAY_FUNC(Counter::FactoryCreate)", "Counter"))
+            .setName(actorName)
+            .remote();
     ObjectRef<Integer> res = actor.task(CppActorMethod.of("Plus1", Integer.class)).remote();
     Assert.assertEquals(res.get(), Integer.valueOf(1));
+    ObjectRef<byte[]> b =
+        actor.task(CppActorMethod.of("GetBytes", byte[].class), "C++ Worker").remote();
+    Assert.assertEquals(b.get(), "C++ Worker".getBytes());
+
+    ObjectRef<byte[]> b2 =
+        actor.task(CppActorMethod.of("echoBytes", byte[].class), "C++ Worker".getBytes()).remote();
+    Assert.assertEquals(b2.get(), "C++ Worker".getBytes());
+
+    // Test get cpp actor by actor name.
+    Optional<CppActorHandle> optional = Ray.getActor(actorName);
+    Assert.assertTrue(optional.isPresent());
+    CppActorHandle actor2 = optional.get();
+    ObjectRef<Integer> res2 = actor2.task(CppActorMethod.of("Plus1", Integer.class)).remote();
+    Assert.assertEquals(res2.get(), Integer.valueOf(2));
+
+    // Test get other cpp actor by actor name.
+    String childName = "child_name";
+    ObjectRef<String> res3 =
+        actor.task(CppActorMethod.of("CreateNestedChildActor", String.class), childName).remote();
+    Assert.assertEquals(res3.get(), "OK");
+    Optional<CppActorHandle> optional3 = Ray.getActor(childName);
+    Assert.assertTrue(optional3.isPresent());
+    CppActorHandle actor3 = optional3.get();
+    ObjectRef<Integer> res4 = actor3.task(CppActorMethod.of("Plus1", Integer.class)).remote();
+    Assert.assertEquals(res4.get(), Integer.valueOf(1));
   }
 
   @Test
@@ -300,6 +355,7 @@ public class CrossLanguageInvocationTest extends BaseTest {
       // ex is a Python exception(py_func_python_raise_exception) with no cause.
       Assert.assertTrue(ex instanceof CrossLanguageException);
       CrossLanguageException e = (CrossLanguageException) ex;
+      Assert.assertEquals(e.getLanguage(), Language.PYTHON);
       // ex.cause is null.
       Assert.assertNull(ex.getCause());
       Assert.assertTrue(
@@ -357,47 +413,13 @@ public class CrossLanguageInvocationTest extends BaseTest {
       Assert.assertTrue(message.contains("py_func_nest_java_throw_exception"), message);
       Assert.assertEquals(
           org.apache.commons.lang3.StringUtils.countMatches(
-              message, "io.ray.api.exception.RayTaskException"),
+              message, "io.ray.runtime.exception.RayTaskException"),
           2);
       Assert.assertTrue(message.contains("py_func_java_throw_exception"), message);
       Assert.assertTrue(message.contains("java.lang.ArithmeticException: / by zero"), message);
       return;
     }
     Assert.fail();
-  }
-
-  @Test
-  public void testCallingPythonNamedActor() {
-    /// 1. create Python named actor.
-    /// 2. get and invoke it in Java.
-    byte[] res =
-        Ray.task(PyFunction.of(PYTHON_MODULE, "py_func_create_named_actor", byte[].class))
-            .remote()
-            .get();
-    Assert.assertEquals(res, "true".getBytes(StandardCharsets.UTF_8));
-    PyActorHandle pyActor = (PyActorHandle) Ray.getActor("py_named_actor").get();
-
-    ObjectRef<byte[]> obj =
-        pyActor.task(PyActorMethod.of("increase", byte[].class), "1".getBytes()).remote();
-    Assert.assertEquals(obj.get(), "102".getBytes());
-  }
-
-  @Test
-  public void testCallingJavaNamedActor() {
-    /// 1. create Java named actor.
-    /// 2. get and invoke it in Python.
-    ActorHandle<TestActor> actor =
-        Ray.actor(TestActor::new, "hello".getBytes(StandardCharsets.UTF_8))
-            .setName("java_named_actor")
-            .remote();
-    Assert.assertEquals(
-        actor.task(TestActor::getValue).remote().get(), "hello".getBytes(StandardCharsets.UTF_8));
-
-    byte[] res =
-        Ray.task(PyFunction.of(PYTHON_MODULE, "py_func_get_and_invoke_named_actor", byte[].class))
-            .remote()
-            .get();
-    Assert.assertEquals(res, "true".getBytes(StandardCharsets.UTF_8));
   }
 
   public static Object[] pack(int i, String s, double f, Object[] o) {
@@ -456,21 +478,278 @@ public class CrossLanguageInvocationTest extends BaseTest {
     return res.get();
   }
 
-  public void testPyCallJavaOeveridedMethodWithDefault() {
-    ObjectRef<Object> res =
-        Ray.task(
-                PyFunction.of(
-                    PYTHON_MODULE,
-                    "py_func_call_java_overrided_method_with_default_keyword",
-                    Object.class))
-            .remote();
-    Assert.assertEquals("hi", res.get());
+  public static class TestActor {
+
+    public TestActor(byte[] v) {
+      value = v;
+    }
+
+    public byte[] concat(byte[] v) {
+      byte[] c = new byte[value.length + v.length];
+      System.arraycopy(value, 0, c, 0, value.length);
+      System.arraycopy(v, 0, c, value.length, v.length);
+      return c;
+    }
+
+    public byte[] value() {
+      return value;
+    }
+
+    private byte[] value;
   }
 
-  public void testPyCallJavaOverloadedMethodByParameterSize() {
-    ObjectRef<Object> res =
-        Ray.task(PyFunction.of(PYTHON_MODULE, "py_func_call_java_overloaded_method", Object.class))
+  /// Cross language RuntimeEnv test.
+  public void testSetSerializedRuntimeEnvForPythonActor() {
+    Map<String, String> envVars = new HashMap<>();
+    envVars.put("a", "b");
+    Map<String, Object> runtimeEnvMap = new HashMap<>();
+    runtimeEnvMap.put("env_vars", envVars);
+    String jsonStr = new Gson().toJson(runtimeEnvMap);
+
+    PyActorHandle actor =
+        Ray.actor(PyActorClass.of(PYTHON_MODULE, "RuntimeEnvActor"))
+            .setSerializedRuntimeEnv(jsonStr)
             .remote();
-    Assert.assertEquals(true, res.get());
+
+    ObjectRef<byte[]> res =
+        actor.task(PyActorMethod.of("get_env_var", byte[].class), "a".getBytes()).remote();
+    Assert.assertEquals(res.get(), "b".getBytes());
+  }
+
+  public void testJavaActorAffinityWithPythonActor() {
+    if (!TestUtils.getRuntime().getRayConfig().gcsTaskSchedulingEnabled) {
+      throw new SkipException("This actor affinity feature don't support raylet schedule mode.");
+    }
+    // python actor0 affinity with java actor1.
+    ActorAffinitySchedulingStrategy schedulingStrategy0 =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.exists("java-language", false))
+            .build();
+    PyActorHandle actor0 =
+        Ray.actor(PyActorClass.of(PYTHON_MODULE, "Counter"), "1".getBytes())
+            .setSchedulingStrategy(schedulingStrategy0)
+            .remote();
+    ObjectRef<byte[]> res0 =
+        actor0.task(PyActorMethod.of("increase", byte[].class), "0".getBytes()).remote();
+    Assert.expectThrows(
+        RayTimeoutException.class,
+        () -> {
+          Assert.assertEquals(res0.get(3000), "1".getBytes());
+        });
+
+    // java actor1 affinity with python actor2.
+    List<String> pythonValues =
+        new ArrayList<String>() {
+          {
+            add("python");
+          }
+        };
+    ActorAffinitySchedulingStrategy schedulingStrategy =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.in("language", pythonValues, false))
+            .build();
+    ActorHandle<JavaCounter> actor1 =
+        Ray.actor(JavaCounter::new, 1)
+            .setLabel("java-language", "yes")
+            .setSchedulingStrategy(schedulingStrategy)
+            .remote();
+    Assert.expectThrows(
+        RayTimeoutException.class,
+        () -> {
+          actor1.task(JavaCounter::getValue).remote().get(3000);
+        });
+
+    // Nomal create python actor2.
+    PyActorHandle actor2 =
+        Ray.actor(PyActorClass.of(PYTHON_MODULE, "Counter"), "1".getBytes())
+            .setLabel("language", "python")
+            .remote();
+    ObjectRef<byte[]> res =
+        actor2.task(PyActorMethod.of("increase", byte[].class), "0".getBytes()).remote();
+    Assert.assertEquals(res.get(3000), "1".getBytes());
+
+    // Check if actor0 and actor1 is ready after actor2 is created.
+    Assert.assertEquals(actor1.task(JavaCounter::getValue).remote().get(3000), Integer.valueOf(1));
+    Assert.assertEquals(res0.get(3000), "1".getBytes());
+  }
+
+  public void testJavaActorAffinityWithCppActor() {
+    if (!TestUtils.getRuntime().getRayConfig().gcsTaskSchedulingEnabled) {
+      throw new SkipException("This actor affinity feature don't support raylet schedule mode.");
+    }
+    // Cpp actor0 depend on java actor1.
+    ActorAffinitySchedulingStrategy schedulingStrategy0 =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.exists("java-language", false))
+            .build();
+    CppActorHandle actor0 =
+        Ray.actor(CppActorClass.of("RAY_FUNC(Counter::FactoryCreate)", "Counter"))
+            .setSchedulingStrategy(schedulingStrategy0)
+            .remote();
+    ObjectRef<byte[]> res0 =
+        actor0.task(CppActorMethod.of("GetBytes", byte[].class), "C++ Worker").remote();
+    Assert.expectThrows(
+        RayTimeoutException.class,
+        () -> {
+          Assert.assertEquals(res0.get(3000), "C++ Worker".getBytes());
+        });
+
+    // Java actor1 depend on cpp actor2.
+    List<String> cppValues =
+        new ArrayList<String>() {
+          {
+            add("cpp");
+          }
+        };
+    ActorAffinitySchedulingStrategy schedulingStrategy =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.in("language", cppValues, false))
+            .build();
+    ActorHandle<JavaCounter> actor1 =
+        Ray.actor(JavaCounter::new, 1)
+            .setLabel("java-language", "yes")
+            .setSchedulingStrategy(schedulingStrategy)
+            .remote();
+    Assert.expectThrows(
+        RayTimeoutException.class,
+        () -> {
+          actor1.task(JavaCounter::getValue).remote().get(3000);
+        });
+
+    // Normal create actor2.
+    CppActorHandle actor2 =
+        Ray.actor(CppActorClass.of("RAY_FUNC(Counter::FactoryCreate)", "Counter"))
+            .setLabel("language", "cpp")
+            .remote();
+    ObjectRef<byte[]> res2 =
+        actor2.task(CppActorMethod.of("GetBytes", byte[].class), "C++ Worker").remote();
+    Assert.assertEquals(res2.get(3000), "C++ Worker".getBytes());
+
+    // Check if actor0 and actor1 is ready after actor2 is created.
+    Assert.assertEquals(actor1.task(JavaCounter::getValue).remote().get(3000), Integer.valueOf(1));
+    Assert.assertEquals(res0.get(3000), "C++ Worker".getBytes());
+  }
+
+  public void testCrossActorAffinityWithCrossActor() {
+    if (!TestUtils.getRuntime().getRayConfig().gcsTaskSchedulingEnabled) {
+      throw new SkipException("This actor affinity feature don't support raylet schedule mode.");
+    }
+    // python actor affinity with python actor
+    ActorAffinitySchedulingStrategy schedulingStrategy0 =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.exists("location", false))
+            .build();
+    PyActorHandle actor0 =
+        Ray.actor(PyActorClass.of(PYTHON_MODULE, "Counter"), "1".getBytes())
+            .setSchedulingStrategy(schedulingStrategy0)
+            .remote();
+    ObjectRef<byte[]> res0 =
+        actor0.task(PyActorMethod.of("increase", byte[].class), "0".getBytes()).remote();
+    Assert.expectThrows(
+        RayTimeoutException.class,
+        () -> {
+          Assert.assertEquals(res0.get(3000), "1".getBytes());
+        });
+
+    ActorAffinitySchedulingStrategy schedulingStrategy1 =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.exists("location", true))
+            .build();
+    PyActorHandle actor1 =
+        Ray.actor(PyActorClass.of(PYTHON_MODULE, "Counter"), "1".getBytes())
+            .setLabel("location", "dc-1")
+            .setLabel("language", "python")
+            .setSchedulingStrategy(schedulingStrategy1)
+            .remote();
+    ObjectRef<byte[]> res1 =
+        actor1.task(PyActorMethod.of("increase", byte[].class), "0".getBytes()).remote();
+    Assert.assertEquals(res1.get(3000), "1".getBytes());
+
+    Assert.assertEquals(res0.get(3000), "1".getBytes());
+
+    List<String> values =
+        new ArrayList<String>() {
+          {
+            add("dc-2");
+          }
+        };
+    ActorAffinitySchedulingStrategy schedulingStrategy2 =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.notIn("location", values, true))
+            .build();
+    PyActorHandle actor2 =
+        Ray.actor(PyActorClass.of(PYTHON_MODULE, "Counter"), "1".getBytes())
+            .setSchedulingStrategy(schedulingStrategy2)
+            .remote();
+    ObjectRef<byte[]> res2 =
+        actor2.task(PyActorMethod.of("increase", byte[].class), "0".getBytes()).remote();
+    Assert.assertEquals(res2.get(3000), "1".getBytes());
+
+    // cpp actor affinity with cpp actor
+    ActorAffinitySchedulingStrategy schedulingStrategyCpp1 =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.exists("cpp-language", false))
+            .build();
+    CppActorHandle actorCpp1 =
+        Ray.actor(CppActorClass.of("RAY_FUNC(Counter::FactoryCreate)", "Counter"))
+            .setSchedulingStrategy(schedulingStrategyCpp1)
+            .remote();
+    ObjectRef<byte[]> resCpp1 =
+        actorCpp1.task(CppActorMethod.of("GetBytes", byte[].class), "C++ Worker").remote();
+    Assert.expectThrows(
+        RayTimeoutException.class,
+        () -> {
+          Assert.assertEquals(resCpp1.get(3000), "C++ Worker".getBytes());
+        });
+
+    ActorAffinitySchedulingStrategy schedulingStrategyCpp2 =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.exists("cpp-language", true))
+            .build();
+    CppActorHandle actorCpp2 =
+        Ray.actor(CppActorClass.of("RAY_FUNC(Counter::FactoryCreate)", "Counter"))
+            .setLabel("cpp-language", "yes")
+            .setSchedulingStrategy(schedulingStrategyCpp2)
+            .remote();
+    ObjectRef<byte[]> resCpp2 =
+        actorCpp2.task(CppActorMethod.of("GetBytes", byte[].class), "C++ Worker").remote();
+    Assert.assertEquals(resCpp2.get(3000), "C++ Worker".getBytes());
+
+    // cpp actorCpp3 affinity with python actor1
+    List<String> cppValues =
+        new ArrayList<String>() {
+          {
+            add("python");
+          }
+        };
+    ActorAffinitySchedulingStrategy schedulingStrategyCpp3 =
+        new ActorAffinitySchedulingStrategy.Builder()
+            .addExpression(ActorAffinityMatchExpression.in("language", cppValues, false))
+            .build();
+    CppActorHandle actorCpp3 =
+        Ray.actor(CppActorClass.of("RAY_FUNC(Counter::FactoryCreate)", "Counter"))
+            .setSchedulingStrategy(schedulingStrategyCpp3)
+            .remote();
+    ObjectRef<byte[]> resCpp3 =
+        actorCpp3.task(CppActorMethod.of("GetBytes", byte[].class), "C++ Worker").remote();
+    Assert.assertEquals(resCpp3.get(3000), "C++ Worker".getBytes());
+  }
+
+  public void testPythonCallJavaActorAffinity() {
+    if (!TestUtils.getRuntime().getRayConfig().gcsTaskSchedulingEnabled) {
+      throw new SkipException("This actor affinity feature don't support raylet schedule mode.");
+    }
+    ObjectRef<byte[]> res =
+        Ray.task(
+                PyFunction.of(
+                    PYTHON_MODULE, "py_func_call_java_actor_test_actor_affinity", byte[].class))
+            .remote();
+    Assert.assertEquals(res.get(), "OK".getBytes());
+  }
+
+  public void testGetCurrentNodeId() {
+    ObjectRef<String> res =
+        Ray.task(PyFunction.of(PYTHON_MODULE, "py_get_current_node_id_hex", String.class)).remote();
+    Assert.assertEquals(res.get(), Ray.getRuntimeContext().getCurrentNodeId().toString());
   }
 }

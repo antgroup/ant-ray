@@ -1,0 +1,38 @@
+// 如果使用此注释，则使用proto3; 否则使用proto2
+syntax = "proto3";
+
+// 引入外部的proto对象
+import "google/protobuf/any.proto";
+
+// 生成类的包名
+option java_package = "io.ray.streaming.common.generated";
+
+//生成的数据访问类的类名
+option java_outer_classname = "Common";
+
+message WorkerUnitedDistributedControllerCommitReport {
+  UnitedDistributedControlMessage control_message = 1;
+}
+
+message UnitedDistributedControlMessage {
+  // Control config of an actor.
+  message ActorControlConfig {
+    bytes actor_id = 1;
+    map<string, bytes> actor_configs = 2;
+  }
+
+  enum BlockingType {
+    BLOCKING = 0;
+    NON_BLOCKING = 1;
+  }
+
+  BlockingType blocking_type = 1;
+  repeated ActorControlConfig control_payload = 2;
+  bytes data_payload = 3;
+  // A flag that indicates that whether the commit phase was successfully done or not.
+  // Only used when operators end report commit result to the controller end.
+  // Default value should be true!
+  bool commit_result = 4;
+  // For barrier align, will set by the engine.
+  int64 id = 5;
+}

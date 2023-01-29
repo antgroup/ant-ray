@@ -8,6 +8,8 @@ public class NodeInfo {
 
   public final UniqueId nodeId;
 
+  public final String nodeName;
+
   public final String nodeAddress;
 
   public final String nodeHostname;
@@ -20,25 +22,31 @@ public class NodeInfo {
 
   public final boolean isAlive;
 
-  public final Map<String, Double> resources;
+  public final Map<String, Double> availableResources;
+
+  public final Map<String, Double> totalResources;
 
   public NodeInfo(
       UniqueId nodeId,
+      String nodeName,
       String nodeAddress,
       String nodeHostname,
       int nodeManagerPort,
       String objectStoreSocketName,
       String rayletSocketName,
       boolean isAlive,
-      Map<String, Double> resources) {
+      Map<String, Double> availableResources,
+      Map<String, Double> totalResources) {
     this.nodeId = nodeId;
+    this.nodeName = nodeName;
     this.nodeAddress = nodeAddress;
     this.nodeHostname = nodeHostname;
     this.nodeManagerPort = nodeManagerPort;
     this.objectStoreSocketName = objectStoreSocketName;
     this.rayletSocketName = rayletSocketName;
     this.isAlive = isAlive;
-    this.resources = resources;
+    this.availableResources = availableResources;
+    this.totalResources = totalResources;
   }
 
   public String toString() {
@@ -46,6 +54,9 @@ public class NodeInfo {
         + "nodeId='"
         + nodeId
         + '\''
+        + ", nodeName='"
+        + nodeName
+        + "\'"
         + ", nodeAddress='"
         + nodeAddress
         + "\'"
@@ -54,8 +65,10 @@ public class NodeInfo {
         + "\'"
         + ", isAlive="
         + isAlive
+        + ", availableResources="
+        + availableResources
         + ", resources="
-        + resources
+        + totalResources
         + "}";
   }
 }

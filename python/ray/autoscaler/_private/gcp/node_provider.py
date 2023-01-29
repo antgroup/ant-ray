@@ -1,216 +1,236 @@
-import logging
-import time
-from functools import wraps
+from uuid import uuid4
 from threading import RLock
-from typing import Dict, List, Tuple
+import time
+import logging
 
-import googleapiclient
-
-from ray.autoscaler._private.gcp.config import (
-    bootstrap_gcp,
-    construct_clients_from_provider_config,
-    get_node_type,
-)
-
-# The logic has been abstracted away here to allow for different GCP resources
-# (API endpoints), which can differ widely, making it impossible to use
-# the same logic for everything.
-from ray.autoscaler._private.gcp.node import GCPTPU  # noqa
-from ray.autoscaler._private.gcp.node import (
-    GCPCompute,
-    GCPNode,
-    GCPNodeType,
-    GCPResource,
-)
 from ray.autoscaler.node_provider import NodeProvider
+from ray.autoscaler.tags import TAG_RAY_CLUSTER_NAME, TAG_RAY_NODE_NAME
+from ray.autoscaler._private.gcp.config import bootstrap_gcp
+from ray.autoscaler._private.gcp.config import MAX_POLLS, POLL_INTERVAL, \
+    construct_clients_from_provider_config
 
 logger = logging.getLogger(__name__)
 
+INSTANCE_NAME_MAX_LEN = 64
+INSTANCE_NAME_UUID_LEN = 8
 
-def _retry(method, max_tries=5, backoff_s=1):
-    """Retry decorator for methods of GCPNodeProvider.
 
-    Upon catching BrokenPipeError, API clients are rebuilt and
-    decorated methods are retried.
+def wait_for_compute_zone_operation(compute, project_name, operation, zone):
+    """Poll for compute zone operation until finished."""
+    logger.info("wait_for_compute_zone_operation: "
+                "Waiting for operation {} to finish...".format(
+                    operation["name"]))
 
-    Work-around for https://github.com/ray-project/ray/issues/16072.
-    Based on https://github.com/kubeflow/pipelines/pull/5250/files.
-    """
+    for _ in range(MAX_POLLS):
+        result = compute.zoneOperations().get(
+            project=project_name, operation=operation["name"],
+            zone=zone).execute()
+        if "error" in result:
+            raise Exception(result["error"])
 
-    @wraps(method)
-    def method_with_retries(self, *args, **kwargs):
-        try_count = 0
-        while try_count < max_tries:
-            try:
-                return method(self, *args, **kwargs)
-            except BrokenPipeError:
-                logger.warning("Caught a BrokenPipeError. Retrying.")
-                try_count += 1
-                if try_count < max_tries:
-                    self._construct_clients()
-                    time.sleep(backoff_s)
-                else:
-                    raise
+        if result["status"] == "DONE":
+            logger.info("wait_for_compute_zone_operation: "
+                        "Operation {} finished.".format(operation["name"]))
+            break
 
-    return method_with_retries
+        time.sleep(POLL_INTERVAL)
+
+    return result
 
 
 class GCPNodeProvider(NodeProvider):
-    def __init__(self, provider_config: dict, cluster_name: str):
+    def __init__(self, provider_config, cluster_name):
         NodeProvider.__init__(self, provider_config, cluster_name)
+
         self.lock = RLock()
-        self._construct_clients()
+        _, _, self.compute = construct_clients_from_provider_config(
+            provider_config)
 
         # Cache of node objects from the last nodes() call. This avoids
         # excessive DescribeInstances requests.
-        self.cached_nodes: Dict[str, GCPNode] = {}
+        self.cached_nodes = {}
 
-    def _construct_clients(self):
-        _, _, compute, tpu = construct_clients_from_provider_config(
-            self.provider_config
-        )
-
-        # Dict of different resources provided by GCP.
-        # At this moment - Compute and TPUs
-        self.resources: Dict[GCPNodeType, GCPResource] = {}
-
-        # Compute is always required
-        self.resources[GCPNodeType.COMPUTE] = GCPCompute(
-            compute,
-            self.provider_config["project_id"],
-            self.provider_config["availability_zone"],
-            self.cluster_name,
-        )
-
-        # if there are no TPU nodes defined in config, tpu will be None.
-        if tpu is not None:
-            self.resources[GCPNodeType.TPU] = GCPTPU(
-                tpu,
-                self.provider_config["project_id"],
-                self.provider_config["availability_zone"],
-                self.cluster_name,
-            )
-
-    def _get_resource_depending_on_node_name(self, node_name: str) -> GCPResource:
-        """Return the resource responsible for the node, based on node_name.
-
-        This expects the name to be in format '[NAME]-[UUID]-[TYPE]',
-        where [TYPE] is either 'compute' or 'tpu' (see ``GCPNodeType``).
-        """
-        return self.resources[GCPNodeType.name_to_type(node_name)]
-
-    @_retry
-    def non_terminated_nodes(self, tag_filters: dict):
+    def non_terminated_nodes(self, tag_filters):
         with self.lock:
-            instances = []
+            if tag_filters:
+                label_filter_expr = "(" + " AND ".join([
+                    "(labels.{key} = {value})".format(key=key, value=value)
+                    for key, value in tag_filters.items()
+                ]) + ")"
+            else:
+                label_filter_expr = ""
 
-            for resource in self.resources.values():
-                node_instances = resource.list_instances(tag_filters)
-                instances += node_instances
+            instance_state_filter_expr = "(" + " OR ".join([
+                "(status = {status})".format(status=status)
+                for status in {"PROVISIONING", "STAGING", "RUNNING"}
+            ]) + ")"
 
+            cluster_name_filter_expr = ("(labels.{key} = {value})"
+                                        "".format(
+                                            key=TAG_RAY_CLUSTER_NAME,
+                                            value=self.cluster_name))
+
+            not_empty_filters = [
+                f for f in [
+                    label_filter_expr,
+                    instance_state_filter_expr,
+                    cluster_name_filter_expr,
+                ] if f
+            ]
+
+            filter_expr = " AND ".join(not_empty_filters)
+
+            response = self.compute.instances().list(
+                project=self.provider_config["project_id"],
+                zone=self.provider_config["availability_zone"],
+                filter=filter_expr,
+            ).execute()
+
+            instances = response.get("items", [])
             # Note: All the operations use "name" as the unique instance id
             self.cached_nodes = {i["name"]: i for i in instances}
+
             return [i["name"] for i in instances]
 
-    def is_running(self, node_id: str):
+    def is_running(self, node_id):
         with self.lock:
             node = self._get_cached_node(node_id)
-            return node.is_running()
+            return node["status"] == "RUNNING"
 
-    def is_terminated(self, node_id: str):
+    def is_terminated(self, node_id):
         with self.lock:
             node = self._get_cached_node(node_id)
-            return node.is_terminated()
+            return node["status"] not in {"PROVISIONING", "STAGING", "RUNNING"}
 
-    def node_tags(self, node_id: str):
+    def node_tags(self, node_id):
         with self.lock:
             node = self._get_cached_node(node_id)
-            return node.get_labels()
+            labels = node.get("labels", {})
+            return labels
 
-    @_retry
-    def set_node_tags(self, node_id: str, tags: dict):
+    def set_node_tags(self, node_id, tags):
         with self.lock:
             labels = tags
+            project_id = self.provider_config["project_id"]
+            availability_zone = self.provider_config["availability_zone"]
+
             node = self._get_node(node_id)
+            operation = self.compute.instances().setLabels(
+                project=project_id,
+                zone=availability_zone,
+                instance=node_id,
+                body={
+                    "labels": dict(node["labels"], **labels),
+                    "labelFingerprint": node["labelFingerprint"]
+                }).execute()
 
-            resource = self._get_resource_depending_on_node_name(node_id)
-
-            result = resource.set_labels(node=node, labels=labels)
+            result = wait_for_compute_zone_operation(
+                self.compute, project_id, operation, availability_zone)
 
             return result
 
-    def external_ip(self, node_id: str):
+    def external_ip(self, node_id):
         with self.lock:
             node = self._get_cached_node(node_id)
 
-            ip = node.get_external_ip()
+            def get_external_ip(node):
+                return node.get("networkInterfaces", [{}])[0].get(
+                    "accessConfigs", [{}])[0].get("natIP", None)
+
+            ip = get_external_ip(node)
             if ip is None:
                 node = self._get_node(node_id)
-                ip = node.get_external_ip()
+                ip = get_external_ip(node)
 
             return ip
 
-    def internal_ip(self, node_id: str):
+    def internal_ip(self, node_id):
         with self.lock:
             node = self._get_cached_node(node_id)
 
-            ip = node.get_internal_ip()
+            def get_internal_ip(node):
+                return node.get("networkInterfaces", [{}])[0].get("networkIP")
+
+            ip = get_internal_ip(node)
             if ip is None:
                 node = self._get_node(node_id)
-                ip = node.get_internal_ip()
+                ip = get_internal_ip(node)
 
             return ip
 
-    @_retry
-    def create_node(self, base_config: dict, tags: dict, count: int) -> Dict[str, dict]:
-        """Creates instances.
-
-        Returns dict mapping instance id to each create operation result for the created
-        instances.
-        """
+    def create_node(self, base_config, tags, count) -> None:
         with self.lock:
             labels = tags  # gcp uses "labels" instead of aws "tags"
+            project_id = self.provider_config["project_id"]
+            availability_zone = self.provider_config["availability_zone"]
 
-            node_type = get_node_type(base_config)
-            resource = self.resources[node_type]
+            config = base_config.copy()
 
-            results = resource.create_instances(
-                base_config, labels, count
-            )  # type: List[Tuple[dict, str]]
-            return {instance_id: result for result, instance_id in results}
+            name_label = labels[TAG_RAY_NODE_NAME]
+            assert (len(name_label) <=
+                    (INSTANCE_NAME_MAX_LEN - INSTANCE_NAME_UUID_LEN - 1)), (
+                        name_label, len(name_label))
 
-    @_retry
-    def terminate_node(self, node_id: str):
+            machine_type = ("zones/{zone}/machineTypes/{machine_type}"
+                            "".format(
+                                zone=availability_zone,
+                                machine_type=base_config["machineType"]))
+            labels = dict(config.get("labels", {}), **labels)
+
+            config.update({
+                "machineType": machine_type,
+                "labels": dict(labels,
+                               **{TAG_RAY_CLUSTER_NAME: self.cluster_name}),
+            })
+
+            operations = [
+                self.compute.instances().insert(
+                    project=project_id,
+                    zone=availability_zone,
+                    body=dict(
+                        config, **{
+                            "name": ("{name_label}-{uuid}".format(
+                                name_label=name_label,
+                                uuid=uuid4().hex[:INSTANCE_NAME_UUID_LEN]))
+                        })).execute() for i in range(count)
+            ]
+
+            for operation in operations:
+                wait_for_compute_zone_operation(self.compute, project_id,
+                                                operation, availability_zone)
+
+    def terminate_node(self, node_id):
         with self.lock:
-            resource = self._get_resource_depending_on_node_name(node_id)
-            try:
-                result = resource.delete_instance(
-                    node_id=node_id,
-                )
-            except googleapiclient.errors.HttpError as http_error:
-                if http_error.resp.status == 404:
-                    logger.warning(
-                        f"Tried to delete the node with id {node_id} "
-                        "but it was already gone."
-                    )
-                else:
-                    raise http_error from None
+            project_id = self.provider_config["project_id"]
+            availability_zone = self.provider_config["availability_zone"]
+
+            operation = self.compute.instances().delete(
+                project=project_id,
+                zone=availability_zone,
+                instance=node_id,
+            ).execute()
+
+            result = wait_for_compute_zone_operation(
+                self.compute, project_id, operation, availability_zone)
+
             return result
 
-    @_retry
-    def _get_node(self, node_id: str) -> GCPNode:
+    def _get_node(self, node_id):
         self.non_terminated_nodes({})  # Side effect: updates cache
 
         with self.lock:
             if node_id in self.cached_nodes:
                 return self.cached_nodes[node_id]
 
-            resource = self._get_resource_depending_on_node_name(node_id)
-            instance = resource.get_instance(node_id=node_id)
+            instance = self.compute.instances().get(
+                project=self.provider_config["project_id"],
+                zone=self.provider_config["availability_zone"],
+                instance=node_id,
+            ).execute()
 
             return instance
 
-    def _get_cached_node(self, node_id: str) -> GCPNode:
+    def _get_cached_node(self, node_id):
         if node_id in self.cached_nodes:
             return self.cached_nodes[node_id]
 

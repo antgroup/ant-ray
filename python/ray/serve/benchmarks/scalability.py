@@ -27,18 +27,16 @@
 #
 # [...] similar results for remaining nodes
 
-import logging
 import time
 import subprocess
 import requests
 
 import ray
-from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
-from ray.util.placement_group import placement_group, remove_placement_group
-
 from ray import serve
+from ray.serve import BackendConfig
+from ray.serve.utils import logger
 
-logger = logging.getLogger(__file__)
+from ray.util.placement_group import placement_group, remove_placement_group
 
 ray.shutdown()
 ray.init(address="auto")
@@ -55,29 +53,33 @@ time_to_run = "20s"
 # Wait until the expected number of nodes have joined the cluster.
 while True:
     num_nodes = len(list(filter(lambda node: node["Alive"], ray.nodes())))
-    logger.info("Waiting for nodes {}/{}".format(num_nodes, expected_num_nodes))
+    logger.info("Waiting for nodes {}/{}".format(num_nodes,
+                                                 expected_num_nodes))
     if num_nodes >= expected_num_nodes:
         break
     time.sleep(5)
 
-logger.info("Nodes have all joined. There are %s resources.", ray.cluster_resources())
+logger.info("Nodes have all joined. There are %s resources.",
+            ray.cluster_resources())
 
-serve.start()
-
-pg = placement_group(
-    [{"CPU": 1} for _ in range(expected_num_nodes)], strategy="STRICT_SPREAD"
-)
-ray.get(pg.ready())
+client = serve.start()
 
 
-@serve.deployment(num_replicas=num_replicas)
-def hey(*args):
+def hey(_):
     time.sleep(0.01)  # Sleep for 10ms
     return b"hey"
 
 
+pg = placement_group(
+    [{
+        "CPU": 1
+    } for _ in range(expected_num_nodes)], strategy="STRICT_SPREAD")
+ray.get(pg.ready())
+
 logger.info("Starting %i replicas", num_replicas)
-hey.deploy()
+client.create_backend(
+    "hey", hey, config=BackendConfig(num_replicas=num_replicas))
+client.create_endpoint("hey", backend="hey", route="/hey")
 
 
 @ray.remote(num_cpus=0)
@@ -107,16 +109,11 @@ def run_wrk():
     return result.stdout.decode()
 
 
-results = ray.get(
-    [
-        run_wrk.options(
-            scheduling_strategy=PlacementGroupSchedulingStrategy(
-                placement_group=pg, placement_group_bundle_index=i
-            )
-        ).remote()
-        for i in range(expected_num_nodes)
-    ]
-)
+results = ray.get([
+    run_wrk.options(placement_group=pg,
+                    placement_group_bundle_index=i).remote()
+    for i in range(expected_num_nodes)
+])
 
 for i in range(expected_num_nodes):
     logger.info("Results for node %i of %i:", i + 1, expected_num_nodes)

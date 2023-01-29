@@ -28,7 +28,7 @@ public class BaseTaskOptionsTest {
     new MockActorCreationOptions(resources);
   }
 
-  @Test
+  @Test(expectedExceptions = {IllegalArgumentException.class})
   public void testIllegalResourcesWithZeroValue() {
     Map<String, Double> resources = ImmutableMap.of("CPU", 0.0);
     new MockActorCreationOptions(resources);

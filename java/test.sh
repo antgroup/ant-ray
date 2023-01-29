@@ -29,7 +29,7 @@ run_testng() {
     # exit_code == 2 means there are skipped tests.
     if [ $exit_code -ne 2 ] && [ $exit_code -ne 0 ] ; then
         # Only print log files if it ran in cluster mode
-        if [[ ! "$*" =~ LOCAL ]]; then
+        if [[ ! "$*" =~ SINGLE_PROCESS ]]; then
           if [ $exit_code -gt 128 ] ; then
               # Test crashed. Print the driver log for diagnosis.
               cat /tmp/ray/session_latest/logs/java-core-driver-*$pid*
@@ -60,9 +60,16 @@ run_timeout() {
 }
 
 pushd "$ROOT_DIR"/..
+bazel build //:redis-server
+export REDIS_SERVER_EXECUTABLE_PATH="$PWD/bazel-bin/external/com_github_antirez_redis/redis-server"
 echo "Build java maven deps."
 bazel build //java:gen_maven_deps
 
+echo "Build test dependency."
+bazel build //cpp:counter.so
+cp "$ROOT_DIR"/../bazel-bin/cpp/counter.so "$ROOT_DIR"/test/src/main/resources/
+bazel build //cpp:plus.so
+cp "$ROOT_DIR"/../bazel-bin/cpp/plus.so "$ROOT_DIR"/test/src/main/resources/
 echo "Build test jar."
 bazel build //java:all_tests_shaded.jar
 
@@ -88,10 +95,11 @@ while true; do
   echo Starting cluster mode test round $round
 
   echo "Running tests under cluster mode."
+  mkdir -p /tmp/ray/java_test_reports/cluster_mode
   # TODO(hchen): Ideally, we should use the following bazel command to run Java tests. However, if there're skipped tests,
   # TestNG will exit with code 2. And bazel treats it as test failure.
-  # bazel test //java:all_tests --config=ci || cluster_exit_code=$?
-  run_testng java -cp "$ROOT_DIR"/../bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /tmp/ray_java_test_output "$ROOT_DIR"/testng.xml
+  # bazel test //java:all_tests_shaded --test_output="errors" || cluster_exit_code=$?
+  run_testng java "${RAY_TEST_JVM_CLUSTER_ARGS[@]}" -cp "$ROOT_DIR"/../bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /tmp/ray/java_test_reports/cluster_mode "$ROOT_DIR"/testng.xml
 
   echo Finished cluster mode test round $round
   date
@@ -101,16 +109,18 @@ while true; do
   fi
 done
 
-echo "Running tests under local mode."
-run_testng java -Dray.run-mode="LOCAL" -cp "$ROOT_DIR"/../bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /tmp/ray_java_test_output "$ROOT_DIR"/testng.xml
+echo "Running tests under single-process mode."
+mkdir -p /tmp/ray/java_test_reports/local_mode
+# bazel test //java:all_tests_shaded --jvmopt="-Dray.run-mode=SINGLE_PROCESS" --test_output="errors" || single_exit_code=$?
+run_testng java "${RAY_TEST_JVM_CLUSTER_ARGS[@]}" -Dray.run-mode="SINGLE_PROCESS" -cp "$ROOT_DIR"/../bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /tmp/ray/java_test_reports/local_mode "$ROOT_DIR"/testng.xml
 
-echo "Running connecting existing cluster tests."
+echo "Running connecting existing cluster tests"
 case "${OSTYPE}" in
   linux*) ip=$(hostname -I | awk '{print $1}');;
   darwin*) ip=$(ipconfig getifaddr en0);;
   *) echo "Can't get ip address for ${OSTYPE}"; exit 1;;
 esac
-RAY_BACKEND_LOG_LEVEL=debug ray start --head --port=6379 --redis-password=123456 --node-ip-address="$ip"
+RAY_BACKEND_LOG_LEVEL=debug ray start --head --port=6379 --redis-password=123456 --code-search-path="$PWD/bazel-bin/java/all_tests_shaded.jar"
 RAY_BACKEND_LOG_LEVEL=debug java -cp bazel-bin/java/all_tests_shaded.jar -Dray.address="$ip:6379"\
  -Dray.redis.password='123456' -Dray.job.code-search-path="$PWD/bazel-bin/java/all_tests_shaded.jar" io.ray.test.MultiDriverTest
 ray stop
@@ -121,20 +131,21 @@ for file in "$docdemo_path"*.java; do
   file=${file#"$docdemo_path"}
   class=${file%".java"}
   echo "Running $class"
-  java -cp bazel-bin/java/all_tests_shaded.jar -Dray.raylet.startup-token=0 "io.ray.docdemo.$class"
+  java -cp bazel-bin/java/all_tests_shaded.jar -Dray.job.num-java-workers-per-process=1 "io.ray.docdemo.$class"
 done
 popd
 
 pushd "$ROOT_DIR"
 echo "Testing maven install."
-mvn -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN clean install -DskipTests -Dcheckstyle.skip
+mvn -B -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN clean install -DskipTests -Dcheckstyle.skip
 # Ensure mvn test works
-mvn test -pl test -Dtest="io.ray.test.HelloWorldTest"
+mvn -B test -pl test -Dtest="io.ray.test.HelloWorldTest"
 popd
 
 pushd "$ROOT_DIR"
 echo "Running performance test."
-run_timeout 60 java -cp "$ROOT_DIR"/../bazel-bin/java/all_tests_shaded.jar io.ray.performancetest.test.ActorPerformanceTestCase1
+export PERF_TEST_DEV=true
+run_timeout 60 java -cp "$ROOT_DIR"/../bazel-bin/java/all_tests_deploy.jar io.ray.performancetest.test.ActorPerformanceTestCase1
 # The performance process may be killed by run_timeout, so clear ray here.
 ray stop
 popd

@@ -24,10 +24,8 @@ namespace stats {
 
 absl::Mutex Metric::registration_mutex_;
 
-namespace internal {
-
-void RegisterAsView(opencensus::stats::ViewDescriptor view_descriptor,
-                    const std::vector<opencensus::tags::TagKey> &keys) {
+static void RegisterAsView(opencensus::stats::ViewDescriptor view_descriptor,
+                           const std::vector<opencensus::tags::TagKey> &keys) {
   // Register global keys.
   for (const auto &tag : ray::stats::StatsConfig::instance().GetGlobalTags()) {
     view_descriptor = view_descriptor.add_column(tag.first);
@@ -41,7 +39,6 @@ void RegisterAsView(opencensus::stats::ViewDescriptor view_descriptor,
   view_descriptor.RegisterForExport();
 }
 
-}  // namespace internal
 ///
 /// Stats Config
 ///
@@ -62,6 +59,34 @@ void StatsConfig::SetIsDisableStats(bool disable_stats) {
 }
 
 bool StatsConfig::IsStatsDisabled() const { return is_stats_disabled_; }
+
+void StatsConfig::SetCeresdbExporterEnabled(bool ceresdb_exporter_enabled) {
+  ceresdb_exporter_enabled_ = ceresdb_exporter_enabled;
+}
+
+bool StatsConfig::GetCeresdbExporterEnabled() const { return ceresdb_exporter_enabled_; };
+
+void StatsConfig::SetCeresdbConfFile(const std::string &ceresdb_conf_file) {
+  ceresdb_conf_file_ = ceresdb_conf_file;
+}
+
+const std::string &StatsConfig::GetCeresdbConfFile() const { return ceresdb_conf_file_; };
+
+void StatsConfig::SetKmonitorExporterEnabled(bool kmonitor_exporter_enabled) {
+  kmonitor_exporter_enabled_ = kmonitor_exporter_enabled;
+}
+
+bool StatsConfig::GetKmonitorExporterEnabled() const {
+  return kmonitor_exporter_enabled_;
+}
+
+void StatsConfig::SetKmonitorConfFile(const std::string &kmonitor_conf_file) {
+  kmonitor_conf_file_ = kmonitor_conf_file;
+}
+
+const std::string &StatsConfig::GetKmonitorConfFile() const {
+  return kmonitor_conf_file_;
+}
 
 void StatsConfig::SetReportInterval(const absl::Duration interval) {
   report_interval_ = interval;
@@ -85,6 +110,13 @@ bool StatsConfig::IsInitialized() const { return is_initialized_; }
 /// Metric
 ///
 using MeasureDouble = opencensus::stats::Measure<double>;
+Metric::Metric(const std::string &name, const std::string &description,
+               const std::string &unit, const std::vector<std::string> &tag_keys)
+    : name_(name), description_(description), unit_(unit), measure_(nullptr) {
+  for (const auto &key : tag_keys) {
+    tag_keys_.push_back(opencensus::tags::TagKey::Register(key));
+  }
+}
 void Metric::Record(double value, const TagsType &tags) {
   if (StatsConfig::instance().IsStatsDisabled()) {
     return;
@@ -122,15 +154,16 @@ void Metric::Record(double value,
                     const std::unordered_map<std::string, std::string> &tags) {
   TagsType tags_pair_vec;
   std::for_each(
-      tags.begin(),
-      tags.end(),
+      tags.begin(), tags.end(),
       [&tags_pair_vec](std::pair<std::string, std::string> tag) {
         return tags_pair_vec.push_back({TagKeyType::Register(tag.first), tag.second});
       });
   Record(value, tags_pair_vec);
 }
 
-Metric::~Metric() { opencensus::stats::StatsExporter::RemoveView(name_); }
+void Metric::Record(double value, std::unordered_map<std::string, std::string> &tags) {
+  Record(value, static_cast<const std::unordered_map<std::string, std::string> &>(tags));
+}
 
 void Gauge::RegisterView() {
   opencensus::stats::ViewDescriptor view_descriptor =
@@ -139,7 +172,12 @@ void Gauge::RegisterView() {
           .set_description(description_)
           .set_measure(name_)
           .set_aggregation(opencensus::stats::Aggregation::LastValue());
-  internal::RegisterAsView(view_descriptor, tag_keys_);
+
+  // set AggregationWindow type kDelta to record the delta value
+  opencensus::stats::SetAggregationWindow(opencensus::stats::AggregationWindow::Delta(),
+                                          &view_descriptor);
+
+  RegisterAsView(view_descriptor, tag_keys_);
 }
 
 void Histogram::RegisterView() {
@@ -151,7 +189,11 @@ void Histogram::RegisterView() {
           .set_aggregation(opencensus::stats::Aggregation::Distribution(
               opencensus::stats::BucketBoundaries::Explicit(boundaries_)));
 
-  internal::RegisterAsView(view_descriptor, tag_keys_);
+  // set AggregationWindow type kDelta to record the delta value
+  opencensus::stats::SetAggregationWindow(opencensus::stats::AggregationWindow::Delta(),
+                                          &view_descriptor);
+
+  RegisterAsView(view_descriptor, tag_keys_);
 }
 
 void Count::RegisterView() {
@@ -160,9 +202,13 @@ void Count::RegisterView() {
           .set_name(name_)
           .set_description(description_)
           .set_measure(name_)
-          .set_aggregation(opencensus::stats::Aggregation::Count());
+          .set_aggregation(opencensus::stats::Aggregation::Sum());
 
-  internal::RegisterAsView(view_descriptor, tag_keys_);
+  // set AggregationWindow type kDelta to record the delta value
+  opencensus::stats::SetAggregationWindow(opencensus::stats::AggregationWindow::Delta(),
+                                          &view_descriptor);
+
+  RegisterAsView(view_descriptor, tag_keys_);
 }
 
 void Sum::RegisterView() {
@@ -173,8 +219,9 @@ void Sum::RegisterView() {
           .set_measure(name_)
           .set_aggregation(opencensus::stats::Aggregation::Sum());
 
-  internal::RegisterAsView(view_descriptor, tag_keys_);
+  RegisterAsView(view_descriptor, tag_keys_);
 }
 
 }  // namespace stats
+
 }  // namespace ray

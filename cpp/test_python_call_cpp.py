@@ -1,16 +1,14 @@
-import pytest
-
 import ray
 import ray.cluster_utils
-from ray.exceptions import CrossLanguageError, RayActorError
+from ray.exceptions import CrossLanguageError
+from ray.exceptions import RayActorError
+import pytest
 
 
 def test_cross_language_cpp():
     ray.init(
         job_config=ray.job_config.JobConfig(
-            code_search_path=["../../plus.so:../../counter.so"]
-        )
-    )
+            code_search_path=["../../plus.so:../../counter.so"]))
     obj = ray.cross_language.cpp_function("Plus1").remote(1)
     assert 2 == ray.get(obj)
 
@@ -66,20 +64,19 @@ def test_cross_language_cpp():
 
 
 def test_cross_language_cpp_actor():
-    actor = ray.cross_language.cpp_actor_class("CreateCounter", "Counter").remote()
+    actor = ray.cross_language.cpp_actor_class(
+        "RAY_FUNC(Counter::FactoryCreate)", "Counter").remote()
     obj = actor.Plus1.remote()
     assert 1 == ray.get(obj)
 
     actor1 = ray.cross_language.cpp_actor_class(
-        "RAY_FUNC(Counter::FactoryCreate)", "Counter"
-    ).remote("invalid arg")
+        "RAY_FUNC(Counter::FactoryCreate)", "Counter").remote("invalid arg")
     obj = actor1.Plus1.remote()
     with pytest.raises(RayActorError):
         ray.get(obj)
 
     actor1 = ray.cross_language.cpp_actor_class(
-        "RAY_FUNC(Counter::FactoryCreate)", "Counter"
-    ).remote()
+        "RAY_FUNC(Counter::FactoryCreate)", "Counter").remote()
 
     obj = actor1.Plus1.remote()
     assert 1 == ray.get(obj)

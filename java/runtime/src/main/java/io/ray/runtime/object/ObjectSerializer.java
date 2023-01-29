@@ -3,14 +3,17 @@ package io.ray.runtime.object;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Bytes;
 import com.google.protobuf.InvalidProtocolBufferException;
-import io.ray.api.exception.RayActorException;
+import io.ray.api.exception.RayActorUnschedulableException;
 import io.ray.api.exception.RayException;
-import io.ray.api.exception.RayTaskException;
-import io.ray.api.exception.RayWorkerException;
-import io.ray.api.exception.UnreconstructableException;
+import io.ray.api.exception.RayRuntimeEnvSetupException;
+import io.ray.api.exception.RayTaskUnschedulableException;
 import io.ray.api.id.ActorId;
 import io.ray.api.id.ObjectId;
 import io.ray.runtime.actor.NativeActorHandle;
+import io.ray.runtime.exception.RayActorException;
+import io.ray.runtime.exception.RayTaskException;
+import io.ray.runtime.exception.RayWorkerException;
+import io.ray.runtime.exception.UnreconstructableException;
 import io.ray.runtime.generated.Common.ErrorType;
 import io.ray.runtime.serializer.RayExceptionSerializer;
 import io.ray.runtime.serializer.Serializer;
@@ -35,19 +38,14 @@ public class ObjectSerializer {
       String.valueOf(ErrorType.ACTOR_DIED.getNumber()).getBytes();
   private static final byte[] UNRECONSTRUCTABLE_EXCEPTION_META =
       String.valueOf(ErrorType.OBJECT_UNRECONSTRUCTABLE.getNumber()).getBytes();
-  private static final byte[] UNRECONSTRUCTABLE_LINEAGE_EVICTED_EXCEPTION_META =
-      String.valueOf(ErrorType.OBJECT_UNRECONSTRUCTABLE_LINEAGE_EVICTED.getNumber()).getBytes();
-  private static final byte[] UNRECONSTRUCTABLE_MAX_ATTEMPTS_EXCEEDED_EXCEPTION_META =
-      String.valueOf(ErrorType.OBJECT_UNRECONSTRUCTABLE_MAX_ATTEMPTS_EXCEEDED.getNumber())
-          .getBytes();
-  private static final byte[] OBJECT_LOST_META =
-      String.valueOf(ErrorType.OBJECT_LOST.getNumber()).getBytes();
-  private static final byte[] OWNER_DIED_META =
-      String.valueOf(ErrorType.OWNER_DIED.getNumber()).getBytes();
-  private static final byte[] OBJECT_DELETED_META =
-      String.valueOf(ErrorType.OBJECT_DELETED.getNumber()).getBytes();
   private static final byte[] TASK_EXECUTION_EXCEPTION_META =
       String.valueOf(ErrorType.TASK_EXECUTION_EXCEPTION.getNumber()).getBytes();
+  private static final byte[] RUNTIME_ENV_SETUP_FAILED_META =
+      String.valueOf(ErrorType.RUNTIME_ENV_SETUP_FAILED.getNumber()).getBytes();
+  private static final byte[] TASK_UNSCHEDULABLE_ERROR_META =
+      String.valueOf(ErrorType.TASK_UNSCHEDULABLE_ERROR.getNumber()).getBytes();
+  private static final byte[] ACTOR_UNSCHEDULABLE_ERROR_META =
+      String.valueOf(ErrorType.ACTOR_UNSCHEDULABLE_ERROR.getNumber()).getBytes();
 
   public static final byte[] OBJECT_METADATA_TYPE_CROSS_LANGUAGE = "XLANG".getBytes();
   public static final byte[] OBJECT_METADATA_TYPE_JAVA = "JAVA".getBytes();
@@ -89,15 +87,11 @@ public class ObjectSerializer {
           || Bytes.indexOf(meta, OBJECT_METADATA_TYPE_JAVA) == 0) {
         return Serializer.decode(data, objectType);
       } else if (Bytes.indexOf(meta, WORKER_EXCEPTION_META) == 0) {
-        return new RayWorkerException();
-      } else if (Bytes.indexOf(meta, UNRECONSTRUCTABLE_EXCEPTION_META) == 0
-          || Bytes.indexOf(meta, UNRECONSTRUCTABLE_LINEAGE_EVICTED_EXCEPTION_META) == 0
-          || Bytes.indexOf(meta, UNRECONSTRUCTABLE_MAX_ATTEMPTS_EXCEEDED_EXCEPTION_META) == 0
-          || Bytes.indexOf(meta, OBJECT_LOST_META) == 0
-          || Bytes.indexOf(meta, OWNER_DIED_META) == 0
-          || Bytes.indexOf(meta, OBJECT_DELETED_META) == 0) {
-        // TODO: Differentiate object errors.
-        return new UnreconstructableException(objectId);
+        return deserializeWorkerException(data, objectId);
+      } else if (Bytes.indexOf(meta, TASK_UNSCHEDULABLE_ERROR_META) == 0) {
+        return deserializeTaskUnschedulableException(data, objectId);
+      } else if (Bytes.indexOf(meta, ACTOR_UNSCHEDULABLE_ERROR_META) == 0) {
+        return deserializeActorUnschedulableException(data, objectId);
       } else if (Bytes.indexOf(meta, ACTOR_EXCEPTION_META) == 0) {
         ActorId actorId = IdUtil.getActorIdFromObjectId(objectId);
         if (data != null && data.length > 0) {
@@ -107,6 +101,8 @@ public class ObjectSerializer {
           }
         }
         return new RayActorException(actorId);
+      } else if (Bytes.indexOf(meta, UNRECONSTRUCTABLE_EXCEPTION_META) == 0) {
+        return new UnreconstructableException(objectId);
       } else if (Bytes.indexOf(meta, TASK_EXECUTION_EXCEPTION_META) == 0) {
         return deserializeRayException(data, objectId);
       } else if (Bytes.indexOf(meta, OBJECT_METADATA_TYPE_ACTOR_HANDLE) == 0) {
@@ -115,6 +111,8 @@ public class ObjectSerializer {
       } else if (Bytes.indexOf(meta, OBJECT_METADATA_TYPE_PYTHON) == 0) {
         throw new IllegalArgumentException(
             "Can't deserialize Python object: " + objectId.toString());
+      } else if (Bytes.indexOf(meta, RUNTIME_ENV_SETUP_FAILED_META) == 0) {
+        return deserializeRuntimeEnvSetupException(data, objectId);
       }
       throw new IllegalArgumentException("Unrecognized metadata " + Arrays.toString(meta));
     } else {
@@ -152,7 +150,7 @@ public class ObjectSerializer {
       byte[] serializedBytes =
           Serializer.encode(RayExceptionSerializer.toBytes(taskException)).getLeft();
       // serializedBytes is MessagePack serialized bytes
-      // taskException.toBytes() is protobuf serialized bytes
+      // RayExceptionSerializer.toBytes(taskException) is protobuf serialized bytes
       // Only OBJECT_METADATA_TYPE_RAW is raw bytes,
       // any other type should be the MessagePack serialized bytes.
       return new NativeRayObject(serializedBytes, TASK_EXECUTION_EXCEPTION_META);
@@ -209,7 +207,7 @@ public class ObjectSerializer {
 
   private static RayException deserializeRayException(byte[] msgPackData, ObjectId objectId) {
     // Serialization logic of task execution exception: an instance of
-    // `io.ray.api.exception.RayTaskException`
+    // `io.ray.runtime.exception.RayTaskException`
     //    -> a `RayException` protobuf message
     //    -> protobuf-serialized bytes
     //    -> MessagePack-serialized bytes.
@@ -221,6 +219,7 @@ public class ObjectSerializer {
       // No RayException provided
       return null;
     }
+
     try {
       return RayExceptionSerializer.fromBytes(pbData);
     } catch (InvalidProtocolBufferException e) {
@@ -232,7 +231,7 @@ public class ObjectSerializer {
   private static RayException deserializeActorException(
       byte[] msgPackData, ActorId actorId, ObjectId objectId) {
     // Serialization logic of task execution exception: an instance of
-    // `io.ray.api.exception.RayTaskException`
+    // `io.ray.runtime.exception.RayTaskException`
     //    -> a `RayException` protobuf message
     //    -> protobuf-serialized bytes
     //    -> MessagePack-serialized bytes.
@@ -259,6 +258,102 @@ public class ObjectSerializer {
     } catch (InvalidProtocolBufferException e) {
       throw new IllegalArgumentException(
           "Can't deserialize RayActorCreationTaskException object: " + objectId.toString(), e);
+    }
+  }
+
+  /**
+   * Deserialize to RuntimeEnvSetupException.
+   *
+   * @param msgPackData serialize data.
+   * @param objectId object id.
+   * @return RayRuntimeEnvSetupException
+   */
+  private static RayRuntimeEnvSetupException deserializeRuntimeEnvSetupException(
+      byte[] msgPackData, ObjectId objectId) {
+    if (msgPackData == null || msgPackData.length == 0) {
+      return new RayRuntimeEnvSetupException("Unkonw exception message.");
+    }
+    byte[] pbData = Serializer.decode(msgPackData, byte[].class);
+
+    if (pbData == null || pbData.length == 0) {
+      return new RayRuntimeEnvSetupException("Unkonw exception message.");
+    }
+
+    try {
+      io.ray.runtime.generated.Common.RayErrorInfo rayErrorInfo =
+          io.ray.runtime.generated.Common.RayErrorInfo.parseFrom(pbData);
+      if (rayErrorInfo.hasRuntimeEnvSetupFailedError()) {
+        return new RayRuntimeEnvSetupException(
+            rayErrorInfo.getRuntimeEnvSetupFailedError().getErrorMessage());
+      } else {
+        return new RayRuntimeEnvSetupException("Unkonw error.");
+      }
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalArgumentException(
+          "Can't deserialize RayRuntimeEnvSetupException object: " + objectId.toString(), e);
+    }
+  }
+
+  private static RayActorUnschedulableException deserializeActorUnschedulableException(
+      byte[] msgPackData, ObjectId objectId) {
+    if (msgPackData == null || msgPackData.length == 0) {
+      return new RayActorUnschedulableException("Unkonw exception message.");
+    }
+    byte[] pbData = Serializer.decode(msgPackData, byte[].class);
+
+    if (pbData == null || pbData.length == 0) {
+      return new RayActorUnschedulableException("Unkonw exception message.");
+    }
+
+    try {
+      io.ray.runtime.generated.Common.RayErrorInfo rayErrorInfo =
+          io.ray.runtime.generated.Common.RayErrorInfo.parseFrom(pbData);
+      return new RayActorUnschedulableException(rayErrorInfo.getErrorMessage());
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalArgumentException(
+          "Can't deserialize RayActorUnschedulableException object: " + objectId.toString(), e);
+    }
+  }
+
+  private static RayTaskUnschedulableException deserializeTaskUnschedulableException(
+      byte[] msgPackData, ObjectId objectId) {
+    if (msgPackData == null || msgPackData.length == 0) {
+      return new RayTaskUnschedulableException("Unkonw exception message.");
+    }
+    byte[] pbData = Serializer.decode(msgPackData, byte[].class);
+
+    if (pbData == null || pbData.length == 0) {
+      return new RayTaskUnschedulableException("Unkonw exception message.");
+    }
+
+    try {
+      io.ray.runtime.generated.Common.RayErrorInfo rayErrorInfo =
+          io.ray.runtime.generated.Common.RayErrorInfo.parseFrom(pbData);
+      return new RayTaskUnschedulableException(rayErrorInfo.getErrorMessage());
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalArgumentException(
+          "Can't deserialize RayTaskUnschedulableException object: " + objectId.toString(), e);
+    }
+  }
+
+  private static RayWorkerException deserializeWorkerException(
+      byte[] msgPackData, ObjectId objectId) {
+    if (msgPackData == null || msgPackData.length == 0) {
+      return new RayWorkerException();
+    }
+    byte[] pbData = Serializer.decode(msgPackData, byte[].class);
+
+    if (pbData == null || pbData.length == 0) {
+      return new RayWorkerException();
+    }
+
+    try {
+      io.ray.runtime.generated.Common.RayErrorInfo rayErrorInfo =
+          io.ray.runtime.generated.Common.RayErrorInfo.parseFrom(pbData);
+      return new RayWorkerException(rayErrorInfo.getErrorMessage());
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalArgumentException(
+          "Can't deserialize RayWorkerException object: " + objectId.toString(), e);
     }
   }
 }

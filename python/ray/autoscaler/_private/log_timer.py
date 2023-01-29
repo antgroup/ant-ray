@@ -22,12 +22,7 @@ class LogTimer:
         status = ""
         if self._show_status:
             status = "failed" if any(error_vals) else "succeeded"
-        cli_logger.print(
-            " ".join(
-                [
-                    self._message,
-                    status,
-                    "[LogTimer={:.0f}ms]".format(td.total_seconds() * 1000),
-                ]
-            )
-        )
+        cli_logger.print(" ".join([
+            self._message, status,
+            "[LogTimer={:.0f}ms]".format(td.total_seconds() * 1000)
+        ]))

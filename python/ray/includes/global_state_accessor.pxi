@@ -1,13 +1,10 @@
-from ray.includes.common cimport (
-    CGcsClientOptions
-)
-
 from ray.includes.unique_ids cimport (
     CActorID,
     CNodeID,
     CObjectID,
     CWorkerID,
-    CPlacementGroupID
+    CPlacementGroupID,
+    CJobID,
 )
 
 from ray.includes.global_state_accessor cimport (
@@ -15,17 +12,21 @@ from ray.includes.global_state_accessor cimport (
 )
 
 from libcpp.string cimport string as c_string
-from libcpp.memory cimport make_unique as c_make_unique
 
 cdef class GlobalStateAccessor:
     """Cython wrapper class of C++ `ray::gcs::GlobalStateAccessor`."""
     cdef:
         unique_ptr[CGlobalStateAccessor] inner
 
-    def __cinit__(self, GcsClientOptions gcs_options):
-        cdef CGcsClientOptions *opts
-        opts = gcs_options.native()
-        self.inner = c_make_unique[CGlobalStateAccessor](opts[0])
+    def __init__(self, redis_address, redis_password):
+        if not redis_password:
+            redis_password = ""
+        self.inner.reset(
+            new CGlobalStateAccessor(
+                redis_address.encode("ascii"),
+                redis_password.encode("ascii"),
+            ),
+        )
 
     def connect(self):
         cdef c_bool result
@@ -43,16 +44,18 @@ cdef class GlobalStateAccessor:
             result = self.inner.get().GetAllJobInfo()
         return result
 
-    def get_next_job_id(self):
-        cdef CJobID cjob_id
-        with nogil:
-            cjob_id = self.inner.get().GetNextJobID()
-        return cjob_id.ToInt()
-
     def get_node_table(self):
         cdef c_vector[c_string] result
         with nogil:
             result = self.inner.get().GetAllNodeInfo()
+        return result
+
+    def get_node_table_by_nodegroup(self, nodegroup_id_string):
+        cdef c_vector[c_string] result
+        cdef c_string c_nodegroup_id_string = nodegroup_id_string
+        with nogil:
+            result = self.inner.get().GetAllNodeInfoByNodegroup(
+                c_nodegroup_id_string)
         return result
 
     def get_all_available_resources(self):
@@ -67,6 +70,21 @@ cdef class GlobalStateAccessor:
             result = self.inner.get().GetAllProfileInfo()
         return result
 
+    def get_object_table(self):
+        cdef c_vector[c_string] result
+        with nogil:
+            result = self.inner.get().GetAllObjectInfo()
+        return result
+
+    def get_object_info(self, object_id):
+        cdef unique_ptr[c_string] object_info
+        cdef CObjectID cobject_id = CObjectID.FromBinary(object_id.binary())
+        with nogil:
+            object_info = self.inner.get().GetObjectInfo(cobject_id)
+        if object_info:
+            return c_string(object_info.get().data(), object_info.get().size())
+        return None
+
     def get_all_resource_usage(self):
         """Get newest resource usage of all nodes from GCS service."""
         cdef unique_ptr[c_string] result
@@ -75,6 +93,12 @@ cdef class GlobalStateAccessor:
         if result:
             return c_string(result.get().data(), result.get().size())
         return None
+
+    def get_cluster_resources(self):
+        cdef c_vector[c_string] result
+        with nogil:
+            result = self.inner.get().GetClusterResources()
+        return result
 
     def get_actor_table(self):
         cdef c_vector[c_string] result
@@ -90,6 +114,13 @@ cdef class GlobalStateAccessor:
         if actor_info:
             return c_string(actor_info.get().data(), actor_info.get().size())
         return None
+
+    def get_node_resource_info(self, node_id):
+        cdef c_string result
+        cdef CNodeID cnode_id = CNodeID.FromBinary(node_id.binary())
+        with nogil:
+            result = self.inner.get().GetNodeResourceInfo(cnode_id)
+        return result
 
     def get_worker_table(self):
         cdef c_vector[c_string] result
@@ -130,6 +161,28 @@ cdef class GlobalStateAccessor:
             return c_string(result.get().data(), result.get().size())
         return None
 
+    def update_job_resource_requirements(self, job_id,
+                                         min_resource_requirements,
+                                         max_resource_requirements):
+        cdef c_bool result
+        cdef CJobID c_job_id = (CJobID.FromBinary(job_id.binary()))
+
+        cdef unordered_map[c_string, double] c_min_resource_requirements
+        prepare_resources(min_resource_requirements,
+                          &c_min_resource_requirements)
+
+        cdef unordered_map[c_string, double] c_max_resource_requirements
+        prepare_resources(max_resource_requirements,
+                          &c_max_resource_requirements)
+
+        try:
+            result = self.inner.get().UpdateJobResourceRequirements(
+                c_job_id, c_min_resource_requirements,
+                c_max_resource_requirements)
+        except Exception as exp:
+            raise exp
+        return result
+
     def get_placement_group_by_name(self, placement_group_name, ray_namespace):
         cdef unique_ptr[c_string] result
         cdef c_string cplacement_group_name = placement_group_name
@@ -140,6 +193,23 @@ cdef class GlobalStateAccessor:
         if result:
             return c_string(result.get().data(), result.get().size())
         return None
+
+    def put_job_data(self, bytes key, bytes data):
+        this_worker = ray.worker.global_worker
+        core_worker = this_worker.core_worker
+        cdef JobID current_job_id = core_worker.get_current_job_id()
+        cdef c_pair[c_bool, c_string] r = \
+            self.inner.get().PutJobData(
+                current_job_id.data, key, data)
+        if not r.first:
+            raise Exception(r.second)
+
+    def get_job_data(self, bytes key):
+        this_worker = ray.worker.global_worker
+        core_worker = this_worker.core_worker
+        cdef JobID current_job_id = core_worker.get_current_job_id()
+        return self.inner.get().GetJobData(
+            current_job_id.data, key)
 
     def get_system_config(self):
         return self.inner.get().GetSystemConfig()

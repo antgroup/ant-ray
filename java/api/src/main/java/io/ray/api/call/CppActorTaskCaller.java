@@ -10,7 +10,7 @@ import io.ray.api.function.CppActorMethod;
  *
  * @param <R> The type of the cpp actor method return value
  */
-public class CppActorTaskCaller<R> {
+public class CppActorTaskCaller<R> extends BaseActorTaskCaller<CppActorTaskCaller<R>> {
   private final CppActorHandle actor;
   private final CppActorMethod<R> method;
   private final Object[] args;
@@ -29,6 +29,6 @@ public class CppActorTaskCaller<R> {
    */
   @SuppressWarnings("unchecked")
   public ObjectRef<R> remote() {
-    return Ray.internal().callActor(actor, method, args);
+    return Ray.internal().callActor(actor, method, args, buildOptions());
   }
 }

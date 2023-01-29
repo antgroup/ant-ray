@@ -14,19 +14,15 @@
 
 #pragma once
 
-#include <boost/bimap.hpp>
-#include <boost/bimap/unordered_set_of.hpp>
-
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "ray/common/id.h"
+#include "ray/gcs/accessor.h"
 #include "ray/gcs/gcs_server/gcs_init_data.h"
-#include "ray/gcs/gcs_server/gcs_resource_manager.h"
 #include "ray/gcs/gcs_server/gcs_table_storage.h"
 #include "ray/gcs/pubsub/gcs_pub_sub.h"
 #include "ray/rpc/client_call.h"
 #include "ray/rpc/gcs_server/gcs_rpc_server.h"
-#include "ray/rpc/node_manager/node_manager_client.h"
 #include "ray/rpc/node_manager/node_manager_client_pool.h"
 #include "src/ray/protobuf/gcs.pb.h"
 
@@ -40,36 +36,48 @@ class GcsNodeManager : public rpc::NodeInfoHandler {
  public:
   /// Create a GcsNodeManager.
   ///
-  /// \param gcs_publisher GCS message publisher.
+  /// \param gcs_pub_sub GCS message publisher.
   /// \param gcs_table_storage GCS table external storage accessor.
-  explicit GcsNodeManager(std::shared_ptr<GcsPublisher> gcs_publisher,
-                          std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage,
-                          std::shared_ptr<rpc::NodeManagerClientPool> raylet_client_pool);
+  /// when detecting the death of nodes.
+  explicit GcsNodeManager(
+      std::shared_ptr<gcs::GcsPubSub> gcs_pub_sub,
+      std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage,
+      std::function<bool(const NodeID &, const std::string &)>
+          is_node_in_nodegroup_callback =
+              [](const NodeID &, const std::string &) { return true; },
+      std::function<void(const NodeID &)> reject_node_fn = [](const NodeID &) {});
 
   /// Handle register rpc request come from raylet.
-  void HandleRegisterNode(rpc::RegisterNodeRequest request,
+  void HandleRegisterNode(const rpc::RegisterNodeRequest &request,
                           rpc::RegisterNodeReply *reply,
                           rpc::SendReplyCallback send_reply_callback) override;
 
   /// Handle unregister rpc request come from raylet.
-  void HandleDrainNode(rpc::DrainNodeRequest request,
-                       rpc::DrainNodeReply *reply,
-                       rpc::SendReplyCallback send_reply_callback) override;
-
-  /// Handle get all node info rpc request.
-  void HandleGetAllNodeInfo(rpc::GetAllNodeInfoRequest request,
-                            rpc::GetAllNodeInfoReply *reply,
+  void HandleUnregisterNode(const rpc::UnregisterNodeRequest &request,
+                            rpc::UnregisterNodeReply *reply,
                             rpc::SendReplyCallback send_reply_callback) override;
 
+  /// Handle get all node info rpc request.
+  void HandleGetAllBasicNodeInfo(const rpc::GetAllBasicNodeInfoRequest &request,
+                                 rpc::GetAllBasicNodeInfoReply *reply,
+                                 rpc::SendReplyCallback send_reply_callback) override;
+
+  void HandleGetAllFullNodeInfo(const rpc::GetAllFullNodeInfoRequest &request,
+                                rpc::GetAllFullNodeInfoReply *reply,
+                                rpc::SendReplyCallback send_reply_callback) override;
   /// Handle get internal config.
-  void HandleGetInternalConfig(rpc::GetInternalConfigRequest request,
+  void HandleGetInternalConfig(const rpc::GetInternalConfigRequest &request,
                                rpc::GetInternalConfigReply *reply,
                                rpc::SendReplyCallback send_reply_callback) override;
 
-  /// Handle check alive request for GCS.
-  void HandleCheckAlive(rpc::CheckAliveRequest request,
-                        rpc::CheckAliveReply *reply,
-                        rpc::SendReplyCallback send_reply_callback) override;
+  void HandleUpdateInternalConfig(const rpc::UpdateInternalConfigRequest &request,
+                                  rpc::UpdateInternalConfigReply *reply,
+                                  rpc::SendReplyCallback send_reply_callback) override;
+
+  /// Handle mark physical machines with failures.
+  void HandleMarkFailureMachines(const rpc::MarkFailureMachinesRequest &request,
+                                 rpc::MarkFailureMachinesReply *reply,
+                                 rpc::SendReplyCallback send_reply_callback) override;
 
   void OnNodeFailure(const NodeID &node_id);
 
@@ -101,6 +109,12 @@ class GcsNodeManager : public rpc::NodeInfoHandler {
     return alive_nodes_;
   }
 
+  /// Get all nodes by nodegroup.
+  ///
+  /// \return all nodes associated with the specifityed nodegroup id.
+  absl::flat_hash_map<NodeID, std::shared_ptr<rpc::GcsNodeInfo>> GetAllNodes(
+      const std::string &nodegroup_id = "") const;
+
   /// Add listener to monitor the remove action of nodes.
   ///
   /// \param listener The handler which process the remove of nodes.
@@ -125,11 +139,24 @@ class GcsNodeManager : public rpc::NodeInfoHandler {
   /// \param gcs_init_data.
   void Initialize(const GcsInitData &gcs_init_data);
 
-  std::string DebugString() const;
+  /// Get cluster realtime resources.
+  const absl::flat_hash_map<NodeID, std::shared_ptr<ResourceSet>>
+      &GetClusterRealtimeResources() const;
 
-  /// Drain the given node.
-  /// Idempotent.
-  void DrainNode(const NodeID &node_id);
+  void QuickDetectNodeFailureByName(const std::string &node_name);
+
+  void QuickDetectNodeFailure();
+
+  /// Evict all dead nodes which ttl is expired.
+  void EvictExpiredNodes();
+
+  /// Get a unique node by node name. If multiple nodes are found, this method will crash.
+  /// Duplicate nodes will be removed in QuickDetectNodeFailureByName, so node name will
+  /// always be unique after AddNode.
+  boost::optional<std::shared_ptr<rpc::GcsNodeInfo>> GetUniqueNodeByName(
+      const std::string &node_name) const;
+
+  std::string DebugString() const;
 
  private:
   /// Add the dead node to the cache. If the cache is full, the earliest dead node is
@@ -137,6 +164,15 @@ class GcsNodeManager : public rpc::NodeInfoHandler {
   ///
   /// \param node The node which is dead.
   void AddDeadNodeToCache(std::shared_ptr<rpc::GcsNodeInfo> node);
+
+  /// \param node_name the node name to find
+  /// \return All alive nodes with the specific node name.
+  std::vector<std::shared_ptr<rpc::GcsNodeInfo>> GetAliveNodesByName(
+      const std::string &node_name) const;
+
+  /// Evict one dead node from sorted_dead_node_list_ as well as
+  /// dead_nodes_.
+  void EvictOneDeadNode();
 
   /// Alive nodes.
   absl::flat_hash_map<NodeID, std::shared_ptr<rpc::GcsNodeInfo>> alive_nodes_;
@@ -152,27 +188,29 @@ class GcsNodeManager : public rpc::NodeInfoHandler {
   std::vector<std::function<void(std::shared_ptr<rpc::GcsNodeInfo>)>>
       node_removed_listeners_;
   /// A publisher for publishing gcs messages.
-  std::shared_ptr<GcsPublisher> gcs_publisher_;
+  std::shared_ptr<gcs::GcsPubSub> gcs_pub_sub_;
   /// Storage for GCS tables.
   std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage_;
-  /// Raylet client pool.
-  std::shared_ptr<rpc::NodeManagerClientPool> raylet_client_pool_;
+  /// The callback to check whether the node is in the nodegroup.
+  std::function<bool(const NodeID &, const std::string &)> is_node_in_nodegroup_callback_;
+  /// The callback to check whether the node is frozen
+  std::function<bool(const NodeID &)> is_node_frozen_fn_;
+  /// Reject a node.
+  std::function<void(const NodeID &)> reject_node_fn_;
+  /// The set of machines with failures.
+  absl::flat_hash_set<std::string> failure_machines_;
+
+  std::string internal_config_json_str_;
 
   // Debug info.
   enum CountType {
     REGISTER_NODE_REQUEST = 0,
-    DRAIN_NODE_REQUEST = 1,
+    UNREGISTER_NODE_REQUEST = 1,
     GET_ALL_NODE_INFO_REQUEST = 2,
     GET_INTERNAL_CONFIG_REQUEST = 3,
     CountType_MAX = 4,
   };
   uint64_t counts_[CountType::CountType_MAX] = {0};
-
-  /// A map of NodeId <-> ip:port of raylet
-  using NodeIDAddrBiMap =
-      boost::bimap<boost::bimaps::unordered_set_of<NodeID, std::hash<NodeID>>,
-                   boost::bimaps::unordered_set_of<std::string>>;
-  NodeIDAddrBiMap node_map_;
 };
 
 }  // namespace gcs

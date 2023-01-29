@@ -43,7 +43,7 @@ class RedisAsyncContext {
   /// Get the raw 'redisAsyncContext' pointer.
   ///
   /// \return redisAsyncContext *
-  redisAsyncContext *GetRawRedisAsyncContext();
+  redisAsyncContext *GetRawRedisAsyncContext() const;
 
   /// Reset the raw 'redisAsyncContext' pointer to nullptr.
   void ResetRawRedisAsyncContext();
@@ -71,13 +71,32 @@ class RedisAsyncContext {
   /// \param argv Array with arguments.
   /// \param argvlen Array with each argument's length.
   /// \return Status
-  Status RedisAsyncCommandArgv(redisCallbackFn *fn,
-                               void *privdata,
-                               int argc,
-                               const char **argv,
-                               const size_t *argvlen);
+  Status RedisAsyncCommandArgv(redisCallbackFn *fn, void *privdata, int argc,
+                               const char **argv, const size_t *argvlen);
+
+  Status RedisVAsyncCommand(redisCallbackFn *fn, void *privdata, const char *format,
+                            va_list ap);
+
+  /// Perform command 'rdisAsyncDisconnect'. Thread-safe.
+  void RedisAsyncDisconnect();
+
+  /// Perform command 'redisAsyncFormattedCommand'. Thread-safe.
+  ///
+  /// \param fn Callback that will be called after the command finishes.
+  /// \param privdata User-defined pointer.
+  /// \param cmd The formatted command.
+  /// \param len The length of the formatted command.
+  /// \return Status
+  Status RedisAsyncFormattedCommand(redisCallbackFn *fn, void *privdata, const char *cmd,
+                                    size_t len);
 
  private:
+  /// Convert the return code of a redis function to status.
+  ///
+  /// \param code The return code of a redis function.
+  /// \return Status
+  Status RedisCodeToStatus(int code);
+
   /// This mutex is used to protect `redis_async_context`.
   /// NOTE(micafan): All the `redisAsyncContext`-related functions only manipulate memory
   /// data and don't actually do any IO operations. So the perf impact of adding the lock

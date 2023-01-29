@@ -35,7 +35,7 @@ class WorkerKillerTest : public ::testing::Test {
     message.mutable_actor_creation_task_spec()->set_max_actor_restarts(max_restarts);
     message.set_type(ray::rpc::TaskType::ACTOR_TASK);
     TaskSpecification task_spec(message);
-    RayTask task(task_spec);
+    RayTask task(task_spec, TaskExecutionSpecification());
     auto worker = std::make_shared<MockWorker>(ray::WorkerID::FromRandom(), port_);
     worker->SetAssignedTask(task);
     return worker;
@@ -46,7 +46,7 @@ class WorkerKillerTest : public ::testing::Test {
     message.mutable_actor_creation_task_spec()->set_max_actor_restarts(max_restarts);
     message.set_type(ray::rpc::TaskType::ACTOR_CREATION_TASK);
     TaskSpecification task_spec(message);
-    RayTask task(task_spec);
+    RayTask task(task_spec, TaskExecutionSpecification());
     auto worker = std::make_shared<MockWorker>(ray::WorkerID::FromRandom(), port_);
     worker->SetAssignedTask(task);
     return worker;
@@ -57,7 +57,7 @@ class WorkerKillerTest : public ::testing::Test {
     message.set_max_retries(max_retries);
     message.set_type(ray::rpc::TaskType::NORMAL_TASK);
     TaskSpecification task_spec(message);
-    RayTask task(task_spec);
+    RayTask task(task_spec, TaskExecutionSpecification());
     auto worker = std::make_shared<MockWorker>(ray::WorkerID::FromRandom(), port_);
     worker->SetAssignedTask(task);
     return worker;

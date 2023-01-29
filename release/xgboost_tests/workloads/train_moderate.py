@@ -13,23 +13,22 @@ import time
 import ray
 from xgboost_ray import RayParams
 
-from release_test_util import train_ray
+from _train import train_ray
 
 if __name__ == "__main__":
-    ray.init(address="auto", runtime_env={"working_dir": os.path.dirname(__file__)})
+    ray.init(address="auto")
 
     ray_params = RayParams(
         elastic_training=False,
         max_actor_restarts=2,
         num_actors=32,
         cpus_per_actor=4,
-        gpus_per_actor=0,
-    )
+        gpus_per_actor=0)
 
     start = time.time()
     train_ray(
         path="/data/classification.parquet",
-        num_workers=None,
+        num_workers=32,
         num_boost_rounds=100,
         num_files=128,
         regression=False,
@@ -42,7 +41,8 @@ if __name__ == "__main__":
     result = {
         "time_taken": taken,
     }
-    test_output_json = os.environ.get("TEST_OUTPUT_JSON", "/tmp/train_moderate.json")
+    test_output_json = os.environ.get("TEST_OUTPUT_JSON",
+                                      "/tmp/train_moderate.json")
     with open(test_output_json, "wt") as f:
         json.dump(result, f)
 

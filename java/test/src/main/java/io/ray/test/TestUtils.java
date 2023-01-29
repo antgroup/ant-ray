@@ -4,8 +4,11 @@ import com.google.common.base.Preconditions;
 import io.ray.api.ObjectRef;
 import io.ray.api.Ray;
 import io.ray.runtime.AbstractRayRuntime;
+import io.ray.runtime.RayRuntimeInternal;
+import io.ray.runtime.RayRuntimeProxy;
 import io.ray.runtime.config.RayConfig;
 import io.ray.runtime.config.RunMode;
+import io.ray.runtime.runner.worker.DefaultDriver;
 import io.ray.runtime.task.ArgumentsBuilder;
 import java.io.Serializable;
 import java.time.Duration;
@@ -34,8 +37,8 @@ public class TestUtils {
 
   private static final int WAIT_INTERVAL_MS = 5;
 
-  public static boolean isLocalMode() {
-    return getRuntime().getRayConfig().runMode == RunMode.LOCAL;
+  public static boolean isSingleProcessMode() {
+    return getRuntime().getRayConfig().runMode == RunMode.SINGLE_PROCESS;
   }
 
   /**
@@ -122,21 +125,42 @@ public class TestUtils {
     Assert.assertEquals(obj.get(), "hi");
   }
 
-  public static AbstractRayRuntime getRuntime() {
-    return (AbstractRayRuntime) Ray.internal();
+  public static RayRuntimeInternal getRuntime() {
+    return (RayRuntimeInternal) Ray.internal();
   }
 
-  public static ProcessBuilder buildDriver(Class<?> mainClass, String[] args) {
+  public static RayRuntimeInternal getUnderlyingRuntime() {
+    if (Ray.internal() instanceof AbstractRayRuntime) {
+      return (RayRuntimeInternal) Ray.internal();
+    }
+    RayRuntimeProxy proxy =
+        (RayRuntimeProxy) (java.lang.reflect.Proxy.getInvocationHandler(Ray.internal()));
+    return proxy.getRuntimeObject();
+  }
+
+  private static int getNumWorkersPerProcessRemoteFunction() {
+    return TestUtils.getRuntime().getRayConfig().numWorkersPerProcess;
+  }
+
+  public static int getNumWorkersPerProcess() {
+    return Ray.task(TestUtils::getNumWorkersPerProcessRemoteFunction).remote().get();
+  }
+
+  public static ProcessBuilder buildDriver(
+      Class<?> mainClass, String[] args, boolean useDefaultDriver) {
     RayConfig rayConfig = TestUtils.getRuntime().getRayConfig();
 
     List<String> fullArgs = new ArrayList<>();
     fullArgs.add("java");
     fullArgs.add("-cp");
     fullArgs.add(System.getProperty("java.class.path"));
-    fullArgs.add("-Dray.address=" + rayConfig.getBootstrapAddress());
+    fullArgs.add("-Dray.address=" + rayConfig.getRedisAddress());
     fullArgs.add("-Dray.object-store.socket-name=" + rayConfig.objectStoreSocketName);
     fullArgs.add("-Dray.raylet.socket-name=" + rayConfig.rayletSocketName);
     fullArgs.add("-Dray.raylet.node-manager-port=" + rayConfig.getNodeManagerPort());
+    if (useDefaultDriver) {
+      fullArgs.add(DefaultDriver.class.getName());
+    }
     fullArgs.add(mainClass.getName());
     if (args != null) {
       fullArgs.addAll(Arrays.asList(args));

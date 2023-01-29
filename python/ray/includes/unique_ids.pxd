@@ -94,7 +94,7 @@ cdef extern from "ray/common/id.h" namespace "ray" nogil:
         @staticmethod
         CJobID FromInt(uint32_t value)
 
-        uint32_t ToInt()
+        c_bool IsSubmittedFromDashboard()
 
     cdef cppclass CTaskID "ray::TaskID"(CBaseID[CTaskID]):
 
@@ -147,8 +147,6 @@ cdef extern from "ray/common/id.h" namespace "ray" nogil:
 
         @staticmethod
         size_t Size()
-
-        c_bool is_put()
 
         int64_t ObjectIndex() const
 

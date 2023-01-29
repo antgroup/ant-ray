@@ -72,9 +72,28 @@ Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetNextJobID(JNIEnv *, jobject
  * Signature: (J)Ljava/util/List;
  */
 JNIEXPORT jobject JNICALL
-Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetAllNodeInfo(JNIEnv *,
-                                                                 jobject,
+Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetAllNodeInfo(JNIEnv *, jobject,
                                                                  jlong);
+
+/*
+ * Class:     io_ray_runtime_gcs_GlobalStateAccessor
+ * Method:    nativeGetAllNodeInfoByNodegroup
+ * Signature: (JLjava/lang/String;)Ljava/util/List;
+ */
+JNIEXPORT jobject JNICALL
+Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetAllNodeInfoByNodegroup(JNIEnv *,
+                                                                            jobject,
+                                                                            jlong,
+                                                                            jstring);
+
+/*
+ * Class:     io_ray_runtime_gcs_GlobalStateAccessor
+ * Method:    nativeGetNodeResourceInfo
+ * Signature: (J[B)[B
+ */
+JNIEXPORT jbyteArray JNICALL
+Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetNodeResourceInfo(JNIEnv *, jobject,
+                                                                      jlong, jbyteArray);
 
 /*
  * Class:     io_ray_runtime_gcs_GlobalStateAccessor
@@ -82,8 +101,7 @@ Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetAllNodeInfo(JNIEnv *,
  * Signature: (J)Ljava/util/List;
  */
 JNIEXPORT jobject JNICALL
-Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetAllActorInfo(JNIEnv *,
-                                                                  jobject,
+Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetAllActorInfo(JNIEnv *, jobject,
                                                                   jlong);
 
 /*
@@ -92,10 +110,17 @@ Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetAllActorInfo(JNIEnv *,
  * Signature: (J[B)[B
  */
 JNIEXPORT jbyteArray JNICALL
-Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetActorInfo(JNIEnv *,
-                                                               jobject,
-                                                               jlong,
+Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetActorInfo(JNIEnv *, jobject, jlong,
                                                                jbyteArray);
+
+/*
+ * Class:     io_ray_runtime_gcs_GlobalStateAccessor
+ * Method:    nativeGetResourceUsage
+ * Signature: (J[B)[B
+ */
+JNIEXPORT jbyteArray JNICALL
+Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetResourceUsage(JNIEnv *, jobject,
+                                                                   jlong, jbyteArray);
 
 /*
  * Class:     io_ray_runtime_gcs_GlobalStateAccessor
@@ -103,8 +128,7 @@ Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetActorInfo(JNIEnv *,
  * Signature: (J[B)[B
  */
 JNIEXPORT jbyteArray JNICALL
-Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetPlacementGroupInfo(JNIEnv *,
-                                                                        jobject,
+Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetPlacementGroupInfo(JNIEnv *, jobject,
                                                                         jlong,
                                                                         jbyteArray);
 
@@ -129,12 +153,37 @@ Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetAllPlacementGroupInfo(JNIEn
 
 /*
  * Class:     io_ray_runtime_gcs_GlobalStateAccessor
- * Method:    nativeGetInternalKV
- * Signature: (JLjava/lang/String;Ljava/lang/String;)[B
+ * Method:    nativeUpdateJobResourceRequirements
+ * Signature: (J[BLjava/util/List;[DLjava/util/List;[D)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeUpdateJobResourceRequirements(
+    JNIEnv *, jobject, jlong, jbyteArray, jobject, jdoubleArray, jobject, jdoubleArray);
+
+/*
+ * Class:     io_ray_runtime_gcs_GlobalStateAccessor
+ * Method:    nativePutJobData
+ * Signature: (J[B[B[B)V
+ */
+JNIEXPORT void JNICALL Java_io_ray_runtime_gcs_GlobalStateAccessor_nativePutJobData(
+    JNIEnv *, jobject, jlong, jbyteArray, jbyteArray, jbyteArray);
+
+/*
+ * Class:     io_ray_runtime_gcs_GlobalStateAccessor
+ * Method:    nativeGetJobData
+ * Signature: (J[B[B)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetJobData(
+    JNIEnv *, jobject, jlong, jbyteArray, jbyteArray);
+
+/*
+ * Class:     io_ray_runtime_gcs_GlobalStateAccessor
+ * Method:    nativeGetApiServerAddress
+ * Signature: (J)[B
  */
 JNIEXPORT jbyteArray JNICALL
-Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetInternalKV(
-    JNIEnv *, jobject, jlong, jstring, jstring);
+Java_io_ray_runtime_gcs_GlobalStateAccessor_nativeGetApiServerAddress(JNIEnv *, jobject,
+                                                                      jlong);
 
 /*
  * Class:     io_ray_runtime_gcs_GlobalStateAccessor

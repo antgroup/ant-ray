@@ -1,0 +1,102 @@
+diff --git src/brpc/stream.cpp src/brpc/stream.cpp
+index e48441e8..40daf490 100644
+--- src/brpc/stream.cpp
++++ src/brpc/stream.cpp
+@@ -50,6 +50,7 @@ Stream::Stream()
+     , _pending_buf(NULL)
+     , _start_idle_timer_us(0)
+     , _idle_timer(0)
++    , _intentional_closed(false)
+ {
+     _connect_meta.on_connect = NULL;
+     CHECK_EQ(0, bthread_mutex_init(&_connect_mutex, NULL));
+@@ -95,6 +96,7 @@ int Stream::Create(const StreamOptions &options,
+     SocketId fake_sock_id;
+     if (Socket::Create(sock_opt, &fake_sock_id) != 0) {
+         s->BeforeRecycle(NULL);
++        LOG(ERROR) << "Create socket failed for stream " << fake_sock_id;
+         return -1;
+     }
+     SocketUniquePtr ptr;
+@@ -106,6 +108,8 @@ int Stream::Create(const StreamOptions &options,
+ }
+
+ void Stream::BeforeRecycle(Socket *) {
++    LOG(INFO) << "stream " << id() << " is recycled, treat it as intentionally closed";
++    _intentional_closed = true;
+     // No one holds reference now, so we don't need lock here
+     bthread_id_list_reset(&_writable_wait_list, ECONNRESET);
+     if (_connected) {
+@@ -497,7 +501,13 @@ int Stream::Consume(void *meta, bthread::TaskIterator<butil::IOBuf*>& iter) {
+             s->_host_socket = NULL;
+         }
+         if (s->_options.handler != NULL) {
+-            s->_options.handler->on_closed(s->id());
++            if (s->_intentional_closed) {
++                LOG(INFO) << "stream " << s->id() << " has been intentionally closed"
++                          << ", so skip invoking its on_closed() handler";
++            } else {
++                LOG(INFO) << "Invoke the on_closed handler for stream " << s->id();
++                s->_options.handler->on_closed(s->id());
++            }
+         }
+         delete s;
+         return 0;
+@@ -607,13 +617,20 @@ void Stream::Close() {
+     return TriggerOnConnectIfNeed();
+ }
+
+-int Stream::SetFailed(StreamId id) {
++int Stream::SetFailed(StreamId id, bool is_intentional) {
+     SocketUniquePtr ptr;
+     if (Socket::AddressFailedAsWell(id, &ptr) == -1) {
+         // Don't care recycled stream
+         return 0;
+     }
+     Stream* s = (Stream*)ptr->conn();
++    // NOTE(zhijunfu): it's possible that when `on_closed` callback is invovked,
++    // the actual handler pointed by s->_options.handler has been destroyed, this
++    // can cause issues
++    if (is_intentional) {
++      s->_intentional_closed = true;
++      LOG(INFO) << "Intentioanlly closed stream " << s->id();
++    }
+     s->Close();
+     return 0;
+ }
+@@ -689,7 +706,7 @@ int StreamWait(StreamId stream_id, const timespec* due_time) {
+ }
+
+ int StreamClose(StreamId stream_id) {
+-    return Stream::SetFailed(stream_id);
++    return Stream::SetFailed(stream_id, true);
+ }
+
+ int StreamCreate(StreamId *request_stream, Controller &cntl,
+diff --git src/brpc/stream_impl.h src/brpc/stream_impl.h
+index 4adb9ac9..188fe34f 100644
+--- src/brpc/stream_impl.h
++++ src/brpc/stream_impl.h
+@@ -60,7 +60,7 @@ public:
+                     const timespec *due_time);
+     int Wait(const timespec* due_time);
+     void FillSettings(StreamSettings *settings);
+-    static int SetFailed(StreamId id);
++    static int SetFailed(StreamId id, bool is_intentional = false);
+     void Close();
+
+ private:
+@@ -124,6 +124,13 @@ friend class MessageBatcher;
+     butil::IOBuf *_pending_buf;
+     int64_t _start_idle_timer_us;
+     bthread_timer_t _idle_timer;
++
++    // NOTE(zhijunfu): This flag indicates whether this stream is intentionally
++    // closed by `StreamClose()`. If it is, then it's possible that the handler
++    // passed in _options has been destroyed, thus it's not safe to invoke its
++    // `on_closed()` function. It will also be set to true if the stream is
++    // recycled.
++    std::atomic<bool> _intentional_closed;
+ };
+
+ } // namespace brpc

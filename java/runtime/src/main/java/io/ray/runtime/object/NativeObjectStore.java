@@ -1,11 +1,9 @@
 package io.ray.runtime.object;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import io.ray.api.Ray;
-import io.ray.api.id.ActorId;
 import io.ray.api.id.BaseId;
 import io.ray.api.id.ObjectId;
-import io.ray.runtime.AbstractRayRuntime;
+import io.ray.api.id.UniqueId;
 import io.ray.runtime.context.WorkerContext;
 import io.ray.runtime.generated.Common.Address;
 import java.util.HashMap;
@@ -33,14 +31,7 @@ public class NativeObjectStore extends ObjectStore {
 
   @Override
   public ObjectId putRaw(NativeRayObject obj) {
-    return new ObjectId(nativePut(obj, null));
-  }
-
-  @Override
-  public ObjectId putRaw(NativeRayObject obj, ActorId ownerActorId) {
-    byte[] serializedOwnerAddressBytes =
-        ((AbstractRayRuntime) Ray.internal()).getGcsClient().getActorAddress(ownerActorId);
-    return new ObjectId(nativePut(obj, serializedOwnerAddressBytes));
+    return new ObjectId(nativePut(obj));
   }
 
   @Override
@@ -65,24 +56,24 @@ public class NativeObjectStore extends ObjectStore {
   }
 
   @Override
-  public void addLocalReference(ObjectId objectId) {
-    nativeAddLocalReference(objectId.getBytes());
+  public void addLocalReference(UniqueId workerId, ObjectId objectId) {
+    nativeAddLocalReference(workerId.getBytes(), objectId.getBytes());
   }
 
   @Override
-  public void removeLocalReference(ObjectId objectId) {
+  public void removeLocalReference(UniqueId workerId, ObjectId objectId) {
     Lock readLock = shutdownLock.readLock();
     readLock.lock();
     try {
-      nativeRemoveLocalReference(objectId.getBytes());
+      nativeRemoveLocalReference(workerId.getBytes(), objectId.getBytes());
     } finally {
       readLock.unlock();
     }
   }
 
   @Override
-  public byte[] getOwnershipInfo(ObjectId objectId) {
-    return nativeGetOwnershipInfo(objectId.getBytes());
+  public byte[] promoteAndGetOwnershipInfo(ObjectId objectId) {
+    return nativePromoteAndGetOwnershipInfo(objectId.getBytes());
   }
 
   @Override
@@ -116,7 +107,7 @@ public class NativeObjectStore extends ObjectStore {
     return ids.stream().map(BaseId::getBytes).collect(Collectors.toList());
   }
 
-  private static native byte[] nativePut(NativeRayObject obj, byte[] serializedOwnerAddressBytes);
+  private static native byte[] nativePut(NativeRayObject obj);
 
   private static native void nativePut(byte[] objectId, NativeRayObject obj);
 
@@ -127,15 +118,15 @@ public class NativeObjectStore extends ObjectStore {
 
   private static native void nativeDelete(List<byte[]> objectIds, boolean localOnly);
 
-  private static native void nativeAddLocalReference(byte[] objectId);
+  private static native void nativeAddLocalReference(byte[] workerId, byte[] objectId);
 
-  private static native void nativeRemoveLocalReference(byte[] objectId);
+  private static native void nativeRemoveLocalReference(byte[] workerId, byte[] objectId);
 
   private static native Map<byte[], long[]> nativeGetAllReferenceCounts();
 
   private static native byte[] nativeGetOwnerAddress(byte[] objectId);
 
-  private static native byte[] nativeGetOwnershipInfo(byte[] objectId);
+  private static native byte[] nativePromoteAndGetOwnershipInfo(byte[] objectId);
 
   private static native void nativeRegisterOwnershipInfoAndResolveFuture(
       byte[] objectId, byte[] outerObjectId, byte[] ownerAddress);

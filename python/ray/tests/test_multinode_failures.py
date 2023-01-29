@@ -6,14 +6,13 @@ import time
 import pytest
 
 import ray
-import ray._private.ray_constants as ray_constants
-from ray._private.test_utils import Semaphore, get_other_nodes
-from ray.cluster_utils import Cluster, cluster_not_supported
+import ray.ray_constants as ray_constants
+from ray.cluster_utils import Cluster
+from ray.test_utils import RayTestTimeoutException, get_other_nodes
 
 SIGKILL = signal.SIGKILL if sys.platform != "win32" else signal.SIGTERM
 
 
-@pytest.mark.xfail(cluster_not_supported, reason="cluster not supported")
 @pytest.fixture(params=[(1, 4), (4, 4)])
 def ray_start_workers_separate_multinode(request):
     num_nodes = request.param[0]
@@ -21,9 +20,7 @@ def ray_start_workers_separate_multinode(request):
     # Start the Ray processes.
     cluster = Cluster()
     for _ in range(num_nodes):
-        cluster.add_node(
-            num_cpus=num_initial_workers, resources={"custom": num_initial_workers}
-        )
+        cluster.add_node(num_cpus=num_initial_workers)
     ray.init(address=cluster.address)
 
     yield num_nodes, num_initial_workers
@@ -33,26 +30,25 @@ def ray_start_workers_separate_multinode(request):
 
 
 def test_worker_failed(ray_start_workers_separate_multinode):
-    num_nodes, num_initial_workers = ray_start_workers_separate_multinode
+    num_nodes, num_initial_workers = (ray_start_workers_separate_multinode)
 
-    block_worker = Semaphore.remote(0)
-    block_driver = Semaphore.remote(0)
-    ray.get([block_worker.locked.remote(), block_driver.locked.remote()])
-
-    # Acquire a custom resource that isn't released on `ray.get` to make sure
-    # this task gets spread across all the nodes.
-    @ray.remote(num_cpus=1, resources={"custom": 1})
+    @ray.remote
     def get_pids():
-        ray.get(block_driver.release.remote())
-        ray.get(block_worker.acquire.remote())
+        time.sleep(0.25)
         return os.getpid()
 
-    total_num_workers = num_nodes * num_initial_workers
-    pid_refs = [get_pids.remote() for _ in range(total_num_workers)]
-    ray.get([block_driver.acquire.remote() for _ in range(total_num_workers)])
-    ray.get([block_worker.release.remote() for _ in range(total_num_workers)])
-
-    pids = set(ray.get(pid_refs))
+    start_time = time.time()
+    pids = set()
+    while len(pids) < num_nodes * num_initial_workers:
+        new_pids = ray.get([
+            get_pids.remote()
+            for _ in range(2 * num_nodes * num_initial_workers)
+        ])
+        for pid in new_pids:
+            pids.add(pid)
+        if time.time() - start_time > 60:
+            raise RayTestTimeoutException(
+                "Timed out while waiting to get worker PIDs.")
 
     @ray.remote
     def f(x):
@@ -78,7 +74,8 @@ def test_worker_failed(ray_start_workers_separate_multinode):
     for object_ref in object_refs:
         try:
             ray.get(object_ref)
-        except (ray.exceptions.RayTaskError, ray.exceptions.WorkerCrashedError):
+        except (ray.exceptions.RayTaskError,
+                ray.exceptions.WorkerCrashedError):
             pass
 
 
@@ -139,38 +136,25 @@ def check_components_alive(cluster, component_type, check_component_alive):
         if check_component_alive:
             assert process.poll() is None
         else:
-            print(
-                "waiting for "
-                + component_type
-                + " with PID "
-                + str(process.pid)
-                + "to terminate"
-            )
+            print("waiting for " + component_type + " with PID " +
+                  str(process.pid) + "to terminate")
             process.wait()
-            print(
-                "done waiting for "
-                + component_type
-                + " with PID "
-                + str(process.pid)
-                + "to terminate"
-            )
+            print("done waiting for " + component_type + " with PID " +
+                  str(process.pid) + "to terminate")
             assert not process.poll() is None
 
 
 @pytest.mark.parametrize(
     "ray_start_cluster",
-    [
-        {
-            "num_cpus": 8,
-            "num_nodes": 4,
-            "_system_config": {
-                # Raylet codepath is not stable with a shorter timeout.
-                "num_heartbeats_timeout": 10
-            },
-        }
-    ],
-    indirect=True,
-)
+    [{
+        "num_cpus": 8,
+        "num_nodes": 4,
+        "_system_config": {
+            # Raylet codepath is not stable with a shorter timeout.
+            "num_heartbeats_timeout": 10
+        },
+    }],
+    indirect=True)
 def test_raylet_failed(ray_start_cluster):
     cluster = ray_start_cluster
     # Kill all raylets on worker nodes.
@@ -179,8 +163,4 @@ def test_raylet_failed(ray_start_cluster):
 
 if __name__ == "__main__":
     import pytest
-
-    if os.environ.get("PARALLEL_CI"):
-        sys.exit(pytest.main(["-n", "auto", "--boxed", "-vs", __file__]))
-    else:
-        sys.exit(pytest.main(["-sv", __file__]))
+    sys.exit(pytest.main(["-v", __file__]))

@@ -13,53 +13,46 @@
 // limitations under the License.
 
 #include "ray/gcs/gcs_server/gcs_worker_manager.h"
-
-#include "ray/stats/metric_defs.h"
+#include "ray/stats/stats.h"
 
 namespace ray {
 namespace gcs {
 
 void GcsWorkerManager::HandleReportWorkerFailure(
-    rpc::ReportWorkerFailureRequest request,
-    rpc::ReportWorkerFailureReply *reply,
+    const rpc::ReportWorkerFailureRequest &request, rpc::ReportWorkerFailureReply *reply,
     rpc::SendReplyCallback send_reply_callback) {
   const rpc::Address worker_address = request.worker_failure().worker_address();
   const auto worker_id = WorkerID::FromBinary(worker_address.worker_id());
   const auto node_id = NodeID::FromBinary(worker_address.raylet_id());
-  std::string message =
-      absl::StrCat("Reporting worker exit, worker id = ",
-                   worker_id.Hex(),
-                   ", node id = ",
-                   node_id.Hex(),
-                   ", address = ",
-                   worker_address.ip_address(),
-                   ", exit_type = ",
-                   rpc::WorkerExitType_Name(request.worker_failure().exit_type()),
-                   ", exit_detail = ",
-                   request.worker_failure().exit_detail());
-  if (request.worker_failure().exit_type() == rpc::WorkerExitType::INTENDED_USER_EXIT ||
-      request.worker_failure().exit_type() == rpc::WorkerExitType::INTENDED_SYSTEM_EXIT) {
-    RAY_LOG(DEBUG) << message;
+  auto worker_failure_data = std::make_shared<WorkerTableData>();
+  worker_failure_data->CopyFrom(request.worker_failure());
+  worker_failure_data->set_is_alive(false);
+
+  std::stringstream log_stream;
+  log_stream << "Reporting worker failure, worker id = " << worker_id
+             << ", node id = " << node_id << ", address = " << worker_address.ip_address()
+             << ", exit_type = "
+             << rpc::WorkerExitType_Name(request.worker_failure().exit_type())
+             << ", has creation task exception = "
+             << request.worker_failure().has_creation_task_exception()
+             << ", worker_failure_data_byte_size = "
+             << worker_failure_data->ByteSizeLong();
+  if (request.worker_failure().exit_type() == rpc::WorkerExitType::INTENDED_EXIT) {
+    RAY_LOG(INFO) << log_stream.str();
   } else {
-    RAY_LOG(WARNING) << message
+    RAY_LOG(WARNING) << log_stream.str()
                      << ". Unintentional worker failures have been reported. If there "
                         "are lots of this logs, that might indicate there are "
                         "unexpected failures in the cluster.";
   }
-  auto worker_failure_data = std::make_shared<WorkerTableData>();
-  worker_failure_data->CopyFrom(request.worker_failure());
-  worker_failure_data->set_is_alive(false);
 
   for (auto &listener : worker_dead_listeners_) {
     listener(worker_failure_data);
   }
 
-  auto on_done = [this,
-                  worker_address,
-                  worker_id,
-                  node_id,
-                  worker_failure_data,
-                  reply,
+  AddDeadWorkerToCache(worker_failure_data);
+
+  auto on_done = [this, worker_address, worker_id, node_id, worker_failure_data, reply,
                   send_reply_callback](const Status &status) {
     if (!status.ok()) {
       RAY_LOG(ERROR) << "Failed to report worker failure, worker id = " << worker_id
@@ -67,13 +60,20 @@ void GcsWorkerManager::HandleReportWorkerFailure(
                      << ", address = " << worker_address.ip_address();
     } else {
       stats::UnintentionalWorkerFailures.Record(1);
-      // Only publish worker_id and raylet_id in address as they are the only fields used
-      // by sub clients.
-      rpc::WorkerDeltaData worker_failure;
-      worker_failure.set_worker_id(worker_failure_data->worker_address().worker_id());
-      worker_failure.set_raylet_id(worker_failure_data->worker_address().raylet_id());
-      RAY_CHECK_OK(
-          gcs_publisher_->PublishWorkerFailure(worker_id, worker_failure, nullptr));
+      auto job_info =
+          get_job_info_func_(JobID::FromBinary(worker_failure_data->job_id()));
+      if (!(job_info && job_info->config().enable_l1_fault_tolerance())) {
+        // Only publish worker_id and raylet_id in address as they are the only fields
+        // used by sub clients.
+        auto worker_failure_delta = std::make_shared<rpc::WorkerDeltaData>();
+        worker_failure_delta->set_worker_id(
+            worker_failure_data->worker_address().worker_id());
+        worker_failure_delta->set_raylet_id(
+            worker_failure_data->worker_address().raylet_id());
+        RAY_CHECK_OK(gcs_pub_sub_->Publish(WORKER_CHANNEL, worker_id.Hex(),
+                                           worker_failure_delta->SerializeAsString(),
+                                           nullptr));
+      }
     }
     GCS_RPC_SEND_REPLY(send_reply_callback, reply, status);
   };
@@ -87,28 +87,9 @@ void GcsWorkerManager::HandleReportWorkerFailure(
   if (!status.ok()) {
     on_done(status);
   }
-
-  if (request.worker_failure().exit_type() == rpc::WorkerExitType::SYSTEM_ERROR ||
-      request.worker_failure().exit_type() == rpc::WorkerExitType::NODE_OUT_OF_MEMORY) {
-    const char *key = "";
-    int count = 0;
-    if (request.worker_failure().exit_type() == rpc::WorkerExitType::SYSTEM_ERROR) {
-      worker_crash_system_error_count_ += 1;
-      key = "worker_crash_system_error";
-      count = worker_crash_system_error_count_;
-    } else if (request.worker_failure().exit_type() ==
-               rpc::WorkerExitType::NODE_OUT_OF_MEMORY) {
-      worker_crash_oom_count_ += 1;
-      key = "worker_crash_oom";
-      count = worker_crash_oom_count_;
-    }
-    if (usage_stats_client_) {
-      usage_stats_client_->RecordExtraUsageTag(key, std::to_string(count));
-    }
-  }
 }
 
-void GcsWorkerManager::HandleGetWorkerInfo(rpc::GetWorkerInfoRequest request,
+void GcsWorkerManager::HandleGetWorkerInfo(const rpc::GetWorkerInfoRequest &request,
                                            rpc::GetWorkerInfoReply *reply,
                                            rpc::SendReplyCallback send_reply_callback) {
   WorkerID worker_id = WorkerID::FromBinary(request.worker_id());
@@ -131,24 +112,12 @@ void GcsWorkerManager::HandleGetWorkerInfo(rpc::GetWorkerInfoRequest request,
 }
 
 void GcsWorkerManager::HandleGetAllWorkerInfo(
-    rpc::GetAllWorkerInfoRequest request,
-    rpc::GetAllWorkerInfoReply *reply,
+    const rpc::GetAllWorkerInfoRequest &request, rpc::GetAllWorkerInfoReply *reply,
     rpc::SendReplyCallback send_reply_callback) {
-  auto limit = request.has_limit() ? request.limit() : -1;
-
   RAY_LOG(DEBUG) << "Getting all worker info.";
-  auto on_done = [reply, send_reply_callback, limit](
-                     const absl::flat_hash_map<WorkerID, WorkerTableData> &result) {
-    auto total_workers = result.size();
-    reply->set_total(total_workers);
-
-    auto count = 0;
+  auto on_done = [reply, send_reply_callback](
+                     const std::unordered_map<WorkerID, WorkerTableData> &result) {
     for (auto &data : result) {
-      if (limit != -1 && count >= limit) {
-        break;
-      }
-      count += 1;
-
       reply->add_worker_table_data()->CopyFrom(data.second);
     }
     RAY_LOG(DEBUG) << "Finished getting all worker info.";
@@ -156,11 +125,11 @@ void GcsWorkerManager::HandleGetAllWorkerInfo(
   };
   Status status = gcs_table_storage_->WorkerTable().GetAll(on_done);
   if (!status.ok()) {
-    on_done(absl::flat_hash_map<WorkerID, WorkerTableData>());
+    on_done(std::unordered_map<WorkerID, WorkerTableData>());
   }
 }
 
-void GcsWorkerManager::HandleAddWorkerInfo(rpc::AddWorkerInfoRequest request,
+void GcsWorkerManager::HandleAddWorkerInfo(const rpc::AddWorkerInfoRequest &request,
                                            rpc::AddWorkerInfoReply *reply,
                                            rpc::SendReplyCallback send_reply_callback) {
   auto worker_data = std::make_shared<WorkerTableData>();
@@ -168,15 +137,15 @@ void GcsWorkerManager::HandleAddWorkerInfo(rpc::AddWorkerInfoRequest request,
   auto worker_id = WorkerID::FromBinary(worker_data->worker_address().worker_id());
   RAY_LOG(DEBUG) << "Adding worker " << worker_id;
 
-  auto on_done =
-      [worker_id, worker_data, reply, send_reply_callback](const Status &status) {
-        if (!status.ok()) {
-          RAY_LOG(ERROR) << "Failed to add worker information, "
-                         << worker_data->DebugString();
-        }
-        RAY_LOG(DEBUG) << "Finished adding worker " << worker_id;
-        GCS_RPC_SEND_REPLY(send_reply_callback, reply, status);
-      };
+  auto on_done = [worker_id, worker_data, reply,
+                  send_reply_callback](const Status &status) {
+    if (!status.ok()) {
+      RAY_LOG(ERROR) << "Failed to add worker information, "
+                     << worker_data->DebugString();
+    }
+    RAY_LOG(DEBUG) << "Finished adding worker " << worker_id;
+    GCS_RPC_SEND_REPLY(send_reply_callback, reply, status);
+  };
 
   Status status = gcs_table_storage_->WorkerTable().Put(worker_id, *worker_data, on_done);
   if (!status.ok()) {
@@ -188,6 +157,79 @@ void GcsWorkerManager::AddWorkerDeadListener(
     std::function<void(std::shared_ptr<WorkerTableData>)> listener) {
   RAY_CHECK(listener != nullptr);
   worker_dead_listeners_.emplace_back(std::move(listener));
+}
+
+void GcsWorkerManager::Initialize(const GcsInitData &gcs_init_data) {
+  for (auto &entry : gcs_init_data.Workers()) {
+    if (!entry.second.is_alive()) {
+      dead_workers_.emplace(entry.first,
+                            std::make_shared<rpc::WorkerTableData>(entry.second));
+      sorted_dead_worker_list_.emplace_back(entry.first, entry.second.timestamp());
+    }
+  }
+  sorted_dead_worker_list_.sort([](const std::pair<WorkerID, int64_t> &left,
+                                   const std::pair<WorkerID, int64_t> &right) {
+    return left.second < right.second;
+  });
+}
+
+void GcsWorkerManager::AddDeadWorkerToCache(
+    const std::shared_ptr<WorkerTableData> &worker_data) {
+  if (dead_workers_.size() >=
+      RayConfig::instance().maximum_gcs_dead_worker_cached_count()) {
+    EvictOneDeadWorker();
+  }
+  auto worker_id = WorkerID::FromBinary(worker_data->worker_address().worker_id());
+  dead_workers_.emplace(worker_id, worker_data);
+  sorted_dead_worker_list_.emplace_back(worker_id, worker_data->timestamp());
+}
+
+void GcsWorkerManager::EvictOneDeadWorker() {
+  if (!sorted_dead_worker_list_.empty()) {
+    auto iter = sorted_dead_worker_list_.begin();
+    const auto &worker_id = iter->first;
+    RAY_CHECK_OK(gcs_table_storage_->WorkerTable().Delete(worker_id, nullptr));
+    dead_workers_.erase(worker_id);
+    sorted_dead_worker_list_.erase(iter);
+  }
+}
+
+void GcsWorkerManager::EvictExpiredWorkers() {
+  RAY_LOG(INFO) << "Try evicting expired workers, there are "
+                << sorted_dead_worker_list_.size() << " dead workers in the cache.";
+  int evicted_worker_number = 0;
+
+  std::vector<WorkerID> batch_ids;
+  size_t batch_size = RayConfig::instance().gcs_dead_data_max_batch_delete_size();
+  batch_ids.reserve(batch_size);
+  auto current_time_ms = current_sys_time_ms();
+  auto gcs_dead_worker_data_keep_duration_ms =
+      RayConfig::instance().gcs_dead_worker_data_keep_duration_ms();
+  while (!sorted_dead_worker_list_.empty()) {
+    auto timestamp = sorted_dead_worker_list_.begin()->second;
+    if (timestamp + gcs_dead_worker_data_keep_duration_ms > current_time_ms) {
+      break;
+    }
+
+    auto iter = sorted_dead_worker_list_.begin();
+    const auto &worker_id = iter->first;
+    batch_ids.emplace_back(worker_id);
+    dead_workers_.erase(worker_id);
+    sorted_dead_worker_list_.erase(iter);
+    ++evicted_worker_number;
+
+    if (batch_ids.size() == batch_size) {
+      RAY_CHECK_OK(gcs_table_storage_->WorkerTable().BatchDelete(batch_ids, nullptr));
+      batch_ids.clear();
+    }
+  }
+
+  if (!batch_ids.empty()) {
+    RAY_CHECK_OK(gcs_table_storage_->WorkerTable().BatchDelete(batch_ids, nullptr));
+  }
+
+  RAY_LOG(INFO) << evicted_worker_number << " workers are evicted, there are still "
+                << sorted_dead_worker_list_.size() << " dead workers in the cache.";
 }
 
 }  // namespace gcs

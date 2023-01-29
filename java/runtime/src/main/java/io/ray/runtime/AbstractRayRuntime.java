@@ -1,8 +1,5 @@
 package io.ray.runtime;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.ray.api.ActorHandle;
@@ -12,7 +9,6 @@ import io.ray.api.ObjectRef;
 import io.ray.api.PyActorHandle;
 import io.ray.api.WaitResult;
 import io.ray.api.concurrencygroup.ConcurrencyGroup;
-import io.ray.api.exception.RuntimeEnvException;
 import io.ray.api.function.CppActorClass;
 import io.ray.api.function.CppActorMethod;
 import io.ray.api.function.CppFunction;
@@ -24,14 +20,13 @@ import io.ray.api.function.RayFuncR;
 import io.ray.api.id.ActorId;
 import io.ray.api.id.ObjectId;
 import io.ray.api.id.PlacementGroupId;
+import io.ray.api.options.ActorCallOptions;
 import io.ray.api.options.ActorCreationOptions;
 import io.ray.api.options.CallOptions;
 import io.ray.api.options.PlacementGroupCreationOptions;
-import io.ray.api.parallelactor.ParallelActorContext;
+import io.ray.api.placementgroup.Bundle;
 import io.ray.api.placementgroup.PlacementGroup;
-import io.ray.api.runtime.RayRuntime;
 import io.ray.api.runtimecontext.RuntimeContext;
-import io.ray.api.runtimeenv.RuntimeEnv;
 import io.ray.runtime.config.RayConfig;
 import io.ray.runtime.config.RunMode;
 import io.ray.runtime.context.RuntimeContextImpl;
@@ -41,26 +36,27 @@ import io.ray.runtime.functionmanager.FunctionDescriptor;
 import io.ray.runtime.functionmanager.FunctionManager;
 import io.ray.runtime.functionmanager.PyFunctionDescriptor;
 import io.ray.runtime.functionmanager.RayFunction;
-import io.ray.runtime.gcs.GcsClient;
+import io.ray.runtime.generated.Common;
 import io.ray.runtime.generated.Common.Language;
 import io.ray.runtime.object.ObjectRefImpl;
 import io.ray.runtime.object.ObjectStore;
-import io.ray.runtime.runtimeenv.RuntimeEnvImpl;
 import io.ray.runtime.task.ArgumentsBuilder;
 import io.ray.runtime.task.FunctionArg;
 import io.ray.runtime.task.TaskExecutor;
 import io.ray.runtime.task.TaskSubmitter;
 import io.ray.runtime.util.ConcurrencyGroupUtils;
-import io.ray.runtime.utils.parallelactor.ParallelActorContextImpl;
+import io.ray.runtime.util.ResourceUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Core functionality to implement Ray APIs. */
-public abstract class AbstractRayRuntime implements RayRuntime {
+public abstract class AbstractRayRuntime implements RayRuntimeInternal {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRayRuntime.class);
   public static final String PYTHON_INIT_METHOD_NAME = "__init__";
@@ -73,12 +69,13 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   protected TaskSubmitter taskSubmitter;
   protected WorkerContext workerContext;
 
-  private static ParallelActorContextImpl parallelActorContextImpl = new ParallelActorContextImpl();
-
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  /** Whether the required thread context is set on the current thread. */
+  final ThreadLocal<Boolean> isContextSet = ThreadLocal.withInitial(() -> false);
 
   public AbstractRayRuntime(RayConfig rayConfig) {
     this.rayConfig = rayConfig;
+    setIsContextSet(rayConfig.workerMode == Common.WorkerType.DRIVER);
+    functionManager = new FunctionManager(rayConfig.codeSearchPath);
     runtimeContext = new RuntimeContextImpl(this);
   }
 
@@ -88,31 +85,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       LOGGER.debug("Putting Object in Task {}.", workerContext.getCurrentTaskId());
     }
     ObjectId objectId = objectStore.put(obj);
-    return new ObjectRefImpl<T>(
-        objectId,
-        (Class<T>) (obj == null ? Object.class : obj.getClass()),
-        /*skipAddingLocalRef=*/ true);
-  }
-
-  public abstract GcsClient getGcsClient();
-
-  public abstract void start();
-
-  public abstract void run();
-
-  @Override
-  public <T> ObjectRef<T> put(T obj, BaseActorHandle ownerActor) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(
-          "Putting an object in task {} with {} as the owner.",
-          workerContext.getCurrentTaskId(),
-          ownerActor.getId());
-    }
-    ObjectId objectId = objectStore.put(obj, ownerActor.getId());
-    return new ObjectRefImpl<T>(
-        objectId,
-        (Class<T>) (obj == null ? Object.class : obj.getClass()),
-        /*skipAddingLocalRef=*/ true);
+    return new ObjectRefImpl<T>(objectId, (Class<T>) (obj == null ? Object.class : obj.getClass()));
   }
 
   @Override
@@ -142,6 +115,12 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     }
     LOGGER.debug("Getting Objects {}.", objectIds);
     return objectStore.get(objectIds, objectType, timeoutMs);
+  }
+
+  // ANT-INTERNAL: for RayaG compatibility. Should be removed in ant-ray 1.2
+  @Override
+  public void free(List<ObjectRef<?>> objectRefs, boolean localOnly, boolean deleteCreatingTasks) {
+    free(objectRefs, localOnly);
   }
 
   @Override
@@ -179,6 +158,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   public ObjectRef call(PyFunction pyFunction, Object[] args, CallOptions options) {
     PyFunctionDescriptor functionDescriptor =
         new PyFunctionDescriptor(pyFunction.moduleName, "", pyFunction.functionName);
+    // Python functions always have a return value, even if it's `None`.
     return callNormalFunction(
         functionDescriptor, args, /*returnType=*/ Optional.of(pyFunction.returnType), options);
   }
@@ -187,13 +167,14 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   public ObjectRef call(CppFunction cppFunction, Object[] args, CallOptions options) {
     CppFunctionDescriptor functionDescriptor =
         new CppFunctionDescriptor(cppFunction.functionName, "JAVA", "");
+    // Python functions always have a return value, even if it's `None`.
     return callNormalFunction(
         functionDescriptor, args, /*returnType=*/ Optional.of(cppFunction.returnType), options);
   }
 
   @Override
   public ObjectRef callActor(
-      ActorHandle<?> actor, RayFunc func, Object[] args, CallOptions options) {
+      ActorHandle<?> actor, RayFunc func, Object[] args, ActorCallOptions options) {
     RayFunction rayFunction = functionManager.getFunction(func);
     FunctionDescriptor functionDescriptor = rayFunction.functionDescriptor;
     Optional<Class<?>> returnType = rayFunction.getReturnType();
@@ -201,29 +182,35 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   }
 
   @Override
-  public ObjectRef callActor(PyActorHandle pyActor, PyActorMethod pyActorMethod, Object... args) {
+  public ObjectRef callActor(
+      PyActorHandle pyActor, PyActorMethod pyActorMethod, Object[] args, ActorCallOptions options) {
     PyFunctionDescriptor functionDescriptor =
         new PyFunctionDescriptor(
             pyActor.getModuleName(), pyActor.getClassName(), pyActorMethod.methodName);
+    // Python functions always have a return value, even if it's `None`.
     return callActorFunction(
         pyActor,
         functionDescriptor,
         args,
         /*returnType=*/ Optional.of(pyActorMethod.returnType),
-        new CallOptions.Builder().build());
+        options);
   }
 
   @Override
   public ObjectRef callActor(
-      CppActorHandle cppActor, CppActorMethod cppActorMethod, Object[] args) {
+      CppActorHandle cppActor,
+      CppActorMethod cppActorMethod,
+      Object[] args,
+      ActorCallOptions options) {
     CppFunctionDescriptor functionDescriptor =
         new CppFunctionDescriptor(cppActorMethod.methodName, "JAVA", cppActor.getClassName());
+    // Cpp functions always have a return value, even if it's `None`.
     return callActorFunction(
         cppActor,
         functionDescriptor,
         args,
         /*returnType=*/ Optional.of(cppActorMethod.returnType),
-        new CallOptions.Builder().build());
+        options);
   }
 
   @Override
@@ -249,7 +236,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       CppActorClass cppActorClass, Object[] args, ActorCreationOptions options) {
     CppFunctionDescriptor functionDescriptor =
         new CppFunctionDescriptor(
-            cppActorClass.createFunctionName, "JAVA", cppActorClass.className);
+            cppActorClass.createFunctionName, "PYTHON", cppActorClass.className);
     return (CppActorHandle) createActorImpl(functionDescriptor, args, options);
   }
 
@@ -258,6 +245,12 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     Preconditions.checkNotNull(
         creationOptions,
         "`PlacementGroupCreationOptions` must be specified when creating a new placement group.");
+
+    // Convert unit if memory resource specified.
+    for (Map<String, Double> resources : creationOptions.bundles) {
+      ResourceUtil.checkMemoryResourceAndConvertToUnit(resources);
+    }
+
     return taskSubmitter.createPlacementGroup(creationOptions);
   }
 
@@ -284,14 +277,52 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   }
 
   @Override
-  public boolean waitPlacementGroupReady(PlacementGroupId id, int timeoutSeconds) {
-    return taskSubmitter.waitPlacementGroupReady(id, timeoutSeconds);
+  public boolean waitPlacementGroupReady(PlacementGroupId id, int timeoutMs) {
+    return taskSubmitter.waitPlacementGroupReady(id, timeoutMs);
+  }
+
+  @Override
+  public void addBundlesForPlacementGroup(PlacementGroupId id, List<Bundle> bundles) {
+    for (Bundle bundle : bundles) {
+      ResourceUtil.checkMemoryResourceAndConvertToUnit(bundle.resources);
+    }
+    taskSubmitter.addBundlesForPlacementGroup(id, bundles);
+  }
+
+  @Override
+  public void removeBundlesForPlacementGroup(PlacementGroupId id, List<Integer> bundleIndexes) {
+    taskSubmitter.removeBundlesForPlacementGroup(id, bundleIndexes);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T extends BaseActorHandle> T getActorHandle(ActorId actorId) {
     return (T) taskSubmitter.getActor(actorId);
+  }
+
+  @Override
+  public void setAsyncContext(Object asyncContext) {
+    isContextSet.set(true);
+  }
+
+  @Override
+  public final Runnable wrapRunnable(Runnable runnable) {
+    Object asyncContext = getAsyncContext();
+    return () -> {
+      try (RayAsyncContextUpdater updater = new RayAsyncContextUpdater(asyncContext, this)) {
+        runnable.run();
+      }
+    };
+  }
+
+  @Override
+  public final <T> Callable<T> wrapCallable(Callable<T> callable) {
+    Object asyncContext = getAsyncContext();
+    return () -> {
+      try (RayAsyncContextUpdater updater = new RayAsyncContextUpdater(asyncContext, this)) {
+        return callable.call();
+      }
+    };
   }
 
   @Override
@@ -306,24 +337,8 @@ public abstract class AbstractRayRuntime implements RayRuntime {
   }
 
   @Override
-  public ParallelActorContext getParallelActorContext() {
-    return parallelActorContextImpl;
-  }
-
-  @Override
-  public RuntimeEnv createRuntimeEnv() {
-    return new RuntimeEnvImpl();
-  }
-
-  @Override
-  public RuntimeEnv deserializeRuntimeEnv(String serializedRuntimeEnv) throws RuntimeEnvException {
-    RuntimeEnvImpl runtimeEnv = new RuntimeEnvImpl();
-    try {
-      runtimeEnv.runtimeEnvs = (ObjectNode) MAPPER.readTree(serializedRuntimeEnv);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    return runtimeEnv;
+  public String getApiServerAddress() {
+    return getGcsClient().getApiServerAddress();
   }
 
   private ObjectRef callNormalFunction(
@@ -331,7 +346,8 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       Object[] args,
       Optional<Class<?>> returnType,
       CallOptions options) {
-    int numReturns = returnType.isPresent() ? 1 : 0;
+    final boolean ignoreReturn = (options != null && options.ignoreReturn);
+    int numReturns = (returnType.isPresent() && !ignoreReturn) ? 1 : 0;
     List<FunctionArg> functionArgs = ArgumentsBuilder.wrap(args, functionDescriptor.getLanguage());
     if (options == null) {
       options = new CallOptions.Builder().build();
@@ -351,7 +367,7 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     if (returnIds.isEmpty()) {
       return null;
     } else {
-      impl.init(returnIds.get(0), returnType.get(), /*skipAddingLocalRef=*/ true);
+      impl.init(returnIds.get(0), returnType.get());
       return impl;
     }
   }
@@ -361,13 +377,13 @@ public abstract class AbstractRayRuntime implements RayRuntime {
       FunctionDescriptor functionDescriptor,
       Object[] args,
       Optional<Class<?>> returnType,
-      CallOptions options) {
-    int numReturns = returnType.isPresent() ? 1 : 0;
+      ActorCallOptions options) {
+    final boolean ignoreReturn = (options != null && options.ignoreReturn);
+    int numReturns = (returnType.isPresent() && !ignoreReturn) ? 1 : 0;
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Submitting Actor Task {}.", functionDescriptor);
+      LOGGER.debug("Submitting actor task {}.", functionDescriptor);
     }
     List<FunctionArg> functionArgs = ArgumentsBuilder.wrap(args, functionDescriptor.getLanguage());
-
     ObjectRefImpl<?> impl = new ObjectRefImpl<>();
     /// Mapping the object id to the object ref.
     List<ObjectId> preparedReturnIds = getCurrentReturnIds(numReturns, rayActor.getId());
@@ -377,16 +393,23 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     List<ObjectId> returnIds =
         taskSubmitter.submitActorTask(
             rayActor, functionDescriptor, functionArgs, numReturns, options);
-    Preconditions.checkState(returnIds.size() == numReturns);
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Finished submitting actor task {}.", functionDescriptor);
+    }
+
     if (returnIds.isEmpty()) {
       return null;
     } else {
+      Preconditions.checkState(returnIds.size() == numReturns);
       validatePreparedReturnIds(preparedReturnIds, returnIds);
-      impl.init(returnIds.get(0), returnType.get(), /*skipAddingLocalRef=*/ true);
+      impl.init(returnIds.get(0), returnType.get());
       return impl;
     }
   }
 
+  // This method will be invoked by com.alipay.streaming.runtime.utils.TideCallUtil.
+  // Keep this in sync with TideCallUtil.
   private BaseActorHandle createActorImpl(
       FunctionDescriptor functionDescriptor, Object[] args, ActorCreationOptions options) {
     if (LOGGER.isDebugEnabled()) {
@@ -396,7 +419,8 @@ public abstract class AbstractRayRuntime implements RayRuntime {
         LOGGER.debug("Creating Actor {}, jvmOptions = {}.", functionDescriptor, options.jvmOptions);
       }
     }
-    if (rayConfig.runMode == RunMode.LOCAL && functionDescriptor.getLanguage() != Language.JAVA) {
+    if (rayConfig.runMode == RunMode.SINGLE_PROCESS
+        && functionDescriptor.getLanguage() != Language.JAVA) {
       throw new IllegalArgumentException(
           "Ray doesn't support cross-language invocation in local mode.");
     }
@@ -405,29 +429,102 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     if (functionDescriptor.getLanguage() != Language.JAVA && options != null) {
       Preconditions.checkState(options.jvmOptions == null || options.jvmOptions.size() == 0);
     }
+    if (options == null) {
+      options = new ActorCreationOptions.Builder().build();
+    } else {
+      if (rayConfig.gcsTaskSchedulingEnabled) {
+        options.jvmOptions.forEach(option -> Preconditions.checkArgument(option != null));
+      }
+
+      if (options.memoryMb > 0) {
+        if (rayConfig.gcsTaskSchedulingEnabled) {
+          options.resources.put("memory", (double) options.memoryMb * 1024 * 1024);
+        } else {
+          if (functionDescriptor.getLanguage() == Language.JAVA) {
+            // direct : xmx : native = 1 : 8 : 1
+            // xmx : xms : xmn = 2 : 1 : 1
+            // We don't limit native memory for now as there's no easy way to implement.
+            long directMemory = options.memoryMb / 10;
+            long xmx = 8 * directMemory;
+            long xms = xmx / 2;
+            long xmn = xmx / 2;
+            options.jvmOptions.add("-Xmx" + xmx + "m");
+            options.jvmOptions.add("-Xms" + xms + "m");
+            options.jvmOptions.add("-Xmn" + xmn + "m");
+            options.jvmOptions.add("-XX:MaxDirectMemorySize=" + directMemory + "m");
+            options.jvmOptions.add("-Xss512k");
+            options.jvmOptions.add("-Dray.maximum-memory-mb=" + options.memoryMb + "m");
+          } else {
+            LOGGER.warn(
+                "The options.memoryMb will affect nothing, language = {}",
+                functionDescriptor.getLanguage());
+          }
+        }
+      }
+    }
+
+    if (options.lifetime == null) {
+      LOGGER.debug(
+          "This actor is not specified lifetime, set a default value: {}",
+          rayConfig.defaultActorLifetime);
+      options.lifetime = rayConfig.defaultActorLifetime;
+    }
 
     BaseActorHandle actor = taskSubmitter.createActor(functionDescriptor, functionArgs, options);
     return actor;
   }
 
+  /// An auto closable class that is used for updating the async context when invoking Ray APIs.
+  private static final class RayAsyncContextUpdater implements AutoCloseable {
+
+    private AbstractRayRuntime runtime;
+
+    private boolean oldIsContextSet;
+
+    private Object oldAsyncContext = null;
+
+    public RayAsyncContextUpdater(Object asyncContext, AbstractRayRuntime runtime) {
+      this.runtime = runtime;
+      oldIsContextSet = runtime.isContextSet.get();
+      if (oldIsContextSet) {
+        oldAsyncContext = runtime.getAsyncContext();
+      }
+      runtime.setAsyncContext(asyncContext);
+    }
+
+    @Override
+    public void close() {
+      if (oldIsContextSet) {
+        runtime.setAsyncContext(oldAsyncContext);
+      } else {
+        runtime.setIsContextSet(false);
+      }
+    }
+  }
+
   abstract List<ObjectId> getCurrentReturnIds(int numReturns, ActorId actorId);
 
+  @Override
   public WorkerContext getWorkerContext() {
     return workerContext;
   }
 
+  @Override
   public ObjectStore getObjectStore() {
     return objectStore;
   }
 
+  @Override
   public TaskExecutor getTaskExecutor() {
     return taskExecutor;
   }
 
+  @Override
   public FunctionManager getFunctionManager() {
     return functionManager;
   }
 
+  @Override
   public RayConfig getRayConfig() {
     return rayConfig;
   }
@@ -436,7 +533,14 @@ public abstract class AbstractRayRuntime implements RayRuntime {
     return runtimeContext;
   }
 
-  /// A helper to validate if the prepared return ids is as expected.
+  @Override
+  public void setIsContextSet(boolean isContextSet) {
+    this.isContextSet.set(isContextSet);
+  }
+
+  /// ANT-INTERNAL
+  ///
+  /// Validate if the prepared return ids is as expected.
   void validatePreparedReturnIds(List<ObjectId> preparedReturnIds, List<ObjectId> realReturnIds) {
     if (rayConfig.runMode == RunMode.CLUSTER) {
       Preconditions.checkState(realReturnIds.size() == preparedReturnIds.size());

@@ -1,8 +1,8 @@
 package io.ray.api.call;
 
 import io.ray.api.options.CallOptions;
+import io.ray.api.options.SchedulingStrategy;
 import io.ray.api.placementgroup.PlacementGroup;
-import io.ray.api.runtimeenv.RuntimeEnv;
 import java.util.Map;
 
 /**
@@ -12,6 +12,20 @@ import java.util.Map;
  */
 public class BaseTaskCaller<T extends BaseTaskCaller<T>> {
   private CallOptions.Builder builder = new CallOptions.Builder();
+
+  /**
+   * Set the memory resource requirement for resource. It will assign a sole worker process for this
+   * task if this method is called. This method can be called multiple times. If the same resource
+   * is set multiple times, the latest quantity will be used.
+   *
+   * @param value memory size in mb
+   * @return self
+   * @see CallOptions.Builder#setMemoryMb(long)
+   */
+  public T setMemoryMb(long value) {
+    builder.setMemoryMb(value);
+    return self();
+  }
 
   /**
    * Set a name for this task.
@@ -52,6 +66,11 @@ public class BaseTaskCaller<T extends BaseTaskCaller<T>> {
     return self();
   }
 
+  public T setIgnoreReturn(boolean returnVoid) {
+    builder.setIgnoreReturn(returnVoid);
+    return self();
+  }
+
   /**
    * Set the placement group to place this task in.
    *
@@ -66,24 +85,15 @@ public class BaseTaskCaller<T extends BaseTaskCaller<T>> {
   }
 
   /**
-   * Set the placement group to place this task in, which may use any available bundle.
+   * Set scheduling strategy.
    *
-   * @param group The placement group of the task.
-   * @return self
-   * @see CallOptions.Builder#setPlacementGroup(PlacementGroup, int)
-   */
-  public T setPlacementGroup(PlacementGroup group) {
-    return setPlacementGroup(group, -1);
-  }
-
-  /**
-   * Set the runtime env for this task to run the task in a specific environment.
+   * <p>If placement group is set, actor/node affinity scheduling strategy can't be set.
    *
-   * @param runtimeEnv The runtime env of this task.
+   * @param schedulingStrategy a specific scheduling strategy.
    * @return self
    */
-  public T setRuntimeEnv(RuntimeEnv runtimeEnv) {
-    builder.setRuntimeEnv(runtimeEnv);
+  public T setSchedulingStrategy(SchedulingStrategy schedulingStrategy) {
+    builder.setSchedulingStrategy(schedulingStrategy);
     return self();
   }
 

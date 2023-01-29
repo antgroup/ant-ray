@@ -1,21 +1,9 @@
-// Copyright 2020-2021 The Ray Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 syntax = "proto3";
 option cc_enable_arenas = true;
 
 package ray.rpc;
+
+option java_package = "io.ray.runtime.generated";
 
 message Event {
   enum SourceType {
@@ -26,9 +14,7 @@ message Event {
     CORE_WORKER = 1;
     GCS = 2;
     RAYLET = 3;
-    CLUSTER_LIFECYCLE = 4;
-    AUTOSCALER = 5;
-    JOBS = 6;
+    EXTERNAL = 4;
   }
 
   enum Severity {
@@ -53,20 +39,47 @@ message Event {
   string label = 6;
   // message is main information of this event
   string message = 7;
-  // timestamp is the report millionseconds since 00:00, Jan 1 1970 UTC
+  // timestamp is the report in seconds since 00:00, Jan 1 1970 UTC
   int64 timestamp = 8;
   // store custom key such as node_id, job_id, task_id
   map<string, string> custom_fields = 9;
 }
 
 message ReportEventsReply {
-  bool send_success = 1;
+  bool send_sucess = 1;
 }
 
 message ReportEventsRequest {
-  repeated string event_strings = 1;
+  repeated Event event_objects = 1;
+  repeated string event_strings = 2;
 }
 
 service ReportEventService {
   rpc ReportEvents(ReportEventsRequest) returns (ReportEventsReply);
+}
+
+message SyncEventsRequest {
+  string report_address = 2;
+}
+
+message SyncEventsReply {
+}
+
+message CheckJavaHsErrLogRequest {
+  string log_path = 1;
+  string job_id = 2;
+  string job_name = 3;
+  string worker_id = 4;
+  string actor_id = 5;
+  int32 pid = 6;
+  string ip = 7;
+  bool is_driver = 8;
+}
+
+message CheckJavaHsErrLogReply {
+}
+
+service EventService {
+  rpc SyncEvents(SyncEventsRequest) returns (SyncEventsReply);
+  rpc CheckJavaHsErrLog(CheckJavaHsErrLogRequest) returns (CheckJavaHsErrLogReply);
 }

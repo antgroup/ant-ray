@@ -1,13 +1,14 @@
 import ray
 import os
 import time
+import ray.test_utils
 import signal
 import sys
 import pytest
 
 from ray.job_config import JobConfig
 
-from ray._private.test_utils import (
+from ray.test_utils import (
     wait_for_condition,
     wait_for_pid_to_exit,
 )
@@ -17,8 +18,12 @@ from ray.exceptions import RayActorError
 SIGKILL = signal.SIGKILL if sys.platform != "win32" else signal.SIGTERM
 
 
-@pytest.mark.parametrize("default_actor_lifetime", ["detached", "non_detached"])
-@pytest.mark.parametrize("child_actor_lifetime", [None, "detached", "non_detached"])
+@pytest.mark.parametrize(
+    "default_actor_lifetime,child_actor_lifetime",
+    [(None, None), (None, "detached"), (None, "non-detached"),
+     ("detached", None), ("detached", "detached"),
+     ("detached", "non-detached"), ("non-detached", None),
+     ("non-detached", "detached"), ("non-detached", "non-detached")])
 def test_default_actor_lifetime(default_actor_lifetime, child_actor_lifetime):
     @ray.remote
     class OwnerActor:
@@ -27,8 +32,7 @@ def test_default_actor_lifetime(default_actor_lifetime, child_actor_lifetime):
                 self._child_actor = ChildActor.remote()
             else:
                 self._child_actor = ChildActor.options(
-                    lifetime=child_actor_lifetime
-                ).remote()
+                    lifetime=child_actor_lifetime).remote()
             assert "ok" == ray.get(self._child_actor.ready.remote())
             return self._child_actor
 
@@ -44,7 +48,9 @@ def test_default_actor_lifetime(default_actor_lifetime, child_actor_lifetime):
             return "ok"
 
     if default_actor_lifetime is not None:
-        ray.init(job_config=JobConfig(default_actor_lifetime=default_actor_lifetime))
+        ray.init(
+            job_config=JobConfig(
+                default_actor_lifetime=default_actor_lifetime))
     else:
         ray.init()
 
@@ -58,24 +64,36 @@ def test_default_actor_lifetime(default_actor_lifetime, child_actor_lifetime):
     wait_for_pid_to_exit(owner_pid)
 
     # 3. Assert child state.
+    def _assert_child_actor_still_alive():
+        time.sleep(4)
+        assert "ok" == ray.get(child.ready.remote())
 
-    def is_child_actor_dead():
-        try:
-            ray.get(child.ready.remote())
-            return False
-        except RayActorError:
-            return True
+    def _assert_child_actor_is_dead():
+        def is_dead():
+            try:
+                ray.get(child.ready.remote())
+                return False
+            except RayActorError:
+                return True
 
-    actual_lifetime = default_actor_lifetime
+        wait_for_condition(is_dead, timeout=5)
+
     if child_actor_lifetime is not None:
-        actual_lifetime = child_actor_lifetime
-
-    assert actual_lifetime is not None
-    if actual_lifetime == "detached":
-        time.sleep(5)
-        assert not is_child_actor_dead()
+        # child_actor_lifetime is specifying at runtime.
+        if child_actor_lifetime == "detached":
+            _assert_child_actor_still_alive()
+        else:
+            _assert_child_actor_is_dead()
     else:
-        wait_for_condition(is_child_actor_dead, timeout=5)
+        # Code path of not specifying child_actor_lifetime, so it's
+        # depends on the default actor lifetime.
+        if default_actor_lifetime is None:
+            _assert_child_actor_is_dead()
+        elif default_actor_lifetime == "detached":
+            _assert_child_actor_still_alive()
+        else:
+            # It's not detached, the child should be dead.
+            _assert_child_actor_is_dead()
 
     ray.shutdown()
 
@@ -83,8 +101,4 @@ def test_default_actor_lifetime(default_actor_lifetime, child_actor_lifetime):
 if __name__ == "__main__":
     import pytest
     import sys
-
-    if os.environ.get("PARALLEL_CI"):
-        sys.exit(pytest.main(["-n", "auto", "--boxed", "-vs", __file__]))
-    else:
-        sys.exit(pytest.main(["-sv", __file__]))
+    sys.exit(pytest.main(["-v", __file__]))

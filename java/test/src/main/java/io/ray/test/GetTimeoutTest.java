@@ -43,7 +43,14 @@ public class GetTimeoutTest extends BaseTest {
     }
   }
 
-  public void testActorTaskGetTimeout() {
+  private void checkTimeout(long startTime, long timeout) {
+    long waitTime = System.currentTimeMillis() - startTime;
+    System.out.printf("Except wait %d ms, actual spend %d ms.%n", timeout, waitTime);
+    Assert.assertTrue(Math.abs(waitTime - timeout) < 1500);
+  }
+
+  @Test
+  public void testActorGetTimeout() {
     ActorHandle<Counter> actor = Ray.actor(Counter::new, 1).remote();
     Assert.assertEquals(Integer.valueOf(1), actor.task(Counter::getValueDelay).remote().get());
     Assert.assertEquals(Integer.valueOf(1), actor.task(Counter::getValueDelay).remote().get(10000));
@@ -53,11 +60,11 @@ public class GetTimeoutTest extends BaseTest {
     Assert.assertThrows(
         RayTimeoutException.class,
         () -> Ray.get(actor.task(Counter::getValueDelay).remote(), timeout));
-    long waitTime = System.currentTimeMillis() - startTime;
-    Assert.assertTrue(Math.abs(waitTime - timeout) < 1500);
+    checkTimeout(startTime, timeout);
   }
 
-  public void testNormalTaskGetTimeout() {
+  @Test
+  public void testFuncGetTimeout() {
     List<ObjectRef<Integer>> objectRefList = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
       objectRefList.add(Ray.task(GetTimeoutTest::squareDelay, i).remote());
@@ -65,12 +72,12 @@ public class GetTimeoutTest extends BaseTest {
     long startTime = System.currentTimeMillis();
     long timeout = 2000;
     Assert.assertThrows(RayTimeoutException.class, () -> Ray.get(objectRefList, timeout));
-    long waitTime = System.currentTimeMillis() - startTime;
-    Assert.assertTrue(Math.abs(waitTime - timeout) < 1500);
+    checkTimeout(startTime, timeout);
     Assert.assertEquals(Ray.get(objectRefList, 10000).toArray(), new int[] {0, 1, 4, 9});
     Assert.assertEquals(Ray.get(objectRefList).toArray(), new int[] {0, 1, 4, 9});
   }
 
+  @Test
   public void testObjectGetTimeout() {
     int y = 1;
     ObjectRef<Integer> objectRef = Ray.put(y);

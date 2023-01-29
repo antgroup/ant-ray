@@ -10,7 +10,7 @@ import io.ray.api.function.PyActorMethod;
  *
  * @param <R> The type of the python actor method return value
  */
-public class PyActorTaskCaller<R> {
+public class PyActorTaskCaller<R> extends BaseActorTaskCaller<PyActorTaskCaller<R>> {
   private final PyActorHandle actor;
   private final PyActorMethod<R> method;
   private final Object[] args;
@@ -29,6 +29,6 @@ public class PyActorTaskCaller<R> {
    */
   @SuppressWarnings("unchecked")
   public ObjectRef<R> remote() {
-    return Ray.internal().callActor(actor, method, args);
+    return Ray.internal().callActor(actor, method, args, buildOptions());
   }
 }

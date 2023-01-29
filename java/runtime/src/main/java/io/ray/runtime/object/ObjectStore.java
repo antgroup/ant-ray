@@ -4,8 +4,8 @@ import com.google.common.base.Preconditions;
 import io.ray.api.ObjectRef;
 import io.ray.api.WaitResult;
 import io.ray.api.exception.RayException;
-import io.ray.api.id.ActorId;
 import io.ray.api.id.ObjectId;
+import io.ray.api.id.UniqueId;
 import io.ray.runtime.context.WorkerContext;
 import io.ray.runtime.generated.Common.Address;
 import java.util.ArrayList;
@@ -32,16 +32,6 @@ public abstract class ObjectStore {
   public abstract ObjectId putRaw(NativeRayObject obj);
 
   /**
-   * Put a raw object into object store, and assign its ownership to the actor identified by
-   * ownerActorId.
-   *
-   * @param obj The ray object.
-   * @param ownerActorId The id of the actor to assign ownership.
-   * @return Generated ID of the object.
-   */
-  public abstract ObjectId putRaw(NativeRayObject obj, ActorId ownerActorId);
-
-  /**
    * Put a raw object with specified ID into object store.
    *
    * @param obj The ray object.
@@ -61,22 +51,6 @@ public abstract class ObjectStore {
           "Trying to put a NativeRayObject. Please use putRaw instead.");
     }
     return putRaw(ObjectSerializer.serialize(object));
-  }
-
-  /**
-   * Serialize and put an object to the object store, and assign its ownership to the actor
-   * identified by ownerActorId.
-   *
-   * @param object The object to put.
-   * @param ownerActorId The id of the actor to assign ownership.
-   * @return Id of the object.
-   */
-  public ObjectId put(Object object, ActorId ownerActorId) {
-    if (object instanceof NativeRayObject) {
-      throw new IllegalArgumentException(
-          "Trying to put a NativeRayObject. Please use putRaw instead.");
-    }
-    return putRaw(ObjectSerializer.serialize(object), ownerActorId);
   }
 
   /**
@@ -221,26 +195,28 @@ public abstract class ObjectStore {
   /**
    * Increase the local reference count for this object ID.
    *
+   * @param workerId The ID of the worker to increase on.
    * @param objectId The object ID to increase the reference count for.
    */
-  public abstract void addLocalReference(ObjectId objectId);
+  public abstract void addLocalReference(UniqueId workerId, ObjectId objectId);
 
   /**
    * Decrease the reference count for this object ID.
    *
+   * @param workerId The ID of the worker to decrease on.
    * @param objectId The object ID to decrease the reference count for.
    */
-  public abstract void removeLocalReference(ObjectId objectId);
+  public abstract void removeLocalReference(UniqueId workerId, ObjectId objectId);
 
   public abstract Address getOwnerAddress(ObjectId id);
 
   /**
-   * Get the ownership info.
+   * Promote the given object to the underlying object store, and get the ownership info.
    *
    * @param objectId The ID of the object to promote
    * @return the serialized ownership address
    */
-  public abstract byte[] getOwnershipInfo(ObjectId objectId);
+  public abstract byte[] promoteAndGetOwnershipInfo(ObjectId objectId);
 
   /**
    * Add a reference to an ObjectID that will deserialized. This will also start the process to

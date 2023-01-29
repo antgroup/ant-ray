@@ -131,7 +131,6 @@ public class RayCallGenerator extends BaseGenerator {
     return sb.toString();
   }
 
-  /** Returns Whole file content of `CppActorCall.java`. */
   private String generateCppActorCallDotJava() {
     sb = new StringBuilder();
 

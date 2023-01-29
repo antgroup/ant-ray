@@ -1,7 +1,7 @@
 # flake8: noqa
 # Original Code: https://github.com/pytorch/examples/blob/master/mnist/main.py
 
-# fmt: off
+# yapf: disable
 # __tutorial_imports_begin__
 import numpy as np
 import torch
@@ -11,13 +11,13 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 
-from ray import air, tune
+from ray import tune
 from ray.tune.schedulers import ASHAScheduler
 # __tutorial_imports_end__
-# fmt: on
+# yapf: enable
 
 
-# fmt: off
+# yapf: disable
 # __model_def_begin__
 class ConvNet(nn.Module):
     def __init__(self):
@@ -33,9 +33,9 @@ class ConvNet(nn.Module):
         x = self.fc(x)
         return F.log_softmax(x, dim=1)
 # __model_def_end__
-# fmt: on
+# yapf: enable
 
-# fmt: off
+# yapf: disable
 # __train_def_begin__
 
 # Change these values if you want the training to run quicker or slower.
@@ -111,12 +111,12 @@ def train_mnist(config):
             # This saves the model to the trial directory
             torch.save(model.state_dict(), "./model.pth")
 # __train_func_end__
-# fmt: on
+# yapf: enable
 
 # __eval_func_begin__
 search_space = {
-    "lr": tune.sample_from(lambda spec: 10 ** (-10 * np.random.rand())),
-    "momentum": tune.uniform(0.1, 0.9),
+    "lr": tune.sample_from(lambda spec: 10**(-10 * np.random.rand())),
+    "momentum": tune.uniform(0.1, 0.9)
 }
 
 # Uncomment this to enable distributed execution
@@ -125,61 +125,46 @@ search_space = {
 # Download the dataset first
 datasets.MNIST("~/data", train=True, download=True)
 
-tuner = tune.Tuner(
-    train_mnist,
-    param_space=search_space,
-)
-results = tuner.fit()
+analysis = tune.run(train_mnist, config=search_space)
 # __eval_func_end__
 
-# __plot_begin__
-dfs = {result.log_dir: result.metrics_dataframe for result in results}
+#__plot_begin__
+dfs = analysis.trial_dataframes
 [d.mean_accuracy.plot() for d in dfs.values()]
-# __plot_end__
+#__plot_end__
 
 # __run_scheduler_begin__
-tuner = tune.Tuner(
+analysis = tune.run(
     train_mnist,
-    tune_config=tune.TuneConfig(
-        num_samples=20,
-        scheduler=ASHAScheduler(metric="mean_accuracy", mode="max"),
-    ),
-    param_space=search_space,
-)
-results = tuner.fit()
+    num_samples=20,
+    scheduler=ASHAScheduler(metric="mean_accuracy", mode="max"),
+    config=search_space)
 
 # Obtain a trial dataframe from all run trials of this `tune.run` call.
-dfs = {result.log_dir: result.metrics_dataframe for result in results}
+dfs = analysis.trial_dataframes
 # __run_scheduler_end__
 
-# fmt: off
+# yapf: disable
 # __plot_scheduler_begin__
 # Plot by epoch
 ax = None  # This plots everything on the same plot
 for d in dfs.values():
     ax = d.mean_accuracy.plot(ax=ax, legend=False)
 # __plot_scheduler_end__
-# fmt: on
+# yapf: enable
 
 # __run_searchalg_begin__
 from hyperopt import hp
-from ray.tune.search.hyperopt import HyperOptSearch
+from ray.tune.suggest.hyperopt import HyperOptSearch
 
 space = {
-    "lr": hp.loguniform("lr", -10, -1),
+    "lr": hp.loguniform("lr", 1e-10, 0.1),
     "momentum": hp.uniform("momentum", 0.1, 0.9),
 }
 
 hyperopt_search = HyperOptSearch(space, metric="mean_accuracy", mode="max")
 
-tuner = tune.Tuner(
-    train_mnist,
-    tune_config=tune.TuneConfig(
-        num_samples=10,
-        search_alg=hyperopt_search,
-    ),
-)
-results = tuner.fit()
+analysis = tune.run(train_mnist, num_samples=10, search_alg=hyperopt_search)
 
 # To enable GPUs, use this instead:
 # analysis = tune.run(
@@ -190,7 +175,8 @@ results = tuner.fit()
 # __run_analysis_begin__
 import os
 
-logdir = results.get_best_result("mean_accuracy", mode="max").log_dir
+df = analysis.results_df
+logdir = analysis.get_best_logdir("mean_accuracy", mode="max")
 state_dict = torch.load(os.path.join(logdir, "model.pth"))
 
 model = ConvNet()
@@ -201,14 +187,10 @@ from ray.tune.examples.mnist_pytorch_trainable import TrainMNIST
 
 # __trainable_run_begin__
 search_space = {
-    "lr": tune.sample_from(lambda spec: 10 ** (-10 * np.random.rand())),
-    "momentum": tune.uniform(0.1, 0.9),
+    "lr": tune.sample_from(lambda spec: 10**(-10 * np.random.rand())),
+    "momentum": tune.uniform(0.1, 0.9)
 }
 
-tuner = tune.Tuner(
-    TrainMNIST,
-    run_config=air.RunConfig(stop={"training_iteration": 10}),
-    param_space=search_space,
-)
-results = tuner.fit()
+analysis = tune.run(
+    TrainMNIST, config=search_space, stop={"training_iteration": 10})
 # __trainable_run_end__

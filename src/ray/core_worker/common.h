@@ -14,16 +14,17 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include "ray/common/id.h"
 #include "ray/common/ray_object.h"
 #include "ray/common/task/task_spec.h"
+#include "ray/common/task/task_util.h"
 #include "ray/raylet_client/raylet_client.h"
 #include "ray/util/util.h"
 
 namespace ray {
-namespace core {
 
 using WorkerType = rpc::WorkerType;
 
@@ -41,31 +42,37 @@ std::string GenerateCachedActorName(const std::string &ns, const std::string &ac
 class RayFunction {
  public:
   RayFunction() {}
-  RayFunction(Language language, const FunctionDescriptor &function_descriptor)
+  RayFunction(Language language, const ray::FunctionDescriptor &function_descriptor)
       : language_(language), function_descriptor_(function_descriptor) {}
 
   Language GetLanguage() const { return language_; }
 
-  const FunctionDescriptor &GetFunctionDescriptor() const { return function_descriptor_; }
+  const ray::FunctionDescriptor &GetFunctionDescriptor() const {
+    return function_descriptor_;
+  }
 
  private:
   Language language_;
-  FunctionDescriptor function_descriptor_;
+  ray::FunctionDescriptor function_descriptor_;
 };
 
 /// Options for all tasks (actor and non-actor) except for actor creation.
 struct TaskOptions {
   TaskOptions() {}
-  TaskOptions(std::string name,
-              int num_returns,
+  TaskOptions(std::string name, int num_returns,
               std::unordered_map<std::string, double> &resources,
-              const std::string &concurrency_group_name = "",
-              const std::string &serialized_runtime_env_info = "{}")
+              const std::string &serialized_runtime_env = "{}",
+              const std::unordered_map<std::string, std::string>
+                  &override_environment_variables = {},
+              bool ignore_return = false,
+              std::optional<bool> enable_task_fast_fail = std::nullopt)
       : name(name),
         num_returns(num_returns),
         resources(resources),
-        concurrency_group_name(concurrency_group_name),
-        serialized_runtime_env_info(serialized_runtime_env_info) {}
+        serialized_runtime_env(serialized_runtime_env),
+        override_environment_variables(override_environment_variables),
+        enable_task_fast_fail(enable_task_fast_fail),
+        ignore_return(ignore_return) {}
 
   /// The name of this task.
   std::string name;
@@ -73,47 +80,52 @@ struct TaskOptions {
   int num_returns = 1;
   /// Resources required by this task.
   std::unordered_map<std::string, double> resources;
-  /// The name of the concurrency group in which this task will be executed.
-  std::string concurrency_group_name;
-  /// Runtime Env Info used by this task. It includes Runtime Env and some
-  /// fields which not contained in Runtime Env, such as eager_install.
-  /// Propagated to child actors and tasks.
-  std::string serialized_runtime_env_info;
+  // Runtime Env used by this task.  Propagated to child actors and tasks.
+  std::string serialized_runtime_env;
+  /// Environment variables to update for this task.  Maps a variable name to its
+  /// value.  Can override existing environment variables and introduce new ones.
+  /// Propagated to child actors and/or tasks.
+  const std::unordered_map<std::string, std::string> override_environment_variables;
+  std::optional<bool> enable_task_fast_fail = std::nullopt;
+
+  /// ANT-INTERNAL
+  bool ignore_return = false;
 };
 
 /// Options for actor creation tasks.
 struct ActorCreationOptions {
   ActorCreationOptions() {}
-  ActorCreationOptions(int64_t max_restarts,
-                       int64_t max_task_retries,
-                       int max_concurrency,
-                       const std::unordered_map<std::string, double> &resources,
-                       const std::unordered_map<std::string, double> &placement_resources,
-                       const std::vector<std::string> &dynamic_worker_options,
-                       std::optional<bool> is_detached,
-                       std::string &name,
-                       std::string &ray_namespace,
-                       bool is_asyncio,
-                       const rpc::SchedulingStrategy &scheduling_strategy,
-                       const std::string &serialized_runtime_env_info = "{}",
-                       const std::vector<ConcurrencyGroup> &concurrency_groups = {},
-                       bool execute_out_of_order = false,
-                       int32_t max_pending_calls = -1)
+  ActorCreationOptions(
+      int64_t max_restarts, int64_t max_task_retries, int max_concurrency,
+      const std::unordered_map<std::string, double> &resources,
+      const std::unordered_map<std::string, double> &placement_resources,
+      const std::vector<std::string> &dynamic_worker_options,
+      std::shared_ptr<bool> is_detached, std::string &name, std::string &ray_namespace,
+      bool is_asyncio, const rpc::SchedulingStrategy &scheduling_strategy,
+      const std::string &serialized_runtime_env = "{}",
+      const std::unordered_map<std::string, std::string> &override_environment_variables =
+          {},
+      bool enable_task_fast_fail = false,
+      const std::unordered_map<std::string, std::string> &labels = {},
+      const std::unordered_map<std::string, std::string> &extended_properties = {},
+      const std::vector<ConcurrentGroup> &concurrent_groups = {})
       : max_restarts(max_restarts),
         max_task_retries(max_task_retries),
         max_concurrency(max_concurrency),
         resources(resources),
         placement_resources(placement_resources),
         dynamic_worker_options(dynamic_worker_options),
-        is_detached(std::move(is_detached)),
+        is_detached(is_detached),
         name(name),
         ray_namespace(ray_namespace),
         is_asyncio(is_asyncio),
-        serialized_runtime_env_info(serialized_runtime_env_info),
-        concurrency_groups(concurrency_groups.begin(), concurrency_groups.end()),
-        execute_out_of_order(execute_out_of_order),
-        max_pending_calls(max_pending_calls),
-        scheduling_strategy(scheduling_strategy){};
+        serialized_runtime_env(serialized_runtime_env),
+        override_environment_variables(override_environment_variables),
+        concurrent_groups(concurrent_groups.begin(), concurrent_groups.end()),
+        enable_task_fast_fail(enable_task_fast_fail),
+        extended_properties(extended_properties),
+        scheduling_strategy(scheduling_strategy),
+        labels(labels) {}
 
   /// Maximum number of times that the actor should be restarted if it dies
   /// unexpectedly. A value of -1 indicates infinite restarts. If it's 0, the
@@ -134,7 +146,8 @@ struct ActorCreationOptions {
   const std::vector<std::string> dynamic_worker_options;
   /// Whether to keep the actor persistent after driver exit. If true, this will set
   /// the worker to not be destroyed after the driver shutdown.
-  std::optional<bool> is_detached;
+  /// null it not specified.
+  std::shared_ptr<bool> is_detached = nullptr;
   /// The name to give this detached actor that can be used to get a handle to it from
   /// other drivers. This must be globally unique across the cluster.
   /// This should set if and only if is_detached is true.
@@ -145,35 +158,39 @@ struct ActorCreationOptions {
   const std::string ray_namespace;
   /// Whether to use async mode of direct actor call.
   const bool is_asyncio = false;
-  /// Runtime Env Info used by this task. It includes Runtime Env and some
-  /// fields which not contained in Runtime Env, such as eager_install.
-  /// Propagated to child actors and tasks.
-  std::string serialized_runtime_env_info;
-  /// The actor concurrency groups to indicate how this actor perform its
+  // Runtime Env used by this actor.  Propagated to child actors and tasks.
+  std::string serialized_runtime_env;
+  /// Environment variables to update for this actor.  Maps a variable name to its
+  /// value.  Can override existing environment variables and introduce new ones.
+  /// Propagated to child actors and/or tasks.
+  const std::unordered_map<std::string, std::string> override_environment_variables;
+  /// The actor concurrent groups to indicate how this actor perform its
   /// methods concurrently.
-  const std::vector<ConcurrencyGroup> concurrency_groups;
-  /// Wether the actor execute tasks out of order.
-  const bool execute_out_of_order = false;
-  /// The maxmium actor call pending count.
-  const int max_pending_calls = -1;
+  const std::vector<ConcurrentGroup> concurrent_groups;
+
+  // ANT-INTERNAL fields
+
+  // If enabled, tasks of this actor will fail immediately when the actor is temporarily
+  // unavailable. E.g., when there is a network issue, or when the actor is restarting.
+  bool enable_task_fast_fail = false;
+
+  /// Customer extended properties for this actor.
+  const std::unordered_map<std::string, std::string> extended_properties;
   // The strategy about how to schedule this actor.
   rpc::SchedulingStrategy scheduling_strategy;
+  const std::unordered_map<std::string, std::string> labels;
 };
 
 using PlacementStrategy = rpc::PlacementStrategy;
 
 struct PlacementGroupCreationOptions {
   PlacementGroupCreationOptions(
-      std::string name,
-      PlacementStrategy strategy,
-      std::vector<std::unordered_map<std::string, double>> bundles,
-      bool is_detached,
-      double max_cpu_fraction_per_node)
+      std::string name, PlacementStrategy strategy,
+      std::vector<std::unordered_map<std::string, double>> bundles, bool is_detached)
       : name(std::move(name)),
         strategy(strategy),
         bundles(std::move(bundles)),
-        is_detached(is_detached),
-        max_cpu_fraction_per_node(max_cpu_fraction_per_node) {}
+        is_detached(is_detached) {}
 
   /// The name of the placement group.
   const std::string name;
@@ -183,53 +200,5 @@ struct PlacementGroupCreationOptions {
   const std::vector<std::unordered_map<std::string, double>> bundles;
   /// Whether to keep the placement group persistent after its creator dead.
   const bool is_detached = false;
-  /// The maximum fraction of CPU cores this placement group can take up on each node.
-  const double max_cpu_fraction_per_node;
 };
-
-class ObjectLocation {
- public:
-  ObjectLocation(NodeID primary_node_id,
-                 uint64_t object_size,
-                 std::vector<NodeID> node_ids,
-                 bool is_spilled,
-                 std::string spilled_url,
-                 NodeID spilled_node_id)
-      : primary_node_id_(primary_node_id),
-        object_size_(object_size),
-        node_ids_(std::move(node_ids)),
-        is_spilled_(is_spilled),
-        spilled_url_(std::move(spilled_url)),
-        spilled_node_id_(spilled_node_id) {}
-
-  const NodeID &GetPrimaryNodeID() const { return primary_node_id_; }
-
-  const uint64_t GetObjectSize() const { return object_size_; }
-
-  const std::vector<NodeID> &GetNodeIDs() const { return node_ids_; }
-
-  bool IsSpilled() const { return is_spilled_; }
-
-  const std::string &GetSpilledURL() const { return spilled_url_; }
-
-  const NodeID &GetSpilledNodeID() const { return spilled_node_id_; }
-
- private:
-  /// The ID of the node has the primary copy of the object.
-  /// Nil if the object is pending resolution.
-  const NodeID primary_node_id_;
-  /// The size of the object in bytes.
-  const uint64_t object_size_;
-  /// The IDs of the nodes that this object appeared on or was evicted by.
-  const std::vector<NodeID> node_ids_;
-  /// Whether this object has been spilled.
-  const bool is_spilled_;
-  /// If spilled, the URL of this object's spill location.
-  const std::string spilled_url_;
-  /// If spilled, the ID of the node that spilled the object. Nil if the object was
-  /// spilled to distributed external storage.
-  const NodeID spilled_node_id_;
-};
-
-}  // namespace core
 }  // namespace ray

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// clang-format off
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "ray/common/asio/instrumented_io_context.h"
@@ -22,16 +21,8 @@
 #include "ray/core_worker/transport/direct_task_transport.h"
 #include "ray/raylet_client/raylet_client.h"
 #include "ray/rpc/worker/core_worker_client.h"
-#include "mock/ray/core_worker/actor_creator.h"
-#include "mock/ray/core_worker/task_manager.h"
-// clang-format on
-
-// clang-format off
-#include "mock/ray/core_worker/task_manager.h"
-// clang-format on
 
 namespace ray {
-namespace core {
 
 using ::testing::_;
 using ::testing::ElementsAre;
@@ -43,8 +34,7 @@ rpc::ActorDeathCause CreateMockDeathCause() {
   return death_cause;
 }
 
-TaskSpecification CreateActorTaskHelper(ActorID actor_id,
-                                        WorkerID caller_worker_id,
+TaskSpecification CreateActorTaskHelper(ActorID actor_id, WorkerID caller_worker_id,
                                         int64_t counter,
                                         TaskID caller_id = TaskID::Nil()) {
   TaskSpecification task;
@@ -55,12 +45,13 @@ TaskSpecification CreateActorTaskHelper(ActorID actor_id,
       caller_worker_id.Binary());
   task.GetMutableMessage().mutable_actor_task_spec()->set_actor_id(actor_id.Binary());
   task.GetMutableMessage().mutable_actor_task_spec()->set_actor_counter(counter);
-  task.GetMutableMessage().set_num_returns(1);
+  task.GetMutableMessage().set_num_returns(2);
+  // Copy the task specification so that we don't need to modify the code above and solve
+  // the potential merge conflicts.
   return task;
 }
 
-rpc::PushTaskRequest CreatePushTaskRequestHelper(ActorID actor_id,
-                                                 int64_t counter,
+rpc::PushTaskRequest CreatePushTaskRequestHelper(ActorID actor_id, int64_t counter,
                                                  WorkerID caller_worker_id,
                                                  TaskID caller_id,
                                                  int64_t caller_timestamp) {
@@ -77,14 +68,13 @@ class MockWorkerClient : public rpc::CoreWorkerClientInterface {
  public:
   const rpc::Address &Addr() const override { return addr; }
 
-  void PushActorTask(std::unique_ptr<rpc::PushTaskRequest> request,
-                     bool skip_queue,
+  void PushActorTask(std::unique_ptr<rpc::PushTaskRequest> request, bool skip_queue,
                      const rpc::ClientCallback<rpc::PushTaskReply> &callback) override {
+    RAY_LOG(INFO) << "MockWorkerClient::PushActorTask seq: "
+                  << request->sequence_number();
     received_seq_nos.push_back(request->sequence_number());
     callbacks.push_back(callback);
   }
-
-  int64_t ClientProcessedUpToSeqno() override { return acked_seqno; }
 
   bool ReplyPushTask(Status status = Status::OK(), size_t index = 0) {
     if (callbacks.size() == 0) {
@@ -99,73 +89,88 @@ class MockWorkerClient : public rpc::CoreWorkerClientInterface {
   rpc::Address addr;
   std::vector<rpc::ClientCallback<rpc::PushTaskReply>> callbacks;
   std::vector<uint64_t> received_seq_nos;
-  int64_t acked_seqno = 0;
 };
 
-class DirectActorSubmitterTest : public ::testing::TestWithParam<bool> {
+class MockTaskFinisher : public TaskFinisherInterface {
+ public:
+  MockTaskFinisher() {}
+
+  MOCK_METHOD3(CompletePendingTask, void(const TaskID &, const rpc::PushTaskReply &,
+                                         const rpc::Address &addr));
+
+  MOCK_METHOD1(RetryTaskIfPossible, bool(const TaskID &task_id));
+
+  MOCK_METHOD5(PendingTaskFailed,
+               bool(const TaskID &task_id, rpc::ErrorType error_type,
+                    const Status *status, const rpc::RayErrorInfo *ray_error_info,
+                    bool immediately_mark_object_fail));
+
+  MOCK_METHOD2(OnTaskDependenciesInlined,
+               void(const std::vector<ObjectID> &, const std::vector<ObjectID> &));
+
+  MOCK_METHOD1(MarkTaskCanceled, bool(const TaskID &task_id));
+
+  MOCK_METHOD4(MarkPendingTaskFailed,
+               void(const TaskID &task_id, const TaskSpecification &spec,
+                    rpc::ErrorType error_type, const rpc::RayErrorInfo *ray_error_info));
+};
+
+class DirectActorSubmitterTest : public ::testing::Test {
  public:
   DirectActorSubmitterTest()
-      : client_pool_(
+      : worker_context_(WorkerType::WORKER, WorkerID::FromRandom(), JobID::FromInt(0)),
+        worker_client_(std::shared_ptr<MockWorkerClient>(new MockWorkerClient())),
+        store_(std::shared_ptr<CoreWorkerMemoryStore>(new CoreWorkerMemoryStore())),
+        task_finisher_(std::make_shared<MockTaskFinisher>()),
+        actor_task_back_pressure_enabled_(true),
+        submitter_(
             std::make_shared<rpc::CoreWorkerClientPool>([&](const rpc::Address &addr) {
               num_clients_connected_++;
               return worker_client_;
-            })),
-        worker_client_(std::make_shared<MockWorkerClient>()),
-        store_(std::make_shared<CoreWorkerMemoryStore>()),
-        task_finisher_(std::make_shared<MockTaskFinisherInterface>()),
-        io_work(io_context),
-        submitter_(
-            *client_pool_,
-            *store_,
-            *task_finisher_,
-            actor_creator_,
-            [this](const ActorID &actor_id, int64_t num_queued) {
-              last_queue_warning_ = num_queued;
-            },
-            io_context) {}
-
-  void TearDown() override { io_context.stop(); }
+            }),
+            store_, task_finisher_, worker_context_, actor_task_back_pressure_enabled_) {}
 
   int num_clients_connected_ = 0;
-  int64_t last_queue_warning_ = 0;
-  MockActorCreatorInterface actor_creator_;
-  std::shared_ptr<rpc::CoreWorkerClientPool> client_pool_;
+  WorkerContext worker_context_;
   std::shared_ptr<MockWorkerClient> worker_client_;
   std::shared_ptr<CoreWorkerMemoryStore> store_;
-  std::shared_ptr<MockTaskFinisherInterface> task_finisher_;
-  instrumented_io_context io_context;
-  boost::asio::io_service::work io_work;
+  std::shared_ptr<MockTaskFinisher> task_finisher_;
+  bool actor_task_back_pressure_enabled_;
   CoreWorkerDirectActorTaskSubmitter submitter_;
 
- protected:
-  bool CheckSubmitTask(TaskSpecification task) {
-    EXPECT_TRUE(submitter_.SubmitTask(task).ok());
-    return 1 == io_context.poll_one();
+ public:
+  void AppendTask(CoreWorkerDirectActorTaskSubmitter &submitter, TaskSpecification task) {
+    std::promise<bool> promise;
+    /// Used to fill in the reference parameter in the test and has no practical meaning.
+    submitter.AppendTask(
+        task, [&promise](const ActorID &actor_id) { promise.set_value(true); });
+    promise.get_future().get();
   }
 };
 
-TEST_P(DirectActorSubmitterTest, TestSubmitTask) {
-  auto execute_out_of_order = GetParam();
+TEST_F(DirectActorSubmitterTest, TestSubmitTask) {
   rpc::Address addr;
   auto worker_id = WorkerID::FromRandom();
   addr.set_worker_id(worker_id.Binary());
   ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
+  submitter_.AddActorQueueIfNotExists(actor_id);
 
   auto task = CreateActorTaskHelper(actor_id, worker_id, 0);
-  ASSERT_TRUE(CheckSubmitTask(task));
+  AppendTask(submitter_, task);
+
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
 
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_EQ(worker_client_->callbacks.size(), 1);
 
   task = CreateActorTaskHelper(actor_id, worker_id, 1);
-  ASSERT_TRUE(CheckSubmitTask(task));
+  AppendTask(submitter_, task);
+
   ASSERT_EQ(worker_client_->callbacks.size(), 2);
 
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(_, _, _, _))
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(_, _, _))
       .Times(worker_client_->callbacks.size());
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(_, _, _, _, _)).Times(0);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(_, _, _, _, _)).Times(0);
   while (!worker_client_->callbacks.empty()) {
     ASSERT_TRUE(worker_client_->ReplyPushTask());
   }
@@ -176,46 +181,16 @@ TEST_P(DirectActorSubmitterTest, TestSubmitTask) {
   // not reset `received_seq_nos`.
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1));
+  submitter_.Shutdown();
+  submitter_.WaitForShutdown();
 }
 
-TEST_P(DirectActorSubmitterTest, TestQueueingWarning) {
-  auto execute_out_of_order = GetParam();
+TEST_F(DirectActorSubmitterTest, TestDependencies) {
   rpc::Address addr;
   auto worker_id = WorkerID::FromRandom();
   addr.set_worker_id(worker_id.Binary());
   ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
-  submitter_.ConnectActor(actor_id, addr, 0);
-
-  for (int i = 0; i < 7500; i++) {
-    auto task = CreateActorTaskHelper(actor_id, worker_id, i);
-    ASSERT_TRUE(CheckSubmitTask(task));
-    ASSERT_TRUE(worker_client_->ReplyPushTask());
-  }
-  ASSERT_EQ(last_queue_warning_, 0);
-
-  for (int i = 7500; i < 15000; i++) {
-    auto task = CreateActorTaskHelper(actor_id, worker_id, i);
-    ASSERT_TRUE(CheckSubmitTask(task));
-    /* no ack */
-  }
-  ASSERT_EQ(last_queue_warning_, 5000);
-
-  for (int i = 15000; i < 35000; i++) {
-    auto task = CreateActorTaskHelper(actor_id, worker_id, i);
-    ASSERT_TRUE(CheckSubmitTask(task));
-    /* no ack */
-  }
-  ASSERT_EQ(last_queue_warning_, 20000);
-}
-
-TEST_P(DirectActorSubmitterTest, TestDependencies) {
-  auto execute_out_of_order = GetParam();
-  rpc::Address addr;
-  auto worker_id = WorkerID::FromRandom();
-  addr.set_worker_id(worker_id.Binary());
-  ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
+  submitter_.AddActorQueueIfNotExists(actor_id);
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
 
@@ -231,8 +206,8 @@ TEST_P(DirectActorSubmitterTest, TestDependencies) {
 
   // Neither task can be submitted yet because they are still waiting on
   // dependencies.
-  ASSERT_TRUE(CheckSubmitTask(task1));
-  ASSERT_TRUE(CheckSubmitTask(task2));
+  AppendTask(submitter_, task1);
+  AppendTask(submitter_, task2);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
 
   // Put the dependencies in the store in the same order as task submission.
@@ -242,15 +217,16 @@ TEST_P(DirectActorSubmitterTest, TestDependencies) {
   ASSERT_TRUE(store_->Put(*data, obj2));
   ASSERT_EQ(worker_client_->callbacks.size(), 2);
   ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1));
+  submitter_.Shutdown();
+  submitter_.WaitForShutdown();
 }
 
-TEST_P(DirectActorSubmitterTest, TestOutOfOrderDependencies) {
-  auto execute_out_of_order = GetParam();
+TEST_F(DirectActorSubmitterTest, TestOutOfOrderDependencies) {
   rpc::Address addr;
   auto worker_id = WorkerID::FromRandom();
   addr.set_worker_id(worker_id.Binary());
   ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
+  submitter_.AddActorQueueIfNotExists(actor_id);
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
 
@@ -266,41 +242,28 @@ TEST_P(DirectActorSubmitterTest, TestOutOfOrderDependencies) {
 
   // Neither task can be submitted yet because they are still waiting on
   // dependencies.
-  ASSERT_TRUE(CheckSubmitTask(task1));
-  ASSERT_TRUE(CheckSubmitTask(task2));
+  AppendTask(submitter_, task1);
+  AppendTask(submitter_, task2);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
 
-  if (execute_out_of_order) {
-    // Put the dependencies in the store in the opposite order of task
-    // submission.
-    auto data = GenerateRandomObject();
-    // task2 is submitted first as we allow out of order execution.
-    ASSERT_TRUE(store_->Put(*data, obj2));
-    ASSERT_EQ(worker_client_->callbacks.size(), 1);
-    ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(1));
-    // then task1 is submitted
-    ASSERT_TRUE(store_->Put(*data, obj1));
-    ASSERT_EQ(worker_client_->callbacks.size(), 2);
-    ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(1, 0));
-  } else {
-    // Put the dependencies in the store in the opposite order of task
-    // submission.
-    auto data = GenerateRandomObject();
-    ASSERT_TRUE(store_->Put(*data, obj2));
-    ASSERT_EQ(worker_client_->callbacks.size(), 0);
-    ASSERT_TRUE(store_->Put(*data, obj1));
-    ASSERT_EQ(worker_client_->callbacks.size(), 2);
-    ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1));
-  }
+  // Put the dependencies in the store in the opposite order of task
+  // submission.
+  auto data = GenerateRandomObject();
+  ASSERT_TRUE(store_->Put(*data, obj2));
+  ASSERT_EQ(worker_client_->callbacks.size(), 0);
+  ASSERT_TRUE(store_->Put(*data, obj1));
+  ASSERT_EQ(worker_client_->callbacks.size(), 2);
+  ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1));
+  submitter_.Shutdown();
+  submitter_.WaitForShutdown();
 }
 
-TEST_P(DirectActorSubmitterTest, TestActorDead) {
-  auto execute_out_of_order = GetParam();
+TEST_F(DirectActorSubmitterTest, TestActorDead) {
   rpc::Address addr;
   auto worker_id = WorkerID::FromRandom();
   addr.set_worker_id(worker_id.Binary());
   ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
+  submitter_.AddActorQueueIfNotExists(actor_id);
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
 
@@ -309,34 +272,33 @@ TEST_P(DirectActorSubmitterTest, TestActorDead) {
   ObjectID obj = ObjectID::FromRandom();
   auto task2 = CreateActorTaskHelper(actor_id, worker_id, 1);
   task2.GetMutableMessage().add_args()->mutable_object_ref()->set_object_id(obj.Binary());
-  ASSERT_TRUE(CheckSubmitTask(task1));
-  ASSERT_TRUE(CheckSubmitTask(task2));
+  AppendTask(submitter_, task1);
+  AppendTask(submitter_, task2);
   ASSERT_EQ(worker_client_->callbacks.size(), 1);
 
   // Simulate the actor dying. All in-flight tasks should get failed.
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task1.TaskId(), _, _, _, _))
-      .Times(1);
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(_, _, _, _)).Times(0);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task1.TaskId(), _, _, _, _)).Times(1);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(_, _, _)).Times(0);
   while (!worker_client_->callbacks.empty()) {
     ASSERT_TRUE(worker_client_->ReplyPushTask(Status::IOError("")));
   }
 
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(_, _, _, _, _)).Times(0);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(_, _, _, _, _)).Times(0);
   const auto death_cause = CreateMockDeathCause();
   submitter_.DisconnectActor(actor_id, 1, /*dead=*/false, death_cause);
   // Actor marked as dead. All queued tasks should get failed.
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task2.TaskId(), _, _, _, _))
-      .Times(1);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task2.TaskId(), _, _, _, _)).Times(1);
   submitter_.DisconnectActor(actor_id, 2, /*dead=*/true, death_cause);
+  submitter_.Shutdown();
+  submitter_.WaitForShutdown();
 }
 
-TEST_P(DirectActorSubmitterTest, TestActorRestartNoRetry) {
-  auto execute_out_of_order = GetParam();
+TEST_F(DirectActorSubmitterTest, TestActorRestartNoRetry) {
   rpc::Address addr;
   auto worker_id = WorkerID::FromRandom();
   addr.set_worker_id(worker_id.Binary());
   ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
+  submitter_.AddActorQueueIfNotExists(actor_id);
   addr.set_port(0);
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
@@ -347,16 +309,14 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartNoRetry) {
   auto task3 = CreateActorTaskHelper(actor_id, worker_id, 2);
   auto task4 = CreateActorTaskHelper(actor_id, worker_id, 3);
   // Submit three tasks.
-  ASSERT_TRUE(CheckSubmitTask(task1));
-  ASSERT_TRUE(CheckSubmitTask(task2));
-  ASSERT_TRUE(CheckSubmitTask(task3));
+  AppendTask(submitter_, task1);
+  AppendTask(submitter_, task2);
+  AppendTask(submitter_, task3);
 
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task1.TaskId(), _, _, _)).Times(1);
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task2.TaskId(), _, _, _, _))
-      .Times(1);
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task3.TaskId(), _, _, _, _))
-      .Times(1);
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task4.TaskId(), _, _, _)).Times(1);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(task1.TaskId(), _, _)).Times(1);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task2.TaskId(), _, _, _, _)).Times(1);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task3.TaskId(), _, _, _, _)).Times(1);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(task4.TaskId(), _, _)).Times(1);
   // First task finishes. Second task fails.
   ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
   ASSERT_TRUE(worker_client_->ReplyPushTask(Status::IOError("")));
@@ -371,25 +331,21 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartNoRetry) {
   // Actor gets restarted.
   addr.set_port(1);
   submitter_.ConnectActor(actor_id, addr, 1);
-  ASSERT_TRUE(CheckSubmitTask(task4));
+  AppendTask(submitter_, task4);
   ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
   ASSERT_TRUE(worker_client_->callbacks.empty());
-  if (execute_out_of_order) {
-    // Actor counter doesn't restart for out of order execution.
-    ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1, 2, 3));
-  } else {
-    // Actor counter restarts at 0 after the actor is restarted.
-    ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1, 2, 0));
-  }
+  // Actor counter restarts at 0 after the actor is restarted.
+  ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1, 2, 0));
+  submitter_.Shutdown();
+  submitter_.WaitForShutdown();
 }
 
-TEST_P(DirectActorSubmitterTest, TestActorRestartRetry) {
-  auto execute_out_of_order = GetParam();
+TEST_F(DirectActorSubmitterTest, TestActorRestartRetry) {
   rpc::Address addr;
   auto worker_id = WorkerID::FromRandom();
   addr.set_worker_id(worker_id.Binary());
   ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
+  submitter_.AddActorQueueIfNotExists(actor_id);
   addr.set_port(0);
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
@@ -400,17 +356,17 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartRetry) {
   auto task3 = CreateActorTaskHelper(actor_id, worker_id, 2);
   auto task4 = CreateActorTaskHelper(actor_id, worker_id, 3);
   // Submit three tasks.
-  ASSERT_TRUE(CheckSubmitTask(task1));
-  ASSERT_TRUE(CheckSubmitTask(task2));
-  ASSERT_TRUE(CheckSubmitTask(task3));
+  AppendTask(submitter_, task1);
+  AppendTask(submitter_, task2);
+  AppendTask(submitter_, task3);
 
   // All tasks will eventually finish.
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(_, _, _, _)).Times(4);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(_, _, _)).Times(4);
   // Tasks 2 and 3 will be retried.
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task2.TaskId(), _, _, _, _))
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task2.TaskId(), _, _, _, _))
       .Times(1)
       .WillRepeatedly(Return(true));
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task3.TaskId(), _, _, _, _))
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task3.TaskId(), _, _, _, _))
       .Times(1)
       .WillRepeatedly(Return(true));
   // First task finishes. Second task fails.
@@ -427,30 +383,26 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartRetry) {
   addr.set_port(1);
   submitter_.ConnectActor(actor_id, addr, 1);
   // A new task is submitted.
-  ASSERT_TRUE(CheckSubmitTask(task4));
+  AppendTask(submitter_, task4);
   // Tasks 2 and 3 get retried.
-  ASSERT_TRUE(CheckSubmitTask(task2));
-  ASSERT_TRUE(CheckSubmitTask(task3));
+  AppendTask(submitter_, task2);
+  AppendTask(submitter_, task3);
   while (!worker_client_->callbacks.empty()) {
     ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
   }
-  if (execute_out_of_order) {
-    // After restart the tasks are executed in submittion order.
-    ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1, 2, 3, 1, 2));
-  } else {
-    // Actor counter restarts at 0 after the actor is restarted. New task cannot
-    // execute until after tasks 2 and 3 are re-executed.
-    ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1, 2, 2, 0, 1));
-  }
+  // Actor counter restarts at 0 after the actor is restarted. New task cannot
+  // execute until after tasks 2 and 3 are re-executed.
+  ASSERT_THAT(worker_client_->received_seq_nos, ElementsAre(0, 1, 2, 2, 0, 1));
+  submitter_.Shutdown();
+  submitter_.WaitForShutdown();
 }
 
-TEST_P(DirectActorSubmitterTest, TestActorRestartOutOfOrderRetry) {
-  auto execute_out_of_order = GetParam();
+TEST_F(DirectActorSubmitterTest, TestActorRestartOutOfOrderRetry) {
   rpc::Address addr;
   auto worker_id = WorkerID::FromRandom();
   addr.set_worker_id(worker_id.Binary());
   ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
+  submitter_.AddActorQueueIfNotExists(actor_id);
   addr.set_port(0);
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
@@ -460,14 +412,14 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartOutOfOrderRetry) {
   auto task2 = CreateActorTaskHelper(actor_id, worker_id, 1);
   auto task3 = CreateActorTaskHelper(actor_id, worker_id, 2);
   // Submit three tasks.
-  ASSERT_TRUE(CheckSubmitTask(task1));
-  ASSERT_TRUE(CheckSubmitTask(task2));
-  ASSERT_TRUE(CheckSubmitTask(task3));
+  AppendTask(submitter_, task1);
+  AppendTask(submitter_, task2);
+  AppendTask(submitter_, task3);
   // All tasks will eventually finish.
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(_, _, _, _)).Times(3);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(_, _, _)).Times(3);
 
   // Tasks 2 will be retried
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task2.TaskId(), _, _, _, _))
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task2.TaskId(), _, _, _, _))
       .Times(1)
       .WillRepeatedly(Return(true));
   // First task finishes. Second task hang. Third task finishes.
@@ -481,37 +433,28 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartOutOfOrderRetry) {
   // Actor gets restarted.
   addr.set_port(1);
   submitter_.ConnectActor(actor_id, addr, 1);
+  // Upon re-connect, task 2 (failed) and 3 (completed) should be both retried.
+  // Retry task 2 manually (simulating task_finisher and SendPendingTask's behavior)
+  // Retry task 3 should happen via event loop
+  AppendTask(submitter_, task2);
 
-  if (execute_out_of_order) {
-    // Upon re-connect, task 2 (failed) should be both retried.
-    // Retry task 2 manually (simulating task_finisher and SendPendingTask's behavior)
-    ASSERT_TRUE(CheckSubmitTask(task2));
-
-    // Only task2 should be submitted.
-    ASSERT_EQ(worker_client_->callbacks.size(), 1);
-  } else {
-    // Upon re-connect, task 2 (failed) and 3 (completed) should be both retried.
-    // Retry task 2 manually (simulating task_finisher and SendPendingTask's behavior)
-    // Retry task 3 should happen via event loop
-    ASSERT_TRUE(CheckSubmitTask(task2));
-
-    // Both task2 and task3 should be submitted.
-    ASSERT_EQ(worker_client_->callbacks.size(), 2);
-  }
+  // Both task2 and task3 should be submitted.
+  ASSERT_EQ(worker_client_->callbacks.size(), 2);
 
   // Finishes all task
   while (!worker_client_->callbacks.empty()) {
     ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
   }
+  submitter_.Shutdown();
+  submitter_.WaitForShutdown();
 }
 
-TEST_P(DirectActorSubmitterTest, TestActorRestartOutOfOrderGcs) {
-  auto execute_out_of_order = GetParam();
+TEST_F(DirectActorSubmitterTest, TestActorRestartOutOfOrderGcs) {
   rpc::Address addr;
   auto worker_id = WorkerID::FromRandom();
   addr.set_worker_id(worker_id.Binary());
   ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
+  submitter_.AddActorQueueIfNotExists(actor_id);
   addr.set_port(0);
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
@@ -520,8 +463,8 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartOutOfOrderGcs) {
   // Create four tasks for the actor.
   auto task = CreateActorTaskHelper(actor_id, worker_id, 0);
   // Submit a task.
-  ASSERT_TRUE(CheckSubmitTask(task));
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task.TaskId(), _, _, _)).Times(1);
+  AppendTask(submitter_, task);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(task.TaskId(), _, _)).Times(1);
   ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
 
   // Actor restarts, but we don't receive the disconnect message until later.
@@ -530,40 +473,34 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartOutOfOrderGcs) {
   ASSERT_EQ(num_clients_connected_, 2);
   // Submit a task.
   task = CreateActorTaskHelper(actor_id, worker_id, 1);
-  ASSERT_TRUE(CheckSubmitTask(task));
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task.TaskId(), _, _, _)).Times(1);
+  AppendTask(submitter_, task);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(task.TaskId(), _, _)).Times(1);
   ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
-
   // We receive the RESTART message late. Nothing happens.
   const auto death_cause = CreateMockDeathCause();
   submitter_.DisconnectActor(actor_id, 1, /*dead=*/false, death_cause);
   ASSERT_EQ(num_clients_connected_, 2);
   // Submit a task.
   task = CreateActorTaskHelper(actor_id, worker_id, 2);
-  ASSERT_TRUE(CheckSubmitTask(task));
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task.TaskId(), _, _, _)).Times(1);
+  AppendTask(submitter_, task);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(task.TaskId(), _, _)).Times(1);
   ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
-
   // The actor dies twice. We receive the last RESTART message first.
   submitter_.DisconnectActor(actor_id, 3, /*dead=*/false, death_cause);
   ASSERT_EQ(num_clients_connected_, 2);
   // Submit a task.
   task = CreateActorTaskHelper(actor_id, worker_id, 3);
-  ASSERT_TRUE(CheckSubmitTask(task));
-  // Tasks submitted when the actor is in RESTARTING state will fail immediately.
-  // This happens in an io_service.post. Search `SendPendingTasks_ForceFail` to locate
-  // the code.
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task.TaskId(), _, _, _, _))
-      .Times(1);
-  ASSERT_EQ(io_context.poll_one(), 1);
-
+  AppendTask(submitter_, task);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(task.TaskId(), _, _)).Times(0);
+  ASSERT_FALSE(worker_client_->ReplyPushTask(Status::OK()));
   // We receive the late messages. Nothing happens.
   addr.set_port(2);
   submitter_.ConnectActor(actor_id, addr, 2);
   submitter_.DisconnectActor(actor_id, 2, /*dead=*/false, death_cause);
   ASSERT_EQ(num_clients_connected_, 2);
 
-  // The actor dies permanently.
+  // The actor dies permanently. All tasks are failed.
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task.TaskId(), _, _, _, _)).Times(1);
   submitter_.DisconnectActor(actor_id, 3, /*dead=*/true, death_cause);
   ASSERT_EQ(num_clients_connected_, 2);
 
@@ -574,18 +511,18 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartOutOfOrderGcs) {
   ASSERT_EQ(num_clients_connected_, 2);
   // Submit a task.
   task = CreateActorTaskHelper(actor_id, worker_id, 4);
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task.TaskId(), _, _, _, _))
-      .Times(1);
-  ASSERT_FALSE(CheckSubmitTask(task));
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task.TaskId(), _, _, _, _)).Times(1);
+  AppendTask(submitter_, task);
+  submitter_.Shutdown();
+  submitter_.WaitForShutdown();
 }
 
-TEST_P(DirectActorSubmitterTest, TestActorRestartFailInflightTasks) {
-  auto execute_out_of_order = GetParam();
+TEST_F(DirectActorSubmitterTest, TestActorRestartFailInflightTasks) {
   rpc::Address addr;
   auto worker_id = WorkerID::FromRandom();
   addr.set_worker_id(worker_id.Binary());
   ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
+  submitter_.AddActorQueueIfNotExists(actor_id);
   addr.set_port(0);
   submitter_.ConnectActor(actor_id, addr, 0);
   ASSERT_EQ(worker_client_->callbacks.size(), 0);
@@ -596,116 +533,38 @@ TEST_P(DirectActorSubmitterTest, TestActorRestartFailInflightTasks) {
   auto task2 = CreateActorTaskHelper(actor_id, worker_id, 1);
   auto task3 = CreateActorTaskHelper(actor_id, worker_id, 1);
   // Submit a task.
-  ASSERT_TRUE(CheckSubmitTask(task1));
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task1.TaskId(), _, _, _)).Times(1);
+  AppendTask(submitter_, task1);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(task1.TaskId(), _, _)).Times(1);
   ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
 
   // Submit 2 tasks.
-  ASSERT_TRUE(CheckSubmitTask(task2));
-  ASSERT_TRUE(CheckSubmitTask(task3));
+  AppendTask(submitter_, task2);
+  AppendTask(submitter_, task3);
   // Actor failed, but the task replies are delayed (or in some scenarios, lost).
   // We should still be able to fail the inflight tasks.
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task2.TaskId(), _, _, _, _))
-      .Times(1);
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task3.TaskId(), _, _, _, _))
-      .Times(1);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task2.TaskId(), _, _, _, _)).Times(1);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task3.TaskId(), _, _, _, _)).Times(1);
   const auto death_cause = CreateMockDeathCause();
   submitter_.DisconnectActor(actor_id, 1, /*dead=*/false, death_cause);
 
   // The task replies are now received. Since the tasks are already failed, they will not
   // be marked as failed or finished again.
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task2.TaskId(), _, _, _)).Times(0);
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task2.TaskId(), _, _, _, _))
-      .Times(0);
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task3.TaskId(), _, _, _)).Times(0);
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task3.TaskId(), _, _, _, _))
-      .Times(0);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(task2.TaskId(), _, _)).Times(0);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task2.TaskId(), _, _, _, _)).Times(0);
+  EXPECT_CALL(*task_finisher_, CompletePendingTask(task3.TaskId(), _, _)).Times(0);
+  EXPECT_CALL(*task_finisher_, PendingTaskFailed(task3.TaskId(), _, _, _, _)).Times(0);
   // Task 2 replied with OK.
   ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
   // Task 3 replied with error.
   ASSERT_TRUE(worker_client_->ReplyPushTask(Status::IOError("")));
+  submitter_.Shutdown();
+  submitter_.WaitForShutdown();
 }
-
-TEST_P(DirectActorSubmitterTest, TestActorRestartFastFail) {
-  auto execute_out_of_order = GetParam();
-  rpc::Address addr;
-  auto worker_id = WorkerID::FromRandom();
-  addr.set_worker_id(worker_id.Binary());
-  ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, -1, execute_out_of_order);
-  addr.set_port(0);
-  submitter_.ConnectActor(actor_id, addr, 0);
-  ASSERT_EQ(worker_client_->callbacks.size(), 0);
-  ASSERT_EQ(num_clients_connected_, 1);
-
-  auto task1 = CreateActorTaskHelper(actor_id, worker_id, 0);
-  // Submit a task.
-  ASSERT_TRUE(CheckSubmitTask(task1));
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task1.TaskId(), _, _, _)).Times(1);
-  ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK()));
-
-  // Actor failed and is now restarting.
-  const auto death_cause = CreateMockDeathCause();
-  submitter_.DisconnectActor(actor_id, 1, /*dead=*/false, death_cause);
-
-  // Submit a new task. This task should fail immediately because "max_task_retries" is 0.
-  auto task2 = CreateActorTaskHelper(actor_id, worker_id, 1);
-  ASSERT_TRUE(CheckSubmitTask(task2));
-  EXPECT_CALL(*task_finisher_, CompletePendingTask(task2.TaskId(), _, _, _)).Times(0);
-  EXPECT_CALL(*task_finisher_, FailOrRetryPendingTask(task2.TaskId(), _, _, _, _))
-      .Times(1);
-  ASSERT_EQ(io_context.poll_one(), 1);
-}
-
-TEST_P(DirectActorSubmitterTest, TestPendingTasks) {
-  auto execute_out_of_order = GetParam();
-  int32_t max_pending_calls = 10;
-  rpc::Address addr;
-  auto worker_id = WorkerID::FromRandom();
-  addr.set_worker_id(worker_id.Binary());
-  ActorID actor_id = ActorID::Of(JobID::FromInt(0), TaskID::Nil(), 0);
-  submitter_.AddActorQueueIfNotExists(actor_id, max_pending_calls, execute_out_of_order);
-  addr.set_port(0);
-
-  // Submit number of `max_pending_calls` tasks would be OK.
-  for (int32_t i = 0; i < max_pending_calls; i++) {
-    ASSERT_FALSE(submitter_.PendingTasksFull(actor_id));
-    auto task = CreateActorTaskHelper(actor_id, worker_id, i);
-    ASSERT_TRUE(CheckSubmitTask(task));
-  }
-
-  // Then the queue should be full.
-  ASSERT_TRUE(submitter_.PendingTasksFull(actor_id));
-
-  ASSERT_EQ(worker_client_->callbacks.size(), 0);
-  submitter_.ConnectActor(actor_id, addr, 0);
-  ASSERT_EQ(worker_client_->callbacks.size(), 10);
-
-  // After task 0 reply comes, the queue turn to not full.
-  ASSERT_TRUE(worker_client_->ReplyPushTask(Status::OK(), 0));
-  ASSERT_FALSE(submitter_.PendingTasksFull(actor_id));
-
-  // We can submit task 10, but after that the queue is full.
-  auto task = CreateActorTaskHelper(actor_id, worker_id, 10);
-  ASSERT_TRUE(CheckSubmitTask(task));
-  ASSERT_TRUE(submitter_.PendingTasksFull(actor_id));
-
-  // All the replies comes, the queue shouble be empty.
-  while (!worker_client_->callbacks.empty()) {
-    ASSERT_TRUE(worker_client_->ReplyPushTask());
-  }
-  ASSERT_FALSE(submitter_.PendingTasksFull(actor_id));
-}
-
-INSTANTIATE_TEST_SUITE_P(ExecuteOutOfOrder,
-                         DirectActorSubmitterTest,
-                         ::testing::Values(true, false));
 
 class MockDependencyWaiter : public DependencyWaiter {
  public:
-  MOCK_METHOD2(Wait,
-               void(const std::vector<rpc::ObjectReference> &dependencies,
-                    std::function<void()> on_dependencies_available));
+  MOCK_METHOD2(Wait, void(const std::vector<rpc::ObjectReference> &dependencies,
+                          std::function<void()> on_dependencies_available));
 
   virtual ~MockDependencyWaiter() {}
 };
@@ -718,49 +577,28 @@ class MockWorkerContext : public WorkerContext {
   }
 };
 
-class MockCoreWorkerDirectTaskReceiver : public CoreWorkerDirectTaskReceiver {
- public:
-  MockCoreWorkerDirectTaskReceiver(WorkerContext &worker_context,
-                                   instrumented_io_context &main_io_service,
-                                   const TaskHandler &task_handler,
-                                   const OnTaskDone &task_done)
-      : CoreWorkerDirectTaskReceiver(
-            worker_context, main_io_service, task_handler, task_done) {}
-
-  void UpdateConcurrencyGroupsCache(const ActorID &actor_id,
-                                    const std::vector<ConcurrencyGroup> &cgs) {
-    concurrency_groups_cache_[actor_id] = cgs;
-  }
-};
-
 class DirectActorReceiverTest : public ::testing::Test {
  public:
   DirectActorReceiverTest()
       : worker_context_(WorkerType::WORKER, JobID::FromInt(0)),
         worker_client_(std::shared_ptr<MockWorkerClient>(new MockWorkerClient())),
         dependency_waiter_(std::make_shared<MockDependencyWaiter>()) {
-    auto execute_task = std::bind(&DirectActorReceiverTest::MockExecuteTask,
-                                  this,
-                                  std::placeholders::_1,
-                                  std::placeholders::_2,
-                                  std::placeholders::_3,
-                                  std::placeholders::_4,
-                                  std::placeholders::_5);
-    receiver_ = std::make_unique<MockCoreWorkerDirectTaskReceiver>(
+    auto execute_task =
+        std::bind(&DirectActorReceiverTest::MockExecuteTask, this, std::placeholders::_1,
+                  std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+    receiver_ = std::make_unique<CoreWorkerDirectTaskReceiver>(
         worker_context_, main_io_service_, execute_task, [] { return Status::OK(); });
     receiver_->Init(std::make_shared<rpc::CoreWorkerClientPool>(
                         [&](const rpc::Address &addr) { return worker_client_; }),
-                    rpc_address_,
-                    dependency_waiter_);
+                    rpc_address_, dependency_waiter_, main_io_service_);
   }
 
-  Status MockExecuteTask(
-      const TaskSpecification &task_spec,
-      const std::shared_ptr<ResourceMappingType> &resource_ids,
-      std::vector<std::pair<ObjectID, std::shared_ptr<RayObject>>> *return_objects,
-      std::vector<std::pair<ObjectID, std::shared_ptr<RayObject>>>
-          *dynamic_return_objects,
-      ReferenceCounter::ReferenceTableProto *borrowed_refs) {
+  Status MockExecuteTask(const TaskSpecification &task_spec,
+                         const std::shared_ptr<ResourceMappingType> &resource_ids,
+                         std::vector<std::shared_ptr<RayObject>> *return_objects,
+                         ReferenceCounter::ReferenceTableProto *borrowed_refs) {
+    return_objects->push_back(std::make_shared<RayObject>(
+        GenerateRandomBuffer(), GenerateRandomBuffer(), std::vector<ObjectID>()));
     return Status::OK();
   }
 
@@ -773,7 +611,7 @@ class DirectActorReceiverTest : public ::testing::Test {
     main_io_service_.stop();
   }
 
-  std::unique_ptr<MockCoreWorkerDirectTaskReceiver> receiver_;
+  std::unique_ptr<CoreWorkerDirectTaskReceiver> receiver_;
 
  private:
   rpc::Address rpc_address_;
@@ -802,13 +640,11 @@ TEST_F(DirectActorReceiverTest, TestNewTaskFromDifferentWorker) {
     auto request =
         CreatePushTaskRequestHelper(actor_id, 0, worker_id, caller_id, curr_timestamp);
     rpc::PushTaskReply reply;
-    auto reply_callback = [&callback_count](Status status,
-                                            std::function<void()> success,
+    auto reply_callback = [&callback_count](Status status, std::function<void()> success,
                                             std::function<void()> failure) {
       ++callback_count;
       ASSERT_TRUE(status.ok());
     };
-    receiver_->UpdateConcurrencyGroupsCache(actor_id, {});
     receiver_->HandleTask(request, &reply, reply_callback);
   }
 
@@ -818,8 +654,7 @@ TEST_F(DirectActorReceiverTest, TestNewTaskFromDifferentWorker) {
     auto request =
         CreatePushTaskRequestHelper(actor_id, 1, worker_id, caller_id, curr_timestamp);
     rpc::PushTaskReply reply;
-    auto reply_callback = [&callback_count](Status status,
-                                            std::function<void()> success,
+    auto reply_callback = [&callback_count](Status status, std::function<void()> success,
                                             std::function<void()> failure) {
       ++callback_count;
       ASSERT_TRUE(status.ok());
@@ -837,8 +672,7 @@ TEST_F(DirectActorReceiverTest, TestNewTaskFromDifferentWorker) {
     auto request =
         CreatePushTaskRequestHelper(actor_id, 0, worker_id, caller_id, new_timestamp);
     rpc::PushTaskReply reply;
-    auto reply_callback = [&callback_count](Status status,
-                                            std::function<void()> success,
+    auto reply_callback = [&callback_count](Status status, std::function<void()> success,
                                             std::function<void()> failure) {
       ++callback_count;
       ASSERT_TRUE(status.ok());
@@ -853,11 +687,13 @@ TEST_F(DirectActorReceiverTest, TestNewTaskFromDifferentWorker) {
     auto request =
         CreatePushTaskRequestHelper(actor_id, 1, worker_id, caller_id, old_timestamp);
     rpc::PushTaskReply reply;
-    auto reply_callback = [&callback_count](Status status,
-                                            std::function<void()> success,
+    auto reply_callback = [&callback_count](Status status, std::function<void()> success,
                                             std::function<void()> failure) {
       ++callback_count;
-      ASSERT_TRUE(!status.ok());
+      // ANT-INTERNAL: We continue executing received tasks even if the task with expected
+      // seq no isn't received.
+      // ASSERT_TRUE(!status.ok());
+      ASSERT_TRUE(status.ok());
     };
     receiver_->HandleTask(request, &reply, reply_callback);
   }
@@ -872,17 +708,15 @@ TEST_F(DirectActorReceiverTest, TestNewTaskFromDifferentWorker) {
   StopIOService();
 }
 
-}  // namespace core
 }  // namespace ray
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
 
   InitShutdownRAII ray_log_shutdown_raii(ray::RayLog::StartRayLog,
-                                         ray::RayLog::ShutDownRayLog,
-                                         argv[0],
+                                         ray::RayLog::ShutDownRayLog, argv[0],
                                          ray::RayLogLevel::INFO,
                                          /*log_dir=*/"");
-  ray::RayLog::InstallFailureSignalHandler(argv[0]);
+  ray::RayLog::InstallFailureSignalHandler();
   return RUN_ALL_TESTS();
 }

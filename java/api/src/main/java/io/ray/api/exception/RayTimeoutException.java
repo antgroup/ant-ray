@@ -1,6 +1,8 @@
 package io.ray.api.exception;
 
-/** Indicate that there are some thing have timed out, including `Ray.get()` or others. */
+/**
+ * This exception could happen either because Ray.get timeout, or because a task operator timeout
+ */
 public class RayTimeoutException extends RayException {
   public RayTimeoutException(String message) {
     super(message);

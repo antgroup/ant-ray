@@ -2,17 +2,15 @@ package io.ray.runtime.placementgroup;
 
 import io.ray.api.Ray;
 import io.ray.api.id.PlacementGroupId;
+import io.ray.api.placementgroup.Bundle;
 import io.ray.api.placementgroup.PlacementGroup;
 import io.ray.api.placementgroup.PlacementGroupState;
 import io.ray.api.placementgroup.PlacementStrategy;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 /** The default implementation of `PlacementGroup` interface. */
-public class PlacementGroupImpl implements PlacementGroup, Serializable {
-
-  private static final long serialVersionUID = -6616291240442716883L;
+public class PlacementGroupImpl implements PlacementGroup {
 
   private final PlacementGroupId id;
   private final String name;
@@ -61,6 +59,42 @@ public class PlacementGroupImpl implements PlacementGroup, Serializable {
   @Override
   public boolean wait(int timeoutSeconds) {
     return Ray.internal().waitPlacementGroupReady(id, timeoutSeconds);
+  }
+
+  @Override
+  public void addBundles(List<Bundle> bundles) {
+    if (this.id == null) {
+      throw new IllegalStateException(
+          "The placement group must be created successfully before adding bundles.");
+    }
+    if (bundles == null || bundles.isEmpty()) {
+      throw new IllegalArgumentException(
+          "Argument `bundles` can't be null or empty "
+              + "when adding bundles to a created placement group.");
+    }
+    boolean bundleResourceValid = bundles.stream().allMatch(Bundle::validate);
+
+    if (!bundleResourceValid) {
+      throw new IllegalArgumentException(
+          "Each bundle's resources must "
+              + "be positive when adding bundles to a placement group.");
+    }
+
+    Ray.internal().addBundlesForPlacementGroup(id, bundles);
+  }
+
+  @Override
+  public void removeBundles(List<Integer> bundleIndexes) {
+    if (this.id == null) {
+      throw new IllegalStateException(
+          "The placement group must has been created successfully before removing bundles.");
+    }
+    if (bundleIndexes == null || bundleIndexes.isEmpty()) {
+      throw new IllegalArgumentException(
+          "Argument `bundleIndexes` can't be null or empty "
+              + "when removing bundles from a created placement group.");
+    }
+    Ray.internal().removeBundlesForPlacementGroup(id, bundleIndexes);
   }
 
   /** A help class for create the placement group. */

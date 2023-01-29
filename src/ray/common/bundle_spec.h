@@ -15,7 +15,6 @@
 #pragma once
 
 #include <cstddef>
-#include <regex>
 #include <string>
 #include <vector>
 
@@ -28,12 +27,10 @@
 
 namespace ray {
 
+typedef std::function<void(const ResourceIdSet &)> ScheduleBundleCallback;
 /// Arguments are the raylet ID to spill back to, the raylet's
 /// address and the raylet's port.
 typedef std::function<void()> SpillbackBundleCallback;
-
-const std::string kGroupKeyword = "_group_";
-const size_t kGroupKeywordSize = kGroupKeyword.size();
 
 class BundleSpecification : public MessageWrapper<rpc::Bundle> {
  public:
@@ -57,21 +54,42 @@ class BundleSpecification : public MessageWrapper<rpc::Bundle> {
   // Return the Placement Group id which the Bundle belong to.
   PlacementGroupID PlacementGroupId() const;
 
-  // Get a node ID that this bundle is scheduled on.
-  NodeID NodeId() const;
-
   // Return the index of the bundle.
   int64_t Index() const;
+
+  // Return the node id which the bundle belongs to.
+  NodeID NodeId() const;
+
+  void MarkAsInvalid();
+
+  // Whether is valid or not.
+  bool IsValid() const;
 
   /// Return the resources that are to be acquired by this bundle.
   ///
   /// \return The resources that will be acquired by this bundle.
-  const ResourceRequest &GetRequiredResources() const;
+  const ResourceSet &GetRequiredResources() const;
+
+  /// Override dispatch behaviour.
+  void OnScheduleInstead(const ScheduleBundleCallback &callback) {
+    on_schedule_ = callback;
+  }
+
+  /// Override spillback behaviour.
+  void OnSpillbackInstead(const SpillbackBundleCallback &callback) {
+    on_spillback_ = callback;
+  }
 
   /// Get all placement group bundle resource labels.
-  const absl::flat_hash_map<std::string, double> &GetFormattedResources() const {
+  const std::unordered_map<std::string, double> &GetFormattedResources() const {
     return bundle_resource_labels_;
   }
+
+  /// Returns the schedule bundle callback, or nullptr.
+  const ScheduleBundleCallback &OnSchedule() const { return on_schedule_; }
+
+  /// Returns the spillback bundle callback, or nullptr.
+  const SpillbackBundleCallback &OnSpillback() const { return on_spillback_; }
 
   std::string DebugString() const;
 
@@ -82,7 +100,7 @@ class BundleSpecification : public MessageWrapper<rpc::Bundle> {
   /// Field storing unit resources. Initialized in constructor.
   /// TODO(ekl) consider optimizing the representation of ResourceSet for fast copies
   /// instead of keeping shared pointers here.
-  std::shared_ptr<ResourceRequest> unit_resource_;
+  std::shared_ptr<ResourceSet> unit_resource_;
 
   /// When a bundle is assigned on a node, we'll add the following special resources on
   /// that node:
@@ -90,13 +108,11 @@ class BundleSpecification : public MessageWrapper<rpc::Bundle> {
   /// or task specifies placement group without bundle id.
   /// 2) `CPU_group_${bundle_index}_${group_id}`: this is the requested resource
   /// when the actor or task specifies placement group with bundle id.
-  absl::flat_hash_map<std::string, double> bundle_resource_labels_;
-};
+  std::unordered_map<std::string, double> bundle_resource_labels_;
 
-struct PgFormattedResourceData {
-  std::string original_resource;
-  /// -1 if it is a wildcard resource.
-  int64_t bundle_index;
+  mutable ScheduleBundleCallback on_schedule_ = nullptr;
+
+  mutable SpillbackBundleCallback on_spillback_ = nullptr;
 };
 
 /// Format a placement group resource, e.g., CPU -> CPU_group_i
@@ -108,44 +124,27 @@ std::string FormatPlacementGroupResource(const std::string &original_resource_na
 std::string FormatPlacementGroupResource(const std::string &original_resource_name,
                                          const BundleSpecification &bundle_spec);
 
+std::unordered_map<std::string, double> AddPlacementGroupConstraint(
+    const std::unordered_map<std::string, double> &resources,
+    const PlacementGroupID &placement_group_id, int64_t bundle_index);
+
+/// Prase placement_group_id and index from a formated resource label
+/// \return whether this is an valid bundle resource label.
+bool ParseBundleResource(const std::string &resource,
+                         PlacementGroupID *placement_group_id, int64_t *index);
+
+/// Return whether a formatted resource is a bundle of the given index.
+bool IsBundleIndex(const std::string &resource, const PlacementGroupID &group_id,
+                   const int bundle_index);
+
 /// Return the original resource name of the placement group resource.
 std::string GetOriginalResourceName(const std::string &resource);
 
-// Return the original resource name of the placement group resource
-// if the resource is the wildcard resource (resource without a bundle id).
-// Returns "" if the resource is not a wildcard resource.
-std::string GetOriginalResourceNameFromWildcardResource(const std::string &resource);
+const std::unordered_map<int64_t, std::string> GetBundleConstraintResources(
+    const std::vector<std::shared_ptr<BundleSpecification>> bundles);
 
-/// Parse the given resource and get the pg related information.
-///
-/// \param resource name of the resource.
-/// \param for_wildcard_resource if true, it parses wildcard pg resources.
-/// E.g., [resource]_group_[pg_id]
-/// \param for_indexed_resource if true, it parses indexed pg resources.
-/// E.g., [resource]_group_[index]_[pg_id]
-/// \return nullopt if it is not a pg resource. Otherwise, it returns the
-/// struct with pg information parsed from the resource.
-/// If a returned bundle index is -1, it means the resource is the wildcard resource.
-std::optional<PgFormattedResourceData> ParsePgFormattedResource(
-    const std::string &resource, bool for_wildcard_resource, bool for_indexed_resource);
-
-/// Generate debug information of given bundles.
-std::string GetDebugStringForBundles(
-    const std::vector<std::shared_ptr<const BundleSpecification>> &bundles);
-
-/// Format the placement group resource set, e.g., CPU -> CPU_group_YYY_i
-std::unordered_map<std::string, double> AddPlacementGroupConstraint(
-    const std::unordered_map<std::string, double> &resources,
-    const PlacementGroupID &placement_group_id,
-    int64_t bundle_index);
-
-/// Format the placement group resource set, e.g., CPU -> CPU_group_YYY_i
-std::unordered_map<std::string, double> AddPlacementGroupConstraint(
-    const std::unordered_map<std::string, double> &resources,
-    const rpc::SchedulingStrategy &scheduling_strategy);
-
-/// Get the group id (as in resources like `CPU_group_${group_id}`) of the placement group
-/// resource.
-std::string GetGroupIDFromResource(const std::string &resource);
+/// Check whether the bundle can be removabe or not.
+bool IsBundleResourceReleasable(const std::shared_ptr<BundleSpecification> &bundle,
+                                const SchedulingResources &resources);
 
 }  // namespace ray

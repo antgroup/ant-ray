@@ -1,31 +1,30 @@
 package io.ray.serve.poll;
 
+import com.google.common.collect.ImmutableMap;
 import io.ray.api.ActorHandle;
 import io.ray.api.ObjectRef;
 import io.ray.api.Ray;
-import io.ray.serve.BaseServeTest;
+import io.ray.serve.Constants;
 import io.ray.serve.DummyServeController;
+import io.ray.serve.RayServeConfig;
+import io.ray.serve.ReplicaContext;
+import io.ray.serve.UpdatedObject;
 import io.ray.serve.api.Serve;
-import io.ray.serve.common.Constants;
-import io.ray.serve.config.RayServeConfig;
 import io.ray.serve.generated.EndpointInfo;
-import io.ray.serve.generated.EndpointSet;
-import io.ray.serve.generated.LongPollResult;
-import io.ray.serve.generated.UpdatedObject;
-import io.ray.serve.replica.ReplicaContext;
 import io.ray.serve.util.CommonUtil;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class LongPollClientTest {
+
   @Test
   public void disableTest() throws Throwable {
-    Map<String, String> config = new HashMap<>();
-    config.put(RayServeConfig.LONG_POOL_CLIENT_ENABLED, "false");
-
-    ReplicaContext replicaContext = new ReplicaContext(null, null, null, null, config);
+    ReplicaContext replicaContext = new ReplicaContext(null, null, null, null);
+    replicaContext.setRayServeConfig(
+        new RayServeConfig().setConfig(RayServeConfig.LONG_POOL_CLIENT_ENABLED, "false"));
     Serve.setInternalReplicaContext(replicaContext);
     try {
       LongPollClientFactory.init(null);
@@ -38,26 +37,27 @@ public class LongPollClientTest {
   @SuppressWarnings({"unchecked", "unused"})
   @Test
   public void normalTest() throws Throwable {
-    BaseServeTest.initRay();
-    try {
-      String prefix = "LongPollClientTest_normalTest";
-      // Init controller.
-      String controllerName = CommonUtil.formatActorName(Constants.SERVE_CONTROLLER_NAME, prefix);
-      ActorHandle<DummyServeController> controllerHandle =
-          Ray.actor(DummyServeController::new, "").setName(controllerName).remote();
+    boolean inited = Ray.isInitialized();
+    Ray.init();
 
-      Serve.setInternalReplicaContext(null, null, controllerName, null, null);
+    try {
+      // Init controller.
+      String controllerName =
+          CommonUtil.formatActorName(
+              Constants.SERVE_CONTROLLER_NAME, RandomStringUtils.randomAlphabetic(6));
+      ActorHandle<DummyServeController> controllerHandle =
+          Ray.actor(DummyServeController::new).setName(controllerName).remote();
+
+      Serve.setInternalReplicaContext(null, null, controllerName, null);
 
       // Init route table.
-      String endpointName1 = prefix + "_endpoint1";
-      String endpointName2 = prefix + "_endpoint2";
-      EndpointSet endpointSet =
-          EndpointSet.newBuilder()
-              .putEndpoints(
-                  endpointName1, EndpointInfo.newBuilder().setEndpointName(endpointName1).build())
-              .putEndpoints(
-                  endpointName2, EndpointInfo.newBuilder().setEndpointName(endpointName2).build())
-              .build();
+      String endpointName1 = "normalTest1";
+      String endpointName2 = "normalTest2";
+      Map<String, EndpointInfo> endpoints = new HashMap<>();
+      endpoints.put(
+          endpointName1, EndpointInfo.newBuilder().setEndpointName(endpointName1).build());
+      endpoints.put(
+          endpointName2, EndpointInfo.newBuilder().setEndpointName(endpointName2).build());
 
       // Construct a listener map.
       KeyType keyType = new KeyType(LongPollNamespace.ROUTE_TABLE, null);
@@ -70,24 +70,20 @@ public class LongPollClientTest {
                   ((Map<String, EndpointInfo>) object).get(endpointName1).getEndpointName());
 
       // Register.
-      LongPollClient longPollClient = new LongPollClient(controllerHandle, keyListeners);
+      LongPollClient longPollClient = new LongPollClient(null, keyListeners);
       Assert.assertTrue(LongPollClientFactory.isInitialized());
 
       // Construct updated object.
       int snapshotId = 10;
-      UpdatedObject updatedObject =
-          UpdatedObject.newBuilder()
-              .setSnapshotId(snapshotId)
-              .setObjectSnapshot(endpointSet.toByteString())
-              .build();
+      UpdatedObject updatedObject = new UpdatedObject();
+      updatedObject.setSnapshotId(snapshotId);
+      updatedObject.setObjectSnapshot(endpoints);
 
       // Mock LongPollResult.
-      LongPollResult longPollResult =
-          LongPollResult.newBuilder().putUpdatedObjects(keyType.toString(), updatedObject).build();
+      LongPollResult longPollResult = new LongPollResult();
+      longPollResult.setUpdatedObjects(ImmutableMap.of(keyType, updatedObject));
       ObjectRef<Boolean> mockLongPollResult =
-          controllerHandle
-              .task(DummyServeController::setLongPollResult, longPollResult.toByteArray())
-              .remote();
+          controllerHandle.task(DummyServeController::setLongPollResult, longPollResult).remote();
       Assert.assertEquals(mockLongPollResult.get().booleanValue(), true);
 
       // Poll.
@@ -103,7 +99,11 @@ public class LongPollClientTest {
       LongPollClientFactory.stop();
       Assert.assertFalse(LongPollClientFactory.isInitialized());
     } finally {
-      BaseServeTest.clearAndShutdownRay();
+      if (!inited) {
+        Ray.shutdown();
+      }
+      Serve.setInternalReplicaContext(null);
+      LongPollClientFactory.stop();
     }
   }
 }

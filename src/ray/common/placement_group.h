@@ -18,20 +18,9 @@
 #include "ray/common/grpc_util.h"
 #include "ray/common/id.h"
 #include "src/ray/protobuf/common.pb.h"
+#include "src/ray/protobuf/gcs.pb.h"
 
 namespace ray {
-
-struct pair_hash {
-  template <class T1, class T2>
-  std::size_t operator()(const std::pair<T1, T2> &pair) const {
-    return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
-  }
-};
-
-using BundleLocations =
-    absl::flat_hash_map<BundleID,
-                        std::pair<NodeID, std::shared_ptr<const BundleSpecification>>,
-                        pair_hash>;
 
 class PlacementGroupSpecification : public MessageWrapper<rpc::PlacementGroupSpec> {
  public:
@@ -52,6 +41,8 @@ class PlacementGroupSpecification : public MessageWrapper<rpc::PlacementGroupSpe
   }
   /// Return the placement group id.
   PlacementGroupID PlacementGroupId() const;
+  /// Return the create job id.
+  JobID GetCreatorJobId() const;
   /// Return the bundles in this placement group.
   std::vector<BundleSpecification> GetBundles() const;
   /// Return the strategy of the placement group.
@@ -60,8 +51,6 @@ class PlacementGroupSpecification : public MessageWrapper<rpc::PlacementGroupSpe
   BundleSpecification GetBundle(int position) const;
   /// Return the name of this placement group.
   std::string GetName() const;
-  /// Return the max CPU fraction per node for this placement group.
-  double GetMaxCpuFractionPerNode() const;
 
  private:
   /// Construct bundle vector from protobuf.
@@ -69,6 +58,14 @@ class PlacementGroupSpecification : public MessageWrapper<rpc::PlacementGroupSpe
   /// The bundles in this placement group.
   std::vector<BundleSpecification> bundles_;
 };
+
+// Set resource for `rpc::Bundle`.
+rpc::Bundle BuildBundle(const std::unordered_map<std::string, double> &resource,
+                        const size_t &bundle_index,
+                        const PlacementGroupID &placement_group_id);
+
+void LogBundlesChangedEventDebugInfo(
+    const rpc::PlacementGroupBundlesChangedNotification &notification);
 
 class PlacementGroupSpecBuilder {
  public:
@@ -79,14 +76,10 @@ class PlacementGroupSpecBuilder {
   ///
   /// \return Reference to the builder object itself.
   PlacementGroupSpecBuilder &SetPlacementGroupSpec(
-      const PlacementGroupID &placement_group_id,
-      std::string name,
+      const PlacementGroupID &placement_group_id, std::string name,
       const std::vector<std::unordered_map<std::string, double>> &bundles,
-      const rpc::PlacementStrategy strategy,
-      const bool is_detached,
-      double max_cpu_fraction_per_node,
-      const JobID &creator_job_id,
-      const ActorID &creator_actor_id,
+      const rpc::PlacementStrategy strategy, const bool is_detached,
+      const JobID &creator_job_id, const ActorID &creator_actor_id,
       bool is_creator_detached_actor) {
     message_->set_placement_group_id(placement_group_id.Binary());
     message_->set_name(name);
@@ -102,24 +95,12 @@ class PlacementGroupSpecBuilder {
     message_->set_creator_actor_id(creator_actor_id.Binary());
     message_->set_creator_actor_dead(creator_actor_id.IsNil());
     message_->set_is_detached(is_detached);
-    message_->set_max_cpu_fraction_per_node(max_cpu_fraction_per_node);
 
     for (size_t i = 0; i < bundles.size(); i++) {
       auto resources = bundles[i];
       auto message_bundle = message_->add_bundles();
-      auto mutable_bundle_id = message_bundle->mutable_bundle_id();
-      mutable_bundle_id->set_bundle_index(i);
-      mutable_bundle_id->set_placement_group_id(placement_group_id.Binary());
-      auto mutable_unit_resources = message_bundle->mutable_unit_resources();
-      for (auto it = resources.begin(); it != resources.end();) {
-        auto current = it++;
-        // Remove a resource with value 0 because they are not allowed.
-        if (current->second == 0) {
-          resources.erase(current);
-        } else {
-          mutable_unit_resources->insert({current->first, current->second});
-        }
-      }
+      const auto &new_bundle = BuildBundle(resources, i, placement_group_id);
+      message_bundle->CopyFrom(new_bundle);
     }
     return *this;
   }

@@ -1,0 +1,20 @@
+diff --git src/butil/popen.cpp src/butil/popen.cpp
+index bb109d1..1f31f0d 100644
+--- src/butil/popen.cpp
++++ src/butil/popen.cpp
+@@ -183,6 +183,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
+ 
+     if (wstatus < 0) {
+         if (read_finished) {
++#if defined(OS_LINUX)
+             // pclose() would fail if SIGCHLD is ignored, so if fread() finished successfully
+             // in this case, we check if SIGCHLD is ignored, and treat it as success in this case.
+             struct sigaction act;
+@@ -191,6 +192,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
+                           << ", cmd: " << cmd;
+                 return 0;
+             }
++#endif
+         }
+         return wstatus;
+     }

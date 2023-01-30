@@ -26,8 +26,8 @@ SUPPORTED_BAZEL = (3, 2, 0)
 
 ROOT_DIR = os.path.dirname(__file__)
 # ANT-INTERNAL
-BUILD_JAVA = True  # os.getenv("RAY_INSTALL_JAVA") == "1"
-INSTALL_CPP = True  # os.getenv("RAY_INSTALL_CPP") == "1"
+BUILD_JAVA = False  # os.getenv("RAY_INSTALL_JAVA") == "1"
+INSTALL_CPP = False  # os.getenv("RAY_INSTALL_CPP") == "1"
 SKIP_BAZEL_BUILD = os.getenv("SKIP_BAZEL_BUILD") == "1"
 
 PICKLE5_SUBDIR = os.path.join("ray", "pickle5_files")
@@ -201,6 +201,7 @@ def is_invalid_windows_platform():
 # Calls Bazel in PATH, falling back to the standard user installatation path
 # (~/.bazel/bin/bazel) if it isn't found.
 def bazel_invoke(invoker, cmdline, *args, **kwargs):
+    print("bazel_invoke::cmdline: ", cmdline)
     home = os.path.expanduser("~")
     first_candidate = os.getenv("BAZEL_PATH", "bazel")
     candidates = [first_candidate]

@@ -72,22 +72,6 @@ void StatsConfig::SetCeresdbConfFile(const std::string &ceresdb_conf_file) {
 
 const std::string &StatsConfig::GetCeresdbConfFile() const { return ceresdb_conf_file_; };
 
-void StatsConfig::SetKmonitorExporterEnabled(bool kmonitor_exporter_enabled) {
-  kmonitor_exporter_enabled_ = kmonitor_exporter_enabled;
-}
-
-bool StatsConfig::GetKmonitorExporterEnabled() const {
-  return kmonitor_exporter_enabled_;
-}
-
-void StatsConfig::SetKmonitorConfFile(const std::string &kmonitor_conf_file) {
-  kmonitor_conf_file_ = kmonitor_conf_file;
-}
-
-const std::string &StatsConfig::GetKmonitorConfFile() const {
-  return kmonitor_conf_file_;
-}
-
 void StatsConfig::SetReportInterval(const absl::Duration interval) {
   report_interval_ = interval;
 }

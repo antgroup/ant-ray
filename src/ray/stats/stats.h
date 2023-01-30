@@ -66,23 +66,6 @@ static std::shared_ptr<MetricExporterClient> InitCeresdbExporter(
   return exporter;
 }
 
-static std::shared_ptr<MetricExporterClient> InitKMonitorExporter(
-    std::shared_ptr<MetricExporterClient> exporter) {
-  if (StatsConfig::instance().GetKmonitorExporterEnabled()) {
-    auto kmonitor_conf_map =
-        LoadPropertiesFromFile(StatsConfig::instance().GetKmonitorConfFile());
-    KMonitorConfig kMonitor_config = {
-        kmonitor_conf_map["tenant_name"], kmonitor_conf_map["service_name"],
-        kmonitor_conf_map["global_tags"], kmonitor_conf_map["sink_address"],
-        kmonitor_conf_map["sink_period"], kmonitor_conf_map["sink_queue_capacity"]};
-    std::shared_ptr<MetricExporterClient> kMonitor_exporter_client(
-        new KMonitorExporterClient(kMonitor_config, exporter));
-    RAY_LOG(INFO) << "Stats KMonitor exporter registered.";
-    return kMonitor_exporter_client;
-  }
-  return exporter;
-}
-
 /// Initialize stats for a process.
 /// NOTE:
 /// - stats::Init should be called only once per PROCESS. Redundant calls will be just
@@ -128,7 +111,6 @@ static inline void Init(const TagsType &global_tags, const int metrics_agent_por
   }
 
   auto ceresdb_exporter = InitCeresdbExporter(exporter);
-  auto pack_exporter = InitKMonitorExporter(ceresdb_exporter);
 
   // Set interval.
   StatsConfig::instance().SetReportInterval(absl::Milliseconds(std::max(
@@ -137,7 +119,6 @@ static inline void Init(const TagsType &global_tags, const int metrics_agent_por
       absl::Milliseconds(std::max(RayConfig::instance().metrics_report_interval_ms() / 2,
                                   static_cast<uint64_t>(500))));
 
-  MetricPointExporter::Register(pack_exporter, metrics_report_batch_size);
   // TODO(buhe): disable exporter to agent process and will fix this later.
   if (metrics_agent_port > 0) {
     OpenCensusProtoExporter::Register(metrics_agent_port, (*metrics_io_service),
@@ -204,15 +185,6 @@ static inline void Start(const TagsType &global_tags = {},
     StatsConfig::instance().SetCeresdbConfFile(RayConfig::instance().ceresdb_conf_file());
     RAY_LOG(INFO) << "Ceresdb exporter enabled and ceresdb conf file is "
                   << RayConfig::instance().ceresdb_conf_file();
-  }
-
-  if (RayConfig::instance().enable_kmonitor_exporter() &&
-      !RayConfig::instance().kmonitor_conf_file().empty()) {
-    StatsConfig::instance().SetKmonitorExporterEnabled(true);
-    StatsConfig::instance().SetKmonitorConfFile(
-        RayConfig::instance().kmonitor_conf_file());
-    RAY_LOG(INFO) << "KMonitor exporter enabled and kmonitor conf file is "
-                  << RayConfig::instance().kmonitor_conf_file();
   }
 
   for (auto pair : global_tags) {

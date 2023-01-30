@@ -56,7 +56,7 @@ def gen_streaming_java_deps():
             ),
         ],
         repositories = [
-            "http://mvn.dev.alipay.net:8080/artifactory/repo/",
+            "https://repo1.maven.org/maven2/",
         ],
         fail_on_missing_checksum = False,
     )

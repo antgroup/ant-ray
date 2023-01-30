@@ -54,7 +54,6 @@ def gen_java_deps():
             ),
         ],
         repositories = [
-            "http://mvn.dev.alipay.net:8080/artifactory/repo/",
-            "http://mvn.test.alipay.net:8080/artifactory/repo/",
+            "https://repo1.maven.org/maven2/",
         ],
     )

@@ -35,71 +35,68 @@ def urlsplit(url):
         "fragment": split_on_anchor[1] if len(split_on_anchor) > 1 else None,
     }
 
-def auto_http_archive(*, name=None, url=None, urls=True,
-                      build_file=None, build_file_content=None,
-                      strip_prefix=True, **kwargs):
+def auto_http_archive(
+        *,
+        name = None,
+        url = None,
+        urls = True,
+        build_file = None,
+        build_file_content = None,
+        strip_prefix = True,
+        **kwargs):
     """ Intelligently choose mirrors based on the given URL for the download.
-
     Either url or urls is required.
-
     If name         == None , it is auto-deduced, but this is NOT recommended.
     If urls         == True , mirrors are automatically chosen.
     If build_file   == True , it is auto-deduced.
     If strip_prefix == True , it is auto-deduced.
     """
     DOUBLE_SUFFIXES_LOWERCASE = [("tar", "bz2"), ("tar", "gz"), ("tar", "xz")]
-    mirror_prefixes = ["https://mirror.bazel.build/"]
+    mirror_prefixes = ["https://mirror.bazel.build/", "https://storage.googleapis.com/bazel-mirror"]
 
     canonical_url = url if url != None else urls[0]
     url_parts = urlsplit(canonical_url)
-    url_except_scheme = (canonical_url.replace(url_parts["scheme"] + "://", "")
-                         if url_parts["scheme"] != None else canonical_url)
+    url_except_scheme = (canonical_url.replace(url_parts["scheme"] + "://", "") if url_parts["scheme"] != None else canonical_url)
     url_path_parts = url_parts["path"]
     url_filename = url_path_parts[-1]
-    url_filename_parts = (url_filename.rsplit(".", 2)
-                          if (tuple(url_filename.lower().rsplit(".", 2)[-2:])
-                              in DOUBLE_SUFFIXES_LOWERCASE)
-                          else url_filename.rsplit(".", 1))
+    url_filename_parts = (url_filename.rsplit(".", 2) if (tuple(url_filename.lower().rsplit(".", 2)[-2:]) in
+                                                          DOUBLE_SUFFIXES_LOWERCASE) else url_filename.rsplit(".", 1))
     is_github = url_parts["netloc"] == ["github", "com"]
 
     if name == None:  # Deduce "com_github_user_project_name" from "https://github.com/user/project-name/..."
         name = "_".join(url_parts["netloc"][::-1] + url_path_parts[:2]).replace("-", "_")
 
+    # auto appending ray project namespace prefix for 3rd party library reusing.
     if build_file == True:
         build_file = "@com_github_ray_project_ray//%s:%s" % ("bazel", "BUILD." + name)
 
     if urls == True:
         prefer_url_over_mirrors = is_github
-        urls = [mirror_prefix + url_except_scheme
-                for mirror_prefix in mirror_prefixes
-                if not canonical_url.startswith(mirror_prefix)]
+        urls = [
+            mirror_prefix + url_except_scheme
+            for mirror_prefix in mirror_prefixes
+            if not canonical_url.startswith(mirror_prefix)
+        ]
         urls.insert(0 if prefer_url_over_mirrors else len(urls), canonical_url)
     else:
-        print("No implicit mirrors used because urls were explicitly provided, name = " + name)
+        print("No implicit mirrors used because urls were explicitly provided")
 
     if strip_prefix == True:
         prefix_without_v = url_filename_parts[0]
         if prefix_without_v.startswith("v") and prefix_without_v[1:2].isdigit():
             # GitHub automatically strips a leading 'v' in version numbers
             prefix_without_v = prefix_without_v[1:]
-        strip_prefix = (url_path_parts[1] + "-" + prefix_without_v
-                        if is_github and url_path_parts[2:3] == ["archive"]
-                        else url_filename_parts[0])
+        strip_prefix = (url_path_parts[1] + "-" + prefix_without_v if is_github and url_path_parts[2:3] == ["archive"] else url_filename_parts[0])
 
-    # Use internal OSS address.
-    url = get_oss_url(name, kwargs['sha256'], url or urls[0])
-    urls = None
-
-    # Add `@com_github_ray_project_ray` prefix to the patch files,
-    # otherwise when other projects loads Ray, there will be issues finding these files.
-    if 'patches' in kwargs:
-        kwargs['patches'] = [
-            "@com_github_ray_project_ray" + patch for patch in kwargs['patches']
-        ]
-
-    return http_archive(name=name, url=url, urls=urls, build_file=build_file,
-                        build_file_content=build_file_content,
-                        strip_prefix=strip_prefix, **kwargs)
+    return http_archive(
+        name = name,
+        url = url,
+        urls = urls,
+        build_file = build_file,
+        build_file_content = build_file_content,
+        strip_prefix = strip_prefix,
+        **kwargs
+    )
 
 def ray_deps_setup(local_thirdparty_path):
 
@@ -324,12 +321,6 @@ def ray_deps_setup(local_thirdparty_path):
 
     # ===== ANT-INTERNAL below =====
     # If you want to add a new dependency, use `oss_uploader.py` to upload it to OSS.
-
-    native.local_repository(
-        name = "com_antfin_kmonitor_client",
-        path = local_thirdparty_path + "/kmoncli",
-    )
-
 
     http_archive(
         name = "nlohmann_json",

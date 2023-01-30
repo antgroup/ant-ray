@@ -14,10 +14,6 @@
 
 #pragma once
 
-#include "kmonitor/client/KMonitor.h"
-#include "kmonitor/client/KMonitorFactory.h"
-#include "kmonitor/client/StatisticsType.h"
-#include "kmonitor/client/core/MetricsTags.h"
 #include "ray/rpc/metrics_agent_client.h"
 #include "ray/stats/metric.h"
 #include "ray/util/opentsdb_client.h"
@@ -95,28 +91,6 @@ class MetricsAgentExporter : public MetricExporterDecorator {
   ~MetricsAgentExporter() {}
 
   void ReportMetrics(const std::vector<MetricPoint> &points) override;
-};
-
-struct KMonitorConfig {
-  std::string tenant_name;
-  std::string service_name;
-  std::string global_tags;
-  std::string sink_address;
-  std::string sink_period;
-  std::string sink_queue_capacity;
-};
-
-class KMonitorExporterClient : public MetricExporterDecorator {
- public:
-  KMonitorExporterClient(KMonitorConfig &config,
-                         std::shared_ptr<MetricExporterClient> exporter);
-
-  ~KMonitorExporterClient();
-
-  void ReportMetrics(const std::vector<MetricPoint> &points) override;
-
- private:
-  kmonitor::KMonitor *kMonitor_{nullptr};
 };
 
 }  // namespace stats

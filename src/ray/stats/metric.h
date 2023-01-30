@@ -50,14 +50,6 @@ class StatsConfig final {
 
   const std::string &GetCeresdbConfFile() const;
 
-  void SetKmonitorExporterEnabled(bool kmonitor_exporter_enabled);
-
-  bool GetKmonitorExporterEnabled() const;
-
-  void SetKmonitorConfFile(const std::string &kmonitor_conf_file);
-
-  const std::string &GetKmonitorConfFile() const;
-
   const absl::Duration &GetReportInterval() const;
 
   const absl::Duration &GetHarvestInterval() const;
@@ -94,9 +86,6 @@ class StatsConfig final {
 
   bool ceresdb_exporter_enabled_ = false;
   std::string ceresdb_conf_file_;
-
-  bool kmonitor_exporter_enabled_ = false;
-  std::string kmonitor_conf_file_;
 
   // Regular reporting interval for all reporters.
   absl::Duration report_interval_ = absl::Milliseconds(10000);

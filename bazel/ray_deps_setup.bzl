@@ -342,18 +342,22 @@ def ray_deps_setup(local_thirdparty_path):
     # leveldb is needed by brpc
     http_archive(
         name = "com_github_google_leveldb",
-        strip_prefix = "leveldb-a53934a3ae1244679f812d998a4f16f2c7f309a6",
-        url = "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci/leveldb/leveldb-1.20.tar.gz",
-        sha256 = "3912ac36dbb264a62797d68687711c8024919640d89b6733f9342ada1d16cda1",
+        strip_prefix = "leveldb-1.20",
+        url = "https://github.com/google/leveldb/archive/refs/tags/v1.20.tar.gz",
+        sha256 = "f5abe8b5b209c2f36560b75f32ce61412f39a2922f7045ae764a2c23335b6664",
         build_file = "@com_github_ray_project_ray//bazel:BUILD.leveldb",
     )
 
     # brpc: use latest candidate 0.9.7-rc03
-    http_archive(
+#    http_archive(
+#        name = "com_github_brpc_brpc",
+#        strip_prefix = "brpc-master",
+#        url = "http://ray-project.oss-cn-hangzhou-zmf.aliyuncs.com/brpc-master.tar.gz",
+#        sha256 = "7e95c2834e71d259fc28a2ac92472017c1bccc53f0b4871762bcc5a77d6dde80",
+#    )
+    native.local_repository(
         name = "com_github_brpc_brpc",
-        strip_prefix = "brpc-master",
-        url = "http://ray-project.oss-cn-hangzhou-zmf.aliyuncs.com/brpc-master.tar.gz",
-        sha256 = "7e95c2834e71d259fc28a2ac92472017c1bccc53f0b4871762bcc5a77d6dde80",
+        path = "/root/codes/brpc-master",
     )
 
     # http_archive(

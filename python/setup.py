@@ -50,8 +50,9 @@ pyd_suffix = ".pyd" if sys.platform == "win32" else ".so"
 # Note: We here use an ant internal oss url as the target instead of a Github
 # url, because it's very slow and unstable to fetch from Github.
 pickle5_url = (
-    "http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/ray-on-yarn/pickle5-backport/archive/"  # noqa: E501
-    "c0c1a158f59366696161e0dffdd10cfe17601372.tar.gz")
+    "https://github.com/pitrou/pickle5-backport/archive/"
+    "e6117502435aba2901585cc6c692fb9582545f08.tar.gz"
+)
 
 # Ideally, we could include these files by putting them in a
 # MANIFEST.in or using the package_data argument to setup, but the

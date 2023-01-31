@@ -37,6 +37,10 @@ void PushManager::OnChunkComplete(const NodeID &dest_id, const ObjectID &obj_id)
   auto push_id = std::make_pair(dest_id, obj_id);
   chunks_in_flight_ -= 1;
   if (--push_info_[push_id]->chunks_remaining <= 0) {
+    double end_time = absl::GetCurrentTimeNanos() / 1e9;
+    RAY_LOG(WARNING) << "[RDMA][Pusher][Object Transfer RTT] Receive Object last chunk reply, object: " << obj_id
+    RAY_LOG(WARNING) << "[RDMA][Pusher][Object Push RTT] Receive Object last chunk reply, object: "<< obj_id;
+
     push_info_.erase(push_id);
     RAY_LOG(DEBUG) << "Push for " << push_id.first << ", " << push_id.second
                    << " completed, remaining: " << NumPushesInFlight();

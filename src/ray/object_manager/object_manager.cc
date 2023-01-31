@@ -245,6 +245,8 @@ void ObjectManager::SendPullRequest(const ObjectID &object_id, const NodeID &cli
   auto rpc_client = GetRpcClient(client_id);
   if (rpc_client) {
     // Try pulling from the client.
+    RAY_LOG(WARNING) << "[RDMA][Puller][Object Pull RTT] Start send pull request for object: " << object_id 
+    << " to client: " << client_id;
     rpc_service_.post(
         [this, object_id, client_id, rpc_client=std::move(rpc_client)]() {
           rpc::PullRequest pull_request;
@@ -308,7 +310,8 @@ void ObjectManager::HandleSendFinished(const ObjectID &object_id, const NodeID &
   profile_event.set_extra_data("[\"" + object_id.Hex() + "\",\"" + node_id.Hex() + "\"," +
                                std::to_string(chunk_index) + ",\"" + status.ToString() +
                                "\"]");
-
+  RAY_LOG(WARNING) << "[RDMA][Pusher][Chunk RTT] Receive object chunk, object: " << object_id
+  << " , chunk index: " << chunk_index;
   std::lock_guard<std::mutex> lock(profile_mutex_);
   profile_events_.push_back(profile_event);
 }
@@ -325,6 +328,8 @@ void ObjectManager::HandleReceiveFinished(const ObjectID &object_id,
   profile_event.set_extra_data("[\"" + object_id.Hex() + "\",\"" + node_id.Hex() + "\"," +
                                std::to_string(chunk_index) + "]");
 
+  RAY_LOG(WARNING) << "[RDMA][Puller][Chunk RTT] Receive object chunk, object: " << object_id 
+  << " , chunk index: " << chunk_index;
   std::lock_guard<std::mutex> lock(profile_mutex_);
   profile_events_.push_back(profile_event);
 }
@@ -380,6 +385,9 @@ void ObjectManager::PushLocalObject(const ObjectID &object_id, const NodeID &nod
   uint64_t metadata_size = static_cast<uint64_t>(object_info.metadata_size);
   uint64_t num_chunks = buffer_pool_.GetNumChunks(total_data_size);
 
+  RAY_LOG(WARNING) << "[RDMA][Pusher][Object Push RTT] Start push object " << obj_id
+  << " , chunk size: " << num_chunks;
+  
   rpc::Address owner_address;
   owner_address.set_raylet_id(object_info.owner_raylet_id.Binary());
   owner_address.set_ip_address(object_info.owner_ip_address);
@@ -545,6 +553,12 @@ void ObjectManager::SendObjectChunk(
         on_complete(status);
       };
 
+  if (chunk_index == 0) {
+    // The first chunk of current object
+    RAY_LOG(WARNING) << "[RDMA][Pusher][Object Transfer RTT] Start send first chunk of object " << object_id;
+  }
+  RAY_LOG(WARNING) << "[RDMA][Pusher][Chunk RTT] Send object chunk, object: " << object_id 
+    << " , chunk index: " << chunk_index;
   rpc_client->Push(push_request, callback);
 
   release_chunk_callback(chunk_index);
@@ -621,6 +635,8 @@ void ObjectManager::HandlePull(const rpc::PullRequest &request, rpc::PullReply *
                                rpc::SendReplyCallback send_reply_callback) {
   ObjectID object_id = ObjectID::FromBinary(request.object_id());
   NodeID node_id = NodeID::FromBinary(request.node_id());
+  RAY_LOG(WARNING) << "[RDMA][Pusher] Received pull request from node " << node_id << " for object ["
+                << object_id << "].";
   RAY_LOG(DEBUG) << "Received pull request from node " << node_id << " for object ["
                  << object_id << "].";
 

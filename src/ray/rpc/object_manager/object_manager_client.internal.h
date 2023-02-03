@@ -251,6 +251,8 @@ class ObjectManagerBrpcClients : public std::enable_shared_from_this<ObjectManag
       ));
       rpc_clients_[i]->Start();
     }
+    RAY_LOG(INFO) << "create clients, with connections number: " << num_connections_
+                  << ", address:" << ip_address << ":" << port;
   };
 
 #define OBJECT_MANAGER_WRAP_CALLBACK_CODE_SNIPPET(REPLY_TYPE)                            \

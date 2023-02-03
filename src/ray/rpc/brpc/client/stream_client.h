@@ -314,7 +314,7 @@ void BrpcStreamClient::CallMethod(MessageType request_type, MessageType reply_ty
     trace_log = GetTraceInfoMessage(*message->trace_info());
   }
 
-  RAY_LOG(DEBUG) << "Calling method for service " << name_
+  RAY_LOG(INFO) << "Calling method for service " << name_
                  << ", request id: " << request_id
                  << ", request type: " << static_cast<int>(request_type);
 
@@ -323,7 +323,7 @@ void BrpcStreamClient::CallMethod(MessageType request_type, MessageType reply_ty
     RAY_LOG(WARNING) << "Failed to write request message "
                      << static_cast<int>(request_type) << " for service " << name_
                      << " to " << address_ << ":" << port_ << ", request id "
-                     << request_id << ", method name: " << method_name 
+                     << request_id << ", method name: " << method_name
                      << ", brpc error number: " << brpc_errno;
     auto status = Status::IOError("Failed to write stream");
     if (wrapped_callback != nullptr) {
@@ -335,7 +335,7 @@ void BrpcStreamClient::CallMethod(MessageType request_type, MessageType reply_ty
       wrapped_callback(status, reply);
     }
   } else {
-    RAY_LOG(DEBUG) << "Sent RPC request " << trace_log;
+    RAY_LOG(INFO) << "Sent RPC request " << trace_log;
   }
 }
 

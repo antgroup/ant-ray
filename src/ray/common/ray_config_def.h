@@ -525,3 +525,5 @@ RAY_CONFIG(uint64_t, placement_group_detect_scheduling_slow_interval_time_s,
 /// Whether enable RDMA during object transfer. This requires rdma driver
 /// installed at runtime otherwise `ray.init()` will hang.
 RAY_CONFIG(bool, use_rdma, false)
+
+RAY_CONFIG(uint32_t, object_manager_conn_num, 4)

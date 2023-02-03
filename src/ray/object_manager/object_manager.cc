@@ -90,7 +90,8 @@ ObjectManager::ObjectManager(
       object_manager_server_("ObjectManager", config_.object_manager_port,
                              config_.rpc_service_threads_number),
       object_manager_service_(rpc_service_, *this),
-      client_call_manager_(main_service, config_.rpc_service_threads_number),
+      // client_call_manager_(main_service, config_.rpc_service_threads_number),
+      client_call_manager_(rpc_service_),
       restore_spilled_object_(restore_spilled_object),
       get_spilled_object_url_(get_spilled_object_url),
       pull_retry_timer_(*main_service_,
@@ -245,7 +246,7 @@ void ObjectManager::SendPullRequest(const ObjectID &object_id, const NodeID &cli
   auto rpc_client = GetRpcClient(client_id);
   if (rpc_client) {
     // Try pulling from the client.
-    RAY_LOG(WARNING) << "[RDMA][Puller][Object Pull RTT] Start send pull request for object: " << object_id 
+    RAY_LOG(WARNING) << "[RDMA][Puller][Object Pull RTT] Start send pull request for object: " << object_id
     << " to client: " << client_id;
     rpc_service_.post(
         [this, object_id, client_id, rpc_client=std::move(rpc_client)]() {
@@ -312,8 +313,8 @@ void ObjectManager::HandleSendFinished(const ObjectID &object_id, const NodeID &
                                "\"]");
   RAY_LOG(WARNING) << "[RDMA][Pusher][Chunk RTT] Receive object chunk, object: " << object_id
   << " , chunk index: " << chunk_index;
-  std::lock_guard<std::mutex> lock(profile_mutex_);
-  profile_events_.push_back(profile_event);
+  // std::lock_guard<std::mutex> lock(profile_mutex_);
+  // profile_events_.push_back(profile_event);
 }
 
 void ObjectManager::HandleReceiveFinished(const ObjectID &object_id,
@@ -328,10 +329,10 @@ void ObjectManager::HandleReceiveFinished(const ObjectID &object_id,
   profile_event.set_extra_data("[\"" + object_id.Hex() + "\",\"" + node_id.Hex() + "\"," +
                                std::to_string(chunk_index) + "]");
 
-  RAY_LOG(WARNING) << "[RDMA][Puller][Chunk RTT] Receive object chunk, object: " << object_id 
+  RAY_LOG(WARNING) << "[RDMA][Puller][Chunk RTT] Receive object chunk, object: " << object_id
   << " , chunk index: " << chunk_index;
-  std::lock_guard<std::mutex> lock(profile_mutex_);
-  profile_events_.push_back(profile_event);
+  // std::lock_guard<std::mutex> lock(profile_mutex_);
+  // profile_events_.push_back(profile_event);
 }
 
 void ObjectManager::Push(const ObjectID &object_id, const NodeID &node_id) {
@@ -384,7 +385,7 @@ void ObjectManager::PushLocalObject(const ObjectID &object_id, const NodeID &nod
       static_cast<uint64_t>(object_info.data_size + object_info.metadata_size);
   uint64_t metadata_size = static_cast<uint64_t>(object_info.metadata_size);
   uint64_t num_chunks = buffer_pool_.GetNumChunks(total_data_size);
-  
+
   rpc::Address owner_address;
   owner_address.set_raylet_id(object_info.owner_raylet_id.Binary());
   owner_address.set_ip_address(object_info.owner_ip_address);
@@ -554,7 +555,7 @@ void ObjectManager::SendObjectChunk(
     // The first chunk of current object
     RAY_LOG(WARNING) << "[RDMA][Pusher][Object Transfer RTT] Start send first chunk of object " << object_id;
   }
-  RAY_LOG(WARNING) << "[RDMA][Pusher][Chunk RTT] Send object chunk, object: " << object_id 
+  RAY_LOG(WARNING) << "[RDMA][Pusher][Chunk RTT] Send object chunk, object: " << object_id
     << " , chunk index: " << chunk_index;
   rpc_client->Push(push_request, callback);
 
@@ -642,10 +643,10 @@ void ObjectManager::HandlePull(const rpc::PullRequest &request, rpc::PullReply *
   profile_event.set_start_time(absl::GetCurrentTimeNanos() / 1e9);
   profile_event.set_end_time(profile_event.start_time());
   profile_event.set_extra_data("[\"" + object_id.Hex() + "\",\"" + node_id.Hex() + "\"]");
-  {
-    std::lock_guard<std::mutex> lock(profile_mutex_);
-    profile_events_.emplace_back(profile_event);
-  }
+  // {
+  //   std::lock_guard<std::mutex> lock(profile_mutex_);
+  //   profile_events_.emplace_back(profile_event);
+  // }
 
   main_service_->post([this, object_id, node_id]() { Push(object_id, node_id); },
                       "ObjectManager.HandlePull");
@@ -711,7 +712,7 @@ std::shared_ptr<rpc::ObjectManagerBrpcClients> ObjectManager::GetRpcClient(
       return nullptr;
     }
     auto object_manager_client = std::make_shared<rpc::ObjectManagerBrpcClients>(
-        connection_info.ip, connection_info.port, client_call_manager_);
+        connection_info.ip, connection_info.port, client_call_manager_, RayConfig::instance().object_manager_conn_num());
 
     RAY_LOG(DEBUG) << "Get rpc client, address: " << connection_info.ip
                    << ", port: " << connection_info.port
@@ -728,13 +729,13 @@ std::shared_ptr<rpc::ProfileTableData> ObjectManager::GetAndResetProfilingInfo()
   profile_info->set_component_type("object_manager");
   profile_info->set_component_id(self_node_id_.Binary());
 
-  {
-    std::lock_guard<std::mutex> lock(profile_mutex_);
-    for (auto const &profile_event : profile_events_) {
-      profile_info->add_profile_events()->CopyFrom(profile_event);
-    }
-    profile_events_.clear();
-  }
+  // {
+  //   std::lock_guard<std::mutex> lock(profile_mutex_);
+  //   for (auto const &profile_event : profile_events_) {
+  //     profile_info->add_profile_events()->CopyFrom(profile_event);
+  //   }
+  //   profile_events_.clear();
+  // }
 
   return profile_info;
 }

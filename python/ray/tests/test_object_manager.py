@@ -52,7 +52,7 @@ def test_object_transfer_during_oom(ray_start_cluster_head):
     remote_ref = put.remote()
 
     with pytest.raises(GetTimeoutError):
-        ray.get(remote_ref, timeout=1)
+        ray.get(remote_ref, timeout=0.5)
     del local_ref
     ray.get(remote_ref)
 

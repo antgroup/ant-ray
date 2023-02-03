@@ -429,6 +429,8 @@ def build(build_python, build_java, build_cpp):
         if is_native_windows_or_msys():
             bazel_flags.append("--enable_runfiles=false")
 
+    bazel_flags.append("--define=BRPC_WITH_RDMA=true")
+
     if build_cpp:
         # TODO:  Remove this `bazel_invoke ` after we address the bazel issue
         # in cpp (https://code.alipay.com/Arc/X/pull_requests/13020).

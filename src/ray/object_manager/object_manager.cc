@@ -384,9 +384,6 @@ void ObjectManager::PushLocalObject(const ObjectID &object_id, const NodeID &nod
       static_cast<uint64_t>(object_info.data_size + object_info.metadata_size);
   uint64_t metadata_size = static_cast<uint64_t>(object_info.metadata_size);
   uint64_t num_chunks = buffer_pool_.GetNumChunks(total_data_size);
-
-  RAY_LOG(WARNING) << "[RDMA][Pusher][Object Push RTT] Start push object " << obj_id
-  << " , chunk size: " << num_chunks;
   
   rpc::Address owner_address;
   owner_address.set_raylet_id(object_info.owner_raylet_id.Binary());
@@ -635,8 +632,8 @@ void ObjectManager::HandlePull(const rpc::PullRequest &request, rpc::PullReply *
                                rpc::SendReplyCallback send_reply_callback) {
   ObjectID object_id = ObjectID::FromBinary(request.object_id());
   NodeID node_id = NodeID::FromBinary(request.node_id());
-  RAY_LOG(WARNING) << "[RDMA][Pusher] Received pull request from node " << node_id << " for object ["
-                << object_id << "].";
+  RAY_LOG(WARNING) << "[RDMA][Pusher][Object Push RTT] Received pull request from node " << node_id << " for object "
+                << object_id;
   RAY_LOG(DEBUG) << "Received pull request from node " << node_id << " for object ["
                  << object_id << "].";
 

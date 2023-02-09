@@ -184,9 +184,10 @@ void StreamServiceMethodImpl<ServiceMessageHandler, Request, Reply,
 
   auto reply = std::make_shared<Reply>();
 
-  RAY_LOG(DEBUG) << "Handle request for service " << StreamServiceType_Name(service_type_)
+  RAY_LOG(INFO) << "Handle request for service " << StreamServiceType_Name(service_type_)
                  << ", request id: " << request_id
-                 << ", request type: " << static_cast<int>(request_type_);
+                 << ", request type: " << static_cast<int>(request_type_)
+                 << ", trace info: " << GetTraceInfoMessage(*request_header->trace_info());
   (service_handler_.*handle_request_function_)(
       *request, reply.get(),
       [this, stream_id, request_id, request, reply, trace_info_object, requires_reply](

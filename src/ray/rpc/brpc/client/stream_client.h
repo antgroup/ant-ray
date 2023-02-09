@@ -87,7 +87,7 @@ class BrpcStreamClient : public BrpcClient,
     RAY_UNUSED(
         rpc_client->AsyncConnect([rpc_client, on_created](const ray::Status &status) {
           on_created(status, status.ok() ? rpc_client : nullptr);
-        }));
+        }, brpcpb::StreamServiceType::ObjectManagerServiceType == service_type));
   }
 
  protected:
@@ -118,7 +118,7 @@ class BrpcStreamClient : public BrpcClient,
   ///
   /// \param[in] handler The callback function to be invoked after the stream
   ///            is established.
-  void AsyncConnect(std::function<void(const ray::Status &)> on_connected);
+  void AsyncConnect(std::function<void(const ray::Status &)> on_connected, bool is_object_manager_conn);
 
  public:
   /// Call a service method.
@@ -316,7 +316,9 @@ void BrpcStreamClient::CallMethod(MessageType request_type, MessageType reply_ty
 
   RAY_LOG(INFO) << "Calling method for service " << name_
                  << ", request id: " << request_id
-                 << ", request type: " << static_cast<int>(request_type);
+                 << ", request type: " << static_cast<int>(request_type)
+                 << ", method name: " << method_name
+                 << ", trace info: " << trace_log;
 
   int brpc_errno = ::brpc::StreamWrite(stream_id_, iobuf);
   if (brpc_errno != 0) {

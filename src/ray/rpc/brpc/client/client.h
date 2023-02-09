@@ -22,7 +22,7 @@ class BrpcClient {
 
   virtual ~BrpcClient();
 
-  Status ConnectChannel(::brpc::Channel **channel);
+  Status ConnectChannel(::brpc::Channel **channel, bool is_object_manager_conn);
 
   /// IP address of the server.
   const std::string address_;

@@ -12,9 +12,10 @@ namespace ray {
 namespace rpc {
 
 void BrpcStreamClient::AsyncConnect(
-    std::function<void(const ray::Status &)> on_connected) {
+    std::function<void(const ray::Status &)> on_connected,
+    bool is_object_manager_conn) {
   ::brpc::Channel *channel;
-  auto status = ConnectChannel(&channel);
+  auto status = ConnectChannel(&channel, is_object_manager_conn);
   if (!status.ok()) {
     on_connected(status);
     return;

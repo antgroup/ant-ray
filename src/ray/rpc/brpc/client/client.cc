@@ -17,7 +17,7 @@ BrpcClient::BrpcClient(const std::string &address, const int port,
 
 BrpcClient::~BrpcClient() {}
 
-Status BrpcClient::ConnectChannel(::brpc::Channel **channel) {
+Status BrpcClient::ConnectChannel(::brpc::Channel **channel, bool is_object_manager_conn) {
   std::string server_ip_and_port = address_ + ":" + std::to_string(port_);
 
   // A Channel represents a communication line to a Server. Notice that
@@ -67,6 +67,10 @@ Status BrpcClient::ConnectChannel(::brpc::Channel **channel) {
       options.protocol = ::brpc::PROTOCOL_BAIDU_STD;
       options.connection_type =
           "";  // Available values: single, pooled, short. Single by default.
+      if (is_object_manager_conn) {
+        options.connection_type = "single";
+        RAY_LOG(INFO) << "connection_type: " << options.connection_type;
+      }
       options.timeout_ms = -1;  // no timeout.
       options.max_retry = 0;    // Max retries(not including the first RPC).
 #ifdef BRPC_WITH_RDMA

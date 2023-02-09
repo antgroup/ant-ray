@@ -328,9 +328,6 @@ void ObjectManager::HandleReceiveFinished(const ObjectID &object_id,
   // which will be parsed by the reader of the profile table.
   profile_event.set_extra_data("[\"" + object_id.Hex() + "\",\"" + node_id.Hex() + "\"," +
                                std::to_string(chunk_index) + "]");
-
-  RAY_LOG(WARNING) << "[RDMA][Puller][Chunk RTT] Receive object chunk, object: " << object_id
-  << " , chunk index: " << chunk_index;
   // std::lock_guard<std::mutex> lock(profile_mutex_);
   // profile_events_.push_back(profile_event);
 }
@@ -574,6 +571,9 @@ void ObjectManager::HandlePush(const rpc::PushRequest &request, rpc::PushReply *
   uint64_t data_size = request.data_size();
   const rpc::Address &owner_address = request.owner_address();
   const std::string &data = request.data();
+
+  RAY_LOG(WARNING) << "[RDMA][Puller][Chunk RTT] Receive object chunk, object: " << object_id
+    << " , chunk index: " << chunk_index;
 
   double start_time = absl::GetCurrentTimeNanos() / 1e9;
   bool success = ReceiveObjectChunk(node_id, object_id, owner_address, data_size,

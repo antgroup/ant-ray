@@ -91,7 +91,7 @@ ObjectManager::ObjectManager(
                              config_.rpc_service_threads_number),
       object_manager_service_(rpc_service_, *this),
       // client_call_manager_(main_service, config_.rpc_service_threads_number),
-      client_call_manager_(rpc_service_),
+      client_call_manager_(rpc_service_, main_service, main_service, 1, true),
       restore_spilled_object_(restore_spilled_object),
       get_spilled_object_url_(get_spilled_object_url),
       pull_retry_timer_(*main_service_,

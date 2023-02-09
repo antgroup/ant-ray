@@ -68,7 +68,7 @@ Status BrpcClient::ConnectChannel(::brpc::Channel **channel, bool is_object_mana
       options.connection_type =
           "";  // Available values: single, pooled, short. Single by default.
       if (is_object_manager_conn) {
-        options.connection_type = "single";
+        options.connection_type = "pooled";
         RAY_LOG(INFO) << "connection_type: " << options.connection_type;
       }
       options.timeout_ms = -1;  // no timeout.

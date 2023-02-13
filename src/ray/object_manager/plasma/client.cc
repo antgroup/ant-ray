@@ -348,6 +348,7 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
       shared_from_this(),
       GetStoreFdAndMmap(store_fd, mmap_size) + object.data_offset,
       object.data_size);
+    RAY_LOG(INFO) << "Get data from mmap fd, start address: " << (*data)->Data() << ", metadata size: " <<  object.data_size;
 #else
     *data = std::make_shared<PlasmaMutableBuffer>(
         shared_from_this(), object.address, object.data_size); // physical address, no need to mmap (virtual) address + offset
@@ -357,7 +358,7 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
     // metadata here. The metadata will be written along with the data streamed
     // from the transfer.
     if (metadata != NULL) {
-  //    RAY_LOG(INFO) << "Before metadata  memcpy, start address: " << (*data)->Data() <<" + " <<  object.data_size << ", metadata size: " << object.metadata_size;
+      RAY_LOG(INFO) << "Before metadata memcpy, start address: " << (*data)->Data() <<" + " <<  object.data_size << ", metadata size: " << object.metadata_size;
       // Copy the metadata to the buffer.
       memcpy((*data)->Data() + object.data_size, metadata, object.metadata_size);
       RAY_LOG(INFO) << "After metadata memcpy";

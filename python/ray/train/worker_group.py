@@ -155,13 +155,19 @@ class WorkerGroup:
                 "`actor_cls_args` or `actor_class_kwargs` are "
                 "passed in but no `actor_cls` is passed in."
             )
-
+        logger.info("Init WorkerGroup with config: "
+        f"num_workers: {num_workers}, "
+        f"num_cpus_per_worker: {num_cpus_per_worker}, "
+        f"additional_resources_per_worker: {additional_resources_per_worker}, "
+        f"actor_cls: {actor_cls}"
+        )
         self.num_workers = num_workers
         self.num_cpus_per_worker = num_cpus_per_worker
         self.num_gpus_per_worker = num_gpus_per_worker
         self.additional_resources_per_worker = additional_resources_per_worker
         self.workers = []
         self._base_cls = create_executable_class(actor_cls)
+        logger.info(f"Created executable class: {self._base_cls}")
         assert issubclass(self._base_cls, BaseWorkerMixin)
 
         self._actor_cls_args = actor_cls_args or []
@@ -176,6 +182,7 @@ class WorkerGroup:
             num_gpus=self.num_gpus_per_worker,
             resources=self.additional_resources_per_worker,
         )(self._base_cls)
+        logger.info(f"Resources are enough, result: {self._remote_cls}")
         self.start()
 
     def start(self):
@@ -187,7 +194,7 @@ class WorkerGroup:
                 "restart them."
             )
 
-        logger.debug(f"Starting {self.num_workers} workers.")
+        logger.debug(f"[Test Pytorch] Starting {self.num_workers} workers.")
         self.add_workers(self.num_workers)
         logger.debug(f"{len(self.workers)} workers have successfully started.")
 

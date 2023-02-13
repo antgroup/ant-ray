@@ -28,6 +28,12 @@ config_setting(
     values = {"compilation_mode": "opt"},
 )
 
+config_setting(
+    name = "ray_in_tee",
+    define_values = {"RAY_IN_TEE": "true"},
+    visibility = ["//visibility:public"],
+)
+
 # === Begin of rpc definitions ===
 
 # GRPC common lib.

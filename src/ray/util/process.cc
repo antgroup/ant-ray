@@ -174,9 +174,13 @@ class ProcessFD {
     if (pipe(pipefds) == -1) {
       pipefds[0] = pipefds[1] = -1;
     }
+#ifndef RAY_IN_TEE
+    pid = pipefds[1] != -1 ? fork() : -1;
+#else
     RAY_LOG(DEBUG) << "pipefds[1]: " << pipefds[1];
     pid = pipefds[1] != -1 ? vfork() : -1;
     RAY_LOG(DEBUG) << "vfork() return value: " << pid;
+#endif
     if (pid <= 0 && pipefds[0] != -1) {
       close(pipefds[0]);  // not the parent, so close the read end of the pipe
       pipefds[0] = -1;
@@ -192,7 +196,11 @@ class ProcessFD {
       RAY_LOG(DEBUG) << "After Sent SIGCHLD signal";
       // If process needs to be decoupled, double-fork to avoid zombies.
       RAY_LOG(DEBUG) << "decouple ? " << decouple;
-      if (pid_t pid2 = decouple ? vfork() : 0) {
+#ifndef RAY_IN_TEE
+    if (pid_t pid2 = decouple ? fork() : 0) {
+#else
+    if (pid_t pid2 = decouple ? vfork() : 0) {
+#endif
 	RAY_LOG(DEBUG) << "exit intermediate process";
         _exit(pid2 == -1 ? errno : 0);  // Parent of grandchild; must exit
       }

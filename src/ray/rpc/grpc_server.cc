@@ -161,6 +161,8 @@ void GrpcServer::PollEventsFromCompletionQueue(int index) {
 
   // Keep reading events from the `CompletionQueue` until it's shutdown.
   while (cqs_[index]->Next(&tag, &ok)) {
+    RAY_LOG(DEBUG) << "Polled event from CQ, thead: " 
+      << pthread_self() << "::" << index << ", status: " << ok;
     auto *server_call = static_cast<ServerCall *>(tag);
     bool delete_call = false;
     // A new call is needed after the server sends a reply, no matter the reply is

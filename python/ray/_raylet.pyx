@@ -138,7 +138,7 @@ from ray._private.client_mode_hook import disable_client_hook
 import ray._private.gcs_utils as gcs_utils
 import ray._private.memory_monitor as memory_monitor
 import ray._private.profiling as profiling
-from ray._private.utils import decode
+from ray._private.utils import decode, ray_in_tee
 
 cimport cpython
 
@@ -781,10 +781,11 @@ cdef void execute_task(
 
     with core_worker.profile_event(b"task::" + name, extra_data=extra_data):
         try:
-            # if (not (<int>task_type == <int>TASK_TYPE_ACTOR_TASK
-            #          and function_name == "__ray_terminate__") and
-            #         ray._config.memory_monitor_refresh_ms() == 0):
-            #     worker.memory_monitor.raise_if_low_memory()
+	    if not ray_in_tee():
+                if (not (<int>task_type == <int>TASK_TYPE_ACTOR_TASK
+                         and function_name == "__ray_terminate__") and
+                        ray._config.memory_monitor_refresh_ms() == 0):
+                    worker.memory_monitor.raise_if_low_memory()
 
             with core_worker.profile_event(b"task:deserialize_arguments"):
                 if c_args.empty():

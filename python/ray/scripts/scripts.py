@@ -21,7 +21,7 @@ import yaml
 import ray
 import ray._private.ray_constants as ray_constants
 import ray._private.services as services
-from ray._private.utils import parse_resources_json
+from ray._private.utils import parse_resources_json, ray_in_tee
 from ray._private.internal_api import memory_summary
 from ray._private.storage import _load_class
 from ray._private.usage import usage_lib
@@ -712,7 +712,7 @@ def start(
         # Fail early when starting a new cluster when one is already running
         if address is None:
             default_address = f"{ray_params.node_ip_address}:{port}"
-            bootstrap_address = services.find_bootstrap_address(temp_dir)
+            bootstrap_address = services.find_bootstrap_address(temp_dir) if not ray_in_tee() else ""
             if (
                 default_address == bootstrap_address
                 and bootstrap_address in services.find_gcs_addresses()

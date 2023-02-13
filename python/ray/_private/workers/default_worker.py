@@ -1,7 +1,3 @@
-def logg(val):
-    with open('/host/tmp/default_worker.log', 'a') as f:
-        f.write(val + '\n')
-logg("entering default_worker.py")
 import argparse
 import base64
 import json
@@ -10,14 +6,12 @@ import sys
 import time
 
 import ray
-logg('imported ray')
 import ray._private.node
 import ray._private.ray_constants as ray_constants
 import ray._private.utils
 import ray.actor
 from ray._private.parameter import RayParams
 from ray._private.ray_logging import configure_log_file, get_worker_log_file_name
-logg('imported all')
 
 parser = argparse.ArgumentParser(
     description=("Parse addresses for the worker to connect to.")
@@ -156,7 +150,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     ray._private.ray_logging.setup_logger(args.logging_level, args.logging_format)
 
-    logg('setup logger complete')
     if args.worker_type == "WORKER":
         mode = ray.WORKER_MODE
     elif args.worker_type == "SPILL_WORKER":
@@ -170,7 +163,6 @@ if __name__ == "__main__":
     if raylet_ip_address is None:
         raylet_ip_address = args.node_ip_address
 
-    logg(f'raylet ip arress{raylet_ip_address}')
     ray_params = RayParams(
         node_ip_address=args.node_ip_address,
         raylet_ip_address=raylet_ip_address,
@@ -193,7 +185,6 @@ if __name__ == "__main__":
         connect_only=True,
     )
 
-    logg('created node')
     # NOTE(suquark): We must initialize the external storage before we
     # connect to raylet. Otherwise we may receive requests before the
     # external storage is intialized.
@@ -219,7 +210,6 @@ if __name__ == "__main__":
         startup_token=args.startup_token,
         ray_debugger_external=args.ray_debugger_external,
     )
-    logg('worker process connected to node')
     # Add code search path to sys.path, set load_code_from_local.
     core_worker = ray._private.worker.global_worker.core_worker
     code_search_path = core_worker.get_job_config().code_search_path

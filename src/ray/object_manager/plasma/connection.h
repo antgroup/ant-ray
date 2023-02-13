@@ -21,6 +21,9 @@ class ClientInterface {
  public:
   virtual ~ClientInterface() {}
 
+#ifndef RAY_IN_TEE
+  virtual ray::Status SendFd(MEMFD_TYPE fd) = 0;
+#endif
   virtual const std::unordered_set<ray::ObjectID> &GetObjectIDs() = 0;
   virtual void MarkObjectAsUsed(const ray::ObjectID &object_id) = 0;
   virtual void MarkObjectAsUnused(const ray::ObjectID &object_id) = 0;
@@ -32,6 +35,9 @@ class Client : public ray::ClientConnection, public ClientInterface {
   static std::shared_ptr<Client> Create(PlasmaStoreMessageHandler message_handler,
                                         ray::local_stream_socket &&socket);
 
+#ifndef RAY_IN_TEE
+  ray::Status SendFd(MEMFD_TYPE fd) override;
+#endif
   const std::unordered_set<ray::ObjectID> &GetObjectIDs() override { return object_ids; }
 
   virtual void MarkObjectAsUsed(const ray::ObjectID &object_id) override {
@@ -60,6 +66,13 @@ std::ostream &operator<<(std::ostream &os, const std::shared_ptr<Client> &client
 class StoreConn : public ray::ServerConnection {
  public:
   StoreConn(ray::local_stream_socket &&socket);
+
+#ifndef RAY_IN_TEE
+  /// Receive a file descriptor for the store.
+  ///
+  /// \return A file descriptor.
+  ray::Status RecvFd(MEMFD_TYPE_NON_UNIQUE *fd);
+#endif
 };
 
 std::ostream &operator<<(std::ostream &os, const std::shared_ptr<StoreConn> &store_conn);

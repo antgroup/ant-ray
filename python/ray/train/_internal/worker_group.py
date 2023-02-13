@@ -199,7 +199,7 @@ class WorkerGroup:
                 "restart them."
             )
 
-        logger.debug(f"[Test Pytorch] Starting {self.num_workers} workers.")
+        logger.debug(f"Starting {self.num_workers} workers.")
         self.add_workers(self.num_workers)
         logger.debug(f"{len(self.workers)} workers have successfully started.")
 

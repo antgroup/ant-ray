@@ -77,6 +77,7 @@ from ray._private.runtime_env.working_dir import upload_working_dir_if_needed
 from ray._private.storage import _load_class
 from ray._private.utils import check_oversized_function, get_ray_doc_version
 from ray.exceptions import ObjectStoreFullError, RayError, RaySystemError, RayTaskError
+from ray._private.utils import check_oversized_function, ray_in_tee
 from ray.experimental.internal_kv import (
     _initialize_internal_kv,
     _internal_kv_get,
@@ -1423,7 +1424,10 @@ def init(
             # TODO (yic): Have a separate connection to gcs client when
             # removal redis is done. The uploading should happen before this
             # one.
-            start_initial_python_workers_for_first_job=False,
+            start_initial_python_workers_for_first_job=(
+                False if ray_in_tee() else
+                    job_config is None or job_config.runtime_env is None
+            ),
             _system_config=_system_config,
             enable_object_reconstruction=_enable_object_reconstruction,
             metrics_export_port=_metrics_export_port,

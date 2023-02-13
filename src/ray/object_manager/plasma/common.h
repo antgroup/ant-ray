@@ -135,7 +135,9 @@ class LocalObject {
     object->metadata_size = GetObjectInfo().metadata_size;
     object->device_num = GetAllocation().device_num;
     object->mmap_size = GetAllocation().mmap_size;
+#ifdef RAY_IN_TEE
     object->address = static_cast<uint8_t*>(GetAllocation().address);
+#endif
   }
 
  private:

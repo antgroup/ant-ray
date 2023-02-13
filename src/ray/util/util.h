@@ -232,6 +232,15 @@ inline std::string GetThreadName() {
 #endif
 }
 
+inline bool RayInTEE() {
+  const char *var_value = std::getenv("RAY_IN_TEE");
+  if (var_value != nullptr) {
+    std::string data = var_value;
+    return data == "true";
+  }
+  return false;
+}
+
 namespace ray {
 template <typename T>
 class ThreadPrivate {

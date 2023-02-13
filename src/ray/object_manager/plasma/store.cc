@@ -234,6 +234,16 @@ void PlasmaStore::ReturnFromGet(const std::shared_ptr<GetRequest> &get_request) 
   // If we successfully sent the get reply message to the client, then also send
   // the file descriptors.
   if (s.ok()) {
+#ifndef RAY_IN_TEE
+    // Send all of the file descriptors for the present objects.
+    for (MEMFD_TYPE store_fd : store_fds) {
+      Status send_fd_status = get_request->client->SendFd(store_fd);
+      if (!send_fd_status.ok()) {
+        RAY_LOG(ERROR) << "Failed to send mmap results to client on fd "
+                       << get_request->client;
+      }
+    }
+#endif
   } else {
     RAY_LOG(ERROR) << "Failed to send Get reply to client on fd " << get_request->client;
   }
@@ -377,7 +387,14 @@ Status PlasmaStore::ProcessMessage(const std::shared_ptr<Client> &client,
           object_id, client, handle_create, object_size);
       const auto &result = result_error.first;
       const auto &error = result_error.second;
+#ifndef RAY_IN_TEE
+      if (SendCreateReply(client, object_id, result, error).ok() &&
+          error == PlasmaError::OK && result.device_num == 0) {
+        static_cast<void>(client->SendFd(result.store_fd));
+      }
+#else
       SendCreateReply(client, object_id, result, error);
+#endif
     } else {
       auto req_id =
           create_request_queue_.AddRequest(object_id, client, handle_create, object_size);
@@ -511,7 +528,14 @@ void PlasmaStore::ReplyToCreateClient(const std::shared_ptr<Client> &client,
   bool finished = create_request_queue_.GetRequestResult(req_id, &result, &error);
   if (finished) {
     RAY_LOG(DEBUG) << "Finishing create object " << object_id << " request ID " << req_id;
+#ifndef RAY_IN_TEE
+    if (SendCreateReply(client, object_id, result, error).ok() &&
+        error == PlasmaError::OK && result.device_num == 0) {
+      static_cast<void>(client->SendFd(result.store_fd));
+    }
+#else
     SendCreateReply(client, object_id, result, error);
+#endif
   } else {
     static_cast<void>(SendUnfinishedCreateReply(client, object_id, req_id));
   }

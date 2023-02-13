@@ -19,6 +19,7 @@ from ray._private.usage import usage_lib
 import ray._private.services as services
 import ray.ray_constants as ray_constants
 import ray._private.utils
+from ray._private.utils import ray_in_tee
 from ray.util.annotations import PublicAPI
 from ray.autoscaler._private.commands import (
     attach_cluster,
@@ -725,7 +726,7 @@ def start(
         # Fail early when starting a new cluster when one is already running
         if address is None:
             default_address = f"{ray_params.node_ip_address}:{port}"
-            bootstrap_addresses = []
+            bootstrap_addresses = services.find_bootstrap_address() if not ray_in_tee() else []
             if default_address in bootstrap_addresses:
                 raise ConnectionError(
                     f"Ray is trying to start at {default_address}, "

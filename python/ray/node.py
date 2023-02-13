@@ -26,7 +26,7 @@ import ray._private.utils
 from ray.internal import storage
 from ray._private.gcs_utils import GcsClient
 from ray._private.resource_spec import ResourceSpec
-from ray._private.utils import try_to_create_directory, try_to_symlink, open_log
+from ray._private.utils import try_to_create_directory, try_to_symlink, open_log, ray_in_tee
 
 # Logger for this module. It should be configured at the entry point
 # into the program using Ray. Ray configures it by default automatically
@@ -149,7 +149,7 @@ class Node:
         )
 
         self._resource_spec = None
-        self._localhost = "127.0.0.1"
+        self._localhost = socket.gethostbyname("localhost") if not ray_in_tee() else "127.0.0.1"
         self._ray_params = ray_params
         self._config = ray_params._system_config or {}
 
@@ -1086,19 +1086,19 @@ class Node:
         assert self._gcs_client is not None
         self._write_cluster_info_to_kv()
 
-        # Workaround because these params are not available in ray.init().
-        # Should be reverted once we start Ray with `ray start` CLI.
+        if not ray_in_tee():
+            # Workaround because these params are not available in ray.init().
+            # Should be reverted once we start Ray with `ray start` CLI.
+            if not self._ray_params.no_monitor:
+                self.start_monitor()
 
-        # if not self._ray_params.no_monitor:
-        #     self.start_monitor()
+            if self._ray_params.ray_client_server_port:
+                self.start_ray_client_server()
 
-        # if self._ray_params.ray_client_server_port:
-        #     self.start_ray_client_server()
-
-        # if self._ray_params.include_dashboard:
-        #     self.start_dashboard(require_dashboard=True)
-        # elif self._ray_params.include_dashboard is None:
-        #     self.start_dashboard(require_dashboard=False)
+            if self._ray_params.include_dashboard:
+                self.start_dashboard(require_dashboard=True)
+            elif self._ray_params.include_dashboard is None:
+                self.start_dashboard(require_dashboard=False)
 
     def start_ray_processes(self):
         """Start all of the processes on the node."""
@@ -1138,10 +1138,11 @@ class Node:
             huge_pages=self._ray_params.huge_pages,
         )
         self.start_raylet(plasma_directory, object_store_memory)
-        # Workaround because these params are not available in ray.init().
-        # Should be reverted once we start Ray with `ray start` CLI.
-        # if self._ray_params.include_log_monitor:
-        #     self.start_log_monitor()
+        if not ray_in_tee():
+            # Workaround because these params are not available in ray.init().
+            # Should be reverted once we start Ray with `ray start` CLI.
+            if self._ray_params.include_log_monitor:
+                self.start_log_monitor()
 
     def _kill_process_type(
         self, process_type, allow_graceful=False, check_alive=True, wait=False
@@ -1192,9 +1193,10 @@ class Node:
         for process_info in process_infos:
             process = process_info.process
 
-            # TODO: Use SIGTERM first if allow_graceful is True
-            os.kill(process, signal.SIGKILL)
-            return
+            if ray_in_tee():
+                # TODO: Use SIGTERM first if allow_graceful is True
+                os.kill(process, signal.SIGKILL)
+                return
 
             # Handle the case where the process has already exited.
             if process.poll() is not None:

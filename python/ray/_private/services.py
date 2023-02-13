@@ -23,6 +23,7 @@ import ray
 import ray.ray_constants as ray_constants
 from ray._raylet import GcsClientOptions
 from ray._private.gcs_utils import GcsClient
+from ray._private.utils import ray_in_tee
 from ray.core.generated.common_pb2 import Language
 
 # Import psutil and colorama after ray so the packaged version is used.
@@ -775,13 +776,25 @@ def start_ray_process(
                 f"got {total_chrs}"
             )
 
-    logger.info(f"Starting process with command: {command}")
-    file_actions = [
-            (os.POSIX_SPAWN_DUP2, stdout_file.fileno(), sys.stdout.fileno()),
-            (os.POSIX_SPAWN_DUP2, stderr_file.fileno(), sys.stderr.fileno()),
-    ]
-    # TODO: support cwd and pipe_stdin
-    process = os.posix_spawn(command[0], command, modified_env, file_actions=file_actions)
+    if not ray_in_tee():
+        process = ConsolePopen(
+            command,
+            env=modified_env,
+            cwd=cwd,
+            stdout=stdout_file,
+            stderr=stderr_file,
+            stdin=subprocess.PIPE if pipe_stdin else None,
+            preexec_fn=preexec_fn if sys.platform != "win32" else None,
+            creationflags=CREATE_SUSPENDED if win32_fate_sharing else 0,
+        )
+    else:
+        logger.info(f"Starting process with command: {command}")
+        file_actions = [
+                (os.POSIX_SPAWN_DUP2, stdout_file.fileno(), sys.stdout.fileno()),
+                (os.POSIX_SPAWN_DUP2, stderr_file.fileno(), sys.stderr.fileno()),
+        ]
+        # TODO(NKCqx): support cwd and pipe_stdin
+        process = os.posix_spawn(command[0], command, modified_env, file_actions=file_actions)
 
     if win32_fate_sharing:
         try:

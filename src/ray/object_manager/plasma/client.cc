@@ -348,7 +348,6 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
       shared_from_this(),
       GetStoreFdAndMmap(store_fd, mmap_size) + object.data_offset,
       object.data_size);
-    RAY_LOG(INFO) << "Get data from mmap fd, start address: " << (*data)->Data() << ", metadata size: " <<  object.data_size;
 #else
     *data = std::make_shared<PlasmaMutableBuffer>(
         shared_from_this(), object.address, object.data_size); // physical address, no need to mmap (virtual) address + offset
@@ -561,8 +560,6 @@ Status PlasmaClient::Impl::GetBuffers(
         physical_buf = std::make_shared<SharedMemoryBuffer>(
             object->address, object->data_size + object->metadata_size);
 #endif
-        physical_buf = std::make_shared<SharedMemoryBuffer>(
-            object->address, object->data_size + object->metadata_size);
       } else {
         RAY_LOG(FATAL) << "Arrow GPU library is not enabled.";
       }

@@ -1195,6 +1195,7 @@ class Node:
 
             if ray_in_tee():
                 # TODO: Use SIGTERM first if allow_graceful is True
+                logger.info("Sending SIGKILL to process", process)
                 os.kill(process, signal.SIGKILL)
                 return
 

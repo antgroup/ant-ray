@@ -144,7 +144,7 @@ class Node:
         )
 
         self._resource_spec = None
-        self._localhost = socket.gethostbyname("localhost")
+        self._localhost = "127.0.0.1"
         self._ray_params = ray_params
         self._config = ray_params._system_config or {}
 

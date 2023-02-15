@@ -1061,36 +1061,35 @@ class Node:
         assert self._gcs_client is not None
         self._write_cluster_info_to_kv()
 
-		if not ray_in_tee():
-        	# Workaround because these params are not available in ray.init().
-        	# Should be reverted once we start Ray with `ray start` CLI.
+        if not ray_in_tee():
+            # Workaround because these params are not available in ray.init().
+            # Should be reverted once we start Ray with `ray start` CLI.
 
-        	if not self._ray_params.no_monitor:
-        	    self.start_monitor()
+            if not self._ray_params.no_monitor:
+                self.start_monitor()
 
-        	if self._ray_params.ray_client_server_port:
-        	    self.start_ray_client_server()
+            if self._ray_params.ray_client_server_port:
+                self.start_ray_client_server()
 
-	        if self._ray_params.include_dashboard is None:
-	            # Default
-	            include_dashboard = True
-	            raise_on_api_server_failure = False
-	        elif self._ray_params.include_dashboard is False:
-	            include_dashboard = False
-	            raise_on_api_server_failure = False
-	        else:
-	            include_dashboard = True
-	            raise_on_api_server_failure = True
+            if self._ray_params.include_dashboard is None:
+                # Default
+                include_dashboard = True
+                raise_on_api_server_failure = False
+            elif self._ray_params.include_dashboard is False:
+                include_dashboard = False
+                raise_on_api_server_failure = False
+            else:
+                include_dashboard = True
+                raise_on_api_server_failure = True
+        else:
+            include_dashboard = False
+            raise_on_api_server_failure = False
+        
+        self.start_api_server(
+            include_dashboard=include_dashboard,
+            raise_on_failure=raise_on_api_server_failure,
+        )
 
-	        self.start_api_server(
-	            include_dashboard=include_dashboard,
-	            raise_on_failure=raise_on_api_server_failure,
-	        )
-		else:
-			self.start_api_server(
-	            include_dashboard=False,
-	            raise_on_failure=False,
-	        )
 
     def start_ray_processes(self):
         """Start all of the processes on the node."""

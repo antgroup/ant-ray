@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional, Union
 
+import logging
 import ray
 from ray._private.client_mode_hook import client_mode_should_convert, client_mode_wrap
 from ray._private.utils import hex_to_binary, get_ray_doc_version

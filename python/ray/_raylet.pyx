@@ -781,7 +781,7 @@ cdef void execute_task(
 
     with core_worker.profile_event(b"task::" + name, extra_data=extra_data):
         try:
-	    if not ray_in_tee():
+            if not ray_in_tee():
                 if (not (<int>task_type == <int>TASK_TYPE_ACTOR_TASK
                          and function_name == "__ray_terminate__") and
                         ray._config.memory_monitor_refresh_ms() == 0):

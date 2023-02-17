@@ -730,6 +730,9 @@ cdef void execute_task(
         c_name_of_concurrency_group_to_execute.decode("ascii")
 
     if <int>task_type == <int>TASK_TYPE_NORMAL_TASK:
+        print(f"=====validating_function: {function_name}")
+        ray._private.utils._validate_target_function_is_allowed(function_name)
+
         next_title = "ray::IDLE"
         function_executor = execution_info.function
         # Record the task name via :task_name: magic token in the log file.
@@ -1008,21 +1011,8 @@ cdef execute_task_with_cancellation_handler(
         actor = actor_class.__new__(actor_class)
         worker.actors[actor_id] = actor
 
-        def __validate_target_class_is_allowed():
-            import yaml
-            config_path = os.getenv("RAY_ALLOWED_CLASSES_AND_FUNCTIONS_CONFIG_PATH", None)
-            if config_path is None:
-                return
-
-            config = yaml.safe_load(open(config_path, "rt"))
-            allowed_classes = config.get("allowed_classes", None)
-            if allowed_classes is None:
-                return
-            if f"{actor_class.__module__}.{actor_class.__name__}" not in allowed_classes:
-                raise ValueError(f"The target actor {actor_class} is not in your "
-                    "allowed classes configuration. If you'd like to allow this class "
-                    "be invoked as an actor, please add it to the allowed list.")
-        __validate_target_class_is_allowed()
+        ray._private.utils._validate_target_class_is_allowed(
+            f"{actor_class.__module__}.{actor_class.__name__}")
 
         # Record the actor class via :actor_name: magic token in the log.
         #
@@ -1048,6 +1038,9 @@ cdef execute_task_with_cancellation_handler(
         execution_infos[function_descriptor] = execution_info
 
     global current_task_id
+
+
+
 
     try:
         task_id = (ray._private.worker.

@@ -1024,10 +1024,12 @@ cdef execute_task_with_cancellation_handler(
                 print("validating...2")
                 logger.error("validating...2")
                 return
-            if actor_class not in allowed_classes:
-                print("validating...3")
+            if f"{actor_class.__module__}.{actor_class.__name__}" not in allowed_classes:
+                print(f"validating...3A: {actor_class.__name__}")
+                print(f"validating...3A: {actor_class.__module__}")
+                print(f"validating...3B: {allowed_classes}")
                 logger.error("validating...3")
-                raise ValueError(f"The target actor class {actor_class} is not in your "
+                raise ValueError(f"The target actor {actor_class} is not in your "
                     "allowed classes configuration. If you'd like to allow this class "
                     "be invoked as an actor, please add it to the allowed list.")
         __validate_target_class_is_allowed()

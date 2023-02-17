@@ -36,7 +36,7 @@ def test_allowed_classes(shutdown_only):
     config_path = "/tmp/test_allowed_classes.yaml"
     with tempfile.TemporaryDirectory() as tmp_dir:
         config_context = {
-            "allowed_classes": ["111"]
+            "allowed_classes": ["111", "test_allowed_classes_and_functions.A"]
         }
         yaml.safe_dump(config_context, open(config_path, "wt"))
         import os

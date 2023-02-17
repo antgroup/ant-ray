@@ -26,7 +26,7 @@ import ray._private.utils
 from ray._private import storage
 from ray._private.gcs_utils import GcsClient
 from ray._private.resource_spec import ResourceSpec
-from ray._private.utils import open_log, try_to_create_directory, try_to_symlink
+from ray._private.utils import open_log, ray_in_tee, try_to_create_directory, try_to_symlink
 
 # Logger for this module. It should be configured at the entry point
 # into the program using Ray. Ray configures it by default automatically
@@ -144,7 +144,7 @@ class Node:
         )
 
         self._resource_spec = None
-        self._localhost = socket.gethostbyname("localhost")
+        self._localhost = socket.gethostbyname("localhost") if not ray_in_tee() else "127.0.0.1"
         self._ray_params = ray_params
         self._config = ray_params._system_config or {}
 
@@ -305,6 +305,7 @@ class Node:
 
         if not connect_only:
             self.start_ray_processes()
+            print("start_ray_processes end")
             # we should update the address info after the node has been started
             try:
                 ray._private.services.wait_for_node(
@@ -941,6 +942,7 @@ class Node:
                 valgrind profiler.
         """
         stdout_file, stderr_file = self.get_log_file_handles("raylet", unique=True)
+        print("calling start_raylet")
         process_info = ray._private.services.start_raylet(
             self.redis_address,
             self.gcs_address,
@@ -982,6 +984,7 @@ class Node:
             env_updates=self._ray_params.env_vars,
             node_name=self._ray_params.node_name,
         )
+        print("end calling start_raylet, next is to wait_for_node")
         assert ray_constants.PROCESS_TYPE_RAYLET not in self.all_processes
         self.all_processes[ray_constants.PROCESS_TYPE_RAYLET] = [process_info]
 
@@ -1058,27 +1061,35 @@ class Node:
         assert self._gcs_client is not None
         self._write_cluster_info_to_kv()
 
-        if not self._ray_params.no_monitor:
-            self.start_monitor()
+        if not ray_in_tee():
+            # Workaround because these params are not available in ray.init().
+            # Should be reverted once we start Ray with `ray start` CLI.
 
-        if self._ray_params.ray_client_server_port:
-            self.start_ray_client_server()
+            if not self._ray_params.no_monitor:
+                self.start_monitor()
 
-        if self._ray_params.include_dashboard is None:
-            # Default
-            include_dashboard = True
-            raise_on_api_server_failure = False
-        elif self._ray_params.include_dashboard is False:
+            if self._ray_params.ray_client_server_port:
+                self.start_ray_client_server()
+
+            if self._ray_params.include_dashboard is None:
+                # Default
+                include_dashboard = True
+                raise_on_api_server_failure = False
+            elif self._ray_params.include_dashboard is False:
+                include_dashboard = False
+                raise_on_api_server_failure = False
+            else:
+                include_dashboard = True
+                raise_on_api_server_failure = True
+        else:
             include_dashboard = False
             raise_on_api_server_failure = False
-        else:
-            include_dashboard = True
-            raise_on_api_server_failure = True
-
+        
         self.start_api_server(
             include_dashboard=include_dashboard,
             raise_on_failure=raise_on_api_server_failure,
         )
+
 
     def start_ray_processes(self):
         """Start all of the processes on the node."""
@@ -1118,8 +1129,11 @@ class Node:
             huge_pages=self._ray_params.huge_pages,
         )
         self.start_raylet(plasma_directory, object_store_memory)
-        if self._ray_params.include_log_monitor:
-            self.start_log_monitor()
+        if not ray_in_tee():
+            # Workaround because these params are not available in ray.init().
+            # Should be reverted once we start Ray with `ray start` CLI.
+            if self._ray_params.include_log_monitor:
+                self.start_log_monitor()
 
     def _kill_process_type(
         self,
@@ -1173,6 +1187,12 @@ class Node:
             assert len(process_infos) == 1
         for process_info in process_infos:
             process = process_info.process
+
+            if ray_in_tee():
+                # TODO: Use SIGTERM first if allow_graceful is True
+                os.kill(process, signal.SIGKILL)
+                return
+
             # Handle the case where the process has already exited.
             if process.poll() is not None:
                 if check_alive:

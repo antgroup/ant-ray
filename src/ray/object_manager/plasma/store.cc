@@ -113,11 +113,12 @@ PlasmaStore::PlasmaStore(instrumented_io_context &main_service,
                 this->AddToClientObjectIds(object_id, request->client);
               },
           [this](const auto &request) { this->ReturnFromGet(request); }) {
+  RAY_LOG(INFO) << "PlasmaStore constructor";
   if (RayConfig::instance().event_stats_print_interval_ms() > 0 &&
       RayConfig::instance().event_stats()) {
     PrintAndRecordDebugDump();
   }
-
+  RAY_LOG(INFO) << "PlasmaStore end";
   if (RayConfig::instance().metrics_report_interval_ms() > 0) {
     ScheduleRecordMetrics();
   }
@@ -238,6 +239,7 @@ void PlasmaStore::ReturnFromGet(const std::shared_ptr<GetRequest> &get_request) 
   // If we successfully sent the get reply message to the client, then also send
   // the file descriptors.
   if (s.ok()) {
+#ifndef RAY_IN_TEE
     // Send all of the file descriptors for the present objects.
     for (MEMFD_TYPE store_fd : store_fds) {
       Status send_fd_status = get_request->client->SendFd(store_fd);
@@ -246,6 +248,7 @@ void PlasmaStore::ReturnFromGet(const std::shared_ptr<GetRequest> &get_request) 
                        << get_request->client;
       }
     }
+#endif
   } else {
     RAY_LOG(ERROR) << "Failed to send Get reply to client on fd " << get_request->client;
   }
@@ -364,6 +367,7 @@ Status PlasmaStore::ProcessMessage(const std::shared_ptr<Client> &client,
   size_t input_size = message.size();
   ObjectID object_id;
 
+  RAY_LOG(INFO) << "Received message of type " << static_cast<int>(type);
   // Process the different types of requests.
   switch (type) {
   case fb::MessageType::PlasmaCreateRequest: {
@@ -388,10 +392,14 @@ Status PlasmaStore::ProcessMessage(const std::shared_ptr<Client> &client,
           object_id, client, handle_create, object_size);
       const auto &result = result_error.first;
       const auto &error = result_error.second;
+#ifndef RAY_IN_TEE
       if (SendCreateReply(client, object_id, result, error).ok() &&
           error == PlasmaError::OK && result.device_num == 0) {
         static_cast<void>(client->SendFd(result.store_fd));
       }
+#else
+      SendCreateReply(client, object_id, result, error);
+#endif
     } else {
       auto req_id =
           create_request_queue_.AddRequest(object_id, client, handle_create, object_size);
@@ -525,10 +533,14 @@ void PlasmaStore::ReplyToCreateClient(const std::shared_ptr<Client> &client,
   bool finished = create_request_queue_.GetRequestResult(req_id, &result, &error);
   if (finished) {
     RAY_LOG(DEBUG) << "Finishing create object " << object_id << " request ID " << req_id;
+#ifndef RAY_IN_TEE
     if (SendCreateReply(client, object_id, result, error).ok() &&
         error == PlasmaError::OK && result.device_num == 0) {
       static_cast<void>(client->SendFd(result.store_fd));
     }
+#else
+    SendCreateReply(client, object_id, result, error);
+#endif
   } else {
     static_cast<void>(SendUnfinishedCreateReply(client, object_id, req_id));
   }

@@ -19,6 +19,10 @@ COPTS_WITHOUT_LOG = select({
     ],
     "//conditions:default": [
     ],
+}) + select({
+    "//:ray-in-tee": ["-DRAY_IN_TEE=1"],
+    "//conditions:default": [
+    ],
 })
 
 COPTS = COPTS_WITHOUT_LOG

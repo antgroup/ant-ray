@@ -1775,3 +1775,6 @@ def _get_pyarrow_version() -> Optional[str]:
             if hasattr(pyarrow, "__version__"):
                 _PYARROW_VERSION = pyarrow.__version__
     return _PYARROW_VERSION
+
+def ray_in_tee():
+    return os.getenv("RAY_IN_TEE") == "true"

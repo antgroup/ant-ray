@@ -49,6 +49,8 @@ struct PlasmaObject {
   int device_num;
   /// Set if device_num is equal to 0.
   int64_t mmap_size;
+  /// The start address of this mapped memory. (Occlum only)
+  uint8_t *address;
 
   bool operator==(const PlasmaObject &other) const {
     return ((store_fd == other.store_fd) && (data_offset == other.data_offset) &&

@@ -82,6 +82,7 @@ std::shared_ptr<Client> Client::Create(PlasmaStoreMessageHandler message_handler
   return self;
 }
 
+#ifndef RAY_IN_TEE
 Status Client::SendFd(MEMFD_TYPE fd) {
   // Only send the file descriptor if it hasn't been sent (see analogous
   // logic in GetStoreFd in client.cc).
@@ -136,15 +137,17 @@ Status Client::SendFd(MEMFD_TYPE fd) {
         return Status::IOError("Unknown I/O Error");
       }
     }
-#endif
+#endif // #ifdef _WIN32
     used_fds_.insert(fd);  // Succeed, record the fd.
   }
   return Status::OK();
 }
+#endif // #ifdef RAY_IN_TEE
 
 StoreConn::StoreConn(ray::local_stream_socket &&socket)
     : ray::ServerConnection(std::move(socket)) {}
 
+#ifndef RAY_IN_TEE
 Status StoreConn::RecvFd(MEMFD_TYPE_NON_UNIQUE *fd) {
 #ifdef _WIN32
   DWORD pid = GetCurrentProcessId();
@@ -164,5 +167,6 @@ Status StoreConn::RecvFd(MEMFD_TYPE_NON_UNIQUE *fd) {
 #endif
   return Status::OK();
 }
+#endif
 
 }  // namespace plasma

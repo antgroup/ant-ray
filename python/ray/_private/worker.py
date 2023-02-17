@@ -77,6 +77,7 @@ from ray._private.runtime_env.working_dir import upload_working_dir_if_needed
 from ray._private.storage import _load_class
 from ray._private.utils import check_oversized_function, get_ray_doc_version
 from ray.exceptions import ObjectStoreFullError, RayError, RaySystemError, RayTaskError
+from ray._private.utils import check_oversized_function, ray_in_tee
 from ray.experimental.internal_kv import (
     _initialize_internal_kv,
     _internal_kv_get,
@@ -1424,7 +1425,8 @@ def init(
             # removal redis is done. The uploading should happen before this
             # one.
             start_initial_python_workers_for_first_job=(
-                job_config is None or job_config.runtime_env is None
+                False if ray_in_tee() else
+                    job_config is None or job_config.runtime_env is None
             ),
             _system_config=_system_config,
             enable_object_reconstruction=_enable_object_reconstruction,
@@ -1439,6 +1441,7 @@ def init(
         _global_node = ray._private.node.Node(
             head=True, shutdown_at_exit=False, spawn_reaper=True, ray_params=ray_params
         )
+        print("Create node end")
     else:
         # In this case, we are connecting to an existing cluster.
         if num_cpus is not None or num_gpus is not None:
@@ -1915,9 +1918,11 @@ def connect(
     worker.gcs_client = node.get_gcs_client()
     assert worker.gcs_client is not None
     _initialize_internal_kv(worker.gcs_client)
+    print("_initialize_internal_kv end")
     ray._private.state.state._initialize_global_state(
         ray._raylet.GcsClientOptions.from_gcs_address(node.gcs_address)
     )
+    print("_initialize_global_state end")
     worker.gcs_publisher = GcsPublisher(address=worker.gcs_client.address)
     worker.gcs_error_subscriber = GcsErrorSubscriber(address=worker.gcs_client.address)
     worker.gcs_log_subscriber = GcsLogSubscriber(address=worker.gcs_client.address)
@@ -2025,6 +2030,7 @@ def connect(
         logs_dir = ""
     else:
         logs_dir = node.get_logs_dir_path()
+    print("Create CoreWorker...")
     worker.core_worker = ray._raylet.CoreWorker(
         mode,
         node.plasma_store_socket_name,
@@ -2049,6 +2055,7 @@ def connect(
 
     # Notify raylet that the core worker is ready.
     worker.core_worker.notify_raylet()
+    print("notify_raylet end")
 
     if driver_object_store_memory is not None:
         logger.warning(
@@ -2434,7 +2441,7 @@ def wait(
     """
     worker = global_worker
     worker.check_connected()
-
+    logger.info("ray.wait")
     if (
         hasattr(worker, "core_worker")
         and worker.core_worker.current_actor_is_asyncio()
@@ -2500,6 +2507,7 @@ def wait(
             worker.current_task_id,
             fetch_local,
         )
+        logger.info(f"wait returned, ready_ids: {ready_ids}, remaining_ids: {remaining_ids}")
         return ready_ids, remaining_ids
 
 

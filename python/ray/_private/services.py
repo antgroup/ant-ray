@@ -24,6 +24,7 @@ import psutil
 import ray
 import ray._private.ray_constants as ray_constants
 from ray._private.gcs_utils import GcsClient
+from ray._private.utils import ray_in_tee
 from ray._raylet import GcsClientOptions
 from ray.core.generated.common_pb2 import Language
 
@@ -424,6 +425,7 @@ def wait_for_node(
     start_time = time.time()
     while time.time() - start_time < timeout:
         clients = global_state.node_table()
+        print("clients: " + str(len(clients)))
         object_store_socket_names = [
             client["ObjectStoreSocketName"] for client in clients
         ]
@@ -859,16 +861,25 @@ def start_ray_process(
                 f"got {total_chrs}"
             )
 
-    process = ConsolePopen(
-        command,
-        env=modified_env,
-        cwd=cwd,
-        stdout=stdout_file,
-        stderr=stderr_file,
-        stdin=subprocess.PIPE if pipe_stdin else None,
-        preexec_fn=preexec_fn if sys.platform != "win32" else None,
-        creationflags=CREATE_SUSPENDED if win32_fate_sharing else 0,
-    )
+    if not ray_in_tee():
+        process = ConsolePopen(
+            command,
+            env=modified_env,
+            cwd=cwd,
+            stdout=stdout_file,
+            stderr=stderr_file,
+            stdin=subprocess.PIPE if pipe_stdin else None,
+            preexec_fn=preexec_fn if sys.platform != "win32" else None,
+            creationflags=CREATE_SUSPENDED if win32_fate_sharing else 0,
+        )
+    else:
+        logger.info(f"Starting process with command: {command}")
+        file_actions = [
+                (os.POSIX_SPAWN_DUP2, stdout_file.fileno(), sys.stdout.fileno()),
+                (os.POSIX_SPAWN_DUP2, stderr_file.fileno(), sys.stderr.fileno()),
+        ]
+        # TODO(NKCqx): support cwd and pipe_stdin
+        process = os.posix_spawn(command[0], command, modified_env, file_actions=file_actions)
 
     if win32_fate_sharing:
         try:
@@ -1709,6 +1720,7 @@ def determine_plasma_store_config(
     if plasma_directory is None:
         if sys.platform == "linux" or sys.platform == "linux2":
             shm_avail = ray._private.utils.get_shared_memory_bytes()
+            print(f"shm_avail: {shm_avail}")
             # Compare the requested memory size to the memory available in
             # /dev/shm.
             if shm_avail > object_store_memory:

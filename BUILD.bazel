@@ -28,6 +28,12 @@ config_setting(
     values = {"compilation_mode": "opt"},
 )
 
+config_setting(
+    name = "ray-in-tee",
+    define_values = {"RAY_IN_TEE": "true"},
+    visibility = ["//visibility:public"],
+)
+
 # === Begin of rpc definitions ===
 
 # GRPC common lib.
@@ -1446,6 +1452,19 @@ cc_test(
     deps = [
         "ray_common",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "boost_test",
+    size = "small",
+    srcs = ["src/ray/boost_test.cc"],
+    copts = COPTS,
+    # linkshared = 1,
+    linkstatic = 1,
+    tags = ["team:core"],
+    deps = [
+        "@boost//:asio",
     ],
 )
 

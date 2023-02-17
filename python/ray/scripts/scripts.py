@@ -601,6 +601,13 @@ def start(
             stacklevel=2,
         )
 
+    if os.getenv("ENABLE_TEE") == "true":
+        # This is the code path to set a random access key for Redis, to workaround
+        # avoiding other worker nodes joining into this cluster.
+        # Currently, we now only support 1 head node if `ENABLE_TEE` is on.
+        import uuid
+        redis_password = uuid.uuid4()
+
     redirect_output = None if not no_redirect_output else True
     ray_params = ray._private.parameter.RayParams(
         node_ip_address=node_ip_address,

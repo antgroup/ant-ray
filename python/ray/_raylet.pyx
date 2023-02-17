@@ -1007,6 +1007,22 @@ cdef execute_task_with_cancellation_handler(
         actor_id = core_worker.get_actor_id()
         actor = actor_class.__new__(actor_class)
         worker.actors[actor_id] = actor
+
+        def __validate_target_class_is_allowed():
+            import yaml
+            config_path = os.getenv("RAY_ALLOWED_CLASSES_AND_FUNCTIONS_CONFIG_PATH", None):
+            if config_path is None:
+                return
+
+            config = yaml.safe_load(open(config_path, "rt"))
+            allowed_classes = config.get("allowed_classes", None)
+            if allowed_classes is None:
+                return
+            if actor_class is not in allowed_classes:
+                raise ValueError(f"The target actor class {actor_class} is not in your "
+                    "allowed classes configuration. If you'd like to allow this class "
+                    "be invoked as an actor, please add it to the allowed list.")
+
         # Record the actor class via :actor_name: magic token in the log.
         #
         # (Phase 1): this covers code run before __init__ finishes.

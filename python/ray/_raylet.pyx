@@ -1011,6 +1011,7 @@ cdef execute_task_with_cancellation_handler(
         actor = actor_class.__new__(actor_class)
         worker.actors[actor_id] = actor
 
+        # Validate whether this actor class is in our allowed list.
         ray._private.utils._validate_target_class_is_allowed(
             f"{actor_class.__module__}.{actor_class.__name__}")
 

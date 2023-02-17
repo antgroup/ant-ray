@@ -1778,8 +1778,11 @@ def _get_pyarrow_version() -> Optional[str]:
     return _PYARROW_VERSION
 
 
-def _load_allowed_classes_and_function_config():
-    config_path = os.getenv("RAY_ALLOWED_CLASSES_AND_FUNCTIONS_CONFIG_PATH", None)
+def _load_allowed_classes_and_functions_config():
+    """Load the configurations of allowed classes and functions, which are
+    ran as remote actors or tasks.
+    """
+    config_path = os.getenv(ray_constants.RAY_ALLOWED_LIST_CONFIG_PATH, None)
     if config_path is None:
         return None, None
 
@@ -1789,7 +1792,7 @@ def _load_allowed_classes_and_function_config():
     return allowed_classes, allowed_functions
 
 def _validate_target_class_is_allowed(target_class_full_name: str):
-    allowed_classes, _ = _load_allowed_classes_and_function_config()
+    allowed_classes, _ = _load_allowed_classes_and_functions_config()
     if allowed_classes is None:
         return
     if target_class_full_name not in allowed_classes:
@@ -1798,7 +1801,7 @@ def _validate_target_class_is_allowed(target_class_full_name: str):
             "be invoked as an actor, please add it to the allowed list.")
 
 def _validate_target_function_is_allowed(target_function_name: str):
-    _, allowed_functions = _load_allowed_classes_and_function_config()
+    _, allowed_functions = _load_allowed_classes_and_functions_config()
     if target_function_name not in allowed_functions:
         raise ValueError(f"The target function {target_function_name} is not in your "
             "allowed function configuration. If you'd like to allow this function "

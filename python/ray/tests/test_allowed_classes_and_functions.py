@@ -16,10 +16,9 @@ from numpy import log
 
 import ray
 import ray.cluster_utils
+import ray._private.ray_constants as ray_constants
 
 logger = logging.getLogger(__name__)
-
-
 
 
 def test_allowed_classes(shutdown_only):
@@ -58,7 +57,7 @@ def test_allowed_classes(shutdown_only):
         }
         yaml.safe_dump(config_context, open(config_path, "wt"))
         import os
-        os.environ["RAY_ALLOWED_CLASSES_AND_FUNCTIONS_CONFIG_PATH"] = config_path 
+        os.environ[ray_constants.RAY_ALLOWED_LIST_CONFIG_PATH] = config_path
 
         ray.init()
         a = A.remote()
@@ -98,7 +97,7 @@ def test_allowed_functions(shutdown_only):
         }
         yaml.safe_dump(config_context, open(config_path, "wt"))
         import os
-        os.environ["RAY_ALLOWED_CLASSES_AND_FUNCTIONS_CONFIG_PATH"] = config_path 
+        os.environ[ray_constants.RAY_ALLOWED_LIST_CONFIG_PATH] = config_path
 
         ray.init()
         o = func1.remote()

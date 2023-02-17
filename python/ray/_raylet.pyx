@@ -1009,20 +1009,31 @@ cdef execute_task_with_cancellation_handler(
         worker.actors[actor_id] = actor
 
         def __validate_target_class_is_allowed():
+            print("validating...")
+            logger.error("validating...")
             import yaml
-            config_path = os.getenv("RAY_ALLOWED_CLASSES_AND_FUNCTIONS_CONFIG_PATH", None):
+            config_path = os.getenv("RAY_ALLOWED_CLASSES_AND_FUNCTIONS_CONFIG_PATH", None)
             if config_path is None:
+                print("validating...1")
+                logger.error("validating...1")
                 return
 
             config = yaml.safe_load(open(config_path, "rt"))
             allowed_classes = config.get("allowed_classes", None)
             if allowed_classes is None:
+                print("validating...2")
+                logger.error("validating...2")
                 return
-            if actor_class is not in allowed_classes:
+            if actor_class not in allowed_classes:
+                print("validating...3")
+                logger.error("validating...3")
                 raise ValueError(f"The target actor class {actor_class} is not in your "
                     "allowed classes configuration. If you'd like to allow this class "
                     "be invoked as an actor, please add it to the allowed list.")
-
+        __validate_target_class_is_allowed()
+        print("validating...4")
+        logger.error("validating...4")
+    
         # Record the actor class via :actor_name: magic token in the log.
         #
         # (Phase 1): this covers code run before __init__ finishes.

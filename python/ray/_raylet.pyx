@@ -730,7 +730,6 @@ cdef void execute_task(
         c_name_of_concurrency_group_to_execute.decode("ascii")
 
     if <int>task_type == <int>TASK_TYPE_NORMAL_TASK:
-        print(f"=====validating_function: {function_name}")
         ray._private.utils._validate_target_function_is_allowed(function_name)
 
         next_title = "ray::IDLE"
@@ -1039,9 +1038,6 @@ cdef execute_task_with_cancellation_handler(
         execution_infos[function_descriptor] = execution_info
 
     global current_task_id
-
-
-
 
     try:
         task_id = (ray._private.worker.

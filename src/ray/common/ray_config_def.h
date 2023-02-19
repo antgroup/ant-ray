@@ -157,8 +157,6 @@ RAY_CONFIG(size_t, free_objects_batch_size, 100)
 /// the task's recursive dependencies. If this is set to true, then the system
 /// will attempt to reconstruct the object from its lineage if the object is
 /// lost.
-/// We change the default to false because not everyone needs the reconstruction
-/// but 
 /// The lineage mechanism will keep pinning objects and therefore increase the memory
 /// usage (see #22816 https://github.com/ray-project/ray/pull/22816/files), since
 /// not everyone needs the task FO, we change the default to False, more defails

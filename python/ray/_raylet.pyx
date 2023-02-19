@@ -730,6 +730,8 @@ cdef void execute_task(
         c_name_of_concurrency_group_to_execute.decode("ascii")
 
     if <int>task_type == <int>TASK_TYPE_NORMAL_TASK:
+        ray._private.utils._validate_target_function_is_allowed(function_name)
+
         next_title = "ray::IDLE"
         function_executor = execution_info.function
         # Record the task name via :task_name: magic token in the log file.
@@ -1007,6 +1009,11 @@ cdef execute_task_with_cancellation_handler(
         actor_id = core_worker.get_actor_id()
         actor = actor_class.__new__(actor_class)
         worker.actors[actor_id] = actor
+
+        # Validate whether this actor class is in our allowed list.
+        ray._private.utils._validate_target_class_is_allowed(
+            f"{actor_class.__module__}.{actor_class.__name__}")
+
         # Record the actor class via :actor_name: magic token in the log.
         #
         # (Phase 1): this covers code run before __init__ finishes.

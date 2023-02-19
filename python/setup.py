@@ -128,7 +128,7 @@ else:
     # "ray" primary wheel package.
     setup_spec = SetupSpec(
         SetupType.RAY,
-        "secretflow-ray",
+        "ant-ray",
         "Ray provides a simple, "
         "universal API for building distributed applications.",
         BUILD_TYPE,
@@ -638,7 +638,8 @@ def pip_run(build_ext):
     if SKIP_BAZEL_BUILD:
         build(False, False, False)
     else:
-        build(True, BUILD_JAVA, True)
+        # In ant-ray, we now disable building RAY_CPP by default.
+        build(True, BUILD_JAVA, False)
 
     if setup_spec.type == SetupType.RAY:
         setup_spec.files_to_include += ray_files

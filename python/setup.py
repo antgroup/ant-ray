@@ -133,7 +133,7 @@ else:
         "universal API for building distributed applications.",
         BUILD_TYPE,
     )
-    RAY_EXTRA_CPP = False
+    RAY_EXTRA_CPP = True
     # Disable extra cpp for the development versions.
     if "dev" in setup_spec.version or os.getenv("RAY_DISABLE_EXTRA_CPP") == "1":
         RAY_EXTRA_CPP = False
@@ -638,8 +638,7 @@ def pip_run(build_ext):
     if SKIP_BAZEL_BUILD:
         build(False, False, False)
     else:
-        # In ant-ray, we now disable building RAY_CPP by default.
-        build(True, BUILD_JAVA, False)
+        build(True, BUILD_JAVA, True)
 
     if setup_spec.type == SetupType.RAY:
         setup_spec.files_to_include += ray_files

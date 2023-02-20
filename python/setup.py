@@ -133,7 +133,7 @@ else:
         "universal API for building distributed applications.",
         BUILD_TYPE,
     )
-    RAY_EXTRA_CPP = True
+    RAY_EXTRA_CPP = False
     # Disable extra cpp for the development versions.
     if "dev" in setup_spec.version or os.getenv("RAY_DISABLE_EXTRA_CPP") == "1":
         RAY_EXTRA_CPP = False

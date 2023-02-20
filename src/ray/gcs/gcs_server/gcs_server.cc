@@ -258,11 +258,13 @@ void GcsServer::InitGcsResourceManager(const GcsInitData &gcs_init_data) {
 
   periodical_runner_.RunFnPeriodically(
       [this] {
+        RAY_LOG(INFO) << "All alived nodes number: " << gcs_node_manager_->GetAllAliveNodes().size();
         for (const auto &alive_node : gcs_node_manager_->GetAllAliveNodes()) {
           std::shared_ptr<ray::RayletClientInterface> raylet_client;
           // GetOrConnectionByID will not connect to the raylet is it hasn't been
           // connected.
           if (auto conn_opt = raylet_client_pool_->GetOrConnectByID(alive_node.first)) {
+            RAY_LOG(INFO) << "Get raylet_client by ID " << alive_node.first;
             raylet_client = *conn_opt;
           } else {
             // When not connect, use GetOrConnectByAddress
@@ -271,6 +273,7 @@ void GcsServer::InitGcsResourceManager(const GcsInitData &gcs_init_data) {
             remote_address.set_ip_address(alive_node.second->node_manager_address());
             remote_address.set_port(alive_node.second->node_manager_port());
             raylet_client = raylet_client_pool_->GetOrConnectByAddress(remote_address);
+            RAY_LOG(INFO) << "Getting raylet_client by address: " << remote_address.port();
           }
           if (raylet_client == nullptr) {
             RAY_LOG(ERROR) << "Failed to connect to node: " << alive_node.first

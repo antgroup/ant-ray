@@ -462,6 +462,9 @@ class Node:
                 object_store_memory,
                 resources,
             ) = merge_resources(env_resources, self._ray_params.resources)
+            print(f"Resolved memory: {memory}, env_resources: {env_resources}, "
+                  f"ray_params.resources: {self._ray_params.resources}, "
+                  f"ray_params.memory: {self._ray_params.memory}")
             self._resource_spec = ResourceSpec(
                 self._ray_params.num_cpus if num_cpus is None else num_cpus,
                 self._ray_params.num_gpus if num_gpus is None else num_gpus,
@@ -472,6 +475,8 @@ class Node:
                 resources,
                 self._ray_params.redis_max_memory,
             ).resolve(is_head=self.head, node_ip_address=self.node_ip_address)
+        print(f"Returning resource spec {self._resource_spec}")
+        logger.info(f"Returning resource spec {self._resource_spec}")
         return self._resource_spec
 
     @property
@@ -960,7 +965,7 @@ class Node:
                 valgrind profiler.
         """
         stdout_file, stderr_file = self.get_log_file_handles("raylet", unique=True)
-        print("calling start_raylet")
+        print(f"calling start_raylet with resource spec: {self.get_resource_spec()}")
         process_info = ray._private.services.start_raylet(
             self.redis_address,
             self.gcs_address,

@@ -197,18 +197,18 @@ class ProcessFD {
       // If process needs to be decoupled, double-fork to avoid zombies.
       RAY_LOG(DEBUG) << "decouple ? " << decouple;
 #ifndef RAY_IN_TEE
-    if (pid_t pid2 = decouple ? fork() : 0) {
+      if (pid_t pid2 = decouple ? fork() : 0) {
 #else
-    if (pid_t pid2 = decouple ? vfork() : 0) {
+      if (pid_t pid2 = decouple ? vfork() : 0) {
 #endif
-	RAY_LOG(DEBUG) << "exit intermediate process";
+	      RAY_LOG(DEBUG) << "exit intermediate process";
         _exit(pid2 == -1 ? errno : 0);  // Parent of grandchild; must exit
       }
       // This is the spawned process. Any intermediate parent is now dead.
       pid_t my_pid = getpid();
       RAY_LOG(DEBUG) << "I am now the grandchild, pid: " << my_pid;
       if (write(pipefds[1], &my_pid, sizeof(my_pid)) == sizeof(my_pid)) {
-	RAY_LOG(DEBUG) << "Calling exec, file image: " << argv[0] << " , argv: " << const_cast<char *const *>(argv) << " , envp: " << const_cast<char *const *>(envp);
+	      RAY_LOG(DEBUG) << "Calling exec, file image: " << argv[0] << " , argv: " << const_cast<char *const *>(argv) << " , envp: " << const_cast<char *const *>(envp);
         execvpe(
             argv[0], const_cast<char *const *>(argv), const_cast<char *const *>(envp));
       }

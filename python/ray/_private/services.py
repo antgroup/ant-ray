@@ -390,7 +390,7 @@ def wait_for_node(
     start_time = time.time()
     while time.time() - start_time < timeout:
         clients = global_state.node_table()
-        print("clients: " + str(len(clients)))
+        print("clients: " + str(len(clients)), clients)
         object_store_socket_names = [
             client["ObjectStoreSocketName"] for client in clients
         ]

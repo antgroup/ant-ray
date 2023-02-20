@@ -145,15 +145,12 @@ class BackendExecutor:
         logger.info("Start to create PG.")
         self._create_placement_group()
         placement_group = self._placement_group or "default"
-        import psutil
-        process = psutil.Process()
-        end_rss = process.memory_info().rss
+        
         logger.info(f"Created PG: {placement_group}")
         logger.info(f"Start to create `WorkerGroup`, "
         f"num_workers: {self._num_workers}, "
         f"num_cpus_per_worker: {self._num_cpus_per_worker}, "
         f"pg: {placement_group}, "
-        f"end mem usage: {end_rss} bytes."
         )
         
         self.worker_group = WorkerGroup(

@@ -1,6 +1,5 @@
 from typing import Dict, List, Optional, Union
 
-import logging
 import ray
 from ray._private.client_mode_hook import client_mode_should_convert, client_mode_wrap
 from ray._private.utils import hex_to_binary, get_ray_doc_version
@@ -11,7 +10,6 @@ from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 bundle_reservation_check = None
 BUNDLE_RESOURCE_LABEL = "bundle"
 
-logger = logging.getLogger(__name__)
 
 
 # We need to import this method to use for ready API.
@@ -76,7 +74,6 @@ class PlacementGroup:
             "bundle length == 0, current bundle length: "
             f"{len(self.bundle_cache)}"
         )
-        logger.info("sending bundle_reservation_check.options remote task.")
         return bundle_reservation_check.options(
             scheduling_strategy=PlacementGroupSchedulingStrategy(placement_group=self),
             resources={BUNDLE_RESOURCE_LABEL: 0.001},
@@ -89,7 +86,6 @@ class PlacementGroup:
         Return:
              True if the placement group is created. False otherwise.
         """
-        logger.info("wait PG")
         return _call_placement_group_ready(self.id, timeout_seconds)
 
     @property
@@ -112,7 +108,6 @@ class PlacementGroup:
 def _call_placement_group_ready(pg_id: PlacementGroupID, timeout_seconds: int) -> bool:
     worker = ray._private.worker.global_worker
     worker.check_connected()
-    logger.info("core_worker.wait_placement_group_ready")
     return worker.core_worker.wait_placement_group_ready(pg_id, timeout_seconds)
 
 
@@ -220,7 +215,6 @@ def placement_group(
             "placement group `lifetime` argument must be either `None` or 'detached'"
         )
 
-    logger.info(f"calling worker.core_worker.create_placement_group, name: {name}, bundles: {bundles}, strategy: {strategy}, detached: {detached}.")
     placement_group_id = worker.core_worker.create_placement_group(
         name,
         bundles,
@@ -228,10 +222,8 @@ def placement_group(
         detached,
         _max_cpu_fraction_per_node,
     )
-    logger.info(f"created pg id: {placement_group_id}, init PG class.")
-    pg_cls = PlacementGroup(placement_group_id)
-    logger.info("created pg class, return.")
-    return pg_cls 
+
+    return PlacementGroup(placement_group_id)
 
 
 @PublicAPI

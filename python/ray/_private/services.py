@@ -1720,7 +1720,6 @@ def determine_plasma_store_config(
     if plasma_directory is None:
         if sys.platform == "linux" or sys.platform == "linux2":
             shm_avail = ray._private.utils.get_shared_memory_bytes()
-            print(f"shm_avail: {shm_avail}")
             # Compare the requested memory size to the memory available in
             # /dev/shm.
             if shm_avail > object_store_memory:

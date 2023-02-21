@@ -305,7 +305,6 @@ class Node:
 
         if not connect_only:
             self.start_ray_processes()
-            print("start_ray_processes end")
             # we should update the address info after the node has been started
             try:
                 ray._private.services.wait_for_node(
@@ -942,7 +941,6 @@ class Node:
                 valgrind profiler.
         """
         stdout_file, stderr_file = self.get_log_file_handles("raylet", unique=True)
-        print("calling start_raylet")
         process_info = ray._private.services.start_raylet(
             self.redis_address,
             self.gcs_address,
@@ -984,7 +982,6 @@ class Node:
             env_updates=self._ray_params.env_vars,
             node_name=self._ray_params.node_name,
         )
-        print("end calling start_raylet, next is to wait_for_node")
         assert ray_constants.PROCESS_TYPE_RAYLET not in self.all_processes
         self.all_processes[ray_constants.PROCESS_TYPE_RAYLET] = [process_info]
 

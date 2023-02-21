@@ -932,7 +932,6 @@ Status PlacementGroupInfoAccessor::SyncCreatePlacementGroup(
   rpc::CreatePlacementGroupRequest request;
   rpc::CreatePlacementGroupReply reply;
   request.mutable_placement_group_spec()->CopyFrom(placement_group_spec.GetMessage());
-  RAY_LOG(DEBUG) << "Sending SyncCreatePlacementGroup.";
   auto status = client_impl_->GetGcsRpcClient().SyncCreatePlacementGroup(
       request, &reply, GetGcsTimeoutMs());
   if (status.ok()) {
@@ -1021,7 +1020,6 @@ Status PlacementGroupInfoAccessor::SyncWaitUntilReady(
   rpc::WaitPlacementGroupUntilReadyRequest request;
   rpc::WaitPlacementGroupUntilReadyReply reply;
   request.set_placement_group_id(placement_group_id.Binary());
-  RAY_LOG(DEBUG) << "Sending SyncWaitPlacementGroupUntilReady ";
   auto status = client_impl_->GetGcsRpcClient().SyncWaitPlacementGroupUntilReady(
       request, &reply, absl::ToInt64Milliseconds(absl::Seconds(timeout_seconds)));
   RAY_LOG(DEBUG) << "Finished waiting placement group until ready, placement group id = "

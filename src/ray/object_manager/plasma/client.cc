@@ -308,9 +308,7 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
                                              uint64_t *retry_with_request_id,
                                              std::shared_ptr<Buffer> *data) {
   std::vector<uint8_t> buffer;
-  RAY_LOG(INFO) << "Before PlasmaReceive";
   RAY_RETURN_NOT_OK(PlasmaReceive(store_conn_, MessageType::PlasmaCreateReply, &buffer));
-  RAY_LOG(INFO) << "After PlasmaReceive buffer size: " << buffer.size();
   ObjectID id;
   PlasmaObject object;
   MEMFD_TYPE store_fd;
@@ -324,7 +322,6 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
                                       &object,
                                       &store_fd,
                                       &mmap_size));
-    RAY_LOG(INFO) << "After RreadCreateReply, retry count: " << *retry_with_request_id;
     if (*retry_with_request_id > 0) {
       // The client should retry the request.
       return Status::OK();
@@ -333,7 +330,6 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
     uint64_t unused = 0;
     RAY_RETURN_NOT_OK(ReadCreateReply(
         buffer.data(), buffer.size(), &id, &unused, &object, &store_fd, &mmap_size));
-    RAY_LOG(INFO) << "After ReadCreateReply";
     RAY_CHECK(unused == 0);
   }
 
@@ -352,7 +348,6 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
     *data = std::make_shared<PlasmaMutableBuffer>(
         shared_from_this(), object.address, object.data_size); // physical address, no need to mmap (virtual) address + offset
 #endif
-    RAY_LOG(INFO) << "After create PlasmaMutableBuffer";
     // If plasma_create is being called from a transfer, then we will not copy the
     // metadata here. The metadata will be written along with the data streamed
     // from the transfer.
@@ -360,7 +355,6 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
   //    RAY_LOG(INFO) << "Before metadata  memcpy, start address: " << (*data)->Data() <<" + " <<  object.data_size << ", metadata size: " << object.metadata_size;
       // Copy the metadata to the buffer.
       memcpy((*data)->Data() + object.data_size, metadata, object.metadata_size);
-      RAY_LOG(INFO) << "After metadata memcpy";
     }
   } else {
     RAY_LOG(FATAL) << "GPU is not enabled.";
@@ -399,9 +393,7 @@ Status PlasmaClient::Impl::CreateAndSpillIfNeeded(const ObjectID &object_id,
                                       source,
                                       device_num,
                                       /*try_immediately=*/false));
-  RAY_LOG(INFO) << "After SendCreateRequest";
   Status status = HandleCreateReply(object_id, metadata, &retry_with_request_id, data);
-  RAY_LOG(INFO) << "After HandleCreateReply";
 
   while (retry_with_request_id > 0) {
     guard.unlock();
@@ -759,19 +751,13 @@ Status PlasmaClient::Impl::Connect(const std::string &store_socket_name,
 
   /// The local stream socket that connects to store.
   ray::local_stream_socket socket(main_service_);
-  RAY_LOG(INFO) << "Before ConnectSocketRetry";
   RAY_RETURN_NOT_OK(ray::ConnectSocketRetry(socket, store_socket_name));
-  RAY_LOG(INFO) << "After ConnectSocketRetry";
   store_conn_.reset(new StoreConn(std::move(socket)));
-  RAY_LOG(INFO) << "After new StoreConn";
   // Send a ConnectRequest to the store to get its memory capacity.
   RAY_RETURN_NOT_OK(SendConnectRequest(store_conn_));
-  RAY_LOG(INFO) << "After SendConnectRequest";
   std::vector<uint8_t> buffer;
   RAY_RETURN_NOT_OK(PlasmaReceive(store_conn_, MessageType::PlasmaConnectReply, &buffer));
-  RAY_LOG(INFO) << "After PlasmaReceive";
   RAY_RETURN_NOT_OK(ReadConnectReply(buffer.data(), buffer.size(), &store_capacity_));
-  RAY_LOG(INFO) << "After ReadConnectReply";
   return Status::OK();
 }
 

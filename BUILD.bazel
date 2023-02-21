@@ -1456,19 +1456,6 @@ cc_test(
 )
 
 cc_test(
-    name = "boost_test",
-    size = "small",
-    srcs = ["src/ray/boost_test.cc"],
-    copts = COPTS,
-    # linkshared = 1,
-    linkstatic = 1,
-    tags = ["team:core"],
-    deps = [
-        "@boost//:asio",
-    ],
-)
-
-cc_test(
     name = "logging_test",
     size = "small",
     srcs = ["src/ray/util/logging_test.cc"],

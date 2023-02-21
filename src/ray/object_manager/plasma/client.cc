@@ -357,7 +357,7 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
     // metadata here. The metadata will be written along with the data streamed
     // from the transfer.
     if (metadata != NULL) {
-      RAY_LOG(INFO) << "Before metadata memcpy, start address: " << (*data)->Data() <<" + " <<  object.data_size << ", metadata size: " << object.metadata_size;
+  //    RAY_LOG(INFO) << "Before metadata  memcpy, start address: " << (*data)->Data() <<" + " <<  object.data_size << ", metadata size: " << object.metadata_size;
       // Copy the metadata to the buffer.
       memcpy((*data)->Data() + object.data_size, metadata, object.metadata_size);
       RAY_LOG(INFO) << "After metadata memcpy";

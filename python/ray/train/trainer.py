@@ -445,8 +445,10 @@ class Trainer:
         Returns ``None`` if ``run()`` has not been called.
         """
         if self._run_id > 0:
-            run_dir = Path(f"run_{self._run_id:03d}")
-            return construct_path(run_dir, self.logdir)
+            run_dir = Path(f"/host/tmp/ray/ray_results/run_{self._run_id:03d}")
+            return run_dir
+            # run_dir = Path(f"run_{self._run_id:03d}")
+            # return construct_path(run_dir, self.logdir)
         else:
             return None
 

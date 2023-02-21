@@ -2436,6 +2436,7 @@ def wait(
     """
     worker = global_worker
     worker.check_connected()
+
     if (
         hasattr(worker, "core_worker")
         and worker.core_worker.current_actor_is_asyncio()
@@ -2536,7 +2537,6 @@ def get_actor(name: str, namespace: Optional[str] = None) -> "ray.actor.ActorHan
 
     worker = global_worker
     worker.check_connected()
-
     return worker.core_worker.get_named_actor_handle(name, namespace or "")
 
 

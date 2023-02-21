@@ -255,7 +255,7 @@ class ResourceSpec(
                 avail_memory
                 - object_store_memory
                 - (redis_max_memory if is_head else 0)
-            ) * ray_constants.DEFAULT_RAYLET_MEMORY_PROPORTION
+            )
             print(f"memory: {memory}")
             if memory < 100e6 and memory < 0.05 * system_memory:
                 raise ValueError(

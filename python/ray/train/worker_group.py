@@ -180,7 +180,6 @@ class WorkerGroup:
         self._remote_cls = ray.remote(
             num_cpus=self.num_cpus_per_worker,
             num_gpus=self.num_gpus_per_worker,
-            # memory = 1 * 1024 * 1024 * 1024, # reserve 1GB per worker
             resources=self.additional_resources_per_worker,
         )(self._base_cls)
         logger.info(f"Resources are enough, result: {self._remote_cls}")

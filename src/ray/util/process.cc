@@ -198,7 +198,6 @@ class ProcessFD {
 #else
     if (pid_t pid2 = decouple ? vfork() : 0) {
 #endif
-	RAY_LOG(DEBUG) << "exit intermediate process";
         _exit(pid2 == -1 ? errno : 0);  // Parent of grandchild; must exit
       }
       // This is the spawned process. Any intermediate parent is now dead.

@@ -2536,6 +2536,7 @@ def get_actor(name: str, namespace: Optional[str] = None) -> "ray.actor.ActorHan
 
     worker = global_worker
     worker.check_connected()
+
     return worker.core_worker.get_named_actor_handle(name, namespace or "")
 
 

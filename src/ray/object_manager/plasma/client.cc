@@ -338,7 +338,6 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
   if (object.device_num == 0) {
     // The metadata should come right after the data.
     RAY_CHECK(object.metadata_offset == object.data_offset + object.data_size);
-//    RAY_LOG(INFO) << "Before create PlasmaMutableBuffer, object.address: " << object.address << " data_size: " << object.data_size;
 #ifndef RAY_IN_TEE
     *data = std::make_shared<PlasmaMutableBuffer>(
       shared_from_this(),
@@ -352,7 +351,6 @@ Status PlasmaClient::Impl::HandleCreateReply(const ObjectID &object_id,
     // metadata here. The metadata will be written along with the data streamed
     // from the transfer.
     if (metadata != NULL) {
-  //    RAY_LOG(INFO) << "Before metadata  memcpy, start address: " << (*data)->Data() <<" + " <<  object.data_size << ", metadata size: " << object.metadata_size;
       // Copy the metadata to the buffer.
       memcpy((*data)->Data() + object.data_size, metadata, object.metadata_size);
     }

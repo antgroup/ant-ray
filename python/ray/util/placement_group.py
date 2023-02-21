@@ -1,3 +1,4 @@
+import warnings
 from typing import Dict, List, Optional, Union
 
 import ray
@@ -9,7 +10,6 @@ from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
 bundle_reservation_check = None
 BUNDLE_RESOURCE_LABEL = "bundle"
-
 
 
 # We need to import this method to use for ready API.
@@ -74,6 +74,7 @@ class PlacementGroup:
             "bundle length == 0, current bundle length: "
             f"{len(self.bundle_cache)}"
         )
+
         return bundle_reservation_check.options(
             scheduling_strategy=PlacementGroupSchedulingStrategy(placement_group=self),
             resources={BUNDLE_RESOURCE_LABEL: 0.001},
@@ -108,6 +109,7 @@ class PlacementGroup:
 def _call_placement_group_ready(pg_id: PlacementGroupID, timeout_seconds: int) -> bool:
     worker = ray._private.worker.global_worker
     worker.check_connected()
+
     return worker.core_worker.wait_placement_group_ready(pg_id, timeout_seconds)
 
 

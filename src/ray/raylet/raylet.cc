@@ -96,9 +96,7 @@ Raylet::Raylet(instrumented_io_context &main_service,
 Raylet::~Raylet() {}
 
 void Raylet::Start() {
-  RAY_LOG(INFO) << "Enter Raylet::Start";
   RAY_CHECK_OK(RegisterGcs());
-  RAY_LOG(INFO) << "After Raylet::RegisterGcs. Before Raylet::DoAccept";
 
   // Start listening for clients.
   DoAccept();
@@ -135,7 +133,6 @@ void Raylet::DoAccept() {
 }
 
 void Raylet::HandleAccept(const boost::system::error_code &error) {
-  RAY_LOG(INFO) << "Enter Raylet::HandleAccept";
   if (!error) {
     // TODO: typedef these handlers.
     ClientHandler client_handler = [this](ClientConnection &client) {
@@ -147,7 +144,6 @@ void Raylet::HandleAccept(const boost::system::error_code &error) {
       node_manager_.ProcessClientMessage(client, message_type, message.data());
     };
     // Accept a new local client and dispatch it to the node manager.
-    RAY_LOG(INFO) << "ClientConnection::Create";
     auto new_connection = ClientConnection::Create(
         client_handler,
         message_handler,
@@ -155,7 +151,6 @@ void Raylet::HandleAccept(const boost::system::error_code &error) {
         "worker",
         node_manager_message_enum,
         static_cast<int64_t>(protocol::MessageType::DisconnectClient));
-    RAY_LOG(INFO) << "ClientConnection::Create end";
   }
   // We're ready to accept another client.
   DoAccept();

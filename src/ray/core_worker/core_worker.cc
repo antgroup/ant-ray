@@ -173,6 +173,7 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
                                              &serialized_job_config,
                                              options_.startup_token,
                                              options_.entrypoint);
+
   if (!raylet_client_status.ok()) {
     // Avoid using FATAL log or RAY_CHECK here because they may create a core dump file.
     RAY_LOG(ERROR) << "Failed to register worker " << worker_id << " to Raylet. "
@@ -1331,6 +1332,7 @@ Status CoreWorker::Wait(const std::vector<ObjectID> &ids,
       results->at(i) = true;
     }
   }
+
   return Status::OK();
 }
 

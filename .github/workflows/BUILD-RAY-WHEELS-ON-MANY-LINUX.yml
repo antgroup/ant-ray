@@ -2,9 +2,9 @@ name: BUILD-RAY-WHEELS-ON-MANY-LINUX.yml
 
 on:
   push:
-    branches: [ dev/secretflow-ray-2.2.0 ]
+    branches: [ dev/2.2.0 ]
   pull_request:
-    branches: [ dev/secretflow-ray-2.2.0 ]
+    branches: [ dev/2.2.0 ]
 
 jobs:
   build-wheel-pipeline:
@@ -14,7 +14,7 @@ jobs:
 
     steps:
     - name: work around permission issue
-      run: git config --global --add safe.directory /__w/ray/ray
+      run: git config --global --add safe.directory /__w/ant-ray/ant-ray
 
     - uses: actions/checkout@v2
 

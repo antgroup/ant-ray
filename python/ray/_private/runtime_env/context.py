@@ -62,6 +62,9 @@ class RuntimeEnvContext:
             # The monkey patched os.execvp function has a different
             # signature. So, we use os.execvp("executable", args=[])
             # instead of os.execvp(file="executable", args=[])
-            os.execvp("bash", args=["bash", "-c", command_str])
+            # Note(NKcqx): Firstly, `Bash` need to be specified by 
+            # absolute path; besides, this `Bash` file is a security
+            # enhancemented version rather than the normal bash.
+            os.execvp("/bin/bash", args=["bash", "-c", command_str])
 
         logger.info(f"Exec'ing worker with command: {command_str}")

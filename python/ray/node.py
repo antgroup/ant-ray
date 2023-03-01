@@ -1097,13 +1097,13 @@ class Node:
             if not self._ray_params.no_monitor:
                 self.start_monitor()
 
-            if self._ray_params.ray_client_server_port:
-                self.start_ray_client_server()
-
             if self._ray_params.include_dashboard:
                 self.start_dashboard(require_dashboard=True)
             elif self._ray_params.include_dashboard is None:
                 self.start_dashboard(require_dashboard=False)
+        
+        if self._ray_params.ray_client_server_port:
+            self.start_ray_client_server()
 
     def start_ray_processes(self):
         """Start all of the processes on the node."""

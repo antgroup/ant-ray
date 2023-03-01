@@ -42,7 +42,9 @@ ID_SIZE = 28
 # overridden by the user.
 DEFAULT_OBJECT_STORE_MAX_MEMORY_BYTES = 200 * 10 ** 9
 # The default proportion of available memory allocated to the object store
-DEFAULT_OBJECT_STORE_MEMORY_PROPORTION = 0.3
+# Note(NKcqx): Reduce this to 0.1 because mmap a large disk file may be so
+# slow that the initialization of UDS between plasma and raylet may time out.
+DEFAULT_OBJECT_STORE_MEMORY_PROPORTION = 0.1
 # The smallest cap on the memory used by the object store that we allow.
 # This must be greater than MEMORY_RESOURCE_UNIT_BYTES
 OBJECT_STORE_MINIMUM_MEMORY_BYTES = 75 * 1024 * 1024

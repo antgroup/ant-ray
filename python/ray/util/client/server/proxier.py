@@ -11,6 +11,8 @@ from threading import Event, Lock, Thread, RLock
 import time
 import traceback
 from typing import Callable, Dict, List, Optional, Tuple
+import os
+import signal
 
 import ray
 from ray.cloudpickle.compat import pickle
@@ -34,7 +36,7 @@ from ray._private.runtime_env.context import RuntimeEnvContext
 from ray._private.services import ProcessInfo, start_ray_client_server
 from ray._private.tls_utils import add_port_to_grpc_server
 from ray._private.gcs_utils import GcsClient
-from ray._private.utils import detect_fate_sharing_support
+from ray._private.utils import detect_fate_sharing_support, ray_in_tee
 
 # Import psutil after ray so the packaged version is used.
 import psutil
@@ -76,6 +78,12 @@ class SpecificServer:
         try:
             proc = self.process_handle_future.result(timeout=0.1)
             if proc is not None:
+                if ray_in_tee():
+                    try:
+                        p = psutil.Process(proc.process)
+                    except psutil.NoSuchProcess:
+                        return 0
+                    return None if p.is_running() else 0
                 return proc.process.poll()
         except futures.TimeoutError:
             return
@@ -85,7 +93,10 @@ class SpecificServer:
         try:
             proc = self.process_handle_future.result(timeout=0.1)
             if proc is not None:
-                proc.process.kill()
+                if ray_in_tee():
+                    os.kill(proc.process, signal.SIGKILL)
+                else:
+                    proc.process.kill()
         except futures.TimeoutError:
             # Server has not been started yet.
             pass
@@ -93,6 +104,7 @@ class SpecificServer:
     def set_result(self, proc: Optional[ProcessInfo]) -> None:
         """Set the result of the internal future if it is currently unset."""
         if not self.is_ready():
+            # NOTE(NKcqx): In tee, this proc's process field is just pid instead the Popen object.
             self.process_handle_future.set_result(proc)
 
 
@@ -318,29 +330,56 @@ class ProxyManager:
             redis_password=self._redis_password,
         )
 
-        # Wait for the process being run transitions from the shim process
-        # to the actual RayClient Server.
-        pid = proc.process.pid
-        if sys.platform != "win32":
-            psutil_proc = psutil.Process(pid)
+        if ray_in_tee():
+            pid = proc.process
+            # Suppose there is no TEE in windows
+            if sys.platform != "win32":
+                psutil_proc = psutil.Process(pid)
+            else:
+                psutil_proc = None
+            while psutil_proc is not None:
+                if not psutil_proc.is_running():
+                    logger.error(
+                        f"SpecificServer startup failed for client: {client_id}"
+                    )
+                    break
+                cmd = psutil_proc.cmdline()
+                if _match_running_client_server(cmd):
+                    break
+                logger.debug("Waiting for Process to reach the actual client server.")
+                time.sleep(0.5)
+            specific_server.set_result(proc)
+            logger.info(
+                f"SpecificServer started on port: {specific_server.port} "
+                f"with PID: {pid} for client: {client_id}"
+            )
+            return specific_server.poll() is None
         else:
-            psutil_proc = None
-        # Don't use `psutil` on Win32
-        while psutil_proc is not None:
-            if proc.process.poll() is not None:
-                logger.error(f"SpecificServer startup failed for client: {client_id}")
-                break
-            cmd = psutil_proc.cmdline()
-            if _match_running_client_server(cmd):
-                break
-            logger.debug("Waiting for Process to reach the actual client server.")
-            time.sleep(0.5)
-        specific_server.set_result(proc)
-        logger.info(
-            f"SpecificServer started on port: {specific_server.port} "
-            f"with PID: {pid} for client: {client_id}"
-        )
-        return proc.process.poll() is None
+            # Wait for the process being run transitions from the shim process
+            # to the actual RayClient Server.
+            pid = proc.process.pid
+            if sys.platform != "win32":
+                psutil_proc = psutil.Process(pid)
+            else:
+                psutil_proc = None
+            # Don't use `psutil` on Win32
+            while psutil_proc is not None:
+                if proc.process.poll() is not None:
+                    logger.error(
+                        f"SpecificServer startup failed for client: {client_id}"
+                    )
+                    break
+                cmd = psutil_proc.cmdline()
+                if _match_running_client_server(cmd):
+                    break
+                logger.debug("Waiting for Process to reach the actual client server.")
+                time.sleep(0.5)
+            specific_server.set_result(proc)
+            logger.info(
+                f"SpecificServer started on port: {specific_server.port} "
+                f"with PID: {pid} for client: {client_id}"
+            )
+            return proc.process.poll() is None
 
     def _get_server_for_client(self, client_id: str) -> Optional[SpecificServer]:
         with self.server_lock:

@@ -184,14 +184,16 @@ def placement_group(
             "placement group `lifetime` argument must be either `None` or 'detached'"
         )
 
-    logger.info(f"calling worker.core_worker.create_placement_group, name: {name}, bundles: {bundles}, strategy: {strategy}, detached: {detached}.")
+    logger.info(
+        f"calling worker.core_worker.create_placement_group, name: {name}, bundles: {bundles}, strategy: {strategy}, detached: {detached}."
+    )
     placement_group_id = worker.core_worker.create_placement_group(
         name, bundles, strategy, detached
     )
     logger.info(f"created pg id: {placement_group_id}, init PG class.")
     pg_cls = PlacementGroup(placement_group_id)
     logger.info("created pg class, return.")
-    return pg_cls 
+    return pg_cls
 
 
 @PublicAPI

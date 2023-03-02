@@ -726,7 +726,9 @@ def start(
         # Fail early when starting a new cluster when one is already running
         if address is None:
             default_address = f"{ray_params.node_ip_address}:{port}"
-            bootstrap_addresses = services.find_bootstrap_address() if not ray_in_tee() else []
+            bootstrap_addresses = (
+                services.find_bootstrap_address() if not ray_in_tee() else []
+            )
             if default_address in bootstrap_addresses:
                 raise ConnectionError(
                     f"Ray is trying to start at {default_address}, "

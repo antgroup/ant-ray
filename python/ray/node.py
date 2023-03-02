@@ -26,7 +26,12 @@ import ray._private.utils
 from ray.internal import storage
 from ray._private.gcs_utils import GcsClient
 from ray._private.resource_spec import ResourceSpec
-from ray._private.utils import try_to_create_directory, try_to_symlink, open_log, ray_in_tee
+from ray._private.utils import (
+    try_to_create_directory,
+    try_to_symlink,
+    open_log,
+    ray_in_tee,
+)
 
 # Logger for this module. It should be configured at the entry point
 # into the program using Ray. Ray configures it by default automatically
@@ -149,7 +154,9 @@ class Node:
         )
 
         self._resource_spec = None
-        self._localhost = socket.gethostbyname("localhost") if not ray_in_tee() else "127.0.0.1"
+        self._localhost = (
+            socket.gethostbyname("localhost") if not ray_in_tee() else "127.0.0.1"
+        )
         self._ray_params = ray_params
         self._config = ray_params._system_config or {}
 
@@ -462,9 +469,11 @@ class Node:
                 object_store_memory,
                 resources,
             ) = merge_resources(env_resources, self._ray_params.resources)
-            print(f"Resolved memory: {memory}, env_resources: {env_resources}, "
-                  f"ray_params.resources: {self._ray_params.resources}, "
-                  f"ray_params.memory: {self._ray_params.memory}")
+            print(
+                f"Resolved memory: {memory}, env_resources: {env_resources}, "
+                f"ray_params.resources: {self._ray_params.resources}, "
+                f"ray_params.memory: {self._ray_params.memory}"
+            )
             self._resource_spec = ResourceSpec(
                 self._ray_params.num_cpus if num_cpus is None else num_cpus,
                 self._ray_params.num_gpus if num_gpus is None else num_gpus,
@@ -1101,7 +1110,7 @@ class Node:
                 self.start_dashboard(require_dashboard=True)
             elif self._ray_params.include_dashboard is None:
                 self.start_dashboard(require_dashboard=False)
-        
+
         if self._ray_params.ray_client_server_port:
             self.start_ray_client_server()
 

@@ -155,11 +155,12 @@ class WorkerGroup:
                 "`actor_cls_args` or `actor_class_kwargs` are "
                 "passed in but no `actor_cls` is passed in."
             )
-        logger.info("Init WorkerGroup with config: "
-        f"num_workers: {num_workers}, "
-        f"num_cpus_per_worker: {num_cpus_per_worker}, "
-        f"additional_resources_per_worker: {additional_resources_per_worker}, "
-        f"actor_cls: {actor_cls}"
+        logger.info(
+            "Init WorkerGroup with config: "
+            f"num_workers: {num_workers}, "
+            f"num_cpus_per_worker: {num_cpus_per_worker}, "
+            f"additional_resources_per_worker: {additional_resources_per_worker}, "
+            f"actor_cls: {actor_cls}"
         )
         self.num_workers = num_workers
         self.num_cpus_per_worker = num_cpus_per_worker

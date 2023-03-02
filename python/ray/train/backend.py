@@ -145,14 +145,15 @@ class BackendExecutor:
         logger.info("Start to create PG.")
         self._create_placement_group()
         placement_group = self._placement_group or "default"
-        
+
         logger.info(f"Created PG: {placement_group}")
-        logger.info(f"Start to create `WorkerGroup`, "
-        f"num_workers: {self._num_workers}, "
-        f"num_cpus_per_worker: {self._num_cpus_per_worker}, "
-        f"pg: {placement_group}, "
+        logger.info(
+            f"Start to create `WorkerGroup`, "
+            f"num_workers: {self._num_workers}, "
+            f"num_cpus_per_worker: {self._num_cpus_per_worker}, "
+            f"pg: {placement_group}, "
         )
-        
+
         self.worker_group = WorkerGroup(
             num_workers=self._num_workers,
             num_cpus_per_worker=self._num_cpus_per_worker,

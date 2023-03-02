@@ -1342,5 +1342,6 @@ def check_version_info(cluster_metadata):
         )
         raise RuntimeError(error_message)
 
+
 def ray_in_tee():
     return os.getenv("RAY_IN_TEE") == "true"

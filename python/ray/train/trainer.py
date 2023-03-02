@@ -168,7 +168,7 @@ class Trainer:
         if resources_per_worker is not None:
             # Copy this parameter to avoid mutating the user input
             resources_per_worker = copy.deepcopy(resources_per_worker)
-        logger.info(f'resources per worker: {resources_per_worker}')
+        logger.info(f"resources per worker: {resources_per_worker}")
         self._num_workers = num_workers
         self._use_gpu = use_gpu
         self._resources_per_worker = resources_per_worker
@@ -285,7 +285,9 @@ class Trainer:
             initialization_hook (Optional[Callable]): The function to call on
                 each worker when it is instantiated.
         """
-        logger.info(f"calling trainer `start`, backend_executor: {self._backend_executor}, hook: {initialization_hook}.")
+        logger.info(
+            f"calling trainer `start`, backend_executor: {self._backend_executor}, hook: {initialization_hook}."
+        )
         self._backend_executor.start(initialization_hook)
 
     def run(

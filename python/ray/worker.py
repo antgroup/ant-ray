@@ -1024,8 +1024,9 @@ def init(
             # removal redis is done. The uploading should happen before this
             # one.
             start_initial_python_workers_for_first_job=(
-                False if ray_in_tee() else
-                    job_config is None or job_config.runtime_env is None
+                False
+                if ray_in_tee()
+                else job_config is None or job_config.runtime_env is None
             ),
             _system_config=_system_config,
             enable_object_reconstruction=_enable_object_reconstruction,
@@ -2026,7 +2027,9 @@ def wait(
             worker.current_task_id,
             fetch_local,
         )
-        logger.info(f"wait returned, ready_ids: {ready_ids}, remaining_ids: {remaining_ids}")
+        logger.info(
+            f"wait returned, ready_ids: {ready_ids}, remaining_ids: {remaining_ids}"
+        )
         return ready_ids, remaining_ids
 
 

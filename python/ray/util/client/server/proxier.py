@@ -104,7 +104,8 @@ class SpecificServer:
     def set_result(self, proc: Optional[ProcessInfo]) -> None:
         """Set the result of the internal future if it is currently unset."""
         if not self.is_ready():
-            # NOTE(NKcqx): In tee, this proc's process field is just pid instead the Popen object.
+            # NOTE(NKcqx): In tee, this proc's process field is just the pid value
+            # instead the Popen object.
             self.process_handle_future.set_result(proc)
 
 

@@ -793,7 +793,8 @@ def start_ray_process(
             (os.POSIX_SPAWN_DUP2, stdout_file.fileno(), sys.stdout.fileno()),
             (os.POSIX_SPAWN_DUP2, stderr_file.fileno(), sys.stderr.fileno()),
         ]
-        # TODO(NKcqx): Support cwd and pipe_stdin (cwd may never get supported, see issue: https://github.com/python/cpython/issues/79718)
+        # TODO(NKcqx): Support cwd and pipe_stdin (cwd may never get supported,
+        # see issue: https://github.com/python/cpython/issues/79718)
         process = os.posix_spawn(
             command[0], command, modified_env, file_actions=file_actions
         )

@@ -184,9 +184,6 @@ def placement_group(
             "placement group `lifetime` argument must be either `None` or 'detached'"
         )
 
-    logger.info(
-        f"calling worker.core_worker.create_placement_group, name: {name}, bundles: {bundles}, strategy: {strategy}, detached: {detached}."
-    )
     placement_group_id = worker.core_worker.create_placement_group(
         name, bundles, strategy, detached
     )

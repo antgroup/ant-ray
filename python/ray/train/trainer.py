@@ -286,7 +286,7 @@ class Trainer:
                 each worker when it is instantiated.
         """
         logger.info(
-            f"calling trainer `start`, backend_executor: {self._backend_executor}, hook: {initialization_hook}."
+            f"calling trainer `start`, backend_executor: {self._backend_executor}."
         )
         self._backend_executor.start(initialization_hook)
 

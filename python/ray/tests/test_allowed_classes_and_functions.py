@@ -16,7 +16,7 @@ from numpy import log
 
 import ray
 import ray.cluster_utils
-import ray._private.ray_constants as ray_constants
+import ray.ray_constants as ray_constants
 
 logger = logging.getLogger(__name__)
 

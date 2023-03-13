@@ -1368,6 +1368,8 @@ def _validate_target_class_is_allowed(target_class_full_name: str):
 
 def _validate_target_function_is_allowed(target_function_name: str):
     _, allowed_functions = _load_allowed_classes_and_functions_config()
+    if allowed_functions is None:
+        return
     if target_function_name not in allowed_functions:
         raise ValueError(f"The target function {target_function_name} is not in your "
             "allowed function configuration. If you'd like to allow this function "

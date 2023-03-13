@@ -305,7 +305,6 @@ class Node:
 
         if not connect_only:
             self.start_ray_processes()
-            print("start_ray_processes end")
             # we should update the address info after the node has been started
             try:
                 ray._private.services.wait_for_node(
@@ -314,7 +313,6 @@ class Node:
                     self._plasma_store_socket_name,
                     self.redis_password,
                 )
-                print("wait_for_node end")
             except TimeoutError:
                 raise Exception(
                     "The current node has not been updated within 30 "
@@ -327,7 +325,6 @@ class Node:
                 self._raylet_ip_address,
                 redis_password=self.redis_password,
             )
-            print("get_node_to_connect_for_driver end")
             self._ray_params.node_manager_port = node_info.node_manager_port
 
         # Makes sure the Node object has valid addresses after setup.
@@ -469,11 +466,6 @@ class Node:
                 object_store_memory,
                 resources,
             ) = merge_resources(env_resources, self._ray_params.resources)
-            print(
-                f"Resolved memory: {memory}, env_resources: {env_resources}, "
-                f"ray_params.resources: {self._ray_params.resources}, "
-                f"ray_params.memory: {self._ray_params.memory}"
-            )
             self._resource_spec = ResourceSpec(
                 self._ray_params.num_cpus if num_cpus is None else num_cpus,
                 self._ray_params.num_gpus if num_gpus is None else num_gpus,
@@ -484,8 +476,6 @@ class Node:
                 resources,
                 self._ray_params.redis_max_memory,
             ).resolve(is_head=self.head, node_ip_address=self.node_ip_address)
-        print(f"Returning resource spec {self._resource_spec}")
-        logger.info(f"Returning resource spec {self._resource_spec}")
         return self._resource_spec
 
     @property
@@ -974,7 +964,6 @@ class Node:
                 valgrind profiler.
         """
         stdout_file, stderr_file = self.get_log_file_handles("raylet", unique=True)
-        print(f"calling start_raylet with resource spec: {self.get_resource_spec()}")
         process_info = ray._private.services.start_raylet(
             self.redis_address,
             self.gcs_address,
@@ -1015,7 +1004,6 @@ class Node:
             env_updates=self._ray_params.env_vars,
             node_name=self._ray_params.node_name,
         )
-        print("end calling start_raylet, next is to wait_for_node")
         assert ray_constants.PROCESS_TYPE_RAYLET not in self.all_processes
         self.all_processes[ray_constants.PROCESS_TYPE_RAYLET] = [process_info]
 

@@ -193,9 +193,6 @@ Status CoreWorkerPlasmaStoreProvider::FetchAndGetFromPlasmaStore(
       std::shared_ptr<Buffer> metadata = nullptr;
 
       if (plasma_results[i].data && plasma_results[i].data->Size()) {
-        RAY_LOG(DEBUG) << "plasma_results[" << i << "].data: " << plasma_results[i].data
-          << " , data size: " << plasma_results[i].data->Size()
-          << " , content: " << plasma_results[i].data->Data();
         // We track the set of active data buffers in active_buffers_. On destruction,
         // the buffer entry will be removed from the set via callback.
         data = std::make_shared<TrackedBuffer>(
@@ -203,15 +200,10 @@ Status CoreWorkerPlasmaStoreProvider::FetchAndGetFromPlasmaStore(
         buffer_tracker_->Record(object_id, data.get(), get_current_call_site_());
       }
       if (plasma_results[i].metadata && plasma_results[i].metadata->Size()) {
-        RAY_LOG(DEBUG) << "plasma_results[" << i << "].metadata: " << plasma_results[i].metadata
-          << " , metadata size: " << plasma_results[i].metadata->Size()
-          << " , content: " << plasma_results[i].metadata->Data();
         metadata = plasma_results[i].metadata;
       }
-      RAY_LOG(DEBUG) << "After parsing, data: " << data << " and metadata: " << metadata;
       const auto result_object = std::make_shared<RayObject>(
           data, metadata, std::vector<rpc::ObjectReference>());
-      RAY_LOG(DEBUG) << "Result object: " << result_object;
       (*results)[object_id] = result_object;
       remaining.erase(object_id);
       if (result_object->IsException()) {

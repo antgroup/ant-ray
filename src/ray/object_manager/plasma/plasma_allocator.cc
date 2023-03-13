@@ -78,9 +78,7 @@ PlasmaAllocator::PlasmaAllocator(const std::string &plasma_directory,
       << " It's likely we don't have enought space in " << plasma_directory;
   // This will unmap the file, but the next one created will be as large
   // as this one (this is an implementation detail of dlmalloc).
-  RAY_LOG(INFO) << "Before Free";
   Free(std::move(allocation.value()));
-  RAY_LOG(INFO) << "After Free";
 }
 
 absl::optional<Allocation> PlasmaAllocator::Allocate(size_t bytes) {
@@ -119,7 +117,6 @@ void PlasmaAllocator::Free(Allocation allocation) {
   RAY_CHECK(allocation.address != nullptr) << "Cannot free the nullptr";
   RAY_LOG(DEBUG) << "deallocating " << allocation.size << " at " << allocation.address;
   dlfree(allocation.address);
-  RAY_LOG(DEBUG) << "deallocated " << allocation.size << " at " << allocation.address;
   allocated_ -= allocation.size;
   if (internal::IsOutsideInitialAllocation(allocation.address)) {
     fallback_allocated_ -= allocation.size;

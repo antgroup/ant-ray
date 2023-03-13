@@ -177,9 +177,7 @@ class ProcessFD {
 #ifndef RAY_IN_TEE
     pid = pipefds[1] != -1 ? fork() : -1;
 #else
-    RAY_LOG(DEBUG) << "pipefds[1]: " << pipefds[1];
     pid = pipefds[1] != -1 ? vfork() : -1;
-    RAY_LOG(DEBUG) << "vfork() return value: " << pid;
 #endif
     if (pid <= 0 && pipefds[0] != -1) {
       close(pipefds[0]);  // not the parent, so close the read end of the pipe
@@ -191,28 +189,21 @@ class ProcessFD {
     }
     if (pid == 0) {
       // Child process case. Reset the SIGCHLD handler.
-      RAY_LOG(DEBUG) << "Sending SIGCHLD signal";
       signal(SIGCHLD, SIG_DFL);
-      RAY_LOG(DEBUG) << "After Sent SIGCHLD signal";
       // If process needs to be decoupled, double-fork to avoid zombies.
-      RAY_LOG(DEBUG) << "decouple ? " << decouple;
 #ifndef RAY_IN_TEE
       if (pid_t pid2 = decouple ? fork() : 0) {
 #else
       if (pid_t pid2 = decouple ? vfork() : 0) {
 #endif
-	      RAY_LOG(DEBUG) << "exit intermediate process";
         _exit(pid2 == -1 ? errno : 0);  // Parent of grandchild; must exit
       }
       // This is the spawned process. Any intermediate parent is now dead.
       pid_t my_pid = getpid();
-      RAY_LOG(DEBUG) << "I am now the grandchild, pid: " << my_pid;
       if (write(pipefds[1], &my_pid, sizeof(my_pid)) == sizeof(my_pid)) {
-	      RAY_LOG(DEBUG) << "Calling exec, file image: " << argv[0] << " , argv: " << const_cast<char *const *>(argv) << " , envp: " << const_cast<char *const *>(envp);
         execvpe(
             argv[0], const_cast<char *const *>(argv), const_cast<char *const *>(envp));
       }
-       RAY_LOG(DEBUG) << "vfork() succeeded and exec() failed, so abort myself, errno: " << errno;
       _exit(errno);  // fork() succeeded and exec() failed, so abort the child
     }
     if (pid > 0) {
@@ -230,7 +221,6 @@ class ProcessFD {
       ec = std::error_code(errno, std::system_category());
     }
 #endif
-    RAY_LOG(DEBUG) << "Return ProcessFD, pid: " << pid;
     return ProcessFD(pid, fd);
   }
 };
@@ -369,9 +359,7 @@ Process::Process(const char *argv[],
                  bool decouple,
                  const ProcessEnvironment &env) {
   (void)io_service;
-  RAY_LOG(INFO) << "Start to call ProcessFD::spawnvpe" ;
   ProcessFD procfd = ProcessFD::spawnvpe(argv, ec, decouple, env);
-  RAY_LOG(INFO) << "Created ProcessFD, ec: " << ec ;
   if (!ec) {
     p_ = std::make_shared<ProcessFD>(std::move(procfd));
   }

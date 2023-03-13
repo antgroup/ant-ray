@@ -110,13 +110,11 @@ PlasmaStore::PlasmaStore(instrumented_io_context &main_service,
                 this->AddToClientObjectIds(object_id, request->client);
               },
           [this](const auto &request) { this->ReturnFromGet(request); }) {
-  RAY_LOG(INFO) << "PlasmaStore constructor";
   const auto event_stats_print_interval_ms =
       RayConfig::instance().event_stats_print_interval_ms();
   if (event_stats_print_interval_ms > 0 && RayConfig::instance().event_stats()) {
     PrintAndRecordDebugDump();
   }
-  RAY_LOG(INFO) << "PlasmaStore end";
 }
 
 // TODO(pcm): Get rid of this destructor by using RAII to clean up data.
@@ -362,7 +360,6 @@ Status PlasmaStore::ProcessMessage(const std::shared_ptr<Client> &client,
   size_t input_size = message.size();
   ObjectID object_id;
 
-  RAY_LOG(INFO) << "Received message of type " << static_cast<int>(type);
   // Process the different types of requests.
   switch (type) {
   case fb::MessageType::PlasmaCreateRequest: {

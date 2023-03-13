@@ -116,7 +116,6 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
   NodeID local_raylet_id;
   int assigned_port;
   std::string serialized_job_config = options_.serialized_job_config;
-  RAY_LOG(INFO) << "Connecting to local Raylet.";
   local_raylet_client_ =
       std::make_shared<raylet::RayletClient>(io_service_,
                                              std::move(grpc_client),
@@ -132,7 +131,6 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
                                              &assigned_port,
                                              &serialized_job_config,
                                              options_.startup_token);
-  RAY_LOG(INFO) << "Connected to local Raylet.";
 
   if (!raylet_client_status.ok()) {
     // Avoid using FATAL log or RAY_CHECK here because they may create a core dump file.
@@ -161,14 +159,12 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
 
   // Start RPC server after all the task receivers are properly initialized and we have
   // our assigned port from the raylet.
-  RAY_LOG(INFO) << "Starting GRPC server.";
   core_worker_server_ =
       std::make_unique<rpc::GrpcServer>(WorkerTypeString(options_.worker_type),
                                         assigned_port,
                                         options_.node_ip_address == "127.0.0.1");
   core_worker_server_->RegisterService(grpc_service_);
   core_worker_server_->Run();
-  RAY_LOG(INFO) << "Started GRPC server.";
 
   // Set our own address.
   RAY_CHECK(!local_raylet_id.IsNil());
@@ -202,9 +198,7 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
       });
 
   RAY_CHECK_OK(gcs_client_->Connect(io_service_));
-  RAY_LOG(INFO) << "GCS client created.";
   RegisterToGcs();
-  RAY_LOG(INFO) << "Registered to GCS.";
 
   // Register a callback to monitor removed nodes.
   auto on_node_change = [this](const NodeID &node_id, const rpc::GcsNodeInfo &data) {
@@ -264,7 +258,6 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
         RayConfig::instance().raylet_death_check_interval_milliseconds());
   }
 
-  RAY_LOG(INFO) << "Creating CoreWorkerPlasmaStoreProvider";
   plasma_store_provider_.reset(new CoreWorkerPlasmaStoreProvider(
       options_.store_socket,
       local_raylet_client_,
@@ -274,7 +267,6 @@ CoreWorker::CoreWorker(const CoreWorkerOptions &options, const WorkerID &worker_
       (options_.worker_type != WorkerType::SPILL_WORKER &&
        options_.worker_type != WorkerType::RESTORE_WORKER),
       /*get_current_call_site=*/boost::bind(&CoreWorker::CurrentCallSite, this)));
-  RAY_LOG(INFO) << "Created CoreWorkerPlasmaStoreProvider";
   memory_store_.reset(new CoreWorkerMemoryStore(
       reference_counter_,
       local_raylet_client_,
@@ -1242,14 +1234,12 @@ Status CoreWorker::Wait(const std::vector<ObjectID> &ids,
 
   absl::flat_hash_set<ObjectID> ready;
   int64_t start_time = current_time_ms();
-  RAY_LOG(INFO) << "Calling memory_store_->Wait";
   RAY_RETURN_NOT_OK(memory_store_->Wait(
       memory_object_ids,
       std::min(static_cast<int>(memory_object_ids.size()), num_objects),
       timeout_ms,
       worker_context_,
       &ready));
-  RAY_LOG(INFO) << "memory_store_->Wait returned, ready num: " << ready.size();
   RAY_CHECK(static_cast<int>(ready.size()) <= num_objects);
   if (timeout_ms > 0) {
     timeout_ms =
@@ -1259,7 +1249,6 @@ Status CoreWorker::Wait(const std::vector<ObjectID> &ids,
     RetryObjectInPlasmaErrors(
         memory_store_, worker_context_, memory_object_ids, plasma_object_ids, ready);
     if (static_cast<int>(ready.size()) < num_objects && plasma_object_ids.size() > 0) {
-      RAY_LOG(INFO) << "Calling plasma_store_provider_->Wait";
       RAY_RETURN_NOT_OK(plasma_store_provider_->Wait(
           plasma_object_ids,
           std::min(static_cast<int>(plasma_object_ids.size()),
@@ -1267,7 +1256,6 @@ Status CoreWorker::Wait(const std::vector<ObjectID> &ids,
           timeout_ms,
           worker_context_,
           &ready));
-      RAY_LOG(INFO) << "plasma_store_provider_->Wait returned, ready num: "<<ready.size();
     }
   }
   RAY_CHECK(static_cast<int>(ready.size()) <= num_objects);
@@ -1277,7 +1265,7 @@ Status CoreWorker::Wait(const std::vector<ObjectID> &ids,
       results->at(i) = true;
     }
   }
-  RAY_LOG(INFO) << "Return OK";
+
   return Status::OK();
 }
 
@@ -1937,7 +1925,6 @@ Status CoreWorker::RemovePlacementGroup(const PlacementGroupID &placement_group_
 
 Status CoreWorker::WaitPlacementGroupReady(const PlacementGroupID &placement_group_id,
                                            int timeout_seconds) {
-  RAY_LOG(INFO) << "WaitPlacementGroupReady, sending .SyncWaitUntilReady to GCS.";
   const auto status =
       gcs_client_->PlacementGroups().SyncWaitUntilReady(placement_group_id);
   if (status.IsTimedOut()) {

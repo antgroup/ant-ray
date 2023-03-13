@@ -105,11 +105,9 @@ bool RayObject::IsException(rpc::ErrorType *error_type) const {
   if (metadata_ == nullptr) {
     return false;
   }
-  RAY_LOG(DEBUG) << "Before parsing metadata: " << metadata_;
   // TODO (kfstorm): metadata should be structured.
   const std::string metadata(reinterpret_cast<const char *>(metadata_->Data()),
                              metadata_->Size());
-  RAY_LOG(DEBUG) << "After parsing metadata: " << metadata;
   const auto error_type_descriptor = ray::rpc::ErrorType_descriptor();
   for (int i = 0; i < error_type_descriptor->value_count(); i++) {
     const auto error_type_number = error_type_descriptor->value(i)->number();

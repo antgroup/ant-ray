@@ -385,7 +385,6 @@ class TorchBackend(Backend):
                     backend = "gloo"
             else:
                 backend = backend_config.backend
-            logger.debug(f"Choosing communication backend: {backend}")
             master_addr, master_port = worker_group.execute_single(
                 0, get_address_and_port
             )

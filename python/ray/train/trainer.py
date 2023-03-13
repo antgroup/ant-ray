@@ -168,7 +168,6 @@ class Trainer:
         if resources_per_worker is not None:
             # Copy this parameter to avoid mutating the user input
             resources_per_worker = copy.deepcopy(resources_per_worker)
-        logger.info(f"resources per worker: {resources_per_worker}")
         self._num_workers = num_workers
         self._use_gpu = use_gpu
         self._resources_per_worker = resources_per_worker
@@ -201,7 +200,6 @@ class Trainer:
                     "`resources_per_worker."
                 )
 
-        logger.info(f"num_cpus: {num_cpus}, num_gpus: {num_gpus}")
         runtime_env = {
             "env_vars": {
                 var_name: os.environ[var_name]
@@ -210,11 +208,8 @@ class Trainer:
             }
         }
 
-        logger.info("Start to create `BackendExecutor` ActorClass")
         remote_executor = ray.remote(num_cpus=0)(BackendExecutor)
-        logger.info(f"Created `BackendExecutor` ActorClass: {remote_executor}")
 
-        logger.info("Start to init `BackendExecutor` Actor.")
         backend_executor_actor = remote_executor.options(
             runtime_env=runtime_env
         ).remote(
@@ -226,7 +221,6 @@ class Trainer:
             max_retries=max_retries,
         )
 
-        logger.info("Done init `BackendExecutor` Actor: {backend_executor_actor}.")
         self._backend_executor = ActorWrapper(backend_executor_actor)
 
         if self._is_tune_enabled():
@@ -285,9 +279,6 @@ class Trainer:
             initialization_hook (Optional[Callable]): The function to call on
                 each worker when it is instantiated.
         """
-        logger.info(
-            f"calling trainer `start`, backend_executor: {self._backend_executor}."
-        )
         self._backend_executor.start(initialization_hook)
 
     def run(
@@ -449,8 +440,6 @@ class Trainer:
         if self._run_id > 0:
             run_dir = Path(f"/host/tmp/ray/ray_results/run_{self._run_id:03d}")
             return run_dir
-            # run_dir = Path(f"run_{self._run_id:03d}")
-            # return construct_path(run_dir, self.logdir)
         else:
             return None
 

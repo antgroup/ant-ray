@@ -72,7 +72,6 @@ class PlacementGroup:
             "bundle length == 0, current bundle length: "
             f"{len(self.bundle_cache)}"
         )
-        logger.info("sending bundle_reservation_check.options remote task.")
         return bundle_reservation_check.options(
             placement_group=self, resources={BUNDLE_RESOURCE_LABEL: 0.001}
         ).remote(self)
@@ -84,7 +83,6 @@ class PlacementGroup:
         Return:
              True if the placement group is created. False otherwise.
         """
-        logger.info("wait PG")
         return _call_placement_group_ready(self.id, timeout_seconds)
 
     @property
@@ -107,7 +105,7 @@ class PlacementGroup:
 def _call_placement_group_ready(pg_id: PlacementGroupID, timeout_seconds: int) -> bool:
     worker = ray.worker.global_worker
     worker.check_connected()
-    logger.info("core_worker.wait_placement_group_ready")
+
     return worker.core_worker.wait_placement_group_ready(pg_id, timeout_seconds)
 
 
@@ -187,10 +185,7 @@ def placement_group(
     placement_group_id = worker.core_worker.create_placement_group(
         name, bundles, strategy, detached
     )
-    logger.info(f"created pg id: {placement_group_id}, init PG class.")
-    pg_cls = PlacementGroup(placement_group_id)
-    logger.info("created pg class, return.")
-    return pg_cls
+    return PlacementGroup(placement_group_id)
 
 
 @PublicAPI

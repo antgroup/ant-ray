@@ -586,7 +586,6 @@ if __name__ == "__main__":
     logger.info(f"Starting monitor using ray installation: {ray.__file__}")
     logger.info(f"Ray version: {ray.__version__}")
     logger.info(f"Ray commit: {ray.__commit__}")
-    logger.info(f"Monitor started with command: {sys.argv}")
 
     if args.autoscaling_config:
         autoscaling_config = os.path.expanduser(args.autoscaling_config)

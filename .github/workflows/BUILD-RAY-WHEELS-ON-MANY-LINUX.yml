@@ -1,0 +1,40 @@
+name: BUILD-RAY-WHEELS-ON-MANY-LINUX.yml
+
+on:
+  push:
+    branches: [ releases/1.13.0-occlum ]
+  pull_request:
+    branches: [ releases/1.13.0-occlum ]
+
+jobs:
+  build-wheel-pipeline:
+    timeout-minutes: 600
+    runs-on: ubuntu-20.04
+    container: 'quay.io/pypa/manylinux2014_x86_64'
+
+    steps:
+    - name: work around permission issue
+      run: git config --global --add safe.directory /__w/ant-ray/ant-ray
+
+    - uses: actions/checkout@v2
+
+    - name: Install basics
+      run: |
+          #  apt-get update
+          #  apt-get install -yq wget curl gcc g++ openjdk-8-jdk maven zlib1g-dev zip git
+    # - name: Install bazel
+    #   run: |
+    #        sh -c "bash ci/env/install-bazel.sh"
+
+    - name: Install Ray and export dist
+      run: |
+           set -e
+           set -x
+           TRAVIS_COMMIT=${GITHUB_SHA} ./python/build-wheel-manylinux2014.sh
+           ls .whl
+           ls .whl/*.whl
+    - name: Archive ray-wheel
+      uses: actions/upload-artifact@v1
+      with:
+        name: ray_wheels_on_many_linux
+        path: .whl/

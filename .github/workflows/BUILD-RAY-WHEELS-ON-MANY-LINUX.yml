@@ -30,7 +30,7 @@ jobs:
       run: |
            set -e
            set -x
-           pip install --user --upgrade setuptools # pin a latest version of setuptools
+           /opt/python/cp38-cp38/bin/pip install --user --upgrade setuptools # pin a latest version of setuptools
            TRAVIS_COMMIT=${GITHUB_SHA} ./python/build-wheel-manylinux2014.sh
            ls .whl
            ls .whl/*.whl

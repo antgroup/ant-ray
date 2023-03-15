@@ -1,0 +1,43 @@
+includes:
+  - base.yaml
+targets:
+  - target: /bin
+    copy:
+      - from: /root/image/usr/local/bin
+        files:
+          - python3.8
+          - ray
+      - files:
+        - /opt/occlum/toolchains/bash/glibc/bash
+  - target: /lib
+    copy:
+      - from: /root/image/usr/local/lib
+        files:
+          - libpython3.8.so.1.0
+          - libpython3.so
+        dirs:
+          - python3.8
+      - from: /root/image/lib/x86_64-linux-gnu
+        files:
+          - libc.so.6
+          - libpthread.so.0
+          - libdl.so.2
+          - libutil.so.1
+          - libm.so.6
+      - from: /root/image/lib64
+        files:
+          - ld-linux-x86-64.so.2
+  - target: /opt/occlum/glibc/lib
+    copy:
+     - files: 
+        - /opt/occlum/glibc/lib/libnss_files.so.2
+        - /opt/occlum/glibc/lib/libnss_dns.so.2
+        - /opt/occlum/glibc/lib/libresolv.so.2
+  - target: /root
+    copy:
+     - files:
+        - /tmp/pytorch_ray.py
+        - /tmp/demo.py
+     - dirs:
+        - /tmp/data
+

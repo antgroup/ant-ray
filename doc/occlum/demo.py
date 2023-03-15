@@ -34,10 +34,11 @@ assert value == "Result data is: 2"
 
 print("Starting `Owner` Actor")
 owner = Owner.remote()
-obj = ray.get(owner.warmup.remote())
+obj_ref = owner.warmup.remote()
+obj = ray.get(obj_ref)
 print(f"Getting value from Actor task `warmup`: {obj}")
 
 print("Starting `Owner` Actor")
 borrower = Borrower.remote()
-obj = ray.get(borrower.borrow.remote(obj))
+obj = ray.get(borrower.borrow.remote(obj_ref))
 print(f"Getting value from Actor task `borrow`: {obj}")

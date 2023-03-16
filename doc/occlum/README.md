@@ -2,8 +2,9 @@
 This folder contains the neccessary scripts and config files for building Ray into the Occlum image.
 
 ## 1. Building & Running Ray-In-Occlum Image
-To build the image, simply run the following command:
+To build the image, simply run the following command in the :
 ```bash
+cd /workdir/ray/doc/occlum # Same path of this turorial
 docker build -t occlum_ray .
 ```
 
@@ -76,3 +77,9 @@ targets:
 ```
 
 Run `occlum build` and then `occlum run /bin/python3.8 /root/pytorch_ray.py` !
+
+## 6. Test & Debug
+For security reason, logs are written in Occlum OS by default, which is a black box.
+
+For testing and debugging, you can explicitly set the log path under `/host` when starting the cluster. Occlum will redirect any files under `/host` to its host fs, i.e. docker container. For example, `demo.py` starts the cluster by `ray.init(_temp_dir="/host/tmp/ray")`, or by ray-cli `ray start --head --temp-dir /host/tmp/ray`.
+

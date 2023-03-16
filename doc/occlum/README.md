@@ -25,7 +25,7 @@ docker run --rm  -it \
 
 ## 2. Running a basic Ray program
 
-`demo.py` is a basic Ray program, which is already putted into the Occlum instance under the `/root` path. To run:
+*demo.py* is a basic Ray program, which is already putted into the Occlum instance under the `/root` path. To run:
 ```
 occlum run /bin/python3.8 /root/demo.py
 ```
@@ -38,7 +38,7 @@ This demo shows:
 5. Submitting Actor task with/without arguments
 
 ## 3. Running a torch-on-ray program
-`pytorch_ray.py` shows a pytorch hand-writing recognition job running in Ray. To run:
+*pytorch_ray.py* shows a pytorch hand-writing recognition job running in Ray. To run:
 ```
 occlum run /bin/python3.8 /root/pytorch_ray.py
 ```
@@ -55,9 +55,9 @@ occlum run /bin/ray start --head
 
 ## 5. Running a customzied Ray program
 Running a Ray program inside the occlum just needs to put the relevant scripts and data into Occlum.
-Take `pytorch_ray.py` as an example:
+Take *pytorch_ray.py* as an example:
 
-Copy the `pytorch_ray.py` file from docker into Occlum instance via `python-ray.yaml`:
+Copy the *pytorch_ray.py* file from docker into Occlum instance via a delaration in *python-ray.yaml*:
 
 ```yaml
 targets:
@@ -81,5 +81,5 @@ Run `occlum build` and then `occlum run /bin/python3.8 /root/pytorch_ray.py` !
 ## 6. Test & Debug
 For security reason, logs are written in Occlum OS by default, which is a black box.
 
-For testing and debugging, you can explicitly set the log path under `/host` when starting the cluster. Occlum will redirect any files under `/host` to its host fs, i.e. docker container. For example, `demo.py` starts the cluster by `ray.init(_temp_dir="/host/tmp/ray")`, or by ray-cli `ray start --head --temp-dir /host/tmp/ray`.
+For testing and debugging, you can explicitly set the log path under `/host` when starting the cluster. Occlum will redirect any files under `/host` to its host fs, i.e. docker container. For example, *demo.py* starts the cluster by `ray.init(_temp_dir="/host/tmp/ray")`, or by ray-cli `ray start --head --temp-dir /host/tmp/ray`.
 

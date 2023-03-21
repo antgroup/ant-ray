@@ -753,4 +753,3 @@ if __name__ == "__main__":
         zip_safe=False,
         license="Apache 2.0",
     )
-else None

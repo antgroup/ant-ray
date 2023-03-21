@@ -701,7 +701,7 @@ if __name__ == "__main__":
         def has_ext_modules(self):
             return True
     
-    print(f"[CI-DEBUG] Printing setup_spec.extras: {setup_spec.extras}")
+    print(f"[CI-DEBUG] Printing setup_spec.extras, type: {type(setup_spec.extras)} , content {setup_spec.extras} . [CI-DEBUG END]")
 
 
 # Ensure no remaining lib files.

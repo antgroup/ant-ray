@@ -700,6 +700,8 @@ if __name__ == "__main__":
     class BinaryDistribution(setuptools.Distribution):
         def has_ext_modules(self):
             return True
+    
+    print(f"[CI-DEBUG] Printing setup_spec.extras: {setup_spec.extras}")
 
 
 # Ensure no remaining lib files.
@@ -707,49 +709,46 @@ build_dir = os.path.join(ROOT_DIR, "build")
 if os.path.isdir(build_dir):
     shutil.rmtree(build_dir)
 
-print(f"[CI-DEBUG] Printing setup_spec.extras: {setup_spec.extras}")
-if __name__ == "__main__":
-    print(f"[CI-DEBUG] Printing setup_spec.extras: {setup_spec.extras}")
-    setuptools.setup(
-        name=setup_spec.name,
-        version=setup_spec.version,
-        author="Ray Team",
-        author_email="ray-dev@googlegroups.com",
-        description=(setup_spec.description),
-        long_description=io.open(
-            os.path.join(ROOT_DIR, os.path.pardir, "README.rst"), "r", encoding="utf-8"
-        ).read(),
-        url="https://github.com/ray-project/ray",
-        keywords=(
-            "ray distributed parallel machine-learning hyperparameter-tuning"
-            "reinforcement-learning deep-learning serving python"
-        ),
-        classifiers=[
-            "Programming Language :: Python :: 3.6",
-            "Programming Language :: Python :: 3.7",
-            "Programming Language :: Python :: 3.8",
-            "Programming Language :: Python :: 3.9",
-        ],
-        packages=setup_spec.get_packages(),
-        cmdclass={"build_ext": build_ext},
-        # The BinaryDistribution argument triggers build_ext.
-        distclass=BinaryDistribution,
-        install_requires=setup_spec.install_requires,
-        setup_requires=["cython >= 0.29.26", "wheel"],
-        extras_require=setup_spec.extras,
-        entry_points={
-            "console_scripts": [
-                "ray=ray.scripts.scripts:main",
-                "rllib=ray.rllib.scripts:cli [rllib]",
-                "tune=ray.tune.scripts:cli",
-                "ray-operator=ray.ray_operator.operator:main",
-                "serve=ray.serve.scripts:cli",
-            ]
-        },
-        package_data={
-            "ray": ["includes/*.pxd", "*.pxd"],
-        },
-        include_package_data=True,
-        zip_safe=False,
-        license="Apache 2.0",
-    )
+setuptools.setup(
+    name=setup_spec.name,
+    version=setup_spec.version,
+    author="Ray Team",
+    author_email="ray-dev@googlegroups.com",
+    description=(setup_spec.description),
+    long_description=io.open(
+        os.path.join(ROOT_DIR, os.path.pardir, "README.rst"), "r", encoding="utf-8"
+    ).read(),
+    url="https://github.com/ray-project/ray",
+    keywords=(
+        "ray distributed parallel machine-learning hyperparameter-tuning"
+        "reinforcement-learning deep-learning serving python"
+    ),
+    classifiers=[
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+    ],
+    packages=setup_spec.get_packages(),
+    cmdclass={"build_ext": build_ext},
+    # The BinaryDistribution argument triggers build_ext.
+    distclass=BinaryDistribution,
+    install_requires=setup_spec.install_requires,
+    setup_requires=["cython >= 0.29.26", "wheel"],
+    extras_require=setup_spec.extras,
+    entry_points={
+        "console_scripts": [
+            "ray=ray.scripts.scripts:main",
+            "rllib=ray.rllib.scripts:cli [rllib]",
+            "tune=ray.tune.scripts:cli",
+            "ray-operator=ray.ray_operator.operator:main",
+            "serve=ray.serve.scripts:cli",
+        ]
+    },
+    package_data={
+        "ray": ["includes/*.pxd", "*.pxd"],
+    },
+    include_package_data=True,
+    zip_safe=False,
+    license="Apache 2.0",
+) if __name__ == "__main__" else None

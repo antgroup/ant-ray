@@ -707,6 +707,8 @@ build_dir = os.path.join(ROOT_DIR, "build")
 if os.path.isdir(build_dir):
     shutil.rmtree(build_dir)
 
+print(f"[CI-DEBUG] Printing setup_spec.extras: {setup_spec.extras}")
+
 setuptools.setup(
     name=setup_spec.name,
     version=setup_spec.version,

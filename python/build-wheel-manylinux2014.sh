@@ -12,17 +12,9 @@ EOF
 chmod +x /usr/bin/nproc
 
 NODE_VERSION="14"
-PYTHONS=("cp36-cp36m"
-         "cp37-cp37m"
-         "cp38-cp38"
-         "cp39-cp39"
-         "cp310-cp310")
+PYTHONS=("cp38-cp38")
 
-NUMPY_VERSIONS=("1.14.5"
-                "1.14.5"
-                "1.14.5"
-                "1.19.3"
-                "1.22.0")
+NUMPY_VERSIONS=("1.14.5")
 
 yum -y install unzip zip sudo
 yum -y install java-1.8.0-openjdk java-1.8.0-openjdk-devel xz
@@ -39,7 +31,7 @@ echo "java_bin path $java_bin"
 java_home=${java_bin%jre/bin/java}
 export JAVA_HOME="$java_home"
 
-/ray/ci/env/install-bazel.sh
+ci/env/install-bazel.sh
 # Put bazel into the PATH if building Bazel from source
 # export PATH=/root/bazel-3.2.0/output:$PATH:/root/bin
 

@@ -1,0 +1,26 @@
+{
+    "resource_limits": {
+        "user_space_size": "28GB",
+        "kernel_space_heap_size": "512MB",
+        "max_num_of_threads": 512
+    },
+    "env": {
+        "default": [
+            "OCCLUM=yes",
+            "PYTHONHOME=/",
+            "PATH=/bin",
+            "RAY_BACKEND_LOG_LEVEL=debug",
+            "RAY_agent_register_timeout_ms=300000",
+            "RAY_worker_register_timeout_seconds=300",
+            "RAY_raylet_client_connect_timeout_milliseconds=2500",
+            "RAY_raylet_client_num_connect_attempts=100",
+	        "HOME=/root",
+            "RAY_IN_TEE=true",
+            "GLOO_SOCKET_IFNAME=eth0"
+        ]
+    },
+    "entry_points": [
+        "/bin"
+    ]
+}
+

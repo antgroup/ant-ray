@@ -16,6 +16,7 @@ from typing import Optional, Sequence, Tuple, Any, Union, Dict
 import uuid
 import grpc
 import warnings
+import yaml
 
 try:
     from grpc import aio as aiogrpc
@@ -1342,6 +1343,37 @@ def check_version_info(cluster_metadata):
         )
         raise RuntimeError(error_message)
 
+
+def _load_allowed_classes_and_functions_config():
+    """Load the configurations of allowed classes and functions, which are
+    ran as remote actors or tasks.
+    """
+    config_path = os.getenv(ray_constants.RAY_ALLOWED_LIST_CONFIG_PATH, None)
+    if config_path is None:
+        return None, None
+
+    config = yaml.safe_load(open(config_path, "rt"))
+    allowed_classes = config.get("allowed_classes", None)
+    allowed_functions = config.get("allowed_functions", None)
+    return allowed_classes, allowed_functions
+
+def _validate_target_class_is_allowed(target_class_full_name: str):
+    allowed_classes, _ = _load_allowed_classes_and_functions_config()
+    if allowed_classes is None:
+        return
+    if target_class_full_name not in allowed_classes:
+        raise ValueError(f"The target actor {target_class_full_name} is not in your "
+            "allowed classes configuration. If you'd like to allow this class "
+            "be invoked as an actor, please add it to the allowed list.")
+
+def _validate_target_function_is_allowed(target_function_name: str):
+    _, allowed_functions = _load_allowed_classes_and_functions_config()
+    if allowed_functions is None:
+        return
+    if target_function_name not in allowed_functions:
+        raise ValueError(f"The target function {target_function_name} is not in your "
+            "allowed function configuration. If you'd like to allow this function "
+            "be invoked as a remote task, please add it to the allowed list.")
 
 def ray_in_tee():
     return os.getenv("RAY_IN_TEE") == "true"

@@ -109,9 +109,9 @@ ObjectManager::ObjectManager(
                         boost::posix_time::milliseconds(config.timer_freq_ms)) {
   RAY_CHECK(config_.rpc_service_threads_number > 0);
 
-  push_manager_.reset(new PushManager(/* max_chunks_in_flight= */ std::max(
-      static_cast<int64_t>(1L),
-      static_cast<int64_t>(config_.max_bytes_in_flight / config_.object_chunk_size))));
+  push_manager_.reset(new PushManager(/* max_bytes_in_flight= */ std::max(
+      static_cast<int64_t>(config_.object_chunk_size),
+      static_cast<int64_t>(config_.max_bytes_in_flight))));
 
   pull_retry_timer_.async_wait([this](const boost::system::error_code &e) { Tick(e); });
 
@@ -474,56 +474,41 @@ void ObjectManager::PushObjectInternal(const ObjectID &object_id,
                  << ", number of chunks: " << chunk_reader->GetNumChunks()
                  << ", total data size: " << chunk_reader->GetObject().GetObjectSize();
 
-  auto push_id = UniqueID::FromRandom();
   push_manager_->StartPush(
-      node_id, object_id, chunk_reader->GetNumChunks(), [=](int64_t chunk_id) {
+      node_id, object_id, chunk_reader->GetNumChunks(), chunk_reader->GetChunkSize(), chunk_reader->GetLastChunkSize(),
+      [=](int64_t chunk_id) {
         rpc_service_.post(
             [=]() {
               // Post to the multithreaded RPC event loop so that data is copied
               // off of the main thread.
-              SendObjectChunk(
-                  push_id,
+              HandleObjectChunk(
                   object_id,
                   node_id,
                   chunk_id,
                   rpc_client,
-                  [=](const Status &status) {
-                    // Post back to the main event loop because the
-                    // PushManager is thread-safe.
-                    main_service_->post(
-                        [this, node_id, object_id]() {
-                          push_manager_->OnChunkComplete(node_id, object_id);
-                        },
-                        "ObjectManager.Push");
-                  },
                   chunk_reader,
                   from_disk);
             },
-            "ObjectManager.Push");
+            "ObjectManager.ReadObjectChunk");
       });
 }
 
-void ObjectManager::SendObjectChunk(const UniqueID &push_id,
-                                    const ObjectID &object_id,
+void ObjectManager::HandleObjectChunk(const ObjectID &object_id,
                                     const NodeID &node_id,
-                                    uint64_t chunk_index,
                                     std::shared_ptr<rpc::ObjectManagerClient> rpc_client,
-                                    std::function<void(const Status &)> on_complete,
+                                    uint64_t chunk_index,
                                     std::shared_ptr<ChunkObjectReader> chunk_reader,
                                     bool from_disk) {
-  double start_time = absl::GetCurrentTimeNanos() / 1e9;
-  rpc::PushRequest push_request;
+  rpc::ChunkInfo chunk_info;
   // Set request header
-  push_request.set_push_id(push_id.Binary());
-  push_request.set_object_id(object_id.Binary());
-  push_request.mutable_owner_address()->CopyFrom(
+  chunk_info.set_object_id(object_id.Binary());
+  chunk_info.mutable_owner_address()->CopyFrom(
       chunk_reader->GetObject().GetOwnerAddress());
-  push_request.set_node_id(self_node_id_.Binary());
-  push_request.set_data_size(chunk_reader->GetObject().GetObjectSize());
-  push_request.set_metadata_size(chunk_reader->GetObject().GetMetadataSize());
-  push_request.set_chunk_index(chunk_index);
+  chunk_info.set_data_size(chunk_reader->GetObject().GetObjectSize());
+  chunk_info.set_metadata_size(chunk_reader->GetObject().GetMetadataSize());
+  chunk_info.set_chunk_index(chunk_index);
 
-  // read a chunk into push_request and handle errors.
+  // read a chunk into chunk_info and handle errors.
   auto optional_chunk = chunk_reader->GetChunk(chunk_index);
   if (!optional_chunk.has_value()) {
     RAY_LOG(DEBUG) << "Read chunk " << chunk_index << " of object " << object_id
@@ -531,29 +516,76 @@ void ObjectManager::SendObjectChunk(const UniqueID &push_id,
     on_complete(Status::IOError("Failed to read spilled object"));
     return;
   }
-  push_request.set_data(std::move(optional_chunk.value()));
+  chunk_info.set_data(std::move(optional_chunk.value()));
   if (from_disk) {
-    num_bytes_pushed_from_disk_ += push_request.data().length();
+    num_bytes_pushed_from_disk_ += chunk_info.data().length();
   } else {
-    num_bytes_pushed_from_plasma_ += push_request.data().length();
+    num_bytes_pushed_from_plasma_ += chunk_info.data().length();
   }
 
+  main_service_->post(
+    [this, node_id, rpc_client, chunk_info=std::move(chunk_info)](){
+      SendObjectChunk(node_id, rpc_client, std::move(chunk_info));
+    },
+    "ObjectManager.SendObjectChunk");
+}
+
+void ObjectManager::SendObjectChunk(const NodeID &node_id,
+                                    std::shared_ptr<rpc::ObjectManagerClient> rpc_client,
+                                    rpc::ChunkInfo chunk_info) {
+  auto it = location_push_buffers_.find(node_id);
+  int64_t chunk_size = chunk_info.data().length();
+  if (it == location_push_buffers_.end() || it->second.second + chunk_size > config_.object_chunk_size) {
+    std::deque<rpc::PushRequest> request_queue();
+    rpc::PushRequest push_request;
+    push_request.set_node_id(node_id.Binary());
+    push_request.add_chunk_infos(std::move(chunk_info));
+    request_queue.push_back(std::move(push_request));
+    it = location_push_buffers_.emplace(node_id, std::make_pair(std::move(request_queue)), chunk_size).first;
+  } else {
+    it->second.first.back().add_chunk_infos(std::move(chunk_info));
+    it->second.second += chunk_size;
+  }
+
+  if (in_flight_push_requests_[node_id] > rpc_client.NumConnections()) {
+    return;
+  }
+
+  std::vector<ObjectID> obj_ids;
+  std::vector<uint32_t> chunk_indexes;
+  for (const auto &chunk_info : it->second.front().chunk_infos()) {
+    obj_ids.push_back(ObjectID::FromBinary(chunk_info.object_id()));
+    chunk_indexes.push_back(chunk_info.chunk_index());
+  }
+
+  double start_time = absl::GetCurrentTimeNanos() / 1e9;
   // record the time cost between send chunk and receive reply
   rpc::ClientCallback<rpc::PushReply> callback =
-      [this, start_time, object_id, node_id, chunk_index, on_complete](
+      [this, start_time, obj_ids=std::move(obj_ids), node_id, chunk_indexes=std::move(chunk_indexes), completed_size=it->second.second](
           const Status &status, const rpc::PushReply &reply) {
-        // TODO: Just print warning here, should we try to resend this chunk?
-        if (!status.ok()) {
-          RAY_LOG(WARNING) << "Send object " << object_id << " chunk to node " << node_id
-                           << " failed due to" << status.message()
-                           << ", chunk index: " << chunk_index;
-        }
         double end_time = absl::GetCurrentTimeNanos() / 1e9;
-        HandleSendFinished(object_id, node_id, chunk_index, start_time, end_time, status);
-        on_complete(status);
+        for (size_t index = 0; index < obj_ids.size(); index++) {
+          const ObjectID &object_id = obj_ids[index];
+          const uint32_t &chunk_index = chunk_indexes[index];
+          // TODO: Just print warning here, should we try to resend this chunk?
+          if (!status.ok()) {
+            RAY_LOG(WARNING) << "Send object " << object_id << " chunk to node " << node_id
+                            << " failed due to" << status.message()
+                            << ", chunk index: " << chunk_index;
+          }
+          HandleSendFinished(object_id, node_id, chunk_index, start_time, end_time, status);
+        }
+        main_service_->post(
+          [this, node_id, obj_ids = std::move(obj_ids)]() {
+              in_flight_push_requests_[node_id]--;
+              push_manager_->OnChunkComplete(node_id, obj_ids, completed_size);
+            },
+            "ObjectManager.PushReply"
+        );
       };
+  in_flight_push_requests_[node_id]++;
+  rpc_client->Push();
 
-  rpc_client->Push(push_request, callback);
 }
 
 /// Implementation of ObjectManagerServiceHandler

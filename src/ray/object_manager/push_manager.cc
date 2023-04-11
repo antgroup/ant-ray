@@ -23,6 +23,8 @@ namespace ray {
 void PushManager::StartPush(const NodeID &dest_id,
                             const ObjectID &obj_id,
                             int64_t num_chunks,
+                            int64_t chunk_size,
+                            int64_t last_chunk_size,
                             std::function<void(int64_t)> send_chunk_fn) {
   auto push_id = std::make_pair(dest_id, obj_id);
   RAY_CHECK(num_chunks > 0);
@@ -32,20 +34,26 @@ void PushManager::StartPush(const NodeID &dest_id,
     chunks_remaining_ += push_info_[push_id]->ResendAllChunks(send_chunk_fn);
   } else {
     chunks_remaining_ += num_chunks;
-    push_info_[push_id].reset(new PushState(num_chunks, send_chunk_fn));
+    push_info_[push_id].reset(new PushState(num_chunks, chunk_size, last_chunk_size, send_chunk_fn));
   }
   ScheduleRemainingPushes();
 }
 
-void PushManager::OnChunkComplete(const NodeID &dest_id, const ObjectID &obj_id) {
-  auto push_id = std::make_pair(dest_id, obj_id);
-  chunks_in_flight_ -= 1;
-  chunks_remaining_ -= 1;
-  push_info_[push_id]->OnChunkComplete();
-  if (push_info_[push_id]->AllChunksComplete()) {
-    push_info_.erase(push_id);
-    RAY_LOG(DEBUG) << "Push for " << push_id.first << ", " << push_id.second
-                   << " completed, remaining: " << NumPushesInFlight();
+void PushManager::OnChunkComplete(
+  const NodeID &dest_id,
+  const std::vector<ObjectID> &obj_ids,
+  const int64_t &completed_size) {
+  bytes_in_flight_ -= completed_size;
+  for (const ObjectID &obj_id : obj_ids) {
+    auto push_id = std::make_pair(dest_id, obj_id);
+    chunks_in_flight_ -= 1;
+    chunks_remaining_ -= 1;
+    push_info_[push_id]->OnChunkComplete();
+    if (push_info_[push_id]->AllChunksComplete()) {
+      push_info_.erase(push_id);
+      RAY_LOG(DEBUG) << "Push for " << push_id.first << ", " << push_id.second
+                     << " completed, remaining: " << NumPushesInFlight();
+    }
   }
   ScheduleRemainingPushes();
 }
@@ -55,21 +63,24 @@ void PushManager::ScheduleRemainingPushes() {
   // Loop over all active pushes for approximate round-robin prioritization.
   // TODO(ekl) this isn't the best implementation of round robin, we should
   // consider tracking the number of chunks active per-push and balancing those.
-  while (chunks_in_flight_ < max_chunks_in_flight_ && keep_looping) {
+  while (bytes_in_flight_ < max_bytes_in_flight_ && keep_looping) {
     // Loop over each active push and try to send another chunk.
     auto it = push_info_.begin();
     keep_looping = false;
-    while (it != push_info_.end() && chunks_in_flight_ < max_chunks_in_flight_) {
+    while (it != push_info_.end() && bytes_in_flight_ < max_bytes_in_flight_) {
       auto push_id = it->first;
       auto &info = it->second;
-      if (info->SendOneChunk()) {
+      auto chunk_size = info->SendOneChunk(bytes_in_flight_, max_bytes_in_flight_);
+      if (chunk_size > 0) {
         chunks_in_flight_ += 1;
+        bytes_in_flight_ += chunk_size;
         keep_looping = true;
         RAY_LOG(DEBUG) << "Sending chunk " << info->next_chunk_id << " of "
                        << info->num_chunks << " for push " << push_id.first << ", "
-                       << push_id.second << ", chunks in flight " << NumChunksInFlight()
-                       << " / " << max_chunks_in_flight_
-                       << " max, remaining chunks: " << NumChunksRemaining();
+                       << push_id.second << ", bytes in flight " << NumBytesInFlight()
+                       << " / " << max_bytes_in_flight_
+                       << " max, num chunks in flight: " << NumChunksInFlight()
+                       << " remaining chunks: " << NumChunksRemaining();
       }
       it++;
     }

@@ -29,6 +29,15 @@ uint64_t ChunkObjectReader::GetNumChunks() const {
          chunk_size_;
 }
 
+uint64_t ChunkObjectReader::GetChunkSize() const {
+  return chunk_size_;
+}
+
+uint64_t ChunkObjectReader::GetLastChunkSize() const {
+  uint64_t last_chunk_size = (object_->GetDataSize() + object_->GetMetadataSize()) % chunk_size_;
+  return last_chunk_size > 0 ? last_chunk_size : chunk_size_;
+}
+
 absl::optional<std::string> ChunkObjectReader::GetChunk(uint64_t chunk_index) const {
   // The spilled file stores metadata before data. But the GetChunk needs to
   // return data before metadata. We achieve by first read from data section,

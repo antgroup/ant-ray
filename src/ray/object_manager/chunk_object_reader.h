@@ -29,6 +29,10 @@ class ChunkObjectReader {
 
   uint64_t GetNumChunks() const;
 
+  uint64_t GetChunkSize() const;
+
+  uint64_t GetLastChunkSize() const;
+
   /// Return the value in a given chunk, identified by chunk_index.
   /// It migh return an empty optional if the file is deleted.
   ///

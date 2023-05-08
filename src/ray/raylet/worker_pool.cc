@@ -173,7 +173,7 @@ void WorkerPool::SetNodeManagerPort(int node_manager_port) {
   node_manager_port_ = node_manager_port;
 }
 
-void WorkerPool::SetAgentManager(std::shared_ptr<AgentManager> agent_manager) {
+void WorkerPool::SetAgentManager(std::shared_ptr<DashboardAgentManager> agent_manager) {
   agent_manager_ = agent_manager;
 }
 

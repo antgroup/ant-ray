@@ -394,7 +394,7 @@ NodeManager::NodeManager(instrumented_io_context &io_service,
   }
 
   auto options = AgentManager::Options({self_node_id, agent_command_line});
-  agent_manager_ = std::make_shared<AgentManager>(
+  agent_manager_ = std::make_shared<DashboardAgentManager>(
       std::move(options),
       /*delay_executor=*/
       [this](std::function<void()> task, uint32_t delay_ms) {

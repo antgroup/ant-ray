@@ -29,61 +29,16 @@
 namespace ray {
 namespace raylet {
 
-using RuntimeEnvAgentClientFactoryFn =
-    std::function<std::shared_ptr<rpc::RuntimeEnvAgentClientInterface>(
-        const std::string &, int)>;
-
-/// Callback that's called after runtime env is created.
-/// \param[in] successful Whether or not the creation was successful.
-/// \param[in] serialized_runtime_env_context Serialized context.
-/// \param[in] setup_error_message The error message if runtime env creation fails.
-/// It must be only set when successful == false.
-using GetOrCreateRuntimeEnvCallback =
-    std::function<void(bool, const std::string &, const std::string &)>;
-using DeleteRuntimeEnvIfPossibleCallback = std::function<void(bool)>;
-
 class DashboardAgentManager : public AgentManager {
  public:
-  explicit DashboardAgentManager(
-      Options options,
-      DelayExecutorFn delay_executor,
-      RuntimeEnvAgentClientFactoryFn runtime_env_agent_client_factory,
-      bool start_agent = true /* for test */)
-      : AgentManager(options, delay_executor, start_agent),
-        runtime_env_agent_client_factory_(std::move(runtime_env_agent_client_factory)) {}
+  explicit DashboardAgentManager(Options options,
+                                 DelayExecutorFn delay_executor,
+                                 bool start_agent = true /* for test */)
+      : AgentManager(options, delay_executor, start_agent) {}
 
   void HandleRegisterAgent(rpc::RegisterAgentRequest request,
                            rpc::RegisterAgentReply *reply,
                            rpc::SendReplyCallback send_reply_callback);
-
-  /// Request agent to increase the runtime env reference. This API is not idempotent.
-  /// \param[in] job_id The job id which the runtime env belongs to.
-  /// \param[in] serialized_runtime_env The serialized runtime environment.
-  /// \param[in] serialized_allocated_resource_instances The serialized allocated resource
-  /// instances.
-  /// \param[in] callback The callback function.
-  virtual void GetOrCreateRuntimeEnv(
-      const JobID &job_id,
-      const std::string &serialized_runtime_env,
-      const rpc::RuntimeEnvConfig &runtime_env_config,
-      const std::string &serialized_allocated_resource_instances,
-      GetOrCreateRuntimeEnvCallback callback);
-
-  /// Request agent to decrease the runtime env reference. This API is not idempotent.
-  /// \param[in] serialized_runtime_env The serialized runtime environment.
-  /// \param[in] callback The callback function.
-  virtual void DeleteRuntimeEnvIfPossible(const std::string &serialized_runtime_env,
-                                          DeleteRuntimeEnvIfPossibleCallback callback);
-
- private:
-  void StartAgent();
-
- private:
-  RuntimeEnvAgentClientFactoryFn runtime_env_agent_client_factory_;
-  std::shared_ptr<rpc::RuntimeEnvAgentClientInterface> runtime_env_agent_client_;
-  /// When the grpc port of agent is invalid, set this flag to indicate that agent client
-  /// is disable.
-  bool disable_agent_client_ = false;
 };
 
 class DefaultAgentManagerServiceHandler : public rpc::AgentManagerServiceHandler {

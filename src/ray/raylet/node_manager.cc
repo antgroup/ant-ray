@@ -399,6 +399,15 @@ NodeManager::NodeManager(instrumented_io_context &io_service,
       /*delay_executor=*/
       [this](std::function<void()> task, uint32_t delay_ms) {
         return execute_after(io_service_, task, delay_ms);
+      });
+
+  auto runtime_env_agent_options =
+      AgentManager::Options({self_node_id, agent_command_line});
+  runtime_env_agent_manager_ = std::make_shared<RuntimeEnvAgentManager>(
+      std::move(runtime_env_agent_options),
+      /*delay_executor=*/
+      [this](std::function<void()> task, uint32_t delay_ms) {
+        return execute_after(io_service_, task, delay_ms);
       },
       /*runtime_env_agent_factory=*/
       [this](const std::string &ip_address, int port) {
@@ -407,7 +416,7 @@ NodeManager::NodeManager(instrumented_io_context &io_service,
         return std::shared_ptr<rpc::RuntimeEnvAgentClientInterface>(
             new rpc::RuntimeEnvAgentClient(ip_address, port, client_call_manager_));
       });
-  worker_pool_.SetAgentManager(agent_manager_);
+  worker_pool_.SetAgentManager(runtime_env_agent_manager_);
   worker_pool_.Start();
   periodical_runner_.RunFnPeriodically([this]() { GCTaskFailureReason(); },
                                        RayConfig::instance().task_failure_entry_ttl_ms());

@@ -31,6 +31,7 @@
 #include "ray/object_manager/object_manager.h"
 #include "ray/raylet/agent_manager.h"
 #include "ray/raylet/dashboard_agent_manager.h"
+#include "ray/raylet/runtime_env_agent_manager.h"
 #include "ray/raylet_client/raylet_client.h"
 #include "ray/raylet/local_object_manager.h"
 #include "ray/raylet/scheduling/scheduling_ids.h"
@@ -836,6 +837,14 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
 
   /// Monitors and reports node memory usage and whether it is above threshold.
   std::unique_ptr<MemoryMonitor> memory_monitor_;
+
+  /// The runtime env agent manager RPC service.
+  std::unique_ptr<rpc::RuntimeEnvAgentManagerServiceHandler> runtime_env_agent_manager_service_handler_;
+  
+  /// The runtime env agent manager 
+  rpc::RuntimeEnvAgentManagerGrpcService runtime_env_agent_manager_service_;
+
+  std::shared_ptr<RuntimeEnvAgentManager> runtime_env_agent_manager_;
 };
 
 }  // namespace raylet

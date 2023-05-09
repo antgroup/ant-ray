@@ -21,7 +21,7 @@ from ray._private.ray_constants import (
     DEFAULT_RUNTIME_ENV_TIMEOUT_SECONDS,
 )
 import ray._private.ray_constants as ray_constants
-import ray._private.runtime_env.runtime_env_agent.runtime_env_consts as runtime_env_consts
+from ray._private.runtime_env.runtime_env_agent import runtime_env_consts
 from ray._private.ray_logging import setup_component_logger
 from ray._private.gcs_utils import GcsAioClient
 from ray._private.runtime_env.conda import CondaPlugin
@@ -44,6 +44,10 @@ from ray.core.generated import (
     runtime_env_agent_manager_pb2,
     runtime_env_agent_manager_pb2_grpc,
 )
+from ray.core.generated.runtime_env_agent_manager_pb2 import (
+    RUNTIME_ENV_AGENT_RPC_STATUS_OK,
+    RUNTIME_ENV_AGENT_RPC_STATUS_FAILED,
+)
 from ray.core.generated.runtime_env_common_pb2 import (
     RuntimeEnvState as ProtoRuntimeEnvState,
 )
@@ -60,6 +64,7 @@ except AttributeError:
 # better pluggability mechanism once available.
 SLEEP_FOR_TESTING_S = os.environ.get("RAY_RUNTIME_ENV_SLEEP_FOR_TESTING_S")
 _PARENT_DEATH_THREASHOLD = 5
+
 
 @dataclass
 class CreatedEnvResult:
@@ -174,7 +179,8 @@ class ReferenceTable:
         return self._runtime_env_reference
 
 
-class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
+class RuntimeEnvAgent(
+    runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
 ):
     """An RPC server to create and delete runtime envs.
 
@@ -182,22 +188,23 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
         dashboard_agent: The DashboardAgent object contains global config.
     """
 
-    def __init__(self,
-            gcs_address,
-            node_ip_address,
-            runtime_env_agent_port,
-            temp_dir,
-            runtime_env_dir,
-            logging_params,
-            agent_id,
-        ):
+    def __init__(
+        self,
+        gcs_address,
+        node_ip_address,
+        runtime_env_agent_port,
+        temp_dir,
+        runtime_env_dir,
+        logging_params,
+        agent_id,
+    ):
         self._node_ip_address = node_ip_address
         self._runtime_env_agent_port = runtime_env_agent_port
         self._runtime_env_dir = runtime_env_dir
         self._agent_id = agent_id
         self._logging_params = logging_params
         self._gcs_address = gcs_address
-    
+
         self._logger = default_logger
         self._logger = setup_component_logger(
             logger_name=default_logger.name, **self._logging_params
@@ -218,7 +225,9 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
         # Setup raylet channel
         options = ray_constants.GLOBAL_GRPC_OPTIONS
         self._aiogrpc_raylet_channel = init_grpc_channel(
-            f"{self._node_ip_address}:{self._runtime_env_agent_port}", options, asynchronous=True
+            f"{self._node_ip_address}:{self._runtime_env_agent_port}",
+            options,
+            asynchronous=True,
         )
         # Setup grpc server
         self._grpc_server = aiogrpc.server(options=(("grpc.so_reuseport", 0),))
@@ -229,10 +238,13 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
             )
         except Exception:
             self._logger.exception(
-                "Failed to add port to grpc server. Runtime env agent will exit now.")
+                "Failed to add port to grpc server. Runtime env agent will exit now."
+            )
             sys.exit(1)
         else:
-            self._logger.info("Runtime env agent grpc address: %s:%s", grpc_ip, self._grpc_port)
+            self._logger.info(
+                "Runtime env agent grpc address: %s:%s", grpc_ip, self._grpc_port
+            )
 
         # Setup runtime env materials
         self._per_job_logger_cache = dict()
@@ -242,7 +254,7 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
         # Maps a serialized runtime env to a lock that is used
         # to prevent multiple concurrent installs of the same env.
         self._env_locks: Dict[str, asyncio.Lock] = dict()
-        self._gcs_aio_client =  GcsAioClient(address=self._gcs_address)
+        self._gcs_aio_client = GcsAioClient(address=self._gcs_address)
         self._pip_plugin = PipPlugin(self._runtime_env_dir)
         self._conda_plugin = CondaPlugin(self._runtime_env_dir)
         self._py_modules_plugin = PyModulesPlugin(
@@ -472,7 +484,7 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
                         f"context: {context}"
                     )
                     return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
-                        status=runtime_env_agent_manager_pb2.RUNTIME_ENV_AGENT_RPC_STATUS_OK,
+                        status=RUNTIME_ENV_AGENT_RPC_STATUS_OK,
                         serialized_runtime_env_context=context,
                     )
                 else:
@@ -487,7 +499,7 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
                         runtime_env, serialized_env, request.source_process
                     )
                     return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
-                        status=runtime_env_agent_manager_pb2.RUNTIME_ENV_AGENT_RPC_STATUS_FAILED,
+                        status=RUNTIME_ENV_AGENT_RPC_STATUS_FAILED,
                         error_message=error_message,
                     )
 
@@ -529,9 +541,9 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
             )
             # Reply the RPC
             return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
-                status=runtime_env_agent_manager_pb2.RUNTIME_ENV_AGENT_RPC_STATUS_OK
+                status=RUNTIME_ENV_AGENT_RPC_STATUS_OK
                 if successful
-                else runtime_env_agent_manager_pb2.RUNTIME_ENV_AGENT_RPC_STATUS_FAILED,
+                else RUNTIME_ENV_AGENT_RPC_STATUS_FAILED,
                 serialized_runtime_env_context=serialized_context,
                 error_message=error_message,
             )
@@ -551,7 +563,7 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
                 f"{request.serialized_runtime_env}"
             )
             return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
-                status=runtime_env_agent_manager_pb2.RUNTIME_ENV_AGENT_RPC_STATUS_FAILED,
+                status=RUNTIME_ENV_AGENT_RPC_STATUS_FAILED,
                 error_message="".join(
                     traceback.format_exception(type(e), e, e.__traceback__)
                 ),
@@ -562,7 +574,7 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
         )
 
         return runtime_env_agent_pb2.DeleteRuntimeEnvIfPossibleReply(
-            status=runtime_env_agent_manager_pb2.RUNTIME_ENV_AGENT_RPC_STATUS_OK
+            status=RUNTIME_ENV_AGENT_RPC_STATUS_OK
         )
 
     async def GetRuntimeEnvsInfo(self, request, context):
@@ -599,7 +611,6 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
         return reply
 
     async def run(self):
-
         async def _check_parent():
             """Check if raylet is dead and fate-share if it is."""
             try:
@@ -632,15 +643,13 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
                         )
                         if parent_death_cnt < _PARENT_DEATH_THREASHOLD:
                             await asyncio.sleep(
-                                runtime_env_consts.RUNTIME_ENV_AGENT_CHECK_PARENT_INTERVAL_S
+                                runtime_env_consts.CHECK_PARENT_INTERVAL_S
                             )
                             continue
                         sys.exit(0)
                     else:
                         parent_death_cnt = 0
-                    await asyncio.sleep(
-                        runtime_env_consts.RUNTIME_ENV_AGENT_CHECK_PARENT_INTERVAL_S
-                    )
+                    await asyncio.sleep(runtime_env_consts.CHECK_PARENT_INTERVAL_S)
             except Exception:
                 logger.exception("Failed to check parent PID, exiting.")
                 sys.exit(1)
@@ -655,8 +664,10 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
             self, self._grpc_server
         )
         # Register agent to agent manager.
-        raylet_stub = runtime_env_agent_manager_pb2_grpc.RuntimeEnvAgentManagerServiceStub(
-            self._aiogrpc_raylet_channel
+        raylet_stub = (
+            runtime_env_agent_manager_pb2_grpc.RuntimeEnvAgentManagerServiceStub(
+                self._aiogrpc_raylet_channel
+            )
         )
         await raylet_stub.RegisterRuntimeEnvAgent(
             runtime_env_agent_manager_pb2.RegisterRuntimeEnvAgentRequest(
@@ -669,12 +680,10 @@ class RuntimeEnvAgent(runtime_env_agent_pb2_grpc.RuntimeEnvServiceServicer,
         await asyncio.gather(*tasks)
         await self.server.wait_for_termination()
 
-
-
-
     @staticmethod
     def is_minimal_module():
         return True
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Runtime env agent.")
@@ -781,9 +790,9 @@ if __name__ == "__main__":
         # Initialize event loop, see Dashboard init code for caveat
         # w.r.t grpc server init in the DashboardAgent initializer.
         agent = RuntimeEnvAgent(
-            gcs_address = args.gcs_address,
-            node_ip_address = args.node_ip_address,
-            runtime_env_agent_port = args.runtime_env_agent_port,
+            gcs_address=args.gcs_address,
+            node_ip_address=args.node_ip_address,
+            runtime_env_agent_port=args.runtime_env_agent_port,
             temp_dir=args.temp_dir,
             runtime_env_dir=args.runtime_env_dir,
             logging_params=logging_params,

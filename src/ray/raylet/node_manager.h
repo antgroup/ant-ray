@@ -839,9 +839,10 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   std::unique_ptr<MemoryMonitor> memory_monitor_;
 
   /// The runtime env agent manager RPC service.
-  std::unique_ptr<rpc::RuntimeEnvAgentManagerServiceHandler> runtime_env_agent_manager_service_handler_;
-  
-  /// The runtime env agent manager 
+  std::unique_ptr<rpc::RuntimeEnvAgentManagerServiceHandler>
+      runtime_env_agent_manager_service_handler_;
+
+  /// The runtime env agent manager
   rpc::RuntimeEnvAgentManagerGrpcService runtime_env_agent_manager_service_;
 
   std::shared_ptr<RuntimeEnvAgentManager> runtime_env_agent_manager_;

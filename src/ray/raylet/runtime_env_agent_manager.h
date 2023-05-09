@@ -53,8 +53,8 @@ class RuntimeEnvAgentManager : public AgentManager {
         runtime_env_agent_client_factory_(std::move(runtime_env_agent_client_factory)) {}
 
   void HandleRegisterRuntimeEnvAgent(rpc::RegisterRuntimeEnvAgentRequest request,
-                           rpc::RegisterRuntimeEnvAgentReply *reply,
-                           rpc::SendReplyCallback send_reply_callback);
+                                     rpc::RegisterRuntimeEnvAgentReply *reply,
+                                     rpc::SendReplyCallback send_reply_callback);
 
   /// Request agent to increase the runtime env reference. This API is not idempotent.
   /// \param[in] job_id The job id which the runtime env belongs to.
@@ -86,15 +86,17 @@ class RuntimeEnvAgentManager : public AgentManager {
   bool disable_agent_client_ = false;
 };
 
-class DefaultRuntimeEnvAgentManagerServiceHandler : public rpc::RuntimeEnvAgentManagerServiceHandler {
+class DefaultRuntimeEnvAgentManagerServiceHandler
+    : public rpc::RuntimeEnvAgentManagerServiceHandler {
  public:
   explicit DefaultRuntimeEnvAgentManagerServiceHandler(
       std::shared_ptr<RuntimeEnvAgentManager> &delegate)
       : delegate_(delegate) {}
 
-  void HandleRegisterRuntimeEnvAgent(rpc::RegisterRuntimeEnvAgentRequest request,
-                           rpc::RegisterRuntimeEnvAgentReply *reply,
-                           rpc::SendReplyCallback send_reply_callback) override {
+  void HandleRegisterRuntimeEnvAgent(
+      rpc::RegisterRuntimeEnvAgentRequest request,
+      rpc::RegisterRuntimeEnvAgentReply *reply,
+      rpc::SendReplyCallback send_reply_callback) override {
     RAY_CHECK(delegate_ != nullptr);
     delegate_->HandleRegisterRuntimeEnvAgent(request, reply, send_reply_callback);
   }

@@ -30,8 +30,8 @@ class RuntimeEnvAgentManagerClient {
   /// \param[in] port Port of the agent manager server.
   /// \param[in] client_call_manager The `ClientCallManager` used for managing requests.
   RuntimeEnvAgentManagerClient(const std::string &address,
-                     const int port,
-                     ClientCallManager &client_call_manager) {
+                               const int port,
+                               ClientCallManager &client_call_manager) {
     grpc_client_ = std::make_unique<GrpcClient<RuntimeEnvAgentManagerService>>(
         address, port, client_call_manager);
   };

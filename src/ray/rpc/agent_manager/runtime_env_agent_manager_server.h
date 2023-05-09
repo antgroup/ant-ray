@@ -39,8 +39,8 @@ class RuntimeEnvAgentManagerServiceHandler {
   /// \param[out] reply The reply message.
   /// \param[in] send_reply_callback The callback to be called when the request is done.
   virtual void HandleRegisterRuntimeEnvAgent(RegisterRuntimeEnvAgentRequest request,
-                                   RegisterRuntimeEnvAgentReply *reply,
-                                   SendReplyCallback send_reply_callback) = 0;
+                                             RegisterRuntimeEnvAgentReply *reply,
+                                             SendReplyCallback send_reply_callback) = 0;
 };
 
 /// The `GrpcService` for `AgentManagerGrpcService`.
@@ -51,7 +51,7 @@ class RuntimeEnvAgentManagerGrpcService : public GrpcService {
   /// \param[in] port See `GrpcService`.
   /// \param[in] handler The service handler that actually handle the requests.
   RuntimeEnvAgentManagerGrpcService(instrumented_io_context &io_service,
-                          RuntimeEnvAgentManagerServiceHandler &service_handler)
+                                    RuntimeEnvAgentManagerServiceHandler &service_handler)
       : GrpcService(io_service), service_handler_(service_handler){};
 
  protected:

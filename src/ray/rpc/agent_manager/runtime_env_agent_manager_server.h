@@ -43,10 +43,10 @@ class RuntimeEnvAgentManagerServiceHandler {
                                              SendReplyCallback send_reply_callback) = 0;
 };
 
-/// The `GrpcService` for `AgentManagerGrpcService`.
+/// The `GrpcService` for `RuntimeEnvAgentManagerGrpcService`.
 class RuntimeEnvAgentManagerGrpcService : public GrpcService {
  public:
-  /// Construct a `AgentManagerGrpcService`.
+  /// Construct a `RuntimeEnvAgentManagerGrpcService`.
   ///
   /// \param[in] port See `GrpcService`.
   /// \param[in] handler The service handler that actually handle the requests.

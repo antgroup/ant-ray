@@ -192,6 +192,7 @@ class RuntimeEnvAgent(
         self,
         gcs_address,
         node_ip_address,
+        node_manager_port,
         runtime_env_agent_port,
         temp_dir,
         runtime_env_dir,
@@ -204,6 +205,7 @@ class RuntimeEnvAgent(
         self._agent_id = agent_id
         self._logging_params = logging_params
         self._gcs_address = gcs_address
+        self._node_manager_port = node_manager_port
 
         self._logger = default_logger
         self._logger = setup_component_logger(
@@ -224,8 +226,9 @@ class RuntimeEnvAgent(
 
         # Setup raylet channel
         options = ray_constants.GLOBAL_GRPC_OPTIONS
+        self._logger.info("node manager port is %d", self._node_manager_port)
         self._aiogrpc_raylet_channel = init_grpc_channel(
-            f"{self._node_ip_address}:{self._runtime_env_agent_port}",
+            f"{self._node_ip_address}:{self._node_manager_port}",
             options,
             asynchronous=True,
         )
@@ -457,7 +460,7 @@ class RuntimeEnvAgent(
                 "[Increase] Failed to parse runtime env: " f"{serialized_env}"
             )
             return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
-                status=runtime_env_agent_pb2.RUNTIME_ENV_AGENT_RPC_STATUS_FAILED,
+                status=RUNTIME_ENV_AGENT_RPC_STATUS_FAILED,
                 error_message="".join(
                     traceback.format_exception(type(e), e, e.__traceback__)
                 ),
@@ -678,7 +681,7 @@ class RuntimeEnvAgent(
         )
         tasks = [check_parent_task]
         await asyncio.gather(*tasks)
-        await self.server.wait_for_termination()
+        await self._grpc_server.wait_for_termination()
 
     @staticmethod
     def is_minimal_module():
@@ -695,6 +698,12 @@ if __name__ == "__main__":
         required=True,
         type=str,
         help="the IP address of this node.",
+    )
+    parser.add_argument(
+        "--node-manager-port",
+        required=True,
+        type=int,
+        help="The port used to start the node manager",
     )
     parser.add_argument(
         "--runtime-env-agent-port",
@@ -792,6 +801,7 @@ if __name__ == "__main__":
         agent = RuntimeEnvAgent(
             gcs_address=args.gcs_address,
             node_ip_address=args.node_ip_address,
+            node_manager_port=args.node_manager_port,
             runtime_env_agent_port=args.runtime_env_agent_port,
             temp_dir=args.temp_dir,
             runtime_env_dir=args.runtime_env_dir,

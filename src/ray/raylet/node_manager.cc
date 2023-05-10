@@ -249,6 +249,10 @@ NodeManager::NodeManager(instrumented_io_context &io_service,
       agent_manager_service_handler_(
           new DefaultAgentManagerServiceHandler(agent_manager_)),
       agent_manager_service_(io_service, *agent_manager_service_handler_),
+      runtime_env_agent_manager_service_handler_(
+          new DefaultRuntimeEnvAgentManagerServiceHandler(runtime_env_agent_manager_)),
+      runtime_env_agent_manager_service_(io_service,
+                                         *runtime_env_agent_manager_service_handler_),
       local_object_manager_(
           self_node_id_,
           config.node_manager_address,
@@ -373,6 +377,8 @@ NodeManager::NodeManager(instrumented_io_context &io_service,
   // Run the node manger rpc server.
   node_manager_server_.RegisterService(node_manager_service_);
   node_manager_server_.RegisterService(agent_manager_service_);
+  node_manager_server_.RegisterService(runtime_env_agent_manager_service_);
+
   if (RayConfig::instance().use_ray_syncer()) {
     node_manager_server_.RegisterService(ray_syncer_service_);
   }
@@ -384,12 +390,13 @@ NodeManager::NodeManager(instrumented_io_context &io_service,
   worker_pool_.SetNodeManagerPort(GetServerPort());
 
   auto agent_command_line = ParseCommandLine(config.agent_command);
+  int server_port = GetServerPort();
   for (auto &arg : agent_command_line) {
     auto node_manager_port_position = arg.find(kNodeManagerPortPlaceholder);
     if (node_manager_port_position != std::string::npos) {
       arg.replace(node_manager_port_position,
                   strlen(kNodeManagerPortPlaceholder),
-                  std::to_string(GetServerPort()));
+                  std::to_string(server_port));
     }
   }
 
@@ -401,8 +408,18 @@ NodeManager::NodeManager(instrumented_io_context &io_service,
         return execute_after(io_service_, task, delay_ms);
       });
 
+  auto runtime_env_agent_command_line =
+      ParseCommandLine(config.runtime_env_agent_command);
+  for (auto &arg : runtime_env_agent_command_line) {
+    auto node_manager_port_position = arg.find(kNodeManagerPortPlaceholder);
+    if (node_manager_port_position != std::string::npos) {
+      arg.replace(node_manager_port_position,
+                  strlen(kNodeManagerPortPlaceholder),
+                  std::to_string(server_port));
+    }
+  }
   auto runtime_env_agent_options =
-      AgentManager::Options({self_node_id, agent_command_line});
+      AgentManager::Options({self_node_id, runtime_env_agent_command_line});
   runtime_env_agent_manager_ = std::make_shared<RuntimeEnvAgentManager>(
       std::move(runtime_env_agent_options),
       /*delay_executor=*/

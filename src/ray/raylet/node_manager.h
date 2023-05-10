@@ -112,6 +112,8 @@ struct NodeManagerConfig {
   int max_io_workers;
   // The minimum object size that can be spilled by each spill operation.
   int64_t min_spilling_size;
+  /// The command used to start runtime env agent.
+  std::string runtime_env_agent_command;
 };
 
 class NodeManager : public rpc::NodeManagerServiceHandler,
@@ -720,6 +722,7 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   WaitManager wait_manager_;
 
   std::shared_ptr<DashboardAgentManager> agent_manager_;
+  std::shared_ptr<RuntimeEnvAgentManager> runtime_env_agent_manager_;
 
   /// The RPC server.
   rpc::GrpcServer node_manager_server_;
@@ -730,6 +733,11 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// The agent manager RPC service.
   std::unique_ptr<rpc::AgentManagerServiceHandler> agent_manager_service_handler_;
   rpc::AgentManagerGrpcService agent_manager_service_;
+
+  /// The runtime env agent manager RPC service.
+  std::unique_ptr<rpc::RuntimeEnvAgentManagerServiceHandler>
+      runtime_env_agent_manager_service_handler_;
+  rpc::RuntimeEnvAgentManagerGrpcService runtime_env_agent_manager_service_;
 
   /// Manages all local objects that are pinned (primary
   /// copies), freed, and/or spilled.
@@ -837,15 +845,6 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
 
   /// Monitors and reports node memory usage and whether it is above threshold.
   std::unique_ptr<MemoryMonitor> memory_monitor_;
-
-  /// The runtime env agent manager RPC service.
-  std::unique_ptr<rpc::RuntimeEnvAgentManagerServiceHandler>
-      runtime_env_agent_manager_service_handler_;
-
-  /// The runtime env agent manager
-  rpc::RuntimeEnvAgentManagerGrpcService runtime_env_agent_manager_service_;
-
-  std::shared_ptr<RuntimeEnvAgentManager> runtime_env_agent_manager_;
 };
 
 }  // namespace raylet

@@ -109,7 +109,7 @@ void AgentManager::StartAgent() {
                   << exit_code << ". ip " << reported_agent_ip_address_ << ". id "
                   << reported_agent_id_;
     if (restart_when_agent_die_) {
-      delay_executor_([this](){StartAgent();}, /*ms*/ 10);
+      delay_executor_([this]() { StartAgent(); }, /*ms*/ 10);
       return;
     }
     RAY_LOG(ERROR)

@@ -33,8 +33,9 @@ class DashboardAgentManager : public AgentManager {
  public:
   explicit DashboardAgentManager(Options options,
                                  DelayExecutorFn delay_executor,
+                                 bool restart_when_agent_die = true,
                                  bool start_agent = true /* for test */)
-      : AgentManager(options, delay_executor, start_agent) {}
+      : AgentManager(options, delay_executor, restart_when_agent_die, start_agent) {}
 
   void HandleRegisterAgent(rpc::RegisterAgentRequest request,
                            rpc::RegisterAgentReply *reply,

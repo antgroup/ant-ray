@@ -40,8 +40,11 @@ class AgentManager {
 
   explicit AgentManager(Options options,
                         DelayExecutorFn delay_executor,
+                        bool restart_when_agent_die = false,
                         bool start_agent = true /* for test */)
-      : options_(std::move(options)), delay_executor_(std::move(delay_executor)) {
+      : options_(std::move(options)),
+        delay_executor_(std::move(delay_executor)),
+        restart_when_agent_die_(restart_when_agent_die) {
     if (start_agent) {
       StartAgent();
     }
@@ -51,13 +54,14 @@ class AgentManager {
   void StartAgent();
 
   Options options_;
+  DelayExecutorFn delay_executor_;
+  bool restart_when_agent_die_ = false;
   pid_t reported_agent_id_ = 0;
   int reported_agent_port_ = 0;
   /// Whether or not we intend to start the agent.  This is false if we
   /// are missing Ray Dashboard dependencies, for example.
   bool should_start_agent_ = true;
   std::string reported_agent_ip_address_;
-  DelayExecutorFn delay_executor_;
 };
 
 }  // namespace raylet

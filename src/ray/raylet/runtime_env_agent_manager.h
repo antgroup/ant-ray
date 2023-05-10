@@ -48,8 +48,9 @@ class RuntimeEnvAgentManager : public AgentManager {
       Options options,
       DelayExecutorFn delay_executor,
       RuntimeEnvAgentClientFactoryFn runtime_env_agent_client_factory,
+      bool restart_when_agent_die = false,
       bool start_agent = true /* for test */)
-      : AgentManager(options, delay_executor, start_agent),
+      : AgentManager(options, delay_executor, restart_when_agent_die, start_agent),
         runtime_env_agent_client_factory_(std::move(runtime_env_agent_client_factory)) {}
 
   void HandleRegisterRuntimeEnvAgent(rpc::RegisterRuntimeEnvAgentRequest request,

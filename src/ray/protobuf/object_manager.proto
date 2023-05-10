@@ -37,8 +37,10 @@ message ChunkInfo {
 message PushRequest {
   // The node ID of client sending this object
   bytes node_id = 1;
+  // The total data size of all chunks
+  uint64 all_chunk_size = 2;
   // All chunk information in the current batch.
-  repeated ChunkInfo chunk_infos = 2;
+  repeated ChunkInfo chunk_infos = 3;
 }
 
 message PullRequest {

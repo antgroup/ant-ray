@@ -22,6 +22,7 @@
 #include "ray/common/id.h"
 #include "ray/common/ray_config.h"
 #include "ray/common/status.h"
+#include "ray/common/asio/instrumented_io_context.h"
 
 namespace ray {
 
@@ -32,8 +33,10 @@ class PushManager {
   ///
   /// \param max_bytes_in_flight Max bytes of chunks allowed to be in flight
   ///                            from this PushManager (this raylet).
-  PushManager(int64_t max_bytes_in_flight)
-      : max_bytes_in_flight_(max_bytes_in_flight) {
+  PushManager(int64_t max_bytes_in_flight, instrumented_io_context &main_service)
+      : max_bytes_in_flight_(max_bytes_in_flight),
+        main_service_(main_service),
+        push_manager_loop_limits_(RayConfig::instance().push_manager_loop_limits()) {
     RAY_CHECK(max_bytes_in_flight_ > 0) << max_bytes_in_flight_;
   };
 
@@ -117,11 +120,12 @@ class PushManager {
     /// If the size is greater than 0, it means the sending was successful.
     /// If the size is 0, it means the sending failed.
     int64_t SendOneChunk(int64_t bytes_in_flight, const int64_t max_bytes_in_flight) {
+      int64_t cur_chunk_size = 0;
       if (num_chunks_to_send == 0) {
         return 0;
       }
-      int64_t chunk_size = num_chunks_to_send == 1 ? last_chunk_size : chunk_size;
-      if (chunk_size + bytes_in_flight > max_bytes_in_flight) {
+      cur_chunk_size = num_chunks_to_send == 1 ? last_chunk_size : chunk_size;
+      if (cur_chunk_size + bytes_in_flight > max_bytes_in_flight) {
         return 0;
       }
       num_chunks_to_send--;
@@ -129,7 +133,7 @@ class PushManager {
       // Send the next chunk for this push.
       chunk_send_fn(next_chunk_id);
       next_chunk_id = (next_chunk_id + 1) % num_chunks;
-      return chunk_size;
+      return cur_chunk_size;
     }
 
     /// Notify that a chunk is successfully sent.
@@ -161,6 +165,12 @@ class PushManager {
 
   /// Tracks all pushes with chunk transfers in flight.
   absl::flat_hash_map<PushID, std::unique_ptr<PushState>> push_info_;
+
+  /// The main event loop, In order to cut off the lengthy loops in function
+  /// `ScheduleRemainingPushes` to ensure that the main thread of Raylet is not blocked.
+  instrumented_io_context &main_service_;
+
+  const int64_t push_manager_loop_limits_;
 };
 
 }  // namespace ray

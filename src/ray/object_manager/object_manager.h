@@ -294,7 +294,7 @@ class ObjectManager : public ObjectManagerInterface,
                           std::shared_ptr<ChunkObjectReader> chunk_reader,
                           bool from_disk);
 
-  /// Read one chunk of the object and send it to remote object manager.
+  /// Read one chunk of the object and add it into a push request.
   ///
   /// Object will be transfered as a sequence of chunks, small object(defined in config)
   /// contains only one chunk
@@ -312,14 +312,26 @@ class ObjectManager : public ObjectManagerInterface,
                          std::shared_ptr<ChunkObjectReader> chunk_reader,
                          bool from_disk);
 
-  /// Send one chunk of the object to remote object manager.
+
+  /// Add the data of a chunk to a push request and attempt to send it to
+  /// the remote object manager.
   ///
-  /// \param node_id The id of the receiver.
-  /// \param rpc_client Rpc client used to send message to remote object manager
-  /// \param chunk_info The chunk information that will be sent.
-  void SendObjectChunk(const NodeID &node_id,
+  /// \param node_id The remote node's id.
+  /// \param rpc_client Rpc client used to send message to remote object manager.
+  /// \param chunk_info The information of the chunk that needs to be sent.
+  void AddChunkIntoPushRequest(const NodeID &node_id,
                        std::shared_ptr<rpc::ObjectManagerClient> rpc_client,
                        rpc::ChunkInfo chunk_info);
+
+  /// Send push request from the location_push_buffers_.
+  /// We allow up to `N` push requests in-flight, where `N` is the number of
+  /// connections between the object manager client and server. If there's already
+  /// the backpressure, this method just buffers the ChunkInfo and batches it in the next
+  /// request.
+  ///
+  /// \param node_id The id of the receiver.
+  void SendObjectChunkIfNeeded(const NodeID &node_id,
+                       std::shared_ptr<rpc::ObjectManagerClient> rpc_client);
 
   /// Handle starting, running, and stopping asio rpc_service.
   void StartRpcService();
@@ -501,8 +513,11 @@ class ObjectManager : public ObjectManagerInterface,
   absl::flat_hash_map<NodeID, int> in_flight_push_requests_;
 
   /// A buffer for batch chunk push request.
-  absl::flat_hash_map<NodeID, std::pair<std::deque<rpc::PushRequest>, int64_t>>
+  absl::flat_hash_map<NodeID, std::deque<rpc::PushRequest> >
       location_push_buffers_;
+
+  /// The upper limit on the number of chunks in a single push request.
+  const int64_t push_request_chunk_number_limits_;
 };
 
 }  // namespace ray

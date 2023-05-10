@@ -63,6 +63,8 @@ void PushManager::ScheduleRemainingPushes() {
   // Loop over all active pushes for approximate round-robin prioritization.
   // TODO(ekl) this isn't the best implementation of round robin, we should
   // consider tracking the number of chunks active per-push and balancing those.
+  int64_t loop_number = 0;
+  int64_t loop_all = 0;
   while (bytes_in_flight_ < max_bytes_in_flight_ && keep_looping) {
     // Loop over each active push and try to send another chunk.
     auto it = push_info_.begin();
@@ -70,17 +72,25 @@ void PushManager::ScheduleRemainingPushes() {
     while (it != push_info_.end() && bytes_in_flight_ < max_bytes_in_flight_) {
       auto push_id = it->first;
       auto &info = it->second;
-      auto chunk_size = info->SendOneChunk(bytes_in_flight_, max_bytes_in_flight_);
+      auto sending_chunk_id = info->next_chunk_id;
+      int64_t chunk_size = info->SendOneChunk(bytes_in_flight_, max_bytes_in_flight_);
+      loop_all += 1;
       if (chunk_size > 0) {
+        loop_number += 1;
         chunks_in_flight_ += 1;
         bytes_in_flight_ += chunk_size;
         keep_looping = true;
-        RAY_LOG(DEBUG) << "Sending chunk " << info->next_chunk_id << " of "
+        RAY_LOG(DEBUG) << "Sending chunk " << sending_chunk_id << " of "
                        << info->num_chunks << " for push " << push_id.first << ", "
                        << push_id.second << ", bytes in flight " << NumBytesInFlight()
                        << " / " << max_bytes_in_flight_
                        << " max, num chunks in flight: " << NumChunksInFlight()
-                       << " remaining chunks: " << NumChunksRemaining();
+                       << " remaining chunks: " << NumChunksRemaining()
+                       << ", loop num: " << loop_number << "/" << loop_all;
+        if (loop_number >= push_manager_loop_limits_) {
+          RAY_LOG(INFO) << "hejialing test: " << loop_number << "/" << loop_all;
+          return;
+        }
       }
       it++;
     }
@@ -99,7 +109,7 @@ std::string PushManager::DebugString() const {
   result << "\n- num pushes in flight: " << NumPushesInFlight();
   result << "\n- num chunks in flight: " << NumChunksInFlight();
   result << "\n- num chunks remaining: " << NumChunksRemaining();
-  result << "\n- max chunks allowed: " << max_chunks_in_flight_;
+  result << "\n- max chunks size allowed: " << max_bytes_in_flight_ << "(bytes)";
   return result.str();
 }
 

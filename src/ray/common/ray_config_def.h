@@ -337,6 +337,13 @@ RAY_CONFIG(uint64_t,
            object_manager_max_bytes_in_flight,
            ((uint64_t)2) * 1024 * 1024 * 1024)
 
+/// Limit the loop count of function ScheduleRemainingPushes in push manager
+/// to prevent it from blocking the main thread.
+RAY_CONFIG(int64_t, push_manager_loop_limits, 1000)
+
+/// The upper limit on the number of chunks in a single push request.
+RAY_CONFIG(int64_t, push_request_chunk_number_limits, 1024)
+
 /// Maximum number of ids in one batch to send to GCS to delete keys.
 RAY_CONFIG(uint32_t, maximum_gcs_deletion_batch_size, 1000)
 

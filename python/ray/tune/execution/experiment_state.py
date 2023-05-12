@@ -206,7 +206,7 @@ class _ExperimentCheckpointManager:
         # Checkpoint
         checkpoint_time_start = time.monotonic()
 
-        # NOTE: This context manager is for Ray Datasets captured in a trial config.
+        # NOTE: This context manager is for Datastreams captured in a trial config.
         # This is the case when *tuning over datasets*.
         # If the datasets have already been full executed, then serializing
         # block refs means that this checkpoint is not usable in a new Ray cluster.
@@ -234,7 +234,7 @@ class _ExperimentCheckpointManager:
         if not self._syncer:  # or not self._remote_checkpoint_dir:
             return False
 
-        if bool(self._sync_config.upload_dir):
+        if bool(self._remote_checkpoint_dir):
             # If an upload dir is given, trainable actors upload checkpoints
             # themselves. Then the driver does not need to sync checkpoints.
             exclude = ["*/checkpoint_*"]
@@ -297,7 +297,7 @@ class _ExperimentCheckpointManager:
         if not self._syncer or not self._remote_checkpoint_dir:
             return False
 
-        if bool(self._sync_config.upload_dir):
+        if bool(self._remote_checkpoint_dir):
             # If an upload dir is given, trainable actors upload checkpoints
             # themselves. Then the driver does not need to sync checkpoints.
             exclude = ["*/checkpoint_*"]

@@ -50,8 +50,9 @@ TEST(TestPushManager, TestPushState) {
     int64_t bytes_in_flight = 0;
     const int64_t max_bytes_in_flight = 2 * 1024 ^ 3;  // 2GB
     std::vector<int64_t> sent_chunks;
+    auto obj_id = ObjectID::FromRandom();
     PushManager::PushState state{
-        2, 2, 1, [&](int64_t chunk_id) { sent_chunks.push_back(chunk_id); }};
+        2, 2, 1, [&](int64_t chunk_id) { sent_chunks.push_back(chunk_id); }, obj_id};
     ASSERT_EQ(state.num_chunks, 2);
     ASSERT_EQ(state.next_chunk_id, 0);
     ASSERT_EQ(state.num_chunks_inflight, 0);
@@ -88,8 +89,9 @@ TEST(TestPushManager, TestPushState) {
     int64_t bytes_in_flight = 0;
     const int64_t max_bytes_in_flight = 2 * 1024 ^ 3;  // 2GB
     std::vector<int64_t> sent_chunks;
+    auto obj_id = ObjectID::FromRandom();
     PushManager::PushState state{
-        3, 2, 1, [&](int64_t chunk_id) { sent_chunks.push_back(chunk_id); }};
+        3, 2, 1, [&](int64_t chunk_id) { sent_chunks.push_back(chunk_id); }, obj_id};
     ASSERT_TRUE(state.SendOneChunk(bytes_in_flight, max_bytes_in_flight) > 0);
     ASSERT_FALSE(state.AllChunksComplete());
     ASSERT_EQ(state.num_chunks, 3);
@@ -210,6 +212,37 @@ TEST(TestPushManager, TestMultipleTransfers) {
   }
   for (int i = 0; i < 10; i++) {
     ASSERT_EQ(results2[i], 2);
+  }
+}
+
+TEST(TestPushManager, TestResendWholeObject) {
+  std::vector<int> results;
+  results.resize(5);
+  auto node_id = NodeID::FromRandom();
+  auto obj_id = ObjectID::FromRandom();
+  PushManager pm(5);
+  pm.StartPush(node_id, obj_id, 5, [&](int64_t chunk_id) { results[chunk_id] = 1; });
+  ASSERT_EQ(pm.NumChunksInFlight(), 5);
+  ASSERT_EQ(pm.NumChunksRemaining(), 5);
+  ASSERT_EQ(pm.NumPushesInFlight(), 1);
+  pm.StartPush(node_id, obj_id, 5, [&](int64_t chunk_id) { results[chunk_id] = 2; });
+  for (size_t i = 0; i < 5; i++) {
+    pm.OnChunkComplete(node_id, obj_id);
+  }
+  ASSERT_EQ(pm.NumChunksInFlight(), 5);
+  ASSERT_EQ(pm.NumChunksRemaining(), 5);
+  ASSERT_EQ(pm.NumPushesInFlight(), 1);
+  for (size_t i = 0; i < 5; i++) {
+    ASSERT_EQ(results[i], 2);
+  }
+  for (size_t i = 0; i < 5; i++) {
+    pm.OnChunkComplete(node_id, obj_id);
+  }
+  ASSERT_EQ(pm.NumChunksInFlight(), 0);
+  ASSERT_EQ(pm.NumChunksRemaining(), 0);
+  ASSERT_EQ(pm.NumPushesInFlight(), 0);
+  for (size_t i = 0; i < 5; i++) {
+    ASSERT_EQ(results[i], 2);
   }
 }
 

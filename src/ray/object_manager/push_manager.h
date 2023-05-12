@@ -16,9 +16,9 @@
 
 #include <algorithm>
 #include <memory>
+#include <queue>
 
 #include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
 #include "ray/common/asio/instrumented_io_context.h"
 #include "ray/common/id.h"
 #include "ray/common/ray_config.h"
@@ -75,7 +75,7 @@ class PushManager {
   int64_t NumChunksRemaining() const { return chunks_remaining_; }
 
   /// Return the number of pushes currently in flight. For testing only.
-  int64_t NumPushesInFlight() const { return push_info_.size(); };
+  int64_t NumPushesInFlight() const { return num_pushes_in_flight_; };
 
   /// Record the internal metrics.
   void RecordMetrics() const;
@@ -101,17 +101,21 @@ class PushManager {
     /// The size of the last chunk.
     const int64_t last_chunk_size;
 
+    const ObjectID obj_id;
+
     PushState(int64_t num_chunks,
               const int64_t chunk_size,
               const int64_t last_chunk_size,
-              std::function<void(int64_t)> chunk_send_fn)
+              std::function<void(int64_t)> chunk_send_fn,
+			  const ObjectID &obj_id)
         : num_chunks(num_chunks),
           chunk_send_fn(chunk_send_fn),
           next_chunk_id(0),
           num_chunks_inflight(0),
           num_chunks_to_send(num_chunks),
           chunk_size(chunk_size),
-          last_chunk_size(last_chunk_size) {}
+          last_chunk_size(last_chunk_size),
+		  obj_id(obj_id) {}
 
     /// Resend all chunks and returns how many more chunks will be sent.
     int64_t ResendAllChunks(std::function<void(int64_t)> send_fn) {
@@ -141,6 +145,8 @@ class PushManager {
       return cur_chunk_size;
     }
 
+    bool HasNoChunkRemained() { return num_chunks_to_send == 0; }
+
     /// Notify that a chunk is successfully sent.
     void OnChunkComplete() { --num_chunks_inflight; }
 
@@ -152,9 +158,6 @@ class PushManager {
 
   /// Called on completion events to trigger additional pushes.
   void ScheduleRemainingPushes();
-
-  /// Pair of (destination, object_id).
-  typedef std::pair<NodeID, ObjectID> PushID;
 
   /// Max bytes of chunks in flight allowed.
   const int64_t max_bytes_in_flight_;
@@ -169,12 +172,16 @@ class PushManager {
   int64_t chunks_remaining_ = 0;
 
   /// Tracks all pushes with chunk transfers in flight.
-  absl::flat_hash_map<PushID, std::unique_ptr<PushState>> push_info_;
-
-  /// The main event loop, In order to cut off the lengthy loops in function
+  absl::flat_hash_map<NodeID,
+                      std::pair<absl::flat_hash_map<ObjectID, std::shared_ptr<PushState>>,
+                                std::queue<std::shared_ptr<PushState>>>>
+      push_info_;
   /// `ScheduleRemainingPushes` to ensure that the main thread of Raylet is not blocked.
   instrumented_io_context &main_service_;
 
+  /// Num pushes in flight
+  int64_t num_pushes_in_flight_ = 0;
+  
   const int64_t push_manager_loop_limits_;
 };
 

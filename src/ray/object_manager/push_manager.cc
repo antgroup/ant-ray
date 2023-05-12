@@ -34,15 +34,15 @@ void PushManager::StartPush(const NodeID &dest_id,
     chunks_remaining_ += push_info_[push_id]->ResendAllChunks(send_chunk_fn);
   } else {
     chunks_remaining_ += num_chunks;
-    push_info_[push_id].reset(new PushState(num_chunks, chunk_size, last_chunk_size, send_chunk_fn));
+    push_info_[push_id].reset(
+        new PushState(num_chunks, chunk_size, last_chunk_size, send_chunk_fn));
   }
   ScheduleRemainingPushes();
 }
 
-void PushManager::OnChunkComplete(
-  const NodeID &dest_id,
-  const std::vector<ObjectID> &obj_ids,
-  const int64_t &completed_size) {
+void PushManager::OnChunkComplete(const NodeID &dest_id,
+                                  const std::vector<ObjectID> &obj_ids,
+                                  const int64_t &completed_size) {
   bytes_in_flight_ -= completed_size;
   for (const ObjectID &obj_id : obj_ids) {
     auto push_id = std::make_pair(dest_id, obj_id);

@@ -14,9 +14,10 @@
 
 #include "ray/object_manager/push_manager.h"
 
+#include <unistd.h>
+
 #include "gtest/gtest.h"
 #include "ray/common/test_util.h"
-#include <unistd.h>
 
 namespace ray {
 
@@ -27,7 +28,8 @@ TEST(TestPushManager, TestSingleTransfer) {
   auto node_id = NodeID::FromRandom();
   auto obj_id = ObjectID::FromRandom();
   PushManager pm(5, io_service);
-  pm.StartPush(node_id, obj_id, 10, 1, 1, [&](int64_t chunk_id) { results[chunk_id] = 1; });
+  pm.StartPush(
+      node_id, obj_id, 10, 1, 1, [&](int64_t chunk_id) { results[chunk_id] = 1; });
   ASSERT_EQ(pm.NumChunksInFlight(), 5);
   ASSERT_EQ(pm.NumChunksRemaining(), 10);
   ASSERT_EQ(pm.NumPushesInFlight(), 1);
@@ -46,7 +48,7 @@ TEST(TestPushManager, TestPushState) {
   // normal sending.
   {
     int64_t bytes_in_flight = 0;
-    const int64_t max_bytes_in_flight = 2 * 1024 ^ 3; //2GB
+    const int64_t max_bytes_in_flight = 2 * 1024 ^ 3;  // 2GB
     std::vector<int64_t> sent_chunks;
     PushManager::PushState state{
         2, 2, 1, [&](int64_t chunk_id) { sent_chunks.push_back(chunk_id); }};
@@ -84,7 +86,7 @@ TEST(TestPushManager, TestPushState) {
   // resend all chunks.
   {
     int64_t bytes_in_flight = 0;
-    const int64_t max_bytes_in_flight = 2 * 1024 ^ 3; //2GB
+    const int64_t max_bytes_in_flight = 2 * 1024 ^ 3;  // 2GB
     std::vector<int64_t> sent_chunks;
     PushManager::PushState state{
         3, 2, 1, [&](int64_t chunk_id) { sent_chunks.push_back(chunk_id); }};
@@ -136,12 +138,14 @@ TEST(TestPushManager, TestRetryDuplicates) {
   PushManager pm(5, io_service);
 
   // First push request.
-  pm.StartPush(node_id, obj_id, 10, 1, 1, [&](int64_t chunk_id) { results[chunk_id] = 1; });
+  pm.StartPush(
+      node_id, obj_id, 10, 1, 1, [&](int64_t chunk_id) { results[chunk_id] = 1; });
   ASSERT_EQ(pm.NumChunksInFlight(), 5);
   ASSERT_EQ(pm.NumChunksRemaining(), 10);
   ASSERT_EQ(pm.NumPushesInFlight(), 1);
   // Second push request will resent the full chunks.
-  pm.StartPush(node_id, obj_id, 10, 1, 1, [&](int64_t chunk_id) { results[chunk_id] = 2; });
+  pm.StartPush(
+      node_id, obj_id, 10, 1, 1, [&](int64_t chunk_id) { results[chunk_id] = 2; });
   ASSERT_EQ(pm.NumChunksInFlight(), 5);
   ASSERT_EQ(pm.NumChunksRemaining(), 15);
   ASSERT_EQ(pm.NumPushesInFlight(), 1);
@@ -221,28 +225,28 @@ TEST(TestPushManager, TestSingleObjectWithMultipleChunks) {
   std::promise<void> promise;
   auto future = promise.get_future();
   io_service.post(
-    [&]() {
-      pm.StartPush(node, obj_id, chunk_num, 1, 1, [&](int64_t chunk_id) {
-        // do nothing.
-        return;
-      });
-      ASSERT_EQ(pm.NumChunksInFlight(), loop_limits);
-      ASSERT_EQ(pm.NumChunksRemaining(), chunk_num);
+      [&]() {
+        pm.StartPush(node, obj_id, chunk_num, 1, 1, [&](int64_t chunk_id) {
+          // do nothing.
+          return;
+        });
+        ASSERT_EQ(pm.NumChunksInFlight(), loop_limits);
+        ASSERT_EQ(pm.NumChunksRemaining(), chunk_num);
 
-      io_service.post(
-        [&]() {
-          for (int i = 0; i < chunk_num; i++) {
-            pm.OnChunkComplete(node, {obj_id}, 1);
-          }
+        io_service.post(
+            [&]() {
+              for (int i = 0; i < chunk_num; i++) {
+                pm.OnChunkComplete(node, {obj_id}, 1);
+              }
 
-          ASSERT_EQ(pm.NumChunksInFlight(), 0);
-          ASSERT_EQ(pm.NumChunksRemaining(), 0);
-          ASSERT_EQ(pm.NumPushesInFlight(), 0);
-          promise.set_value();
-        }, ""
-      );
-    }, ""
-  );
+              ASSERT_EQ(pm.NumChunksInFlight(), 0);
+              ASSERT_EQ(pm.NumChunksRemaining(), 0);
+              ASSERT_EQ(pm.NumPushesInFlight(), 0);
+              promise.set_value();
+            },
+            "");
+      },
+      "");
 
   auto thread = std::thread([&]() {
     SetThreadName("TestSingleObjectWithMultipleChunks.main_thread");

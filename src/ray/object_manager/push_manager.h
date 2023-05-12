@@ -19,10 +19,10 @@
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
+#include "ray/common/asio/instrumented_io_context.h"
 #include "ray/common/id.h"
 #include "ray/common/ray_config.h"
 #include "ray/common/status.h"
-#include "ray/common/asio/instrumented_io_context.h"
 
 namespace ray {
 
@@ -61,7 +61,9 @@ class PushManager {
 
   /// Called every time a chunk completes to trigger additional sends.
   /// TODO(ekl) maybe we should cancel the entire push on error.
-  void OnChunkComplete(const NodeID &dest_id, const std::vector<ObjectID> &obj_ids, const int64_t &completed_size);
+  void OnChunkComplete(const NodeID &dest_id,
+                       const std::vector<ObjectID> &obj_ids,
+                       const int64_t &completed_size);
 
   /// Return the number of chunks currently in flight. For testing only.
   int64_t NumChunksInFlight() const { return chunks_in_flight_; };
@@ -99,7 +101,10 @@ class PushManager {
     /// The size of the last chunk.
     const int64_t last_chunk_size;
 
-    PushState(int64_t num_chunks, const int64_t chunk_size, const int64_t last_chunk_size, std::function<void(int64_t)> chunk_send_fn)
+    PushState(int64_t num_chunks,
+              const int64_t chunk_size,
+              const int64_t last_chunk_size,
+              std::function<void(int64_t)> chunk_send_fn)
         : num_chunks(num_chunks),
           chunk_send_fn(chunk_send_fn),
           next_chunk_id(0),

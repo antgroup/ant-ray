@@ -870,7 +870,6 @@ class Node:
 
     def start_log_monitor(self):
         """Start the log monitor."""
-        print(f"====== redirect_logging: {self.should_redirect_logs()} =========")
         process_info = ray._private.services.start_log_monitor(
             self._logs_dir,
             self.gcs_address,

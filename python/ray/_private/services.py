@@ -795,7 +795,7 @@ def start_ray_process(
         file_actions = [
             (os.POSIX_SPAWN_DUP2, stdout_file, sys.stdout.fileno()),
             (os.POSIX_SPAWN_DUP2, stderr_file, sys.stderr.fileno()),
-        ]
+        ] if stdout_file >= 0 else None
         # TODO(NKcqx): Support cwd and pipe_stdin (cwd may never get supported,
         # see issue: https://github.com/python/cpython/issues/79718)
         process = os.posix_spawn(

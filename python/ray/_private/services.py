@@ -786,10 +786,10 @@ def start_ray_process(
         )
     else:
         # `os.dup2` only takes fd instead of file handler
-        if (stdout_file is not None):
+        if stdout_file is not None:
             if (hasattr(stdout_file, "fileno")):
                 stdout_file = stdout_file.fileno()
-        if (stderr_file is not None):
+        if stderr_file is not None:
             if (hasattr(stderr_file, "fileno")):
                 stderr_file = stderr_file.fileno()
         file_actions = [

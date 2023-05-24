@@ -785,10 +785,15 @@ def start_ray_process(
             creationflags=CREATE_SUSPENDED if win32_fate_sharing else 0,
         )
     else:
+        # `os.dup2` only takes fd instead of file handler
+        if stdout_file is not None and hasattr(stdout_file, "fileno"):
+            stdout_file = stdout_file.fileno()
+        if stderr_file is not None and hasattr(stderr_file, "fileno"):
+            stderr_file = stderr_file.fileno()
         file_actions = [
-            (os.POSIX_SPAWN_DUP2, stdout_file.fileno(), sys.stdout.fileno()),
-            (os.POSIX_SPAWN_DUP2, stderr_file.fileno(), sys.stderr.fileno()),
-        ]
+            (os.POSIX_SPAWN_DUP2, stdout_file, sys.stdout.fileno()),
+            (os.POSIX_SPAWN_DUP2, stderr_file, sys.stderr.fileno()),
+        ] if stdout_file >= 0 else None
         # TODO(NKcqx): Support cwd and pipe_stdin (cwd may never get supported,
         # see issue: https://github.com/python/cpython/issues/79718)
         process = os.posix_spawn(

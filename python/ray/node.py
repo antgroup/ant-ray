@@ -1140,11 +1140,9 @@ class Node:
             huge_pages=self._ray_params.huge_pages,
         )
         self.start_raylet(plasma_directory, object_store_memory)
-        if not ray_in_tee():
-            # Workaround because these params are not available in ray.init().
-            # Should be reverted once we start Ray with `ray start` CLI.
-            if self._ray_params.include_log_monitor:
-                self.start_log_monitor()
+
+        if self._ray_params.include_log_monitor:
+            self.start_log_monitor()
 
     def _kill_process_type(
         self, process_type, allow_graceful=False, check_alive=True, wait=False

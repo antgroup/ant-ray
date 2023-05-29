@@ -107,7 +107,7 @@ class PushManager {
               const int64_t chunk_size,
               const int64_t last_chunk_size,
               std::function<void(int64_t)> chunk_send_fn,
-			  const ObjectID &obj_id)
+              const ObjectID &obj_id)
         : num_chunks(num_chunks),
           chunk_send_fn(chunk_send_fn),
           next_chunk_id(0),
@@ -115,7 +115,7 @@ class PushManager {
           num_chunks_to_send(num_chunks),
           chunk_size(chunk_size),
           last_chunk_size(last_chunk_size),
-		  obj_id(obj_id) {}
+          obj_id(obj_id) {}
 
     /// Resend all chunks and returns how many more chunks will be sent.
     int64_t ResendAllChunks(std::function<void(int64_t)> send_fn) {
@@ -181,7 +181,7 @@ class PushManager {
 
   /// Num pushes in flight
   int64_t num_pushes_in_flight_ = 0;
-  
+
   const int64_t push_manager_loop_limits_;
 };
 

@@ -38,7 +38,8 @@ void PushManager::StartPush(const NodeID &dest_id,
   } else {
     num_pushes_in_flight_ += 1;
     chunks_remaining_ += num_chunks;
-    auto push_state = std::make_shared<PushState>(num_chunks, chunk_size, last_chunk_size, send_chunk_fn, obj_id);
+    auto push_state = std::make_shared<PushState>(
+        num_chunks, chunk_size, last_chunk_size, send_chunk_fn, obj_id);
     if (push_info_.contains(dest_id)) {
       push_info_[dest_id].first[obj_id] = push_state;
       push_info_[dest_id].second.push(push_state);
@@ -61,16 +62,16 @@ void PushManager::OnChunkComplete(const NodeID &dest_id,
   for (const ObjectID &obj_id : obj_ids) {
     chunks_in_flight_ -= 1;
     chunks_remaining_ -= 1;
-  	push_info_[dest_id].first[obj_id]->OnChunkComplete();
-  	if (push_info_[dest_id].first[obj_id]->AllChunksComplete()) {
-    	push_info_[dest_id].first.erase(obj_id);
-    	if (push_info_[dest_id].first.empty()) {
-      	RAY_CHECK(push_info_[dest_id].second.empty());
-      	push_info_.erase(dest_id);
-      	num_pushes_in_flight_ -= 1;
-    	}
-    	RAY_LOG(DEBUG) << "Push for " << dest_id << ", " << obj_id
-        	             << " completed, remaining: " << NumPushesInFlight();
+    push_info_[dest_id].first[obj_id]->OnChunkComplete();
+    if (push_info_[dest_id].first[obj_id]->AllChunksComplete()) {
+      push_info_[dest_id].first.erase(obj_id);
+      if (push_info_[dest_id].first.empty()) {
+        RAY_CHECK(push_info_[dest_id].second.empty());
+        push_info_.erase(dest_id);
+        num_pushes_in_flight_ -= 1;
+      }
+      RAY_LOG(DEBUG) << "Push for " << dest_id << ", " << obj_id
+                     << " completed, remaining: " << NumPushesInFlight();
     }
   }
   ScheduleRemainingPushes();
@@ -89,7 +90,7 @@ void PushManager::ScheduleRemainingPushes() {
     keep_looping = false;
     while (it != push_info_.end() && bytes_in_flight_ < max_bytes_in_flight_) {
       NodeID node_id = it->first;
-      if (it->second.second.empty()) {
+      if (!it->second.second.empty()) {
         auto &info = it->second.second.front();
         auto sending_chunk_id = info->next_chunk_id;
         int64_t chunk_size = info->SendOneChunk(bytes_in_flight_, max_bytes_in_flight_);
@@ -100,15 +101,18 @@ void PushManager::ScheduleRemainingPushes() {
           bytes_in_flight_ += chunk_size;
           keep_looping = true;
           RAY_LOG(DEBUG) << "Sending chunk " << sending_chunk_id << " of "
-                        << info->num_chunks << " for push " << info->obj_id << ", "
-                        << node_id << ", bytes in flight " << NumBytesInFlight()
-                        << " / " << max_bytes_in_flight_
-                        << " max, num chunks in flight: " << NumChunksInFlight()
-                        << " remaining chunks: " << NumChunksRemaining()
-                        << ", loop num: " << loop_number << "/" << loop_all;
+                         << info->num_chunks << " for push " << info->obj_id << ", "
+                         << node_id << ", bytes in flight " << NumBytesInFlight() << " / "
+                         << max_bytes_in_flight_
+                         << " max, num chunks in flight: " << NumChunksInFlight()
+                         << " remaining chunks: " << NumChunksRemaining()
+                         << ", loop num: " << loop_number << "/" << loop_all;
           if (info->HasNoChunkRemained()) it->second.second.pop();
           if (loop_number >= push_manager_loop_limits_) {
-            RAY_LOG(INFO) << "hejialing test: " << loop_number << "/" << loop_all;
+            RAY_LOG(INFO) << "hejialing test " << loop_number << " " << loop_all;
+            main_service_.post([this]() {
+              ScheduleRemainingPushes();
+            }, "PushManager.ScheduleRemainingPushes");
             return;
           }
         }

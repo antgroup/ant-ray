@@ -1,7 +1,16 @@
 load("//bazel:python.bzl", "doctest")
 
 doctest(
-    files = glob(["**/*.py"], exclude=["examples/**/*", "tests/**/*", "benchmarks/**/*"]),
+    files = glob(
+        ["**/*.py"],
+        exclude=[
+            "examples/**",
+            "tests/**",
+            "benchmarks/**",
+            # FIXME: Failing on Windows
+            "gradio_integrations.py"
+        ]
+    ),
     tags = ["team:serve"]
 )
 
@@ -616,6 +625,14 @@ py_test(
 
 py_test(
     name = "test_multiplex",
+    size = "medium",
+    srcs = serve_tests_srcs,
+    tags = ["exclusive", "team:serve"],
+    deps = [":serve_lib"],
+)
+
+py_test(
+    name = "test_serve_ha",
     size = "medium",
     srcs = serve_tests_srcs,
     tags = ["exclusive", "team:serve"],

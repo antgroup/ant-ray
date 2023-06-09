@@ -79,6 +79,8 @@ class ObjectManagerClient {
                          grpc_clients_[freeobjects_rr_index_++ % num_connections_],
                          /*method_timeout_ms*/ -1, )
 
+  int NumConnections() const { return num_connections_; };
+
  private:
   /// To optimize object manager performance we create multiple concurrent
   /// GRPC connections, and use these connections in a round-robin way.

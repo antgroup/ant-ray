@@ -87,6 +87,22 @@ public class Deployment {
             blocking);
   }
 
+  public Application bind() {
+    Serve.getGlobalClient()
+        .deploy(
+            name,
+            deploymentDef,
+            initArgs,
+            rayActorOptions,
+            config,
+            version,
+            prevVersion,
+            routePrefix,
+            url,
+            true);
+    return new Application();
+  }
+
   /** Delete this deployment. */
   public void delete() {
     Serve.getGlobalClient().deleteDeployment(name, true);

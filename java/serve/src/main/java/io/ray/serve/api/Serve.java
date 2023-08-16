@@ -11,11 +11,13 @@ import io.ray.api.function.PyActorMethod;
 import io.ray.api.options.ActorLifetime;
 import io.ray.serve.common.Constants;
 import io.ray.serve.config.RayServeConfig;
+import io.ray.serve.deployment.Application;
 import io.ray.serve.deployment.Deployment;
 import io.ray.serve.deployment.DeploymentCreator;
 import io.ray.serve.deployment.DeploymentRoute;
 import io.ray.serve.exception.RayServeException;
 import io.ray.serve.generated.ActorNameList;
+import io.ray.serve.handle.RayServeHandle;
 import io.ray.serve.poll.LongPollClientFactory;
 import io.ray.serve.replica.ReplicaContext;
 import io.ray.serve.util.CollectionUtil;
@@ -333,5 +335,9 @@ public class Serve {
               entry.getValue().getDeploymentInfo().getReplicaConfig().getRayActorOptions()));
     }
     return deployments;
+  }
+
+  public static RayServeHandle run(Application target) {
+    return null;
   }
 }

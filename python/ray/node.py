@@ -305,6 +305,9 @@ class Node:
 
         if not connect_only:
             self.start_ray_processes()
+            # Timeout waiting for node to be registered in GCS
+            node_register_timeout = os.environ.get(
+                "RAY_node_register_timeout_seconds", 30)
             # we should update the address info after the node has been started
             try:
                 ray._private.services.wait_for_node(
@@ -312,10 +315,12 @@ class Node:
                     self.gcs_address,
                     self._plasma_store_socket_name,
                     self.redis_password,
+                    node_register_timeout
                 )
             except TimeoutError:
                 raise Exception(
-                    "The current node has not been updated within 30 "
+                    "The current node has not been updated within"
+                    f"{node_register_timeout} "
                     "seconds, this could happen because of some of "
                     "the Ray processes failed to startup."
                 )

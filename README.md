@@ -3,7 +3,7 @@
 A comprehensive guide to building RAG-based LLM applications for production.
 
 - **Blog post**: https://www.anyscale.com/blog/a-comprehensive-guide-for-building-rag-based-llm-applications-part-1
-- **GitHub repository**: https://github.com/ray-project/llm-applications
+- **GitHub repository**: https://github.com/alipay/ant-ray/tree/RAG_on_ray
 - **Interactive notebook**: https://github.com/ray-project/llm-applications/blob/main/notebooks/rag.ipynb
 - **Anyscale Endpoints**: https://endpoints.anyscale.com/
 - **Ray documentation**: https://docs.ray.io/

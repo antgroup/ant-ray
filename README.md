@@ -20,6 +20,7 @@ In this guide, we will learn how to:
 <img width="800" src="https://images.ctfassets.net/xjan103pcp94/7FWrvPPlIdz5fs8wQgxLFz/fdae368044275028f0544a3d252fcfe4/image15.png">
 
 ## Setup
+Some vulnerability setup issues have been documented in [《Ray 构建 RAG Setup & 踩坑》](https://yuque.antfin-inc.com/ray-project/core/lf194i6b9lzsezla).
 
 ### API keys
 We'll be using [OpenAI](https://platform.openai.com/docs/models/) to access ChatGPT models like `gpt-3.5-turbo`, `gpt-4`, etc.
@@ -45,7 +46,15 @@ git config --global user.email <EMAIL-ADDRESS>
 ```
 
 ### Data
-Run this bash command to download your documents data into local disk.
+Run this bash command to download your documents data into local disk. This may take hours for crawling and downloading, but you can stop at any time, the RAG code works as long as one document is there. And feel free to change the documents url to yours, SHOULD be worked for any text documents.
+
+```bash
+export EFS_DIR=/desired/output/directory
+wget -e robots=off --recursive --no-clobber --page-requisites \
+  --html-extension --convert-links --restrict-file-names=windows \
+  --domains docs.ray.io --no-parent --accept=html \
+  -P $EFS_DIR https://docs.ray.io/en/master/
+```
 
 ### Environment
 
@@ -60,6 +69,7 @@ pre-commit autoupdate
 ```
 
 ### Credentials
+Again, for AntGroup members, contact us for internal LLM API keys.
 ```bash
 touch .env
 # Add environment variables to .env
@@ -72,5 +82,5 @@ source .env
 Now we're ready to go through the [RAG_demo_local_version.ipynb](notebooks/RAG_demo_local_version.ipynb) and [RAG_demo_distributed_with_ray.ipynb](notebooks/RAG_demo_distributed_with_ray.ipynb) interactive notebook to develop and serve our LLM application!
 
 ### Learn more
-- If your team is investing heavily in developing LLM applications, reach out to us via email(chenqixiang.cqx@antgroup.com) or DingTalk(帕尔) to learn more about how [Ray](https://github.com/ray-project/ray) can help you scale and productionize everything.
+- If your team is investing heavily in developing LLM applications, reach out to us via email(chenqixiang.cqx@antgroup.com) or DingTalk(@帕尔) to learn more about how [Ray](https://github.com/ray-project/ray) can help you scale and productionize everything.
 - Learn more about how companies like OpenAI, Netflix, Pinterest, Verizon, Instacart and others leverage Ray and Anyscale for their AI workloads at the [Ray Summit 2023](https://raysummit.anyscale.com/) this Sept 18-20 in San Francisco.

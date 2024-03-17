@@ -1,11 +1,12 @@
 from pathlib import Path
 
 # Directories
-EFS_DIR = Path("/efs/shared_storage/goku")
+EFS_DIR = Path("/Users/paer/Documents/work/codes/RAG_ray")
 ROOT_DIR = Path(__file__).parent.parent.absolute()
 
 # Mappings
 EMBEDDING_DIMENSIONS = {
+    "fake": 768,
     "thenlper/gte-base": 768,
     "thenlper/gte-large": 1024,
     "BAAI/bge-large-en": 1024,

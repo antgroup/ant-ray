@@ -108,6 +108,3 @@ embedded_chunks = chunks_ds.map_batches(
 sample = embedded_chunks.take(1)
 print("Embedding size:", len(sample[0]["embeddings"]))
 print(f"The first embedding: {sample[0]['text']}")
-
-
-

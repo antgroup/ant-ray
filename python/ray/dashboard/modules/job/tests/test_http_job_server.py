@@ -879,5 +879,128 @@ async def test_job_head_pick_random_job_agent(monkeypatch):
             address = job_agent_client._agent_address
 
 
+@pytest.mark.parametrize(
+    "ray_start_cluster_head",
+    [
+        {
+            "include_dashboard": True,
+        }
+    ],
+    indirect=True,
+)
+def test_submit_job_with_virtual_cluster(ray_start_cluster_head, headers):
+    cluster = ray_start_cluster_head
+    assert wait_until_server_available(cluster.webui_url) is True
+    webui_url = cluster.webui_url
+    ip, _ = webui_url.split(":")
+    webui_url = format_web_url(webui_url)
+    client = JobSubmissionClient(webui_url, headers=headers)
+    cluster.add_node(resources={"agent": 100})
+
+    agent_address = f"{ip}:{ray_constants.DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
+    assert wait_until_server_available(agent_address)
+
+    worker = cluster.add_node(resources={"worker": 100})
+
+    virtual_cluster_id = "test_id"
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        path = Path(tmp_dir)
+        driver_script = """
+import ray
+import time
+ray.init(address='auto')
+
+from ray._private.internal_api import (
+    get_local_ongoing_lineage_reconstruction_tasks,
+)
+
+@ray.remote(num_cpus=0, resources={"agent": 1})
+class Counter:
+    def __init__(self):
+        self.count = 0
+
+    def inc(self):
+        self.count = self.count + 1
+        return self.count
+
+@ray.remote(
+    max_retries=-1, num_cpus=0, resources={"worker": 1}
+)
+def task(counter):
+    count = ray.get(counter.inc.remote())
+    if count > 1:
+        # lineage reconstruction
+        time.sleep(100000)
+    return [1] * 1024 * 1024
+
+@ray.remote(
+    max_restarts=-1,
+    max_task_retries=-1,
+    num_cpus=0,
+    resources={"worker": 1},
+)
+class Actor:
+    def run(self, counter):
+        count = ray.get(counter.inc.remote())
+        if count > 1:
+            # lineage reconstruction
+            time.sleep(100000)
+        return [1] * 1024 * 1024
+
+counter1 = Counter.remote()
+obj1 = task.remote(counter1)
+# Wait for task to finish
+ray.wait([obj1], fetch_local=False)
+
+counter2 = Counter.remote()
+actor = Actor.remote()
+obj2 = actor.run.remote(counter2)
+# Wait for actor task to finish
+ray.wait([obj2], fetch_local=False)
+
+print("actor ready")
+
+while True:
+    tasks = get_local_ongoing_lineage_reconstruction_tasks()
+    tasks.sort(key=lambda task: task[0].name)
+    virtual_cluster_ids = []
+    if len(tasks) != 0:
+        for t in tasks:
+            virtual_cluster_ids.append(t[0].labels["virtual_cluster_id"])
+        print(":".join(virtual_cluster_ids))
+        break
+    time.sleep(0.1)
+"""
+        test_script_file = path / "test_script.py"
+        with open(test_script_file, "w+") as f:
+            f.write(driver_script)
+
+        job_id = client.submit_job(
+            entrypoint="python test_script.py",
+            runtime_env={"working_dir": tmp_dir},
+            virtual_cluster_id=virtual_cluster_id,
+            entrypoint_num_cpus=0,
+            entrypoint_num_gpus=0,
+            entrypoint_memory=0,
+            entrypoint_resources={"agent": 1},
+        )
+
+        def _check_actor_ready(client, job_id):
+            logs = client.get_job_logs(job_id)
+            assert "actor ready" in logs
+            return True
+
+        wait_for_condition(_check_actor_ready, client=client, job_id=job_id)
+
+        cluster.remove_node(worker)
+
+        def _check_logs_ready(client, job_id):
+            logs = client.get_job_logs(job_id)
+            assert ":".join([virtual_cluster_id, virtual_cluster_id]) in logs
+            return True
+
+        wait_for_condition(_check_logs_ready, client=client, job_id=job_id)
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__]))

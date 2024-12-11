@@ -18,8 +18,17 @@
 
 namespace ray {
 
+const std::string kDefaultVirtualClusterID = "kDefaultVirtualClusterID";
+
 class VirtualClusterID : public SimpleID<VirtualClusterID> {
-  using SimpleID::SimpleID;
+ public:
+  static VirtualClusterID OwnerID(const std::string &id) {
+    size_t pos = id.find("##");
+    if (pos != std::string::npos) {
+      return VirtualClusterID::FromBinary(id.substr(0, pos));
+    }
+    return VirtualClusterID::FromBinary(kDefaultVirtualClusterID);
+  }
 };
 
 inline std::ostream &operator<<(std::ostream &os, const ray::VirtualClusterID &id) {

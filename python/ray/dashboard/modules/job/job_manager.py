@@ -535,7 +535,6 @@ class JobManager:
                 )
 
             driver_logger.info("Runtime env is setting up.")
-
             supervisor = self._supervisor_actor_cls.options(
                 lifetime="detached",
                 name=JOB_ACTOR_NAME_TEMPLATE.format(job_id=submission_id),

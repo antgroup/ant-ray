@@ -536,10 +536,6 @@ class JobManager:
 
             driver_logger.info("Runtime env is setting up.")
 
-            virtual_cluster_metadata = {}
-            if virtual_cluster_id is not None:
-                virtual_cluster_metadata["virtual_cluster_id"] = virtual_cluster_id
-
             supervisor = self._supervisor_actor_cls.options(
                 lifetime="detached",
                 name=JOB_ACTOR_NAME_TEMPLATE.format(job_id=submission_id),
@@ -551,7 +547,6 @@ class JobManager:
                 runtime_env=self._get_supervisor_runtime_env(
                     runtime_env, submission_id, resources_specified, virtual_cluster_id
                 ),
-                _metadata=virtual_cluster_metadata,
                 namespace=SUPERVISOR_ACTOR_RAY_NAMESPACE,
             ).remote(
                 submission_id,

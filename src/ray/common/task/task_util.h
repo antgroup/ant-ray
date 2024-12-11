@@ -167,6 +167,11 @@ class TaskSpecBuilder {
     message_->set_concurrency_group_name(concurrency_group_name);
     message_->set_enable_task_events(enable_task_events);
     message_->mutable_labels()->insert(labels.begin(), labels.end());
+    std::string virtual_cluster_id = std::getenv(kEnvVarKeyVirtualClusterID)
+                                         ? std::getenv(kEnvVarKeyVirtualClusterID)
+                                         : "";
+    message_->mutable_labels()->emplace(kLabelVirtualClusterID, virtual_cluster_id);
+
     return *this;
   }
 

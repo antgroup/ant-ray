@@ -45,7 +45,10 @@ class GcsActorSchedulerTest;
 /// This class is not thread safe.
 class ClusterResourceManager {
  public:
-  explicit ClusterResourceManager(instrumented_io_context &io_service);
+  explicit ClusterResourceManager(
+      instrumented_io_context &io_service,
+      std::function<bool(scheduling::NodeID, const std::string &)>
+          is_node_in_virtual_cluster_fn);
 
   /// Get the resource view of the cluster.
   const absl::flat_hash_map<scheduling::NodeID, Node> &GetResourceView() const;
@@ -158,6 +161,8 @@ class ClusterResourceManager {
   /// If node_id not found, return false; otherwise return true.
   bool GetNodeResources(scheduling::NodeID node_id, NodeResources *ret_resources) const;
 
+  std::function<bool(std::string)> GenNodeInClusterFn(scheduling::NodeID node_id);
+
   /// List of nodes in the clusters and their resources organized as a map.
   /// The key of the map is the node ID.
   absl::flat_hash_map<scheduling::NodeID, Node> nodes_;
@@ -169,6 +174,10 @@ class ClusterResourceManager {
 
   /// Timer to revert local changes to the resources periodically.
   std::shared_ptr<PeriodicalRunner> timer_;
+
+  /// Callback to check if node is in virtual cluster.
+  std::function<bool(scheduling::NodeID, const std::string &)>
+      is_node_in_virtual_cluster_fn_;
 
   friend class ClusterResourceSchedulerTest;
   friend struct ClusterResourceManagerTest;

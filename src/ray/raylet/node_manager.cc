@@ -320,7 +320,11 @@ NodeManager::NodeManager(
       [this]() { return object_manager_.PullManagerHasPullsQueued(); },
       shutdown_raylet_gracefully,
       /*labels*/
-      config.labels);
+      config.labels,
+      /*is_node_in_virtual_cluster_fn=*/
+      [](scheduling::NodeID node_id, const std::string &virtual_cluster_id) {
+        return true;
+      });
 
   auto get_node_info_func = [this](const NodeID &node_id) {
     return gcs_client_->Nodes().Get(node_id);

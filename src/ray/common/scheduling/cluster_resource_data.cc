@@ -93,13 +93,10 @@ bool NodeResources::IsAvailable(const ResourceRequest &resource_request,
     return false;
   }
 
-  std::string current_virtual_cluster_id = labels.find(kLabelVirtualClusterID) != labels.end() ? labels.at(kLabelVirtualClusterID) : "";
-  RAY_LOG(INFO) << "scheduling with virtual cluster "<< resource_request.GetVirtualClusterID();
-  if(current_virtual_cluster_id == ""){
-    return true;
-  }
-  if(current_virtual_cluster_id!=resource_request.GetVirtualClusterId()){
-    return false;
+  if (is_node_in_virtual_cluster_fn != nullptr) {
+    if (!is_node_in_virtual_cluster_fn(resource_request.GetVirtualClusterId())) {
+      return false;
+    }
   }
 
   if (!this->normal_task_resources.IsEmpty()) {
@@ -111,6 +108,11 @@ bool NodeResources::IsAvailable(const ResourceRequest &resource_request,
 }
 
 bool NodeResources::IsFeasible(const ResourceRequest &resource_request) const {
+  if (is_node_in_virtual_cluster_fn != nullptr) {
+    if (!is_node_in_virtual_cluster_fn(resource_request.GetVirtualClusterId())) {
+      return false;
+    }
+  }
   return this->total >= resource_request.GetResourceSet();
 }
 

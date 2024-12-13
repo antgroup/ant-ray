@@ -879,40 +879,5 @@ async def test_job_head_pick_random_job_agent(monkeypatch):
             address = job_agent_client._agent_address
 
 
-def test_submit_job_with_virtual_cluster_id(job_sdk_client):
-    client = job_sdk_client
-    virtual_cluster_id = "test_virtual_cluster_id"
-
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        path = Path(tmp_dir)
-        driver_script = f"""
-import ray
-from ray.core.generated.core_worker_pb2 import ActorHandle
-
-ray.init(address='auto')
-@ray.remote
-class Actor:
-    def __init__(self):
-        pass
-
-a = Actor.remote()
-info = ray._private.worker.global_worker.core_worker.serialize_actor_handle(a._actor_id)
-raw_handle = ActorHandle()
-raw_handle.ParseFromString(info[0])
-assert raw_handle.labels["virtual_cluster_id"] == "{virtual_cluster_id}"
-        """
-        test_script_file = path / "test_script.py"
-        with open(test_script_file, "w+") as file:
-            file.write(driver_script)
-
-        job_id = client.submit_job(
-            entrypoint="python test_script.py",
-            runtime_env={"working_dir": tmp_dir},
-            virtual_cluster_id=virtual_cluster_id,
-        )
-
-        wait_for_condition(_check_job_succeeded, client=client, job_id=job_id)
-
-
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__]))

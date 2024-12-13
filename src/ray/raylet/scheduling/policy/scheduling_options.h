@@ -200,6 +200,7 @@ struct SchedulingOptions {
   std::string preferred_node_id;
   int32_t schedule_top_k_absolute;
   float scheduler_top_k_fraction;
+  std::string virtual_cluster_id_;
 
  private:
   SchedulingOptions(

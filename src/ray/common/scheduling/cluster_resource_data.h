@@ -61,9 +61,7 @@ class ResourceRequest {
     virtual_cluster_id_ = virtual_cluster_id;
   }
 
-  std::string GetVirtualClusterId() const {
-    return virtual_cluster_id_;
-  }
+  std::string GetVirtualClusterId() const { return virtual_cluster_id_; }
 
   bool Has(ResourceID resource_id) const { return resources_.Has(resource_id); }
 
@@ -351,6 +349,8 @@ class NodeResources {
   std::string DebugString() const;
   /// Returns compact dict-like string.
   std::string DictString() const;
+  // Callback to check is current node in virtual cluster
+  std::function<bool(const std::string &)> is_node_in_virtual_cluster_fn;
 };
 
 /// Total and available capacities of each resource instance.
@@ -372,7 +372,11 @@ class NodeResourceInstances {
 };
 
 struct Node {
-  Node(const NodeResources &resources) : local_view_(resources) {}
+  Node(const NodeResources &resources,
+       std::function<bool(const std::string &)> is_node_in_virtual_cluster_fn)
+      : local_view_(resources) {
+    local_view_.is_node_in_virtual_cluster_fn = is_node_in_virtual_cluster_fn;
+  }
 
   NodeResources *GetMutableLocalView() {
     local_view_modified_ts_ = absl::Now();

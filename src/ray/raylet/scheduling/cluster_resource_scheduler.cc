@@ -231,6 +231,8 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
     bool *is_infeasible) {
   ResourceRequest resource_request =
       ResourceMapToResourceRequest(task_resources, requires_object_store_memory);
+  const std::string& virtual_cluster_id = scheduling_strategy.virtual_cluster_id()
+  resource_request.SetVirtualClusterId(virtual_cluster_id);
   return GetBestSchedulableNode(resource_request,
                                 scheduling_strategy,
                                 actor_creation,

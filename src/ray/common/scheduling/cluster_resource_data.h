@@ -57,6 +57,14 @@ class ResourceRequest {
     resources_.Set(resource_id, value);
   }
 
+  void SetVirtualClusterId(const std::string &virtual_cluster_id) {
+    virtual_cluster_id_ = virtual_cluster_id;
+  }
+
+  std::string GetVirtualClusterId() const {
+    return virtual_cluster_id_;
+  }
+
   bool Has(ResourceID resource_id) const { return resources_.Has(resource_id); }
 
   ResourceSet::ResourceIdIterator ResourceIds() const { return resources_.ResourceIds(); }
@@ -117,6 +125,9 @@ class ResourceRequest {
   /// Whether this task requires object store memory.
   /// TODO(swang): This should be a quantity instead of a flag.
   bool requires_object_store_memory_ = false;
+  /// virtual cluster id is viewed as a type of resource
+  /// since node labes are viewed as resources
+  std::string virtual_cluster_id_;
 };
 
 /// Represents a resource set that contains the per-instance resource values.

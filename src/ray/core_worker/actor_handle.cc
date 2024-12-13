@@ -52,10 +52,6 @@ rpc::ActorHandle CreateInnerActorHandle(
   inner.set_max_pending_calls(max_pending_calls);
   inner.set_enable_task_events(enable_task_events.value_or(kDefaultTaskEventEnabled));
   inner.mutable_labels()->insert(labels.begin(), labels.end());
-  std::string virtual_cluster_id = std::getenv(kEnvVarKeyVirtualClusterID)
-                                       ? std::getenv(kEnvVarKeyVirtualClusterID)
-                                       : "";
-  inner.mutable_labels()->emplace(kLabelVirtualClusterID, virtual_cluster_id);
   return inner;
 }
 

@@ -40,7 +40,7 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
             return dashboard_optional_utils.rest_response(
                 success=True,
                 message="All virtual clusters fetched.",
-                virtual_clusters=data,
+                virtual_clusters=data["virtualClusterDataList"],
             )
         else:
             logger.info("Failed to get all virtual clusters")
@@ -58,20 +58,20 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
 
         virtual_cluster_info = dict(virtual_cluster_info_json)
         virtual_cluster_id = virtual_cluster_info["virtualClusterId"]
-        job_exec_mode = JobExecMode.Mixed
+        job_exec_mode = JobExecMode.MIXED
         if str(virtual_cluster_info.get("jobExecMode", "mixed")).lower() == "exclusive":
-            job_exec_mode = JobExecMode.Exclusive
+            job_exec_mode = JobExecMode.EXCLUSIVE
 
         replica_set_list = []
-        for data in virtual_cluster_info["nodeTypeAndCountList"]:
+        for data in virtual_cluster_info["replicaSetList"]:
             replica_set = ReplicaSet(
-                template_id=data["nodeType"], replicas=data["nodeCount"]
+                template_id=data["templateId"], replicas=data["replicas"]
             )
             replica_set_list.append(replica_set)
 
         request = CreateOrUpdateVirtualClusterRequest(
             virtual_cluster_id=virtual_cluster_id,
-            virtual_cluster_name=virtual_cluster_info.get("name", ""),
+            virtual_cluster_name=virtual_cluster_info.get("virtualClusterName", ""),
             mode=job_exec_mode,
             replica_set_list=replica_set_list,
             revision=int(virtual_cluster_info.get("revision", 0)),
@@ -79,6 +79,7 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
         reply = await (
             self._gcs_virtual_cluster_info_stub.CreateOrUpdateVirtualCluster(request)
         )
+
         if reply.status.code == 0:
             logger.info("Virtual cluster %s created or updated", virtual_cluster_id)
             data = dashboard_utils.message_to_dict(reply)

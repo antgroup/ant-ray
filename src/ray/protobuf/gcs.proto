@@ -711,10 +711,11 @@ message JobTableData {
 ///////////////////////////////////////////////////////////////////////////////
 
 enum AllocationMode {
+  UNKNOWN = 0;
   // A single node can carray tasks for multiple jobs.
-  Mixed = 0;
+  MIXED = 1;
   // A single node can only carray tasks for one job.
-  Exclusive = 1;
+  EXCLUSIVE = 2;
 }
 
 message NodeInstance {
@@ -726,7 +727,7 @@ message NodeInstance {
 
 message VirtualClusterTableData {
   // The virtual cluster id.
-  string id = 1;
+  string virtual_cluster_id = 1;
   // The virtual cluster name.
   string name = 2;
   // The allocation mode of the virtual cluster.

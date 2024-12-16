@@ -1683,16 +1683,18 @@ TEST_F(ClusterResourceSchedulerTest, AffinityWithBundleScheduleTest) {
 TEST_F(ClusterResourceSchedulerTest, VirtualClusterScheduleTest) {
   int num_nodes = 10;
   instrumented_io_context io_context;
+  auto is_node_in_virtual_cluster_fn_ = [](scheduling::NodeID node_id,
+                                           const std::string &virtual_cluster_id) {
+    auto curr_virtual_cluster_id = node_id.ToInt() % 2;
+    return curr_virtual_cluster_id == std::stoi(virtual_cluster_id);
+  };
   ClusterResourceScheduler resource_scheduler(
       io_context,
       scheduling::NodeID(num_nodes + 1),
       NodeResources(),
       [](auto) { return true; },
       true,
-      [](scheduling::NodeID node_id, const std::string &virtual_cluster_id) {
-        auto curr_virtual_cluster_id = node_id.ToInt() % 2;
-        return curr_virtual_cluster_id == std::stoi(virtual_cluster_id);
-      });
+      is_node_in_virtual_cluster_fn_);
   AssertPredefinedNodeResources();
 
   initCluster(resource_scheduler, num_nodes);
@@ -1700,20 +1702,20 @@ TEST_F(ClusterResourceSchedulerTest, VirtualClusterScheduleTest) {
   ASSERT_EQ(resource_scheduler.GetClusterResourceManager().NumNodes(), num_nodes + 1);
   auto nodes = resource_scheduler.GetClusterResourceManager().GetResourceView();
   ResourceRequest resource_request_v0 = CreateResourceRequest({{ResourceID::CPU(), 0}});
-  resource_request_v0.SetVirtualClusterId("0");
+  std::string virtual_cluster_id = "0";
+  resource_request_v0.set_is_virtual_cluster_feasible_callback(std::bind(
+      is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id));
   ResourceRequest resource_request_v1 = CreateResourceRequest({{ResourceID::CPU(), 0}});
-  resource_request_v1.SetVirtualClusterId("1");
+  virtual_cluster_id = "1";
+  resource_request_v1.set_is_virtual_cluster_feasible_callback(std::bind(
+      is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id));
   for (const auto &[node_id, node] : nodes) {
     const auto &node_resources = node.GetLocalView();
     auto virtual_cluster_id = node_id.ToInt() % 2;
     if (virtual_cluster_id == 0) {
-      ASSERT_TRUE(node_resources.IsAvailable(resource_request_v0));
-      ASSERT_TRUE(!node_resources.IsAvailable(resource_request_v1));
       ASSERT_TRUE(node_resources.IsFeasible(resource_request_v0));
       ASSERT_TRUE(!node_resources.IsFeasible(resource_request_v1));
     } else {
-      ASSERT_TRUE(node_resources.IsAvailable(resource_request_v1));
-      ASSERT_TRUE(!node_resources.IsAvailable(resource_request_v0));
       ASSERT_TRUE(node_resources.IsFeasible(resource_request_v1));
       ASSERT_TRUE(!node_resources.IsFeasible(resource_request_v0));
     }

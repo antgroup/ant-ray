@@ -93,12 +93,6 @@ bool NodeResources::IsAvailable(const ResourceRequest &resource_request,
     return false;
   }
 
-  if (is_node_in_virtual_cluster_fn != nullptr) {
-    if (!is_node_in_virtual_cluster_fn(resource_request.GetVirtualClusterId())) {
-      return false;
-    }
-  }
-
   if (!this->normal_task_resources.IsEmpty()) {
     auto available_resources = this->available;
     available_resources -= this->normal_task_resources;
@@ -108,10 +102,9 @@ bool NodeResources::IsAvailable(const ResourceRequest &resource_request,
 }
 
 bool NodeResources::IsFeasible(const ResourceRequest &resource_request) const {
-  if (is_node_in_virtual_cluster_fn != nullptr) {
-    if (!is_node_in_virtual_cluster_fn(resource_request.GetVirtualClusterId())) {
-      return false;
-    }
+  // This ensures that resource allocation considers the virtual cluster constraints.
+  if (!resource_request.is_virtual_cluster_feasible(this->node_id)) {
+    return false;
   }
   return this->total >= resource_request.GetResourceSet();
 }

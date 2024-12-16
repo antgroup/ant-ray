@@ -22,12 +22,8 @@
 
 namespace ray {
 
-ClusterResourceManager::ClusterResourceManager(
-    instrumented_io_context &io_service,
-    std::function<bool(scheduling::NodeID, const std::string &)>
-        is_node_in_virtual_cluster_fn)
-    : timer_(PeriodicalRunner::Create(io_service)),
-      is_node_in_virtual_cluster_fn_(is_node_in_virtual_cluster_fn) {
+ClusterResourceManager::ClusterResourceManager(instrumented_io_context &io_service)
+    : timer_(PeriodicalRunner::Create(io_service)) {
   timer_->RunFnPeriodically(
       [this]() {
         auto syncer_delay = absl::Milliseconds(
@@ -66,11 +62,12 @@ void ClusterResourceManager::AddOrUpdateNode(scheduling::NodeID node_id,
   auto it = nodes_.find(node_id);
   if (it == nodes_.end()) {
     // This node is new, so add it to the map.
-    auto node = Node(node_resources, GenNodeInClusterFn(node_id));
+    // include node_id during node creation, helping track resource ownership effectively.
+    auto node = Node(node_resources, node_id);
     nodes_.emplace(node_id, node);
   } else {
     // This node exists, so update its resources.
-    it->second = Node(node_resources, GenNodeInClusterFn(node_id));
+    it->second = Node(node_resources, node_id);
   }
 }
 
@@ -138,7 +135,7 @@ void ClusterResourceManager::UpdateResourceCapacity(scheduling::NodeID node_id,
   auto it = nodes_.find(node_id);
   if (it == nodes_.end()) {
     NodeResources node_resources;
-    auto node = Node(node_resources, GenNodeInClusterFn(node_id));
+    auto node = Node(node_resources, node_id);
     it = nodes_.emplace(node_id, node).first;
   }
 
@@ -288,19 +285,10 @@ void ClusterResourceManager::SetNodeLabels(
   auto it = nodes_.find(node_id);
   if (it == nodes_.end()) {
     NodeResources node_resources;
-    auto node = Node(node_resources, GenNodeInClusterFn(node_id));
+    auto node = Node(node_resources, node_id);
     it = nodes_.emplace(node_id, node).first;
   }
   it->second.GetMutableLocalView()->labels = labels;
-}
-
-std::function<bool(std::string)> ClusterResourceManager::GenNodeInClusterFn(
-    scheduling::NodeID node_id) {
-  using namespace std::placeholders;
-  if (is_node_in_virtual_cluster_fn_ == nullptr) {
-    return nullptr;
-  }
-  return std::bind(is_node_in_virtual_cluster_fn_, node_id, _1);
 }
 
 }  // namespace ray

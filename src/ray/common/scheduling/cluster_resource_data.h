@@ -57,12 +57,6 @@ class ResourceRequest {
     resources_.Set(resource_id, value);
   }
 
-  void SetVirtualClusterId(const std::string &virtual_cluster_id) {
-    virtual_cluster_id_ = virtual_cluster_id;
-  }
-
-  std::string GetVirtualClusterId() const { return virtual_cluster_id_; }
-
   bool Has(ResourceID resource_id) const { return resources_.Has(resource_id); }
 
   ResourceSet::ResourceIdIterator ResourceIds() const { return resources_.ResourceIds(); }
@@ -118,13 +112,28 @@ class ResourceRequest {
   /// Return a human-readable string for this set.
   std::string DebugString() const { return resources_.DebugString(); }
 
+  /// This function is used to determine if a node is feasible
+  /// within a given virtual cluster.
+  void set_is_virtual_cluster_feasible_callback(
+      std::function<bool(scheduling::NodeID)> fn) {
+    is_virtual_cluster_feasible_fn_ = fn;
+  }
+
+  bool is_virtual_cluster_feasible(const scheduling::NodeID &node_id) const {
+    if (is_virtual_cluster_feasible_fn_ == nullptr) {
+      return true;
+    }
+    return is_virtual_cluster_feasible_fn_(node_id);
+  }
+
  private:
   ResourceSet resources_;
   /// Whether this task requires object store memory.
   /// TODO(swang): This should be a quantity instead of a flag.
   bool requires_object_store_memory_ = false;
-  /// virtual cluster id is viewed as a type of resource
-  std::string virtual_cluster_id_;
+  /// Evaluates whether a given node is accommodated within the virtual
+  /// cluster associated with this resource request.
+  std::function<bool(scheduling::NodeID)> is_virtual_cluster_feasible_fn_ = nullptr;
 };
 
 /// Represents a resource set that contains the per-instance resource values.
@@ -331,6 +340,9 @@ class NodeResources {
   int64_t latest_resources_normal_task_timestamp = 0;
   bool object_pulls_queued = false;
 
+  // Track which node resources belong to.
+  scheduling::NodeID node_id;
+
   /// Amongst CPU, memory, and object store memory, calculate the utilization percentage
   /// of each resource and return the highest.
   float CalculateCriticalResourceUtilization() const;
@@ -348,8 +360,6 @@ class NodeResources {
   std::string DebugString() const;
   /// Returns compact dict-like string.
   std::string DictString() const;
-  // Callback to check is current node in virtual cluster
-  std::function<bool(const std::string &)> is_node_in_virtual_cluster_fn;
 };
 
 /// Total and available capacities of each resource instance.
@@ -371,10 +381,10 @@ class NodeResourceInstances {
 };
 
 struct Node {
-  Node(const NodeResources &resources,
-       std::function<bool(const std::string &)> is_node_in_virtual_cluster_fn)
+  Node(const NodeResources &resources, const scheduling::NodeID &node_id)
       : local_view_(resources) {
-    local_view_.is_node_in_virtual_cluster_fn = is_node_in_virtual_cluster_fn;
+    // linking nodes with their resource data properly.
+    local_view_.node_id = node_id;
   }
 
   NodeResources *GetMutableLocalView() {

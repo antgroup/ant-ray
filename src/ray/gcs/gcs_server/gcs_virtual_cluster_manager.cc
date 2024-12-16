@@ -23,9 +23,13 @@ void GcsVirtualClusterManager::Initialize(const GcsInitData &gcs_init_data) {
   // TODO(Shanly): To be implement.
 }
 
-void GcsVirtualClusterManager::OnNodeAdded(const rpc::GcsNodeInfo &node) {}
+void GcsVirtualClusterManager::OnNodeAdd(const rpc::GcsNodeInfo &node) {
+  primary_cluster_->OnNodeAdd(node);
+}
 
-void GcsVirtualClusterManager::OnNodeRemoved(const rpc::GcsNodeInfo &node) {}
+void GcsVirtualClusterManager::OnNodeDead(const rpc::GcsNodeInfo &node) {
+  primary_cluster_->OnNodeDead(node);
+}
 
 void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(
     rpc::CreateOrUpdateVirtualClusterRequest request,
@@ -70,6 +74,7 @@ void GcsVirtualClusterManager::HandleRemoveVirtualCluster(
   const auto &virtual_cluster_id = request.virtual_cluster_id();
   RAY_LOG(INFO) << "Start removing virtual cluster " << virtual_cluster_id;
   // TODO(Shanly): To be implement.
+  GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
 }
 
 void GcsVirtualClusterManager::HandleGetAllVirtualClusters(
@@ -78,6 +83,7 @@ void GcsVirtualClusterManager::HandleGetAllVirtualClusters(
     rpc::SendReplyCallback send_reply_callback) {
   RAY_LOG(DEBUG) << "Getting all virtual clusters.";
   // TODO(Shanly): To be implement.
+  GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
 }
 
 Status GcsVirtualClusterManager::VerifyRequest(
@@ -160,6 +166,11 @@ Status GcsVirtualClusterManager::FlushAndPublish(
       callback(status, std::move(data));
     }
   };
+
+  if (data->is_removed()) {
+    return gcs_table_storage_.VirtualClusterTable().Delete(
+        VirtualClusterID::FromBinary(data->id()), on_done);
+  }
 
   // Write the virtual cluster data to the storage.
   return gcs_table_storage_.VirtualClusterTable().Put(

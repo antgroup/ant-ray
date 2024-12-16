@@ -41,9 +41,15 @@ class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
   /// \param gcs_init_data.
   void Initialize(const GcsInitData &gcs_init_data);
 
-  void OnNodeAdded(const rpc::GcsNodeInfo &node);
+  /// Handle the node added event.
+  ///
+  /// \param node The node that is added.
+  void OnNodeAdd(const rpc::GcsNodeInfo &node);
 
-  void OnNodeRemoved(const rpc::GcsNodeInfo &node);
+  /// Handle the node dead event.
+  ///
+  /// \param node The node that is dead.
+  void OnNodeDead(const rpc::GcsNodeInfo &node);
 
  protected:
   void HandleCreateOrUpdateVirtualCluster(

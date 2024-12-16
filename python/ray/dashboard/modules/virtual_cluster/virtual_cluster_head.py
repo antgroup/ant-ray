@@ -35,12 +35,19 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
         )
 
         if reply.status.code == 0:
-            data = dashboard_utils.message_to_dict(reply)
+            data = dashboard_utils.message_to_dict(
+                reply, always_print_fields_with_no_presence=True
+            )
+            for virtual_cluster_data in data.get("virtualClusterDataList", []):
+                if "revision" in virtual_cluster_data:
+                    virtual_cluster_data["revision"] = int(
+                        virtual_cluster_data.get("revision")
+                    )
 
             return dashboard_optional_utils.rest_response(
                 success=True,
                 message="All virtual clusters fetched.",
-                virtual_clusters=data["virtualClusterDataList"],
+                virtual_clusters=data.get("virtualClusterDataList", []),
             )
         else:
             logger.info("Failed to get all virtual clusters")
@@ -82,14 +89,16 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
 
         if reply.status.code == 0:
             logger.info("Virtual cluster %s created or updated", virtual_cluster_id)
-            data = dashboard_utils.message_to_dict(reply)
+            data = dashboard_utils.message_to_dict(
+                reply, always_print_fields_with_no_presence=True
+            )
 
             return dashboard_optional_utils.rest_response(
                 success=True,
                 message="Virtual cluster created or updated.",
                 virtual_cluster_id=virtual_cluster_id,
-                revision=data.get("revision", 0),
-                node_instances=data["nodeInstances"],
+                revision=int(data.get("revision", 0)),
+                node_instances=data.get("nodeInstances", {}),
             )
         else:
             logger.info(

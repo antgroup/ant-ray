@@ -39,10 +39,9 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
                 reply, always_print_fields_with_no_presence=True
             )
             for virtual_cluster_data in data.get("virtualClusterDataList", []):
-                if "revision" in virtual_cluster_data:
-                    virtual_cluster_data["revision"] = int(
-                        virtual_cluster_data.get("revision")
-                    )
+                virtual_cluster_data["revision"] = int(
+                    virtual_cluster_data.get("revision", 0)
+                )
 
             return dashboard_optional_utils.rest_response(
                 success=True,

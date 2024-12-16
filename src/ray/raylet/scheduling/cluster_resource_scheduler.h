@@ -250,6 +250,7 @@ class ClusterResourceScheduler {
   FRIEND_TEST(ClusterTaskManagerTestWithGPUsAtHead, RleaseAndReturnWorkerCpuResources);
   FRIEND_TEST(ClusterResourceSchedulerTest, TestForceSpillback);
   FRIEND_TEST(ClusterResourceSchedulerTest, AffinityWithBundleScheduleTest);
+  FRIEND_TEST(ClusterResourceSchedulerTest, VirtualClusterScheduleTest);
 };
 
 }  // end namespace ray

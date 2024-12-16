@@ -1682,15 +1682,16 @@ TEST_F(ClusterResourceSchedulerTest, AffinityWithBundleScheduleTest) {
 
 TEST_F(ClusterResourceSchedulerTest, VirtualClusterScheduleTest) {
   int num_nodes = 10;
+  scheduling::NodeID local_node = scheduling::NodeID(num_nodes + 1);
   instrumented_io_context io_context;
   auto is_node_in_virtual_cluster_fn_ = [](scheduling::NodeID node_id,
                                            const std::string &virtual_cluster_id) {
-    auto curr_virtual_cluster_id = node_id.ToInt() % 2;
+    auto curr_virtual_cluster_id = node_id.ToInt();
     return curr_virtual_cluster_id == std::stoi(virtual_cluster_id);
   };
   ClusterResourceScheduler resource_scheduler(
       io_context,
-      scheduling::NodeID(num_nodes + 1),
+      local_node,
       NodeResources(),
       [](auto) { return true; },
       true,
@@ -1701,24 +1702,77 @@ TEST_F(ClusterResourceSchedulerTest, VirtualClusterScheduleTest) {
 
   ASSERT_EQ(resource_scheduler.GetClusterResourceManager().NumNodes(), num_nodes + 1);
   auto nodes = resource_scheduler.GetClusterResourceManager().GetResourceView();
-  ResourceRequest resource_request_v0 = CreateResourceRequest({{ResourceID::CPU(), 0}});
-  std::string virtual_cluster_id = "0";
-  resource_request_v0.set_is_virtual_cluster_feasible_callback(std::bind(
-      is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id));
-  ResourceRequest resource_request_v1 = CreateResourceRequest({{ResourceID::CPU(), 0}});
-  virtual_cluster_id = "1";
-  resource_request_v1.set_is_virtual_cluster_feasible_callback(std::bind(
-      is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id));
-  for (const auto &[node_id, node] : nodes) {
-    const auto &node_resources = node.GetLocalView();
-    auto virtual_cluster_id = node_id.ToInt() % 2;
-    if (virtual_cluster_id == 0) {
-      ASSERT_TRUE(node_resources.IsFeasible(resource_request_v0));
-      ASSERT_TRUE(!node_resources.IsFeasible(resource_request_v1));
-    } else {
-      ASSERT_TRUE(node_resources.IsFeasible(resource_request_v1));
-      ASSERT_TRUE(!node_resources.IsFeasible(resource_request_v0));
+  std::vector<ResourceRequest> resource_requests;
+  for (int i = 0; i < num_nodes; i++) {
+    ResourceRequest resource_request = CreateResourceRequest({{ResourceID::CPU(), 0}});
+    std::string virtual_cluster_id = std::to_string(i);
+    resource_request.set_is_virtual_cluster_feasible_callback(std::bind(
+        is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id));
+    resource_requests.emplace_back(resource_request);
+  }
+  for (auto &[node_id, node] : nodes) {
+    const auto node_resources = node.GetLocalView();
+    for (int64_t j = 0; j < (int64_t)resource_requests.size(); j++) {
+      auto resource_request = resource_requests[j];
+      if (node_id.ToInt() == j) {
+        ASSERT_TRUE(node_resources.IsFeasible(resource_request));
+      } else {
+        ASSERT_TRUE(!node_resources.IsFeasible(resource_request));
+      }
     }
+  }
+
+  for (size_t i = 0; i < resource_requests.size(); i++) {
+    auto resource_request = resource_requests[i];
+    int64_t violations;
+    bool is_infeasible;
+    rpc::SchedulingStrategy scheduling_strategy;
+    scheduling_strategy.mutable_node_affinity_scheduling_strategy()->set_node_id(
+        local_node.Binary());
+    scheduling_strategy.mutable_node_affinity_scheduling_strategy()->set_soft(true);
+    auto node_id = resource_scheduler.GetBestSchedulableNode(resource_request,
+                                                             scheduling_strategy,
+                                                             false,
+                                                             false,
+                                                             std::string(),
+                                                             &violations,
+                                                             &is_infeasible);
+
+    ASSERT_EQ(node_id.ToInt(), i);
+  }
+
+  for (size_t i = 0; i < resource_requests.size(); i++) {
+    auto resource_request = resource_requests[i];
+    int64_t violations;
+    bool is_infeasible;
+    rpc::SchedulingStrategy scheduling_strategy;
+    scheduling_strategy.mutable_spread_scheduling_strategy();
+    auto node_id = resource_scheduler.GetBestSchedulableNode(resource_request,
+                                                             scheduling_strategy,
+                                                             false,
+                                                             false,
+                                                             std::string(),
+                                                             &violations,
+                                                             &is_infeasible);
+
+    ASSERT_EQ(node_id.ToInt(), i);
+  }
+
+  for (size_t i = 0; i < resource_requests.size(); i++) {
+    auto resource_request = resource_requests[i];
+    int64_t violations;
+    bool is_infeasible;
+    rpc::SchedulingStrategy scheduling_strategy;
+    scheduling_strategy.mutable_default_scheduling_strategy();
+    auto node_id = resource_scheduler.GetBestSchedulableNode(resource_request,
+                                                             scheduling_strategy,
+                                                             false,
+                                                             false,
+                                                             std::string(),
+                                                             &violations,
+                                                             &is_infeasible);
+
+    ASSERT_EQ(node_id.ToInt(), i);
   }
 }
 

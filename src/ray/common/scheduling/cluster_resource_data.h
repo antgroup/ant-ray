@@ -124,7 +124,6 @@ class ResourceRequest {
   /// TODO(swang): This should be a quantity instead of a flag.
   bool requires_object_store_memory_ = false;
   /// virtual cluster id is viewed as a type of resource
-  /// since node labes are viewed as resources
   std::string virtual_cluster_id_;
 };
 

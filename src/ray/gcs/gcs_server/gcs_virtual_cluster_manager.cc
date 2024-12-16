@@ -120,24 +120,24 @@ Status GcsVirtualClusterManager::VerifyRequest(
     }
   }
 
-  if (auto virtual_cluster =
-          primary_cluster_->GetVirtualCluster(request.virtual_cluster_id())) {
+  if (auto logical_cluster =
+          primary_cluster_->GetLogicalCluster(request.virtual_cluster_id())) {
     // Check if the revision of the virtual cluster is expired.
-    if (request.revision() != virtual_cluster->GetRevision()) {
+    if (request.revision() != logical_cluster->GetRevision()) {
       std::ostringstream ss;
       ss << "The revision (" << request.revision()
          << ") is expired, the latest revision of the virtual cluster "
-         << request.virtual_cluster_id() << " is " << virtual_cluster->GetRevision();
+         << request.virtual_cluster_id() << " is " << logical_cluster->GetRevision();
       std::string message = ss.str();
       RAY_LOG(ERROR) << message;
       return Status::InvalidArgument(message);
     }
 
     // check if the request attributes are compatible with the virtual cluster.
-    if (request.mode() != virtual_cluster->GetMode()) {
+    if (request.mode() != logical_cluster->GetMode()) {
       std::ostringstream ostr;
       ostr << "The requested attributes are incompatible with virtual cluster "
-           << request.virtual_cluster_id() << ". expect: (" << virtual_cluster->GetMode()
+           << request.virtual_cluster_id() << ". expect: (" << logical_cluster->GetMode()
            << "), actual: (" << request.mode() << ").";
       std::string message = ostr.str();
       RAY_LOG(ERROR) << message;

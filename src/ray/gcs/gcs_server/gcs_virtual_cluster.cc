@@ -16,9 +16,9 @@
 
 namespace ray {
 namespace gcs {
-///////////////////////// AbstractCluster /////////////////////////
-void AbstractCluster::UpdateNodeInstances(ReplicaInstances replica_instances_to_add,
-                                          ReplicaInstances replica_instances_to_remove) {
+///////////////////////// VirtualCluster /////////////////////////
+void VirtualCluster::UpdateNodeInstances(ReplicaInstances replica_instances_to_add,
+                                         ReplicaInstances replica_instances_to_remove) {
   // Insert node instances to the virtual cluster.
   InsertNodeInstances(std::move(replica_instances_to_add));
   // Remove node instances from the virtual cluster.
@@ -27,7 +27,7 @@ void AbstractCluster::UpdateNodeInstances(ReplicaInstances replica_instances_to_
   revision_ = current_sys_time_ns();
 }
 
-void AbstractCluster::InsertNodeInstances(ReplicaInstances replica_instances) {
+void VirtualCluster::InsertNodeInstances(ReplicaInstances replica_instances) {
   for (auto &[template_id, job_node_instances] : replica_instances) {
     auto &template_node_instances = visible_node_instances_[template_id];
     auto &replicas = replica_sets_[template_id];
@@ -41,7 +41,7 @@ void AbstractCluster::InsertNodeInstances(ReplicaInstances replica_instances) {
   }
 }
 
-void AbstractCluster::RemoveNodeInstances(ReplicaInstances replica_instances) {
+void VirtualCluster::RemoveNodeInstances(ReplicaInstances replica_instances) {
   for (auto &[template_id, job_node_instances] : replica_instances) {
     auto template_iter = visible_node_instances_.find(template_id);
     RAY_CHECK(template_iter != visible_node_instances_.end());
@@ -73,7 +73,7 @@ void AbstractCluster::RemoveNodeInstances(ReplicaInstances replica_instances) {
   }
 }
 
-Status AbstractCluster::LookupIdleNodeInstances(
+Status VirtualCluster::LookupIdleNodeInstances(
     const ReplicaSets &replica_sets, ReplicaInstances &replica_instances) const {
   bool success = true;
   for (const auto &[template_id, replicas] : replica_sets) {
@@ -119,8 +119,8 @@ Status AbstractCluster::LookupIdleNodeInstances(
   return Status::OK();
 }
 
-bool AbstractCluster::MarkNodeInstanceAsDead(const std::string &template_id,
-                                             const std::string &node_instance_id) {
+bool VirtualCluster::MarkNodeInstanceAsDead(const std::string &template_id,
+                                            const std::string &node_instance_id) {
   auto iter = visible_node_instances_.find(template_id);
   if (iter == visible_node_instances_.end()) {
     return false;
@@ -137,7 +137,7 @@ bool AbstractCluster::MarkNodeInstanceAsDead(const std::string &template_id,
   return false;
 }
 
-std::shared_ptr<rpc::VirtualClusterTableData> AbstractCluster::ToProto() const {
+std::shared_ptr<rpc::VirtualClusterTableData> VirtualCluster::ToProto() const {
   auto data = std::make_shared<rpc::VirtualClusterTableData>();
   data->set_id(GetID());
   data->set_name(GetName());
@@ -194,7 +194,7 @@ Status JobClusterManager::CreateJobCluster(
 }
 
 ///////////////////////// PrimaryCluster /////////////////////////
-std::shared_ptr<VirtualCluster> PrimaryCluster::GetVirtualCluster(
+std::shared_ptr<LogicalCluster> PrimaryCluster::GetLogicalCluster(
     const std::string &virtual_cluster_id) const {
   auto iter = virtual_clusters_.find(virtual_cluster_id);
   return iter != virtual_clusters_.end() ? iter->second : nullptr;
@@ -214,15 +214,15 @@ Status PrimaryCluster::CreateOrUpdateVirtualCluster(
     return status;
   }
 
-  auto virtual_cluster = GetVirtualCluster(request.virtual_cluster_id());
-  if (virtual_cluster == nullptr) {
+  auto logical_cluster = GetLogicalCluster(request.virtual_cluster_id());
+  if (logical_cluster == nullptr) {
     // replica_instances_to_remove must be empty as the virtual cluster is a new one.
     RAY_CHECK(replica_instances_to_remove_from_virtual_cluster.empty());
-    virtual_cluster = std::make_shared<VirtualCluster>(async_data_flusher_,
+    logical_cluster = std::make_shared<LogicalCluster>(async_data_flusher_,
                                                        request.virtual_cluster_id(),
                                                        request.virtual_cluster_name(),
                                                        request.mode());
-    virtual_clusters_[request.virtual_cluster_id()] = virtual_cluster;
+    virtual_clusters_[request.virtual_cluster_id()] = logical_cluster;
   }
 
   // Update the main cluster replica sets and node instances.
@@ -235,10 +235,10 @@ Status PrimaryCluster::CreateOrUpdateVirtualCluster(
                       std::move(replica_instances_to_remove_from_primary_cluster));
 
   // Update the virtual cluster replica sets and node instances.
-  virtual_cluster->UpdateNodeInstances(
+  logical_cluster->UpdateNodeInstances(
       std::move(replica_instances_to_add_to_virtual_cluster),
       std::move(replica_instances_to_remove_from_virtual_cluster));
-  return async_data_flusher_(virtual_cluster->ToProto(), std::move(callback));
+  return async_data_flusher_(logical_cluster->ToProto(), std::move(callback));
 }
 
 Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
@@ -249,13 +249,13 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
   replica_instances_to_remove.clear();
 
   const auto &virtual_cluster_id = request.virtual_cluster_id();
-  auto virtual_cluster = GetVirtualCluster(virtual_cluster_id);
-  if (virtual_cluster != nullptr) {
+  auto logical_cluster = GetLogicalCluster(virtual_cluster_id);
+  if (logical_cluster != nullptr) {
     auto replica_sets_to_remove =
-        ReplicasDifference(virtual_cluster->GetReplicaSets(), request.replica_sets());
+        ReplicasDifference(logical_cluster->GetReplicaSets(), request.replica_sets());
     // Lookup idle node instances from the virtual cluster based on
     // `replica_sets_to_remove`.
-    auto status = virtual_cluster->LookupIdleNodeInstances(replica_sets_to_remove,
+    auto status = logical_cluster->LookupIdleNodeInstances(replica_sets_to_remove,
                                                            replica_instances_to_remove);
     if (!status.ok()) {
       return status;
@@ -264,7 +264,7 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
 
   auto replica_sets_to_add = ReplicasDifference(
       request.replica_sets(),
-      virtual_cluster ? virtual_cluster->GetReplicaSets() : ReplicaSets());
+      logical_cluster ? logical_cluster->GetReplicaSets() : ReplicaSets());
   // Lookup idle node instances from main cluster based on `replica_sets_to_add`.
   return LookupIdleNodeInstances(replica_sets_to_add, replica_instances_to_add);
 }
@@ -296,15 +296,15 @@ void PrimaryCluster::OnNodeRemoved(const rpc::GcsNodeInfo &node) {
     return;
   }
 
-  for (const auto &[virtual_cluster_id, virtual_cluster] : virtual_clusters_) {
-    if (virtual_cluster->MarkNodeInstanceAsDead(template_id, node_instance_id)) {
+  for (const auto &[virtual_cluster_id, logical_cluster] : virtual_clusters_) {
+    if (logical_cluster->MarkNodeInstanceAsDead(template_id, node_instance_id)) {
       return;
     }
   }
 }
 
-///////////////////////// VirtualCluster /////////////////////////
-bool VirtualCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
+///////////////////////// LogicalCluster /////////////////////////
+bool LogicalCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
                                         const gcs::NodeInstance &node_instance) const {
   if (GetMode() == rpc::WorkloadMode::Exclusive) {
     return job_cluster_id.empty();

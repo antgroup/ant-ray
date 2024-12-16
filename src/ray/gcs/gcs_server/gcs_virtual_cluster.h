@@ -88,9 +88,9 @@ ReplicaSets ReplicasDifference(const T1 &left, const T2 &right) {
 }
 
 class JobCluster;
-class AbstractCluster {
+class VirtualCluster {
  public:
-  virtual ~AbstractCluster() = default;
+  virtual ~VirtualCluster() = default;
 
   /// Get the id of the cluster.
   virtual const std::string &GetID() const = 0;
@@ -173,7 +173,7 @@ class AbstractCluster {
   uint64_t revision_{0};
 };
 
-class JobClusterManager : public AbstractCluster {
+class JobClusterManager : public VirtualCluster {
  public:
   JobClusterManager(const AsyncClusterDataFlusher &async_data_flusher)
       : async_data_flusher_(async_data_flusher) {}
@@ -195,7 +195,7 @@ class JobClusterManager : public AbstractCluster {
   AsyncClusterDataFlusher async_data_flusher_;
 };
 
-class VirtualCluster;
+class LogicalCluster;
 class PrimaryCluster : public JobClusterManager {
  public:
   PrimaryCluster(const AsyncClusterDataFlusher &async_data_flusher)
@@ -218,7 +218,7 @@ class PrimaryCluster : public JobClusterManager {
   ///
   /// \param virtual_cluster_id The id of the virtual cluster.
   /// \return The virtual cluster if it exists, otherwise return nullptr.
-  std::shared_ptr<VirtualCluster> GetVirtualCluster(
+  std::shared_ptr<LogicalCluster> GetLogicalCluster(
       const std::string &virtual_cluster_id) const;
 
   void OnNodeAdded(const rpc::GcsNodeInfo &node);
@@ -244,18 +244,18 @@ class PrimaryCluster : public JobClusterManager {
 
   /// The map of virtual clusters.
   /// Mapping from virtual cluster id to the virtual cluster.
-  absl::flat_hash_map<std::string, std::shared_ptr<VirtualCluster>> virtual_clusters_;
+  absl::flat_hash_map<std::string, std::shared_ptr<LogicalCluster>> virtual_clusters_;
 };
 
-class VirtualCluster : public JobClusterManager {
+class LogicalCluster : public JobClusterManager {
  public:
-  VirtualCluster(const AsyncClusterDataFlusher &async_data_flusher,
+  LogicalCluster(const AsyncClusterDataFlusher &async_data_flusher,
                  const std::string &id,
                  const std::string &name,
                  rpc::WorkloadMode mode)
       : JobClusterManager(async_data_flusher), id_(id), name_(name), mode_(mode) {}
 
-  VirtualCluster &operator=(const VirtualCluster &) = delete;
+  LogicalCluster &operator=(const LogicalCluster &) = delete;
 
   const std::string &GetID() const override { return id_; }
   rpc::WorkloadMode GetMode() const override { return mode_; }
@@ -274,7 +274,7 @@ class VirtualCluster : public JobClusterManager {
   rpc::WorkloadMode mode_;
 };
 
-class JobCluster : public AbstractCluster {
+class JobCluster : public VirtualCluster {
  public:
   JobCluster(const std::string &id, const std::string &name) : id_(id), name_(name) {}
 

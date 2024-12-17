@@ -378,8 +378,16 @@ void GcsServer::InitClusterResourceScheduler() {
       [](auto) { return true; },
       /*is_local_node_with_raylet=*/false,
       /*is_node_in_virtual_cluster_fn=*/
-      [](scheduling::NodeID node_id, const std::string &virtual_cluster_id) {
-        return true;
+      [this](scheduling::NodeID node_id, const std::string &virtual_cluster_id) {
+        // Check if the virtual cluster manager exists.
+        if (gcs_virtual_cluster_manager_ == nullptr) {
+          return true;
+        }
+        auto node_instance_id = NodeID::FromBinary(node_id.Binary()).Hex();
+        // Check if the node is contained within the specified virtual cluster.
+        auto ret = gcs_virtual_cluster_manager_->IsVirtualClusterContainsNode(
+            node_instance_id, virtual_cluster_id);
+        return ret;
       });
 }
 

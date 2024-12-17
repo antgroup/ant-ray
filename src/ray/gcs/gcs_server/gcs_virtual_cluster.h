@@ -151,6 +151,8 @@ class VirtualCluster {
   bool MarkNodeInstanceAsDead(const std::string &template_id,
                               const std::string &node_instance_id);
 
+  bool ContainsNodeInstance(const std::string &node_instance_id);
+
   /// Convert the virtual cluster to proto data which usually is used for flushing
   /// to redis or publishing to raylet.
   /// \return A shared pointer to the proto data.

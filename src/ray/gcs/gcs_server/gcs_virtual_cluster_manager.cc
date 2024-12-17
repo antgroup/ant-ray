@@ -31,6 +31,32 @@ void GcsVirtualClusterManager::OnNodeDead(const rpc::GcsNodeInfo &node) {
   primary_cluster_->OnNodeDead(node);
 }
 
+bool GcsVirtualClusterManager::IsVirtualClusterContainsNode(
+    const std::string &node_instance_id, const std::string &virtual_cluster_id) {
+  // Check for cases where no specific virtual cluster ID is provided or the primary
+  // cluster ID is used.
+  if ((virtual_cluster_id == "") || (virtual_cluster_id == kPrimaryClusterID)) {
+    return primary_cluster_->ContainsNodeInstance(node_instance_id);
+  }
+  // Check if the node is in the job cluster of the specified virtual cluster ID.
+  auto job_cluster = primary_cluster_->GetJobCluster(virtual_cluster_id);
+  if (job_cluster != nullptr) {
+    return job_cluster->ContainsNodeInstance(node_instance_id);
+  }
+  // Check for the node in logical clusters with mixed allocation mode.
+  auto logical_cluster = primary_cluster_->GetLogicalCluster(virtual_cluster_id);
+  if (logical_cluster->GetMode() == rpc::AllocationMode::Mixed) {
+    return logical_cluster->ContainsNodeInstance(node_instance_id);
+  } else {
+    // Check if the node is in a job cluster within the logical cluster.
+    auto job_cluster = logical_cluster->GetJobCluster(virtual_cluster_id);
+    if (job_cluster != nullptr) {
+      return job_cluster->ContainsNodeInstance(node_instance_id);
+    }
+  }
+  return false;
+}
+
 void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(
     rpc::CreateOrUpdateVirtualClusterRequest request,
     rpc::CreateOrUpdateVirtualClusterReply *reply,

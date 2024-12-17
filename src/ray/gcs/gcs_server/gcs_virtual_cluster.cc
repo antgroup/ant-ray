@@ -160,6 +160,21 @@ bool VirtualCluster::MarkNodeInstanceAsDead(const std::string &template_id,
   return false;
 }
 
+bool VirtualCluster::ContainsNodeInstance(const std::string &node_instance_id) {
+  // TODO(sule): Use the index from node instance id to cluster id to optimize this code.
+  // Iterate through visible node instances to find a matching node instance ID.
+  for (auto &[template_id, job_node_instances] : visible_node_instances_) {
+    auto iter = job_node_instances.find(kEmptyJobClusterId);
+    if (iter != job_node_instances.end()) {
+      auto &node_instances = iter->second;
+      if (node_instances.find(node_instance_id) != node_instances.end()) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 std::shared_ptr<rpc::VirtualClusterTableData> VirtualCluster::ToProto() const {
   auto data = std::make_shared<rpc::VirtualClusterTableData>();
   data->set_id(GetID());
@@ -379,7 +394,7 @@ bool PrimaryCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
 }
 
 void PrimaryCluster::OnNodeAdd(const rpc::GcsNodeInfo &node) {
-  const auto &template_id = node.template_id();
+  const auto &template_id = node.node_type_name();
   auto node_instance_id = NodeID::FromBinary(node.node_id()).Hex();
   auto node_instance = std::make_shared<gcs::NodeInstance>();
   node_instance->set_template_id(template_id);
@@ -392,7 +407,7 @@ void PrimaryCluster::OnNodeAdd(const rpc::GcsNodeInfo &node) {
 }
 
 void PrimaryCluster::OnNodeDead(const rpc::GcsNodeInfo &node) {
-  const auto &template_id = node.template_id();
+  const auto &template_id = node.node_type_name();
   auto node_instance_id = NodeID::FromBinary(node.node_id()).Hex();
 
   // TODO(Shanly): Build an index from node instance id to cluster id.

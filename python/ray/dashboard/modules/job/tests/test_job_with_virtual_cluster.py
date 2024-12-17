@@ -85,6 +85,12 @@ def _ray_start_virtual_cluster(**kwargs):
 
 
 @pytest_asyncio.fixture
+def is_virtual_cluster_empty(request):
+    param = getattr(request, "param", True)
+    yield param
+
+
+@pytest_asyncio.fixture
 async def job_sdk_client(request, make_sure_dashboard_http_port_unused):
     param = getattr(request, "param", {})
     with _ray_start_virtual_cluster(do_init=True, num_nodes=10, **param) as res:
@@ -193,6 +199,86 @@ ray.get(a.run.remote())
                 if actor_info["Name"] == actor_name:
                     node_id = actor_info["Address"]["NodeID"]
                     assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+
+
+@pytest.mark.parametrize(
+    "job_sdk_client,is_virtual_cluster_empty",
+    [
+        ({"_system_config": {"gcs_actor_scheduling_enabled": True}}, True),
+        ({"_system_config": {"gcs_actor_scheduling_enabled": True}}, False),
+    ],
+    indirect=True,
+)
+@pytest.mark.asyncio
+async def test_primary_virtual_cluster(
+    request, job_sdk_client, is_virtual_cluster_empty
+):
+    agent_client, head_client, gcs_address = job_sdk_client
+    virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
+    non_primary_nodes = set()
+    for i in range(NTEMPLATE - 1):
+        virtual_cluster_id = virtual_cluster_id_prefix + str(i)
+        nodes = await create_virtual_cluster(
+            gcs_address, virtual_cluster_id, {TEMPLATE_ID_PREFIX + str(i): 2}
+        )
+        assert len(nodes) != 0
+        for node_id in nodes:
+            non_primary_nodes.add(node_id)
+
+    actor_name = "test_actor_primary"
+    virtual_cluster_id = "kPrimaryClusterID"
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        path = Path(tmp_dir)
+        driver_script = f"""
+import ray
+ray.init(address='auto')
+
+@ray.remote
+class Actor:
+    def __init__(self):
+        pass
+
+    def run(self):
+        pass
+
+a = Actor.options(name="{actor_name}", num_cpus=1).remote()
+ray.get(a.run.remote())
+            """
+        test_script_file = path / "test_script.py"
+        with open(test_script_file, "w+") as file:
+            file.write(driver_script)
+
+        runtime_env = {"working_dir": tmp_dir}
+        runtime_env = upload_working_dir_if_needed(runtime_env, tmp_dir, logger=logger)
+        runtime_env = RuntimeEnv(**runtime_env).to_dict()
+        if is_virtual_cluster_empty:
+            virtual_cluster_id = ""
+
+        request = validate_request_type(
+            {
+                "runtime_env": runtime_env,
+                "entrypoint": "python test_script.py",
+                "virtual_cluster_id": virtual_cluster_id,
+            },
+            JobSubmitRequest,
+        )
+        submit_result = await agent_client.submit_job_internal(request)
+        job_id = submit_result.submission_id
+
+        wait_for_condition(
+            partial(
+                _check_job,
+                client=head_client,
+                job_id=job_id,
+                status=JobStatus.SUCCEEDED,
+            ),
+            timeout=100,
+        )
+        actors = ray.state.actors()
+        for _, actor_info in actors.items():
+            if actor_info["Name"] == actor_name:
+                node_id = actor_info["Address"]["NodeID"]
+                assert node_id not in non_primary_nodes
 
 
 if __name__ == "__main__":

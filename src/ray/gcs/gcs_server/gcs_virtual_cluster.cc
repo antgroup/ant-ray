@@ -162,7 +162,7 @@ bool VirtualCluster::MarkNodeInstanceAsDead(const std::string &template_id,
 
 std::shared_ptr<rpc::VirtualClusterTableData> VirtualCluster::ToProto() const {
   auto data = std::make_shared<rpc::VirtualClusterTableData>();
-  data->set_id(GetID());
+  data->set_virtual_cluster_id(GetID());
   data->set_name(GetName());
   data->set_mode(GetMode());
   data->set_revision(GetRevision());
@@ -197,7 +197,7 @@ Status JobClusterManager::CreateJobCluster(
     const std::string &job_name,
     ReplicaSets replica_sets,
     CreateOrUpdateVirtualClusterCallback callback) {
-  if (GetMode() != rpc::AllocationMode::Exclusive) {
+  if (GetMode() != rpc::AllocationMode::EXCLUSIVE) {
     std::ostringstream ostr;
     ostr << "The job cluster can only be created in exclusive mode, virtual_cluster_id: "
          << GetID() << ", job_name: " << job_name;
@@ -248,7 +248,7 @@ Status JobClusterManager::CreateJobCluster(
 
 Status JobClusterManager::RemoveJobCluster(const std::string &job_name,
                                            RemoveVirtualClusterCallback callback) {
-  if (GetMode() != rpc::AllocationMode::Exclusive) {
+  if (GetMode() != rpc::AllocationMode::EXCLUSIVE) {
     std::ostringstream ostr;
     ostr << "The job cluster can only be removed in exclusive mode, virtual_cluster_id: "
          << GetID() << ", job_name: " << job_name;
@@ -374,7 +374,7 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
 
 bool PrimaryCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
                                         const gcs::NodeInstance &node_instance) const {
-  RAY_CHECK(GetMode() == rpc::AllocationMode::Exclusive);
+  RAY_CHECK(GetMode() == rpc::AllocationMode::EXCLUSIVE);
   return job_cluster_id == kEmptyJobClusterId;
 }
 
@@ -410,7 +410,7 @@ void PrimaryCluster::OnNodeDead(const rpc::GcsNodeInfo &node) {
 ///////////////////////// LogicalCluster /////////////////////////
 bool LogicalCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
                                         const gcs::NodeInstance &node_instance) const {
-  if (GetMode() == rpc::AllocationMode::Exclusive) {
+  if (GetMode() == rpc::AllocationMode::EXCLUSIVE) {
     return job_cluster_id == kEmptyJobClusterId;
   }
 
@@ -423,7 +423,7 @@ bool LogicalCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
 ///////////////////////// JobCluster /////////////////////////
 bool JobCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
                                     const gcs::NodeInstance &node_instance) const {
-  RAY_CHECK(GetMode() == rpc::AllocationMode::Mixed);
+  RAY_CHECK(GetMode() == rpc::AllocationMode::MIXED);
   // TODO(Shanly): The job_cluster_id will always be empty in mixed mode although the node
   // instance is assigned to one or two jobs, so we need to check the node resources
   // usage.

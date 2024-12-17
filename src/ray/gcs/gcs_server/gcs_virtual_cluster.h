@@ -227,7 +227,7 @@ class PrimaryCluster : public JobClusterManager {
       : JobClusterManager(async_data_flusher) {}
 
   const std::string &GetID() const override { return kPrimaryClusterID; }
-  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Exclusive; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::EXCLUSIVE; }
   const std::string &GetName() const override { return kPrimaryClusterID; }
 
   /// Create or update a new virtual cluster.
@@ -309,7 +309,7 @@ class JobCluster : public VirtualCluster {
   JobCluster(const std::string &id, const std::string &name) : id_(id), name_(name) {}
 
   const std::string &GetID() const override { return id_; }
-  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Mixed; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::MIXED; }
   const std::string &GetName() const override { return id_; }
 
   bool IsIdleNodeInstance(const std::string &job_cluster_id,

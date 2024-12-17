@@ -47,7 +47,8 @@ void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(
                                               data->node_instances().end());
       // Fill the revision of the virtual cluster to the reply.
       reply->set_revision(data->revision());
-      RAY_LOG(INFO) << "Succeed in creating or updating virtual cluster " << data->id();
+      RAY_LOG(INFO) << "Succeed in creating or updating virtual cluster "
+                    << data->virtual_cluster_id();
     } else {
       RAY_CHECK(data == nullptr);
       RAY_LOG(WARNING) << "Failed to create or update virtual cluster "
@@ -161,7 +162,7 @@ Status GcsVirtualClusterManager::FlushAndPublish(
     // The backend storage is supposed to be reliable, so the status must be ok.
     RAY_CHECK_OK(status);
     RAY_CHECK_OK(gcs_publisher_.PublishVirtualCluster(
-        VirtualClusterID::FromBinary(data->id()), *data, nullptr));
+        VirtualClusterID::FromBinary(data->virtual_cluster_id()), *data, nullptr));
     if (callback) {
       callback(status, std::move(data));
     }
@@ -169,12 +170,12 @@ Status GcsVirtualClusterManager::FlushAndPublish(
 
   if (data->is_removed()) {
     return gcs_table_storage_.VirtualClusterTable().Delete(
-        VirtualClusterID::FromBinary(data->id()), on_done);
+        VirtualClusterID::FromBinary(data->virtual_cluster_id()), on_done);
   }
 
   // Write the virtual cluster data to the storage.
   return gcs_table_storage_.VirtualClusterTable().Put(
-      VirtualClusterID::FromBinary(data->id()), *data, on_done);
+      VirtualClusterID::FromBinary(data->virtual_cluster_id()), *data, on_done);
 }
 }  // namespace gcs
 }  // namespace ray

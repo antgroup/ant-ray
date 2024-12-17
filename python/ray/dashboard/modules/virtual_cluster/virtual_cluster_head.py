@@ -5,12 +5,11 @@ import aiohttp.web
 import ray.dashboard.optional_utils as dashboard_optional_utils
 import ray.dashboard.utils as dashboard_utils
 from ray.core.generated import gcs_service_pb2_grpc
-from ray.core.generated.gcs_pb2 import JobExecMode
+from ray.core.generated.gcs_pb2 import AllocationMode
 from ray.core.generated.gcs_service_pb2 import (
     CreateOrUpdateVirtualClusterRequest,
     GetAllVirtualClustersRequest,
     RemoveVirtualClusterRequest,
-    ReplicaSet,
 )
 
 logger = logging.getLogger(__name__)
@@ -42,6 +41,9 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
                 virtual_cluster_data["revision"] = int(
                     virtual_cluster_data.get("revision", 0)
                 )
+                virtual_cluster_data["allocationMode"] = str(
+                    virtual_cluster_data.pop("mode", "mixed")
+                ).lower()
 
             return dashboard_optional_utils.rest_response(
                 success=True,
@@ -64,22 +66,17 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
 
         virtual_cluster_info = dict(virtual_cluster_info_json)
         virtual_cluster_id = virtual_cluster_info["virtualClusterId"]
-        job_exec_mode = JobExecMode.MIXED
-        if str(virtual_cluster_info.get("jobExecMode", "mixed")).lower() == "exclusive":
-            job_exec_mode = JobExecMode.EXCLUSIVE
-
-        replica_set_list = []
-        for data in virtual_cluster_info["replicaSetList"]:
-            replica_set = ReplicaSet(
-                template_id=data["templateId"], replicas=data["replicas"]
-            )
-            replica_set_list.append(replica_set)
+        allocation_mode = AllocationMode.MIXED
+        if (
+            str(virtual_cluster_info.get("allocationMode", "mixed")).lower()
+            == "exclusive"
+        ):
+            allocation_mode = AllocationMode.EXCLUSIVE
 
         request = CreateOrUpdateVirtualClusterRequest(
             virtual_cluster_id=virtual_cluster_id,
-            virtual_cluster_name=virtual_cluster_info.get("virtualClusterName", ""),
-            mode=job_exec_mode,
-            replica_set_list=replica_set_list,
+            mode=allocation_mode,
+            replica_sets=virtual_cluster_info.get("replicaSets", {}),
             revision=int(virtual_cluster_info.get("revision", 0)),
         )
         reply = await (

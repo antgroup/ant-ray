@@ -162,7 +162,7 @@ bool VirtualCluster::MarkNodeInstanceAsDead(const std::string &template_id,
 
 std::shared_ptr<rpc::VirtualClusterTableData> VirtualCluster::ToProto() const {
   auto data = std::make_shared<rpc::VirtualClusterTableData>();
-  data->set_virtual_cluster_id(GetID());
+  data->set_id(GetID());
   data->set_mode(GetMode());
   data->set_revision(GetRevision());
   data->mutable_replica_sets()->insert(replica_sets_.begin(), replica_sets_.end());

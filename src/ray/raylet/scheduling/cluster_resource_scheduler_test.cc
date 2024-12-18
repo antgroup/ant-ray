@@ -1706,8 +1706,8 @@ TEST_F(ClusterResourceSchedulerTest, VirtualClusterScheduleTest) {
   for (int i = 0; i < num_nodes; i++) {
     ResourceRequest resource_request = CreateResourceRequest({{ResourceID::CPU(), 0}});
     std::string virtual_cluster_id = std::to_string(i);
-    resource_request.set_is_virtual_cluster_feasible_callback(std::bind(
-        is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id));
+    resource_request.mutable_virtual_cluster_feasible_callback() = std::bind(
+        is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id);
     resource_requests.emplace_back(resource_request);
   }
   for (auto &[node_id, node] : nodes) {

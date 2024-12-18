@@ -477,5 +477,30 @@ Status PrimaryCluster::RemoveLogicalCluster(const std::string &logical_cluster_i
   return async_data_flusher_(std::move(data), std::move(callback));
 }
 
+std::shared_ptr<VirtualCluster> PrimaryCluster::GetVirtualCluster(
+    const std::string &virtual_cluster_id) {
+  // Check if it is a logical cluster
+  auto logical_cluster = GetLogicalCluster(virtual_cluster_id);
+  if (logical_cluster != nullptr) {
+    return logical_cluster;
+  }
+  // Check if it is a job cluster
+  auto job_cluster = GetJobCluster(virtual_cluster_id);
+  if (job_cluster != nullptr) {
+    return job_cluster;
+  }
+  // Check if it is a job cluster of any logical cluster
+  for (auto &[cluster_id, logical_cluster] : logical_clusters_) {
+    if (logical_cluster->GetMode() == rpc::AllocationMode::Exclusive) {
+      ExclusiveCluster *exclusive_cluster =
+          dynamic_cast<ExclusiveCluster *>(logical_cluster.get());
+      auto job_cluster = exclusive_cluster->GetJobCluster(virtual_cluster_id);
+      if (job_cluster != nullptr) {
+        return job_cluster;
+      }
+    }
+  }
+  return nullptr;
+}
 }  // namespace gcs
 }  // namespace ray

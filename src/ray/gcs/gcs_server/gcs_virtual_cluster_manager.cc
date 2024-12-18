@@ -33,27 +33,14 @@ void GcsVirtualClusterManager::OnNodeDead(const rpc::GcsNodeInfo &node) {
 
 std::shared_ptr<VirtualCluster> GcsVirtualClusterManager::GetVirtualCluster(
     const std::string &virtual_cluster_id) {
-  // Check if it is a logical cluster
-  auto logical_cluster = primary_cluster_->GetLogicalCluster(virtual_cluster_id);
-  if (logical_cluster != nullptr) {
-    return logical_cluster;
+  if (virtual_cluster_id.empty()) {
+    return nullptr;
   }
-  // Check if it is a job cluster
-  auto job_cluster = primary_cluster_->GetJobCluster(virtual_cluster_id);
-  if (job_cluster != nullptr) {
-    return job_cluster;
+  // check if it is the primary cluster
+  if (virtual_cluster_id == kPrimaryClusterID) {
+    return primary_cluster_;
   }
-  // Check if it is a job cluster of any logical cluster
-  auto logical_clusters = primary_cluster_->GetAllLogicalClusters();
-  for (auto &[cluster_id, logical_cluster] : logical_clusters) {
-    ExclusiveCluster *exclusive_cluster =
-        dynamic_cast<ExclusiveCluster *>(logical_cluster.get());
-    auto job_cluster = exclusive_cluster->GetJobCluster(virtual_cluster_id);
-    if (job_cluster != nullptr) {
-      return job_cluster;
-    }
-  }
-  return nullptr;
+  return primary_cluster_->GetVirtualCluster(virtual_cluster_id);
 }
 
 void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(

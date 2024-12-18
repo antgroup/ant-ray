@@ -24,7 +24,7 @@ from ray.core.generated.gcs_service_pb2 import CreateOrUpdateVirtualClusterReque
 from ray.dashboard.modules.job.common import JobSubmitRequest, validate_request_type
 from ray.dashboard.modules.job.job_head import JobAgentSubmissionClient
 from ray.dashboard.tests.conftest import *  # noqa
-from ray.job_submission import JobStatus, JobSubmissionClient
+from ray.job_submission import JobSubmissionClient
 from ray.runtime_env.runtime_env import RuntimeEnv
 from ray.tests.conftest import get_default_fixture_ray_kwargs
 
@@ -32,14 +32,6 @@ TEMPLATE_ID_PREFIX = "template_id_"
 NTEMPLATE = 5
 
 logger = logging.getLogger(__name__)
-
-
-def _check_job(
-    client: JobSubmissionClient, job_id: str, status: JobStatus, timeout: int = 10
-) -> bool:
-    res_status = client.get_job_status(job_id)
-    assert res_status == status
-    return True
 
 
 @contextmanager
@@ -66,12 +58,15 @@ def _ray_start_virtual_cluster(**kwargs):
     for i in range(num_nodes):
         if i > 0 and "_system_config" in init_kwargs:
             del init_kwargs["_system_config"]
+        env_vars = {}
+        if i > 0:
+            env_vars = {
+                "RAY_NODE_TYPE_NAME": TEMPLATE_ID_PREFIX + str((i - 1) % NTEMPLATE)
+            }
         remote_nodes.append(
             cluster.add_node(
                 **init_kwargs,
-                env_vars={
-                    "RAY_NODE_TYPE_NAME": TEMPLATE_ID_PREFIX + str(i % NTEMPLATE)
-                },
+                env_vars=env_vars,
             )
         )
         # We assume driver will connect to the head (first node),
@@ -91,10 +86,10 @@ def is_virtual_cluster_empty(request):
 
 
 @pytest_asyncio.fixture
-async def job_sdk_client(request, make_sure_dashboard_http_port_unused):
+async def job_sdk_client(request, make_sure_dashboard_http_port_unused, external_redis):
     param = getattr(request, "param", {})
     with _ray_start_virtual_cluster(
-        do_init=True, num_cpus=3, num_nodes=10, **param
+        do_init=True, num_cpus=10, num_nodes=16, **param
     ) as res:
         ip, _ = res.webui_url.split(":")
         agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
@@ -105,6 +100,7 @@ async def job_sdk_client(request, make_sure_dashboard_http_port_unused):
             JobAgentSubmissionClient(format_web_url(agent_address)),
             JobSubmissionClient(format_web_url(head_address)),
             res.gcs_address,
+            res,
         )
 
 
@@ -133,16 +129,16 @@ async def create_virtual_cluster(
 )
 @pytest.mark.asyncio
 async def test_mixed_virtual_cluster(job_sdk_client):
-    agent_client, head_client, gcs_address = job_sdk_client
+    agent_client, head_client, gcs_address, cluster = job_sdk_client
     virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
     node_to_virtual_cluster = {}
     for i in range(NTEMPLATE):
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
         nodes = await create_virtual_cluster(
-            gcs_address, virtual_cluster_id, {TEMPLATE_ID_PREFIX + str(i): 2}
+            gcs_address, virtual_cluster_id, {TEMPLATE_ID_PREFIX + str(i): 3}
         )
-        assert len(nodes) != 0
         for node_id in nodes:
+            assert node_id not in node_to_virtual_cluster
             node_to_virtual_cluster[node_id] = virtual_cluster_id
 
     for i in range(NTEMPLATE):
@@ -153,19 +149,23 @@ async def test_mixed_virtual_cluster(job_sdk_client):
             path = Path(tmp_dir)
             driver_script = """
 import ray
+import time
 ray.init(address='auto')
 
-@ray.remote
+@ray.remote(max_restarts=10)
 class Actor:
     def __init__(self):
         pass
 
     def run(self):
-        pass
+        while True:
+            time.sleep(1)
 
-pg = ray.util.placement_group(bundles=[{"CPU": 1}], name="__pg_name__")
+pg = ray.util.placement_group(bundles=[{"CPU": 1}],
+        name="__pg_name__", lifetime="detached")
 
-a = Actor.options(name="__actor_name__", num_cpus=1).remote()
+a = Actor.options(name="__actor_name__", num_cpus=1, lifetime="detached").remote()
+print("actor __actor_name__ created", flush=True)
 ray.get(a.run.remote())
             """
             driver_script = driver_script.replace("__actor_name__", actor_name).replace(
@@ -192,30 +192,116 @@ ray.get(a.run.remote())
             submit_result = await agent_client.submit_job_internal(request)
             job_id = submit_result.submission_id
 
+            def _check_job_logs(job_id, actor_name):
+                logs = head_client.get_job_logs(job_id)
+                assert f"actor {actor_name} created" in logs
+                return True
+
+            wait_for_condition(
+                partial(_check_job_logs, job_id, actor_name),
+                timeout=100,
+            )
+
+            def _check_actor_alive(
+                actor_name, node_to_virtual_cluster, virtual_cluster_id
+            ):
+                actors = ray.state.actors()
+                for _, actor_info in actors.items():
+                    if actor_info["Name"] == actor_name:
+                        assert actor_info["State"] == "ALIVE"
+                        assert actor_info["NumRestarts"] == 0
+                        node_id = actor_info["Address"]["NodeID"]
+                        assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+                        return True
+                return False
+
             wait_for_condition(
                 partial(
-                    _check_job,
-                    client=head_client,
-                    job_id=job_id,
-                    status=JobStatus.SUCCEEDED,
+                    _check_actor_alive,
+                    actor_name,
+                    node_to_virtual_cluster,
+                    virtual_cluster_id,
                 ),
                 timeout=100,
             )
+
+            nodes_to_remove = set()
+
             actors = ray.state.actors()
             nassert = 0
             for _, actor_info in actors.items():
                 if actor_info["Name"] == actor_name:
                     node_id = actor_info["Address"]["NodeID"]
+                    nodes_to_remove.add(node_id)
                     nassert += 1
                     assert node_to_virtual_cluster[node_id] == virtual_cluster_id
             assert nassert > 0
+
             nassert = 0
             for _, placement_group_data in ray.util.placement_group_table().items():
                 if placement_group_data["name"] == pg_name:
                     node_id = placement_group_data["bundles_to_node_id"][0]
+                    nodes_to_remove.add(node_id)
                     nassert += 1
                     assert node_to_virtual_cluster[node_id] == virtual_cluster_id
             assert nassert > 0
+
+            to_remove = []
+            for node in cluster.worker_nodes:
+                if node.node_id in nodes_to_remove:
+                    to_remove.append(node)
+            for node in to_remove:
+                cluster.remove_node(node)
+
+            def _check_actor_recover(
+                nodes_to_remove, actor_name, node_to_virtual_cluster, virtual_cluster_id
+            ):
+                actors = ray.state.actors()
+                for _, actor_info in actors.items():
+                    if actor_info["Name"] == actor_name:
+                        print(actor_info, "h", nodes_to_remove)
+                        node_id = actor_info["Address"]["NodeID"]
+                        assert actor_info["NumRestarts"] > 0
+                        print("-=-----------", node_id in node_to_virtual_cluster)
+                        print(node_to_virtual_cluster[node_id], virtual_cluster_id)
+                        print("------------")
+                        assert node_id not in nodes_to_remove
+                        assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+                        return True
+                return False
+
+            wait_for_condition(
+                partial(
+                    _check_actor_recover,
+                    nodes_to_remove,
+                    actor_name,
+                    node_to_virtual_cluster,
+                    virtual_cluster_id,
+                ),
+                timeout=100,
+            )
+
+            def _check_pg_rescheduled(
+                nodes_to_remove, pg_name, node_to_virtual_cluster, virtual_cluster_id
+            ):
+                for _, placement_group_data in ray.util.placement_group_table().items():
+                    if placement_group_data["name"] == pg_name:
+                        node_id = placement_group_data["bundles_to_node_id"][0]
+                        assert node_id not in nodes_to_remove
+                        assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+                        return True
+                return False
+
+            wait_for_condition(
+                partial(
+                    _check_pg_rescheduled,
+                    nodes_to_remove,
+                    pg_name,
+                    node_to_virtual_cluster,
+                    virtual_cluster_id,
+                ),
+                timeout=100,
+            )
 
 
 if __name__ == "__main__":

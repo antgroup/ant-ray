@@ -31,7 +31,7 @@ class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
       : gcs_table_storage_(gcs_table_storage),
         gcs_publisher_(gcs_publisher),
         primary_cluster_(
-            std::make_unique<PrimaryCluster>([this](auto data, auto callback) {
+            std::make_shared<PrimaryCluster>([this](auto data, auto callback) {
               return FlushAndPublish(std::move(data), std::move(callback));
             })) {}
 
@@ -86,7 +86,7 @@ class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
   GcsPublisher &gcs_publisher_;
 
   /// The global cluster.
-  std::unique_ptr<PrimaryCluster> primary_cluster_;
+  std::shared_ptr<PrimaryCluster> primary_cluster_;
 };
 
 }  // namespace gcs

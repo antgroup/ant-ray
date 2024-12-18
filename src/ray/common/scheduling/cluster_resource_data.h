@@ -114,9 +114,9 @@ class ResourceRequest {
 
   /// This function is used to determine if a node is feasible
   /// within a given virtual cluster.
-  void set_is_virtual_cluster_feasible_callback(
-      std::function<bool(scheduling::NodeID)> fn) const {
-    is_virtual_cluster_feasible_fn_ = fn;
+  std::function<bool(scheduling::NodeID)> &mutable_virtual_cluster_feasible_callback()
+      const {
+    return is_virtual_cluster_feasible_fn_;
   }
 
   bool is_virtual_cluster_feasible(const scheduling::NodeID &node_id) const {

@@ -31,7 +31,7 @@ void GcsVirtualClusterManager::OnNodeDead(const rpc::GcsNodeInfo &node) {
   primary_cluster_->OnNodeDead(node);
 }
 
-bool GcsVirtualClusterManager::IsVirtualClusterContainsNode(
+bool GcsVirtualClusterManager::ContainsNodeInstance(
     const std::string &node_instance_id, const std::string &virtual_cluster_id) {
   // Check for cases where no specific virtual cluster ID is provided
   if (virtual_cluster_id == "") {
@@ -52,7 +52,10 @@ bool GcsVirtualClusterManager::IsVirtualClusterContainsNode(
     return logical_cluster->ContainsNodeInstance(node_instance_id);
   } else {
     // Check if the node is in a job cluster within the logical cluster.
-    auto job_cluster = logical_cluster->GetJobCluster(virtual_cluster_id);
+    ExclusiveCluster *exclusive_cluster =
+        dynamic_cast<ExclusiveCluster *>(logical_cluster.get());
+
+    auto job_cluster = exclusive_cluster->GetJobCluster(virtual_cluster_id);
     if (job_cluster != nullptr) {
       return job_cluster->ContainsNodeInstance(node_instance_id);
     }

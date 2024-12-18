@@ -118,7 +118,6 @@ async def create_virtual_cluster(
     )
     request = CreateOrUpdateVirtualClusterRequest(
         virtual_cluster_id=virtual_cluster_id,
-        virtual_cluster_name=virtual_cluster_id,
         mode=allocation_mode,
         replica_sets=replica_sets,
     )

@@ -385,8 +385,8 @@ void GcsServer::InitClusterResourceScheduler() {
         }
         auto node_instance_id = NodeID::FromBinary(node_id.Binary()).Hex();
         // Check if the node is contained within the specified virtual cluster.
-        auto ret = gcs_virtual_cluster_manager_->IsVirtualClusterContainsNode(
-            node_instance_id, virtual_cluster_id);
+        auto ret = gcs_virtual_cluster_manager_->ContainsNodeInstance(node_instance_id,
+                                                                      virtual_cluster_id);
         RAY_LOG(INFO) << "scheduling check vid " << virtual_cluster_id << " with nid "
                       << node_instance_id << " ret " << ret;
         return ret;

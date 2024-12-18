@@ -51,8 +51,12 @@ class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
   /// \param node The node that is dead.
   void OnNodeDead(const rpc::GcsNodeInfo &node);
 
-  bool ContainsNodeInstance(const std::string &node_instance_id,
-                            const std::string &virtual_cluster_id);
+  /// Get virtual cluster by virtual cluster id
+  ///
+  /// \param virtual_cluster_id The id of virtual cluster
+  /// \return the virtual cluster
+  std::shared_ptr<VirtualCluster> GetVirtualCluster(
+      const std::string &virtual_cluster_id);
 
  protected:
   void HandleCreateOrUpdateVirtualCluster(

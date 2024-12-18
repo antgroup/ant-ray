@@ -68,6 +68,7 @@ void GcsPlacementGroupScheduler::ScheduleUnplacedBundles(
                               strategy,
                               placement_group->GetMaxCpuFractionPerNode(),
                               placement_group->GetSoftTargetNodeID());
+  scheduling_options.virtual_cluster_id = placement_group->GetVirtualClusterId();
   auto scheduling_result =
       cluster_resource_scheduler_.Schedule(resource_request_list, scheduling_options);
 
@@ -812,12 +813,6 @@ void GcsPlacementGroupScheduler::HandleWaitingRemovedBundles() {
   for (const auto &listener : resources_changed_listeners_) {
     listener();
   }
-}
-
-void GcsPlacementGroupScheduler::PrepareResourceRequest(
-    ResourceRequest &resource_request, const std::string &virtual_cluster_id) {
-  return cluster_resource_scheduler_.PrepareResourceRequest(resource_request,
-                                                            virtual_cluster_id);
 }
 
 LeaseStatusTracker::LeaseStatusTracker(

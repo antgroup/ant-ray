@@ -384,12 +384,11 @@ void GcsServer::InitClusterResourceScheduler() {
           return true;
         }
         auto node_instance_id = NodeID::FromBinary(node_id.Binary()).Hex();
+        auto virtual_cluster =
+            gcs_virtual_cluster_manager_->GetVirtualCluster(virtual_cluster_id);
+        RAY_CHECK(virtual_cluster->GetMode() == rpc::AllocationMode::Mixed);
         // Check if the node is contained within the specified virtual cluster.
-        auto ret = gcs_virtual_cluster_manager_->ContainsNodeInstance(node_instance_id,
-                                                                      virtual_cluster_id);
-        RAY_LOG(INFO) << "scheduling check vid " << virtual_cluster_id << " with nid "
-                      << node_instance_id << " ret " << ret;
-        return ret;
+        return virtual_cluster->ContainsNodeInstance(node_instance_id);
       });
 }
 

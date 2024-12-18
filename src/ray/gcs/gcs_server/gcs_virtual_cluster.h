@@ -292,6 +292,14 @@ class PrimaryCluster : public ExclusiveCluster {
   std::shared_ptr<VirtualCluster> GetLogicalCluster(
       const std::string &logical_cluster_id) const;
 
+  /// Get all logical clusters
+  ///
+  /// \return all logical clusters
+  absl::flat_hash_map<std::string, std::shared_ptr<VirtualCluster>>
+  GetAllLogicalClusters() const {
+    return logical_clusters_;
+  }
+
   /// Remove logical cluster by the logical cluster id.
   ///
   /// \param logical_cluster_id The id of the logical cluster to be removed.

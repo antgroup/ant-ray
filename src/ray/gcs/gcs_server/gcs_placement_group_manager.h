@@ -107,9 +107,6 @@ class GcsPlacementGroup {
   /// Get the mutable bundle of this placement group.
   rpc::Bundle *GetMutableBundle(int bundle_index);
 
-  /// Sets the callback function for preparing bundle resources during scheduling.
-  void SetBundleSchedulingPreparationFn(std::function<void(ResourceRequest &)> fn);
-
   /// Update the state of this placement_group.
   void UpdateState(rpc::PlacementGroupTableData::PlacementGroupState state);
 
@@ -224,8 +221,6 @@ class GcsPlacementGroup {
 
   /// The last recorded metric state.
   std::optional<rpc::PlacementGroupTableData::PlacementGroupState> last_metric_state_;
-
-  std::function<void(ResourceRequest &)> bundle_scheduling_preparation_fn_;
 };
 
 /// GcsPlacementGroupManager is responsible for managing the lifecycle of all placement

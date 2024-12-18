@@ -31,36 +31,29 @@ void GcsVirtualClusterManager::OnNodeDead(const rpc::GcsNodeInfo &node) {
   primary_cluster_->OnNodeDead(node);
 }
 
-bool GcsVirtualClusterManager::ContainsNodeInstance(
-    const std::string &node_instance_id, const std::string &virtual_cluster_id) {
-  // Check for cases where no specific virtual cluster ID is provided
-  if (virtual_cluster_id == "") {
-    return true;
+std::shared_ptr<VirtualCluster> GcsVirtualClusterManager::GetVirtualCluster(
+    const std::string &virtual_cluster_id) {
+  // Check if it is a logical cluster
+  auto logical_cluster = primary_cluster_->GetLogicalCluster(virtual_cluster_id);
+  if (logical_cluster != nullptr) {
+    return logical_cluster;
   }
-  // Check for cases where the primary cluster ID is used.
-  if (virtual_cluster_id == kPrimaryClusterID) {
-    return primary_cluster_->ContainsNodeInstance(node_instance_id);
-  }
-  // Check if the node is in the job cluster of the specified virtual cluster ID.
+  // Check if it is a job cluster
   auto job_cluster = primary_cluster_->GetJobCluster(virtual_cluster_id);
   if (job_cluster != nullptr) {
-    return job_cluster->ContainsNodeInstance(node_instance_id);
+    return job_cluster;
   }
-  // Check for the node in logical clusters with mixed allocation mode.
-  auto logical_cluster = primary_cluster_->GetLogicalCluster(virtual_cluster_id);
-  if (logical_cluster->GetMode() == rpc::AllocationMode::Mixed) {
-    return logical_cluster->ContainsNodeInstance(node_instance_id);
-  } else {
-    // Check if the node is in a job cluster within the logical cluster.
+  // Check if it is a job cluster of any logical cluster
+  auto logical_clusters = primary_cluster_->GetAllLogicalClusters();
+  for (auto &[cluster_id, logical_cluster] : logical_clusters) {
     ExclusiveCluster *exclusive_cluster =
         dynamic_cast<ExclusiveCluster *>(logical_cluster.get());
-
     auto job_cluster = exclusive_cluster->GetJobCluster(virtual_cluster_id);
     if (job_cluster != nullptr) {
-      return job_cluster->ContainsNodeInstance(node_instance_id);
+      return job_cluster;
     }
   }
-  return false;
+  return nullptr;
 }
 
 void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(

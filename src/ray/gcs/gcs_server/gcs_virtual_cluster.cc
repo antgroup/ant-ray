@@ -164,9 +164,7 @@ bool VirtualCluster::ContainsNodeInstance(const std::string &node_instance_id) {
   // TODO(sule): Use the index from node instance id to cluster id to optimize this code.
   // Iterate through visible node instances to find a matching node instance ID.
   for (auto &[template_id, job_node_instances] : visible_node_instances_) {
-    auto iter = job_node_instances.find(kEmptyJobClusterId);
-    if (iter != job_node_instances.end()) {
-      auto &node_instances = iter->second;
+    for (auto &[job_cluster_id, node_instances] : job_node_instances) {
       if (node_instances.find(node_instance_id) != node_instances.end()) {
         return true;
       }

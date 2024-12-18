@@ -136,21 +136,6 @@ class ClusterResourceScheduler {
 
   bool IsLocalNodeWithRaylet() { return is_local_node_with_raylet_; }
 
-  /// Prepares the resource request by setting up the virtual cluster feasibility
-  /// callback.
-  ///
-  /// \param resource_request The resource request to be prepared.
-  /// \param virtual_cluster_id The Virtual Cluster ID associated with the request.
-  void PrepareResourceRequest(ResourceRequest &resource_request,
-                              const std::string &virtual_cluster_id) {
-    if (is_node_in_virtual_cluster_fn_ != nullptr) {
-      // use the virtual cluster feasibility callback if present,
-      // ensuring that virtual cluster constraints influence scheduling decisions.
-      resource_request.set_is_virtual_cluster_feasible_callback(std::bind(
-          is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id));
-    }
-  }
-
  private:
   void Init(instrumented_io_context &io_service,
             const NodeResources &local_node_resources,

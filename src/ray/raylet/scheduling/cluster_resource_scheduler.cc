@@ -238,9 +238,13 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
     bool *is_infeasible) {
   ResourceRequest resource_request =
       ResourceMapToResourceRequest(task_resources, requires_object_store_memory);
-  std::string virtual_cluster_id = scheduling_strategy.virtual_cluster_id();
-  // Prepare the resource request with the associated Virtual Cluster ID
-  PrepareResourceRequest(resource_request, virtual_cluster_id);
+  if (is_node_in_virtual_cluster_fn_ != nullptr) {
+    std::string virtual_cluster_id = scheduling_strategy.virtual_cluster_id();
+    // use the virtual cluster feasibility callback if present,
+    // ensuring that virtual cluster constraints influence scheduling decisions.
+    resource_request.set_is_virtual_cluster_feasible_callback(std::bind(
+        is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id));
+  }
   return GetBestSchedulableNode(resource_request,
                                 scheduling_strategy,
                                 actor_creation,
@@ -340,6 +344,16 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
 SchedulingResult ClusterResourceScheduler::Schedule(
     const std::vector<const ResourceRequest *> &resource_request_list,
     SchedulingOptions options) {
+  for (const ResourceRequest *resource_request : resource_request_list) {
+    if (is_node_in_virtual_cluster_fn_ != nullptr) {
+      // use the virtual cluster feasibility callback if present,
+      // ensuring that virtual cluster constraints influence scheduling decisions.
+      resource_request->set_is_virtual_cluster_feasible_callback(
+          std::bind(is_node_in_virtual_cluster_fn_,
+                    std::placeholders::_1,
+                    options.virtual_cluster_id));
+    }
+  }
   return bundle_scheduling_policy_->Schedule(resource_request_list, options);
 }
 

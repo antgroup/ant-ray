@@ -200,6 +200,8 @@ struct SchedulingOptions {
   std::string preferred_node_id;
   int32_t schedule_top_k_absolute;
   float scheduler_top_k_fraction;
+  // virtual cluster the placement group being scheduled to
+  std::string virtual_cluster_id;
 
  private:
   SchedulingOptions(

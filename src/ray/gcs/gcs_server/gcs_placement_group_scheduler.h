@@ -110,10 +110,6 @@ class GcsPlacementGroupSchedulerInterface {
           &group_to_bundles,
       const std::vector<SchedulePgRequest> &prepared_pgs) = 0;
 
-  // prepare resource request for scheduling
-  virtual void PrepareResourceRequest(ResourceRequest &resource_request,
-                                      const std::string &virtual_cluster_id) = 0;
-
   virtual ~GcsPlacementGroupSchedulerInterface() {}
 };
 
@@ -367,10 +363,6 @@ class GcsPlacementGroupScheduler : public GcsPlacementGroupSchedulerInterface {
   void AddResourcesChangedListener(std::function<void()> listener);
 
   void HandleWaitingRemovedBundles();
-
-  // prepare resource request for scheduling
-  void PrepareResourceRequest(ResourceRequest &resource_request,
-                              const std::string &virtual_cluster_id) override;
 
  protected:
   /// Send bundles PREPARE requests to a node. The PREPARE requests will lock resources

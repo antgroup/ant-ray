@@ -41,8 +41,15 @@ class BundleSpecification : public MessageWrapper<rpc::Bundle> {
   /// The input message will be **copied** into this object.
   ///
   /// \param message The protobuf message.
-  explicit BundleSpecification(rpc::Bundle message) : MessageWrapper(message) {
+  explicit BundleSpecification(
+      rpc::Bundle message,
+      std::function<void(ResourceRequest &)> scheduling_preparation_fn = nullptr)
+      : MessageWrapper(message) {
     ComputeResources();
+    if (scheduling_preparation_fn != nullptr) {
+      // Prepare resources for scheduling by invoking the provided callback
+      scheduling_preparation_fn(*unit_resource_);
+    }
   }
   /// Construct from a protobuf message shared_ptr.
   ///

@@ -814,6 +814,12 @@ void GcsPlacementGroupScheduler::HandleWaitingRemovedBundles() {
   }
 }
 
+void GcsPlacementGroupScheduler::PrepareResourceRequest(
+    ResourceRequest &resource_request, const std::string &virtual_cluster_id) {
+  return cluster_resource_scheduler_.PrepareResourceRequest(resource_request,
+                                                            virtual_cluster_id);
+}
+
 LeaseStatusTracker::LeaseStatusTracker(
     std::shared_ptr<GcsPlacementGroup> placement_group,
     const std::vector<std::shared_ptr<const BundleSpecification>> &unplaced_bundles,

@@ -16,6 +16,18 @@
 
 namespace {
 
+/// Determines if a node is feasible within the specified Virtual Cluster.
+///
+/// \param node_resources The resources of the node being evaluated.
+/// \param is_virtual_cluster_feasible A callback to check Virtual Cluster feasibility.
+/// \return true if the node is feasible within the Virtual Cluster, false otherwise.
+bool NodeFeasibleWithVirtualCluster(
+    const ray::NodeResources &node_resources,
+    std::function<bool(ray::scheduling::NodeID)> is_virtual_cluster_feasible) {
+  RAY_CHECK(is_virtual_cluster_feasible != nullptr);
+  return is_virtual_cluster_feasible(node_resources.node_id);
+}
+
 /// Return true if scheduling this bundle (with resource_request) will exceed the
 /// max cpu fraction for placement groups. This is per node.
 ///
@@ -213,7 +225,12 @@ std::pair<scheduling::NodeID, const Node *> BundleSchedulingPolicy::GetBestNode(
   // Score the nodes.
   for (const auto &[node_id, node] : candidate_nodes) {
     const auto &node_resources = node->GetLocalView();
-    if (AllocationWillExceedMaxCpuFraction(
+    std::function<bool(scheduling::NodeID)> virtual_cluster_feasible_fn =
+        std::bind(&ResourceRequest::is_virtual_cluster_feasible,
+                  required_resources,
+                  std::placeholders::_1);
+    if (!NodeFeasibleWithVirtualCluster(node_resources, virtual_cluster_feasible_fn) ||
+        AllocationWillExceedMaxCpuFraction(
             node_resources,
             required_resources,
             options.max_cpu_fraction_per_node,
@@ -285,9 +302,16 @@ SchedulingResult BundlePackSchedulingPolicy::Schedule(
     // We try to schedule more resources on one node.
     for (auto iter = required_resources_list_copy.begin();
          iter != required_resources_list_copy.end();) {
+      std::function<bool(scheduling::NodeID)> virtual_cluster_feasible_fn =
+          std::bind(&ResourceRequest::is_virtual_cluster_feasible,
+                    iter->second,
+                    std::placeholders::_1);
       if (node_resources.IsAvailable(*iter->second)  // If the node has enough resources.
-          && !AllocationWillExceedMaxCpuFraction(    // and allocating resources won't
-                                                     // exceed max cpu fraction.
+          && NodeFeasibleWithVirtualCluster(
+                 node_resources,
+                 virtual_cluster_feasible_fn)      // and is feasible with virtual cluster
+          && !AllocationWillExceedMaxCpuFraction(  // and allocating resources won't
+                                                   // exceed max cpu fraction.
                  node_resources,
                  *iter->second,
                  options.max_cpu_fraction_per_node,
@@ -409,23 +433,35 @@ SchedulingResult BundleStrictPackSchedulingPolicy::Schedule(
 
   // Aggregate required resources.
   ResourceRequest aggregated_resource_request;
+  std::function<bool(scheduling::NodeID)> virtual_cluster_feasible_fn = nullptr;
   for (const auto &resource_request : resource_request_list) {
     for (auto &resource_id : resource_request->ResourceIds()) {
       auto value = aggregated_resource_request.Get(resource_id) +
                    resource_request->Get(resource_id);
       aggregated_resource_request.Set(resource_id, value);
     }
+    if (virtual_cluster_feasible_fn == nullptr) {
+      virtual_cluster_feasible_fn =
+          std::bind(&ResourceRequest::is_virtual_cluster_feasible,
+                    resource_request,
+                    std::placeholders::_1);
+    }
   }
 
   const auto &right_node_it = std::find_if(
       candidate_nodes.begin(),
       candidate_nodes.end(),
-      [&aggregated_resource_request, &options, &available_cpus_before_bundle_scheduling](
-          const auto &entry) {
+      [&aggregated_resource_request,
+       &options,
+       &available_cpus_before_bundle_scheduling,
+       virtual_cluster_feasible_fn](const auto &entry) {
         const auto &node_resources = entry.second->GetLocalView();
         auto allocatable =
             (node_resources.IsFeasible(
-                 aggregated_resource_request)         // If the resource is available
+                 aggregated_resource_request)  // If the resource is available
+             && NodeFeasibleWithVirtualCluster(
+                    node_resources,
+                    virtual_cluster_feasible_fn)  // and is feasible with virtual cluster
              && !AllocationWillExceedMaxCpuFraction(  // and allocating resources won't
                                                       // exceed max cpu fraction.
                     node_resources,

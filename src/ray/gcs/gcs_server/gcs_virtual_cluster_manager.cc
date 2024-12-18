@@ -33,9 +33,12 @@ void GcsVirtualClusterManager::OnNodeDead(const rpc::GcsNodeInfo &node) {
 
 bool GcsVirtualClusterManager::IsVirtualClusterContainsNode(
     const std::string &node_instance_id, const std::string &virtual_cluster_id) {
-  // Check for cases where no specific virtual cluster ID is provided or the primary
-  // cluster ID is used.
-  if ((virtual_cluster_id == "") || (virtual_cluster_id == kPrimaryClusterID)) {
+  // Check for cases where no specific virtual cluster ID is provided
+  if (virtual_cluster_id == "") {
+    return true;
+  }
+  // Check for cases where the primary cluster ID is used.
+  if (virtual_cluster_id == kPrimaryClusterID) {
     return primary_cluster_->ContainsNodeInstance(node_instance_id);
   }
   // Check if the node is in the job cluster of the specified virtual cluster ID.

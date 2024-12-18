@@ -93,7 +93,8 @@ std::vector<std::shared_ptr<const BundleSpecification>> &GcsPlacementGroup::GetB
   if (cached_bundle_specs_.empty()) {
     const auto &bundles = placement_group_table_data_.bundles();
     for (const auto &bundle : bundles) {
-      cached_bundle_specs_.push_back(std::make_shared<const BundleSpecification>(bundle));
+      cached_bundle_specs_.push_back(std::make_shared<const BundleSpecification>(
+          bundle, bundle_scheduling_preparation_fn_));
     }
   }
   return cached_bundle_specs_;
@@ -120,6 +121,10 @@ rpc::PlacementStrategy GcsPlacementGroup::GetStrategy() const {
   return placement_group_table_data_.strategy();
 }
 
+std::string GcsPlacementGroup::GetVirtualClusterId() const {
+  return placement_group_table_data_.virtual_cluster_id();
+}
+
 const rpc::PlacementGroupTableData &GcsPlacementGroup::GetPlacementGroupTableData()
     const {
   return placement_group_table_data_;
@@ -136,6 +141,11 @@ rpc::Bundle *GcsPlacementGroup::GetMutableBundle(int bundle_index) {
   // Invalidate the cache.
   cached_bundle_specs_.clear();
   return placement_group_table_data_.mutable_bundles(bundle_index);
+}
+
+void GcsPlacementGroup::SetBundleSchedulingPreparationFn(
+    std::function<void(ResourceRequest &)> fn) {
+  bundle_scheduling_preparation_fn_ = fn;
 }
 
 const ActorID GcsPlacementGroup::GetCreatorActorId() const {
@@ -424,6 +434,14 @@ void GcsPlacementGroupManager::SchedulePendingPlacementGroups() {
     auto backoff = iter->second.first;
     auto placement_group = std::move(iter->second.second);
     pending_placement_groups_.erase(iter);
+
+    // Bind the PrepareResourceRequest method with the scheduler and virtual cluster ID,
+    // and set it as the bundle scheduling preparation function for the placement group.
+    placement_group->SetBundleSchedulingPreparationFn(
+        std::bind(&GcsPlacementGroupSchedulerInterface::PrepareResourceRequest,
+                  gcs_placement_group_scheduler_,
+                  std::placeholders::_1,
+                  placement_group->GetVirtualClusterId()));
 
     const auto &placement_group_id = placement_group->GetPlacementGroupID();
     // Do not reschedule if the placement group has removed already.

@@ -93,7 +93,9 @@ def is_virtual_cluster_empty(request):
 @pytest_asyncio.fixture
 async def job_sdk_client(request, make_sure_dashboard_http_port_unused):
     param = getattr(request, "param", {})
-    with _ray_start_virtual_cluster(do_init=True, num_nodes=10, **param) as res:
+    with _ray_start_virtual_cluster(
+        do_init=True, num_cpus=3, num_nodes=10, **param
+    ) as res:
         ip, _ = res.webui_url.split(":")
         agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
         assert wait_until_server_available(agent_address)
@@ -146,10 +148,11 @@ async def test_mixed_virtual_cluster(job_sdk_client):
 
     for i in range(NTEMPLATE):
         actor_name = f"test_actors_{i}"
+        pg_name = f"test_pgs_{i}"
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
         with tempfile.TemporaryDirectory() as tmp_dir:
             path = Path(tmp_dir)
-            driver_script = f"""
+            driver_script = """
 import ray
 ray.init(address='auto')
 
@@ -161,9 +164,14 @@ class Actor:
     def run(self):
         pass
 
-a = Actor.options(name="{actor_name}", num_cpus=1).remote()
+pg = ray.util.placement_group(bundles=[{"CPU": 1}], name="__pg_name__")
+
+a = Actor.options(name="__actor_name__", num_cpus=1).remote()
 ray.get(a.run.remote())
             """
+            driver_script = driver_script.replace("__actor_name__", actor_name).replace(
+                "__pg_name__", pg_name
+            )
             test_script_file = path / "test_script.py"
             with open(test_script_file, "w+") as file:
                 file.write(driver_script)
@@ -195,24 +203,31 @@ ray.get(a.run.remote())
                 timeout=100,
             )
             actors = ray.state.actors()
+            nassert = 0
             for _, actor_info in actors.items():
                 if actor_info["Name"] == actor_name:
                     node_id = actor_info["Address"]["NodeID"]
+                    nassert += 1
                     assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+            assert nassert > 0
+            nassert = 0
+            for _, placement_group_data in ray.util.placement_group_table().items():
+                if placement_group_data["name"] == pg_name:
+                    node_id = placement_group_data["bundles_to_node_id"][0]
+                    nassert += 1
+                    assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+            assert nassert > 0
 
 
 @pytest.mark.parametrize(
-    "job_sdk_client,is_virtual_cluster_empty",
+    "job_sdk_client",
     [
-        ({"_system_config": {"gcs_actor_scheduling_enabled": True}}, True),
-        ({"_system_config": {"gcs_actor_scheduling_enabled": True}}, False),
+        {"_system_config": {"gcs_actor_scheduling_enabled": True}},
     ],
     indirect=True,
 )
 @pytest.mark.asyncio
-async def test_primary_virtual_cluster(
-    request, job_sdk_client, is_virtual_cluster_empty
-):
+async def test_primary_virtual_cluster(request, job_sdk_client):
     agent_client, head_client, gcs_address = job_sdk_client
     virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
     non_primary_nodes = set()
@@ -226,10 +241,11 @@ async def test_primary_virtual_cluster(
             non_primary_nodes.add(node_id)
 
     actor_name = "test_actor_primary"
+    pg_name = "test_pg_primary"
     virtual_cluster_id = "kPrimaryClusterID"
     with tempfile.TemporaryDirectory() as tmp_dir:
         path = Path(tmp_dir)
-        driver_script = f"""
+        driver_script = """
 import ray
 ray.init(address='auto')
 
@@ -241,9 +257,14 @@ class Actor:
     def run(self):
         pass
 
-a = Actor.options(name="{actor_name}", num_cpus=1).remote()
+pg = ray.util.placement_group(bundles=[{"CPU": 1}], name="__pg_name__")
+
+a = Actor.options(name="__actor_name__", num_cpus=1).remote()
 ray.get(a.run.remote())
             """
+        driver_script = driver_script.replace("__actor_name__", actor_name).replace(
+            "__pg_name__", pg_name
+        )
         test_script_file = path / "test_script.py"
         with open(test_script_file, "w+") as file:
             file.write(driver_script)
@@ -251,8 +272,6 @@ ray.get(a.run.remote())
         runtime_env = {"working_dir": tmp_dir}
         runtime_env = upload_working_dir_if_needed(runtime_env, tmp_dir, logger=logger)
         runtime_env = RuntimeEnv(**runtime_env).to_dict()
-        if is_virtual_cluster_empty:
-            virtual_cluster_id = ""
 
         request = validate_request_type(
             {
@@ -275,10 +294,20 @@ ray.get(a.run.remote())
             timeout=100,
         )
         actors = ray.state.actors()
+        nassert = 0
         for _, actor_info in actors.items():
             if actor_info["Name"] == actor_name:
                 node_id = actor_info["Address"]["NodeID"]
+                nassert += 1
                 assert node_id not in non_primary_nodes
+        assert nassert > 0
+        nassert = 0
+        for _, placement_group_data in ray.util.placement_group_table().items():
+            if placement_group_data["name"] == pg_name:
+                node_id = placement_group_data["bundles_to_node_id"][0]
+                nassert += 1
+                assert node_id not in non_primary_nodes
+        assert nassert > 0
 
 
 if __name__ == "__main__":

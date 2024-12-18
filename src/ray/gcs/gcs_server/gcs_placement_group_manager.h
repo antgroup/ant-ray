@@ -85,6 +85,8 @@ class GcsPlacementGroup {
     placement_group_table_data_.set_ray_namespace(ray_namespace);
     placement_group_table_data_.set_placement_group_creation_timestamp_ms(
         current_sys_time_ms());
+    placement_group_table_data_.set_virtual_cluster_id(
+        placement_group_spec.virtual_cluster_id());
     SetupStates();
   }
 
@@ -104,6 +106,9 @@ class GcsPlacementGroup {
 
   /// Get the mutable bundle of this placement group.
   rpc::Bundle *GetMutableBundle(int bundle_index);
+
+  /// Sets the callback function for preparing bundle resources during scheduling.
+  void SetBundleSchedulingPreparationFn(std::function<void(ResourceRequest &)> fn);
 
   /// Update the state of this placement_group.
   void UpdateState(rpc::PlacementGroupTableData::PlacementGroupState state);
@@ -131,6 +136,9 @@ class GcsPlacementGroup {
 
   /// Get the Strategy
   rpc::PlacementStrategy GetStrategy() const;
+
+  /// Get the Virtual Cluster ID associated with this PlacementGroup
+  std::string GetVirtualClusterId() const;
 
   /// Get debug string for the placement group.
   std::string DebugString() const;
@@ -216,6 +224,8 @@ class GcsPlacementGroup {
 
   /// The last recorded metric state.
   std::optional<rpc::PlacementGroupTableData::PlacementGroupState> last_metric_state_;
+
+  std::function<void(ResourceRequest &)> bundle_scheduling_preparation_fn_;
 };
 
 /// GcsPlacementGroupManager is responsible for managing the lifecycle of all placement

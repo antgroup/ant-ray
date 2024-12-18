@@ -539,7 +539,7 @@ TEST_F(PrimaryClusterTest, RemoveLogicalCluster) {
   {
     rpc::CreateOrUpdateVirtualClusterRequest request;
     request.set_virtual_cluster_id(virtual_cluster_id_0);
-    request.set_mode(rpc::AllocationMode::Exclusive);
+    request.set_mode(rpc::AllocationMode::EXCLUSIVE);
     request.set_revision(0);
     request.mutable_replica_sets()->insert({template_id_0, 5});
     request.mutable_replica_sets()->insert({template_id_1, 10});

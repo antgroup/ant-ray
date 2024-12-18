@@ -298,7 +298,7 @@ bool ExclusiveCluster::InUse() const { return !job_clusters_.empty(); }
 
 bool ExclusiveCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
                                           const gcs::NodeInstance &node_instance) const {
-  RAY_CHECK(GetMode() == rpc::AllocationMode::Exclusive);
+  RAY_CHECK(GetMode() == rpc::AllocationMode::EXCLUSIVE);
   return job_cluster_id == kEmptyJobClusterId;
 }
 
@@ -341,7 +341,7 @@ Status PrimaryCluster::CreateOrUpdateVirtualCluster(
   if (logical_cluster == nullptr) {
     // replica_instances_to_remove must be empty as the virtual cluster is a new one.
     RAY_CHECK(replica_instances_to_remove_from_logical_cluster.empty());
-    if (request.mode() == rpc::AllocationMode::Exclusive) {
+    if (request.mode() == rpc::AllocationMode::EXCLUSIVE) {
       logical_cluster = std::make_shared<ExclusiveCluster>(request.virtual_cluster_id(),
                                                            async_data_flusher_);
     } else {

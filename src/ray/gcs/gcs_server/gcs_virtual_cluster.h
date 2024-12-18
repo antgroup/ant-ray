@@ -96,16 +96,13 @@ ReplicaSets ReplicasDifference(const T1 &left, const T2 &right) {
   return result;
 }
 
-class JobCluster;
 class VirtualCluster {
  public:
+  VirtualCluster(const std::string &id) : id_(id) {}
   virtual ~VirtualCluster() = default;
 
   /// Get the id of the cluster.
   virtual const std::string &GetID() const = 0;
-
-  /// Get the id of the cluster.
-  virtual const std::string &GetName() const = 0;
 
   /// Get the allocation mode of the cluster.
   /// There are two modes of the cluster:
@@ -151,7 +148,16 @@ class VirtualCluster {
   bool MarkNodeInstanceAsDead(const std::string &template_id,
                               const std::string &node_instance_id);
 
+  /// Check the virtual cluster contains node instance
+  ///
+  /// \param node_instance_id The id of the node instance to check
+  /// \return True if the node instance is in this virtual cluster, false otherwise.
   bool ContainsNodeInstance(const std::string &node_instance_id);
+
+  /// Check if the virtual cluster is in use.
+  ///
+  /// \return True if the virtual cluster is in use, false otherwise.
+  virtual bool InUse() const = 0;
 
   /// Convert the virtual cluster to proto data which usually is used for flushing
   /// to redis or publishing to raylet.
@@ -179,6 +185,8 @@ class VirtualCluster {
   /// \param replica_instances The node instances to be removed.
   void RemoveNodeInstances(ReplicaInstances replica_instances);
 
+  /// The id of the virtual cluster.
+  std::string id_;
   /// Node instances that are visible to the cluster.
   ReplicaInstances visible_node_instances_;
   /// Replica sets to express the visible node instances.
@@ -187,10 +195,15 @@ class VirtualCluster {
   uint64_t revision_{0};
 };
 
-class JobClusterManager : public VirtualCluster {
+class JobCluster;
+class ExclusiveCluster : public VirtualCluster {
  public:
-  JobClusterManager(const AsyncClusterDataFlusher &async_data_flusher)
-      : async_data_flusher_(async_data_flusher) {}
+  ExclusiveCluster(const std::string &id,
+                   const AsyncClusterDataFlusher &async_data_flusher)
+      : VirtualCluster(id), async_data_flusher_(async_data_flusher) {}
+
+  const std::string &GetID() const override { return id_; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Exclusive; }
 
   /// Create a job cluster.
   ///
@@ -215,22 +228,54 @@ class JobClusterManager : public VirtualCluster {
   /// \return The job cluster if it exists, otherwise return nullptr.
   std::shared_ptr<JobCluster> GetJobCluster(const std::string &job_name) const;
 
+  /// Check if the virtual cluster is in use.
+  ///
+  /// \return True if the virtual cluster is in use, false otherwise.
+  bool InUse() const override;
+
  protected:
+  bool IsIdleNodeInstance(const std::string &job_cluster_id,
+                          const gcs::NodeInstance &node_instance) const override;
+
+  /// The id of the virtual cluster.
+  std::string id_;
   // The mapping from job cluster id to `JobCluster` instance.
   absl::flat_hash_map<std::string, std::shared_ptr<JobCluster>> job_clusters_;
   // The async data flusher.
   AsyncClusterDataFlusher async_data_flusher_;
 };
 
-class LogicalCluster;
-class PrimaryCluster : public JobClusterManager {
+class MixedCluster : public VirtualCluster {
+ public:
+  MixedCluster(const std::string &id) : VirtualCluster(id) {}
+  MixedCluster &operator=(const MixedCluster &) = delete;
+
+  const std::string &GetID() const override { return id_; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Mixed; }
+
+  /// Check if the virtual cluster is in use.
+  ///
+  /// \return True if the virtual cluster is in use, false otherwise.
+  bool InUse() const override;
+
+ protected:
+  bool IsIdleNodeInstance(const std::string &job_cluster_id,
+                          const gcs::NodeInstance &node_instance) const override;
+};
+
+class JobCluster : public MixedCluster {
+ public:
+  using MixedCluster::MixedCluster;
+};
+
+class PrimaryCluster : public ExclusiveCluster {
  public:
   PrimaryCluster(const AsyncClusterDataFlusher &async_data_flusher)
-      : JobClusterManager(async_data_flusher) {}
+      : ExclusiveCluster(kPrimaryClusterID, async_data_flusher) {}
+  PrimaryCluster &operator=(const PrimaryCluster &) = delete;
 
   const std::string &GetID() const override { return kPrimaryClusterID; }
   rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Exclusive; }
-  const std::string &GetName() const override { return kPrimaryClusterID; }
 
   /// Create or update a new virtual cluster.
   ///
@@ -244,8 +289,17 @@ class PrimaryCluster : public JobClusterManager {
   ///
   /// \param logical_cluster_id The id of the virtual cluster.
   /// \return The logical cluster if it exists, otherwise return nullptr.
-  std::shared_ptr<LogicalCluster> GetLogicalCluster(
+  std::shared_ptr<VirtualCluster> GetLogicalCluster(
       const std::string &logical_cluster_id) const;
+
+  /// Remove logical cluster by the logical cluster id.
+  ///
+  /// \param logical_cluster_id The id of the logical cluster to be removed.
+  /// \param callback The callback that will be called after the logical cluster is
+  /// removed.
+  /// \return Status The status of the removal.
+  Status RemoveLogicalCluster(const std::string &logical_cluster_id,
+                              RemoveVirtualClusterCallback callback);
 
   /// Handle the node added event.
   ///
@@ -276,52 +330,7 @@ class PrimaryCluster : public JobClusterManager {
 
   /// The map of virtual clusters.
   /// Mapping from virtual cluster id to the virtual cluster.
-  absl::flat_hash_map<std::string, std::shared_ptr<LogicalCluster>> logical_clusters_;
-};
-
-class LogicalCluster : public JobClusterManager {
- public:
-  LogicalCluster(const AsyncClusterDataFlusher &async_data_flusher,
-                 const std::string &id,
-                 const std::string &name,
-                 rpc::AllocationMode mode)
-      : JobClusterManager(async_data_flusher), id_(id), name_(name), mode_(mode) {}
-
-  LogicalCluster &operator=(const LogicalCluster &) = delete;
-
-  const std::string &GetID() const override { return id_; }
-  rpc::AllocationMode GetMode() const override { return mode_; }
-  const std::string &GetName() const override { return name_; }
-
- protected:
-  bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                          const gcs::NodeInstance &node_instance) const override;
-
- private:
-  /// The id of the virtual cluster.
-  std::string id_;
-  /// The name of the virtual cluster.
-  std::string name_;
-  /// The allocation mode of the virtual cluster.
-  rpc::AllocationMode mode_;
-};
-
-class JobCluster : public VirtualCluster {
- public:
-  JobCluster(const std::string &id, const std::string &name) : id_(id), name_(name) {}
-
-  const std::string &GetID() const override { return id_; }
-  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Mixed; }
-  const std::string &GetName() const override { return id_; }
-
-  bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                          const gcs::NodeInstance &node_instance) const override;
-
- private:
-  /// The id of the job cluster.
-  std::string id_;
-  /// The name of the job cluster.
-  std::string name_;
+  absl::flat_hash_map<std::string, std::shared_ptr<VirtualCluster>> logical_clusters_;
 };
 
 }  // namespace gcs

@@ -55,7 +55,7 @@ TEST_F(PrimaryClusterTest, NodeAddAndRemove) {
   for (size_t i = 0; i < node_count; ++i) {
     auto node = Mocker::GenNodeInfo();
     auto template_id = std::to_string(i % template_count);
-    node->set_template_id(template_id);
+    node->set_node_type_name(template_id);
     primary_cluster->OnNodeAdd(*node);
     template_id_to_nodes[template_id].emplace(NodeID::FromBinary(node->node_id()), node);
   }
@@ -135,7 +135,7 @@ TEST_F(PrimaryClusterTest, CreateOrUpdateVirtualCluster) {
   for (size_t i = 0; i < node_count; ++i) {
     auto node = Mocker::GenNodeInfo();
     auto template_id = std::to_string(i % template_count);
-    node->set_template_id(template_id);
+    node->set_node_type_name(template_id);
     primary_cluster->OnNodeAdd(*node);
   }
 
@@ -298,7 +298,7 @@ TEST_F(PrimaryClusterTest, CreateJobCluster) {
   for (size_t i = 0; i < node_count; ++i) {
     auto node = Mocker::GenNodeInfo();
     auto template_id = std::to_string(i % template_count);
-    node->set_template_id(template_id);
+    node->set_node_type_name(template_id);
     primary_cluster->OnNodeAdd(*node);
   }
 
@@ -322,6 +322,7 @@ TEST_F(PrimaryClusterTest, CreateJobCluster) {
   auto job_cluster_0 = primary_cluster->GetJobCluster(job_id_0);
   ASSERT_NE(job_cluster_0, nullptr);
   auto job_cluster_id_0 = job_cluster_0->GetID();
+  ASSERT_EQ(job_cluster_id_0, kPrimaryClusterID + "##" + job_id_0);
   {
     // Check the job cluster job_cluster_id_0 visible node instances.
     const auto &visiable_node_instances = job_cluster_0->GetVisibleNodeInstances();
@@ -407,6 +408,36 @@ TEST_F(PrimaryClusterTest, CreateJobCluster) {
               node_count_per_template - 10);
     ASSERT_FALSE(visiable_node_instances.at(template_id_0).contains(kEmptyJobClusterId));
   }
+
+  {
+    rpc::CreateOrUpdateVirtualClusterRequest request;
+    request.set_virtual_cluster_id("virtual_cluster_id_0");
+    request.set_mode(rpc::AllocationMode::EXCLUSIVE);
+    request.set_revision(0);
+    request.mutable_replica_sets()->insert({template_id_0, 2});
+    request.mutable_replica_sets()->insert({template_id_1, 2});
+    auto status = primary_cluster->CreateOrUpdateVirtualCluster(
+        request,
+        [this](const Status &status, std::shared_ptr<rpc::VirtualClusterTableData> data) {
+          ASSERT_TRUE(status.ok());
+        });
+    ASSERT_TRUE(status.ok());
+
+    std::string job_id_1 = "job_1";
+    auto logical_cluster = primary_cluster->GetLogicalCluster(virtual_cluster_id_0);
+    ExclusiveCluster *exclusive_cluster =
+        dynamic_cast<ExclusiveCluster *>(logical_cluster.get());
+    // Create job_cluster_id_1 and check that the status is ok.
+    auto status = exclusive_cluster->CreateJobCluster(
+        job_id_1,
+        {{template_id_0, 1}, {template_id_1, 1}},
+        [this, job_id_1](const Status &status,
+                         std::shared_ptr<rpc::VirtualClusterTableData> data) {
+          ASSERT_EQ(data->id(), std::string("virtual_cluster_id_0") + "##" + job_id_1);
+          ASSERT_TRUE(status.ok());
+        });
+    ASSERT_TRUE(status.ok());
+  }
 }
 
 TEST_F(PrimaryClusterTest, RemoveJobCluster) {
@@ -421,7 +452,7 @@ TEST_F(PrimaryClusterTest, RemoveJobCluster) {
   for (size_t i = 0; i < node_count; ++i) {
     auto node = Mocker::GenNodeInfo();
     auto template_id = std::to_string(i % template_count);
-    node->set_template_id(template_id);
+    node->set_node_type_name(template_id);
     primary_cluster->OnNodeAdd(*node);
   }
 
@@ -526,7 +557,7 @@ TEST_F(PrimaryClusterTest, RemoveLogicalCluster) {
   for (size_t i = 0; i < node_count; ++i) {
     auto node = Mocker::GenNodeInfo();
     auto template_id = std::to_string(i % template_count);
-    node->set_template_id(template_id);
+    node->set_node_type_name(template_id);
     primary_cluster->OnNodeAdd(*node);
   }
 

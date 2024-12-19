@@ -105,7 +105,7 @@ async def job_sdk_client(request, make_sure_dashboard_http_port_unused, external
 
 
 async def create_virtual_cluster(
-    gcs_address, virtual_cluster_id, replica_sets, allocation_mode=AllocationMode.Mixed
+    gcs_address, virtual_cluster_id, replica_sets, allocation_mode=AllocationMode.MIXED
 ):
     channel = GcsChannel(gcs_address, aio=True)
     channel.connect()
@@ -259,12 +259,8 @@ ray.get(a.run.remote())
                 actors = ray.state.actors()
                 for _, actor_info in actors.items():
                     if actor_info["Name"] == actor_name:
-                        print(actor_info, "h", nodes_to_remove)
                         node_id = actor_info["Address"]["NodeID"]
                         assert actor_info["NumRestarts"] > 0
-                        print("-=-----------", node_id in node_to_virtual_cluster)
-                        print(node_to_virtual_cluster[node_id], virtual_cluster_id)
-                        print("------------")
                         assert node_id not in nodes_to_remove
                         assert node_to_virtual_cluster[node_id] == virtual_cluster_id
                         return True

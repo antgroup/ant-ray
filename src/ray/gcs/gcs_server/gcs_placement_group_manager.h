@@ -135,7 +135,7 @@ class GcsPlacementGroup {
   rpc::PlacementStrategy GetStrategy() const;
 
   /// Get the Virtual Cluster ID associated with this PlacementGroup
-  std::string GetVirtualClusterId() const;
+  const std::string &GetVirtualClusterId() const;
 
   /// Get debug string for the placement group.
   std::string DebugString() const;

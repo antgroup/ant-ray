@@ -636,6 +636,9 @@ class NodeManager : public rpc::NodeManagerServiceHandler,
   /// Whether a task is an actor creation task.
   bool IsActorCreationTask(const TaskID &task_id);
 
+  /// Handle the update of virtual cluster.
+  void VirtualClusterUpdated(const rpc::VirtualClusterTableData &virtual_cluster_data);
+
   /// Return back all the bundle resource.
   ///
   /// \param bundle_spec: Specification of bundle whose resources will be returned.

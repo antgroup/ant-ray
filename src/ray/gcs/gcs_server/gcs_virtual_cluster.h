@@ -203,7 +203,7 @@ class ExclusiveCluster : public VirtualCluster {
       : VirtualCluster(id), async_data_flusher_(async_data_flusher) {}
 
   const std::string &GetID() const override { return id_; }
-  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Exclusive; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::EXCLUSIVE; }
 
   /// Create a job cluster.
   ///
@@ -251,7 +251,7 @@ class MixedCluster : public VirtualCluster {
   MixedCluster &operator=(const MixedCluster &) = delete;
 
   const std::string &GetID() const override { return id_; }
-  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Mixed; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::MIXED; }
 
   /// Check if the virtual cluster is in use.
   ///
@@ -275,7 +275,7 @@ class PrimaryCluster : public ExclusiveCluster {
   PrimaryCluster &operator=(const PrimaryCluster &) = delete;
 
   const std::string &GetID() const override { return kPrimaryClusterID; }
-  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Exclusive; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::EXCLUSIVE; }
 
   /// Create or update a new virtual cluster.
   ///

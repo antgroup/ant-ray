@@ -33,7 +33,8 @@ jobs:
       env:
         RAY_DEBUG_BUILD: nightly
       run: |
-          python python/setup.py bdist_wheel
+          cd python
+          python setup.py bdist_wheel -d dist
     - name: Upload
       if: env.COMMIT_TODAY == 'true'
       uses: pypa/gh-action-pypi-publish@release/v1

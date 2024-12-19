@@ -491,7 +491,7 @@ std::shared_ptr<VirtualCluster> PrimaryCluster::GetVirtualCluster(
   }
   // Check if it is a job cluster of any logical cluster
   for (auto &[cluster_id, logical_cluster] : logical_clusters_) {
-    if (logical_cluster->GetMode() == rpc::AllocationMode::Exclusive) {
+    if (logical_cluster->GetMode() == rpc::AllocationMode::EXCLUSIVE) {
       ExclusiveCluster *exclusive_cluster =
           dynamic_cast<ExclusiveCluster *>(logical_cluster.get());
       auto job_cluster = exclusive_cluster->GetJobCluster(virtual_cluster_id);

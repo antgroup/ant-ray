@@ -28,10 +28,13 @@ ClusterResourceScheduler::ClusterResourceScheduler(
     scheduling::NodeID local_node_id,
     const NodeResources &local_node_resources,
     std::function<bool(scheduling::NodeID)> is_node_available_fn,
-    bool is_local_node_with_raylet)
+    bool is_local_node_with_raylet,
+    std::function<bool(scheduling::NodeID, const SchedulingContext *)>
+        is_node_schedulable_fn)
     : local_node_id_(local_node_id),
       is_node_available_fn_(is_node_available_fn),
-      is_local_node_with_raylet_(is_local_node_with_raylet) {
+      is_local_node_with_raylet_(is_local_node_with_raylet),
+      is_node_schedulable_fn_(is_node_schedulable_fn) {
   Init(io_service,
        local_node_resources,
        /*get_used_object_store_memory=*/nullptr,
@@ -47,8 +50,12 @@ ClusterResourceScheduler::ClusterResourceScheduler(
     std::function<int64_t(void)> get_used_object_store_memory,
     std::function<bool(void)> get_pull_manager_at_capacity,
     std::function<void(const rpc::NodeDeathInfo &)> shutdown_raylet_gracefully,
-    const absl::flat_hash_map<std::string, std::string> &local_node_labels)
-    : local_node_id_(local_node_id), is_node_available_fn_(is_node_available_fn) {
+    const absl::flat_hash_map<std::string, std::string> &local_node_labels,
+    std::function<bool(scheduling::NodeID, const SchedulingContext *)>
+        is_node_schedulable_fn)
+    : local_node_id_(local_node_id),
+      is_node_available_fn_(is_node_available_fn),
+      is_node_schedulable_fn_(is_node_schedulable_fn) {
   NodeResources node_resources = ResourceMapToNodeResources(
       local_node_resources, local_node_resources, local_node_labels);
   Init(io_service,
@@ -81,12 +88,16 @@ void ClusterResourceScheduler::Init(
           local_node_id_,
           *cluster_resource_manager_,
           /*is_node_available_fn*/
-          [this](auto node_id) { return this->NodeAvailable(node_id); });
+          [this](auto node_id) { return this->NodeAvailable(node_id); },
+          /*is_node_schedulable_fn*/
+          is_node_schedulable_fn_);
   bundle_scheduling_policy_ =
       std::make_unique<raylet_scheduling_policy::CompositeBundleSchedulingPolicy>(
           *cluster_resource_manager_,
           /*is_node_available_fn*/
-          [this](auto node_id) { return this->NodeAvailable(node_id); });
+          [this](auto node_id) { return this->NodeAvailable(node_id); },
+          /*is_node_schedulable_fn*/
+          is_node_schedulable_fn_);
 }
 
 bool ClusterResourceScheduler::NodeAvailable(scheduling::NodeID node_id) const {

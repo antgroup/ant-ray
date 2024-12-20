@@ -29,7 +29,7 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
     @routes.get("/virtual_clusters")
     @dashboard_optional_utils.aiohttp_cache(10)
     async def get_all_virtual_clusters(self, req) -> aiohttp.web.Response:
-        reply = await self._gcs_virtual_cluster_info_stub.GetAllVirtualClusters(
+        reply = await self._gcs_virtual_cluster_info_stub.GetVirtualClusters(
             GetVirtualClustersRequest()
         )
 

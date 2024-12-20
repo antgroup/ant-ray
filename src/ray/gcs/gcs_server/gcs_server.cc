@@ -380,7 +380,8 @@ void GcsServer::InitClusterResourceScheduler() {
       /*is_node_schedulable_fn=*/
       [this](scheduling::NodeID node_id, const SchedulingContext *context) {
         // Check if the virtual cluster manager exists.
-        if (gcs_virtual_cluster_manager_ == nullptr) {
+        if (gcs_virtual_cluster_manager_ == nullptr ||
+            context->virtual_cluster_id == kPrimaryClusterID) {
           return true;
         }
         auto node_instance_id = NodeID::FromBinary(node_id.Binary()).Hex();

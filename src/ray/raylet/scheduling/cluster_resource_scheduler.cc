@@ -162,38 +162,38 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
     const std::string &preferred_node_id,
     int64_t *total_violations,
     bool *is_infeasible) {
+  const std::string &virtual_cluster_id = scheduling_strategy.virtual_cluster_id();
   // The zero cpu actor is a special case that must be handled the same way by all
   // scheduling policies, except for HARD node affnity scheduling policy.
   if (actor_creation && resource_request.IsEmpty() &&
       !IsHardNodeAffinitySchedulingStrategy(scheduling_strategy)) {
-    auto scheduling_options = SchedulingOptions::Random();
-    scheduling_options.scheduling_context->virtual_cluster_id =
-        scheduling_strategy.virtual_cluster_id();
-    return scheduling_policy_->Schedule(resource_request, scheduling_options);
+    return scheduling_policy_->Schedule(resource_request,
+                                        SchedulingOptions::Random(virtual_cluster_id));
   }
 
   auto best_node_id = scheduling::NodeID::Nil();
   if (scheduling_strategy.scheduling_strategy_case() ==
       rpc::SchedulingStrategy::SchedulingStrategyCase::kSpreadSchedulingStrategy) {
-    auto scheduling_options = SchedulingOptions::Spread(
-        /*avoid_local_node*/ force_spillback,
-        /*require_node_available*/ force_spillback);
-    scheduling_options.scheduling_context->virtual_cluster_id =
-        scheduling_strategy.virtual_cluster_id();
-    best_node_id = scheduling_policy_->Schedule(resource_request, scheduling_options);
+    best_node_id =
+        scheduling_policy_->Schedule(resource_request,
+                                     SchedulingOptions::Spread(
+                                         /*avoid_local_node*/ force_spillback,
+                                         /*require_node_available*/ force_spillback,
+                                         /*virtual_cluster_id*/ virtual_cluster_id));
   } else if (scheduling_strategy.scheduling_strategy_case() ==
              rpc::SchedulingStrategy::SchedulingStrategyCase::
                  kNodeAffinitySchedulingStrategy) {
-    auto scheduling_options = SchedulingOptions::NodeAffinity(
-        force_spillback,
-        force_spillback,
-        scheduling_strategy.node_affinity_scheduling_strategy().node_id(),
-        scheduling_strategy.node_affinity_scheduling_strategy().soft(),
-        scheduling_strategy.node_affinity_scheduling_strategy().spill_on_unavailable(),
-        scheduling_strategy.node_affinity_scheduling_strategy().fail_on_unavailable());
-    scheduling_options.scheduling_context->virtual_cluster_id =
-        scheduling_strategy.virtual_cluster_id();
-    best_node_id = scheduling_policy_->Schedule(resource_request, scheduling_options);
+    best_node_id = scheduling_policy_->Schedule(
+        resource_request,
+        SchedulingOptions::NodeAffinity(
+            force_spillback,
+            force_spillback,
+            scheduling_strategy.node_affinity_scheduling_strategy().node_id(),
+            scheduling_strategy.node_affinity_scheduling_strategy().soft(),
+            scheduling_strategy.node_affinity_scheduling_strategy()
+                .spill_on_unavailable(),
+            scheduling_strategy.node_affinity_scheduling_strategy().fail_on_unavailable(),
+            virtual_cluster_id));
   } else if (IsAffinityWithBundleSchedule(scheduling_strategy) &&
              !is_local_node_with_raylet_) {
     // This scheduling strategy is only used for gcs scheduling for the time being.
@@ -203,25 +203,23 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
         std::pair(placement_group_id,
                   scheduling_strategy.placement_group_scheduling_strategy()
                       .placement_group_bundle_index());
-    auto scheduling_options = SchedulingOptions::AffinityWithBundle(bundle_id);
-    scheduling_options.scheduling_context->virtual_cluster_id =
-        scheduling_strategy.virtual_cluster_id();
-    best_node_id = scheduling_policy_->Schedule(resource_request, scheduling_options);
+    best_node_id = scheduling_policy_->Schedule(
+        resource_request,
+        SchedulingOptions::AffinityWithBundle(bundle_id, virtual_cluster_id));
   } else if (scheduling_strategy.has_node_label_scheduling_strategy()) {
-    auto scheduling_options = SchedulingOptions::NodeLabelScheduling(scheduling_strategy);
-    scheduling_options.scheduling_context->virtual_cluster_id =
-        scheduling_strategy.virtual_cluster_id();
-    best_node_id = scheduling_policy_->Schedule(resource_request, scheduling_options);
+    best_node_id = scheduling_policy_->Schedule(
+        resource_request,
+        SchedulingOptions::NodeLabelScheduling(scheduling_strategy, virtual_cluster_id));
   } else {
     // TODO (Alex): Setting require_available == force_spillback is a hack in order to
     // remain bug compatible with the legacy scheduling algorithms.
-    auto scheduling_options = SchedulingOptions::Hybrid(
-        /*avoid_local_node*/ force_spillback,
-        /*require_node_available*/ force_spillback,
-        preferred_node_id);
-    scheduling_options.scheduling_context->virtual_cluster_id =
-        scheduling_strategy.virtual_cluster_id();
-    best_node_id = scheduling_policy_->Schedule(resource_request, scheduling_options);
+    best_node_id =
+        scheduling_policy_->Schedule(resource_request,
+                                     SchedulingOptions::Hybrid(
+                                         /*avoid_local_node*/ force_spillback,
+                                         /*require_node_available*/ force_spillback,
+                                         preferred_node_id,
+                                         virtual_cluster_id));
   }
 
   *is_infeasible = best_node_id.IsNil();

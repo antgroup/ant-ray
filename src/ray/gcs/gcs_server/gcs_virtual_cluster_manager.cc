@@ -31,6 +31,18 @@ void GcsVirtualClusterManager::OnNodeDead(const rpc::GcsNodeInfo &node) {
   primary_cluster_->OnNodeDead(node);
 }
 
+std::shared_ptr<VirtualCluster> GcsVirtualClusterManager::GetVirtualCluster(
+    const std::string &virtual_cluster_id) {
+  if (virtual_cluster_id.empty()) {
+    return nullptr;
+  }
+  // check if it is the primary cluster
+  if (virtual_cluster_id == kPrimaryClusterID) {
+    return primary_cluster_;
+  }
+  return primary_cluster_->GetVirtualCluster(virtual_cluster_id);
+}
+
 void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(
     rpc::CreateOrUpdateVirtualClusterRequest request,
     rpc::CreateOrUpdateVirtualClusterReply *reply,
@@ -97,12 +109,15 @@ void GcsVirtualClusterManager::HandleRemoveVirtualCluster(
   }
 }
 
-void GcsVirtualClusterManager::HandleGetAllVirtualClusters(
-    rpc::GetAllVirtualClustersRequest request,
-    rpc::GetAllVirtualClustersReply *reply,
+void GcsVirtualClusterManager::HandleGetVirtualClusters(
+    rpc::GetVirtualClustersRequest request,
+    rpc::GetVirtualClustersReply *reply,
     rpc::SendReplyCallback send_reply_callback) {
-  RAY_LOG(DEBUG) << "Getting all virtual clusters.";
-  // TODO(Shanly): To be implement.
+  RAY_LOG(DEBUG) << "Getting virtual clusters.";
+  primary_cluster_->GetVirtualClustersData(
+      std::move(request), [reply, send_reply_callback](auto data) {
+        reply->add_virtual_cluster_data_list()->CopyFrom(*data);
+      });
   GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
 }
 

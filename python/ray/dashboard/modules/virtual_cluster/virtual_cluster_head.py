@@ -38,6 +38,9 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
                 reply, always_print_fields_with_no_presence=True
             )
             for virtual_cluster_data in data.get("virtualClusterDataList", []):
+                virtual_cluster_data["virtualClusterId"] = virtual_cluster_data.pop(
+                    "id"
+                )
                 virtual_cluster_data["revision"] = int(
                     virtual_cluster_data.get("revision", 0)
                 )

@@ -1,9 +1,11 @@
 import logging
+import os
 import socket
 
 import pytest
 import requests
 
+import ray
 from ray._private.test_utils import (
     format_web_url,
     wait_for_condition,
@@ -15,7 +17,7 @@ from ray.dashboard.tests.conftest import *  # noqa
 logger = logging.getLogger(__name__)
 
 
-def create_virtual_cluster(
+def create_or_update_virtual_cluster(
     webui_url, virtual_cluster_id, allocation_mode, replica_sets, revision
 ):
     try:
@@ -27,15 +29,25 @@ def create_virtual_cluster(
                 "replicaSets": replica_sets,
                 "revision": revision,
             },
+            timeout=10,
         )
-        resp.raise_for_status()
         result = resp.json()
         print(result)
-        assert result["result"] is True, resp.text
-        return True
+        return result
     except Exception as ex:
         logger.info(ex)
-        return False
+
+
+def remove_virtual_cluster(webui_url, virtual_cluster_id):
+    try:
+        resp = requests.delete(
+            webui_url + "/virtual_clusters/" + virtual_cluster_id, timeout=10
+        )
+        result = resp.json()
+        print(result)
+        return result
+    except Exception as ex:
+        logger.info(ex)
 
 
 @pytest.mark.parametrize(
@@ -55,9 +67,11 @@ def test_create_and_update_virtual_cluster(
     webui_url = cluster.webui_url
     webui_url = format_web_url(webui_url)
 
+    # Add two nodes to the primary cluster.
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"})
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"})
     hostname = socket.gethostname()
+
     virtual_cluster_id = ""
     allocation_mode = ""
     replica_sets = {}
@@ -89,30 +103,143 @@ def test_create_and_update_virtual_cluster(
                 virtual_cluster_replica_sets[node_instance["templateId"]] = (
                     virtual_cluster_replica_sets.get(node_instance["templateId"], 0) + 1
                 )
+            # The virtual cluster has the same node types and count as expected.
             assert replica_sets == virtual_cluster_replica_sets
             return True
         except Exception as ex:
             logger.info(ex)
             return False
 
+    # Create a new virtual cluster with exclusive allocation mode.
     virtual_cluster_id = "virtual_cluster_1"
     allocation_mode = "exclusive"
     replica_sets = {"4c8g": 1, "8c16g": 1}
     wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
 
+    # Update the virtual cluster with less nodes.
     replica_sets = {"4c8g": 1}
     wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
 
+    # Update the virtual cluster with more nodes.
     replica_sets = {"4c8g": 1, "8c16g": 1}
     wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
 
+    # Update the virtual cluster with zero node (make it empty).
     replica_sets = {}
     wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
 
+    # `virtual_cluster_1` has released all nodes, so we can now
+    # create a new virtual cluster with two nodes.
     virtual_cluster_id = "virtual_cluster_2"
-    allocation_mode = "mixed"
     replica_sets = {"4c8g": 1, "8c16g": 1}
+    # Using mixed allocation mode.
+    allocation_mode = "mixed"
     wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+
+    # TODO: uncomment this when `MixedCluster::IsIdleNodeInstance` is fixed.
+    # Update the virtual cluster with less nodes.
+    # replica_sets = {"4c8g": 1}
+    # wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+
+    # Update the virtual cluster with more nodes.
+    # replica_sets = {"4c8g": 1, "8c16g": 1}
+    # wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+
+    # Update the virtual cluster with zero node (make it empty).
+    # replica_sets = {}
+    # wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+
+
+@pytest.mark.parametrize(
+    "ray_start_cluster_head",
+    [
+        {
+            "include_dashboard": True,
+        }
+    ],
+    indirect=True,
+)
+@pytest.mark.parametrize("allocation_mode", ["exclusive", "mixed"])
+def test_create_and_update_virtual_cluster_with_exceptions(
+    disable_aiohttp_cache, ray_start_cluster_head, allocation_mode
+):
+    cluster: Cluster = ray_start_cluster_head
+    assert wait_until_server_available(cluster.webui_url) is True
+    webui_url = cluster.webui_url
+    webui_url = format_web_url(webui_url)
+
+    # Add two nodes to the primary cluster.
+    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"})
+    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"})
+
+    # Create a new virtual cluster with a non-exist node type.
+    result = create_or_update_virtual_cluster(
+        webui_url=webui_url,
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode=allocation_mode,
+        replica_sets={"16c32g": 1},
+        revision=0,
+    )
+    assert result["result"] is False
+    assert str(result["msg"]).endswith("No enough node instances to assign.")
+
+    # Create a new virtual cluster with node count that the primary cluster
+    # can not provide.
+    result = create_or_update_virtual_cluster(
+        webui_url=webui_url,
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode=allocation_mode,
+        replica_sets={"4c8g": 2, "8c16g": 1},
+        revision=0,
+    )
+    assert result["result"] is False
+    assert str(result["msg"]).endswith("No enough node instances to assign.")
+
+    # Create a new virtual cluster with one `4c8g` node, which shall succeed.
+    result = create_or_update_virtual_cluster(
+        webui_url=webui_url,
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode=allocation_mode,
+        replica_sets={"4c8g": 1},
+        revision=0,
+    )
+    assert result["result"] is True
+    revision = result["data"]["revision"]
+
+    # Update the virtual cluster with an expired revision.
+    result = create_or_update_virtual_cluster(
+        webui_url=webui_url,
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode=allocation_mode,
+        replica_sets={"4c8g": 1, "8c16g": 2},
+        revision=0,
+    )
+    assert result["result"] is False
+    assert "The revision (0) is expired" in str(result["msg"])
+
+    # Update the virtual cluster with node count that the primary cluster
+    # can not provide.
+    result = create_or_update_virtual_cluster(
+        webui_url=webui_url,
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode=allocation_mode,
+        replica_sets={"4c8g": 1, "8c16g": 2},
+        revision=revision,
+    )
+    assert result["result"] is False
+    assert str(result["msg"]).endswith("No enough node instances to assign.")
+
+    # Create a new virtual cluster that the remaining nodes in the primary cluster
+    # are not enough.
+    result = create_or_update_virtual_cluster(
+        webui_url=webui_url,
+        virtual_cluster_id="virtual_cluster_2",
+        allocation_mode=allocation_mode,
+        replica_sets={"4c8g": 1, "8c16g": 1},
+        revision=0,
+    )
+    assert result["result"] is False
+    assert str(result["msg"]).endswith("No enough node instances to assign.")
 
 
 @pytest.mark.parametrize(
@@ -133,29 +260,66 @@ def test_remove_virtual_cluster(disable_aiohttp_cache, ray_start_cluster_head):
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"})
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"})
 
-    wait_for_condition(
-        create_virtual_cluster,
-        timeout=10,
+    # Create a new virtual cluster with exclusive allocation mode.
+    result = create_or_update_virtual_cluster(
         webui_url=webui_url,
         virtual_cluster_id="virtual_cluster_1",
         allocation_mode="exclusive",
         replica_sets={"4c8g": 1, "8c16g": 1},
         revision=0,
     )
+    assert result["result"] is True
 
-    def _remove_virtual_cluster():
-        try:
-            resp = requests.delete(webui_url + "/virtual_clusters/virtual_cluster_1")
-            resp.raise_for_status()
-            result = resp.json()
-            print(result)
-            assert result["result"] is True, resp.text
-            return True
-        except Exception as ex:
-            logger.info(ex)
-            return False
+    # Try removing a non-exist virtual cluster.
+    result = remove_virtual_cluster(
+        webui_url=webui_url, virtual_cluster_id="virtual_cluster_2"
+    )
+    assert result["result"] is False
+    # The error msg should tell us the virtual cluster does not exit.
+    assert str(result["msg"]).endswith("does not exist.")
 
-    wait_for_condition(_remove_virtual_cluster, timeout=10)
+    # Remove the virtual cluster.
+    result = remove_virtual_cluster(
+        webui_url=webui_url, virtual_cluster_id="virtual_cluster_1"
+    )
+    assert result["result"] is True
+
+    # Create a new virtual cluster with mixed mode.
+    result = create_or_update_virtual_cluster(
+        webui_url=webui_url,
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode="mixed",
+        replica_sets={"4c8g": 1, "8c16g": 1},
+        revision=0,
+    )
+    assert result["result"] is True
+
+    @ray.remote
+    class SmallActor:
+        def pid(self):
+            return os.getpid()
+
+    # Create an actor that requires some resources.
+    actor = SmallActor.options(num_cpus=0.1).remote()
+    ray.get(actor.pid.remote(), timeout=10)
+
+    # Remove the virtual cluster.
+    result = remove_virtual_cluster(
+        webui_url=webui_url, virtual_cluster_id="virtual_cluster_1"
+    )
+    # The virtual cluster can not be removed because some nodes
+    # are still in use.
+    assert result["result"] is False
+    assert str(result["msg"]).endswith("still in use.")
+
+    ray.kill(actor, no_restart=True)
+
+    # TODO: uncomment this when `MixedCluster::IsIdleNodeInstance` is fixed.
+    # # Remove the virtual cluster.
+    # result = remove_virtual_cluster(
+    #     webui_url=webui_url,
+    #     virtual_cluster_id="virtual_cluster_1")
+    # assert result["result"] is True
 
 
 @pytest.mark.parametrize(
@@ -174,30 +338,33 @@ def test_get_virtual_clusters(disable_aiohttp_cache, ray_start_cluster_head):
     webui_url = format_web_url(webui_url)
     hostname = socket.gethostname()
 
+    # Add two `4c8g` nodes and two `8c16g` nodes to the primary cluster.
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"})
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"})
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"})
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"})
 
-    wait_for_condition(
-        create_virtual_cluster,
-        timeout=10,
+    # Create a new virtual cluster with mixed allocation mode and
+    # two `4c8g` nodes.
+    result = create_or_update_virtual_cluster(
         webui_url=webui_url,
         virtual_cluster_id="virtual_cluster_1",
         allocation_mode="mixed",
         replica_sets={"4c8g": 2},
         revision=0,
     )
+    assert result["result"] is True
 
-    wait_for_condition(
-        create_virtual_cluster,
-        timeout=10,
+    # Create a new virtual cluster with exclusive allocation mode
+    # and two `8c16g` nodes.
+    result = create_or_update_virtual_cluster(
         webui_url=webui_url,
         virtual_cluster_id="virtual_cluster_2",
         allocation_mode="exclusive",
         replica_sets={"8c16g": 2},
         revision=0,
     )
+    assert result["result"] is True
 
     def _get_virtual_clusters():
         try:
@@ -207,7 +374,7 @@ def test_get_virtual_clusters(disable_aiohttp_cache, ray_start_cluster_head):
             print(result)
             assert result["result"] is True, resp.text
             for virtual_cluster in result["data"]["virtualClusters"]:
-                if virtual_cluster["id"] == "virtual_cluster_1":
+                if virtual_cluster["virtualClusterId"] == "virtual_cluster_1":
                     assert virtual_cluster["allocationMode"] == "mixed"
                     assert virtual_cluster["replicaSets"] == {"4c8g": 2}
                     assert len(virtual_cluster["nodeInstances"]) == 2
@@ -216,7 +383,7 @@ def test_get_virtual_clusters(disable_aiohttp_cache, ray_start_cluster_head):
                         assert node_instance["templateId"] == "4c8g"
                     revision_1 = virtual_cluster["revision"]
                     assert revision_1 > 0
-                elif virtual_cluster["id"] == "virtual_cluster_2":
+                elif virtual_cluster["virtualClusterId"] == "virtual_cluster_2":
                     assert virtual_cluster["allocationMode"] == "exclusive"
                     assert virtual_cluster["replicaSets"] == {"8c16g": 2}
                     assert len(virtual_cluster["nodeInstances"]) == 2
@@ -227,6 +394,8 @@ def test_get_virtual_clusters(disable_aiohttp_cache, ray_start_cluster_head):
                     assert revision_2 > 0
                 else:
                     return False
+            # `virtual_cluster_2` should have a more recent revision because it was
+            # created later than `virtual_cluster_1`.
             assert revision_2 > revision_1
             return True
         except Exception as ex:

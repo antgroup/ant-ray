@@ -133,7 +133,7 @@ if os.getenv("RAY_INSTALL_CPP") == "1":
     # "ray-cpp" wheel package.
     setup_spec = SetupSpec(
         SetupType.RAY_CPP,
-        "ray-cpp",
+        "ant-ray-cpp",
         "A subpackage of Ray which provides the Ray C++ API.",
         BUILD_TYPE,
     )
@@ -141,7 +141,7 @@ else:
     # "ray" primary wheel package.
     setup_spec = SetupSpec(
         SetupType.RAY,
-        "ray",
+        "ant-ray",
         "Ray provides a simple, "
         "universal API for building distributed applications.",
         BUILD_TYPE,

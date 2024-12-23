@@ -71,8 +71,9 @@ jobs:
         uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_PLATFORM: "linux macos"
-          CIBW_BEFORE_BUILD: "cd python"
+          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel
         with:
+          package-dir: ./python
           output-dir: ./python/dist
 
       - uses: actions/upload-artifact@v4

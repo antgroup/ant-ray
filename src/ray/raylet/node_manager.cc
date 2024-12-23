@@ -321,10 +321,8 @@ NodeManager::NodeManager(
       shutdown_raylet_gracefully,
       /*labels*/
       config.labels,
-      /*is_node_in_virtual_cluster_fn=*/
-      [](scheduling::NodeID node_id, const std::string &virtual_cluster_id) {
-        return true;
-      });
+      /*is_node_schedulable_fn=*/
+      [](scheduling::NodeID node_id, const SchedulingContext *context) { return true; });
 
   auto get_node_info_func = [this](const NodeID &node_id) {
     return gcs_client_->Nodes().Get(node_id);
@@ -407,6 +405,8 @@ NodeManager::NodeManager(
 
   mutable_object_provider_ = std::make_unique<core::experimental::MutableObjectProvider>(
       *store_client_, absl::bind_front(&NodeManager::CreateRayletClient, this));
+
+  virtual_cluster_manager_ = std::make_shared<VirtualClusterManager>();
 }
 
 std::shared_ptr<raylet::RayletClient> NodeManager::CreateRayletClient(
@@ -503,6 +503,18 @@ ray::Status NodeManager::RegisterGcs() {
   };
   RAY_RETURN_NOT_OK(
       gcs_client_->Jobs().AsyncSubscribeAll(job_subscribe_handler, nullptr));
+
+  // Subscribe to all virtual clusrter update notification.
+  const auto virtual_cluster_update_notification_handler =
+      [this](const VirtualClusterID &virtual_cluster_id,
+             rpc::VirtualClusterTableData &&virtual_cluster_data) {
+        virtual_cluster_manager_->UpdateVirtualCluster(std::move(virtual_cluster_data));
+      };
+  RAY_RETURN_NOT_OK(gcs_client_->VirtualCluster().AsyncSubscribeAll(
+      virtual_cluster_update_notification_handler, [](const ray::Status &status) {
+        RAY_CHECK_OK(status);
+        RAY_LOG(INFO) << "Finished subscribing all virtual cluster infos.";
+      }));
 
   periodical_runner_->RunFnPeriodically(
       [this] {

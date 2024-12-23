@@ -29,12 +29,12 @@ ClusterResourceScheduler::ClusterResourceScheduler(
     const NodeResources &local_node_resources,
     std::function<bool(scheduling::NodeID)> is_node_available_fn,
     bool is_local_node_with_raylet,
-    std::function<bool(scheduling::NodeID, const std::string &)>
-        is_node_in_virtual_cluster_fn)
+    std::function<bool(scheduling::NodeID, const SchedulingContext *)>
+        is_node_schedulable_fn)
     : local_node_id_(local_node_id),
       is_node_available_fn_(is_node_available_fn),
       is_local_node_with_raylet_(is_local_node_with_raylet),
-      is_node_in_virtual_cluster_fn_(is_node_in_virtual_cluster_fn) {
+      is_node_schedulable_fn_(is_node_schedulable_fn) {
   Init(io_service,
        local_node_resources,
        /*get_used_object_store_memory=*/nullptr,
@@ -51,11 +51,11 @@ ClusterResourceScheduler::ClusterResourceScheduler(
     std::function<bool(void)> get_pull_manager_at_capacity,
     std::function<void(const rpc::NodeDeathInfo &)> shutdown_raylet_gracefully,
     const absl::flat_hash_map<std::string, std::string> &local_node_labels,
-    std::function<bool(scheduling::NodeID, const std::string &)>
-        is_node_in_virtual_cluster_fn)
+    std::function<bool(scheduling::NodeID, const SchedulingContext *)>
+        is_node_schedulable_fn)
     : local_node_id_(local_node_id),
       is_node_available_fn_(is_node_available_fn),
-      is_node_in_virtual_cluster_fn_(is_node_in_virtual_cluster_fn) {
+      is_node_schedulable_fn_(is_node_schedulable_fn) {
   NodeResources node_resources = ResourceMapToNodeResources(
       local_node_resources, local_node_resources, local_node_labels);
   Init(io_service,
@@ -88,12 +88,16 @@ void ClusterResourceScheduler::Init(
           local_node_id_,
           *cluster_resource_manager_,
           /*is_node_available_fn*/
-          [this](auto node_id) { return this->NodeAvailable(node_id); });
+          [this](auto node_id) { return this->NodeAvailable(node_id); },
+          /*is_node_schedulable_fn*/
+          is_node_schedulable_fn_);
   bundle_scheduling_policy_ =
       std::make_unique<raylet_scheduling_policy::CompositeBundleSchedulingPolicy>(
           *cluster_resource_manager_,
           /*is_node_available_fn*/
-          [this](auto node_id) { return this->NodeAvailable(node_id); });
+          [this](auto node_id) { return this->NodeAvailable(node_id); },
+          /*is_node_schedulable_fn*/
+          is_node_schedulable_fn_);
 }
 
 bool ClusterResourceScheduler::NodeAvailable(scheduling::NodeID node_id) const {
@@ -158,11 +162,13 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
     const std::string &preferred_node_id,
     int64_t *total_violations,
     bool *is_infeasible) {
+  const std::string &virtual_cluster_id = scheduling_strategy.virtual_cluster_id();
   // The zero cpu actor is a special case that must be handled the same way by all
   // scheduling policies, except for HARD node affnity scheduling policy.
   if (actor_creation && resource_request.IsEmpty() &&
       !IsHardNodeAffinitySchedulingStrategy(scheduling_strategy)) {
-    return scheduling_policy_->Schedule(resource_request, SchedulingOptions::Random());
+    return scheduling_policy_->Schedule(resource_request,
+                                        SchedulingOptions::Random(virtual_cluster_id));
   }
 
   auto best_node_id = scheduling::NodeID::Nil();
@@ -172,7 +178,8 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
         scheduling_policy_->Schedule(resource_request,
                                      SchedulingOptions::Spread(
                                          /*avoid_local_node*/ force_spillback,
-                                         /*require_node_available*/ force_spillback));
+                                         /*require_node_available*/ force_spillback,
+                                         /*virtual_cluster_id*/ virtual_cluster_id));
   } else if (scheduling_strategy.scheduling_strategy_case() ==
              rpc::SchedulingStrategy::SchedulingStrategyCase::
                  kNodeAffinitySchedulingStrategy) {
@@ -185,8 +192,8 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
             scheduling_strategy.node_affinity_scheduling_strategy().soft(),
             scheduling_strategy.node_affinity_scheduling_strategy()
                 .spill_on_unavailable(),
-            scheduling_strategy.node_affinity_scheduling_strategy()
-                .fail_on_unavailable()));
+            scheduling_strategy.node_affinity_scheduling_strategy().fail_on_unavailable(),
+            virtual_cluster_id));
   } else if (IsAffinityWithBundleSchedule(scheduling_strategy) &&
              !is_local_node_with_raylet_) {
     // This scheduling strategy is only used for gcs scheduling for the time being.
@@ -197,10 +204,12 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
                   scheduling_strategy.placement_group_scheduling_strategy()
                       .placement_group_bundle_index());
     best_node_id = scheduling_policy_->Schedule(
-        resource_request, SchedulingOptions::AffinityWithBundle(bundle_id));
+        resource_request,
+        SchedulingOptions::AffinityWithBundle(bundle_id, virtual_cluster_id));
   } else if (scheduling_strategy.has_node_label_scheduling_strategy()) {
     best_node_id = scheduling_policy_->Schedule(
-        resource_request, SchedulingOptions::NodeLabelScheduling(scheduling_strategy));
+        resource_request,
+        SchedulingOptions::NodeLabelScheduling(scheduling_strategy, virtual_cluster_id));
   } else {
     // TODO (Alex): Setting require_available == force_spillback is a hack in order to
     // remain bug compatible with the legacy scheduling algorithms.
@@ -209,7 +218,8 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
                                      SchedulingOptions::Hybrid(
                                          /*avoid_local_node*/ force_spillback,
                                          /*require_node_available*/ force_spillback,
-                                         preferred_node_id));
+                                         preferred_node_id,
+                                         virtual_cluster_id));
   }
 
   *is_infeasible = best_node_id.IsNil();
@@ -238,13 +248,6 @@ scheduling::NodeID ClusterResourceScheduler::GetBestSchedulableNode(
     bool *is_infeasible) {
   ResourceRequest resource_request =
       ResourceMapToResourceRequest(task_resources, requires_object_store_memory);
-  if (is_node_in_virtual_cluster_fn_ != nullptr) {
-    std::string virtual_cluster_id = scheduling_strategy.virtual_cluster_id();
-    // use the virtual cluster feasibility callback if present,
-    // ensuring that virtual cluster constraints influence scheduling decisions.
-    resource_request.set_is_virtual_cluster_feasible_callback(std::bind(
-        is_node_in_virtual_cluster_fn_, std::placeholders::_1, virtual_cluster_id));
-  }
   return GetBestSchedulableNode(resource_request,
                                 scheduling_strategy,
                                 actor_creation,

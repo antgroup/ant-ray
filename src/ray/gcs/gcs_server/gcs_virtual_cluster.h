@@ -61,6 +61,8 @@ using CreateOrUpdateVirtualClusterCallback =
     std::function<void(const Status &, std::shared_ptr<rpc::VirtualClusterTableData>)>;
 
 using RemoveVirtualClusterCallback = CreateOrUpdateVirtualClusterCallback;
+using GetVirtualClustersDataCallback =
+    std::function<void(std::shared_ptr<rpc::VirtualClusterTableData>)>;
 
 /// <template_id, _>
 ///               |
@@ -148,6 +150,12 @@ class VirtualCluster {
   bool MarkNodeInstanceAsDead(const std::string &template_id,
                               const std::string &node_instance_id);
 
+  /// Check the virtual cluster contains node instance
+  ///
+  /// \param node_instance_id The id of the node instance to check
+  /// \return True if the node instance is in this virtual cluster, false otherwise.
+  bool ContainsNodeInstance(const std::string &node_instance_id);
+
   /// Check if the virtual cluster is in use.
   ///
   /// \return True if the virtual cluster is in use, false otherwise.
@@ -197,7 +205,7 @@ class ExclusiveCluster : public VirtualCluster {
       : VirtualCluster(id), async_data_flusher_(async_data_flusher) {}
 
   const std::string &GetID() const override { return id_; }
-  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Exclusive; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::EXCLUSIVE; }
 
   /// Create a job cluster.
   ///
@@ -222,6 +230,11 @@ class ExclusiveCluster : public VirtualCluster {
   /// \return The job cluster if it exists, otherwise return nullptr.
   std::shared_ptr<JobCluster> GetJobCluster(const std::string &job_name) const;
 
+  /// Iterate all job clusters.
+  void ForeachJobCluster(
+      const std::function<void(const std::string &, const std::shared_ptr<JobCluster> &)>
+          &fn) const;
+
   /// Check if the virtual cluster is in use.
   ///
   /// \return True if the virtual cluster is in use, false otherwise.
@@ -231,8 +244,6 @@ class ExclusiveCluster : public VirtualCluster {
   bool IsIdleNodeInstance(const std::string &job_cluster_id,
                           const gcs::NodeInstance &node_instance) const override;
 
-  /// The id of the virtual cluster.
-  std::string id_;
   // The mapping from job cluster id to `JobCluster` instance.
   absl::flat_hash_map<std::string, std::shared_ptr<JobCluster>> job_clusters_;
   // The async data flusher.
@@ -245,7 +256,7 @@ class MixedCluster : public VirtualCluster {
   MixedCluster &operator=(const MixedCluster &) = delete;
 
   const std::string &GetID() const override { return id_; }
-  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Mixed; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::MIXED; }
 
   /// Check if the virtual cluster is in use.
   ///
@@ -269,7 +280,7 @@ class PrimaryCluster : public ExclusiveCluster {
   PrimaryCluster &operator=(const PrimaryCluster &) = delete;
 
   const std::string &GetID() const override { return kPrimaryClusterID; }
-  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::Exclusive; }
+  rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::EXCLUSIVE; }
 
   /// Create or update a new virtual cluster.
   ///
@@ -286,6 +297,13 @@ class PrimaryCluster : public ExclusiveCluster {
   std::shared_ptr<VirtualCluster> GetLogicalCluster(
       const std::string &logical_cluster_id) const;
 
+  /// Get virtual cluster by virtual cluster id
+  ///
+  /// \param virtual_cluster_id The id of virtual cluster
+  /// \return the virtual cluster
+  std::shared_ptr<VirtualCluster> GetVirtualCluster(
+      const std::string &virtual_cluster_id);
+
   /// Remove logical cluster by the logical cluster id.
   ///
   /// \param logical_cluster_id The id of the logical cluster to be removed.
@@ -294,6 +312,10 @@ class PrimaryCluster : public ExclusiveCluster {
   /// \return Status The status of the removal.
   Status RemoveLogicalCluster(const std::string &logical_cluster_id,
                               RemoveVirtualClusterCallback callback);
+
+  /// Get virtual cluster's proto data.
+  void GetVirtualClustersData(rpc::GetVirtualClustersRequest request,
+                              GetVirtualClustersDataCallback callback);
 
   /// Handle the node added event.
   ///

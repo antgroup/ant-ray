@@ -275,6 +275,8 @@ class TaskSpecBuilder {
     }
 
     // This ensures that actors incorporate virtual cluster information during scheduling.
+    // Specifically, for the supervisor actor, the virtual cluster ID is included within
+    // the labels.
     std::string virtual_cluster_id = message_->labels().contains(kLabelVirtualClusterID)
                                          ? message_->labels().at(kLabelVirtualClusterID)
                                          : (std::getenv(kEnvVarKeyVirtualClusterID)

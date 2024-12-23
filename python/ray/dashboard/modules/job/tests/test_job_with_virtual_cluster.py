@@ -31,7 +31,6 @@ from ray.runtime_env.runtime_env import RuntimeEnv
 from ray.tests.conftest import get_default_fixture_ray_kwargs
 
 TEMPLATE_ID_PREFIX = "template_id_"
-NTEMPLATE = 5
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +43,7 @@ def _ray_start_virtual_cluster(**kwargs):
     init_kwargs = get_default_fixture_ray_kwargs()
     num_nodes = 0
     do_init = False
+    ntemplates = kwargs["ntemplates"]
     # num_nodes & do_init are not arguments for ray.init, so delete them.
     if "num_nodes" in kwargs:
         num_nodes = kwargs["num_nodes"]
@@ -53,6 +53,8 @@ def _ray_start_virtual_cluster(**kwargs):
         del kwargs["do_init"]
     elif num_nodes > 0:
         do_init = True
+
+    kwargs.pop("ntemplates")
     init_kwargs.update(kwargs)
     namespace = init_kwargs.pop("namespace")
     cluster = Cluster()
@@ -63,7 +65,7 @@ def _ray_start_virtual_cluster(**kwargs):
         env_vars = {}
         if i > 0:
             env_vars = {
-                "RAY_NODE_TYPE_NAME": TEMPLATE_ID_PREFIX + str((i - 1) % NTEMPLATE)
+                "RAY_NODE_TYPE_NAME": TEMPLATE_ID_PREFIX + str((i - 1) % ntemplates)
             }
         remote_nodes.append(
             cluster.add_node(
@@ -90,8 +92,9 @@ def is_virtual_cluster_empty(request):
 @pytest_asyncio.fixture
 async def job_sdk_client(request, make_sure_dashboard_http_port_unused, external_redis):
     param = getattr(request, "param", {})
+    ntemplates = param["ntemplates"]
     with _ray_start_virtual_cluster(
-        do_init=True, num_cpus=20, num_nodes=21, **param
+        do_init=True, num_cpus=20, num_nodes=4 * ntemplates + 1, **param
     ) as res:
         ip, _ = res.webui_url.split(":")
         agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
@@ -126,8 +129,14 @@ async def create_virtual_cluster(
 @pytest.mark.parametrize(
     "job_sdk_client",
     [
-        {"_system_config": {"gcs_actor_scheduling_enabled": False}},
-        {"_system_config": {"gcs_actor_scheduling_enabled": True}},
+        {
+            "_system_config": {"gcs_actor_scheduling_enabled": False},
+            "ntemplates": 5,
+        },
+        {
+            "_system_config": {"gcs_actor_scheduling_enabled": True},
+            "ntemplates": 5,
+        },
     ],
     indirect=True,
 )
@@ -136,7 +145,8 @@ async def test_mixed_virtual_cluster(job_sdk_client):
     head_client, gcs_address, cluster = job_sdk_client
     virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
     node_to_virtual_cluster = {}
-    for i in range(NTEMPLATE):
+    ntemplates = 5
+    for i in range(ntemplates):
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
         nodes = await create_virtual_cluster(
             gcs_address, virtual_cluster_id, {TEMPLATE_ID_PREFIX + str(i): 3}
@@ -163,7 +173,7 @@ async def test_mixed_virtual_cluster(job_sdk_client):
         def nodes(self):
             return self._nodes
 
-    for i in range(NTEMPLATE):
+    for i in range(ntemplates):
         actor_name = f"test_actors_{i}"
         pg_name = f"test_pgs_{i}"
         control_actor_name = f"control_{i}"
@@ -180,7 +190,7 @@ import asyncio
 
 ray.init(address="auto")
 
-control = ray.get_actor(name="__control_actor_name__", namespace="control")
+control = ray.get_actor(name="{control_actor_name}", namespace="control")
 
 
 @ray.remote(max_restarts=10)
@@ -218,7 +228,7 @@ class Actor:
 
 
 pg = ray.util.placement_group(
-    bundles=[{"CPU": 1}], name="__pg_name__", lifetime="detached"
+    bundles=[{{"CPU": 1}}], name="{pg_name}", lifetime="detached"
 )
 
 
@@ -229,7 +239,7 @@ def hello(control):
 
 
 ray.get(hello.remote(control))
-a = Actor.options(name="__actor_name__",
+a = Actor.options(name="{actor_name}",
                   namespace="control",
                   num_cpus=1,
                   lifetime="detached").remote(
@@ -237,10 +247,10 @@ a = Actor.options(name="__actor_name__",
 )
 ray.get(a.run.remote(control))
             """
-            driver_script = (
-                driver_script.replace("__actor_name__", actor_name)
-                .replace("__pg_name__", pg_name)
-                .replace("__control_actor_name__", control_actor_name)
+            driver_script = driver_script.format(
+                actor_name=actor_name,
+                pg_name=pg_name,
+                control_actor_name=control_actor_name,
             )
             test_script_file = path / "test_script.py"
             with open(test_script_file, "w+") as file:
@@ -290,6 +300,11 @@ ray.get(a.run.remote(control))
             actor_info = ray.state.actors(supervisor_actor._actor_id.hex())
             driver_node_id = actor_info["Address"]["NodeID"]
             assert node_to_virtual_cluster[driver_node_id] == virtual_cluster_id
+
+            job_info = head_client.get_job_info(job_id)
+            assert (
+                node_to_virtual_cluster[job_info.driver_node_id] == virtual_cluster_id
+            )
 
             nodes_to_remove = ray.get(control_actor.nodes.remote())
             if driver_node_id in nodes_to_remove:

@@ -70,7 +70,6 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_PLATFORM: "linux macos"
           CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel
         with:
           package-dir: ./python

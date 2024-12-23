@@ -36,6 +36,20 @@ std::string DebugString(const ReplicaInstances &replica_instances, int indent = 
   return stream.str();
 }
 
+std::string DebugString(const ReplicaSets &replica_sets) {
+  if (replica_sets.empty()) {
+    return "{}";
+  }
+  std::ostringstream ostr;
+  ostr << "{";
+  for (const auto &entry : replica_sets) {
+    ostr << "\"" << entry.first << "\""
+         << ": " << entry.second << ", ";
+  }
+  auto str = ostr.str();
+  return str.substr(0, str.length() - 2) + "}";
+}
+
 ///////////////////////// VirtualCluster /////////////////////////
 void VirtualCluster::UpdateNodeInstances(ReplicaInstances replica_instances_to_add,
                                          ReplicaInstances replica_instances_to_remove) {
@@ -98,13 +112,17 @@ void VirtualCluster::RemoveNodeInstances(ReplicaInstances replica_instances) {
 }
 
 Status VirtualCluster::LookupIdleNodeInstances(
-    const ReplicaSets &replica_sets, ReplicaInstances &replica_instances) const {
+    ReplicaSets &replica_sets, ReplicaInstances &replica_instances) const {
   bool success = true;
-  for (const auto &[template_id, replicas] : replica_sets) {
-    auto &template_node_instances = replica_instances[template_id];
+  for (auto replica_iter = replica_sets.begin(); replica_iter != replica_sets.end();) {
+    auto current_replica_iter = replica_iter;
+    replica_iter++;
+    auto &replicas = current_replica_iter->second;
     if (replicas <= 0) {
       continue;
     }
+    const auto &template_id = current_replica_iter->first;
+    auto &template_node_instances = replica_instances[template_id];
 
     auto iter = visible_node_instances_.find(template_id);
     if (iter == visible_node_instances_.end()) {
@@ -124,19 +142,19 @@ Status VirtualCluster::LookupIdleNodeInstances(
         continue;
       }
       job_node_instances.emplace(id, node_instance);
-      if (job_node_instances.size() == static_cast<size_t>(replicas)) {
+      replicas--;
+      if (replicas == 0) {
+        replica_sets.erase(current_replica_iter);
         break;
       }
     }
-    if (job_node_instances.size() < static_cast<size_t>(replicas)) {
+    if (replicas > 0) {
       success = false;
     }
   }
 
   if (!success) {
-    // TODO(Shanly): Give a more detailed error message about the demand replica set and
-    // the idle replica instances.
-    return Status::OutOfResource("No enough node instances to assign.");
+    return Status::OutOfResource("");
   }
 
   return Status::OK();
@@ -407,7 +425,11 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
     auto status = logical_cluster->LookupIdleNodeInstances(replica_sets_to_remove,
                                                            replica_instances_to_remove);
     if (!status.ok()) {
-      return status;
+      std::ostringstream ss;
+      ss << "No enough nodes to remove from the virtual cluster. You have to "
+            "additionally drain the following replica sets: ";
+      ss << ray::gcs::DebugString(replica_sets_to_remove);
+      return Status::OutOfResource(ss.str());
     }
   }
 
@@ -415,7 +437,15 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
       request.replica_sets(),
       logical_cluster ? logical_cluster->GetReplicaSets() : ReplicaSets());
   // Lookup idle node instances from main cluster based on `replica_sets_to_add`.
-  return LookupIdleNodeInstances(replica_sets_to_add, replica_instances_to_add);
+  auto status = LookupIdleNodeInstances(replica_sets_to_add, replica_instances_to_add);
+  if (!status.ok()) {
+    std::ostringstream ss;
+    ss << "No enough nodes to add to the virtual cluster. You have to additionally "
+          "prepare the following replica sets: ";
+    ss << ray::gcs::DebugString(replica_sets_to_add);
+    return Status::OutOfResource(ss.str());
+  }
+  return Status::OK();
 }
 
 bool PrimaryCluster::IsIdleNodeInstance(const std::string &job_cluster_id,

@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import socket
@@ -48,6 +49,12 @@ def remove_virtual_cluster(webui_url, virtual_cluster_id):
         return result
     except Exception as ex:
         logger.info(ex)
+
+
+@ray.remote
+class SmallActor:
+    def pid(self):
+        return os.getpid()
 
 
 @pytest.mark.parametrize(
@@ -169,8 +176,17 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     webui_url = format_web_url(webui_url)
 
     # Add two nodes to the primary cluster.
-    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"})
-    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"})
+    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"}, resources={"4c8g": 1})
+    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"}, resources={"8c16g": 1})
+
+    def _extract_dict_from_msg(msg: str):
+        open_brace = msg.rfind("{")
+        close_brace = msg.rfind("}")
+
+        if open_brace == -1 or close_brace == -1 or open_brace > close_brace:
+            raise ValueError("No valid {} pair found")
+
+        return json.loads(msg[open_brace : close_brace + 1])
 
     # Create a new virtual cluster with a non-exist node type.
     result = create_or_update_virtual_cluster(
@@ -181,7 +197,11 @@ def test_create_and_update_virtual_cluster_with_exceptions(
         revision=0,
     )
     assert result["result"] is False
-    assert str(result["msg"]).endswith("No enough node instances to assign.")
+    assert "No enough nodes to add to the virtual cluster" in result["msg"]
+    result_dict = _extract_dict_from_msg(result["msg"])
+    # The primary cluster lacks one `16c32g` node to meet the
+    # virtual cluster's requirement.
+    assert result_dict == {"16c32g": 1}
 
     # Create a new virtual cluster with node count that the primary cluster
     # can not provide.
@@ -193,7 +213,11 @@ def test_create_and_update_virtual_cluster_with_exceptions(
         revision=0,
     )
     assert result["result"] is False
-    assert str(result["msg"]).endswith("No enough node instances to assign.")
+    assert "No enough nodes to add to the virtual cluster" in result["msg"]
+    result_dict = _extract_dict_from_msg(result["msg"])
+    # The primary cluster lacks one `4c8g` node to meet the
+    # virtual cluster's requirement.
+    assert result_dict == {"4c8g": 1}
 
     # Create a new virtual cluster with one `4c8g` node, which shall succeed.
     result = create_or_update_virtual_cluster(
@@ -211,7 +235,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
         webui_url=webui_url,
         virtual_cluster_id="virtual_cluster_1",
         allocation_mode=allocation_mode,
-        replica_sets={"4c8g": 1, "8c16g": 2},
+        replica_sets={"4c8g": 2, "8c16g": 2},
         revision=0,
     )
     assert result["result"] is False
@@ -223,11 +247,34 @@ def test_create_and_update_virtual_cluster_with_exceptions(
         webui_url=webui_url,
         virtual_cluster_id="virtual_cluster_1",
         allocation_mode=allocation_mode,
-        replica_sets={"4c8g": 1, "8c16g": 2},
+        replica_sets={"4c8g": 2, "8c16g": 2},
         revision=revision,
     )
     assert result["result"] is False
-    assert str(result["msg"]).endswith("No enough node instances to assign.")
+    assert "No enough nodes to add to the virtual cluster" in result["msg"]
+    result_dict = _extract_dict_from_msg(result["msg"])
+    # The primary cluster lacks one `4c8g` node and one `8c16g`
+    # node to meet the virtual cluster's requirement.
+    assert result_dict == {"4c8g": 1, "8c16g": 1}
+
+    if allocation_mode == "mixed":
+        actor = SmallActor.options(resources={"4c8g": 1}).remote()
+        ray.get(actor.pid.remote(), timeout=10)
+
+        # Update (scale down) the virtual cluster with one node in use.
+        result = create_or_update_virtual_cluster(
+            webui_url=webui_url,
+            virtual_cluster_id="virtual_cluster_1",
+            allocation_mode=allocation_mode,
+            replica_sets={},
+            revision=revision,
+        )
+        assert result["result"] is False
+        assert "No enough nodes to remove from the virtual cluster" in result["msg"]
+        result_dict = _extract_dict_from_msg(result["msg"])
+        # The virtual cluster has one `4c8g` node in use. We have
+        # to drain it before scaling down the virtual cluster.
+        assert result_dict == {"4c8g": 1}
 
     # Create a new virtual cluster that the remaining nodes in the primary cluster
     # are not enough.
@@ -239,7 +286,11 @@ def test_create_and_update_virtual_cluster_with_exceptions(
         revision=0,
     )
     assert result["result"] is False
-    assert str(result["msg"]).endswith("No enough node instances to assign.")
+    assert "No enough nodes to add to the virtual cluster" in result["msg"]
+    result_dict = _extract_dict_from_msg(result["msg"])
+    # The primary cluster lacks one `4c8g` node to meet the
+    # virtual cluster's requirement.
+    assert result_dict == {"4c8g": 1}
 
 
 @pytest.mark.parametrize(
@@ -293,11 +344,6 @@ def test_remove_virtual_cluster(disable_aiohttp_cache, ray_start_cluster_head):
         revision=0,
     )
     assert result["result"] is True
-
-    @ray.remote
-    class SmallActor:
-        def pid(self):
-            return os.getpid()
 
     # Create an actor that requires some resources.
     actor = SmallActor.options(num_cpus=0.1).remote()

@@ -140,7 +140,7 @@ class VirtualCluster {
   /// \param replica_instances The node instances lookuped best effort from the visible
   /// node instances.
   /// \return OK if the lookup is successful, otherwise return an error.
-  Status LookupIdleNodeInstances(const ReplicaSets &replica_sets,
+  Status LookupIdleNodeInstances(ReplicaSets &replica_sets,
                                  ReplicaInstances &replica_instances) const;
 
   /// Mark the node instance as dead.

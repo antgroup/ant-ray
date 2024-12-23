@@ -70,7 +70,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel
+          CIBW_BEFORE_BUILD_LINUX: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh
           CIBW_BUILD: cp39-* cp310-* cp311-* cp312-*
         with:
           package-dir: ./python

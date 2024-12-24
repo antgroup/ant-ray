@@ -154,18 +154,17 @@ def test_create_and_update_virtual_cluster(
     allocation_mode = "mixed"
     wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
 
-    # TODO: uncomment this when `MixedCluster::IsIdleNodeInstance` is fixed.
     # Update the virtual cluster with less nodes.
-    # replica_sets = {"4c8g": 1}
-    # wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    replica_sets = {"4c8g": 1}
+    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
 
     # Update the virtual cluster with more nodes.
-    # replica_sets = {"4c8g": 1, "8c16g": 1}
-    # wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    replica_sets = {"4c8g": 1, "8c16g": 1}
+    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
 
     # Update the virtual cluster with zero node (make it empty).
-    # replica_sets = {}
-    # wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    replica_sets = {}
+    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
 
 
 @pytest.mark.parametrize(

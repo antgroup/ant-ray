@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import socket
+import time
 
 import pytest
 import requests
@@ -49,6 +50,16 @@ def remove_virtual_cluster(webui_url, virtual_cluster_id):
         return result
     except Exception as ex:
         logger.info(ex)
+
+
+def extract_dict_from_msg(msg: str):
+    open_brace = msg.find("{")
+    close_brace = msg.rfind("}")
+
+    if open_brace == -1 or close_brace == -1 or open_brace > close_brace:
+        raise ValueError("No valid {} pair found")
+
+    return json.loads(msg[open_brace : close_brace + 1])
 
 
 @ray.remote
@@ -179,15 +190,6 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"}, resources={"4c8g": 1})
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"}, resources={"8c16g": 1})
 
-    def _extract_dict_from_msg(msg: str):
-        open_brace = msg.rfind("{")
-        close_brace = msg.rfind("}")
-
-        if open_brace == -1 or close_brace == -1 or open_brace > close_brace:
-            raise ValueError("No valid {} pair found")
-
-        return json.loads(msg[open_brace : close_brace + 1])
-
     # Create a new virtual cluster with a non-exist node type.
     result = create_or_update_virtual_cluster(
         webui_url=webui_url,
@@ -198,7 +200,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    result_dict = _extract_dict_from_msg(result["msg"])
+    result_dict = extract_dict_from_msg(result["msg"])
     # The primary cluster lacks one `16c32g` node to meet the
     # virtual cluster's requirement.
     assert result_dict == {"16c32g": 1}
@@ -214,7 +216,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    result_dict = _extract_dict_from_msg(result["msg"])
+    result_dict = extract_dict_from_msg(result["msg"])
     # The primary cluster lacks one `4c8g` node to meet the
     # virtual cluster's requirement.
     assert result_dict == {"4c8g": 1}
@@ -252,7 +254,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    result_dict = _extract_dict_from_msg(result["msg"])
+    result_dict = extract_dict_from_msg(result["msg"])
     # The primary cluster lacks one `4c8g` node and one `8c16g`
     # node to meet the virtual cluster's requirement.
     assert result_dict == {"4c8g": 1, "8c16g": 1}
@@ -271,7 +273,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
         )
         assert result["result"] is False
         assert "No enough nodes to remove from the virtual cluster" in result["msg"]
-        result_dict = _extract_dict_from_msg(result["msg"])
+        result_dict = extract_dict_from_msg(result["msg"])
         # The virtual cluster has one `4c8g` node in use. We have
         # to drain it before scaling down the virtual cluster.
         assert result_dict == {"4c8g": 1}
@@ -287,7 +289,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    result_dict = _extract_dict_from_msg(result["msg"])
+    result_dict = extract_dict_from_msg(result["msg"])
     # The primary cluster lacks one `4c8g` node to meet the
     # virtual cluster's requirement.
     assert result_dict == {"4c8g": 1}
@@ -298,7 +300,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     [
         {
             "include_dashboard": True,
-        }
+        },
     ],
     indirect=True,
 )
@@ -308,8 +310,8 @@ def test_remove_virtual_cluster(disable_aiohttp_cache, ray_start_cluster_head):
     webui_url = cluster.webui_url
     webui_url = format_web_url(webui_url)
 
-    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"})
-    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"})
+    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"}, resources={"4c8g": 1})
+    cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"}, resources={"8c16g": 1})
 
     # Create a new virtual cluster with exclusive allocation mode.
     result = create_or_update_virtual_cluster(
@@ -329,7 +331,7 @@ def test_remove_virtual_cluster(disable_aiohttp_cache, ray_start_cluster_head):
     # The error msg should tell us the virtual cluster does not exit.
     assert str(result["msg"]).endswith("does not exist.")
 
-    # Remove the virtual cluster.
+    # Remove the virtual cluster. This will release all nodes.
     result = remove_virtual_cluster(
         webui_url=webui_url, virtual_cluster_id="virtual_cluster_1"
     )
@@ -338,7 +340,7 @@ def test_remove_virtual_cluster(disable_aiohttp_cache, ray_start_cluster_head):
     # Create a new virtual cluster with mixed mode.
     result = create_or_update_virtual_cluster(
         webui_url=webui_url,
-        virtual_cluster_id="virtual_cluster_1",
+        virtual_cluster_id="virtual_cluster_2",
         allocation_mode="mixed",
         replica_sets={"4c8g": 1, "8c16g": 1},
         revision=0,
@@ -346,26 +348,31 @@ def test_remove_virtual_cluster(disable_aiohttp_cache, ray_start_cluster_head):
     assert result["result"] is True
 
     # Create an actor that requires some resources.
-    actor = SmallActor.options(num_cpus=0.1).remote()
+    actor = SmallActor.options(num_cpus=1, resources={"4c8g": 1}).remote()
     ray.get(actor.pid.remote(), timeout=10)
 
     # Remove the virtual cluster.
     result = remove_virtual_cluster(
-        webui_url=webui_url, virtual_cluster_id="virtual_cluster_1"
+        webui_url=webui_url, virtual_cluster_id="virtual_cluster_2"
     )
     # The virtual cluster can not be removed because some nodes
     # are still in use.
     assert result["result"] is False
-    assert str(result["msg"]).endswith("still in use.")
+    assert "still in use" in result["msg"]
+
+    result_dict = extract_dict_from_msg(result["msg"])
+    assert "4c8g" in result_dict
 
     ray.kill(actor, no_restart=True)
 
-    # TODO: uncomment this when `MixedCluster::IsIdleNodeInstance` is fixed.
-    # # Remove the virtual cluster.
-    # result = remove_virtual_cluster(
-    #     webui_url=webui_url,
-    #     virtual_cluster_id="virtual_cluster_1")
-    # assert result["result"] is True
+    # Wait for RESOURCE_VIEW sync message consumed by gcs.
+    time.sleep(3)
+
+    # Remove the virtual cluster.
+    result = remove_virtual_cluster(
+        webui_url=webui_url, virtual_cluster_id="virtual_cluster_2"
+    )
+    assert result["result"] is True
 
 
 @pytest.mark.parametrize(

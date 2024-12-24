@@ -20,6 +20,7 @@
 #include "ray/common/virtual_cluster_id.h"
 #include "src/ray/protobuf/gcs.pb.h"
 #include "src/ray/protobuf/gcs_service.pb.h"
+#include "src/ray/raylet/scheduling/cluster_resource_manager.h"
 
 namespace ray {
 namespace gcs {
@@ -100,7 +101,9 @@ ReplicaSets ReplicasDifference(const T1 &left, const T2 &right) {
 
 class VirtualCluster {
  public:
-  VirtualCluster(const std::string &id) : id_(id) {}
+  VirtualCluster(const std::string &id,
+                 const ClusterResourceManager &cluster_resource_manager)
+      : id_(id), cluster_resource_manager_(cluster_resource_manager) {}
   virtual ~VirtualCluster() = default;
 
   /// Get the id of the cluster.
@@ -159,7 +162,7 @@ class VirtualCluster {
   /// Check if the virtual cluster is in use.
   ///
   /// \return True if the virtual cluster is in use, false otherwise.
-  virtual bool InUse() const = 0;
+  virtual bool InUse(ReplicaInstances *in_use_instances = nullptr) const = 0;
 
   /// Convert the virtual cluster to proto data which usually is used for flushing
   /// to redis or publishing to raylet.
@@ -175,6 +178,7 @@ class VirtualCluster {
   /// \param node_instance The node instance to be checked.
   /// \return True if the node instance is idle, false otherwise.
   virtual bool IsIdleNodeInstance(const std::string &job_cluster_id,
+                                  const std::string &node_instance_id,
                                   const gcs::NodeInstance &node_instance) const = 0;
 
   /// Insert the node instances to the cluster.
@@ -195,14 +199,18 @@ class VirtualCluster {
   ReplicaSets replica_sets_;
   // Version number of the last modification to the cluster.
   uint64_t revision_{0};
+
+  const ClusterResourceManager &cluster_resource_manager_;
 };
 
 class JobCluster;
 class ExclusiveCluster : public VirtualCluster {
  public:
   ExclusiveCluster(const std::string &id,
-                   const AsyncClusterDataFlusher &async_data_flusher)
-      : VirtualCluster(id), async_data_flusher_(async_data_flusher) {}
+                   const AsyncClusterDataFlusher &async_data_flusher,
+                   const ClusterResourceManager &cluster_resource_manager)
+      : VirtualCluster(id, cluster_resource_manager),
+        async_data_flusher_(async_data_flusher) {}
 
   const std::string &GetID() const override { return id_; }
   rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::EXCLUSIVE; }
@@ -238,10 +246,11 @@ class ExclusiveCluster : public VirtualCluster {
   /// Check if the virtual cluster is in use.
   ///
   /// \return True if the virtual cluster is in use, false otherwise.
-  bool InUse() const override;
+  bool InUse(ReplicaInstances *in_use_instances = nullptr) const override;
 
  protected:
   bool IsIdleNodeInstance(const std::string &job_cluster_id,
+                          const std::string &node_instance_id,
                           const gcs::NodeInstance &node_instance) const override;
 
   // The mapping from job cluster id to `JobCluster` instance.
@@ -252,7 +261,9 @@ class ExclusiveCluster : public VirtualCluster {
 
 class MixedCluster : public VirtualCluster {
  public:
-  MixedCluster(const std::string &id) : VirtualCluster(id) {}
+  MixedCluster(const std::string &id,
+               const ClusterResourceManager &cluster_resource_manager)
+      : VirtualCluster(id, cluster_resource_manager) {}
   MixedCluster &operator=(const MixedCluster &) = delete;
 
   const std::string &GetID() const override { return id_; }
@@ -261,10 +272,11 @@ class MixedCluster : public VirtualCluster {
   /// Check if the virtual cluster is in use.
   ///
   /// \return True if the virtual cluster is in use, false otherwise.
-  bool InUse() const override;
+  bool InUse(ReplicaInstances *in_use_instances = nullptr) const override;
 
  protected:
   bool IsIdleNodeInstance(const std::string &job_cluster_id,
+                          const std::string &node_instance_id,
                           const gcs::NodeInstance &node_instance) const override;
 };
 
@@ -275,8 +287,10 @@ class JobCluster : public MixedCluster {
 
 class PrimaryCluster : public ExclusiveCluster {
  public:
-  PrimaryCluster(const AsyncClusterDataFlusher &async_data_flusher)
-      : ExclusiveCluster(kPrimaryClusterID, async_data_flusher) {}
+  PrimaryCluster(const AsyncClusterDataFlusher &async_data_flusher,
+                 const ClusterResourceManager &cluster_resource_manager)
+      : ExclusiveCluster(
+            kPrimaryClusterID, async_data_flusher, cluster_resource_manager) {}
   PrimaryCluster &operator=(const PrimaryCluster &) = delete;
 
   const std::string &GetID() const override { return kPrimaryClusterID; }
@@ -329,6 +343,7 @@ class PrimaryCluster : public ExclusiveCluster {
 
  protected:
   bool IsIdleNodeInstance(const std::string &job_cluster_id,
+                          const std::string &node_instance_id,
                           const gcs::NodeInstance &node_instance) const override;
 
  private:

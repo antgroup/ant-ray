@@ -14,8 +14,12 @@
 
 #include "ray/gcs/gcs_server/gcs_virtual_cluster.h"
 
+#include "nlohmann/json.hpp"
+
 namespace ray {
 namespace gcs {
+
+using json = nlohmann::json;
 
 std::string DebugString(const ReplicaInstances &replica_instances, int indent = 0) {
   std::ostringstream stream;
@@ -36,18 +40,12 @@ std::string DebugString(const ReplicaInstances &replica_instances, int indent = 
   return stream.str();
 }
 
-std::string DebugString(const ReplicaSets &replica_sets) {
-  if (replica_sets.empty()) {
-    return "{}";
-  }
-  std::ostringstream ostr;
-  ostr << "{";
+std::string ToJsonString(const ReplicaSets &replica_sets) {
+  json replica_sets_json = json::object();
   for (const auto &entry : replica_sets) {
-    ostr << "\"" << entry.first << "\""
-         << ": " << entry.second << ", ";
+    replica_sets_json[entry.first] = entry.second;
   }
-  auto str = ostr.str();
-  return str.substr(0, str.length() - 2) + "}";
+  return replica_sets_json.dump();
 }
 
 ///////////////////////// VirtualCluster /////////////////////////
@@ -138,7 +136,7 @@ Status VirtualCluster::LookupIdleNodeInstances(
 
     auto &job_node_instances = template_node_instances[kEmptyJobClusterId];
     for (const auto &[id, node_instance] : empty_iter->second) {
-      if (!IsIdleNodeInstance(kEmptyJobClusterId, *node_instance)) {
+      if (!IsIdleNodeInstance(kEmptyJobClusterId, id, *node_instance)) {
         continue;
       }
       job_node_instances.emplace(id, node_instance);
@@ -266,7 +264,8 @@ Status ExclusiveCluster::CreateJobCluster(const std::string &job_name,
                       std::move(replica_instances_to_remove_from_current_cluster));
 
   // Create a job cluster.
-  auto job_cluster = std::make_shared<JobCluster>(job_cluster_id);
+  auto job_cluster =
+      std::make_shared<JobCluster>(job_cluster_id, cluster_resource_manager_);
   job_cluster->UpdateNodeInstances(std::move(replica_instances_to_add),
                                    ReplicaInstances());
   RAY_CHECK(job_clusters_.emplace(job_cluster_id, job_cluster).second);
@@ -325,9 +324,12 @@ std::shared_ptr<JobCluster> ExclusiveCluster::GetJobCluster(
   return iter != job_clusters_.end() ? iter->second : nullptr;
 }
 
-bool ExclusiveCluster::InUse() const { return !job_clusters_.empty(); }
+bool ExclusiveCluster::InUse(ReplicaInstances *in_use_instances) const {
+  return !job_clusters_.empty();
+}
 
 bool ExclusiveCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
+                                          const std::string &node_instance_id,
                                           const gcs::NodeInstance &node_instance) const {
   RAY_CHECK(GetMode() == rpc::AllocationMode::EXCLUSIVE);
   return job_cluster_id == kEmptyJobClusterId;
@@ -346,15 +348,37 @@ void ExclusiveCluster::ForeachJobCluster(
 
 ///////////////////////// MixedCluster /////////////////////////
 bool MixedCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
+                                      const std::string &node_instance_id,
                                       const gcs::NodeInstance &node_instance) const {
-  // TODO(Shanly): The job_cluster_id will always be empty in mixed mode although the node
-  // instance is assigned to one or two jobs, so we need to check the node resources
-  // usage.
-  return node_instance.is_dead();
+  if (node_instance.is_dead()) {
+    return true;
+  }
+  auto node_id = scheduling::NodeID(NodeID::FromHex(node_instance_id).Binary());
+  const auto &node_resources = cluster_resource_manager_.GetNodeResources(node_id);
+  if (node_resources.normal_task_resources.IsEmpty() &&
+      node_resources.total == node_resources.available) {
+    return true;
+  }
+  return false;
 }
 
-bool MixedCluster::InUse() const {
-  // TODO(Shanly): Check if the virtual cluster still running jobs or placement groups.
+bool MixedCluster::InUse(ReplicaInstances *in_use_instances) const {
+  for (const auto &[template_id, job_cluster_instances] : visible_node_instances_) {
+    for (const auto &[job_cluster_id, node_instances] : job_cluster_instances) {
+      for (const auto &[node_instance_id, node_instance] : node_instances) {
+        if (!IsIdleNodeInstance(job_cluster_id, node_instance_id, *node_instance)) {
+          if (!in_use_instances) {
+            return true;
+          }
+          (*in_use_instances)[template_id][job_cluster_id][node_instance_id] =
+              node_instance;
+        }
+      }
+    }
+  }
+  if (!in_use_instances || in_use_instances->empty()) {
+    return false;
+  }
   return true;
 }
 
@@ -384,10 +408,11 @@ Status PrimaryCluster::CreateOrUpdateVirtualCluster(
     // replica_instances_to_remove must be empty as the virtual cluster is a new one.
     RAY_CHECK(replica_instances_to_remove_from_logical_cluster.empty());
     if (request.mode() == rpc::AllocationMode::EXCLUSIVE) {
-      logical_cluster = std::make_shared<ExclusiveCluster>(request.virtual_cluster_id(),
-                                                           async_data_flusher_);
+      logical_cluster = std::make_shared<ExclusiveCluster>(
+          request.virtual_cluster_id(), async_data_flusher_, cluster_resource_manager_);
     } else {
-      logical_cluster = std::make_shared<MixedCluster>(request.virtual_cluster_id());
+      logical_cluster = std::make_shared<MixedCluster>(request.virtual_cluster_id(),
+                                                       cluster_resource_manager_);
     }
     logical_clusters_[request.virtual_cluster_id()] = logical_cluster;
   }
@@ -428,7 +453,7 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
       std::ostringstream ss;
       ss << "No enough nodes to remove from the virtual cluster. You have to "
             "additionally drain the following replica sets: ";
-      ss << ray::gcs::DebugString(replica_sets_to_remove);
+      ss << ray::gcs::ToJsonString(replica_sets_to_remove);
       return Status::OutOfResource(ss.str());
     }
   }
@@ -442,13 +467,14 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
     std::ostringstream ss;
     ss << "No enough nodes to add to the virtual cluster. You have to additionally "
           "prepare the following replica sets: ";
-    ss << ray::gcs::DebugString(replica_sets_to_add);
+    ss << ray::gcs::ToJsonString(replica_sets_to_add);
     return Status::OutOfResource(ss.str());
   }
   return Status::OK();
 }
 
 bool PrimaryCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
+                                        const std::string &node_instance_id,
                                         const gcs::NodeInstance &node_instance) const {
   RAY_CHECK(GetMode() == rpc::AllocationMode::EXCLUSIVE);
   return job_cluster_id == kEmptyJobClusterId;
@@ -492,13 +518,27 @@ Status PrimaryCluster::RemoveLogicalCluster(const std::string &logical_cluster_i
   }
 
   // Check if the virtual cluster is in use.
-  if (logical_cluster->InUse()) {
+  ReplicaInstances in_use_instances;
+  if (logical_cluster->InUse(&in_use_instances)) {
     std::ostringstream ostr;
     ostr << "The virtual cluster " << logical_cluster_id
-         << " can not be removed as it still in use.";
+         << " can not be removed as it is still in use. ";
+    ostr << "The nodes in use include: ";
+    json in_use_instances_json;
+    for (const auto &[template_id, job_cluster_instances] : in_use_instances) {
+      in_use_instances_json[template_id] = json::object();
+      for (const auto &[job_cluster_id, node_instances] : job_cluster_instances) {
+        for (const auto &[node_instance_id, node_instance] : node_instances) {
+          in_use_instances_json[template_id][node_instance_id] = {
+              {"hostname", node_instance->hostname()},
+              {"is_dead", node_instance->is_dead()}};
+        }
+      }
+    }
+    ostr << in_use_instances_json.dump();
     auto message = ostr.str();
     RAY_LOG(ERROR) << message;
-    // TODO(Shanly): build a new status.
+
     return Status::InvalidArgument(message);
   }
 

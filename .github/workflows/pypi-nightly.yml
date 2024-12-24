@@ -71,7 +71,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_BEFORE_BUILD_LINUX: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh
-          CIBW_BUILD: cp39-* cp310-* cp311-*
+          CIBW_BUILD: cp39-* cp310-* cp311-* *-manylinux_x86_64*
           RAY_DEBUG_BUILD: nightly
         with:
           package-dir: ./python

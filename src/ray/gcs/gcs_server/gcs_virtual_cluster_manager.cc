@@ -71,8 +71,7 @@ void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(
   // Verify if the arguments in the request is valid.
   auto status = VerifyRequest(request);
   if (status.ok()) {
-    status = primary_cluster_->CreateOrUpdateVirtualCluster(std::move(request),
-                                                            std::move(on_done));
+    status = primary_cluster_->CreateOrUpdateVirtualCluster(std::move(request), on_done);
   }
   if (!status.ok()) {
     on_done(status, nullptr);

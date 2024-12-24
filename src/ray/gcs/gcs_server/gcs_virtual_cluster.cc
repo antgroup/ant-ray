@@ -355,6 +355,7 @@ bool MixedCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
   }
   auto node_id = scheduling::NodeID(NodeID::FromHex(node_instance_id).Binary());
   const auto &node_resources = cluster_resource_manager_.GetNodeResources(node_id);
+  // TODO(Chong-Li): the resource view sync message may lag.
   if (node_resources.normal_task_resources.IsEmpty() &&
       node_resources.total == node_resources.available) {
     return true;
@@ -367,6 +368,8 @@ bool MixedCluster::InUse(ReplicaInstances *in_use_instances) const {
     for (const auto &[job_cluster_id, node_instances] : job_cluster_instances) {
       for (const auto &[node_instance_id, node_instance] : node_instances) {
         if (!IsIdleNodeInstance(job_cluster_id, node_instance_id, *node_instance)) {
+          // If the caller does not need to know the exact in-use instances, we
+          // can just return here.
           if (!in_use_instances) {
             return true;
           }

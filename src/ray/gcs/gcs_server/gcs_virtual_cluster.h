@@ -138,6 +138,9 @@ class VirtualCluster {
 
   /// Lookup idle node instances from `visible_node_instances_` based on the demand
   /// final replica sets.
+  /// Note, when the function returns, `replica_sets` will contain the replica sets that
+  /// can not be satisfied, while `replica_instances` will contain the (idle) instances
+  /// chosen from the `visible_node_instances_`.
   ///
   /// \param replica_sets The demand final replica sets.
   /// \param replica_instances The node instances lookuped best effort from the visible
@@ -161,6 +164,7 @@ class VirtualCluster {
 
   /// Check if the virtual cluster is in use.
   ///
+  /// \param in_use_instances The node instances that are still in use.
   /// \return True if the virtual cluster is in use, false otherwise.
   virtual bool InUse(ReplicaInstances *in_use_instances = nullptr) const = 0;
 

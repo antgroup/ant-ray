@@ -121,6 +121,47 @@ void GcsVirtualClusterManager::HandleGetVirtualClusters(
   GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
 }
 
+void GcsVirtualClusterManager::HandleCreateJobCluster(
+    rpc::CreateJobClusterRequest request,
+    rpc::CreateJobClusterReply *reply,
+    rpc::SendReplyCallback send_reply_callback) {
+  const auto &virtual_cluster_id = request.virtual_cluster_id();
+  RAY_LOG(INFO) << "Start creating job cluster in virtual cluster: "
+                << virtual_cluster_id;
+  auto virtual_cluster = GetVirtualCluster(virtual_cluster_id);
+  if (virtual_cluster == nullptr) {
+    GCS_RPC_SEND_REPLY(
+        send_reply_callback, reply, Status::Invalid("virtual cluster not exists"));
+    return;
+  }
+  if (virtual_cluster->GetMode() != rpc::AllocationMode::EXCLUSIVE) {
+    GCS_RPC_SEND_REPLY(
+        send_reply_callback, reply, Status::Invalid("virtual cluster is not exclusive"));
+    return;
+  }
+  ReplicaSets replica_sets;
+  for (const auto &[template_id, count] : request.replica_sets()) {
+    replica_sets[template_id] = count;
+  }
+
+  auto exclusive_cluster = dynamic_cast<ExclusiveCluster *>(virtual_cluster.get());
+  const std::string &job_cluster_id =
+      exclusive_cluster->BuildJobClusterID(request.job_id());
+
+  exclusive_cluster->CreateJobCluster(
+      job_cluster_id,
+      std::move(replica_sets),
+      [reply, send_reply_callback](const Status &status,
+                                   std::shared_ptr<rpc::VirtualClusterTableData> data) {
+        if (status.ok()) {
+          reply->set_job_cluster_id(data->id());
+          GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
+        } else {
+          GCS_RPC_SEND_REPLY(send_reply_callback, reply, status);
+        }
+      });
+}
+
 Status GcsVirtualClusterManager::VerifyRequest(
     const rpc::CreateOrUpdateVirtualClusterRequest &request) {
   const auto &virtual_cluster_id = request.virtual_cluster_id();

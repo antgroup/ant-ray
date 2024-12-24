@@ -622,7 +622,8 @@ class JobHead(dashboard_utils.DashboardHeadModule):
         reply = await (self._gcs_virtual_cluster_info_stub.CreateJobCluster(request))
         if reply.status.code != 0:
             logger.warning(
-                f"failed to create job cluster for {job_id} in {virtual_cluster_id}"
+                f"failed to create job cluster for {job_id} in"
+                f" {virtual_cluster_id}, message: {reply.status.message}"
             )
             return None
         return reply.job_cluster_id

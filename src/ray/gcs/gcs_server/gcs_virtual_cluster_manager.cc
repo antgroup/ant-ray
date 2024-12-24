@@ -131,18 +131,16 @@ void GcsVirtualClusterManager::HandleCreateJobCluster(
   auto virtual_cluster = GetVirtualCluster(virtual_cluster_id);
   if (virtual_cluster == nullptr) {
     GCS_RPC_SEND_REPLY(
-        send_reply_callback, reply, Status::Invalid("virtual cluster not exists"));
+        send_reply_callback, reply, Status::NotFound("virtual cluster not exists"));
     return;
   }
   if (virtual_cluster->GetMode() != rpc::AllocationMode::EXCLUSIVE) {
-    GCS_RPC_SEND_REPLY(
-        send_reply_callback, reply, Status::Invalid("virtual cluster is not exclusive"));
+    GCS_RPC_SEND_REPLY(send_reply_callback,
+                       reply,
+                       Status::InvalidArgument("virtual cluster is not exclusive"));
     return;
   }
-  ReplicaSets replica_sets;
-  for (const auto &[template_id, count] : request.replica_sets()) {
-    replica_sets[template_id] = count;
-  }
+  ReplicaSets replica_sets(request.replica_sets().begin(), request.replica_sets().end());
 
   auto exclusive_cluster = dynamic_cast<ExclusiveCluster *>(virtual_cluster.get());
   const std::string &job_cluster_id =

@@ -1,5 +1,4 @@
-
-name: Ant Ray PyPi Nightly
+name: Ant Ray PyPi Release
 
 on:
   workflow_dispatch:
@@ -40,24 +39,8 @@ jobs:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./python/dist/*.whl
 
-  build_sdist:
-    name: Build source distribution
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build sdist
-        run: |
-          cd python/
-          python setup.py sdist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cibw-sdist
-          path: ./python/dist/*.tar.gz
-
   upload_pypi:
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheels]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -78,7 +61,7 @@ jobs:
           packages-dir: python/dist
 
   upload_test_pypi:
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheels]
     runs-on: ubuntu-latest
     environment: testpypi-publish
     permissions:

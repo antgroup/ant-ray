@@ -26,7 +26,9 @@ namespace ray {
 namespace gcs {
 
 struct NodeInstance {
-  NodeInstance() = default;
+  NodeInstance(const std::string &id) : id_(id) {}
+
+  const std::string &id() const { return id_; }
 
   const std::string &hostname() const { return hostname_; }
   void set_hostname(const std::string &hostname) { hostname_ = hostname; }
@@ -52,6 +54,7 @@ struct NodeInstance {
   }
 
  private:
+  std::string id_;
   std::string hostname_;
   std::string template_id_;
   bool is_dead_ = false;
@@ -62,7 +65,7 @@ using CreateOrUpdateVirtualClusterCallback =
     std::function<void(const Status &, std::shared_ptr<rpc::VirtualClusterTableData>)>;
 
 using RemoveVirtualClusterCallback = CreateOrUpdateVirtualClusterCallback;
-using GetVirtualClustersDataCallback =
+using VirtualClustersDataVisitCallback =
     std::function<void(std::shared_ptr<rpc::VirtualClusterTableData>)>;
 
 /// <template_id, _>
@@ -81,6 +84,8 @@ using ReplicaSets = absl::flat_hash_map<std::string, int32_t>;
 
 using AsyncClusterDataFlusher = std::function<Status(
     std::shared_ptr<rpc::VirtualClusterTableData>, CreateOrUpdateVirtualClusterCallback)>;
+
+using NodeInstanceFilter = std::function<bool(const gcs::NodeInstance &node_instance)>;
 
 /// Calculate the difference between two replica sets.
 template <typename T1, typename T2>
@@ -103,13 +108,17 @@ template <typename T>
 ReplicaInstances toReplicaInstances(const T &node_instances) {
   ReplicaInstances result;
   for (const auto &[id, node_instance] : node_instances) {
-    auto inst = std::make_shared<NodeInstance>();
+    auto inst = std::make_shared<NodeInstance>(id);
     inst->set_hostname(node_instance.hostname());
     inst->set_template_id(node_instance.template_id());
     result[node_instance.template_id()][kEmptyJobClusterId].emplace(id, std::move(inst));
   }
   return result;
 }
+
+std::string DebugString(const ReplicaInstances &replica_instances, int indent = 0);
+std::string DebugString(const ReplicaSets &replica_sets, int indent = 0);
+
 class VirtualCluster {
  public:
   VirtualCluster(const std::string &id) : id_(id) {}
@@ -145,15 +154,17 @@ class VirtualCluster {
   void UpdateNodeInstances(ReplicaInstances replica_instances_to_add,
                            ReplicaInstances replica_instances_to_remove);
 
-  /// Lookup idle node instances from `visible_node_instances_` based on the demand
-  /// final replica sets.
+  /// Lookup node instances from queue of kEmptyJobClusterId in `visible_node_instances_`
+  /// based on the desired final replica sets and node_instance_filter.
   ///
   /// \param replica_sets The demand final replica sets.
   /// \param replica_instances The node instances lookuped best effort from the visible
   /// node instances.
+  /// \param node_instance_filter The filter to check if the node instance is desired.
   /// \return OK if the lookup is successful, otherwise return an error.
-  Status LookupIdleNodeInstances(const ReplicaSets &replica_sets,
-                                 ReplicaInstances &replica_instances) const;
+  Status LookupNodeInstances(const ReplicaSets &replica_sets,
+                             ReplicaInstances &replica_instances,
+                             NodeInstanceFilter node_instance_filter) const;
 
   /// Mark the node instance as dead.
   ///
@@ -181,14 +192,14 @@ class VirtualCluster {
   /// Get the debug string of the virtual cluster.
   virtual std::string DebugString() const;
 
- protected:
   /// Check if the node instance is idle. If a node instance is idle, it can be
   /// removed from the virtual cluster safely.
+  ///
   /// \param node_instance The node instance to be checked.
   /// \return True if the node instance is idle, false otherwise.
-  virtual bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                                  const gcs::NodeInstance &node_instance) const = 0;
+  virtual bool IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const = 0;
 
+ protected:
   /// Insert the node instances to the cluster.
   ///
   /// \param replica_instances The node instances to be inserted.
@@ -221,15 +232,17 @@ class ExclusiveCluster : public VirtualCluster {
 
   /// Load a job cluster to the exclusive cluster.
   ///
-  /// \param data The data of the job cluster.
-  void LoadJobCluster(const rpc::VirtualClusterTableData &data);
+  /// \param job_cluster_id The id of the job cluster.
+  /// \param replica_instances The replica instances of the job cluster.
+  void LoadJobCluster(const std::string &job_cluster_id,
+                      ReplicaInstances replica_instances);
 
   /// Build the job cluster id.
   ///
-  /// \param job_id The name of the job.
+  /// \param job_name The name of the job.
   /// \return The job cluster id.
-  std::string BuildJobClusterID(const std::string &job_id) {
-    return VirtualClusterID::FromBinary(GetID()).BuildJobClusterID(job_id).Binary();
+  std::string BuildJobClusterID(const std::string &job_name) {
+    return VirtualClusterID::FromBinary(GetID()).BuildJobClusterID(job_name).Binary();
   }
 
   /// Create a job cluster.
@@ -264,10 +277,14 @@ class ExclusiveCluster : public VirtualCluster {
   /// \return True if the virtual cluster is in use, false otherwise.
   bool InUse() const override;
 
- protected:
-  bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                          const gcs::NodeInstance &node_instance) const override;
+  /// Check if the node instance is idle. If a node instance is idle, it can be
+  /// removed from the virtual cluster safely.
+  ///
+  /// \param node_instance The node instance to be checked.
+  /// \return True if the node instance is idle, false otherwise.
+  bool IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const override;
 
+ protected:
   /// Create a job cluster to the exclusive cluster.
   ///
   /// \param job_cluster_id The id of the job cluster.
@@ -295,9 +312,12 @@ class MixedCluster : public VirtualCluster {
   /// \return True if the virtual cluster is in use, false otherwise.
   bool InUse() const override;
 
- protected:
-  bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                          const gcs::NodeInstance &node_instance) const override;
+  /// Check if the node instance is idle. If a node instance is idle, it can be
+  /// removed from the virtual cluster safely.
+  ///
+  /// \param node_instance The node instance to be checked.
+  /// \return True if the node instance is idle, false otherwise.
+  bool IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const override;
 };
 
 class JobCluster : public MixedCluster {
@@ -305,7 +325,8 @@ class JobCluster : public MixedCluster {
   using MixedCluster::MixedCluster;
 };
 
-class PrimaryCluster : public ExclusiveCluster {
+class PrimaryCluster : public ExclusiveCluster,
+                       public std::enable_shared_from_this<PrimaryCluster> {
  public:
   PrimaryCluster(const AsyncClusterDataFlusher &async_data_flusher)
       : ExclusiveCluster(kPrimaryClusterID, async_data_flusher) {}
@@ -319,10 +340,14 @@ class PrimaryCluster : public ExclusiveCluster {
 
   /// Load a logical cluster to the primary cluster.
   ///
-  /// \param data The data of the logical cluster.
+  /// \param virtual_cluster_id The id of the logical cluster.
+  /// \param mode The allocation mode of the logical cluster.
+  /// \param replica_instances The replica instances of the logical cluster.
   /// \return The loaded logical cluster.
   std::shared_ptr<VirtualCluster> LoadLogicalCluster(
-      const rpc::VirtualClusterTableData &data);
+      const std::string &virtual_cluster_id,
+      rpc::AllocationMode mode,
+      ReplicaInstances replica_instances);
 
   const std::string &GetID() const override { return kPrimaryClusterID; }
   rpc::AllocationMode GetMode() const override { return rpc::AllocationMode::EXCLUSIVE; }
@@ -342,19 +367,6 @@ class PrimaryCluster : public ExclusiveCluster {
   std::shared_ptr<VirtualCluster> GetLogicalCluster(
       const std::string &logical_cluster_id) const;
 
-  /// Iterate all virtual clusters.
-  ///
-  /// \param fn The function to be called for each logical cluster.
-  void ForeachVirtualCluster(
-      const std::function<void(const std::shared_ptr<VirtualCluster> &)> &fn) const;
-
-  /// Get virtual cluster by virtual cluster id
-  ///
-  /// \param virtual_cluster_id The id of virtual cluster
-  /// \return the virtual cluster
-  std::shared_ptr<VirtualCluster> GetVirtualCluster(
-      const std::string &virtual_cluster_id);
-
   /// Remove logical cluster by the logical cluster id.
   ///
   /// \param logical_cluster_id The id of the logical cluster to be removed.
@@ -364,9 +376,25 @@ class PrimaryCluster : public ExclusiveCluster {
   Status RemoveLogicalCluster(const std::string &logical_cluster_id,
                               RemoveVirtualClusterCallback callback);
 
-  /// Get virtual cluster's proto data.
-  void GetVirtualClustersData(rpc::GetVirtualClustersRequest request,
-                              GetVirtualClustersDataCallback callback);
+  /// Get virtual cluster by virtual cluster id
+  ///
+  /// \param virtual_cluster_id The id of virtual cluster
+  /// \return the virtual cluster
+  std::shared_ptr<VirtualCluster> GetVirtualCluster(
+      const std::string &virtual_cluster_id);
+
+  /// Iterate all virtual clusters.
+  ///
+  /// \param fn The function to be called for each logical cluster.
+  void ForeachVirtualCluster(
+      const std::function<void(const std::shared_ptr<VirtualCluster> &)> &fn) const;
+
+  /// Iterate virtual clusters data matching the request.
+  ///
+  /// \param request The request to get the virtual clusters data.
+  /// \param callback The callback to visit each virtual cluster data.
+  void ForeachVirtualClustersData(rpc::GetVirtualClustersRequest request,
+                                  VirtualClustersDataVisitCallback callback);
 
   /// Handle the node added event.
   ///
@@ -379,9 +407,6 @@ class PrimaryCluster : public ExclusiveCluster {
   void OnNodeDead(const rpc::GcsNodeInfo &node);
 
  protected:
-  bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                          const gcs::NodeInstance &node_instance) const override;
-
   /// Handle the node dead event.
   ///
   /// \param node_instance_id The id of the node instance that is dead.

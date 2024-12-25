@@ -17,7 +17,46 @@
 namespace ray {
 namespace gcs {
 
-std::string DebugString(const ReplicaInstances &replica_instances, int indent = 0) {
+ReplicaSets buildReplicaSets(const ReplicaInstances &replica_instances) {
+  ReplicaSets result;
+  for (const auto &[template_id, job_node_instances] : replica_instances) {
+    int32_t count = 0;
+    for (const auto &[_, node_instances] : job_node_instances) {
+      count += node_instances.size();
+    }
+    result[template_id] = count;
+  }
+  return result;
+}
+
+/// Calculate the difference between two replica instances.
+ReplicaInstances ReplicaInstancesDifference(const ReplicaInstances &left,
+                                            const ReplicaInstances &right) {
+  ReplicaInstances result;
+  for (const auto &[template_id, job_node_instances] : left) {
+    for (const auto &[job_cluster_id, node_instances] : job_node_instances) {
+      auto right_iter = right.find(template_id);
+      if (right_iter == right.end()) {
+        result[template_id][job_cluster_id] = node_instances;
+      } else {
+        auto right_job_cluster_iter = right_iter->second.find(job_cluster_id);
+        if (right_job_cluster_iter == right_iter->second.end()) {
+          result[template_id][job_cluster_id] = node_instances;
+        } else {
+          for (const auto &[node_instance_id, node_instance] : node_instances) {
+            if (right_job_cluster_iter->second.find(node_instance_id) ==
+                right_job_cluster_iter->second.end()) {
+              result[template_id][job_cluster_id][node_instance_id] = node_instance;
+            }
+          }
+        }
+      }
+    }
+  }
+  return result;
+}
+
+std::string DebugString(const ReplicaInstances &replica_instances, int indent /* = 0*/) {
   std::ostringstream stream;
   stream << "{\n";
   for (const auto &[template_id, job_cluster_instances] : replica_instances) {
@@ -25,12 +64,22 @@ std::string DebugString(const ReplicaInstances &replica_instances, int indent = 
     for (const auto &[job_cluster_id, node_instances] : job_cluster_instances) {
       stream << std::string(indent + 4, ' ') << job_cluster_id << " : {\n";
       for (const auto &[node_instance_id, node_instance] : node_instances) {
-        stream << std::string(indent + 6, ' ') << node_instance_id << ":"
+        stream << std::string(indent + 6, ' ') << node_instance_id << " : "
                << node_instance->DebugString() << ",\n";
       }
       stream << std::string(indent + 4, ' ') << "},\n";
     }
     stream << std::string(indent + 2, ' ') << "},\n";
+  }
+  stream << std::string(indent, ' ') << "}\n";
+  return stream.str();
+}
+
+std::string DebugString(const ReplicaSets &replica_sets, int indent /* = 0*/) {
+  std::ostringstream stream;
+  stream << "{\n";
+  for (const auto &[template_id, replica] : replica_sets) {
+    stream << std::string(indent + 2, ' ') << template_id << " : " << replica << ",\n";
   }
   stream << std::string(indent, ' ') << "}\n";
   return stream.str();
@@ -101,8 +150,10 @@ void VirtualCluster::RemoveNodeInstances(ReplicaInstances replica_instances) {
   }
 }
 
-Status VirtualCluster::LookupIdleNodeInstances(
-    const ReplicaSets &replica_sets, ReplicaInstances &replica_instances) const {
+Status VirtualCluster::LookupNodeInstances(
+    const ReplicaSets &replica_sets,
+    ReplicaInstances &replica_instances,
+    NodeInstanceFilter node_instance_filter) const {
   bool success = true;
   for (const auto &[template_id, replicas] : replica_sets) {
     auto &template_node_instances = replica_instances[template_id];
@@ -124,7 +175,7 @@ Status VirtualCluster::LookupIdleNodeInstances(
 
     auto &job_node_instances = template_node_instances[kEmptyJobClusterId];
     for (const auto &[id, node_instance] : empty_iter->second) {
-      if (!IsIdleNodeInstance(kEmptyJobClusterId, *node_instance)) {
+      if (!node_instance_filter(*node_instance)) {
         continue;
       }
       job_node_instances.emplace(id, node_instance);
@@ -208,14 +259,12 @@ std::string VirtualCluster::DebugString() const {
 }
 
 ///////////////////////// ExclusiveCluster /////////////////////////
-void ExclusiveCluster::LoadJobCluster(const rpc::VirtualClusterTableData &data) {
-  RAY_CHECK(GetMode() == rpc::AllocationMode::EXCLUSIVE);
-
-  const auto &job_cluster_id = data.id();
+void ExclusiveCluster::LoadJobCluster(const std::string &job_cluster_id,
+                                      ReplicaInstances replica_instances) {
   RAY_CHECK(VirtualClusterID::FromBinary(job_cluster_id).IsJobClusterID());
   RAY_CHECK(job_clusters_.find(job_cluster_id) == job_clusters_.end());
 
-  DoCreateJobCluster(data.id(), toReplicaInstances(data.node_instances()));
+  DoCreateJobCluster(job_cluster_id, std::move(replica_instances));
 }
 
 Status ExclusiveCluster::CreateJobCluster(const std::string &job_cluster_id,
@@ -236,8 +285,11 @@ Status ExclusiveCluster::CreateJobCluster(const std::string &job_cluster_id,
   }
 
   ReplicaInstances replica_instances_to_add;
-  // Lookup idle node instances from main cluster based on `replica_sets_to_add`.
-  auto status = LookupIdleNodeInstances(replica_sets, replica_instances_to_add);
+  // Lookup unassigned alive node instances based on `replica_sets_to_add`.
+  auto status = LookupNodeInstances(
+      replica_sets, replica_instances_to_add, [this](const auto &node_instance) {
+        return !node_instance.is_dead();
+      });
   if (!status.ok()) {
     // TODO(Shanly): Give a more detailed error message about the demand replica set and
     // the idle replica instances.
@@ -320,10 +372,16 @@ std::shared_ptr<JobCluster> ExclusiveCluster::GetJobCluster(
 
 bool ExclusiveCluster::InUse() const { return !job_clusters_.empty(); }
 
-bool ExclusiveCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
-                                          const gcs::NodeInstance &node_instance) const {
-  RAY_CHECK(GetMode() == rpc::AllocationMode::EXCLUSIVE);
-  return job_cluster_id == kEmptyJobClusterId;
+bool ExclusiveCluster::IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const {
+  auto template_iter = visible_node_instances_.find(node_instance.template_id());
+  if (template_iter == visible_node_instances_.end()) {
+    return false;
+  }
+  auto job_iter = template_iter->second.find(kEmptyJobClusterId);
+  if (job_iter == template_iter->second.end()) {
+    return false;
+  }
+  return job_iter->second.contains(node_instance.id());
 }
 
 void ExclusiveCluster::ForeachJobCluster(
@@ -337,8 +395,7 @@ void ExclusiveCluster::ForeachJobCluster(
 }
 
 ///////////////////////// MixedCluster /////////////////////////
-bool MixedCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
-                                      const gcs::NodeInstance &node_instance) const {
+bool MixedCluster::IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const {
   // TODO(Shanly): The job_cluster_id will always be empty in mixed mode although the node
   // instance is assigned to one or two jobs, so we need to check the node resources
   // usage.
@@ -352,53 +409,122 @@ bool MixedCluster::InUse() const {
 
 ///////////////////////// PrimaryCluster /////////////////////////
 void PrimaryCluster::Initialize(const GcsInitData &gcs_init_data) {
+  // Let mixed cluster be Vm, exclusive cluster be Ve, job cluster be J, empty job cluster
+  // be E, then
+  //
+  //   Nodes(Ve) = Σ(Nodes(J)) + Nodes(E).
+  //
+  // When node belongs to Vm is dead (it's a simple case):
+  // 1. Find a new replica instance from primary cluster to replace the dead one in Vm,
+  // then flush and publish Vm.
+  //
+  // When node belongs to J is dead(It will also be dead in Ve as both Ve and J hold the
+  // shared node instance).
+  // 1. Find a new replica instance from E to replace the dead one in J, then flush and
+  // publish J.
+  // 2. If there is no enough node instances in E, then find a new replica instance from
+  // primary cluster to replace the dead one in J, then:
+  //   a. flush and publish J.
+  //   b. flush Ve.
+  // 3. If there is no enough node instances in primary cluster, then wait for the new
+  // node to register.
+  //
+  // When node belongs to E is dead (it's simple case).
+  // 1. Find a new replica instance from primary cluster to replace the dead one in E,
+  // then flush Ve.
+  // 2. If there is no enough node instances in primary cluster, then wait for the new
+  // node to register.
+  //
+  // When failover happens, we need to load the logical clusters and job clusters from the
+  // GCS tables, and repair the Ve based on J.
+  // 1. Find the different node instances between Σ(Nodes(J)) and Nodes(Ve), let the
+  // difference be D.
+  //    D = Σ(Nodes(J)) - Ve
+  // 2. Remove the dead node instances from Ve based on the replica sets of D and then
+  // flush Ve.
   const auto &nodes = gcs_init_data.Nodes();
-  absl::flat_hash_map<std::string, std::string> dead_node_instances;
-  absl::flat_hash_map<VirtualClusterID, const rpc::VirtualClusterTableData *>
-      logical_clusters_data;
-  absl::flat_hash_map<VirtualClusterID, const rpc::VirtualClusterTableData *>
-      job_clusters_data;
-  for (const auto &[virtual_cluster_id, virtual_cluster_data] :
-       gcs_init_data.VirtualClusters()) {
-    if (virtual_cluster_id.IsJobClusterID()) {
-      job_clusters_data[virtual_cluster_id] = &virtual_cluster_data;
-    } else {
-      logical_clusters_data[virtual_cluster_id] = &virtual_cluster_data;
-    }
-    for (auto &[id, node_instance] : virtual_cluster_data.node_instances()) {
-      auto node_id = NodeID::FromHex(id);
-      if (!nodes.contains(node_id) ||
-          nodes.at(node_id).state() == rpc::GcsNodeInfo::DEAD) {
-        dead_node_instances.emplace(id, node_instance.template_id());
-      }
-    }
-  }
-
   for (const auto &[_, node] : nodes) {
     if (node.state() == rpc::GcsNodeInfo::ALIVE) {
       OnNodeAdd(node);
     }
   }
 
-  for (const auto &[_, virtual_cluster_data] : logical_clusters_data) {
-    LoadLogicalCluster(*virtual_cluster_data);
+  absl::flat_hash_map<VirtualClusterID, ReplicaInstances>
+      job_cluster_replica_instances_map;
+  for (const auto &[virtual_cluster_id, virtual_cluster_data] :
+       gcs_init_data.VirtualClusters()) {
+    // Convert the node instances to replica instances and mark the dead node instances.
+    auto replica_instances = toReplicaInstances(virtual_cluster_data.node_instances());
+    for (auto &[_, job_node_instances] : replica_instances) {
+      for (auto &[_, node_instances] : job_node_instances) {
+        for (auto &[node_instance_id, node_instance] : node_instances) {
+          auto node_id = NodeID::FromHex(node_instance_id);
+          auto it = nodes.find(node_id);
+          if (it == nodes.end() || it->second.state() == rpc::GcsNodeInfo::DEAD) {
+            node_instance->set_is_dead(true);
+          }
+        }
+      }
+    }
+    // Stash the job clusters and load the logical clusters.
+    if (virtual_cluster_id.IsJobClusterID()) {
+      job_cluster_replica_instances_map[virtual_cluster_id] =
+          std::move(replica_instances);
+    } else {
+      // Load the logical cluster.
+      LoadLogicalCluster(virtual_cluster_data.id(),
+                         virtual_cluster_data.mode(),
+                         std::move(replica_instances));
+    }
   }
 
-  for (auto &[job_cluster_id, virtual_cluster_data] : job_clusters_data) {
+  // Repair the exclusive cluster's node instances to ensure that the node instances in
+  // the virtual clusters contains all the node instances in the job clusters. Calculate
+  // the different node instances between Σ(Nodes(J)) and Nodes(Ve),
+  //   D = Σ(Nodes(J)) - Ve
+  for (auto &[job_cluster_id, replica_instances] : job_cluster_replica_instances_map) {
+    auto parent_cluster_id = job_cluster_id.ParentID().Binary();
+    auto virtual_cluster = GetVirtualCluster(parent_cluster_id);
+    RAY_CHECK(virtual_cluster != nullptr);
+    auto replica_instances_to_repair = ReplicaInstancesDifference(
+        replica_instances, virtual_cluster->GetVisibleNodeInstances());
+    if (replica_instances_to_repair.empty()) {
+      continue;
+    }
+    // TODO(Shanly): Lookup dead node instances from the virtual cluster based on
+    // `replica_sets_to_repair`.
+    ReplicaInstances replica_instances_to_remove;
+    auto replica_sets_to_repair = buildReplicaSets(replica_instances_to_repair);
+    // Lookup unassigned dead node instances best effort.
+    virtual_cluster->LookupNodeInstances(
+        replica_sets_to_repair,
+        replica_instances_to_remove,
+        [](const auto &node_instance) { return node_instance.is_dead(); });
+    RAY_LOG(INFO) << "Repair the exclusive cluster " << parent_cluster_id
+                  << " based on the job cluster " << job_cluster_id
+                  << "\nreplica_sets_to_repair: "
+                  << ray::gcs::DebugString(replica_sets_to_repair)
+                  << "replica_instances_to_repair: "
+                  << ray::gcs::DebugString(replica_instances_to_repair)
+                  << "replica_instances_to_remove: "
+                  << ray::gcs::DebugString(replica_instances_to_remove);
+    virtual_cluster->UpdateNodeInstances(std::move(replica_instances_to_repair),
+                                         std::move(replica_instances_to_remove));
+  }
+
+  // Replay the job clusters.
+  for (auto &[job_cluster_id, replica_instances] : job_cluster_replica_instances_map) {
     auto parent_cluster_id = job_cluster_id.ParentID().Binary();
     if (parent_cluster_id == kPrimaryClusterID) {
-      LoadJobCluster(*virtual_cluster_data);
+      LoadJobCluster(job_cluster_id.Binary(), std::move(replica_instances));
     } else {
       auto logical_cluster = std::dynamic_pointer_cast<ExclusiveCluster>(
           GetLogicalCluster(parent_cluster_id));
       RAY_CHECK(logical_cluster != nullptr &&
                 logical_cluster->GetMode() == rpc::AllocationMode::EXCLUSIVE);
-      logical_cluster->LoadJobCluster(*virtual_cluster_data);
+      logical_cluster->LoadJobCluster(job_cluster_id.Binary(),
+                                      std::move(replica_instances));
     }
-  }
-
-  for (const auto &[id, node_type_name] : dead_node_instances) {
-    OnNodeInstanceDead(id, node_type_name);
   }
 }
 
@@ -425,27 +551,24 @@ void PrimaryCluster::ForeachVirtualCluster(
 }
 
 std::shared_ptr<VirtualCluster> PrimaryCluster::LoadLogicalCluster(
-    const rpc::VirtualClusterTableData &data) {
-  const auto &logical_cluster_id = data.id();
+    const std::string &virtual_cluster_id,
+    rpc::AllocationMode mode,
+    ReplicaInstances replica_instances) {
   std::shared_ptr<VirtualCluster> logical_cluster;
-  if (data.mode() == rpc::AllocationMode::EXCLUSIVE) {
+  if (mode == rpc::AllocationMode::EXCLUSIVE) {
     logical_cluster =
-        std::make_shared<ExclusiveCluster>(logical_cluster_id, async_data_flusher_);
+        std::make_shared<ExclusiveCluster>(virtual_cluster_id, async_data_flusher_);
   } else {
-    logical_cluster = std::make_shared<MixedCluster>(logical_cluster_id);
+    logical_cluster = std::make_shared<MixedCluster>(virtual_cluster_id);
   }
-  RAY_CHECK(logical_clusters_.emplace(logical_cluster_id, logical_cluster).second);
+  RAY_CHECK(logical_clusters_.emplace(virtual_cluster_id, logical_cluster).second);
 
-  auto replica_instances_to_add_to_logical_cluster =
-      toReplicaInstances(data.node_instances());
-  auto replica_instances_to_remove_from_primary_cluster =
-      replica_instances_to_add_to_logical_cluster;
+  auto replica_instances_to_remove_from_primary_cluster = replica_instances;
   UpdateNodeInstances(ReplicaInstances(),
                       std::move(replica_instances_to_remove_from_primary_cluster));
 
   // Update the virtual cluster replica sets and node instances.
-  logical_cluster->UpdateNodeInstances(
-      std::move(replica_instances_to_add_to_logical_cluster), ReplicaInstances());
+  logical_cluster->UpdateNodeInstances(std::move(replica_instances), ReplicaInstances());
   return logical_cluster;
 }
 
@@ -506,8 +629,19 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
         ReplicasDifference(logical_cluster->GetReplicaSets(), request.replica_sets());
     // Lookup idle node instances from the logical cluster based on
     // `replica_sets_to_remove`.
-    auto status = logical_cluster->LookupIdleNodeInstances(replica_sets_to_remove,
-                                                           replica_instances_to_remove);
+    // TODO(Shanly): Iterate the dead node instances in advance.
+    auto status = logical_cluster->LookupNodeInstances(
+        replica_sets_to_remove,
+        replica_instances_to_remove,
+        [logical_cluster](const auto &node_instance) {
+          if (logical_cluster->GetMode() == rpc::AllocationMode::EXCLUSIVE) {
+            return true;
+          }
+          if (node_instance.is_dead()) {
+            return true;
+          }
+          return logical_cluster->IsIdleNodeInstance(node_instance);
+        });
     if (!status.ok()) {
       return status;
     }
@@ -516,20 +650,17 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
   auto replica_sets_to_add = ReplicasDifference(
       request.replica_sets(),
       logical_cluster ? logical_cluster->GetReplicaSets() : ReplicaSets());
-  // Lookup idle node instances from main cluster based on `replica_sets_to_add`.
-  return LookupIdleNodeInstances(replica_sets_to_add, replica_instances_to_add);
-}
-
-bool PrimaryCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
-                                        const gcs::NodeInstance &node_instance) const {
-  RAY_CHECK(GetMode() == rpc::AllocationMode::EXCLUSIVE);
-  return job_cluster_id == kEmptyJobClusterId;
+  // Lookup unassigned node instances from main cluster based on `replica_sets_to_add`.
+  return LookupNodeInstances(
+      replica_sets_to_add, replica_instances_to_add, [this](const auto &node_instance) {
+        return !node_instance.is_dead();
+      });
 }
 
 void PrimaryCluster::OnNodeAdd(const rpc::GcsNodeInfo &node) {
   const auto &template_id = node.node_type_name();
   auto node_instance_id = NodeID::FromBinary(node.node_id()).Hex();
-  auto node_instance = std::make_shared<gcs::NodeInstance>();
+  auto node_instance = std::make_shared<gcs::NodeInstance>(node_instance_id);
   node_instance->set_template_id(template_id);
   node_instance->set_hostname(node.node_manager_hostname());
   node_instance->set_is_dead(false);
@@ -596,6 +727,10 @@ Status PrimaryCluster::RemoveLogicalCluster(const std::string &logical_cluster_i
 
 std::shared_ptr<VirtualCluster> PrimaryCluster::GetVirtualCluster(
     const std::string &virtual_cluster_id) {
+  if (virtual_cluster_id == kPrimaryClusterID) {
+    return shared_from_this();
+  }
+
   // Check if it is a logical cluster
   auto logical_cluster = GetLogicalCluster(virtual_cluster_id);
   if (logical_cluster != nullptr) {
@@ -620,8 +755,8 @@ std::shared_ptr<VirtualCluster> PrimaryCluster::GetVirtualCluster(
   return nullptr;
 }
 
-void PrimaryCluster::GetVirtualClustersData(rpc::GetVirtualClustersRequest request,
-                                            GetVirtualClustersDataCallback callback) {
+void PrimaryCluster::ForeachVirtualClustersData(
+    rpc::GetVirtualClustersRequest request, VirtualClustersDataVisitCallback callback) {
   std::vector<std::shared_ptr<rpc::VirtualClusterTableData>> virtual_cluster_data_list;
   auto virtual_cluster_id = request.virtual_cluster_id();
   bool include_job_clusters = request.include_job_clusters();

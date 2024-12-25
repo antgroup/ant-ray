@@ -71,8 +71,7 @@ void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(
   // Verify if the arguments in the request is valid.
   auto status = VerifyRequest(request);
   if (status.ok()) {
-    status = primary_cluster_->CreateOrUpdateVirtualCluster(std::move(request),
-                                                            std::move(on_done));
+    status = primary_cluster_->CreateOrUpdateVirtualCluster(std::move(request), on_done);
   }
   if (!status.ok()) {
     on_done(status, nullptr);
@@ -114,7 +113,7 @@ void GcsVirtualClusterManager::HandleGetVirtualClusters(
     rpc::GetVirtualClustersReply *reply,
     rpc::SendReplyCallback send_reply_callback) {
   RAY_LOG(DEBUG) << "Getting virtual clusters.";
-  primary_cluster_->GetVirtualClustersData(
+  primary_cluster_->ForeachVirtualClustersData(
       std::move(request), [reply, send_reply_callback](auto data) {
         reply->add_virtual_cluster_data_list()->CopyFrom(*data);
       });

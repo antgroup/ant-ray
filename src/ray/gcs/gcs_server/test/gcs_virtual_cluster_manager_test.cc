@@ -113,6 +113,16 @@ bool ReplicaSetsEquals(const ReplicaSets &lhs, const ReplicaSets &rhs) {
 
 class VirtualClusterTest : public ::testing::Test {
  public:
+  VirtualClusterTest() {
+    async_data_flusher_ = [this](auto data, auto callback) {
+      virtual_clusters_data_[data->id()] = data;
+      if (callback != nullptr) {
+        callback(Status::OK(), data);
+      }
+      return Status::OK();
+    };
+  }
+
   std::shared_ptr<ray::gcs::PrimaryCluster> InitPrimaryCluster(
       size_t node_count,
       size_t template_count,
@@ -120,11 +130,7 @@ class VirtualClusterTest : public ::testing::Test {
                           absl::flat_hash_map<NodeID, std::shared_ptr<rpc::GcsNodeInfo>>>
           *template_id_to_nodes = nullptr) {
     auto primary_cluster =
-        std::make_shared<ray::gcs::PrimaryCluster>([this](auto data, auto callback) {
-          virtual_clusters_data_[data->id()] = data;
-          callback(Status::OK(), data);
-          return Status::OK();
-        });
+        std::make_shared<ray::gcs::PrimaryCluster>(async_data_flusher_);
 
     for (size_t i = 0; i < node_count; ++i) {
       auto node = Mocker::GenNodeInfo();
@@ -158,6 +164,7 @@ class VirtualClusterTest : public ::testing::Test {
     return status;
   }
 
+  AsyncClusterDataFlusher async_data_flusher_;
   absl::flat_hash_map<NodeID, std::shared_ptr<rpc::GcsNodeInfo>> nodes_;
   absl::flat_hash_map<std::string, std::shared_ptr<rpc::VirtualClusterTableData>>
       virtual_clusters_data_;
@@ -701,7 +708,7 @@ TEST_F(PrimaryClusterTest, GetVirtualClusters) {
     request.set_include_job_clusters(false);
     absl::flat_hash_map<std::string, std::shared_ptr<rpc::VirtualClusterTableData>>
         virtual_clusters_data_map;
-    primary_cluster->GetVirtualClustersData(
+    primary_cluster->ForeachVirtualClustersData(
         request, [this, &virtual_clusters_data_map](auto data) {
           virtual_clusters_data_map.emplace(data->id(), data);
         });
@@ -710,7 +717,7 @@ TEST_F(PrimaryClusterTest, GetVirtualClusters) {
 
     virtual_clusters_data_map.clear();
     request.set_include_job_clusters(true);
-    primary_cluster->GetVirtualClustersData(
+    primary_cluster->ForeachVirtualClustersData(
         request, [this, &virtual_clusters_data_map](auto data) {
           virtual_clusters_data_map.emplace(data->id(), data);
         });
@@ -724,7 +731,7 @@ TEST_F(PrimaryClusterTest, GetVirtualClusters) {
     virtual_clusters_data_map.clear();
     request.set_include_job_clusters(true);
     request.set_only_include_mixed_clusters(true);
-    primary_cluster->GetVirtualClustersData(
+    primary_cluster->ForeachVirtualClustersData(
         request, [this, &virtual_clusters_data_map](auto data) {
           virtual_clusters_data_map.emplace(data->id(), data);
         });
@@ -770,7 +777,7 @@ class FailoverTest : public PrimaryClusterTest {
     job_cluster_id_0_ = primary_cluster->BuildJobClusterID("job_0");
     RAY_CHECK_OK(primary_cluster->CreateJobCluster(
         job_cluster_id_0_,
-        {{template_id_0_, 10}, {template_id_1_, 10}},
+        {{template_id_0_, 4}, {template_id_1_, 4}},
         [this](const Status &status, auto data) { ASSERT_TRUE(status.ok()); }));
 
     auto virtual_cluster_1 = std::dynamic_pointer_cast<ExclusiveCluster>(
@@ -780,7 +787,7 @@ class FailoverTest : public PrimaryClusterTest {
     job_cluster_id_1_ = virtual_cluster_1->BuildJobClusterID("job_1");
     RAY_CHECK_OK(virtual_cluster_1->CreateJobCluster(
         job_cluster_id_1_,
-        {{template_id_0_, 2}, {template_id_1_, 2}},
+        {{template_id_0_, 4}, {template_id_1_, 4}},
         [this](const Status &status, auto data) { ASSERT_TRUE(status.ok()); }));
     return primary_cluster;
   }
@@ -807,30 +814,31 @@ TEST_F(FailoverTest, FailoverNormal) {
   gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
 
   // Failover to a new primary cluster.
-  PrimaryCluster new_primary_cluster([this](auto data, auto callback) {
-    callback(Status::OK(), data);
-    return Status::OK();
-  });
-  new_primary_cluster.Initialize(gcs_init_data);
+  auto new_primary_cluster =
+      std::make_shared<PrimaryCluster>([this](auto data, auto callback) {
+        callback(Status::OK(), data);
+        return Status::OK();
+      });
+  new_primary_cluster->Initialize(gcs_init_data);
 
   // Check the visible node instances and replica sets of the primary cluster are the
   // same.
-  ASSERT_TRUE(ReplicaInstancesEquals(new_primary_cluster.GetVisibleNodeInstances(),
+  ASSERT_TRUE(ReplicaInstancesEquals(new_primary_cluster->GetVisibleNodeInstances(),
                                      primary_cluster->GetVisibleNodeInstances()));
-  ASSERT_TRUE(ReplicaSetsEquals(new_primary_cluster.GetReplicaSets(),
+  ASSERT_TRUE(ReplicaSetsEquals(new_primary_cluster->GetReplicaSets(),
                                 primary_cluster->GetReplicaSets()));
 
   // Check the visible node instances and replica sets of the virtual clusters are the
   // same.
   primary_cluster->ForeachVirtualCluster(
-      [this, &new_primary_cluster](const auto &logical_cluster) {
+      [this, new_primary_cluster](const auto &virtual_cluster) {
         auto new_virtual_cluster =
-            new_primary_cluster.GetVirtualCluster(logical_cluster->GetID());
+            new_primary_cluster->GetVirtualCluster(virtual_cluster->GetID());
         ASSERT_TRUE(new_virtual_cluster != nullptr);
         ASSERT_TRUE(ReplicaInstancesEquals(new_virtual_cluster->GetVisibleNodeInstances(),
-                                           logical_cluster->GetVisibleNodeInstances()));
+                                           virtual_cluster->GetVisibleNodeInstances()));
         ASSERT_TRUE(ReplicaSetsEquals(new_virtual_cluster->GetReplicaSets(),
-                                      logical_cluster->GetReplicaSets()));
+                                      virtual_cluster->GetReplicaSets()));
       });
 }
 
@@ -883,39 +891,138 @@ TEST_F(FailoverTest, FailoverWithDeadNodes) {
     nodes_.erase(dead_node_id);
   }
 
-  // Mock a gcs_init_data.
-  instrumented_io_context io_service;
-  gcs::InMemoryGcsTableStorage gcs_table_storage(io_service);
-  MockGcsInitData gcs_init_data(gcs_table_storage);
-  gcs_init_data.SetNodes(nodes_);
-  gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
+  {
+    // Mock a gcs_init_data.
+    instrumented_io_context io_service;
+    gcs::InMemoryGcsTableStorage gcs_table_storage(io_service);
+    MockGcsInitData gcs_init_data(gcs_table_storage);
+    gcs_init_data.SetNodes(nodes_);
+    gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
 
-  // Failover to a new primary cluster.
-  PrimaryCluster new_primary_cluster([this](auto data, auto callback) {
-    callback(Status::OK(), data);
-    return Status::OK();
-  });
-  new_primary_cluster.Initialize(gcs_init_data);
+    // Failover to a new primary cluster.
+    auto new_primary_cluster =
+        std::make_shared<PrimaryCluster>([this](auto data, auto callback) {
+          callback(Status::OK(), data);
+          return Status::OK();
+        });
+    new_primary_cluster->Initialize(gcs_init_data);
 
-  // Check the visible node instances and replica sets of the primary cluster are not the
-  // same.
-  // ASSERT_TRUE(ReplicaInstancesEquals(new_primary_cluster.GetVisibleNodeInstances(),
-  //                                    primary_cluster->GetVisibleNodeInstances()));
-  // ASSERT_FALSE(ReplicaSetsEquals(new_primary_cluster.GetReplicaSets(),
-  //                                primary_cluster->GetReplicaSets()));
+    // Check the visible node instances and replica sets of the primary cluster are the
+    // same.
+    ASSERT_TRUE(ReplicaInstancesEquals(new_primary_cluster->GetVisibleNodeInstances(),
+                                       primary_cluster->GetVisibleNodeInstances()));
+    ASSERT_TRUE(ReplicaSetsEquals(new_primary_cluster->GetReplicaSets(),
+                                  primary_cluster->GetReplicaSets()));
 
-  // Check the visible node instances and replica sets of the virtual clusters are the
-  // same.
-  primary_cluster->ForeachVirtualCluster(
-      [this, &new_primary_cluster](const auto &logical_cluster) {
-        auto new_virtual_cluster =
-            new_primary_cluster.GetVirtualCluster(logical_cluster->GetID());
-        ASSERT_TRUE(new_virtual_cluster != nullptr);
-        ASSERT_TRUE(ReplicaInstancesEquals(new_virtual_cluster->GetVisibleNodeInstances(),
-                                           logical_cluster->GetVisibleNodeInstances()));
-        ASSERT_TRUE(ReplicaSetsEquals(new_virtual_cluster->GetReplicaSets(),
-                                      logical_cluster->GetReplicaSets()));
-      });
+    // Check the visible node instances and replica sets of the virtual clusters are the
+    // same.
+    primary_cluster->ForeachVirtualCluster([this, new_primary_cluster](
+                                               const auto &logical_cluster) {
+      auto new_virtual_cluster =
+          new_primary_cluster->GetVirtualCluster(logical_cluster->GetID());
+      ASSERT_TRUE(new_virtual_cluster != nullptr);
+      ASSERT_TRUE(ReplicaInstancesEquals(new_virtual_cluster->GetVisibleNodeInstances(),
+                                         logical_cluster->GetVisibleNodeInstances()));
+      ASSERT_TRUE(ReplicaSetsEquals(new_virtual_cluster->GetReplicaSets(),
+                                    logical_cluster->GetReplicaSets()));
+    });
+  }
+
+  {
+    // Assume that the dead nodes in job cluster 1 is replaced by a new alive one from
+    // primary cluster.
+    ReplicaInstances replica_instances_to_remove;
+    ASSERT_TRUE(job_cluster_1
+                    ->LookupNodeInstances(
+                        {{template_id_0_, 1}},
+                        replica_instances_to_remove,
+                        [](const auto &node_instance) { return node_instance.is_dead(); })
+                    .ok());
+    auto dead_node_instance = replica_instances_to_remove.at(template_id_0_)
+                                  .at(kEmptyJobClusterId)
+                                  .begin()
+                                  ->second;
+    ASSERT_TRUE(dead_node_instance->is_dead());
+
+    ReplicaInstances replica_instances_to_add;
+    ASSERT_TRUE(primary_cluster
+                    ->LookupNodeInstances({{template_id_0_, 1}},
+                                          replica_instances_to_add,
+                                          [](const auto &node_instance) {
+                                            return !node_instance.is_dead();
+                                          })
+                    .ok());
+    auto idle_node_instance = replica_instances_to_add.at(template_id_0_)
+                                  .at(kEmptyJobClusterId)
+                                  .begin()
+                                  ->second;
+    ASSERT_FALSE(idle_node_instance->is_dead());
+
+    // Replace the dead node with the new alive one to simulate the scenario that:
+    //   1. job cluster table data is flushed
+    //   2. gcs restart before the logical cluster table data flushed
+    auto replica_instances_to_add_to_virtual_cluster_1 = replica_instances_to_add;
+    auto replica_instances =
+        replica_instances_to_add_to_virtual_cluster_1[template_id_0_][kEmptyJobClusterId];
+    replica_instances_to_add_to_virtual_cluster_1[template_id_0_].erase(
+        kEmptyJobClusterId);
+    replica_instances_to_add_to_virtual_cluster_1[template_id_0_][job_cluster_id_1_] =
+        std::move(replica_instances);
+
+    auto replica_instances_to_remove_from_virtual_cluster_1 = replica_instances_to_remove;
+    replica_instances =
+        replica_instances_to_remove_from_virtual_cluster_1[template_id_0_]
+                                                          [kEmptyJobClusterId];
+    replica_instances_to_remove_from_virtual_cluster_1[template_id_0_].erase(
+        kEmptyJobClusterId);
+    replica_instances_to_remove_from_virtual_cluster_1[template_id_0_]
+                                                      [job_cluster_id_1_] =
+                                                          std::move(replica_instances);
+
+    // TODO(Shanly): Remove the dead node from the replica set.
+    virtual_cluster_1->UpdateNodeInstances(
+        replica_instances_to_add_to_virtual_cluster_1,
+        replica_instances_to_remove_from_virtual_cluster_1);
+    job_cluster_1->UpdateNodeInstances(replica_instances_to_add,
+                                       replica_instances_to_remove);
+    async_data_flusher_(job_cluster_1->ToProto(), nullptr);
+    // async_data_flusher_(virtual_cluster_1->ToProto(), nullptr);
+
+    // Mock a gcs_init_data.
+    instrumented_io_context io_service;
+    gcs::InMemoryGcsTableStorage gcs_table_storage(io_service);
+    MockGcsInitData gcs_init_data(gcs_table_storage);
+    gcs_init_data.SetNodes(nodes_);
+    gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
+
+    // Failover to a new primary cluster.
+    auto new_primary_cluster =
+        std::make_shared<PrimaryCluster>([this](auto data, auto callback) {
+          callback(Status::OK(), data);
+          return Status::OK();
+        });
+    new_primary_cluster->Initialize(gcs_init_data);
+
+    // Check the visible node instances and replica sets of the primary cluster are the
+    // same.
+    ASSERT_TRUE(ReplicaInstancesEquals(new_primary_cluster->GetVisibleNodeInstances(),
+                                       primary_cluster->GetVisibleNodeInstances()));
+    ASSERT_TRUE(ReplicaSetsEquals(new_primary_cluster->GetReplicaSets(),
+                                  primary_cluster->GetReplicaSets()));
+
+    // Check the visible node instances and replica sets of the virtual clusters are the
+    // same.
+    primary_cluster->ForeachVirtualCluster([this, new_primary_cluster](
+                                               const auto &virtual_cluster) {
+      auto new_virtual_cluster =
+          new_primary_cluster->GetVirtualCluster(virtual_cluster->GetID());
+      ASSERT_TRUE(new_virtual_cluster != nullptr);
+      ASSERT_TRUE(ReplicaInstancesEquals(new_virtual_cluster->GetVisibleNodeInstances(),
+                                         virtual_cluster->GetVisibleNodeInstances()));
+      ASSERT_TRUE(ReplicaSetsEquals(new_virtual_cluster->GetReplicaSets(),
+                                    virtual_cluster->GetReplicaSets()));
+    });
+  }
 }
 
 }  // namespace gcs

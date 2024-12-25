@@ -80,7 +80,7 @@ jobs:
             cp310-manylinux_aarch64
             cp311-manylinux_x86_64
             cp311-manylinux_aarch64
-          RAY_DEBUG_BUILD: nightly
+          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly
         with:
           package-dir: ./python
           output-dir: ./python/dist
@@ -115,6 +115,24 @@ jobs:
     # if: github.event_name == 'release' && github.event.action == 'published'
     # # or, alternatively, upload to PyPI on every tag starting with 'v' (remove on: release above to use this)
     # # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          # unpacks all CIBW artifacts into dist/
+          pattern: cibw-*
+          path: python/dist
+          merge-multiple: true
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist
+
+  upload_test_pypi:
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    environment: testpypi-publish
+    permissions:
+      id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:

@@ -24,8 +24,8 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && pip install -q --target=/project/python/ray/thirdparty_files psutil "setproctitle==1.2.2" colorama && ./ci/env/install-bazel.sh
-          CIBW_BUILD: cp312-manylinux_x86_64
+          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh
+          CIBW_BUILD: cp39-macosx_x86_64
 
           CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly SKIP_THIRDPARTY_INSTALL=1
         with:

@@ -37,6 +37,71 @@ jobs:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./python/dist/*.whl
 
+  build_wheels_on_linux_aarch64:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    container:
+      image: quay.io/pypa/manylinux2014_aarch64
+
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [ubuntu-22.04]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.22.0
+        env:
+          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh --system
+          CIBW_BUILD: cp39-manylinux_aarch64
+
+          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly SKIP_THIRDPARTY_INSTALL=1
+        with:
+          package-dir: ./python
+          output-dir: ./python/dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./python/dist/*.whl
+
+
+  build_wheels_on_musl_linux_x86_64:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    container:
+      # Use container used for building musllinux wheels
+      # it has git installed, all the pythons, etc
+      image: quay.io/pypa/musllinux_1_2_x86_64
+
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [ubuntu-22.04]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.22.0
+        env:
+          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh --system
+          CIBW_BUILD: cp39-manylinux_aarch64
+
+          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly SKIP_THIRDPARTY_INSTALL=1
+        with:
+          package-dir: ./python
+          output-dir: ./python/dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./python/dist/*.whl
+
   build_wheels_on_macos:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}

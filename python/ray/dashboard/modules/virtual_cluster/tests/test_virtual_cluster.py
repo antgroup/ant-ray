@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import socket
@@ -52,16 +51,6 @@ def remove_virtual_cluster(webui_url, virtual_cluster_id):
         logger.info(ex)
 
 
-def extract_dict_from_msg(msg: str):
-    open_brace = msg.find("{")
-    close_brace = msg.rfind("}")
-
-    if open_brace == -1 or close_brace == -1 or open_brace > close_brace:
-        raise ValueError("No valid {} pair found")
-
-    return json.loads(msg[open_brace : close_brace + 1])
-
-
 @ray.remote
 class SmallActor:
     def pid(self):
@@ -89,82 +78,93 @@ def test_create_and_update_virtual_cluster(
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"})
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "8c16g"})
     hostname = socket.gethostname()
-
-    virtual_cluster_id = ""
-    allocation_mode = ""
-    replica_sets = {}
     revision = 0
 
-    def _create_or_update_virtual_cluster():
-        try:
-            nonlocal revision
-            resp = requests.post(
-                webui_url + "/virtual_clusters",
-                json={
-                    "virtualClusterId": virtual_cluster_id,
-                    "allocationMode": allocation_mode,
-                    "replicaSets": replica_sets,
-                    "revision": revision,
-                },
+    def _check_create_or_update_virtual_cluster(
+        virtual_cluster_id, allocation_mode, replica_sets
+    ):
+        nonlocal revision
+        resp = requests.post(
+            webui_url + "/virtual_clusters",
+            json={
+                "virtualClusterId": virtual_cluster_id,
+                "allocationMode": allocation_mode,
+                "replicaSets": replica_sets,
+                "revision": revision,
+            },
+            timeout=10,
+        )
+        resp.raise_for_status()
+        result = resp.json()
+        print(result)
+        assert result["result"] is True, resp.text
+        assert result["data"]["virtualClusterId"] == virtual_cluster_id
+        current_revision = result["data"]["revision"]
+        assert current_revision > revision
+        revision = current_revision
+        virtual_cluster_replica_sets = {}
+        for _, node_instance in result["data"]["nodeInstances"].items():
+            assert node_instance["hostname"] == hostname
+            virtual_cluster_replica_sets[node_instance["templateId"]] = (
+                virtual_cluster_replica_sets.get(node_instance["templateId"], 0) + 1
             )
-            resp.raise_for_status()
-            result = resp.json()
-            print(result)
-            assert result["result"] is True, resp.text
-            assert result["data"]["virtualClusterId"] == virtual_cluster_id
-            current_revision = result["data"]["revision"]
-            assert current_revision > revision
-            revision = current_revision
-            virtual_cluster_replica_sets = {}
-            for _, node_instance in result["data"]["nodeInstances"].items():
-                assert node_instance["hostname"] == hostname
-                virtual_cluster_replica_sets[node_instance["templateId"]] = (
-                    virtual_cluster_replica_sets.get(node_instance["templateId"], 0) + 1
-                )
-            # The virtual cluster has the same node types and count as expected.
-            assert replica_sets == virtual_cluster_replica_sets
-            return True
-        except Exception as ex:
-            logger.info(ex)
-            return False
+        # The virtual cluster has the same node types and count as expected.
+        assert replica_sets == virtual_cluster_replica_sets
 
     # Create a new virtual cluster with exclusive allocation mode.
-    virtual_cluster_id = "virtual_cluster_1"
-    allocation_mode = "exclusive"
-    replica_sets = {"4c8g": 1, "8c16g": 1}
-    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    _check_create_or_update_virtual_cluster(
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode="exclusive",
+        replica_sets={"4c8g": 1, "8c16g": 1},
+    )
 
-    # Update the virtual cluster with less nodes.
-    replica_sets = {"4c8g": 1}
-    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    # Update the virtual cluster with less nodes (scale down).
+    _check_create_or_update_virtual_cluster(
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode="exclusive",
+        replica_sets={"4c8g": 1},
+    )
 
-    # Update the virtual cluster with more nodes.
-    replica_sets = {"4c8g": 1, "8c16g": 1}
-    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    # Update the virtual cluster with more nodes (scale up).
+    _check_create_or_update_virtual_cluster(
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode="exclusive",
+        replica_sets={"4c8g": 1, "8c16g": 1},
+    )
 
     # Update the virtual cluster with zero node (make it empty).
-    replica_sets = {}
-    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    _check_create_or_update_virtual_cluster(
+        virtual_cluster_id="virtual_cluster_1",
+        allocation_mode="exclusive",
+        replica_sets={},
+    )
 
     # `virtual_cluster_1` has released all nodes, so we can now
-    # create a new virtual cluster with two nodes.
-    virtual_cluster_id = "virtual_cluster_2"
-    replica_sets = {"4c8g": 1, "8c16g": 1}
-    # Using mixed allocation mode.
-    allocation_mode = "mixed"
-    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    # create a new (mixed) virtual cluster with two nodes.
+    _check_create_or_update_virtual_cluster(
+        virtual_cluster_id="virtual_cluster_2",
+        allocation_mode="mixed",
+        replica_sets={"4c8g": 1, "8c16g": 1},
+    )
 
     # Update the virtual cluster with less nodes.
-    replica_sets = {"4c8g": 1}
-    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    _check_create_or_update_virtual_cluster(
+        virtual_cluster_id="virtual_cluster_2",
+        allocation_mode="mixed",
+        replica_sets={"4c8g": 1},
+    )
 
     # Update the virtual cluster with more nodes.
-    replica_sets = {"4c8g": 1, "8c16g": 1}
-    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    _check_create_or_update_virtual_cluster(
+        virtual_cluster_id="virtual_cluster_2",
+        allocation_mode="mixed",
+        replica_sets={"4c8g": 1, "8c16g": 1},
+    )
 
     # Update the virtual cluster with zero node (make it empty).
-    replica_sets = {}
-    wait_for_condition(_create_or_update_virtual_cluster, timeout=10)
+    _check_create_or_update_virtual_cluster(
+        virtual_cluster_id="virtual_cluster_2", allocation_mode="mixed", replica_sets={}
+    )
 
 
 @pytest.mark.parametrize(
@@ -199,10 +199,10 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    result_dict = extract_dict_from_msg(result["msg"])
-    # The primary cluster lacks one `16c32g` node to meet the
+    replica_sets = result["data"].get("replicaSets", {})
+    # The primary cluster can fulfill none `16c32g` node to meet the
     # virtual cluster's requirement.
-    assert result_dict == {"16c32g": 1}
+    assert replica_sets == {}
 
     # Create a new virtual cluster with node count that the primary cluster
     # can not provide.
@@ -215,10 +215,10 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    result_dict = extract_dict_from_msg(result["msg"])
-    # The primary cluster lacks one `4c8g` node to meet the
+    replica_sets = result["data"].get("replicaSets", {})
+    # The primary cluster can only fulfill one `4c8g` node and one `8c16g` to meet the
     # virtual cluster's requirement.
-    assert result_dict == {"4c8g": 1}
+    assert replica_sets == {"4c8g": 1, "8c16g": 1}
 
     # Create a new virtual cluster with one `4c8g` node, which shall succeed.
     result = create_or_update_virtual_cluster(
@@ -253,10 +253,10 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    result_dict = extract_dict_from_msg(result["msg"])
-    # The primary cluster lacks one `4c8g` node and one `8c16g`
+    replica_sets = result["data"].get("replicaSets", {})
+    # The primary cluster can only fulfill one `8c16g`
     # node to meet the virtual cluster's requirement.
-    assert result_dict == {"4c8g": 1, "8c16g": 1}
+    assert replica_sets == {"8c16g": 1}
 
     if allocation_mode == "mixed":
         actor = SmallActor.options(resources={"4c8g": 1}).remote()
@@ -272,10 +272,9 @@ def test_create_and_update_virtual_cluster_with_exceptions(
         )
         assert result["result"] is False
         assert "No enough nodes to remove from the virtual cluster" in result["msg"]
-        result_dict = extract_dict_from_msg(result["msg"])
-        # The virtual cluster has one `4c8g` node in use. We have
-        # to drain it before scaling down the virtual cluster.
-        assert result_dict == {"4c8g": 1}
+        replica_sets = result["data"].get("replicaSets", {})
+        # The virtual cluster has one `4c8g` node in use. So we can fulfill none node.
+        assert replica_sets == {}
 
     # Create a new virtual cluster that the remaining nodes in the primary cluster
     # are not enough.
@@ -288,10 +287,10 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    result_dict = extract_dict_from_msg(result["msg"])
+    replica_sets = result["data"].get("replicaSets", {})
     # The primary cluster lacks one `4c8g` node to meet the
     # virtual cluster's requirement.
-    assert result_dict == {"4c8g": 1}
+    assert replica_sets == {"8c16g": 1}
 
 
 @pytest.mark.parametrize(
@@ -358,9 +357,6 @@ def test_remove_virtual_cluster(disable_aiohttp_cache, ray_start_cluster_head):
     # are still in use.
     assert result["result"] is False
     assert "still in use" in result["msg"]
-
-    result_dict = extract_dict_from_msg(result["msg"])
-    assert "4c8g" in result_dict
 
     ray.kill(actor, no_restart=True)
 

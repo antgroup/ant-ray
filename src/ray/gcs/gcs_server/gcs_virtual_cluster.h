@@ -28,6 +28,11 @@ namespace gcs {
 struct NodeInstance {
   NodeInstance() = default;
 
+  const std::string &node_instance_id() const { return node_instance_id_; }
+  void set_node_instance_id(const std::string &node_instance_id) {
+    node_instance_id_ = node_instance_id;
+  }
+
   const std::string &hostname() const { return hostname_; }
   void set_hostname(const std::string &hostname) { hostname_ = hostname; }
 
@@ -46,12 +51,13 @@ struct NodeInstance {
 
   std::string DebugString() const {
     std::ostringstream stream;
-    stream << "NodeInstance(" << hostname_ << "," << template_id_ << ", " << is_dead_
-           << ")";
+    stream << "NodeInstance(" << node_instance_id_ << "," << hostname_ << ","
+           << template_id_ << ", " << is_dead_ << ")";
     return stream.str();
   }
 
  private:
+  std::string node_instance_id_;
   std::string hostname_;
   std::string template_id_;
   bool is_dead_ = false;
@@ -138,16 +144,13 @@ class VirtualCluster {
 
   /// Lookup idle node instances from `visible_node_instances_` based on the demand
   /// final replica sets.
-  /// Note, when the function returns, `replica_sets` will contain the replica sets that
-  /// can not be satisfied, while `replica_instances` will contain the (idle) instances
-  /// chosen from the `visible_node_instances_`.
   ///
   /// \param replica_sets The demand final replica sets.
   /// \param replica_instances The node instances lookuped best effort from the visible
   /// node instances.
-  /// \return OK if the lookup is successful, otherwise return an error.
-  Status LookupIdleNodeInstances(ReplicaSets &replica_sets,
-                                 ReplicaInstances &replica_instances) const;
+  /// \return True if the lookup is successful, otherwise return false.
+  bool LookupIdleNodeInstances(const ReplicaSets &replica_sets,
+                               ReplicaInstances &replica_instances) const;
 
   /// Mark the node instance as dead.
   ///
@@ -166,7 +169,7 @@ class VirtualCluster {
   ///
   /// \param in_use_instances The node instances that are still in use.
   /// \return True if the virtual cluster is in use, false otherwise.
-  virtual bool InUse(ReplicaInstances *in_use_instances = nullptr) const = 0;
+  virtual bool InUse() const = 0;
 
   /// Convert the virtual cluster to proto data which usually is used for flushing
   /// to redis or publishing to raylet.
@@ -182,7 +185,6 @@ class VirtualCluster {
   /// \param node_instance The node instance to be checked.
   /// \return True if the node instance is idle, false otherwise.
   virtual bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                                  const std::string &node_instance_id,
                                   const gcs::NodeInstance &node_instance) const = 0;
 
   /// Insert the node instances to the cluster.
@@ -250,11 +252,10 @@ class ExclusiveCluster : public VirtualCluster {
   /// Check if the virtual cluster is in use.
   ///
   /// \return True if the virtual cluster is in use, false otherwise.
-  bool InUse(ReplicaInstances *in_use_instances = nullptr) const override;
+  bool InUse() const override;
 
  protected:
   bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                          const std::string &node_instance_id,
                           const gcs::NodeInstance &node_instance) const override;
 
   // The mapping from job cluster id to `JobCluster` instance.
@@ -276,11 +277,10 @@ class MixedCluster : public VirtualCluster {
   /// Check if the virtual cluster is in use.
   ///
   /// \return True if the virtual cluster is in use, false otherwise.
-  bool InUse(ReplicaInstances *in_use_instances = nullptr) const override;
+  bool InUse() const override;
 
  protected:
   bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                          const std::string &node_instance_id,
                           const gcs::NodeInstance &node_instance) const override;
 };
 
@@ -347,7 +347,6 @@ class PrimaryCluster : public ExclusiveCluster {
 
  protected:
   bool IsIdleNodeInstance(const std::string &job_cluster_id,
-                          const std::string &node_instance_id,
                           const gcs::NodeInstance &node_instance) const override;
 
  private:

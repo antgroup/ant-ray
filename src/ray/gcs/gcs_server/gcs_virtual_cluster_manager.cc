@@ -61,9 +61,14 @@ void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(
       reply->set_revision(data->revision());
       RAY_LOG(INFO) << "Succeed in creating or updating virtual cluster " << data->id();
     } else {
-      RAY_CHECK(data == nullptr);
       RAY_LOG(WARNING) << "Failed to create or update virtual cluster "
                        << virtual_cluster_id << ", status = " << status.ToString();
+      if (data != nullptr && (status.IsOutOfResource() || status.IsUnsafeToRemove())) {
+        auto &replica_sets = *(reply->mutable_replica_sets());
+        for (const auto &[node_instance_id, node_instance] : data->node_instances()) {
+          replica_sets[node_instance.template_id()] += 1;
+        }
+      }
     }
     GCS_RPC_SEND_REPLY(callback, reply, status);
   };
@@ -72,6 +77,9 @@ void GcsVirtualClusterManager::HandleCreateOrUpdateVirtualCluster(
   auto status = VerifyRequest(request);
   if (status.ok()) {
     status = primary_cluster_->CreateOrUpdateVirtualCluster(std::move(request), on_done);
+    if (status.IsOutOfResource() || status.IsUnsafeToRemove()) {
+      return;
+    }
   }
   if (!status.ok()) {
     on_done(status, nullptr);
@@ -97,12 +105,10 @@ void GcsVirtualClusterManager::HandleRemoveVirtualCluster(
   };
 
   auto status = VerifyRequest(request);
-  if (!status.ok()) {
-    on_done(status, nullptr);
-    return;
-  }
 
-  status = primary_cluster_->RemoveLogicalCluster(virtual_cluster_id, on_done);
+  if (status.ok()) {
+    status = primary_cluster_->RemoveLogicalCluster(virtual_cluster_id, on_done);
+  }
   if (!status.ok()) {
     on_done(status, nullptr);
   }

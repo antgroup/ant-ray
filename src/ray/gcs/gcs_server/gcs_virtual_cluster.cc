@@ -14,12 +14,8 @@
 
 #include "ray/gcs/gcs_server/gcs_virtual_cluster.h"
 
-#include "nlohmann/json.hpp"
-
 namespace ray {
 namespace gcs {
-
-using json = nlohmann::json;
 
 std::string DebugString(const ReplicaInstances &replica_instances, int indent = 0) {
   std::ostringstream stream;
@@ -38,14 +34,6 @@ std::string DebugString(const ReplicaInstances &replica_instances, int indent = 
   }
   stream << std::string(indent, ' ') << "}\n";
   return stream.str();
-}
-
-std::string ToJsonString(const ReplicaSets &replica_sets) {
-  json replica_sets_json = json::object();
-  for (const auto &entry : replica_sets) {
-    replica_sets_json[entry.first] = entry.second;
-  }
-  return replica_sets_json.dump();
 }
 
 ///////////////////////// VirtualCluster /////////////////////////
@@ -109,25 +97,20 @@ void VirtualCluster::RemoveNodeInstances(ReplicaInstances replica_instances) {
   }
 }
 
-Status VirtualCluster::LookupIdleNodeInstances(
-    ReplicaSets &replica_sets, ReplicaInstances &replica_instances) const {
+bool VirtualCluster::LookupIdleNodeInstances(const ReplicaSets &replica_sets,
+                                             ReplicaInstances &replica_instances) const {
   bool success = true;
-  for (auto replica_iter = replica_sets.begin(); replica_iter != replica_sets.end();) {
-    auto current_replica_iter = replica_iter;
-    replica_iter++;
-    auto &replicas = current_replica_iter->second;
+  for (const auto &[template_id, replicas] : replica_sets) {
+    auto &template_node_instances = replica_instances[template_id];
     if (replicas <= 0) {
       continue;
     }
-    const auto &template_id = current_replica_iter->first;
-    auto &template_node_instances = replica_instances[template_id];
 
     auto iter = visible_node_instances_.find(template_id);
     if (iter == visible_node_instances_.end()) {
       success = false;
       continue;
     }
-
     auto empty_iter = iter->second.find(kEmptyJobClusterId);
     if (empty_iter == iter->second.end()) {
       success = false;
@@ -136,26 +119,20 @@ Status VirtualCluster::LookupIdleNodeInstances(
 
     auto &job_node_instances = template_node_instances[kEmptyJobClusterId];
     for (const auto &[id, node_instance] : empty_iter->second) {
-      if (!IsIdleNodeInstance(kEmptyJobClusterId, id, *node_instance)) {
+      if (!IsIdleNodeInstance(kEmptyJobClusterId, *node_instance)) {
         continue;
       }
       job_node_instances.emplace(id, node_instance);
-      replicas--;
-      if (replicas == 0) {
-        replica_sets.erase(current_replica_iter);
+      if (job_node_instances.size() == static_cast<size_t>(replicas)) {
         break;
       }
     }
-    if (replicas > 0) {
+    if (job_node_instances.size() < static_cast<size_t>(replicas)) {
       success = false;
     }
   }
 
-  if (!success) {
-    return Status::OutOfResource("");
-  }
-
-  return Status::OK();
+  return success;
 }
 
 bool VirtualCluster::MarkNodeInstanceAsDead(const std::string &template_id,
@@ -243,8 +220,8 @@ Status ExclusiveCluster::CreateJobCluster(const std::string &job_name,
 
   ReplicaInstances replica_instances_to_add;
   // Lookup idle node instances from main cluster based on `replica_sets_to_add`.
-  auto status = LookupIdleNodeInstances(replica_sets, replica_instances_to_add);
-  if (!status.ok()) {
+  auto success = LookupIdleNodeInstances(replica_sets, replica_instances_to_add);
+  if (!success) {
     // TODO(Shanly): Give a more detailed error message about the demand replica set and
     // the idle replica instances.
     std::ostringstream ostr;
@@ -324,12 +301,9 @@ std::shared_ptr<JobCluster> ExclusiveCluster::GetJobCluster(
   return iter != job_clusters_.end() ? iter->second : nullptr;
 }
 
-bool ExclusiveCluster::InUse(ReplicaInstances *in_use_instances) const {
-  return !job_clusters_.empty();
-}
+bool ExclusiveCluster::InUse() const { return !job_clusters_.empty(); }
 
 bool ExclusiveCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
-                                          const std::string &node_instance_id,
                                           const gcs::NodeInstance &node_instance) const {
   RAY_CHECK(GetMode() == rpc::AllocationMode::EXCLUSIVE);
   return job_cluster_id == kEmptyJobClusterId;
@@ -348,12 +322,12 @@ void ExclusiveCluster::ForeachJobCluster(
 
 ///////////////////////// MixedCluster /////////////////////////
 bool MixedCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
-                                      const std::string &node_instance_id,
                                       const gcs::NodeInstance &node_instance) const {
   if (node_instance.is_dead()) {
     return true;
   }
-  auto node_id = scheduling::NodeID(NodeID::FromHex(node_instance_id).Binary());
+  auto node_id =
+      scheduling::NodeID(NodeID::FromHex(node_instance.node_instance_id()).Binary());
   const auto &node_resources = cluster_resource_manager_.GetNodeResources(node_id);
   // TODO(Chong-Li): the resource view sync message may lag.
   if (node_resources.normal_task_resources.IsEmpty() &&
@@ -363,26 +337,17 @@ bool MixedCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
   return false;
 }
 
-bool MixedCluster::InUse(ReplicaInstances *in_use_instances) const {
+bool MixedCluster::InUse() const {
   for (const auto &[template_id, job_cluster_instances] : visible_node_instances_) {
     for (const auto &[job_cluster_id, node_instances] : job_cluster_instances) {
       for (const auto &[node_instance_id, node_instance] : node_instances) {
-        if (!IsIdleNodeInstance(job_cluster_id, node_instance_id, *node_instance)) {
-          // If the caller does not need to know the exact in-use instances, we
-          // can just return here.
-          if (!in_use_instances) {
-            return true;
-          }
-          (*in_use_instances)[template_id][job_cluster_id][node_instance_id] =
-              node_instance;
+        if (!IsIdleNodeInstance(job_cluster_id, *node_instance)) {
+          return true;
         }
       }
     }
   }
-  if (!in_use_instances || in_use_instances->empty()) {
-    return false;
-  }
-  return true;
+  return false;
 }
 
 ///////////////////////// PrimaryCluster /////////////////////////
@@ -403,6 +368,32 @@ Status PrimaryCluster::CreateOrUpdateVirtualCluster(
       replica_instances_to_add_to_logical_cluster,
       replica_instances_to_remove_from_logical_cluster);
   if (!status.ok()) {
+    ReplicaInstances *replica_instances = nullptr;
+    if (status.IsOutOfResource()) {
+      replica_instances = &replica_instances_to_add_to_logical_cluster;
+      status = Status::OutOfResource(
+          "No enough nodes to add to the virtual cluster. The replica sets that gcs can "
+          "fulfill to meet the request are shown below. Using it as a suggestion to "
+          "adjust your request or cluster.");
+    } else if (status.IsUnsafeToRemove()) {
+      replica_instances = &replica_instances_to_remove_from_logical_cluster;
+      status = Status::UnsafeToRemove(
+          "No enough nodes to remove from the virtual cluster. The replica sets that gcs "
+          "can fulfill to meet the request are shown below. Using it as a suggestion to "
+          "adjust your request or cluster.");
+    }
+    if (replica_instances) {
+      auto data = std::make_shared<rpc::VirtualClusterTableData>();
+      auto &node_instance = *(data->mutable_node_instances());
+      for (const auto &[template_id, job_cluster_instances] : *replica_instances) {
+        for (const auto &[job_cluster_id, node_instances] : job_cluster_instances) {
+          for (const auto &[node_instance_id, node_instance_ptr] : node_instances) {
+            node_instance[node_instance_id] = *(node_instance_ptr->ToProto());
+          }
+        }
+      }
+      callback(status, data);
+    }
     return status;
   }
 
@@ -450,14 +441,10 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
         ReplicasDifference(logical_cluster->GetReplicaSets(), request.replica_sets());
     // Lookup idle node instances from the logical cluster based on
     // `replica_sets_to_remove`.
-    auto status = logical_cluster->LookupIdleNodeInstances(replica_sets_to_remove,
-                                                           replica_instances_to_remove);
-    if (!status.ok()) {
-      std::ostringstream ss;
-      ss << "No enough nodes to remove from the virtual cluster. You have to "
-            "additionally drain the following replica sets: ";
-      ss << ray::gcs::ToJsonString(replica_sets_to_remove);
-      return Status::OutOfResource(ss.str());
+    auto success = logical_cluster->LookupIdleNodeInstances(replica_sets_to_remove,
+                                                            replica_instances_to_remove);
+    if (!success) {
+      return Status::UnsafeToRemove("");
     }
   }
 
@@ -465,19 +452,14 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
       request.replica_sets(),
       logical_cluster ? logical_cluster->GetReplicaSets() : ReplicaSets());
   // Lookup idle node instances from main cluster based on `replica_sets_to_add`.
-  auto status = LookupIdleNodeInstances(replica_sets_to_add, replica_instances_to_add);
-  if (!status.ok()) {
-    std::ostringstream ss;
-    ss << "No enough nodes to add to the virtual cluster. You have to additionally "
-          "prepare the following replica sets: ";
-    ss << ray::gcs::ToJsonString(replica_sets_to_add);
-    return Status::OutOfResource(ss.str());
+  auto success = LookupIdleNodeInstances(replica_sets_to_add, replica_instances_to_add);
+  if (!success) {
+    return Status::OutOfResource("");
   }
   return Status::OK();
 }
 
 bool PrimaryCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
-                                        const std::string &node_instance_id,
                                         const gcs::NodeInstance &node_instance) const {
   RAY_CHECK(GetMode() == rpc::AllocationMode::EXCLUSIVE);
   return job_cluster_id == kEmptyJobClusterId;
@@ -487,6 +469,7 @@ void PrimaryCluster::OnNodeAdd(const rpc::GcsNodeInfo &node) {
   const auto &template_id = node.node_type_name();
   auto node_instance_id = NodeID::FromBinary(node.node_id()).Hex();
   auto node_instance = std::make_shared<gcs::NodeInstance>();
+  node_instance->set_node_instance_id(node_instance_id);
   node_instance->set_template_id(template_id);
   node_instance->set_hostname(node.node_manager_hostname());
   node_instance->set_is_dead(false);
@@ -522,27 +505,14 @@ Status PrimaryCluster::RemoveLogicalCluster(const std::string &logical_cluster_i
 
   // Check if the virtual cluster is in use.
   ReplicaInstances in_use_instances;
-  if (logical_cluster->InUse(&in_use_instances)) {
+  if (logical_cluster->InUse()) {
     std::ostringstream ostr;
     ostr << "The virtual cluster " << logical_cluster_id
          << " can not be removed as it is still in use. ";
-    ostr << "The nodes in use include: ";
-    json in_use_instances_json;
-    for (const auto &[template_id, job_cluster_instances] : in_use_instances) {
-      in_use_instances_json[template_id] = json::object();
-      for (const auto &[job_cluster_id, node_instances] : job_cluster_instances) {
-        for (const auto &[node_instance_id, node_instance] : node_instances) {
-          in_use_instances_json[template_id][node_instance_id] = {
-              {"hostname", node_instance->hostname()},
-              {"is_dead", node_instance->is_dead()}};
-        }
-      }
-    }
-    ostr << in_use_instances_json.dump();
     auto message = ostr.str();
     RAY_LOG(ERROR) << message;
 
-    return Status::InvalidArgument(message);
+    return Status::UnsafeToRemove(message);
   }
 
   const auto &replica_instances_to_remove = logical_cluster->GetVisibleNodeInstances();

@@ -24,7 +24,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh --system
+          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh --system
           CIBW_BUILD: |
             cp39-manylinux_aarch64
             cp39-musllinux_x86_64
@@ -54,7 +54,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh --system
+          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh --system
           CIBW_BUILD: cp39-macosx_*
 
           CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly
@@ -82,7 +82,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh --system
+          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh --system
           CIBW_BUILD: cp39-macosx_*
 
           CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly

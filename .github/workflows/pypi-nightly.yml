@@ -55,7 +55,35 @@ jobs:
         uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh
-          CIBW_BUILD: cp39-macosx_x86_64
+          CIBW_BUILD: cp39-macosx_*
+
+          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly
+        with:
+          package-dir: ./python
+          output-dir: ./python/dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./python/dist/*.whl
+
+  build_wheels_on_macos_silicon:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [macos-14]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.22.0
+        env:
+          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh
+          CIBW_BUILD: cp39-macosx_*
 
           CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly
         with:

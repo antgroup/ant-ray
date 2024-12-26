@@ -49,8 +49,8 @@ void GcsVirtualClusterManager::OnJobFinished(const rpc::JobTableData &job_data) 
 
   auto virtual_cluster = GetVirtualCluster(exclusive_cluster_id);
   if (virtual_cluster == nullptr) {
-    RAY_LOG(ERROR) << "Remove job cluster on job finished failed for job cluster "
-                   << virtual_cluster_id << ", parent virtual cluster not exists";
+    RAY_LOG(WARNING) << "Failed to remove job cluster " << job_cluster_id.Binary()
+                     << " when handling job finished event,  parent cluster not exists.";
     return;
   }
 
@@ -64,21 +64,20 @@ void GcsVirtualClusterManager::OnJobFinished(const rpc::JobTableData &job_data) 
 
   auto status = exclusive_cluster->RemoveJobCluster(
       virtual_cluster_id,
-      [this, virtual_cluster_id](const Status &status,
-                                 std::shared_ptr<rpc::VirtualClusterTableData> data) {
+      [this, job_cluster_id](const Status &status,
+                             std::shared_ptr<rpc::VirtualClusterTableData> data) {
         if (!status.ok() || !data->is_removed()) {
-          RAY_LOG(WARNING) << "Remove job cluster on job finished failed for job cluster "
-                           << virtual_cluster_id
-                           << ", error message: " << status.message();
+          RAY_LOG(WARNING) << "Failed to remove job cluster " << job_cluster_id.Binary()
+                           << " when handling job finished event. status: "
+                           << status.message();
         } else {
-          RAY_LOG(INFO)
-              << "Remove job cluster on job finished successfully for job cluster "
-              << virtual_cluster_id;
+          RAY_LOG(INFO) << "Successfully removed job cluster " << job_cluster_id.Binary()
+                        << " after handling job finished event.";
         }
       });
   if (!status.ok()) {
-    RAY_LOG(WARNING) << "Remove job cluster on job finished failed for job cluster "
-                     << job_cluster_id << ", error message: " << status.message();
+    RAY_LOG(WARNING) << "Failed to remove job cluster " << job_cluster_id.Binary()
+                     << " when handling job finished event. status: " << status.message();
   }
 }
 

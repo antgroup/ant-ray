@@ -54,6 +54,11 @@ class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
   /// \param node The node that is dead.
   void OnNodeDead(const rpc::GcsNodeInfo &node);
 
+  /// Handle the job finished event.
+  ///
+  /// \param job_data The job that is finished.
+  void OnJobFinished(const rpc::JobTableData &job_data);
+
   /// Get virtual cluster by virtual cluster id
   ///
   /// \param virtual_cluster_id The id of virtual cluster
@@ -74,6 +79,10 @@ class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
   void HandleGetVirtualClusters(rpc::GetVirtualClustersRequest request,
                                 rpc::GetVirtualClustersReply *reply,
                                 rpc::SendReplyCallback send_reply_callback) override;
+
+  void HandleCreateJobCluster(rpc::CreateJobClusterRequest request,
+                              rpc::CreateJobClusterReply *reply,
+                              rpc::SendReplyCallback send_reply_callback) override;
 
   Status VerifyRequest(const rpc::CreateOrUpdateVirtualClusterRequest &request);
 

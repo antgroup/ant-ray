@@ -388,6 +388,9 @@ void GcsServer::InitClusterResourceScheduler() {
         auto node_instance_id = NodeID::FromBinary(node_id.Binary()).Hex();
         auto virtual_cluster =
             gcs_virtual_cluster_manager_->GetVirtualCluster(context->virtual_cluster_id);
+        if (virtual_cluster == nullptr) {
+          return true;
+        }
         RAY_CHECK(virtual_cluster->GetMode() == rpc::AllocationMode::MIXED);
         // Check if the node is contained within the specified virtual cluster.
         return virtual_cluster->ContainsNodeInstance(node_instance_id);
@@ -772,6 +775,7 @@ void GcsServer::InstallEventListeners() {
     const auto job_id = JobID::FromBinary(job_data.job_id());
     gcs_task_manager_->OnJobFinished(job_id, job_data.end_time());
     gcs_placement_group_manager_->CleanPlacementGroupIfNeededWhenJobDead(job_id);
+    gcs_virtual_cluster_manager_->OnJobFinished(job_data);
   });
 
   // Install scheduling event listeners.

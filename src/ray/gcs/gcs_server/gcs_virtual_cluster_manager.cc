@@ -20,7 +20,7 @@ namespace ray {
 namespace gcs {
 
 void GcsVirtualClusterManager::Initialize(const GcsInitData &gcs_init_data) {
-  // TODO(Shanly): To be implement.
+  primary_cluster_->Initialize(gcs_init_data);
 }
 
 void GcsVirtualClusterManager::OnNodeAdd(const rpc::GcsNodeInfo &node) {
@@ -29,6 +29,56 @@ void GcsVirtualClusterManager::OnNodeAdd(const rpc::GcsNodeInfo &node) {
 
 void GcsVirtualClusterManager::OnNodeDead(const rpc::GcsNodeInfo &node) {
   primary_cluster_->OnNodeDead(node);
+}
+
+void GcsVirtualClusterManager::OnJobFinished(const rpc::JobTableData &job_data) {
+  // exit early when job has no virtual cluster id
+  const auto &virtual_cluster_id = job_data.virtual_cluster_id();
+  if (virtual_cluster_id.empty()) {
+    return;
+  }
+
+  auto job_cluster_id = VirtualClusterID::FromBinary(virtual_cluster_id);
+
+  if (!job_cluster_id.IsJobClusterID()) {
+    // exit early when this job is submitted in a mixed cluster
+    return;
+  }
+
+  std::string exclusive_cluster_id = job_cluster_id.ParentID().Binary();
+
+  auto virtual_cluster = GetVirtualCluster(exclusive_cluster_id);
+  if (virtual_cluster == nullptr) {
+    RAY_LOG(WARNING) << "Failed to remove job cluster " << job_cluster_id.Binary()
+                     << " when handling job finished event,  parent cluster not exists.";
+    return;
+  }
+
+  if (virtual_cluster->GetMode() != rpc::AllocationMode::EXCLUSIVE) {
+    // this should not happen, virtual cluster should be exclusive
+    return;
+  }
+
+  ExclusiveCluster *exclusive_cluster =
+      dynamic_cast<ExclusiveCluster *>(virtual_cluster.get());
+
+  auto status = exclusive_cluster->RemoveJobCluster(
+      virtual_cluster_id,
+      [this, job_cluster_id](const Status &status,
+                             std::shared_ptr<rpc::VirtualClusterTableData> data) {
+        if (!status.ok() || !data->is_removed()) {
+          RAY_LOG(WARNING) << "Failed to remove job cluster " << job_cluster_id.Binary()
+                           << " when handling job finished event. status: "
+                           << status.message();
+        } else {
+          RAY_LOG(INFO) << "Successfully removed job cluster " << job_cluster_id.Binary()
+                        << " after handling job finished event.";
+        }
+      });
+  if (!status.ok()) {
+    RAY_LOG(WARNING) << "Failed to remove job cluster " << job_cluster_id.Binary()
+                     << " when handling job finished event. status: " << status.message();
+  }
 }
 
 std::shared_ptr<VirtualCluster> GcsVirtualClusterManager::GetVirtualCluster(
@@ -126,6 +176,53 @@ void GcsVirtualClusterManager::HandleGetVirtualClusters(
   GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
 }
 
+void GcsVirtualClusterManager::HandleCreateJobCluster(
+    rpc::CreateJobClusterRequest request,
+    rpc::CreateJobClusterReply *reply,
+    rpc::SendReplyCallback send_reply_callback) {
+  const auto &virtual_cluster_id = request.virtual_cluster_id();
+  RAY_LOG(INFO) << "Start creating job cluster in virtual cluster: "
+                << virtual_cluster_id;
+  auto virtual_cluster = GetVirtualCluster(virtual_cluster_id);
+  if (virtual_cluster == nullptr) {
+    std::ostringstream ostr;
+    ostr << "Create job cluster for job " << request.job_id()
+         << " failed, virtual cluster not exists: " << virtual_cluster_id;
+    std::string message = ostr.str();
+    RAY_LOG(ERROR) << message;
+    GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::NotFound(message));
+    return;
+  }
+  if (virtual_cluster->GetMode() != rpc::AllocationMode::EXCLUSIVE) {
+    std::ostringstream ostr;
+    ostr << "Create job cluster for job " << request.job_id()
+         << " failed, virtual cluster is not exclusive: " << virtual_cluster_id;
+    std::string message = ostr.str();
+    RAY_LOG(ERROR) << message;
+    GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::InvalidArgument(message));
+    return;
+  }
+  ReplicaSets replica_sets(request.replica_sets().begin(), request.replica_sets().end());
+
+  auto exclusive_cluster = dynamic_cast<ExclusiveCluster *>(virtual_cluster.get());
+  std::string job_cluster_id = exclusive_cluster->BuildJobClusterID(request.job_id());
+
+  exclusive_cluster->CreateJobCluster(
+      job_cluster_id,
+      std::move(replica_sets),
+      [reply, send_reply_callback, job_id = request.job_id()](
+          const Status &status, std::shared_ptr<rpc::VirtualClusterTableData> data) {
+        if (status.ok()) {
+          reply->set_job_cluster_id(data->id());
+          GCS_RPC_SEND_REPLY(send_reply_callback, reply, Status::OK());
+        } else {
+          RAY_LOG(ERROR) << "Create job cluster for job " << job_id << " failed, "
+                         << status.message();
+          GCS_RPC_SEND_REPLY(send_reply_callback, reply, status);
+        }
+      });
+}
+
 Status GcsVirtualClusterManager::VerifyRequest(
     const rpc::CreateOrUpdateVirtualClusterRequest &request) {
   const auto &virtual_cluster_id = request.virtual_cluster_id();
@@ -221,6 +318,15 @@ Status GcsVirtualClusterManager::FlushAndPublish(
   auto on_done = [this, data, callback = std::move(callback)](const Status &status) {
     // The backend storage is supposed to be reliable, so the status must be ok.
     RAY_CHECK_OK(status);
+    if (data->mode() != rpc::AllocationMode::MIXED) {
+      // Tasks can only be scheduled on the nodes in the mixed cluster, so we just need to
+      // publish the mixed cluster data.
+      if (callback) {
+        callback(status, std::move(data));
+      }
+      return;
+    }
+
     RAY_CHECK_OK(gcs_publisher_.PublishVirtualCluster(
         VirtualClusterID::FromBinary(data->id()), *data, nullptr));
     if (callback) {

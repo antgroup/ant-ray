@@ -856,11 +856,28 @@ message GetVirtualClustersRequest {
   string virtual_cluster_id = 1;
   // Wether include job clusters.
   bool include_job_clusters = 2;
+  // It will reply mixed clusters if only_include_mixed_clusters is true.
+  bool only_include_mixed_clusters = 3;
 }
 
 message GetVirtualClustersReply {
   GcsStatus status = 1;
   repeated VirtualClusterTableData virtual_cluster_data_list = 2;
+}
+
+message CreateJobClusterRequest {
+  // The job id.
+  string job_id = 1;
+  // ID of the virtual cluster that the job belongs to.
+  string virtual_cluster_id = 2;
+  // The replica set of the job cluster.
+  map<string, int32> replica_sets = 3;
+}
+
+message CreateJobClusterReply {
+  GcsStatus status = 1;
+  // The job cluster id.
+  string job_cluster_id = 2;
 }
 
 service VirtualClusterInfoGcsService {
@@ -871,4 +888,6 @@ service VirtualClusterInfoGcsService {
   rpc RemoveVirtualCluster(RemoveVirtualClusterRequest) returns (RemoveVirtualClusterReply);
   // Get virtual clusters.
   rpc GetVirtualClusters(GetVirtualClustersRequest) returns (GetVirtualClustersReply);
+  // Create job cluster.
+  rpc CreateJobCluster(CreateJobClusterRequest) returns (CreateJobClusterReply);
 }

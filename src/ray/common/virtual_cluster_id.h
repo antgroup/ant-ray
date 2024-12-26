@@ -25,15 +25,15 @@ class VirtualClusterID : public SimpleID<VirtualClusterID> {
  public:
   using SimpleID::SimpleID;
 
-  VirtualClusterID BuildJobClusterID(const std::string &job_name) const {
-    return VirtualClusterID::FromBinary(id_ + kJobClusterIDSeperator + job_name);
+  VirtualClusterID BuildJobClusterID(const std::string &job_id) const {
+    return VirtualClusterID::FromBinary(id_ + kJobClusterIDSeperator + job_id);
   }
 
   bool IsJobClusterID() const {
     return id_.find(kJobClusterIDSeperator) != std::string::npos;
   }
 
-  VirtualClusterID OwnerID() const {
+  VirtualClusterID ParentID() const {
     auto pos = id_.find(kJobClusterIDSeperator);
     return pos == std::string::npos ? Nil()
                                     : VirtualClusterID::FromBinary(id_.substr(0, pos));

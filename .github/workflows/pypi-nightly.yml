@@ -27,6 +27,7 @@ jobs:
           CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh
           CIBW_BUILD: |
             cp39-macosx_x86_64
+            cp39-manylinux_aarch64
 
           CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly SKIP_THIRDPARTY_INSTALL=1
         with:

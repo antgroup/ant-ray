@@ -16,7 +16,7 @@ jobs:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
         # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-13]
 
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,8 @@ jobs:
         uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh
-          CIBW_BUILD: cp39-macosx_x86_64
+          CIBW_BUILD: |
+            cp39-macosx_x86_64
 
           CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly SKIP_THIRDPARTY_INSTALL=1
         with:

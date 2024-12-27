@@ -27,12 +27,11 @@ namespace ray {
 namespace gcs {
 
 struct NodeInstance {
-  NodeInstance() = default;
-
-  const std::string &node_instance_id() const { return node_instance_id_; }
-  void set_node_instance_id(const std::string &node_instance_id) {
+  NodeInstance(const std::string &node_instance_id) {
     node_instance_id_ = node_instance_id;
   }
+
+  const std::string &node_instance_id() const { return node_instance_id_; }
 
   const std::string &hostname() const { return hostname_; }
   void set_hostname(const std::string &hostname) { hostname_ = hostname; }
@@ -65,12 +64,6 @@ struct NodeInstance {
 };
 
 static const std::string kEmptyJobClusterId = "NIL";
-using CreateOrUpdateVirtualClusterCallback =
-    std::function<void(const Status &, std::shared_ptr<rpc::VirtualClusterTableData>)>;
-
-using RemoveVirtualClusterCallback = CreateOrUpdateVirtualClusterCallback;
-using GetVirtualClustersDataCallback =
-    std::function<void(std::shared_ptr<rpc::VirtualClusterTableData>)>;
 
 /// <template_id, _>
 ///               |
@@ -85,6 +78,13 @@ using ReplicaInstances = absl::flat_hash_map<
         absl::flat_hash_map<std::string, std::shared_ptr<gcs::NodeInstance>>>>;
 
 using ReplicaSets = absl::flat_hash_map<std::string, int32_t>;
+
+using CreateOrUpdateVirtualClusterCallback = std::function<void(
+    const Status &, std::shared_ptr<rpc::VirtualClusterTableData>, const ReplicaSets *)>;
+
+using RemoveVirtualClusterCallback = CreateOrUpdateVirtualClusterCallback;
+using GetVirtualClustersDataCallback =
+    std::function<void(std::shared_ptr<rpc::VirtualClusterTableData>)>;
 
 using AsyncClusterDataFlusher = std::function<Status(
     std::shared_ptr<rpc::VirtualClusterTableData>, CreateOrUpdateVirtualClusterCallback)>;
@@ -110,7 +110,7 @@ template <typename T>
 ReplicaInstances toReplicaInstances(const T &node_instances) {
   ReplicaInstances result;
   for (const auto &[id, node_instance] : node_instances) {
-    auto inst = std::make_shared<NodeInstance>();
+    auto inst = std::make_shared<NodeInstance>(id);
     inst->set_hostname(node_instance.hostname());
     inst->set_template_id(node_instance.template_id());
     result[node_instance.template_id()][kEmptyJobClusterId].emplace(id, std::move(inst));
@@ -348,10 +348,14 @@ class PrimaryCluster : public ExclusiveCluster {
   /// Create or update a new virtual cluster.
   ///
   /// \param request The request to create or update a virtual cluster.
-  /// cluster. \param callback The callback that will be called after the virtual
-  /// cluster is flushed. \return Status.
+  /// \param callback The callback that will be called after the virtual cluster
+  /// is flushed.
+  /// \param[out] replica_sets_at_most The replica sets that we can fulfill the
+  /// request at most. It can be used as a suggestion to adjust the request if it fails.
+  /// \return Status.
   Status CreateOrUpdateVirtualCluster(rpc::CreateOrUpdateVirtualClusterRequest request,
-                                      CreateOrUpdateVirtualClusterCallback callback);
+                                      CreateOrUpdateVirtualClusterCallback callback,
+                                      ReplicaSets *replica_sets_at_most = nullptr);
 
   /// Get the virtual cluster by the logical cluster id.
   ///

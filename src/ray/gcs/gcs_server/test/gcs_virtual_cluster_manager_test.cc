@@ -122,8 +122,8 @@ class VirtualClusterTest : public ::testing::Test {
       absl::flat_hash_map<std::string,
                           absl::flat_hash_map<NodeID, std::shared_ptr<rpc::GcsNodeInfo>>>
           *template_id_to_nodes = nullptr) {
-    auto primary_cluster =
-        std::make_shared<ray::gcs::PrimaryCluster>([this](auto data, auto callback) {
+    auto primary_cluster = std::make_shared<ray::gcs::PrimaryCluster>(
+        [this](auto data, auto callback) {
           virtual_clusters_data_[data->id()] = data;
           callback(Status::OK(), data);
           return Status::OK();

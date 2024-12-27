@@ -199,7 +199,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    replica_sets = result["data"].get("replicaSets", {})
+    replica_sets = result["data"].get("replicaSetsAtMost", {})
     # The primary cluster can fulfill none `16c32g` node to meet the
     # virtual cluster's requirement.
     assert replica_sets == {}
@@ -215,7 +215,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    replica_sets = result["data"].get("replicaSets", {})
+    replica_sets = result["data"].get("replicaSetsAtMost", {})
     # The primary cluster can only fulfill one `4c8g` node and one `8c16g` to meet the
     # virtual cluster's requirement.
     assert replica_sets == {"4c8g": 1, "8c16g": 1}
@@ -253,7 +253,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    replica_sets = result["data"].get("replicaSets", {})
+    replica_sets = result["data"].get("replicaSetsAtMost", {})
     # The primary cluster can only fulfill one `8c16g`
     # node to meet the virtual cluster's requirement.
     assert replica_sets == {"8c16g": 1}
@@ -272,7 +272,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
         )
         assert result["result"] is False
         assert "No enough nodes to remove from the virtual cluster" in result["msg"]
-        replica_sets = result["data"].get("replicaSets", {})
+        replica_sets = result["data"].get("replicaSetsAtMost", {})
         # The virtual cluster has one `4c8g` node in use. So we can fulfill none node.
         assert replica_sets == {}
 
@@ -287,7 +287,7 @@ def test_create_and_update_virtual_cluster_with_exceptions(
     )
     assert result["result"] is False
     assert "No enough nodes to add to the virtual cluster" in result["msg"]
-    replica_sets = result["data"].get("replicaSets", {})
+    replica_sets = result["data"].get("replicaSetsAtMost", {})
     # The primary cluster lacks one `4c8g` node to meet the
     # virtual cluster's requirement.
     assert replica_sets == {"8c16g": 1}
@@ -424,7 +424,6 @@ def test_get_virtual_clusters(disable_aiohttp_cache, ray_start_cluster_head):
             for virtual_cluster in result["data"]["virtualClusters"]:
                 if virtual_cluster["virtualClusterId"] == "virtual_cluster_1":
                     assert virtual_cluster["allocationMode"] == "mixed"
-                    assert virtual_cluster["replicaSets"] == {"4c8g": 2}
                     assert len(virtual_cluster["nodeInstances"]) == 2
                     for _, node_instance in virtual_cluster["nodeInstances"].items():
                         assert node_instance["hostname"] == hostname
@@ -433,7 +432,6 @@ def test_get_virtual_clusters(disable_aiohttp_cache, ray_start_cluster_head):
                     assert revision_1 > 0
                 elif virtual_cluster["virtualClusterId"] == "virtual_cluster_2":
                     assert virtual_cluster["allocationMode"] == "exclusive"
-                    assert virtual_cluster["replicaSets"] == {"8c16g": 2}
                     assert len(virtual_cluster["nodeInstances"]) == 2
                     for _, node_instance in virtual_cluster["nodeInstances"].items():
                         assert node_instance["hostname"] == hostname

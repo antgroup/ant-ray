@@ -98,12 +98,12 @@ void VirtualCluster::UpdateNodeInstances(ReplicaInstances replica_instances_to_a
 
 void VirtualCluster::InsertNodeInstances(ReplicaInstances replica_instances) {
   for (auto &[template_id, job_node_instances] : replica_instances) {
-    auto &template_node_instances = visible_node_instances_[template_id];
+    auto &cached_job_node_instances = visible_node_instances_[template_id];
     auto &replicas = replica_sets_[template_id];
     for (auto &[job_cluster_id, node_instances] : job_node_instances) {
-      auto &job_node_instances = template_node_instances[job_cluster_id];
+      auto &cached_node_instances = cached_job_node_instances[job_cluster_id];
       for (auto &[id, node_instance] : node_instances) {
-        job_node_instances[id] = std::move(node_instance);
+        cached_node_instances[id] = std::move(node_instance);
         ++replicas;
       }
     }
@@ -226,6 +226,78 @@ bool VirtualCluster::ContainsNodeInstance(const std::string &node_instance_id) {
     }
   }
   return false;
+}
+
+bool VirtualCluster::ReplenishNodeInstances(
+    const NodeInstanceReplenishCallback &callback) {
+  RAY_CHECK(callback != nullptr);
+  bool any_node_instance_replenished = false;
+  for (auto &[template_id, job_node_instances] : visible_node_instances_) {
+    auto iter = job_node_instances.find(kEmptyJobClusterId);
+    if (iter == job_node_instances.end()) {
+      continue;
+    }
+
+    absl::flat_hash_map<std::string, std::shared_ptr<gcs::NodeInstance>>
+        node_instances_to_add;
+    absl::flat_hash_map<std::string, std::shared_ptr<gcs::NodeInstance>>
+        node_instances_to_remove;
+    for (auto &[node_instance_id, node_instance] : iter->second) {
+      if (node_instance->is_dead()) {
+        if (auto replenished_node_instance = callback(node_instance)) {
+          RAY_LOG(INFO) << "Replenish node instance " << node_instance->id()
+                        << " in virtual cluster " << GetID() << " with node instance "
+                        << replenished_node_instance->id();
+          node_instances_to_remove.emplace(node_instance_id, node_instance);
+          node_instances_to_add.emplace(replenished_node_instance->id(),
+                                        replenished_node_instance);
+          any_node_instance_replenished = true;
+          break;
+        }
+      }
+    }
+    for (auto &[node_instance_id, node_instance] : node_instances_to_remove) {
+      iter->second.erase(node_instance_id);
+    }
+    for (auto &[node_instance_id, node_instance] : node_instances_to_add) {
+      iter->second.emplace(node_instance_id, node_instance);
+    }
+  }
+
+  return any_node_instance_replenished;
+}
+
+std::shared_ptr<NodeInstance> VirtualCluster::ReplenishNodeInstance(
+    std::shared_ptr<NodeInstance> node_instance_to_replenish) {
+  if (node_instance_to_replenish == nullptr || !node_instance_to_replenish->is_dead()) {
+    return nullptr;
+  }
+
+  auto template_iter =
+      visible_node_instances_.find(node_instance_to_replenish->template_id());
+  if (template_iter == visible_node_instances_.end()) {
+    return nullptr;
+  }
+
+  auto job_iter = template_iter->second.find(kEmptyJobClusterId);
+  if (job_iter == template_iter->second.end()) {
+    return nullptr;
+  }
+
+  std::shared_ptr<NodeInstance> replenished_node_instance;
+  for (auto &[node_instance_id, node_instance] : job_iter->second) {
+    if (!node_instance->is_dead()) {
+      replenished_node_instance = node_instance;
+      break;
+    }
+  }
+  if (replenished_node_instance != nullptr) {
+    job_iter->second.erase(replenished_node_instance->id());
+    job_iter->second.emplace(node_instance_to_replenish->id(),
+                             node_instance_to_replenish);
+  }
+
+  return replenished_node_instance;
 }
 
 std::shared_ptr<rpc::VirtualClusterTableData> VirtualCluster::ToProto() const {
@@ -392,6 +464,61 @@ void ExclusiveCluster::ForeachJobCluster(
   for (const auto &[_, job_cluster] : job_clusters_) {
     fn(job_cluster);
   }
+}
+
+bool ExclusiveCluster::ReplenishNodeInstances(
+    const NodeInstanceReplenishCallback &callback) {
+  RAY_CHECK(callback != nullptr);
+  bool any_node_instance_replenished = false;
+  for (const auto &[job_cluster_id, job_cluster] : job_clusters_) {
+    bool replenished = job_cluster->ReplenishNodeInstances(
+        [this, &job_cluster_id, &callback, &any_node_instance_replenished](
+            std::shared_ptr<NodeInstance> node_instance) {
+          const auto &template_id = node_instance->template_id();
+          if (auto replenished_node_instance = callback(node_instance)) {
+            RAY_LOG(INFO) << "Replenish node instance " << node_instance->id()
+                          << " in virtual cluster " << job_cluster_id
+                          << " with node instance " << replenished_node_instance->id()
+                          << " in primary cluster.";
+            ReplicaInstances replica_instances_to_add;
+            replica_instances_to_add[template_id][job_cluster_id]
+                                    [replenished_node_instance->id()] =
+                                        replenished_node_instance;
+
+            ReplicaInstances replica_instances_to_remove;
+            replica_instances_to_remove[template_id][job_cluster_id]
+                                       [node_instance->id()] = node_instance;
+
+            UpdateNodeInstances(std::move(replica_instances_to_add),
+                                std::move(replica_instances_to_remove));
+
+            any_node_instance_replenished = true;
+            return replenished_node_instance;
+          }
+
+          auto replenished_node_instance = ReplenishNodeInstance(node_instance);
+          if (replenished_node_instance != nullptr) {
+            RAY_LOG(INFO) << "Replenish node instance " << node_instance->id()
+                          << " in job cluster " << job_cluster_id
+                          << " with node instance " << replenished_node_instance->id()
+                          << " in virtual cluster " << GetID();
+            return replenished_node_instance;
+          }
+
+          return replenished_node_instance;
+        });
+
+    if (replenished) {
+      // Flush and publish the job cluster data.
+      async_data_flusher_(job_cluster->ToProto(), nullptr);
+    }
+  }
+
+  if (VirtualCluster::ReplenishNodeInstances(callback)) {
+    any_node_instance_replenished = true;
+  }
+
+  return any_node_instance_replenished;
 }
 
 ///////////////////////// MixedCluster /////////////////////////
@@ -795,6 +922,23 @@ void PrimaryCluster::ForeachVirtualClustersData(
   auto logical_cluster = GetLogicalCluster(virtual_cluster_id);
   if (logical_cluster != nullptr) {
     visit_proto_data(logical_cluster.get());
+  }
+}
+
+void PrimaryCluster::ReplenishAllClusterNodeInstances() {
+  auto node_instance_replenish_callback = [this](auto node_instance) {
+    return ReplenishNodeInstance(std::move(node_instance));
+  };
+
+  for (auto &[_, logical_cluster] : logical_clusters_) {
+    if (logical_cluster->ReplenishNodeInstances(node_instance_replenish_callback)) {
+      // Flush the logical cluster data.
+      async_data_flusher_(logical_cluster->ToProto(), nullptr);
+    }
+  }
+
+  if (ReplenishNodeInstances(node_instance_replenish_callback)) {
+    // Primary cluster proto data need not to flush.
   }
 }
 

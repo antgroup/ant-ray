@@ -119,6 +119,9 @@ ReplicaInstances toReplicaInstances(const T &node_instances) {
 std::string DebugString(const ReplicaInstances &replica_instances, int indent = 0);
 std::string DebugString(const ReplicaSets &replica_sets, int indent = 0);
 
+using NodeInstanceReplenishCallback = std::function<std::shared_ptr<NodeInstance>(
+    std::shared_ptr<NodeInstance> node_instance_to_replenish)>;
+
 class VirtualCluster {
  public:
   VirtualCluster(const std::string &id) : id_(id) {}
@@ -198,6 +201,19 @@ class VirtualCluster {
   /// \param node_instance The node instance to be checked.
   /// \return True if the node instance is idle, false otherwise.
   virtual bool IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const = 0;
+
+  /// Replenish the node instances of the virtual cluster.
+  ///
+  /// \param callback The callback to replenish the dead node instances.
+  /// \return True if any dead node instances are replenished, false otherwise.
+  virtual bool ReplenishNodeInstances(const NodeInstanceReplenishCallback &callback);
+
+  /// Replenish a node instance.
+  ///
+  /// \param node_instance_to_replenish The node instance to replenish.
+  /// \return True if the node instances is replenished, false otherwise.
+  std::shared_ptr<NodeInstance> ReplenishNodeInstance(
+      std::shared_ptr<NodeInstance> node_instance_to_replenish);
 
  protected:
   /// Insert the node instances to the cluster.
@@ -283,6 +299,12 @@ class ExclusiveCluster : public VirtualCluster {
   /// \param node_instance The node instance to be checked.
   /// \return True if the node instance is idle, false otherwise.
   bool IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const override;
+
+  /// Replenish the node instances of the virtual cluster.
+  ///
+  /// \param callback The callback to replenish the dead node instances.
+  /// \return True if any dead node instances are replenished, false otherwise.
+  bool ReplenishNodeInstances(const NodeInstanceReplenishCallback &callback) override;
 
  protected:
   /// Create a job cluster to the exclusive cluster.
@@ -405,6 +427,9 @@ class PrimaryCluster : public ExclusiveCluster,
   ///
   /// \param node The node that is dead.
   void OnNodeDead(const rpc::GcsNodeInfo &node);
+
+  /// Replenish dead node instances of all the virtual clusters.
+  void ReplenishAllClusterNodeInstances();
 
  protected:
   /// Handle the node dead event.

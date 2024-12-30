@@ -21,6 +21,14 @@ namespace gcs {
 
 void GcsVirtualClusterManager::Initialize(const GcsInitData &gcs_init_data) {
   primary_cluster_->Initialize(gcs_init_data);
+  if (periodical_runner_ != nullptr) {
+    // Periodically check and replenish all the dead node instances of all the virtual
+    // clusters.
+    periodical_runner_->RunFnPeriodically(
+        [this]() { primary_cluster_->ReplenishAllClusterNodeInstances(); },
+        RayConfig::instance().node_instances_replenish_interval_ms(),
+        "ReplenishNodeInstances");
+  }
 }
 
 void GcsVirtualClusterManager::OnNodeAdd(const rpc::GcsNodeInfo &node) {

@@ -21,15 +21,21 @@
 #include "ray/rpc/gcs_server/gcs_rpc_server.h"
 
 namespace ray {
+
+class PeriodicalRunner;
+
 namespace gcs {
 
 /// This implementation class of `VirtualClusterInfoHandler`.
 class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
  public:
-  explicit GcsVirtualClusterManager(GcsTableStorage &gcs_table_storage,
-                                    GcsPublisher &gcs_publisher)
+  explicit GcsVirtualClusterManager(
+      GcsTableStorage &gcs_table_storage,
+      GcsPublisher &gcs_publisher,
+      std::shared_ptr<PeriodicalRunner> periodical_runner = nullptr)
       : gcs_table_storage_(gcs_table_storage),
         gcs_publisher_(gcs_publisher),
+        periodical_runner_(periodical_runner),
         primary_cluster_(
             std::make_shared<PrimaryCluster>([this](auto data, auto callback) {
               return FlushAndPublish(std::move(data), std::move(callback));
@@ -94,6 +100,8 @@ class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
   /// The publisher of the GCS tables.
   GcsPublisher &gcs_publisher_;
 
+  /// The periodical runner to run `ReplenishAllClusterNodeInstances` task.
+  std::shared_ptr<PeriodicalRunner> periodical_runner_;
   /// The global cluster.
   std::shared_ptr<PrimaryCluster> primary_cluster_;
 };

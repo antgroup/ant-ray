@@ -61,7 +61,38 @@ void VirtualCluster::InsertNodeInstances(ReplicaInstances replica_instances) {
   }
 }
 
+void VirtualCluster::DrainNodeInstances(const ReplicaInstances &replica_instances) {
+  for (const auto &[_, job_node_instances] : replica_instances) {
+    for (const auto &[_, node_instances] : job_node_instances) {
+      for (const auto &[node_instance_id, _] : node_instances) {
+        auto node_id = NodeID::FromHex(node_instance_id);
+        auto reply = std::make_shared<rpc::autoscaler::DrainNodeReply>();
+        auto send_reply_callback = [this, node_id, reply](Status status,
+                                                          std::function<void()> success,
+                                                          std::function<void()> failure) {
+          if (!status.ok()) {
+            RAY_LOG(WARNING) << "Failed to drain node " << node_id << ": "
+                             << status.message();
+          }
+          if (!reply->is_accepted()) {
+            RAY_LOG(WARNING) << "It is rejected to drain node " << node_id << ": "
+                             << reply->rejection_reason_message();
+          }
+        };
+        rpc::autoscaler::DrainNodeRequest request;
+        request.set_node_id(node_id.Binary());
+        request.set_reason(
+            rpc::autoscaler::DrainNodeReason::DRAIN_NODE_REASON_VIRTUAL_CLUSTER_UPDATE);
+        gcs_autoscaler_state_manager_.HandleDrainNode(
+            std::move(request), reply.get(), send_reply_callback);
+      }
+    }
+  }
+}
+
 void VirtualCluster::RemoveNodeInstances(ReplicaInstances replica_instances) {
+  DrainNodeInstances(replica_instances);
+
   for (auto &[template_id, job_node_instances] : replica_instances) {
     auto template_iter = visible_node_instances_.find(template_id);
     if (template_iter == visible_node_instances_.end()) {
@@ -260,7 +291,7 @@ std::shared_ptr<JobCluster> ExclusiveCluster::DoCreateJobCluster(
 
   // Create a job cluster.
   auto job_cluster =
-      std::make_shared<JobCluster>(job_cluster_id, cluster_resource_manager_);
+      std::make_shared<JobCluster>(job_cluster_id, gcs_autoscaler_state_manager_);
   job_cluster->UpdateNodeInstances(std::move(replica_instances_to_add),
                                    ReplicaInstances());
   RAY_CHECK(job_clusters_.emplace(job_cluster_id, job_cluster).second);
@@ -337,12 +368,19 @@ bool MixedCluster::IsIdleNodeInstance(const std::string &job_cluster_id,
   if (node_instance.is_dead()) {
     return true;
   }
-  auto node_id =
-      scheduling::NodeID(NodeID::FromHex(node_instance.node_instance_id()).Binary());
-  const auto &node_resources = cluster_resource_manager_.GetNodeResources(node_id);
-  // TODO(Chong-Li): the resource view sync message may lag.
-  if (node_resources.normal_task_resources.IsEmpty() &&
-      node_resources.total == node_resources.available) {
+
+  const auto &node_resource_info = gcs_autoscaler_state_manager_.GetNodeResourceInfo();
+  auto node_iter =
+      node_resource_info.find(NodeID::FromHex(node_instance.node_instance_id()));
+  if (node_iter == node_resource_info.end()) {
+    return true;
+  }
+
+  const auto &node_resources_data = node_iter->second.second;
+
+  if (node_resources_data.resources_normal_task().empty() &&
+      MapFromProtobuf(node_resources_data.resources_total()) ==
+          MapFromProtobuf(node_resources_data.resources_available())) {
     return true;
   }
   return false;
@@ -441,10 +479,10 @@ std::shared_ptr<VirtualCluster> PrimaryCluster::LoadLogicalCluster(
   std::shared_ptr<VirtualCluster> logical_cluster;
   if (data.mode() == rpc::AllocationMode::EXCLUSIVE) {
     logical_cluster = std::make_shared<ExclusiveCluster>(
-        logical_cluster_id, async_data_flusher_, cluster_resource_manager_);
+        logical_cluster_id, async_data_flusher_, gcs_autoscaler_state_manager_);
   } else {
     logical_cluster =
-        std::make_shared<MixedCluster>(logical_cluster_id, cluster_resource_manager_);
+        std::make_shared<MixedCluster>(logical_cluster_id, gcs_autoscaler_state_manager_);
   }
   RAY_CHECK(logical_clusters_.emplace(logical_cluster_id, logical_cluster).second);
 
@@ -500,11 +538,12 @@ Status PrimaryCluster::CreateOrUpdateVirtualCluster(
     // replica_instances_to_remove must be empty as the virtual cluster is a new one.
     RAY_CHECK(replica_instances_to_remove_from_logical_cluster.empty());
     if (request.mode() == rpc::AllocationMode::EXCLUSIVE) {
-      logical_cluster = std::make_shared<ExclusiveCluster>(
-          request.virtual_cluster_id(), async_data_flusher_, cluster_resource_manager_);
+      logical_cluster = std::make_shared<ExclusiveCluster>(request.virtual_cluster_id(),
+                                                           async_data_flusher_,
+                                                           gcs_autoscaler_state_manager_);
     } else {
       logical_cluster = std::make_shared<MixedCluster>(request.virtual_cluster_id(),
-                                                       cluster_resource_manager_);
+                                                       gcs_autoscaler_state_manager_);
     }
     logical_clusters_[request.virtual_cluster_id()] = logical_cluster;
   }

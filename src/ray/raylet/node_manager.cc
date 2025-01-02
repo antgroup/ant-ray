@@ -2089,6 +2089,25 @@ void NodeManager::HandleDrainRaylet(rpc::DrainRayletRequest request,
       reply->set_rejection_reason_message(
           "The node to be idle terminated is no longer idle.");
     }
+  } else if (request.reason() ==
+             rpc::autoscaler::DrainNodeReason::DRAIN_NODE_REASON_VIRTUAL_CLUSTER_UPDATE) {
+    const bool is_idle =
+        cluster_resource_scheduler_->GetLocalResourceManager().IsLocalNodeIdle();
+    if (is_idle) {
+      local_task_manager_->CancelTasks(
+          [](const std::shared_ptr<internal::Work> &work) { return true; },
+          rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
+          "The node is being removed from a virtual cluster.");
+      cluster_task_manager_->CancelTasks(
+          [](const std::shared_ptr<internal::Work> &work) { return true; },
+          rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
+          "The node is being removed from a virtual cluster.");
+      reply->set_is_accepted(true);
+    } else {
+      reply->set_is_accepted(false);
+      reply->set_rejection_reason_message(
+          "The node to be removed from a virtual cluster is no longer idle.");
+    }
   } else {
     // Non-rejectable draining request.
     RAY_CHECK_EQ(request.reason(),

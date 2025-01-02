@@ -406,8 +406,11 @@ void GcsAutoscalerStateManager::HandleDrainNode(
         reply->set_is_accepted(raylet_reply.is_accepted());
 
         if (raylet_reply.is_accepted()) {
-          gcs_node_manager_.SetNodeDraining(
-              node_id, std::make_shared<rpc::autoscaler::DrainNodeRequest>(request));
+          if (request.reason() != rpc::autoscaler::DrainNodeReason::
+                                      DRAIN_NODE_REASON_VIRTUAL_CLUSTER_UPDATE()) {
+            gcs_node_manager_.SetNodeDraining(
+                node_id, std::make_shared<rpc::autoscaler::DrainNodeRequest>(request));
+          }
         } else {
           reply->set_rejection_reason_message(raylet_reply.rejection_reason_message());
         }

@@ -19,9 +19,9 @@
 #include "ray/common/status.h"
 #include "ray/common/virtual_cluster_id.h"
 #include "ray/gcs/gcs_server/gcs_init_data.h"
+#include "src/ray/gcs/gcs_server/gcs_autoscaler_state_manager.h"
 #include "src/ray/protobuf/gcs.pb.h"
 #include "src/ray/protobuf/gcs_service.pb.h"
-#include "src/ray/raylet/scheduling/cluster_resource_manager.h"
 
 namespace ray {
 namespace gcs {
@@ -120,8 +120,8 @@ ReplicaInstances toReplicaInstances(const T &node_instances) {
 class VirtualCluster {
  public:
   VirtualCluster(const std::string &id,
-                 const ClusterResourceManager &cluster_resource_manager)
-      : id_(id), cluster_resource_manager_(cluster_resource_manager) {}
+                 GcsAutoscalerStateManager &gcs_autoscaler_state_manager)
+      : id_(id), gcs_autoscaler_state_manager_(gcs_autoscaler_state_manager) {}
   virtual ~VirtualCluster() = default;
 
   /// Get the id of the cluster.
@@ -209,6 +209,8 @@ class VirtualCluster {
   /// \param replica_instances The node instances to be removed.
   void RemoveNodeInstances(ReplicaInstances replica_instances);
 
+  void DrainNodeInstances(const ReplicaInstances &replica_instances);
+
   /// The id of the virtual cluster.
   std::string id_;
   /// Node instances that are visible to the cluster.
@@ -218,7 +220,7 @@ class VirtualCluster {
   // Version number of the last modification to the cluster.
   uint64_t revision_{0};
 
-  const ClusterResourceManager &cluster_resource_manager_;
+  GcsAutoscalerStateManager &gcs_autoscaler_state_manager_;
 };
 
 class JobCluster;
@@ -226,8 +228,8 @@ class ExclusiveCluster : public VirtualCluster {
  public:
   ExclusiveCluster(const std::string &id,
                    const AsyncClusterDataFlusher &async_data_flusher,
-                   const ClusterResourceManager &cluster_resource_manager)
-      : VirtualCluster(id, cluster_resource_manager),
+                   GcsAutoscalerStateManager &gcs_autoscaler_state_manager)
+      : VirtualCluster(id, gcs_autoscaler_state_manager),
         async_data_flusher_(async_data_flusher) {}
 
   const std::string &GetID() const override { return id_; }
@@ -299,8 +301,8 @@ class ExclusiveCluster : public VirtualCluster {
 class MixedCluster : public VirtualCluster {
  public:
   MixedCluster(const std::string &id,
-               const ClusterResourceManager &cluster_resource_manager)
-      : VirtualCluster(id, cluster_resource_manager) {}
+               GcsAutoscalerStateManager &gcs_autoscaler_state_manager)
+      : VirtualCluster(id, gcs_autoscaler_state_manager) {}
   MixedCluster &operator=(const MixedCluster &) = delete;
 
   const std::string &GetID() const override { return id_; }
@@ -325,9 +327,9 @@ class PrimaryCluster : public ExclusiveCluster,
                        public std::enable_shared_from_this<PrimaryCluster> {
  public:
   PrimaryCluster(const AsyncClusterDataFlusher &async_data_flusher,
-                 const ClusterResourceManager &cluster_resource_manager)
+                 GcsAutoscalerStateManager &gcs_autoscaler_state_manager)
       : ExclusiveCluster(
-            kPrimaryClusterID, async_data_flusher, cluster_resource_manager) {}
+            kPrimaryClusterID, async_data_flusher, gcs_autoscaler_state_manager) {}
   PrimaryCluster &operator=(const PrimaryCluster &) = delete;
 
   /// Initialize with the gcs tables data synchronously.

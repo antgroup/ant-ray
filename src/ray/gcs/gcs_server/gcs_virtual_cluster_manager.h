@@ -29,14 +29,14 @@ class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
   explicit GcsVirtualClusterManager(
       GcsTableStorage &gcs_table_storage,
       GcsPublisher &gcs_publisher,
-      const ClusterResourceManager &cluster_resource_manager)
+      GcsAutoscalerStateManager &gcs_autoscaler_state_manager)
       : gcs_table_storage_(gcs_table_storage),
         gcs_publisher_(gcs_publisher),
         primary_cluster_(std::make_shared<PrimaryCluster>(
             [this](auto data, auto callback) {
               return FlushAndPublish(std::move(data), std::move(callback));
             },
-            cluster_resource_manager)) {}
+            gcs_autoscaler_state_manager)) {}
 
   /// Initialize with the gcs tables data synchronously.
   /// This should be called when GCS server restarts after a failure.

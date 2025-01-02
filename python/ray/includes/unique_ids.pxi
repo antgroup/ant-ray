@@ -428,9 +428,9 @@ cdef class ClusterID(UniqueID):
         return <CClusterID>self.data
 
 cdef class VirtualClusterID(SimpleID):
+    cdef CVirtualClusterID data
 
     def __init__(self, id):
-        check_id(id)
         self.data = CVirtualClusterID.FromBinary(<c_string>id)
 
 

@@ -229,11 +229,10 @@ void GcsNodeManager::HandleGetAllNodeInfo(rpc::GetAllNodeInfoRequest request,
   }
   std::string filter_node_name = request.filters().node_name();
   std::string filter_virtual_cluster_id = request.filters().virtual_cluster_id();
-  RAY_LOG(DEBUG) << "GetAllNodeInfo request, limit = " << limit
-                 << ", filter_node_id = " << filter_node_id
-                 << ", filter_state = " << filter_state.value_or(-1)
-                 << ", filter_node_name = " << filter_node_name
-                 << ", filter_virtual_cluster_id = " << filter_virtual_cluster_id;
+  // RAY_LOG(DEBUG) << "GetAllNodeInfo request, limit = " << limit
+  //                << ", filter_node_id = " << filter_node_id
+  //                << ", filter_node_name = " << filter_node_name
+  //                << ", filter_virtual_cluster_id = " << filter_virtual_cluster_id;
   auto filter_fn = [this, &filter_node_id, &filter_node_name, &filter_virtual_cluster_id](const rpc::GcsNodeInfo &node) {
     if (!filter_node_id.IsNil() && filter_node_id != NodeID::FromBinary(node.node_id())) {
       return false;
@@ -246,7 +245,7 @@ void GcsNodeManager::HandleGetAllNodeInfo(rpc::GetAllNodeInfoRequest request,
     // TODO: Optimize this after we have the revert index for node_id -> virtual_cluster_id.
     if (!filter_virtual_cluster_id.empty() && 
          !gcs_virtual_cluster_manager_.GetVirtualCluster(
-          filter_virtual_cluster_id).ContainsNodeInstance(NodeID::FromBinary(node.node_id()).Hex())) {
+          filter_virtual_cluster_id)->ContainsNodeInstance(NodeID::FromBinary(node.node_id()).Hex())) {
       return false;
     }
     return true;

@@ -100,7 +100,7 @@ bool operator==(const ReplicaInstances &lhs, const ReplicaInstances &rhs) {
   return true;
 }
 
-// lhs >= rhs
+// lhs <= rhs
 bool operator<=(const ReplicaInstances &lhs, const ReplicaInstances &rhs) {
   if (lhs.size() > rhs.size()) {
     return false;
@@ -137,10 +137,6 @@ bool operator<=(const ReplicaInstances &lhs, const ReplicaInstances &rhs) {
   return true;
 }
 
-bool operator<(const ReplicaInstances &lhs, const ReplicaInstances &rhs) {
-  return !(rhs <= lhs);
-}
-
 bool operator==(const ReplicaSets &lhs, const ReplicaSets &rhs) {
   if (lhs.size() != rhs.size()) {
     return false;
@@ -164,8 +160,6 @@ bool operator<=(const ReplicaSets &lhs, const ReplicaSets &rhs) {
   }
   return true;
 }
-
-bool operator<(const ReplicaSets &lhs, const ReplicaSets &rhs) { return !(rhs <= lhs); }
 
 class VirtualClusterTest : public ::testing::Test {
  public:
@@ -867,7 +861,22 @@ class FailoverTest : public PrimaryClusterTest {
         [this](const Status &status, auto data, const auto *replica_sets_to_recommend) {
           ASSERT_TRUE(status.ok());
         }));
+    primary_cluster_ = primary_cluster;
     return primary_cluster;
+  }
+
+  NodeID SelectFirstNode(const std::string &virtual_cluster_id,
+                         const std::string &template_id) {
+    if (auto virtual_cluster = primary_cluster_->GetVirtualCluster(virtual_cluster_id)) {
+      ReplicaSets replica_sets{{template_id, 1}};
+      ReplicaInstances replica_instances;
+      if (virtual_cluster->LookupNodeInstances(
+              replica_sets, replica_instances, nullptr)) {
+        return NodeID::FromHex(
+            replica_instances.at(template_id).at(kEmptyJobClusterId).begin()->first);
+      }
+    }
+    return NodeID::Nil();
   }
 
   std::string template_id_0_ = "0";
@@ -876,6 +885,7 @@ class FailoverTest : public PrimaryClusterTest {
   std::string job_cluster_id_1_;
   std::string virtual_cluster_id_1_ = "virtual_cluster_id_1";
   std::string virtual_cluster_id_2_ = "virtual_cluster_id_2";
+  std::shared_ptr<ray::gcs::PrimaryCluster> primary_cluster_;
 };
 
 TEST_F(FailoverTest, FailoverNormal) {
@@ -926,42 +936,13 @@ TEST_F(FailoverTest, FailoverWithDeadNodes) {
   auto primary_cluster = InitVirtualClusters(node_count, template_count);
   ASSERT_EQ(virtual_clusters_data_.size(), 4);
 
-  auto job_cluster_0 = primary_cluster->GetJobCluster(job_cluster_id_0_);
-  ASSERT_TRUE(job_cluster_0 != nullptr);
-
-  auto virtual_cluster_1 = std::dynamic_pointer_cast<ExclusiveCluster>(
-      primary_cluster->GetVirtualCluster(virtual_cluster_id_1_));
-  ASSERT_TRUE(virtual_cluster_1 != nullptr);
-
-  auto virtual_cluster_2 = primary_cluster->GetVirtualCluster(virtual_cluster_id_2_);
-  ASSERT_TRUE(virtual_cluster_2 != nullptr);
-
-  auto job_cluster_1 = virtual_cluster_1->GetJobCluster(job_cluster_id_1_);
-  ASSERT_TRUE(job_cluster_1 != nullptr);
-
-  absl::flat_hash_set<NodeID> dead_node_ids;
-  // Mock template_id_0_'s nodes dead in job_cluster_0 and virtual_cluster_1.
-  dead_node_ids.emplace(NodeID::FromHex(job_cluster_0->GetVisibleNodeInstances()
-                                            .at(template_id_0_)
-                                            .at(kEmptyJobClusterId)
-                                            .begin()
-                                            ->first));
-  dead_node_ids.emplace(NodeID::FromHex(job_cluster_1->GetVisibleNodeInstances()
-                                            .at(template_id_0_)
-                                            .at(kEmptyJobClusterId)
-                                            .begin()
-                                            ->first));
+  std::vector<NodeID> dead_node_ids;
+  // Mock template_id_1_'s nodes dead in job_cluster_1 and job_cluster_2.
+  dead_node_ids.emplace_back(SelectFirstNode(job_cluster_id_0_, template_id_0_));
+  dead_node_ids.emplace_back(SelectFirstNode(job_cluster_id_1_, template_id_0_));
   // Mock template_id_1_'s nodes dead in virtual_cluster_1 and virtual_cluster_2.
-  dead_node_ids.emplace(NodeID::FromHex(virtual_cluster_1->GetVisibleNodeInstances()
-                                            .at(template_id_1_)
-                                            .at(kEmptyJobClusterId)
-                                            .begin()
-                                            ->first));
-  dead_node_ids.emplace(NodeID::FromHex(virtual_cluster_2->GetVisibleNodeInstances()
-                                            .at(template_id_1_)
-                                            .at(kEmptyJobClusterId)
-                                            .begin()
-                                            ->first));
+  dead_node_ids.emplace_back(SelectFirstNode(virtual_cluster_id_1_, template_id_1_));
+  dead_node_ids.emplace_back(SelectFirstNode(virtual_cluster_id_2_, template_id_1_));
   // Erase the dead nodes.
   for (const auto &dead_node_id : dead_node_ids) {
     const auto &dead_node = nodes_.at(dead_node_id);
@@ -1009,6 +990,10 @@ TEST_F(FailoverTest, FailoverWithDeadNodes) {
   }
 
   {
+    auto virtual_cluster_1 = std::dynamic_pointer_cast<ExclusiveCluster>(
+        primary_cluster->GetVirtualCluster(virtual_cluster_id_1_));
+    ASSERT_TRUE(virtual_cluster_1 != nullptr);
+
     // Assume that the dead nodes in job cluster 1 is replaced by a new alive one from
     // primary cluster.
     auto node_instance_replenish_callback = [primary_cluster](auto node_instance) {
@@ -1032,9 +1017,9 @@ TEST_F(FailoverTest, FailoverWithDeadNodes) {
 
     // Check the visible node instances and replica sets of the new primary cluster are
     // less than the old primary cluster.
-    ASSERT_TRUE(new_primary_cluster->GetVisibleNodeInstances() <
+    ASSERT_TRUE(new_primary_cluster->GetVisibleNodeInstances() <=
                 primary_cluster->GetVisibleNodeInstances());
-    ASSERT_TRUE(new_primary_cluster->GetReplicaSets() <
+    ASSERT_TRUE(new_primary_cluster->GetReplicaSets() <=
                 primary_cluster->GetReplicaSets());
 
     // Check the visible node instances and replica sets of the virtual clusters are the
@@ -1048,6 +1033,82 @@ TEST_F(FailoverTest, FailoverWithDeadNodes) {
                       virtual_cluster->GetVisibleNodeInstances());
           ASSERT_TRUE(new_virtual_cluster->GetReplicaSets() ==
                       virtual_cluster->GetReplicaSets());
+        });
+  }
+}
+
+TEST_F(FailoverTest, OnlyFlushJobClusters) {
+  size_t node_count = 40;
+  size_t template_count = 2;
+  auto primary_cluster = InitVirtualClusters(node_count, template_count);
+  ASSERT_EQ(virtual_clusters_data_.size(), 4);
+
+  std::vector<NodeID> dead_node_ids;
+  // Mock template_id_1_'s nodes dead in job_cluster_1 and job_cluster_2.
+  dead_node_ids.emplace_back(SelectFirstNode(job_cluster_id_0_, template_id_0_));
+  dead_node_ids.emplace_back(SelectFirstNode(job_cluster_id_1_, template_id_0_));
+  // Mock template_id_1_'s nodes dead in virtual_cluster_1 and virtual_cluster_2.
+  dead_node_ids.emplace_back(SelectFirstNode(virtual_cluster_id_1_, template_id_1_));
+  dead_node_ids.emplace_back(SelectFirstNode(virtual_cluster_id_2_, template_id_1_));
+  // Erase the dead nodes.
+  for (const auto &dead_node_id : dead_node_ids) {
+    const auto &dead_node = nodes_.at(dead_node_id);
+    primary_cluster->OnNodeDead(*dead_node);
+    nodes_.erase(dead_node_id);
+  }
+
+  auto default_data_flusher = [this](auto data, auto callback) {
+    callback(Status::OK(), data, nullptr);
+    return Status::OK();
+  };
+
+  {
+    auto virtual_cluster_1 = std::dynamic_pointer_cast<ExclusiveCluster>(
+        primary_cluster->GetVirtualCluster(virtual_cluster_id_1_));
+    ASSERT_TRUE(virtual_cluster_1 != nullptr);
+
+    // Assume that the dead nodes in job cluster 1 is replaced by a new alive one from
+    // primary cluster.
+    auto node_instance_replenish_callback = [primary_cluster](auto node_instance) {
+      return primary_cluster->ReplenishNodeInstance(std::move(node_instance));
+    };
+    ASSERT_TRUE(
+        virtual_cluster_1->ReplenishNodeInstances(node_instance_replenish_callback));
+    // async_data_flusher_(virtual_cluster_1->ToProto(), nullptr);
+
+    // Mock a gcs_init_data.
+    instrumented_io_context io_service;
+    gcs::InMemoryGcsTableStorage gcs_table_storage(io_service);
+    MockGcsInitData gcs_init_data(gcs_table_storage);
+    gcs_init_data.SetNodes(nodes_);
+    gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
+
+    RAY_LOG(INFO) << "Initialize";
+    // Failover to a new primary cluster.
+    auto new_primary_cluster =
+        std::make_shared<PrimaryCluster>(default_data_flusher, cluster_resource_manager_);
+    new_primary_cluster->Initialize(gcs_init_data);
+
+    auto new_job_cluster_1 = new_primary_cluster->GetVirtualCluster(job_cluster_id_1_);
+    ASSERT_TRUE(new_job_cluster_1 != nullptr);
+    // The dead node dead_node_ids[1] in job cluster 1 is replenished and the job cluster
+    // 1 is flushed.
+    ASSERT_FALSE(new_job_cluster_1->ContainsNodeInstance(dead_node_ids[1].Hex()));
+
+    auto new_virtual_cluster_1 =
+        new_primary_cluster->GetVirtualCluster(virtual_cluster_id_1_);
+    ASSERT_TRUE(new_virtual_cluster_1 != nullptr);
+    // The dead node dead_node_ids[1] is repaired in virtual cluster 1 when fo.
+    ASSERT_FALSE(new_virtual_cluster_1->ContainsNodeInstance(dead_node_ids[1].Hex()));
+    // The dead node dead_node_ids[2] is still in the virtual cluster 1 as it is not
+    // flushed.
+    ASSERT_TRUE(new_virtual_cluster_1->ContainsNodeInstance(dead_node_ids[2].Hex()));
+
+    // Check all the node instances in job cluster 1 are in the new virtual cluster 1.
+    new_job_cluster_1->ForeachNodeInstance(
+        [new_virtual_cluster_1](const auto &node_instance) {
+          ASSERT_TRUE(new_virtual_cluster_1->ContainsNodeInstance(
+              node_instance->node_instance_id()));
         });
   }
 }

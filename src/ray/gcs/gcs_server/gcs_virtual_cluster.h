@@ -191,6 +191,12 @@ class VirtualCluster {
   /// \return True if the node instance is in this virtual cluster, false otherwise.
   bool ContainsNodeInstance(const std::string &node_instance_id);
 
+  /// Iterate all node instances of the virtual cluster.
+  ///
+  /// \param fn The callback to iterate all node instances.
+  void ForeachNodeInstance(
+      const std::function<void(const std::shared_ptr<NodeInstance> &)> &fn) const;
+
   /// Check if the virtual cluster is in use.
   ///
   /// \param in_use_instances The node instances that are still in use.

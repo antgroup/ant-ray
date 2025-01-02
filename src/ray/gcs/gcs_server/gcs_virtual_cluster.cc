@@ -173,7 +173,7 @@ bool VirtualCluster::LookupNodeInstances(const ReplicaSets &replica_sets,
 
     auto &job_node_instances = template_node_instances[kEmptyJobClusterId];
     for (const auto &[id, node_instance] : empty_iter->second) {
-      if (!node_instance_filter(*node_instance)) {
+      if (node_instance_filter != nullptr && !node_instance_filter(*node_instance)) {
         continue;
       }
       job_node_instances.emplace(id, node_instance);
@@ -218,6 +218,20 @@ bool VirtualCluster::ContainsNodeInstance(const std::string &node_instance_id) {
     }
   }
   return false;
+}
+
+void VirtualCluster::ForeachNodeInstance(
+    const std::function<void(const std::shared_ptr<NodeInstance> &)> &fn) const {
+  if (fn == nullptr) {
+    return;
+  }
+  for (const auto &[template_id, job_node_instances] : visible_node_instances_) {
+    for (const auto &[job_cluster_id, node_instances] : job_node_instances) {
+      for (const auto &[_, node_instance] : node_instances) {
+        fn(node_instance);
+      }
+    }
+  }
 }
 
 bool VirtualCluster::ReplenishNodeInstances(

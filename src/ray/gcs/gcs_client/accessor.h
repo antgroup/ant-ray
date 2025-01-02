@@ -382,6 +382,16 @@ class NodeInfoAccessor {
   virtual Status AsyncGetAll(const MultiItemCallback<rpc::GcsNodeInfo> &callback,
                              int64_t timeout_ms);
 
+  /// Get information of all nodes from GCS asynchronously.
+  ///
+  /// \param virtual_cluster_id The ID of the virtual cluster to look up in GCS.
+  /// \param callback Callback that will be called after lookup finishes.
+  /// \return Status
+  virtual Status AsyncGetByVirtualClusterID(
+      const std::optional<VirtualClusterID> &virtual_cluster_id,
+      const MultiItemCallback<rpc::GcsNodeInfo> &callback,
+      int64_t timeout_ms);
+
   /// Subscribe to node addition and removal events from GCS and cache those information.
   ///
   /// \param subscribe Callback that will be called if a node is

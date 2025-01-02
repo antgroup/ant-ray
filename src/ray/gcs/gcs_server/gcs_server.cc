@@ -276,7 +276,8 @@ void GcsServer::InitGcsNodeManager(const GcsInitData &gcs_init_data) {
   gcs_node_manager_ = std::make_unique<GcsNodeManager>(gcs_publisher_.get(),
                                                        gcs_table_storage_.get(),
                                                        raylet_client_pool_.get(),
-                                                       rpc_server_.GetClusterId());
+                                                       rpc_server_.GetClusterId(),
+                                                       *gcs_virtual_cluster_manager_);
   // Initialize by gcs tables data.
   gcs_node_manager_->Initialize(gcs_init_data);
   // Register service.

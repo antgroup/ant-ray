@@ -15,6 +15,7 @@ from ray.includes.unique_ids cimport (
     CObjectID,
     CWorkerID,
     CPlacementGroupID,
+    CVirtualClusterID,
 )
 from ray.includes.common cimport (
     CRayStatus,
@@ -32,7 +33,7 @@ cdef extern from "ray/gcs/gcs_client/global_state_accessor.h" nogil:
         c_vector[c_string] GetAllJobInfo(
           c_bool skip_submission_job_info_field, c_bool skip_is_running_tasks_field)
         CJobID GetNextJobID()
-        c_vector[c_string] GetAllNodeInfo()
+        c_vector[c_string] GetAllNodeInfo(optional[CVirtualClusterID])
         c_vector[c_string] GetAllAvailableResources()
         c_vector[c_string] GetAllTotalResources()
         unordered_map[CNodeID, c_int64_t] GetDrainingNodes()

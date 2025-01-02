@@ -157,7 +157,7 @@ class GlobalState:
         }
         return actor_info
 
-    def node_table(self):
+    def node_table(self, virtual_cluster_id=None):
         """Fetch and parse the Gcs node info table.
 
         Returns:
@@ -165,7 +165,7 @@ class GlobalState:
         """
         self._check_connected()
 
-        return self.global_state_accessor.get_node_table()
+        return self.global_state_accessor.get_node_table(virtual_cluster_id)
 
     def job_table(self):
         """Fetch and parse the gcs job table.
@@ -867,13 +867,13 @@ def next_job_id():
 
 @DeveloperAPI
 @client_mode_hook
-def nodes():
+def nodes(virtual_cluster_id=None):
     """Get a list of the nodes in the cluster (for debugging only).
 
     Returns:
         Information about the Ray clients in the cluster.
     """
-    return state.node_table()
+    return state.node_table(virtual_cluster_id)
 
 
 def workers():

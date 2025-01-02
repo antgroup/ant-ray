@@ -565,5 +565,137 @@ ray.get(a.run.remote(control))
             head_client.stop_job(job_id)
 
 
+@pytest.mark.parametrize(
+    "job_sdk_client",
+    [
+        {
+            "_system_config": {"gcs_actor_scheduling_enabled": False},
+            "ntemplates": 3,
+        },
+        {
+            "_system_config": {"gcs_actor_scheduling_enabled": True},
+            "ntemplates": 3,
+        },
+    ],
+    indirect=True,
+)
+@pytest.mark.asyncio
+async def test_job_access_cluster_data(job_sdk_client):
+    # 测试：
+    # 1. job driver 调用 ray.nodes 只返回当前 virtual cluster 的节点
+    # 2. job actor、normal task 调用 ray.nodes 同样只返回当前 virtual cluster 的节点
+    # 3. local driver 调用 ray.nodes 返回所有节点
+    head_client, gcs_address, cluster = job_sdk_client
+    virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
+    node_to_virtual_cluster = {}
+    ntemplates = 3
+    for i in range(ntemplates):
+        virtual_cluster_id = virtual_cluster_id_prefix + str(i)
+        nodes = await create_virtual_cluster(
+            gcs_address, virtual_cluster_id, {TEMPLATE_ID_PREFIX + str(i): 3}
+        )
+        for node_id in nodes:
+            assert node_id not in node_to_virtual_cluster
+            node_to_virtual_cluster[node_id] = virtual_cluster_id
+
+    for i in range(ntemplates):
+        actor_name = f"test_actors_{i}"
+        resource_accessor_name = f"accessor_{i}"
+        virtual_cluster_id = virtual_cluster_id_prefix + str(i)
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir)
+            driver_script = """
+import ray
+
+
+@ray.remote
+class ResourceAccessor:
+    def __init__(self):
+        self._nodes = []
+
+    def is_ready(self):
+        return True
+
+    def nodes(self):
+        if len(self._nodes) == 0:
+            self._nodes = ray.nodes()
+        return self._nodes
+
+ray.init(address="auto")
+
+actor = ResourceAccessor.options(name="{resource_accessor_name}").remote()
+
+            """
+            driver_script = driver_script.format(
+                resource_accessor_name=resource_accessor_name,
+            )
+            test_script_file = path / "test_script.py"
+            with open(test_script_file, "w+") as file:
+                file.write(driver_script)
+
+            runtime_env = {"working_dir": tmp_dir}
+            runtime_env = upload_working_dir_if_needed(
+                runtime_env, tmp_dir, logger=logger
+            )
+            runtime_env = RuntimeEnv(**runtime_env).to_dict()
+
+            job_id = head_client.submit_job(
+                entrypoint="python test_script.py",
+                entrypoint_memory=1,
+                runtime_env=runtime_env,
+                virtual_cluster_id=virtual_cluster_id,
+            )
+
+            wait_for_condition(
+                lambda: ray.get_actor(resource_accessor_name).is_ready.remote(), timeout=20
+            )
+
+            accessor_actor = ray.get_actor(
+                name=resource_accessor_name, namespace="control"
+            )
+
+            def _check_only_access_virtual_cluster_nodes(
+                accessor_actor, node_to_virtual_cluster, virtual_cluster_id
+            ):
+                nodes = ray.get(accessor_actor.nodes.remote())
+                assert len(nodes) > 0
+                for node in nodes:
+                    node_id = node["NodeID"]
+                    assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+                return True
+
+            wait_for_condition(
+                partial(
+                    _check_only_access_virtual_cluster_nodes,
+                    accessor_actor,
+                    node_to_virtual_cluster,
+                    virtual_cluster_id,
+                ),
+                timeout=20,
+            )
+            def _check_recover(
+                nodes_to_remove, actor_name, node_to_virtual_cluster, virtual_cluster_id
+            ):
+                actor = ray.get_actor(actor_name, namespace="control")
+                nodes = ray.get(actor.get_node_id.remote())
+                for node_id in nodes:
+                    assert node_id not in nodes_to_remove
+                    assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+                return True
+
+            wait_for_condition(
+                partial(
+                    _check_recover,
+                    nodes_to_remove,
+                    actor_name,
+                    node_to_virtual_cluster,
+                    virtual_cluster_id,
+                ),
+                timeout=120,
+            )
+            head_client.stop_job(job_id)
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__]))

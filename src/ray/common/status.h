@@ -56,17 +56,12 @@ class error_code;
     }                                  \
   } while (0)
 
-// If 'to_call' returns a bad status, CHECK immediately with a logged message
-// of 'msg' followed by the status.
-#define RAY_CHECK_OK_PREPEND(to_call, msg)                \
-  do {                                                    \
-    const ::ray::Status &_s = (to_call);                  \
-    RAY_CHECK(_s.ok()) << (msg) << ": " << _s.ToString(); \
-  } while (0)
-
-// If the status is bad, CHECK immediately, appending the status to the
-// logged message.
-#define RAY_CHECK_OK(s) RAY_CHECK_OK_PREPEND((s), "Bad status")
+// If the status is not OK, CHECK-fail immediately, appending the status to the
+// logged message. The message can be appended with <<.
+#define RAY_CHECK_OK(s)                          \
+  if (const ::ray::Status &_status_ = (s); true) \
+  RAY_CHECK_WITH_DISPLAY(_status_.ok(), #s)      \
+      << "Status not OK: " << _status_.ToString() << " "
 
 namespace ray {
 
@@ -89,6 +84,7 @@ enum class StatusCode : char {
   NotFound = 17,
   Disconnected = 18,
   SchedulingCancelled = 19,
+  AlreadyExists = 20,
   // object store status
   ObjectExists = 21,
   ObjectNotFound = 22,
@@ -209,6 +205,10 @@ class RAY_EXPORT Status {
     return Status(StatusCode::SchedulingCancelled, msg);
   }
 
+  static Status AlreadyExists(const std::string &msg) {
+    return Status(StatusCode::AlreadyExists, msg);
+  }
+
   static Status ObjectExists(const std::string &msg) {
     return Status(StatusCode::ObjectExists, msg);
   }
@@ -296,6 +296,7 @@ class RAY_EXPORT Status {
   bool IsNotFound() const { return code() == StatusCode::NotFound; }
   bool IsDisconnected() const { return code() == StatusCode::Disconnected; }
   bool IsSchedulingCancelled() const { return code() == StatusCode::SchedulingCancelled; }
+  bool IsAlreadyExists() const { return code() == StatusCode::AlreadyExists; }
   bool IsObjectExists() const { return code() == StatusCode::ObjectExists; }
   bool IsObjectNotFound() const { return code() == StatusCode::ObjectNotFound; }
   bool IsObjectUnknownOwner() const { return code() == StatusCode::ObjectUnknownOwner; }

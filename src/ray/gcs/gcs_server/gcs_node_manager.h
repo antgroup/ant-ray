@@ -19,6 +19,7 @@
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_multiset_of.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
+#include <deque>
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
@@ -35,8 +36,7 @@
 #include "ray/util/event.h"
 #include "src/ray/protobuf/gcs.pb.h"
 
-namespace ray {
-namespace gcs {
+namespace ray::gcs {
 
 class GcsAutoscalerStateManagerTest;
 class GcsStateTest;
@@ -237,8 +237,8 @@ class GcsNodeManager : public rpc::NodeInfoHandler {
   /// Dead nodes.
   absl::flat_hash_map<NodeID, std::shared_ptr<rpc::GcsNodeInfo>> dead_nodes_;
   /// The nodes are sorted according to the timestamp, and the oldest is at the head of
-  /// the list.
-  std::list<std::pair<NodeID, int64_t>> sorted_dead_node_list_;
+  /// the deque.
+  std::deque<std::pair<NodeID, int64_t>> sorted_dead_node_list_;
   /// Listeners which monitors the addition of nodes.
   std::vector<std::function<void(std::shared_ptr<rpc::GcsNodeInfo>)>>
       node_added_listeners_;
@@ -275,5 +275,4 @@ class GcsNodeManager : public rpc::NodeInfoHandler {
   friend GcsStateTest;
 };
 
-}  // namespace gcs
-}  // namespace ray
+}  // namespace ray::gcs

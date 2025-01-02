@@ -214,7 +214,7 @@ class GcsServer {
   void PrintAsioStats();
 
   /// Get or connect to a redis server
-  std::shared_ptr<RedisClient> GetOrConnectRedis();
+  std::shared_ptr<RedisClient> CreateRedisClient(instrumented_io_context &io_service);
 
   void TryGlobalGC();
 
@@ -245,10 +245,12 @@ class GcsServer {
   std::unique_ptr<GcsResourceManager> gcs_resource_manager_;
   /// The autoscaler state manager.
   std::unique_ptr<GcsAutoscalerStateManager> gcs_autoscaler_state_manager_;
+  /// A publisher for publishing gcs messages.
+  std::unique_ptr<GcsPublisher> gcs_publisher_;
   /// The gcs node manager.
   std::unique_ptr<GcsNodeManager> gcs_node_manager_;
   /// The health check manager.
-  std::unique_ptr<GcsHealthCheckManager> gcs_healthcheck_manager_;
+  std::shared_ptr<GcsHealthCheckManager> gcs_healthcheck_manager_;
   /// The gcs virtual cluster handler and service.
   std::shared_ptr<GcsVirtualClusterManager> gcs_virtual_cluster_manager_;
   std::unique_ptr<rpc::VirtualClusterInfoGrpcService> gcs_virtual_cluster_service_;
@@ -261,8 +263,6 @@ class GcsServer {
   /// The gcs placement group scheduler.
   /// [gcs_placement_group_scheduler_] depends on [raylet_client_pool_].
   std::unique_ptr<GcsPlacementGroupScheduler> gcs_placement_group_scheduler_;
-  /// A publisher for publishing gcs messages.
-  std::unique_ptr<GcsPublisher> gcs_publisher_;
   /// Function table manager.
   std::unique_ptr<GcsFunctionManager> function_manager_;
   /// Stores references to URIs stored by the GCS for runtime envs.
@@ -307,8 +307,6 @@ class GcsServer {
   std::unique_ptr<rpc::TaskInfoGrpcService> task_info_service_;
   /// Gcs Autoscaler state manager.
   std::unique_ptr<rpc::autoscaler::AutoscalerStateGrpcService> autoscaler_state_service_;
-  /// Backend client.
-  std::shared_ptr<RedisClient> redis_client_;
   /// Grpc based pubsub's periodical runner.
   std::shared_ptr<PeriodicalRunner> pubsub_periodical_runner_;
   /// The runner to run function periodically.

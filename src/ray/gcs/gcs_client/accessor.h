@@ -388,7 +388,7 @@ class NodeInfoAccessor {
   /// \param callback Callback that will be called after lookup finishes.
   /// \return Status
   virtual Status AsyncGetByVirtualClusterID(
-      const std::optional<VirtualClusterID> &virtual_cluster_id,
+      const std::optional<std::string> &virtual_cluster_id,
       const MultiItemCallback<rpc::GcsNodeInfo> &callback,
       int64_t timeout_ms);
 

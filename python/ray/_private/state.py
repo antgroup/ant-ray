@@ -157,7 +157,7 @@ class GlobalState:
         }
         return actor_info
 
-    def node_table(self, virtual_cluster_id=None):
+    def node_table(self, virtual_cluster_id=""):
         """Fetch and parse the Gcs node info table.
 
         Returns:
@@ -867,7 +867,7 @@ def next_job_id():
 
 @DeveloperAPI
 @client_mode_hook
-def nodes(virtual_cluster_id=None):
+def nodes(virtual_cluster_id=""):
     """Get a list of the nodes in the cluster (for debugging only).
 
     Returns:

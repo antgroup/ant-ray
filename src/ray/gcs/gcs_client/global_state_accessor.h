@@ -61,7 +61,8 @@ class GlobalStateAccessor {
   /// Get all node information from GCS.
   ///
   /// \return A list of `GcsNodeInfo` objects serialized in protobuf format.
-  std::vector<std::string> GetAllNodeInfo() ABSL_LOCKS_EXCLUDED(mutex_);
+  std::vector<std::string> GetAllNodeInfo(
+    const std::optional<std::string> &virtual_cluster_id = std::nullopt) ABSL_LOCKS_EXCLUDED(mutex_);
 
   /// Get information of all task events from GCS Service.
   ///

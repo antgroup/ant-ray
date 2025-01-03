@@ -581,10 +581,6 @@ ray.get(a.run.remote(control))
 )
 @pytest.mark.asyncio
 async def test_job_access_cluster_data(job_sdk_client):
-    # 测试：
-    # 1. job driver 调用 ray.nodes 只返回当前 virtual cluster 的节点
-    # 2. job actor、normal task 调用 ray.nodes 同样只返回当前 virtual cluster 的节点
-    # 3. local driver 调用 ray.nodes 返回所有节点
     head_client, gcs_address, cluster = job_sdk_client
     virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
     node_to_virtual_cluster = {}
@@ -610,6 +606,10 @@ import ray
 
 
 @ray.remote
+def access_nodes():
+    return ray.nodes()
+
+@ray.remote
 class ResourceAccessor:
     def __init__(self):
         self._nodes = []
@@ -622,10 +622,26 @@ class ResourceAccessor:
             self._nodes = ray.nodes()
         return self._nodes
 
+    def store_driver_nodes(self, driver_nodes):
+        self._driver_nodes = driver_nodes
+
+    def get_driver_nodes(self):
+        return self._driver_nodes
+
+    def store_normal_task_nodes(self, normal_task_nodes):
+        self._normal_task_nodes = normal_task_nodes
+
+    def get_normal_task_nodes(self):
+        return self._normal_task_nodes
+
 ray.init(address="auto")
 
 actor = ResourceAccessor.options(name="{resource_accessor_name}").remote()
-
+ray.get(actor.is_ready.remote())
+driver_nodes = ray.nodes()
+ray.get(actor.store_driver_nodes.remote(driver_nodes))
+normal_task_nodes_ref = access_nodes.remote()
+actor.store_normal_task_nodes.remote(normal_task_nodes_ref)
             """
             driver_script = driver_script.format(
                 resource_accessor_name=resource_accessor_name,
@@ -658,9 +674,21 @@ actor = ResourceAccessor.options(name="{resource_accessor_name}").remote()
             def _check_only_access_virtual_cluster_nodes(
                 accessor_actor, node_to_virtual_cluster, virtual_cluster_id
             ):
-                nodes = ray.get(accessor_actor.nodes.remote())
-                assert len(nodes) > 0
-                for node in nodes:
+                actor_nodes = ray.get(accessor_actor.nodes.remote())
+                assert len(actor_nodes) > 0
+                for node in actor_nodes:
+                    node_id = node["NodeID"]
+                    assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+
+                job_driver_nodes = ray.get(accessor_actor.get_driver_nodes.remote())
+                assert len(job_driver_nodes) > 0
+                for node in job_driver_nodes:
+                    node_id = node["NodeID"]
+                    assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+                
+                normal_task_nodes = ray.get(accessor_actor.get_normal_task_nodes.remote())
+                assert len(normal_task_nodes) > 0
+                for node in normal_task_nodes:
                     node_id = node["NodeID"]
                     assert node_to_virtual_cluster[node_id] == virtual_cluster_id
                 return True
@@ -674,28 +702,46 @@ actor = ResourceAccessor.options(name="{resource_accessor_name}").remote()
                 ),
                 timeout=20,
             )
-            def _check_recover(
-                nodes_to_remove, actor_name, node_to_virtual_cluster, virtual_cluster_id
-            ):
-                actor = ray.get_actor(actor_name, namespace="control")
-                nodes = ray.get(actor.get_node_id.remote())
-                for node_id in nodes:
-                    assert node_id not in nodes_to_remove
-                    assert node_to_virtual_cluster[node_id] == virtual_cluster_id
-                return True
-
-            wait_for_condition(
-                partial(
-                    _check_recover,
-                    nodes_to_remove,
-                    actor_name,
-                    node_to_virtual_cluster,
-                    virtual_cluster_id,
-                ),
-                timeout=120,
-            )
             head_client.stop_job(job_id)
 
+@pytest.mark.parametrize(
+    "job_sdk_client",
+    [
+        {
+            "_system_config": {"gcs_actor_scheduling_enabled": False},
+            "ntemplates": 3,
+        },
+        {
+            "_system_config": {"gcs_actor_scheduling_enabled": True},
+            "ntemplates": 3,
+        },
+    ],
+    indirect=True,
+)
+@pytest.mark.asyncio
+async def test_job_access_cluster_data(job_sdk_client):
+    head_client, gcs_address, cluster = job_sdk_client
+    virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
+    node_to_virtual_cluster = {}
+    ntemplates = 3
+    for i in range(ntemplates):
+        virtual_cluster_id = virtual_cluster_id_prefix + str(i)
+        nodes = await create_virtual_cluster(
+            gcs_address, virtual_cluster_id, {TEMPLATE_ID_PREFIX + str(i): 3}
+        )
+        for node_id in nodes:
+            assert node_id not in node_to_virtual_cluster
+            node_to_virtual_cluster[node_id] = virtual_cluster_id
+
+    for i in range(ntemplates):
+        virtual_cluster_id = virtual_cluster_id_prefix + str(i)
+        cluster_nodes = ray.nodes(virtual_cluster_id=virtual_cluster_id_prefix + str(i))
+        for node in cluster_nodes:
+            assert node["NodeID"] in node_to_virtual_cluster
+            assert node_to_virtual_cluster[node["NodeID"]] == virtual_cluster_id
+
+    nodes = ray.nodes("NON_EXIST_VIRTUAL_CLUSTER")
+    assert len(nodes) == 0
 
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__]))

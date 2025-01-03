@@ -42,11 +42,7 @@ bool GlobalStateAccessor::Connect() {
   absl::WriterMutexLock lock(&mutex_);
   if (!is_connected_) {
     is_connected_ = true;
-    // return gcs_client_->Connect(*io_service_).ok();
-    Status status = gcs_client_->Connect(*io_service_);
-    if (status.ok()) {
-      gcs_client_->VirtualCluster()
-    }
+    return gcs_client_->Connect(*io_service_).ok();
   }
   RAY_LOG(DEBUG) << "Duplicated connection for GlobalStateAccessor.";
   return true;
@@ -93,12 +89,14 @@ JobID GlobalStateAccessor::GetNextJobID() {
 }
 
 std::vector<std::string> GlobalStateAccessor::GetAllNodeInfo(
-  const std::optional<VirtualClusterID> &virtual_cluster_id) {
+  const std::optional<std::string> &virtual_cluster_id) {
   // This method assumes GCS is HA and does not return any error. On GCS down, it
   // retries indefinitely.
   std::vector<std::string> node_table_data;
   std::promise<bool> promise;
-  if (virtual_cluster_id.has_value()) {
+  RAY_LOG(DEBUG) << "Getting all node info, virtual_cluster_id: "
+                << (virtual_cluster_id.has_value() ? virtual_cluster_id.value() : "");
+  if (virtual_cluster_id) {
     absl::ReaderMutexLock lock(&mutex_);
     RAY_CHECK_OK(gcs_client_->Nodes().AsyncGetByVirtualClusterID(
         virtual_cluster_id.value(),

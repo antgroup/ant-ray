@@ -651,15 +651,15 @@ Status NodeInfoAccessor::AsyncGetAll(const MultiItemCallback<GcsNodeInfo> &callb
 }
 
 Status NodeInfoAccessor::AsyncGetByVirtualClusterID(
-    const std::optional<VirtualClusterID> &virtual_cluster_id,
+    const std::optional<std::string> &virtual_cluster_id,
     const MultiItemCallback<GcsNodeInfo> &callback, int64_t timeout_ms) {
   RAY_LOG(DEBUG) << "Getting information of all nodes by virtual cluster id: "
-      << virtual_cluster_id;
-  if (virtual_cluster_id.empty()) {
+      << virtual_cluster_id.value();
+  if (!virtual_cluster_id) {
     return AsyncGetAll(callback, timeout_ms);
   }
   rpc::GetAllNodeInfoRequest request;
-  request.mutable_filters()->set_virtual_cluster_id(virtual_cluster_id.value().Hex());
+  request.mutable_filters()->set_virtual_cluster_id(virtual_cluster_id.value());
   client_impl_->GetGcsRpcClient().GetAllNodeInfo(
       request,
       [callback](const Status &status, rpc::GetAllNodeInfoReply &&reply) {
@@ -670,8 +670,7 @@ Status NodeInfoAccessor::AsyncGetByVirtualClusterID(
         }
         callback(status, std::move(result));
         RAY_LOG(DEBUG) << "Finished getting information of all nodes by virtual cluster "
-                          "id, status = "
-                       << status;
+                          "id, status = " << status;
       },
       timeout_ms);
   return Status::OK();

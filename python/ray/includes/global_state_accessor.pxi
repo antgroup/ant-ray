@@ -66,13 +66,18 @@ cdef class GlobalStateAccessor:
             cjob_id = self.inner.get().GetNextJobID()
         return cjob_id.ToInt()
 
-    def get_node_table(self, virtual_cluster_id=None):
+    def get_node_table(self, virtual_cluster_id):
         cdef:
             c_vector[c_string] items
             c_string item
             CGcsNodeInfo c_node_info
             unordered_map[c_string, double] c_resources
-            cdef optional[CVirtualClusterID] cvirtual_cluster_id
+            cdef c_string cvirtual_cluster_id
+
+        if virtual_cluster_id is None:
+            cvirtual_cluster_id = b""
+        else:
+            cvirtual_cluster_id = virtual_cluster_id
         with nogil:
             items = self.inner.get().GetAllNodeInfo(cvirtual_cluster_id)
         results = []

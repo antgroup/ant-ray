@@ -138,7 +138,6 @@ cdef class UniqueID(BaseID):
         return self.data.Hash()
 
 cdef class SimpleID:
-    cdef CSimpleID data
 
     @classmethod
     def from_binary(cls, id_bytes):

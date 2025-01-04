@@ -520,6 +520,14 @@ class NodeResourceInfoAccessor {
   virtual Status AsyncGetAllTotalResources(
       const MultiItemCallback<rpc::TotalResources> &callback);
 
+  /// Get total resources of all nodes from GCS asynchronously.
+  ///
+  /// \param callback Callback that will be called after lookup finishes.
+  /// \return Status
+  virtual Status AsyncGetAllTotalResourcesByVirtualClusterID(
+      const std::optional<std::string> &virtual_cluster_id,
+      const MultiItemCallback<rpc::TotalResources> &callback);
+
   /// Get draining nodes from GCS asynchronously.
   ///
   /// \param callback Callback that will be called after lookup finishes.

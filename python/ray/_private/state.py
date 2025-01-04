@@ -723,7 +723,7 @@ class GlobalState:
             worker_id, num_paused_threads_delta
         )
 
-    def cluster_resources(self):
+    def cluster_resources(self, virtual_cluster_id=""):
         """Get the current total cluster resources.
 
         Note that this information can grow stale as nodes are added to or
@@ -737,15 +737,15 @@ class GlobalState:
 
         # Calculate total resources.
         total_resources = defaultdict(int)
-        for node_total_resources in self.total_resources_per_node().values():
+        for node_total_resources in self.total_resources_per_node(virtual_cluster_id).values():
             for resource_id, value in node_total_resources.items():
                 total_resources[resource_id] += value
 
         return dict(total_resources)
 
-    def _live_node_ids(self):
+    def _live_node_ids(self, virtual_cluster_id=""):
         """Returns a set of node IDs corresponding to nodes still alive."""
-        return set(self.total_resources_per_node().keys())
+        return set(self.total_resources_per_node(virtual_cluster_id).keys())
 
     def available_resources_per_node(self):
         """Returns a dictionary mapping node id to available resources."""
@@ -768,11 +768,11 @@ class GlobalState:
         return available_resources_by_id
 
     # returns a dict that maps node_id(hex string) to a dict of {resource_id: capacity}
-    def total_resources_per_node(self) -> Dict[str, Dict[str, int]]:
+    def total_resources_per_node(self, virtual_cluster_id="") -> Dict[str, Dict[str, int]]:
         self._check_connected()
         total_resources_by_node = {}
 
-        all_total_resources = self.global_state_accessor.get_all_total_resources()
+        all_total_resources = self.global_state_accessor.get_all_total_resources(virtual_cluster_id)
         for node_total_resources in all_total_resources:
             message = gcs_pb2.TotalResources.FromString(node_total_resources)
             # Calculate total resources for this node.
@@ -873,6 +873,7 @@ def nodes(virtual_cluster_id=""):
     Returns:
         Information about the Ray clients in the cluster.
     """
+    virtual_cluster_id = ray.get_runtime_context().virtual_cluster_id
     return state.node_table(virtual_cluster_id)
 
 

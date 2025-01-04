@@ -278,7 +278,9 @@ message GetAllAvailableResourcesReply {
   repeated AvailableResources resources_list = 2;
 }
 
-message GetAllTotalResourcesRequest {}
+message GetAllTotalResourcesRequest {
+  string virtual_cluster_id = 1;
+}
 
 message GetAllTotalResourcesReply {
   GcsStatus status = 1;

@@ -136,10 +136,15 @@ cdef class GlobalStateAccessor:
             result = self.inner.get().GetAllAvailableResources()
         return result
 
-    def get_all_total_resources(self):
+    def get_all_total_resources(self, virtual_cluster_id):
         cdef c_vector[c_string] result
+        cdef c_string cvirtual_cluster_id
+        if virtual_cluster_id is None:
+            cvirtual_cluster_id = b""
+        else:
+            cvirtual_cluster_id = virtual_cluster_id
         with nogil:
-            result = self.inner.get().GetAllTotalResources()
+            result = self.inner.get().GetAllTotalResources(cvirtual_cluster_id)
         return result
 
     def get_task_events(self):

@@ -719,7 +719,7 @@ actor.store_normal_task_nodes.remote(normal_task_nodes_ref)
     indirect=True,
 )
 @pytest.mark.asyncio
-async def test_job_access_cluster_data(job_sdk_client):
+async def test_list_nodes(job_sdk_client):
     head_client, gcs_address, cluster = job_sdk_client
     virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
     node_to_virtual_cluster = {}
@@ -740,8 +740,16 @@ async def test_job_access_cluster_data(job_sdk_client):
             assert node["NodeID"] in node_to_virtual_cluster
             assert node_to_virtual_cluster[node["NodeID"]] == virtual_cluster_id
 
-    nodes = ray.nodes("NON_EXIST_VIRTUAL_CLUSTER")
-    assert len(nodes) == 0
+    assert len(ray.nodes()) == 9
+    assert len(ray.nodes("")) == 9
+    assert len(ray.nodes(None)) == 9
+
+    for i in range(ntemplates):
+        virtual_cluster_id = virtual_cluster_id_prefix + str(i)
+        assert len(ray.nodes(virtual_cluster_id)) == 3
+
+    assert len(ray.nodes("FAKE")) == 0
+    assert len(ray.nodes(1)) == 0
 
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__]))

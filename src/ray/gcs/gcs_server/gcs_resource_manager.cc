@@ -122,6 +122,7 @@ void GcsResourceManager::HandleGetAllTotalResources(
     rpc::GetAllTotalResourcesRequest request,
     rpc::GetAllTotalResourcesReply *reply,
     rpc::SendReplyCallback send_reply_callback) {
+  std::string virtual_cluster_id = request.virtual_cluster_id();
   auto local_scheduling_node_id = scheduling::NodeID(local_node_id_.Binary());
   for (const auto &node_resources_entry : cluster_resource_manager_.GetResourceView()) {
     if (node_resources_entry.first == local_scheduling_node_id) {

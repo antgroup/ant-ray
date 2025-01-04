@@ -854,6 +854,24 @@ Status NodeResourceInfoAccessor::AsyncGetAllTotalResources(
   return Status::OK();
 }
 
+Status NodeResourceInfoAccessor::AsyncGetAllTotalResourcesByVirtualClusterID(
+    const std::optional<std::string> &virtual_cluster_id,
+    const MultiItemCallback<rpc::TotalResources> &callback) {
+  if (!virtual_cluster_id) {
+    return AsyncGetAllTotalResources(callback);
+  }
+
+  rpc::GetAllTotalResourcesRequest request;
+  request.set_virtual_cluster_id(virtual_cluster_id.value());
+  client_impl_->GetGcsRpcClient().GetAllTotalResources(
+      request, [callback](const Status &status, rpc::GetAllTotalResourcesReply &&reply) {
+        callback(status, VectorFromProtobuf(std::move(*reply.mutable_resources_list())));
+        RAY_LOG(DEBUG) << "Finished getting total resources of all nodes, status = "
+                       << status;
+      });
+  return Status::OK();
+}
+
 Status NodeResourceInfoAccessor::AsyncGetDrainingNodes(
     const ItemCallback<std::unordered_map<NodeID, int64_t>> &callback) {
   rpc::GetDrainingNodesRequest request;

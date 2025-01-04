@@ -254,7 +254,7 @@ class GcsNodeManager : public rpc::NodeInfoHandler {
   /// Cluster ID to be shared with clients when connecting.
   const ClusterID cluster_id_;
   /// The gcs virtual cluster handler and service.
-  GcsVirtualClusterManager gcs_virtual_cluster_manager_;
+  GcsVirtualClusterManager &gcs_virtual_cluster_manager_;
 
   // Debug info.
   enum CountType {

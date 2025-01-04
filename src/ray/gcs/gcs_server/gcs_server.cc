@@ -324,6 +324,7 @@ void GcsServer::InitGcsResourceManager(const GcsInitData &gcs_init_data) {
       cluster_resource_scheduler_->GetClusterResourceManager(),
       *gcs_node_manager_,
       kGCSNodeID,
+      *gcs_virtual_cluster_manager_,
       cluster_task_manager_.get());
 
   // Initialize by gcs tables data.

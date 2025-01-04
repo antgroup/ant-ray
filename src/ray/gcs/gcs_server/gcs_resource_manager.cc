@@ -24,11 +24,13 @@ GcsResourceManager::GcsResourceManager(instrumented_io_context &io_context,
                                        ClusterResourceManager &cluster_resource_manager,
                                        GcsNodeManager &gcs_node_manager,
                                        NodeID local_node_id,
+                                       GcsVirtualClusterManager &gcs_virtual_cluster_manager,
                                        ClusterTaskManager *cluster_task_manager)
     : io_context_(io_context),
       cluster_resource_manager_(cluster_resource_manager),
       gcs_node_manager_(gcs_node_manager),
       local_node_id_(std::move(local_node_id)),
+      gcs_virtual_cluster_manager_(gcs_virtual_cluster_manager),
       cluster_task_manager_(cluster_task_manager) {}
 
 void GcsResourceManager::ConsumeSyncMessage(

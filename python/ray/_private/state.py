@@ -873,7 +873,10 @@ def nodes(virtual_cluster_id=""):
     Returns:
         Information about the Ray clients in the cluster.
     """
-    virtual_cluster_id = ray.get_runtime_context().virtual_cluster_id
+    if not virtual_cluster_id:
+        virtual_cluster_id = ray.get_runtime_context().virtual_cluster_id
+    elif type(virtual_cluster_id) is not str:
+        raise TypeError(f"virtual_cluster_id must be a string, got {type(virtual_cluster_id)}")
     return state.node_table(virtual_cluster_id)
 
 

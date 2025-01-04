@@ -740,16 +740,18 @@ async def test_list_nodes(job_sdk_client):
             assert node["NodeID"] in node_to_virtual_cluster
             assert node_to_virtual_cluster[node["NodeID"]] == virtual_cluster_id
 
-    assert len(ray.nodes()) == 9
-    assert len(ray.nodes("")) == 9
-    assert len(ray.nodes(None)) == 9
+    assert len(ray.nodes()) == 13
+    assert len(ray.nodes("")) == 13
+    assert len(ray.nodes(None)) == 13
 
     for i in range(ntemplates):
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
         assert len(ray.nodes(virtual_cluster_id)) == 3
 
     assert len(ray.nodes("FAKE")) == 0
-    assert len(ray.nodes(1)) == 0
+    with pytest.raises(TypeError):
+        ray.nodes(1)
+
 
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__]))

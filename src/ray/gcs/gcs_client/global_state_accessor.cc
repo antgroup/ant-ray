@@ -141,7 +141,7 @@ std::vector<std::string> GlobalStateAccessor::GetAllTotalResources(
   const std::optional<std::string> &virtual_cluster_id) {
   std::vector<std::string> total_resources;
   std::promise<bool> promise;
-  RAY_LOG(DEBUG) << "Getting all total resources, virtual_cluster_id: "
+  RAY_LOG(DEBUG) << "Requesting all total resources, virtual_cluster_id: "
                 << (virtual_cluster_id.has_value() ? virtual_cluster_id.value() : "");
   if (virtual_cluster_id) {
     absl::ReaderMutexLock lock(&mutex_);

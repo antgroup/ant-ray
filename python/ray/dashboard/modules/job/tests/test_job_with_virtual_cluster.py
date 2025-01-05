@@ -704,6 +704,7 @@ actor.store_normal_task_nodes.remote(normal_task_nodes_ref)
             )
             head_client.stop_job(job_id)
 
+
 @pytest.mark.parametrize(
     "job_sdk_client",
     [
@@ -751,6 +752,48 @@ async def test_list_nodes(job_sdk_client):
     assert len(ray.nodes("FAKE")) == 0
     with pytest.raises(TypeError):
         ray.nodes(1)
+
+
+@pytest.mark.parametrize(
+    "job_sdk_client",
+    [
+        {
+            "_system_config": {"gcs_actor_scheduling_enabled": False},
+            "ntemplates": 3,
+        },
+        # {
+        #     "_system_config": {"gcs_actor_scheduling_enabled": True},
+        #     "ntemplates": 3,
+        # },
+    ],
+    indirect=True,
+)
+@pytest.mark.asyncio
+async def test_list_cluster_resources(job_sdk_client):
+    head_client, gcs_address, cluster = job_sdk_client
+    virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
+    node_to_virtual_cluster = {}
+    ntemplates = 3
+    for i in range(ntemplates):
+        virtual_cluster_id = virtual_cluster_id_prefix + str(i)
+        nodes = await create_virtual_cluster(
+            gcs_address, virtual_cluster_id, {TEMPLATE_ID_PREFIX + str(i): 3}
+        )
+        for node_id in nodes:
+            assert node_id not in node_to_virtual_cluster
+            node_to_virtual_cluster[node_id] = virtual_cluster_id
+
+    total_resources = ray.cluster_resources()
+    print("total_resources: ", total_resources)
+    assert len(total_resources) > 0, f"total_resources {total_resources} is empty"
+    assert total_resources["CPU"] == 260
+    for i in range(ntemplates):
+        virtual_cluster_id = virtual_cluster_id_prefix + str(i)
+        virtual_cluster_resources = ray.cluster_resources(virtual_cluster_id=virtual_cluster_id_prefix + str(i))
+        print(f"virtual_cluster {virtual_cluster_id} total_resources: {virtual_cluster_resources}")
+        assert int(virtual_cluster_resources["CPU"]) == 60
+
+    assert len(ray.cluster_resources("NON_EXIST_VIRTUAL_CLUSTER")) == 0
 
 
 if __name__ == "__main__":

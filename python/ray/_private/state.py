@@ -783,6 +783,7 @@ class GlobalState:
             node_id = ray._private.utils.binary_to_hex(message.node_id)
             total_resources_by_node[node_id] = node_resources
 
+        print(f"Got total resources per node: {total_resources_by_node}")
         return total_resources_by_node
 
     def available_resources(self):
@@ -991,7 +992,7 @@ def object_transfer_timeline(filename=None):
 
 @DeveloperAPI
 @client_mode_hook
-def cluster_resources():
+def cluster_resources(virtual_cluster_id=""):
     """Get the current total cluster resources.
 
     Note that this information can grow stale as nodes are added to or removed
@@ -1001,7 +1002,11 @@ def cluster_resources():
         A dictionary mapping resource name to the total quantity of that
             resource in the cluster.
     """
-    return state.cluster_resources()
+    # if not virtual_cluster_id:
+    #     virtual_cluster_id = ray.get_runtime_context().virtual_cluster_id
+    # elif type(virtual_cluster_id) is not str:
+    #     raise TypeError(f"virtual_cluster_id must be a string, got {type(virtual_cluster_id)}")                                                 
+    return state.cluster_resources(virtual_cluster_id)
 
 
 @DeveloperAPI

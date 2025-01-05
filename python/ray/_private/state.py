@@ -783,7 +783,6 @@ class GlobalState:
             node_id = ray._private.utils.binary_to_hex(message.node_id)
             total_resources_by_node[node_id] = node_resources
 
-        print(f"Got total resources per node: {total_resources_by_node}")
         return total_resources_by_node
 
     def available_resources(self):
@@ -1002,10 +1001,10 @@ def cluster_resources(virtual_cluster_id=""):
         A dictionary mapping resource name to the total quantity of that
             resource in the cluster.
     """
-    # if not virtual_cluster_id:
-    #     virtual_cluster_id = ray.get_runtime_context().virtual_cluster_id
-    # elif type(virtual_cluster_id) is not str:
-    #     raise TypeError(f"virtual_cluster_id must be a string, got {type(virtual_cluster_id)}")                                                 
+    if not virtual_cluster_id:
+        virtual_cluster_id = ray.get_runtime_context().virtual_cluster_id
+    elif type(virtual_cluster_id) is not str:
+        raise TypeError(f"virtual_cluster_id must be a string, got {type(virtual_cluster_id)}")                                                 
     return state.cluster_resources(virtual_cluster_id)
 
 
@@ -1042,7 +1041,7 @@ def available_resources_per_node():
 
 
 @DeveloperAPI
-def total_resources_per_node():
+def total_resources_per_node(virtual_cluster_id=""):
     """Get the current total resources of each live node.
 
     Note that this information can grow stale as tasks start and finish.
@@ -1051,6 +1050,10 @@ def total_resources_per_node():
         A dictionary mapping node hex id to total resources dictionary.
     """
 
+    if not virtual_cluster_id:
+        virtual_cluster_id = ray.get_runtime_context().virtual_cluster_id
+    elif type(virtual_cluster_id) is not str:
+        raise TypeError(f"virtual_cluster_id must be a string, got {type(virtual_cluster_id)}")      
     return state.total_resources_per_node()
 
 

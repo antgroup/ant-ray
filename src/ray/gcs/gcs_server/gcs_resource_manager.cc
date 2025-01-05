@@ -134,6 +134,8 @@ void GcsResourceManager::HandleGetAllTotalResources(
     }
     if (!virtual_cluster_id.empty()) {
       /// Filter out nodes that are not in the virtual cluster.
+      /// TODO: Only debug, rm later
+      NodeID node_id = NodeID::FromBinary(node_resources_entry.first.Binary());
       if (virtual_cluster == nullptr ||
           !virtual_cluster->ContainsNodeInstance(node_id.Hex())) {
         continue;

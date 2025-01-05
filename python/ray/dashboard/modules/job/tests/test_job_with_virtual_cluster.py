@@ -584,6 +584,38 @@ async def test_job_access_cluster_data(job_sdk_client):
     head_client, gcs_address, cluster = job_sdk_client
     virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
     node_to_virtual_cluster = {}
+    @ray.remote
+    class StorageActor:
+        def __init__(self):
+            self._nodes = set()
+            self._ready = False
+            self._driver_info = {}
+            self._actor_info = {}
+            self._normal_task_info = {}
+
+        def ready(self):
+            self._ready = True
+
+        def is_ready(self):
+            return self._ready
+
+        def get_info(self):
+            return {
+                "driver": self._driver_info,
+                "actor": self._actor_info,
+                "normal_task": self._normal_task_info
+            }
+
+        def set_driver_info(self, key, value):
+            self._driver_info[key] = value
+
+        def set_actor_info(self, key, value):
+            self._actor_info[key] = value
+        
+        def set_normal_task_info(self, key, value):
+            self._normal_task_info[key] = value
+
+
     ntemplates = 3
     for i in range(ntemplates):
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
@@ -595,7 +627,14 @@ async def test_job_access_cluster_data(job_sdk_client):
             node_to_virtual_cluster[node_id] = virtual_cluster_id
 
     for i in range(ntemplates):
-        actor_name = f"test_actors_{i}"
+        storage_actor_name = f"storage_{i}"
+        if i == ntemplates:
+            virtual_cluster_id = kPrimaryClusterID
+        storage_actor = StorageActor.options(
+            name=storage_actor_name, namespace="storage", num_cpus=0
+        ).remote()
+
+        assert not ray.get(storage_actor.is_ready.remote())
         resource_accessor_name = f"accessor_{i}"
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
 
@@ -603,48 +642,71 @@ async def test_job_access_cluster_data(job_sdk_client):
             path = Path(tmp_dir)
             driver_script = """
 import ray
+import os
 
+
+ray.init(address="auto")
+storage = ray.get_actor(name="{storage_actor_name}", namespace="storage")
 
 @ray.remote
 def access_nodes():
     return ray.nodes()
 
 @ray.remote
-class ResourceAccessor:
-    def __init__(self):
-        self._nodes = []
+def access_cluster_resources():
+    return ray.cluster_resources()
 
+@ray.remote
+def access_available_resources():
+    return ray.available_resources()
+
+@ray.remote
+class ResourceAccessor:
     def is_ready(self):
         return True
 
     def nodes(self):
-        if len(self._nodes) == 0:
-            self._nodes = ray.nodes()
+        self._nodes = ray.nodes()
         return self._nodes
 
-    def store_driver_nodes(self, driver_nodes):
-        self._driver_nodes = driver_nodes
+    def total_cluster_resources(self):
+        self._total_cluster_resources = ray.cluster_resources()
+        return self._total_cluster_resources
+    
+    def available_resources(self):
+        self._available_resources = ray.available_resources()
+        return self._available_resources
 
-    def get_driver_nodes(self):
-        return self._driver_nodes
 
-    def store_normal_task_nodes(self, normal_task_nodes):
-        self._normal_task_nodes = normal_task_nodes
+accessor = ResourceAccessor.options(name="{resource_accessor_name}", namespace="storage", num_cpus=0).remote()
+ray.get(accessor.is_ready.remote())
 
-    def get_normal_task_nodes(self):
-        return self._normal_task_nodes
+ray.get(storage.ready.remote())
 
-ray.init(address="auto")
-
-actor = ResourceAccessor.options(name="{resource_accessor_name}").remote()
-ray.get(actor.is_ready.remote())
 driver_nodes = ray.nodes()
-ray.get(actor.store_driver_nodes.remote(driver_nodes))
-normal_task_nodes_ref = access_nodes.remote()
-actor.store_normal_task_nodes.remote(normal_task_nodes_ref)
+driver_cluster_resources = ray.cluster_resources()
+driver_available_resources = ray.available_resources()
+ray.get(storage.set_driver_info.remote("nodes", driver_nodes))
+ray.get(storage.set_driver_info.remote("cluster_resources", driver_cluster_resources))
+ray.get(storage.set_driver_info.remote("available_resources", driver_available_resources))
+
+actor_nodes = ray.get(accessor.nodes.remote())
+actor_cluster_resources = ray.get(accessor.total_cluster_resources.remote())
+actor_available_resources = ray.get(accessor.available_resources.remote())
+ray.get(storage.set_actor_info.remote("nodes", actor_nodes))
+ray.get(storage.set_actor_info.remote("cluster_resources", actor_cluster_resources))
+ray.get(storage.set_actor_info.remote("available_resources", actor_available_resources))
+
+normal_task_nodes = ray.get(access_nodes.options(num_cpus=0).remote())
+normal_task_cluster_resources = ray.get(access_cluster_resources.options(num_cpus=0).remote())
+normal_task_available_resources = ray.get(access_available_resources.options(num_cpus=0).remote())
+ray.get(storage.set_normal_task_info.remote("nodes", normal_task_nodes))
+ray.get(storage.set_normal_task_info.remote("cluster_resources", normal_task_cluster_resources))
+ray.get(storage.set_normal_task_info.remote("available_resources", normal_task_available_resources))
             """
             driver_script = driver_script.format(
                 resource_accessor_name=resource_accessor_name,
+                storage_actor_name=storage_actor_name,
             )
             test_script_file = path / "test_script.py"
             with open(test_script_file, "w+") as file:
@@ -664,31 +726,36 @@ actor.store_normal_task_nodes.remote(normal_task_nodes_ref)
             )
 
             wait_for_condition(
-                lambda: ray.get_actor(resource_accessor_name).is_ready.remote(), timeout=20
-            )
-
-            accessor_actor = ray.get_actor(
-                name=resource_accessor_name, namespace="control"
+                lambda: ray.get(storage_actor.is_ready.remote()), timeout=20
             )
 
             def _check_only_access_virtual_cluster_nodes(
-                accessor_actor, node_to_virtual_cluster, virtual_cluster_id
+                storage_actor, node_to_virtual_cluster, virtual_cluster_id
             ):
-                actor_nodes = ray.get(accessor_actor.nodes.remote())
-                assert len(actor_nodes) > 0
-                for node in actor_nodes:
-                    node_id = node["NodeID"]
-                    assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+                cluster_info = ray.get(storage_actor.get_info.remote())
+                expect_nodes = ray.nodes(virtual_cluster_id)
+                expect_total_cluster_resources = ray.cluster_resources(virtual_cluster_id)
+                expect_available_resources = ray.available_resources(virtual_cluster_id)
 
-                job_driver_nodes = ray.get(accessor_actor.get_driver_nodes.remote())
-                assert len(job_driver_nodes) > 0
-                for node in job_driver_nodes:
+
+                assert len(cluster_info) > 0
+                assert cluster_info["driver"]["nodes"] == expect_nodes
+                assert cluster_info["driver"]["cluster_resources"]["CPU"] == expect_total_cluster_resources["CPU"]
+                assert cluster_info["driver"]["available_resources"]["CPU"] == expect_available_resources["CPU"]
+                assert cluster_info["actor"]["nodes"] == expect_nodes
+                assert cluster_info["actor"]["cluster_resources"]["CPU"] == expect_total_cluster_resources["CPU"]
+                assert cluster_info["actor"]["available_resources"]["CPU"] == expect_available_resources["CPU"]
+                assert cluster_info["normal_task"]["nodes"] == expect_nodes
+                assert cluster_info["normal_task"]["cluster_resources"]["CPU"] == expect_total_cluster_resources["CPU"]
+                assert cluster_info["normal_task"]["available_resources"]["CPU"] == expect_available_resources["CPU"]
+
+                for node in cluster_info["driver"]["nodes"]:
                     node_id = node["NodeID"]
                     assert node_to_virtual_cluster[node_id] == virtual_cluster_id
-                
-                normal_task_nodes = ray.get(accessor_actor.get_normal_task_nodes.remote())
-                assert len(normal_task_nodes) > 0
-                for node in normal_task_nodes:
+                for node in cluster_info["actor"]["nodes"]:
+                    node_id = node["NodeID"]
+                    assert node_to_virtual_cluster[node_id] == virtual_cluster_id
+                for node in cluster_info["normal_task"]["nodes"]:
                     node_id = node["NodeID"]
                     assert node_to_virtual_cluster[node_id] == virtual_cluster_id
                 return True
@@ -696,7 +763,7 @@ actor.store_normal_task_nodes.remote(normal_task_nodes_ref)
             wait_for_condition(
                 partial(
                     _check_only_access_virtual_cluster_nodes,
-                    accessor_actor,
+                    storage_actor,
                     node_to_virtual_cluster,
                     virtual_cluster_id,
                 ),

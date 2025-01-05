@@ -134,9 +134,12 @@ class IdToIpMap:
         ip = self._node_id_to_ip.get(node_id)
         if not ip:
             return None
-        assert ip in self._ip_to_node_id
-        self._node_id_to_ip.pop(node_id)
-        self._ip_to_node_id.pop(ip)
+        # assert ip in self._ip_to_node_id
+        try:
+            self._node_id_to_ip.pop(node_id)
+            self._ip_to_node_id.pop(ip)
+        except KeyError:
+            return True
         return True
 
 

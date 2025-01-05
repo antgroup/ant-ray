@@ -1024,6 +1024,10 @@ def available_resources(virtual_cluster_id=""):
             is currently not available (i.e., quantity is 0), it will not
             be included in this dictionary.
     """
+    if not virtual_cluster_id:
+        virtual_cluster_id = ray.get_runtime_context().virtual_cluster_id
+    elif type(virtual_cluster_id) is not str:
+        raise TypeError(f"virtual_cluster_id must be a string, got {type(virtual_cluster_id)}")  
     return state.available_resources(virtual_cluster_id)
 
 

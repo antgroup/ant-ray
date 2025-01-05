@@ -747,13 +747,13 @@ class GlobalState:
         """Returns a set of node IDs corresponding to nodes still alive."""
         return set(self.total_resources_per_node(virtual_cluster_id).keys())
 
-    def available_resources_per_node(self):
+    def available_resources_per_node(self, virtual_cluster_id=""):
         """Returns a dictionary mapping node id to available resources."""
         self._check_connected()
         available_resources_by_id = {}
 
         all_available_resources = (
-            self.global_state_accessor.get_all_available_resources()
+            self.global_state_accessor.get_all_available_resources(virtual_cluster_id)
         )
         for available_resource in all_available_resources:
             message = gcs_pb2.AvailableResources.FromString(available_resource)
@@ -785,7 +785,7 @@ class GlobalState:
 
         return total_resources_by_node
 
-    def available_resources(self):
+    def available_resources(self, virtual_cluster_id=""):
         """Get the current available cluster resources.
 
         This is different from `cluster_resources` in that this will return
@@ -801,7 +801,7 @@ class GlobalState:
         """
         self._check_connected()
 
-        available_resources_by_id = self.available_resources_per_node()
+        available_resources_by_id = self.available_resources_per_node(virtual_cluster_id)
 
         # Calculate total available resources.
         total_available_resources = defaultdict(int)
@@ -1010,7 +1010,7 @@ def cluster_resources(virtual_cluster_id=""):
 
 @DeveloperAPI
 @client_mode_hook
-def available_resources():
+def available_resources(virtual_cluster_id=""):
     """Get the current available cluster resources.
 
     This is different from `cluster_resources` in that this will return idle
@@ -1024,7 +1024,7 @@ def available_resources():
             is currently not available (i.e., quantity is 0), it will not
             be included in this dictionary.
     """
-    return state.available_resources()
+    return state.available_resources(virtual_cluster_id)
 
 
 @DeveloperAPI

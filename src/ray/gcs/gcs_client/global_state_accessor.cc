@@ -124,10 +124,19 @@ std::vector<std::string> GlobalStateAccessor::GetAllTaskEvents() {
   return task_events;
 }
 
-std::vector<std::string> GlobalStateAccessor::GetAllAvailableResources() {
+std::vector<std::string> GlobalStateAccessor::GetAllAvailableResources(
+  const std::optional<std::string> &virtual_cluster_id) {
   std::vector<std::string> available_resources;
   std::promise<bool> promise;
-  {
+  RAY_LOG(DEBUG) << "Requesting all available resources, virtual_cluster_id: "
+                << (virtual_cluster_id.has_value() ? virtual_cluster_id.value() : "");
+  if (virtual_cluster_id) {
+    absl::ReaderMutexLock lock(&mutex_);
+    RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllAvailableResourcesByVirtualClusterID(
+        virtual_cluster_id.value(),
+        TransformForMultiItemCallback<rpc::AvailableResources>(available_resources,
+                                                               promise)));
+  } else {
     absl::ReaderMutexLock lock(&mutex_);
     RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllAvailableResources(
         TransformForMultiItemCallback<rpc::AvailableResources>(available_resources,

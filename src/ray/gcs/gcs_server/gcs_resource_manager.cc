@@ -85,10 +85,23 @@ void GcsResourceManager::HandleGetAllAvailableResources(
     rpc::GetAllAvailableResourcesRequest request,
     rpc::GetAllAvailableResourcesReply *reply,
     rpc::SendReplyCallback send_reply_callback) {
+  std::string virtual_cluster_id = request.virtual_cluster_id();
+  RAY_LOG(DEBUG) << "Getting all available resources, virtual_cluster_id: "
+                 << virtual_cluster_id;
   auto local_scheduling_node_id = scheduling::NodeID(local_node_id_.Binary());
+  auto virtual_cluster = gcs_virtual_cluster_manager_.GetVirtualCluster(virtual_cluster_id);
   for (const auto &node_resources_entry : cluster_resource_manager_.GetResourceView()) {
     if (node_resources_entry.first == local_scheduling_node_id) {
       continue;
+    }
+    if (!virtual_cluster_id.empty()) {
+      /// Filter out nodes that are not in the virtual cluster.
+      /// TODO: Only debug, rm later
+      NodeID node_id = NodeID::FromBinary(node_resources_entry.first.Binary());
+      if (virtual_cluster == nullptr ||
+          !virtual_cluster->ContainsNodeInstance(node_id.Hex())) {
+        continue;
+      }
     }
     rpc::AvailableResources resource;
     resource.set_node_id(node_resources_entry.first.Binary());

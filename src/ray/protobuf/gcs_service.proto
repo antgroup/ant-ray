@@ -271,7 +271,9 @@ message DeleteResourcesReply {
   GcsStatus status = 1;
 }
 
-message GetAllAvailableResourcesRequest {}
+message GetAllAvailableResourcesRequest {
+  string virtual_cluster_id = 1;
+}
 
 message GetAllAvailableResourcesReply {
   GcsStatus status = 1;

@@ -842,6 +842,24 @@ Status NodeResourceInfoAccessor::AsyncGetAllAvailableResources(
   return Status::OK();
 }
 
+Status NodeResourceInfoAccessor::AsyncGetAllAvailableResourcesByVirtualClusterID(
+    const std::optional<std::string> &virtual_cluster_id,
+    const MultiItemCallback<rpc::AvailableResources> &callback) {
+  if (!virtual_cluster_id) {
+    return AsyncGetAllAvailableResources(callback);
+  }
+  rpc::GetAllAvailableResourcesRequest request;
+  request.set_virtual_cluster_id(virtual_cluster_id.value());
+  client_impl_->GetGcsRpcClient().GetAllAvailableResources(
+      request,
+      [callback](const Status &status, rpc::GetAllAvailableResourcesReply &&reply) {
+        callback(status, VectorFromProtobuf(std::move(*reply.mutable_resources_list())));
+        RAY_LOG(DEBUG) << "Finished getting available resources of all nodes, status = "
+                       << status;
+      });
+  return Status::OK();
+}
+
 Status NodeResourceInfoAccessor::AsyncGetAllTotalResources(
     const MultiItemCallback<rpc::TotalResources> &callback) {
   rpc::GetAllTotalResourcesRequest request;

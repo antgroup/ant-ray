@@ -421,14 +421,13 @@ NodeManager::NodeManager(
         cluster_task_manager_->CancelTasks(
             [](const std::shared_ptr<internal::Work> &work) { return true; },
             rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
-            "The node is being removed from a virtual cluster.");
+            "The node is removed from a virtual cluster.");
         local_task_manager_->CancelTasks(
             [](const std::shared_ptr<internal::Work> &work) { return true; },
             rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
-            "The node is being removed from a virtual cluster.");
+            "The node is removed from a virtual cluster.");
         if (!cluster_resource_scheduler_->GetLocalResourceManager().IsLocalNodeIdle()) {
-          for (auto &iter : leased_workers_) {
-            auto &worker = iter->second;
+          for (auto &[_, worker] : leased_workers_) {
             RAY_LOG(DEBUG).WithField(worker->WorkerId())
                 << "Worker is cleaned because the node is removed from virtual cluster.";
             DestroyWorker(

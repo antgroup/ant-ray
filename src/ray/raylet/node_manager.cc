@@ -416,7 +416,28 @@ NodeManager::NodeManager(
   mutable_object_provider_ = std::make_unique<core::experimental::MutableObjectProvider>(
       *store_client_, absl::bind_front(&NodeManager::CreateRayletClient, this));
 
-  virtual_cluster_manager_ = std::make_shared<VirtualClusterManager>();
+  virtual_cluster_manager_ = std::make_shared<VirtualClusterManager>(
+      self_node_id_, /*on_local_node_instance_removed=*/[this]() {
+        cluster_task_manager_->CancelTasks(
+            [](const std::shared_ptr<internal::Work> &work) { return true; },
+            rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
+            "The node is being removed from a virtual cluster.");
+        local_task_manager_->CancelTasks(
+            [](const std::shared_ptr<internal::Work> &work) { return true; },
+            rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
+            "The node is being removed from a virtual cluster.");
+        if (!cluster_resource_scheduler_->GetLocalResourceManager().IsLocalNodeIdle()) {
+          for (auto &iter : leased_workers_) {
+            auto &worker = iter->second;
+            RAY_LOG(DEBUG).WithField(worker->WorkerId())
+                << "Worker is cleaned because the node is removed from virtual cluster.";
+            DestroyWorker(
+                worker,
+                rpc::WorkerExitType::INTENDED_SYSTEM_EXIT,
+                "Worker is cleaned because the node is removed from virtual cluster.");
+          }
+        }
+      });
 }
 
 std::shared_ptr<raylet::RayletClient> NodeManager::CreateRayletClient(

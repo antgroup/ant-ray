@@ -40,6 +40,13 @@ bool VirtualClusterManager::UpdateVirtualCluster(
       return false;
     }
 
+    // The local node is removed from a (indivisible) virtual cluster, we have to clean up
+    // the local tasks.
+    if (it->second.node_instances().contains(local_node_instance_id_) &&
+        !virtual_cluster_data.node_instances().contains(local_node_instance_id_)) {
+      on_local_node_instance_removed_();
+    }
+
     if (virtual_cluster_data.is_removed()) {
       virtual_clusters_.erase(it);
       return true;

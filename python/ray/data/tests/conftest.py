@@ -23,7 +23,10 @@ from ray.data.tests.mock_server import *  # noqa
 from ray.tests.conftest import *  # noqa
 from ray.tests.conftest import pytest_runtest_makereport  # noqa
 from ray.tests.conftest import _ray_start, wait_for_condition
-
+from ray._private.test_utils import (
+    format_web_url,
+    wait_until_server_available,
+)
 
 @pytest.fixture(scope="module")
 def ray_start_2_cpus_shared(request):
@@ -717,3 +720,104 @@ def assert_blocks_expected_in_plasma(
 @pytest.fixture(autouse=True, scope="function")
 def log_internal_stack_trace_to_stdout(restore_data_context):
     ray.data.context.DataContext.get_current().log_internal_stack_trace_to_stdout = True
+
+
+@contextmanager
+def _ray_start_cluster(**kwargs):
+    cluster_not_supported_ = kwargs.pop("skip_cluster", cluster_not_supported)
+    if cluster_not_supported_:
+        pytest.skip("Cluster not supported")
+    init_kwargs = get_default_fixture_ray_kwargs()
+    num_nodes = 0
+    do_init = False
+    # num_nodes & do_init are not arguments for ray.init, so delete them.
+    if "num_nodes" in kwargs:
+        num_nodes = kwargs["num_nodes"]
+        del kwargs["num_nodes"]
+    if "do_init" in kwargs:
+        do_init = kwargs["do_init"]
+        del kwargs["do_init"]
+    elif num_nodes > 0:
+        do_init = True
+    init_kwargs.update(kwargs)
+    namespace = init_kwargs.pop("namespace")
+    cluster = Cluster()
+    remote_nodes = []
+    for i in range(num_nodes):
+        if i > 0 and "_system_config" in init_kwargs:
+            del init_kwargs["_system_config"]
+        remote_nodes.append(cluster.add_node(**init_kwargs))
+        # We assume driver will connect to the head (first node),
+        # so ray init will be invoked if do_init is true
+        if len(remote_nodes) == 1 and do_init:
+            ray.init(address=cluster.address, namespace=namespace)
+    yield cluster
+    # The code after the yield will run as teardown code.
+    ray.shutdown()
+    cluster.shutdown()
+
+
+def create_or_update_virtual_cluster(
+    webui_url, virtual_cluster_id, allocation_mode, replica_sets, revision
+):
+    try:
+        resp = requests.post(
+            webui_url + "/virtual_clusters",
+            json={
+                "virtualClusterId": virtual_cluster_id,
+                "allocationMode": allocation_mode,
+                "replicaSets": replica_sets,
+                "revision": revision,
+            },
+            timeout=10,
+        )
+        result = resp.json()
+        print(result)
+        return result
+    except Exception as ex:
+        logger.info(ex)
+
+
+@pytest.fixture
+def create_virtual_cluster(node_instances, virtual_cluster):
+    default_node_instances = [
+        ("1c2g", 3),
+        ("2c4g", 3),
+        ("4c8g", 3),
+    ]
+    default_virtual_cluster = {}
+    for i in range(3):
+        default_virtual_cluster[f"VIRTUAL_CLUSTER_{i}"] = {
+            "allocation_mode": "mixed",
+            "replica_sets": {
+                "1c2g": 1,
+                "2c4g": 1,
+                "4c8g": 1,
+            },
+            "revision": 0,
+        }
+    if node_instances is None or len(node_instances) == 0:
+        node_instances = default_node_instances
+    if virtual_cluster is None or len(virtual_cluster) == 0:
+        virtual_cluster = default_virtual_cluster
+    with _ray_start_cluster(do_init=True, num_nodes=0) as cluster:
+        assert wait_until_server_available(cluster.webui_url) is True
+        webui_url = cluster.webui_url
+        webui_url = format_web_url(webui_url)
+
+        for node_type, amount in node_instances:
+            num_cpus = node_type.split("c")[0]
+            for _ in range(amount):
+                cluster.add_node(
+                    env_vars={"RAY_NODE_TYPE_NAME": node_type},
+                    num_cpus=num_cpus)
+
+        for virtual_cluster_id, config in virtual_cluster.items():
+            create_or_update_virtual_cluster(
+                webui_url=webui_url,
+                virtual_cluster_id=virtual_cluster_id,
+                allocation_mode=config.get("allocation_mode", "mixed"),
+                replica_sets=config.get("replica_sets", {}),
+                revision=config.get("revision", 0),
+            )
+        yield cluster

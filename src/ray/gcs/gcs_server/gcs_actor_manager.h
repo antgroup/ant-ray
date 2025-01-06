@@ -177,6 +177,9 @@ class GcsActor {
   /// Get the state of this gcs actor.
   rpc::ActorTableData::ActorState GetState() const;
 
+  /// Get virtual cluster id of this actor
+  std::string GetVirtualClusterId() const;
+
   /// Get the id of this actor.
   ActorID GetActorID() const;
   /// Returns whether or not this is a detached actor.

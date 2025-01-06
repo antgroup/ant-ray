@@ -27,6 +27,7 @@
 #include "ray/gcs/gcs_server/gcs_node_manager.h"
 #include "ray/gcs/gcs_server/gcs_placement_group_scheduler.h"
 #include "ray/gcs/gcs_server/gcs_table_storage.h"
+#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
 #include "ray/gcs/gcs_server/usage_stats_client.h"
 #include "ray/gcs/pubsub/gcs_pub_sub.h"
 #include "ray/rpc/worker/core_worker_client.h"
@@ -243,6 +244,7 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
                            GcsPlacementGroupSchedulerInterface *scheduler,
                            gcs::GcsTableStorage *gcs_table_storage,
                            GcsResourceManager &gcs_resource_manager,
+                           GcsVirtualClusterManager &gcs_virtual_cluster_manager,
                            std::function<std::string(const JobID &)> get_ray_namespace);
 
   ~GcsPlacementGroupManager() override = default;
@@ -398,8 +400,10 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
 
  protected:
   /// For testing/mocking only.
-  explicit GcsPlacementGroupManager(instrumented_io_context &io_context,
-                                    GcsResourceManager &gcs_resource_manager);
+  explicit GcsPlacementGroupManager(
+      instrumented_io_context &io_context,
+      GcsResourceManager &gcs_resource_manager,
+      GcsVirtualClusterManager &gcs_virtual_cluster_manager);
 
  private:
   /// Push a placement group to pending queue.
@@ -500,6 +504,9 @@ class GcsPlacementGroupManager : public rpc::PlacementGroupInfoHandler {
 
   /// Reference of GcsResourceManager.
   GcsResourceManager &gcs_resource_manager_;
+
+  /// Reference of GcsVirtualClusterManager.
+  GcsVirtualClusterManager &gcs_virtual_cluster_manager_;
 
   UsageStatsClient *usage_stats_client_;
 

@@ -563,6 +563,25 @@ bool MixedCluster::InUse() const {
   return false;
 }
 
+///////////////////////// JobCluster /////////////////////////
+void JobCluster::OnDetachedActorRegistration(const ActorID &actor_id) {
+  detached_actors_.insert(actor_id);
+}
+
+void JobCluster::OnDetachedActorDestroy(const ActorID &actor_id) {
+  detached_actors_.erase(actor_id);
+}
+
+void JobCluster::OnDetachedPlacementGroupRegistration(
+    const PlacementGroupID &placement_group_id) {
+  detached_placement_groups_.insert(placement_group_id);
+}
+
+void JobCluster::OnDetachedPlacementGroupDestroy(
+    const PlacementGroupID &placement_group_id) {
+  detached_placement_groups_.erase(placement_group_id);
+}
+
 ///////////////////////// PrimaryCluster /////////////////////////
 void PrimaryCluster::Initialize(const GcsInitData &gcs_init_data) {
   // Let mixed cluster be Vm, exclusive cluster be Ve, job cluster be J, empty job cluster
@@ -877,8 +896,8 @@ Status PrimaryCluster::RemoveVirtualCluster(const std::string &virtual_cluster_i
   auto cluster_id = VirtualClusterID::FromBinary(virtual_cluster_id);
   if (cluster_id.IsJobClusterID()) {
     auto parent_cluster_id = cluster_id.ParentID().Binary();
-    auto virtual_cluster = GetVirtualCluster(parent_cluster_id);
-    if (virtual_cluster == nullptr) {
+    auto parent_cluster = GetVirtualCluster(parent_cluster_id);
+    if (parent_cluster == nullptr) {
       std::ostringstream ostr;
       ostr << "Failed to remove virtual cluster, parent cluster not exists, virtual "
               "cluster id: "
@@ -886,7 +905,7 @@ Status PrimaryCluster::RemoveVirtualCluster(const std::string &virtual_cluster_i
       auto message = ostr.str();
       return Status::NotFound(message);
     }
-    if (virtual_cluster->GetMode() != rpc::AllocationMode::EXCLUSIVE) {
+    if (parent_cluster->GetMode() != rpc::AllocationMode::EXCLUSIVE) {
       std::ostringstream ostr;
       ostr << "Failed to remove virtual cluster, parent cluster is not exclusive, "
               "virtual cluster id: "
@@ -894,8 +913,21 @@ Status PrimaryCluster::RemoveVirtualCluster(const std::string &virtual_cluster_i
       auto message = ostr.str();
       return Status::InvalidArgument(message);
     }
+
+    auto virtual_cluster = GetVirtualCluster(virtual_cluster_id);
+    if (virtual_cluster != nullptr) {
+      JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
+      if (job_cluster->IsDetached()) {
+        std::ostringstream ostr;
+        ostr << "Failed to remove virtual cluster, job cluster is detached, "
+             << "virtual cluster id: " << virtual_cluster_id;
+        auto message = ostr.str();
+        return Status::Invalid(message);
+      }
+    }
+
     ExclusiveCluster *exclusive_cluster =
-        dynamic_cast<ExclusiveCluster *>(virtual_cluster.get());
+        dynamic_cast<ExclusiveCluster *>(parent_cluster.get());
     return exclusive_cluster->RemoveJobCluster(virtual_cluster_id, callback);
   } else {
     return RemoveLogicalCluster(virtual_cluster_id, callback);

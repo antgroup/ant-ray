@@ -67,6 +67,20 @@ void GcsVirtualClusterManager::OnJobFinished(const rpc::JobTableData &job_data) 
     return;
   }
 
+  auto job_virtual_cluster = GetVirtualCluster(virtual_cluster_id);
+  if (job_virtual_cluster == nullptr) {
+    // this should not happen, job cluster should exist
+    return;
+  }
+  JobCluster *job_cluster = dynamic_cast<JobCluster *>(job_virtual_cluster.get());
+  if (job_cluster->IsDetached()) {
+    job_cluster->SetFinished();
+    // job cluster is detached, do not remove it
+    RAY_LOG(INFO) << "Failed to remove job cluster " << job_cluster_id.Binary()
+                  << " when handling job finished event, job cluster is detached.";
+    return;
+  }
+
   ExclusiveCluster *exclusive_cluster =
       dynamic_cast<ExclusiveCluster *>(virtual_cluster.get());
 
@@ -356,5 +370,74 @@ Status GcsVirtualClusterManager::FlushAndPublish(
   return gcs_table_storage_.VirtualClusterTable().Put(
       VirtualClusterID::FromBinary(data->id()), *data, on_done);
 }
+
+void GcsVirtualClusterManager::OnDetachedActorRegistration(
+    const std::string &virtual_cluster_id, const ActorID &actor_id) {
+  RAY_LOG(INFO) << "On detached actor registration: " << virtual_cluster_id;
+  if (VirtualClusterID::FromBinary(virtual_cluster_id).IsJobClusterID()) {
+    auto virtual_cluster = GetVirtualCluster(virtual_cluster_id);
+    if (virtual_cluster == nullptr) {
+      RAY_LOG(ERROR) << "Failed to find virtual cluster on detached actor registration: "
+                     << virtual_cluster_id;
+      return;
+    }
+    JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
+    job_cluster->OnDetachedActorRegistration(actor_id);
+  }
+}
+
+void GcsVirtualClusterManager::OnDetachedActorDestroy(
+    const std::string &virtual_cluster_id, const ActorID &actor_id) {
+  RAY_LOG(INFO) << "On detached actor destroy: " << virtual_cluster_id;
+  if (VirtualClusterID::FromBinary(virtual_cluster_id).IsJobClusterID()) {
+    auto virtual_cluster = GetVirtualCluster(virtual_cluster_id);
+    if (virtual_cluster == nullptr) {
+      RAY_LOG(ERROR) << "Failed to find virtual cluster on detached actor destroy: "
+                     << virtual_cluster_id;
+      return;
+    }
+    JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
+    job_cluster->OnDetachedActorDestroy(actor_id);
+    if (!job_cluster->IsDetached() && job_cluster->IsFinished()) {
+      primary_cluster_->RemoveVirtualCluster(virtual_cluster_id, nullptr);
+    }
+  }
+}
+
+void GcsVirtualClusterManager::OnDetachedPlacementGroupRegistration(
+    const std::string &virtual_cluster_id, const PlacementGroupID &placement_group_id) {
+  RAY_LOG(INFO) << "On detached pg registration: " << virtual_cluster_id;
+  if (VirtualClusterID::FromBinary(virtual_cluster_id).IsJobClusterID()) {
+    auto virtual_cluster = GetVirtualCluster(virtual_cluster_id);
+    if (virtual_cluster == nullptr) {
+      RAY_LOG(ERROR)
+          << "Failed to find virtual cluster on detached placement group registration: "
+          << virtual_cluster_id;
+      return;
+    }
+    JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
+    job_cluster->OnDetachedPlacementGroupRegistration(placement_group_id);
+  }
+}
+
+void GcsVirtualClusterManager::OnDetachedPlacementGroupDestroy(
+    const std::string &virtual_cluster_id, const PlacementGroupID &placement_group_id) {
+  RAY_LOG(INFO) << "On detached placement group destroy: " << virtual_cluster_id;
+  if (VirtualClusterID::FromBinary(virtual_cluster_id).IsJobClusterID()) {
+    auto virtual_cluster = GetVirtualCluster(virtual_cluster_id);
+    if (virtual_cluster == nullptr) {
+      RAY_LOG(ERROR)
+          << "Failed to find virtual cluster on detached placement group destroy: "
+          << virtual_cluster_id;
+      return;
+    }
+    JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
+    job_cluster->OnDetachedPlacementGroupDestroy(placement_group_id);
+    if (!job_cluster->IsDetached() && job_cluster->IsFinished()) {
+      primary_cluster_->RemoveVirtualCluster(virtual_cluster_id, nullptr);
+    }
+  }
+}
+
 }  // namespace gcs
 }  // namespace ray

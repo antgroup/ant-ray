@@ -186,19 +186,25 @@ rpc::PlacementGroupStats *GcsPlacementGroup::GetMutableStats() {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 GcsPlacementGroupManager::GcsPlacementGroupManager(
-    instrumented_io_context &io_context, GcsResourceManager &gcs_resource_manager)
-    : io_context_(io_context), gcs_resource_manager_(gcs_resource_manager) {}
+    instrumented_io_context &io_context,
+    GcsResourceManager &gcs_resource_manager,
+    GcsVirtualClusterManager &gcs_virtual_cluster_manager)
+    : io_context_(io_context),
+      gcs_resource_manager_(gcs_resource_manager),
+      gcs_virtual_cluster_manager_(gcs_virtual_cluster_manager) {}
 
 GcsPlacementGroupManager::GcsPlacementGroupManager(
     instrumented_io_context &io_context,
     GcsPlacementGroupSchedulerInterface *scheduler,
     gcs::GcsTableStorage *gcs_table_storage,
     GcsResourceManager &gcs_resource_manager,
+    GcsVirtualClusterManager &gcs_virtual_cluster_manager,
     std::function<std::string(const JobID &)> get_ray_namespace)
     : io_context_(io_context),
       gcs_placement_group_scheduler_(scheduler),
       gcs_table_storage_(gcs_table_storage),
       gcs_resource_manager_(gcs_resource_manager),
+      gcs_virtual_cluster_manager_(gcs_virtual_cluster_manager),
       get_ray_namespace_(std::move(get_ray_namespace)) {
   placement_group_state_counter_.reset(
       new CounterMap<rpc::PlacementGroupTableData::PlacementGroupState>());
@@ -263,6 +269,13 @@ void GcsPlacementGroupManager::RegisterPlacementGroup(
   registered_placement_groups_.emplace(placement_group->GetPlacementGroupID(),
                                        placement_group);
   AddToPendingQueue(placement_group);
+
+  if (placement_group->IsDetached()) {
+    // If it's a detached placement group, we need to handle registration event
+    // by gcs virtual cluster manager.
+    gcs_virtual_cluster_manager_.OnDetachedPlacementGroupRegistration(
+        placement_group->GetVirtualClusterID(), placement_group->GetPlacementGroupID());
+  }
 
   RAY_CHECK_OK(gcs_table_storage_->PlacementGroupTable().Put(
       placement_group_id,
@@ -555,6 +568,13 @@ void GcsPlacementGroupManager::RemovePlacementGroup(
   if (pending_it != infeasible_placement_groups_.end()) {
     // The placement group is infeasible now, remove it from the queue.
     infeasible_placement_groups_.erase(pending_it);
+  }
+
+  if (placement_group->IsDetached()) {
+    // If it's a detached placement group, we need to handle destroy event
+    // by gcs virtual cluster manager.
+    gcs_virtual_cluster_manager_.OnDetachedPlacementGroupDestroy(
+        placement_group->GetVirtualClusterID(), placement_group->GetPlacementGroupID());
   }
 
   // Flush the status and respond to workers.
@@ -1034,6 +1054,12 @@ void GcsPlacementGroupManager::Initialize(const GcsInitData &gcs_init_data) {
     if (state == rpc::PlacementGroupTableData::PENDING ||
         state == rpc::PlacementGroupTableData::RESCHEDULING) {
       AddToPendingQueue(std::move(placement_group));
+    }
+    if (placement_group->IsDetached()) {
+      // If it's a detached placement group, we need to handle registration event on FO
+      // by gcs virtual cluster manager.
+      gcs_virtual_cluster_manager_.OnDetachedPlacementGroupRegistration(
+          placement_group->GetVirtualClusterID(), placement_group->GetPlacementGroupID());
     }
   }
 

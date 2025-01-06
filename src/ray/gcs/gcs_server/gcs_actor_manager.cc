@@ -217,6 +217,10 @@ rpc::ActorTableData::ActorState GcsActor::GetState() const {
   return actor_table_data_.state();
 }
 
+std::string GcsActor::GetVirtualClusterId() const {
+  return task_spec_->scheduling_strategy().virtual_cluster_id();
+}
+
 ActorID GcsActor::GetActorID() const {
   return ActorID::FromBinary(actor_table_data_.actor_id());
 }
@@ -798,6 +802,10 @@ Status GcsActorManager::RegisterActor(const ray::rpc::RegisterActorRequest &requ
     // If it's a detached actor, we need to register the runtime env it used to GC.
     runtime_env_manager_.AddURIReference(actor->GetActorID().Hex(),
                                          request.task_spec().runtime_env_info());
+    // If it's a detached actor, we need to handle registration event
+    // by gcs virtual cluster manager.
+    gcs_virtual_cluster_manager_.OnDetachedActorRegistration(virtual_cluster_id,
+                                                             actor->GetActorID());
   }
 
   // The backend storage is supposed to be reliable, so the status must be ok.
@@ -1115,6 +1123,11 @@ void GcsActorManager::DestroyActor(const ActorID &actor_id,
       RemoveActorFromOwner(actor);
     } else {
       runtime_env_manager_.RemoveURIReference(actor_id.Hex());
+
+      // If it's a detached actor, we need to handle destroy event
+      // by gcs virtual cluster manager.
+      gcs_virtual_cluster_manager_.OnDetachedActorDestroy(actor->GetVirtualClusterId(),
+                                                          actor->GetActorID());
     }
   }
 
@@ -1627,6 +1640,11 @@ void GcsActorManager::Initialize(const GcsInitData &gcs_init_data) {
         // This actor is owned. Send a long polling request to the actor's
         // owner to determine when the actor should be removed.
         PollOwnerForActorRefDeleted(actor);
+      } else {
+        // If it's a detached actor, we need to handle registration event on FO
+        // by gcs virtual cluster manager.
+        gcs_virtual_cluster_manager_.OnDetachedActorRegistration(
+            actor->GetVirtualClusterId(), actor->GetActorID());
       }
 
       if (!actor->GetWorkerID().IsNil()) {

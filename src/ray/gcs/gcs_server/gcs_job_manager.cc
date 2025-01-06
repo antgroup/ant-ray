@@ -29,6 +29,23 @@ void GcsJobManager::Initialize(const GcsInitData &gcs_init_data) {
     // Recover [running_job_ids_] from storage.
     if (!job_table_data.is_dead()) {
       running_job_ids_.insert(job_id);
+    } else {
+      const auto &virtual_cluster_id = job_table_data.virtual_cluster_id();
+      if (virtual_cluster_id.empty()) {
+        continue;
+      }
+      auto job_cluster_id = VirtualClusterID::FromBinary(virtual_cluster_id);
+      if (!job_cluster_id.IsJobClusterID()) {
+        continue;
+      }
+
+      auto job_virtual_cluster =
+          gcs_virtual_cluster_manager_.GetVirtualCluster(virtual_cluster_id);
+      if (job_virtual_cluster == nullptr) {
+        continue;
+      }
+      JobCluster *job_cluster = dynamic_cast<JobCluster *>(job_virtual_cluster.get());
+      job_cluster->SetFinished();
     }
   }
 }

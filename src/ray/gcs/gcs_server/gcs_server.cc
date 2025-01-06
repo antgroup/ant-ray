@@ -525,6 +525,7 @@ void GcsServer::InitGcsPlacementGroupManager(const GcsInitData &gcs_init_data) {
       gcs_placement_group_scheduler_.get(),
       gcs_table_storage_.get(),
       *gcs_resource_manager_,
+      *gcs_virtual_cluster_manager_,
       [this](const JobID &job_id) {
         return gcs_job_manager_->GetJobConfig(job_id)->ray_namespace();
       });

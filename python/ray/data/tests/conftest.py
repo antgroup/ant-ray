@@ -13,6 +13,8 @@ import ray
 import ray.util.state
 from ray._private.internal_api import get_memory_info_reply, get_state_from_address
 from ray._private.utils import _get_pyarrow_version
+from ray._private.ray_constants import DEFAULT_DASHBOARD_AGENT_LISTEN_PORT
+from ray.job_submission import JobSubmissionClient
 from ray.air.constants import TENSOR_COLUMN_NAME
 from ray.air.util.tensor_extensions.arrow import ArrowTensorArray
 from ray.data import Schema
@@ -779,7 +781,10 @@ def create_or_update_virtual_cluster(
 
 
 @pytest.fixture
-def create_virtual_cluster(node_instances, virtual_cluster):
+def create_virtual_cluster(request):
+    param = getattr(request, "param", {})
+    node_instances = param.get("node_instances", None)
+    virtual_cluster = param.get("virtual_cluster", None)
     default_node_instances = [
         ("1c2g", 3),
         ("2c4g", 3),
@@ -800,17 +805,19 @@ def create_virtual_cluster(node_instances, virtual_cluster):
         node_instances = default_node_instances
     if virtual_cluster is None or len(virtual_cluster) == 0:
         virtual_cluster = default_virtual_cluster
-    with _ray_start_cluster(do_init=True, num_nodes=0) as cluster:
-        assert wait_until_server_available(cluster.webui_url) is True
+    with _ray_start_cluster(do_init=True, num_nodes=1) as cluster:
         webui_url = cluster.webui_url
+        ip, _ = webui_url.split(":")
         webui_url = format_web_url(webui_url)
-
+        agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
+        assert wait_until_server_available(agent_address)
+        assert wait_until_server_available(cluster.webui_url) is True
         for node_type, amount in node_instances:
             num_cpus = node_type.split("c")[0]
             for _ in range(amount):
                 cluster.add_node(
                     env_vars={"RAY_NODE_TYPE_NAME": node_type},
-                    num_cpus=num_cpus)
+                    num_cpus=int(num_cpus))
 
         for virtual_cluster_id, config in virtual_cluster.items():
             create_or_update_virtual_cluster(
@@ -820,4 +827,9 @@ def create_virtual_cluster(node_instances, virtual_cluster):
                 replica_sets=config.get("replica_sets", {}),
                 revision=config.get("revision", 0),
             )
-        yield cluster
+
+        yield (
+            cluster,
+            JobSubmissionClient(format_web_url(webui_url)),
+        )
+

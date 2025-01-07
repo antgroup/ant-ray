@@ -48,12 +48,12 @@ Status VirtualClusterInfoAccessor::AsyncGet(
 
 Status VirtualClusterInfoAccessor::AsyncGetAll(
     bool include_job_clusters,
-    bool only_include_mixed_clusters,
+    bool only_include_indivisible_clusters,
     const MultiItemCallback<rpc::VirtualClusterTableData> &callback) {
   RAY_LOG(DEBUG) << "Getting all virtual cluster info.";
   rpc::GetVirtualClustersRequest request;
   request.set_include_job_clusters(true);
-  request.set_only_include_mixed_clusters(true);
+  request.set_only_include_indivisible_clusters(true);
   client_impl_->GetGcsRpcClient().GetVirtualClusters(
       request, [callback](const Status &status, rpc::GetVirtualClustersReply &&reply) {
         callback(
@@ -84,7 +84,7 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
         };
     RAY_CHECK_OK(AsyncGetAll(
         /*include_job_clusters=*/true,
-        /*only_include_mixed_clusters=*/true,
+        /*only_include_indivisible_clusters=*/true,
         callback));
   };
   subscribe_operation_ = [this, subscribe](const StatusCallback &done) {
@@ -92,6 +92,21 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
   };
   return subscribe_operation_(
       [this, done](const Status &status) { fetch_all_data_operation_(done); });
+}
+
+void VirtualClusterInfoAccessor::AsyncResubscribe() {
+  RAY_LOG(DEBUG) << "Reestablishing subscription for virtual cluster info.";
+  auto fetch_all_done = [](const Status &status) {
+    RAY_LOG(INFO)
+        << "Finished fetching all virtual cluster information from gcs server after gcs "
+           "server or pub-sub server is restarted.";
+  };
+
+  if (subscribe_operation_ != nullptr) {
+    RAY_CHECK_OK(subscribe_operation_([this, fetch_all_done](const Status &status) {
+      fetch_all_data_operation_(fetch_all_done);
+    }));
+  }
 }
 
 }  // namespace gcs

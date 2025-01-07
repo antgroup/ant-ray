@@ -85,7 +85,7 @@ void GcsResourceManager::HandleGetAllAvailableResources(
     rpc::GetAllAvailableResourcesRequest request,
     rpc::GetAllAvailableResourcesReply *reply,
     rpc::SendReplyCallback send_reply_callback) {
-  std::string virtual_cluster_id = request.virtual_cluster_id();
+  const std::string& virtual_cluster_id = request.virtual_cluster_id();
   RAY_LOG(DEBUG) << "Getting all available resources, virtual_cluster_id: "
                  << virtual_cluster_id;
   auto local_scheduling_node_id = scheduling::NodeID(local_node_id_.Binary());
@@ -137,7 +137,7 @@ void GcsResourceManager::HandleGetAllTotalResources(
     rpc::GetAllTotalResourcesRequest request,
     rpc::GetAllTotalResourcesReply *reply,
     rpc::SendReplyCallback send_reply_callback) {
-  std::string virtual_cluster_id = request.virtual_cluster_id();
+  const std::string& virtual_cluster_id = request.virtual_cluster_id();
   RAY_LOG(DEBUG) << "Getting all total resources, virtual_cluster_id: " << virtual_cluster_id;
   auto local_scheduling_node_id = scheduling::NodeID(local_node_id_.Binary());
   auto virtual_cluster = gcs_virtual_cluster_manager_.GetVirtualCluster(virtual_cluster_id);

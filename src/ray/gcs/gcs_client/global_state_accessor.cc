@@ -130,18 +130,11 @@ std::vector<std::string> GlobalStateAccessor::GetAllAvailableResources(
   std::promise<bool> promise;
   RAY_LOG(DEBUG) << "Requesting all available resources, virtual_cluster_id: "
                 << (virtual_cluster_id.has_value() ? virtual_cluster_id.value() : "");
-  if (virtual_cluster_id) {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllAvailableResourcesByVirtualClusterID(
-        virtual_cluster_id.value(),
-        TransformForMultiItemCallback<rpc::AvailableResources>(available_resources,
-                                                               promise)));
-  } else {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllAvailableResources(
-        TransformForMultiItemCallback<rpc::AvailableResources>(available_resources,
-                                                               promise)));
-  }
+  absl::ReaderMutexLock lock(&mutex_);
+  RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllAvailableResources(
+      TransformForMultiItemCallback<rpc::AvailableResources>(available_resources,
+                                                              promise)),
+      virtual_cluster_id.value());
   promise.get_future().get();
   return available_resources;
 }
@@ -152,16 +145,10 @@ std::vector<std::string> GlobalStateAccessor::GetAllTotalResources(
   std::promise<bool> promise;
   RAY_LOG(DEBUG) << "Requesting all total resources, virtual_cluster_id: "
                 << (virtual_cluster_id.has_value() ? virtual_cluster_id.value() : "");
-  if (virtual_cluster_id) {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllTotalResourcesByVirtualClusterID(
-        virtual_cluster_id.value(),
-        TransformForMultiItemCallback<rpc::TotalResources>(total_resources, promise)));
-  } else {
-    absl::ReaderMutexLock lock(&mutex_);
-    RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllTotalResources(
-        TransformForMultiItemCallback<rpc::TotalResources>(total_resources, promise)));
-  }
+  absl::ReaderMutexLock lock(&mutex_);
+  RAY_CHECK_OK(gcs_client_->NodeResources().AsyncGetAllTotalResources(
+      TransformForMultiItemCallback<rpc::TotalResources>(total_resources, promise)),
+      virtual_cluster_id.value());
   promise.get_future().get();
   return total_resources;
 }

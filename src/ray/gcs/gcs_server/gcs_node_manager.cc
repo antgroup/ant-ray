@@ -243,9 +243,6 @@ void GcsNodeManager::HandleGetAllNodeInfo(rpc::GetAllNodeInfoRequest request,
     if (filter_virtual_cluster_id.empty()) {
       return true;
     }
-    // WARNING: This is a near O(N^3) operation due to the complexity of looking up
-    // node in a virtual cluster, see VirtualCluster::ContainsNodeInstance for details.
-    // TODO: Optimize this after we have the revert index for node_id -> virtual_cluster_id.
     auto virtual_cluster = gcs_virtual_cluster_manager_.GetVirtualCluster(filter_virtual_cluster_id);
     if (virtual_cluster != nullptr) {
       bool contains = virtual_cluster->ContainsNodeInstance(NodeID::FromBinary(node.node_id()).Hex());

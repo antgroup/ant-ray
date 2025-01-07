@@ -28,8 +28,8 @@ from ray.dashboard.modules.job.common import (
 from ray.dashboard.tests.conftest import *  # noqa
 from ray.job_submission import JobSubmissionClient
 from ray.runtime_env.runtime_env import RuntimeEnv
-from ray.util.placement_group import PlacementGroup
 from ray.tests.conftest import _ray_start_virtual_cluster
+from ray.util.placement_group import PlacementGroup
 
 TEMPLATE_ID_PREFIX = "template_id_"
 kPrimaryClusterID = "kPrimaryClusterID"
@@ -42,7 +42,11 @@ def job_sdk_client(request):
     param = getattr(request, "param", {})
     ntemplates = param["ntemplates"]
     with _ray_start_virtual_cluster(
-        do_init=True, num_cpus=20, num_nodes=4 * ntemplates + 1, template_id_prefix=TEMPLATE_ID_PREFIX, **param
+        do_init=True,
+        num_cpus=20,
+        num_nodes=4 * ntemplates + 1,
+        template_id_prefix=TEMPLATE_ID_PREFIX,
+        **param,
     ) as res:
         ip, _ = res.webui_url.split(":")
         agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
@@ -55,12 +59,17 @@ def job_sdk_client(request):
             res,
         )
 
+
 @pytest_asyncio.fixture
 def job_sdk_client_with_external_redis(request, external_redis):
     param = getattr(request, "param", {})
     ntemplates = param["ntemplates"]
     with _ray_start_virtual_cluster(
-        do_init=True, num_cpus=20, num_nodes=4 * ntemplates + 1, template_id_prefix=TEMPLATE_ID_PREFIX, **param
+        do_init=True,
+        num_cpus=20,
+        num_nodes=4 * ntemplates + 1,
+        template_id_prefix=TEMPLATE_ID_PREFIX,
+        **param,
     ) as res:
         ip, _ = res.webui_url.split(":")
         agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
@@ -528,6 +537,7 @@ ray.get(a.run.remote(control))
                 timeout=120,
             )
             head_client.stop_job(job_id)
+
 
 @pytest.mark.parametrize(
     "job_sdk_client",

@@ -538,6 +538,7 @@ def _ray_start_cluster(**kwargs):
     ray.shutdown()
     cluster.shutdown()
 
+
 @contextmanager
 def _ray_start_virtual_cluster(**kwargs):
     cluster_not_supported_ = kwargs.pop("skip_cluster", cluster_not_supported)

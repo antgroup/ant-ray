@@ -418,14 +418,22 @@ NodeManager::NodeManager(
 
   virtual_cluster_manager_ = std::make_shared<VirtualClusterManager>(
       self_node_id_, /*on_local_node_instance_removed=*/[this]() {
-        cluster_task_manager_->CancelTasks(
+        auto tasks_canceled = cluster_task_manager_->CancelTasks(
             [](const std::shared_ptr<internal::Work> &work) { return true; },
             rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
             "The node is removed from a virtual cluster.");
-        local_task_manager_->CancelTasks(
+        if (tasks_canceled) {
+          RAY_LOG(DEBUG) << "Tasks are cleaned up from cluster_task_manager because the "
+                            "node is removed from virtual cluster.";
+        }
+        tasks_canceled = local_task_manager_->CancelTasks(
             [](const std::shared_ptr<internal::Work> &work) { return true; },
             rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
             "The node is removed from a virtual cluster.");
+        if (tasks_canceled) {
+          RAY_LOG(DEBUG) << "Tasks are cleaned up from local_task_manager because the "
+                            "node is removed from virtual cluster.";
+        }
         if (!cluster_resource_scheduler_->GetLocalResourceManager().IsLocalNodeIdle()) {
           for (auto &[_, worker] : leased_workers_) {
             RAY_LOG(DEBUG).WithField(worker->WorkerId())

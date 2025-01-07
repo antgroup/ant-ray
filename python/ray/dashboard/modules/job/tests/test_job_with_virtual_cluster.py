@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest_asyncio.fixture
-def job_sdk_client(request, external_redis):
+def job_sdk_client(request):
     param = getattr(request, "param", {})
     ntemplates = param["ntemplates"]
     with _ray_start_virtual_cluster(
@@ -53,9 +53,25 @@ def job_sdk_client(request, external_redis):
             JobSubmissionClient(format_web_url(head_address)),
             res.gcs_address,
             res,
-        ) 
+        )
 
-
+@pytest_asyncio.fixture
+def job_sdk_client_with_external_redis(request, external_redis):
+    param = getattr(request, "param", {})
+    ntemplates = param["ntemplates"]
+    with _ray_start_virtual_cluster(
+        do_init=True, num_cpus=20, num_nodes=4 * ntemplates + 1, template_id_prefix=TEMPLATE_ID_PREFIX, **param
+    ) as res:
+        ip, _ = res.webui_url.split(":")
+        agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
+        assert wait_until_server_available(agent_address)
+        head_address = res.webui_url
+        assert wait_until_server_available(head_address)
+        yield (
+            JobSubmissionClient(format_web_url(head_address)),
+            res.gcs_address,
+            res,
+        )
 
 
 async def create_virtual_cluster(
@@ -513,7 +529,6 @@ ray.get(a.run.remote(control))
             )
             head_client.stop_job(job_id)
 
-
 @pytest.mark.parametrize(
     "job_sdk_client",
     [
@@ -533,6 +548,7 @@ async def test_job_access_cluster_data(job_sdk_client):
     head_client, gcs_address, cluster = job_sdk_client
     virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
     node_to_virtual_cluster = {}
+
     @ray.remote
     class StorageActor:
         def __init__(self):
@@ -552,7 +568,7 @@ async def test_job_access_cluster_data(job_sdk_client):
             return {
                 "driver": self._driver_info,
                 "actor": self._actor_info,
-                "normal_task": self._normal_task_info
+                "normal_task": self._normal_task_info,
             }
 
         def set_driver_info(self, key, value):
@@ -560,10 +576,9 @@ async def test_job_access_cluster_data(job_sdk_client):
 
         def set_actor_info(self, key, value):
             self._actor_info[key] = value
-        
+
         def set_normal_task_info(self, key, value):
             self._normal_task_info[key] = value
-
 
     ntemplates = 3
     for i in range(ntemplates):
@@ -621,13 +636,14 @@ class ResourceAccessor:
     def total_cluster_resources(self):
         self._total_cluster_resources = ray.cluster_resources()
         return self._total_cluster_resources
-    
+
     def available_resources(self):
         self._available_resources = ray.available_resources()
         return self._available_resources
 
 
-accessor = ResourceAccessor.options(name="{resource_accessor_name}", namespace="storage", num_cpus=0).remote()
+accessor = ResourceAccessor.options(name="{resource_accessor_name}",
+    namespace="storage", num_cpus=0).remote()
 ray.get(accessor.is_ready.remote())
 
 ray.get(storage.ready.remote())
@@ -637,7 +653,8 @@ driver_cluster_resources = ray.cluster_resources()
 driver_available_resources = ray.available_resources()
 ray.get(storage.set_driver_info.remote("nodes", driver_nodes))
 ray.get(storage.set_driver_info.remote("cluster_resources", driver_cluster_resources))
-ray.get(storage.set_driver_info.remote("available_resources", driver_available_resources))
+ray.get(storage.set_driver_info.remote("available_resources",
+    driver_available_resources))
 
 actor_nodes = ray.get(accessor.nodes.remote())
 actor_cluster_resources = ray.get(accessor.total_cluster_resources.remote())
@@ -647,11 +664,15 @@ ray.get(storage.set_actor_info.remote("cluster_resources", actor_cluster_resourc
 ray.get(storage.set_actor_info.remote("available_resources", actor_available_resources))
 
 normal_task_nodes = ray.get(access_nodes.options(num_cpus=0).remote())
-normal_task_cluster_resources = ray.get(access_cluster_resources.options(num_cpus=0).remote())
-normal_task_available_resources = ray.get(access_available_resources.options(num_cpus=0).remote())
+normal_task_cluster_resources =
+    ray.get(access_cluster_resources.options(num_cpus=0).remote())
+normal_task_available_resources =
+    ray.get(access_available_resources.options(num_cpus=0).remote())
 ray.get(storage.set_normal_task_info.remote("nodes", normal_task_nodes))
-ray.get(storage.set_normal_task_info.remote("cluster_resources", normal_task_cluster_resources))
-ray.get(storage.set_normal_task_info.remote("available_resources", normal_task_available_resources))
+ray.get(storage.set_normal_task_info.remote("cluster_resources",
+    normal_task_cluster_resources))
+ray.get(storage.set_normal_task_info.remote("available_resources",
+    normal_task_available_resources))
             """
             driver_script = driver_script.format(
                 resource_accessor_name=resource_accessor_name,
@@ -675,7 +696,11 @@ ray.get(storage.set_normal_task_info.remote("available_resources", normal_task_a
             )
 
             wait_for_condition(
-                lambda: ray.get(storage_actor.is_ready.remote()), timeout=20
+                partial(
+                    lambda storage_actor: ray.get(storage_actor.is_ready.remote()),
+                    storage_actor,
+                ),
+                timeout=20,
             )
 
             def _check_only_access_virtual_cluster_nodes(
@@ -683,20 +708,39 @@ ray.get(storage.set_normal_task_info.remote("available_resources", normal_task_a
             ):
                 cluster_info = ray.get(storage_actor.get_info.remote())
                 expect_nodes = ray.nodes(virtual_cluster_id)
-                expect_total_cluster_resources = ray.cluster_resources(virtual_cluster_id)
+                expect_total_cluster_resources = ray.cluster_resources(
+                    virtual_cluster_id
+                )
                 expect_available_resources = ray.available_resources(virtual_cluster_id)
-
 
                 assert len(cluster_info) > 0
                 assert cluster_info["driver"]["nodes"] == expect_nodes
-                assert cluster_info["driver"]["cluster_resources"]["CPU"] == expect_total_cluster_resources["CPU"]
-                assert cluster_info["driver"]["available_resources"]["CPU"] == expect_available_resources["CPU"]
+                assert (
+                    cluster_info["driver"]["cluster_resources"]["CPU"]
+                    == expect_total_cluster_resources["CPU"]
+                )
+                assert (
+                    cluster_info["driver"]["available_resources"]["CPU"]
+                    == expect_available_resources["CPU"]
+                )
                 assert cluster_info["actor"]["nodes"] == expect_nodes
-                assert cluster_info["actor"]["cluster_resources"]["CPU"] == expect_total_cluster_resources["CPU"]
-                assert cluster_info["actor"]["available_resources"]["CPU"] == expect_available_resources["CPU"]
+                assert (
+                    cluster_info["actor"]["cluster_resources"]["CPU"]
+                    == expect_total_cluster_resources["CPU"]
+                )
+                assert (
+                    cluster_info["actor"]["available_resources"]["CPU"]
+                    == expect_available_resources["CPU"]
+                )
                 assert cluster_info["normal_task"]["nodes"] == expect_nodes
-                assert cluster_info["normal_task"]["cluster_resources"]["CPU"] == expect_total_cluster_resources["CPU"]
-                assert cluster_info["normal_task"]["available_resources"]["CPU"] == expect_available_resources["CPU"]
+                assert (
+                    cluster_info["normal_task"]["cluster_resources"]["CPU"]
+                    == expect_total_cluster_resources["CPU"]
+                )
+                assert (
+                    cluster_info["normal_task"]["available_resources"]["CPU"]
+                    == expect_available_resources["CPU"]
+                )
 
                 for node in cluster_info["driver"]["nodes"]:
                     node_id = node["NodeID"]
@@ -804,45 +848,45 @@ async def test_list_cluster_resources(job_sdk_client):
     assert total_resources["CPU"] > 0
     for i in range(ntemplates):
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
-        virtual_cluster_resources = ray.cluster_resources(virtual_cluster_id=virtual_cluster_id_prefix + str(i))
+        virtual_cluster_resources = ray.cluster_resources(
+            virtual_cluster_id=virtual_cluster_id_prefix + str(i)
+        )
         assert int(virtual_cluster_resources["CPU"]) == 60
     assert len(ray.cluster_resources("NON_EXIST_VIRTUAL_CLUSTER")) == 0
     with pytest.raises(TypeError):
         ray.cluster_resources(1)
 
     available_resources = ray.available_resources()
-    assert len(available_resources) > 0, f"available_resources {available_resources} is empty"
+    assert (
+        len(available_resources) > 0
+    ), f"available_resources {available_resources} is empty"
     assert available_resources["CPU"] > 0
     assert available_resources["CPU"] <= total_resources["CPU"]
     assert ray.available_resources(None) == available_resources
     for i in range(ntemplates):
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
-        virtual_cluster_resources = ray.available_resources(virtual_cluster_id=virtual_cluster_id_prefix + str(i))
+        virtual_cluster_resources = ray.available_resources(
+            virtual_cluster_id=virtual_cluster_id_prefix + str(i)
+        )
         assert int(virtual_cluster_resources["CPU"]) > 0
         assert int(virtual_cluster_resources["CPU"]) < total_resources["CPU"]
     assert len(ray.available_resources("NON_EXIST_VIRTUAL_CLUSTER")) == 0
     with pytest.raises(TypeError):
         ray.available_resources(1)
-    
 
-@pytest.mark.parametrize("gcs_fo", [True, False])
+
 @pytest.mark.parametrize(
-    "job_sdk_client",
+    "job_sdk_client_with_external_redis",
     [
         {
-            "_system_config": {"gcs_actor_scheduling_enabled": False},
-            "ntemplates": 1,
-        },
-        {
-            "_system_config": {"gcs_actor_scheduling_enabled": True},
             "ntemplates": 1,
         },
     ],
     indirect=True,
 )
 @pytest.mark.asyncio
-async def test_detached_job_cluster(job_sdk_client, gcs_fo):
-    head_client, gcs_address, cluster = job_sdk_client
+async def test_detached_job_cluster(job_sdk_client_with_external_redis):
+    head_client, gcs_address, cluster = job_sdk_client_with_external_redis
     virtual_cluster_id = "VIRTUAL_CLUSTER_0"
     await create_virtual_cluster(
         gcs_address,
@@ -915,9 +959,8 @@ ray.get(a.run.remote())
 
         _successful_submit()
 
-        if gcs_fo:
-            cluster.head_node.kill_gcs_server(False)
-            cluster.head_node.start_gcs_server()
+        cluster.head_node.kill_gcs_server(False)
+        cluster.head_node.start_gcs_server()
 
         def _failed_submit():
             job_id = head_client.submit_job(

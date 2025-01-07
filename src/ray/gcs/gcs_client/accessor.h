@@ -1029,7 +1029,7 @@ class VirtualClusterInfoAccessor {
   /// \return Status
   virtual Status AsyncGetAll(
       bool include_job_clusters,
-      bool only_include_mixed_clusters,
+      bool only_include_indivisible_clusters,
       const MultiItemCallback<rpc::VirtualClusterTableData> &callback);
 
   /// Subscribe to virtual cluster updates.
@@ -1040,6 +1040,13 @@ class VirtualClusterInfoAccessor {
   virtual Status AsyncSubscribeAll(
       const SubscribeCallback<VirtualClusterID, rpc::VirtualClusterTableData> &subscribe,
       const StatusCallback &done);
+
+  /// Reestablish subscription.
+  /// This should be called when GCS server restarts from a failure.
+  /// PubSub server restart will cause GCS server restart. In this case, we need to
+  /// resubscribe from PubSub server, otherwise we only need to fetch data from GCS
+  /// server.
+  virtual void AsyncResubscribe();
 
  private:
   /// Save the fetch data operation in this function, so we can call it again when GCS

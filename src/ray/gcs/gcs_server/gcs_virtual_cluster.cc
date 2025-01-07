@@ -580,6 +580,12 @@ void JobCluster::OnDetachedPlacementGroupDestroy(
   detached_placement_groups_.erase(placement_group_id);
 }
 
+bool JobCluster::InUse() const {
+  // TODO(xsuler) this should consider normal task if job cluster
+  // is removed asynchronously.
+  return !detached_actors_.empty() || !detached_placement_groups_.empty();
+}
+
 ///////////////////////// PrimaryCluster /////////////////////////
 void PrimaryCluster::Initialize(const GcsInitData &gcs_init_data) {
   // Let indivisible cluster be Vi, divisible cluster be Vd, job cluster be J, empty job

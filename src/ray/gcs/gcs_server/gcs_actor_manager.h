@@ -34,7 +34,9 @@
 #include "ray/util/event.h"
 #include "src/ray/protobuf/gcs_service.pb.h"
 
-namespace {
+namespace ray {
+namespace gcs {
+
 // Returns true if an actor should be loaded to registered_actors_.
 // `false` Cases:
 // 0. state is DEAD, and is not restartable
@@ -42,10 +44,6 @@ namespace {
 // 2. root owner is another detached actor, and that actor is dead
 bool OnInitializeActorShouldLoad(const ray::gcs::GcsInitData &gcs_init_data,
                                  ray::ActorID actor_id);
-}
-
-namespace ray {
-namespace gcs {
 
 /// GcsActor just wraps `ActorTableData` and provides some convenient interfaces to access
 /// the fields inside `ActorTableData`.

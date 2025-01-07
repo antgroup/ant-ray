@@ -60,29 +60,6 @@ def job_sdk_client(request):
         )
 
 
-@pytest_asyncio.fixture
-def job_sdk_client_with_external_redis(request, external_redis):
-    param = getattr(request, "param", {})
-    ntemplates = param["ntemplates"]
-    with _ray_start_virtual_cluster(
-        do_init=True,
-        num_cpus=20,
-        num_nodes=4 * ntemplates + 1,
-        template_id_prefix=TEMPLATE_ID_PREFIX,
-        **param,
-    ) as res:
-        ip, _ = res.webui_url.split(":")
-        agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
-        assert wait_until_server_available(agent_address)
-        head_address = res.webui_url
-        assert wait_until_server_available(head_address)
-        yield (
-            JobSubmissionClient(format_web_url(head_address)),
-            res.gcs_address,
-            res,
-        )
-
-
 async def create_virtual_cluster(
     gcs_address, virtual_cluster_id, replica_sets, divisible=False
 ):
@@ -622,17 +599,21 @@ import os
 ray.init(address="auto")
 storage = ray.get_actor(name="{storage_actor_name}", namespace="storage")
 
+
 @ray.remote
 def access_nodes():
     return ray.nodes()
+
 
 @ray.remote
 def access_cluster_resources():
     return ray.cluster_resources()
 
+
 @ray.remote
 def access_available_resources():
     return ray.available_resources()
+
 
 @ray.remote
 class ResourceAccessor:
@@ -652,8 +633,9 @@ class ResourceAccessor:
         return self._available_resources
 
 
-accessor = ResourceAccessor.options(name="{resource_accessor_name}",
-    namespace="storage", num_cpus=0).remote()
+accessor = ResourceAccessor.options(
+    name="{resource_accessor_name}", namespace="storage", num_cpus=0
+).remote()
 ray.get(accessor.is_ready.remote())
 
 ray.get(storage.ready.remote())
@@ -663,8 +645,9 @@ driver_cluster_resources = ray.cluster_resources()
 driver_available_resources = ray.available_resources()
 ray.get(storage.set_driver_info.remote("nodes", driver_nodes))
 ray.get(storage.set_driver_info.remote("cluster_resources", driver_cluster_resources))
-ray.get(storage.set_driver_info.remote("available_resources",
-    driver_available_resources))
+ray.get(
+    storage.set_driver_info.remote("available_resources", driver_available_resources)
+)
 
 actor_nodes = ray.get(accessor.nodes.remote())
 actor_cluster_resources = ray.get(accessor.total_cluster_resources.remote())
@@ -674,15 +657,23 @@ ray.get(storage.set_actor_info.remote("cluster_resources", actor_cluster_resourc
 ray.get(storage.set_actor_info.remote("available_resources", actor_available_resources))
 
 normal_task_nodes = ray.get(access_nodes.options(num_cpus=0).remote())
-normal_task_cluster_resources =
-    ray.get(access_cluster_resources.options(num_cpus=0).remote())
-normal_task_available_resources =
-    ray.get(access_available_resources.options(num_cpus=0).remote())
+normal_task_cluster_resources = ray.get(
+    access_cluster_resources.options(num_cpus=0).remote()
+)
+normal_task_available_resources = ray.get(
+    access_available_resources.options(num_cpus=0).remote()
+)
 ray.get(storage.set_normal_task_info.remote("nodes", normal_task_nodes))
-ray.get(storage.set_normal_task_info.remote("cluster_resources",
-    normal_task_cluster_resources))
-ray.get(storage.set_normal_task_info.remote("available_resources",
-    normal_task_available_resources))
+ray.get(
+    storage.set_normal_task_info.remote(
+        "cluster_resources", normal_task_cluster_resources
+    )
+)
+ray.get(
+    storage.set_normal_task_info.remote(
+        "available_resources", normal_task_available_resources
+    )
+)
             """
             driver_script = driver_script.format(
                 resource_accessor_name=resource_accessor_name,
@@ -886,7 +877,7 @@ async def test_list_cluster_resources(job_sdk_client):
 
 
 @pytest.mark.parametrize(
-    "job_sdk_client_with_external_redis",
+    "job_sdk_client",
     [
         {
             "ntemplates": 1,
@@ -895,8 +886,8 @@ async def test_list_cluster_resources(job_sdk_client):
     indirect=True,
 )
 @pytest.mark.asyncio
-async def test_detached_job_cluster(job_sdk_client_with_external_redis):
-    head_client, gcs_address, cluster = job_sdk_client_with_external_redis
+async def test_detached_job_cluster(job_sdk_client):
+    head_client, gcs_address, cluster = job_sdk_client
     virtual_cluster_id = "VIRTUAL_CLUSTER_0"
     await create_virtual_cluster(
         gcs_address,
@@ -968,9 +959,6 @@ ray.get(a.run.remote())
             )
 
         _successful_submit()
-
-        cluster.head_node.kill_gcs_server(False)
-        cluster.head_node.start_gcs_server()
 
         def _failed_submit():
             job_id = head_client.submit_job(

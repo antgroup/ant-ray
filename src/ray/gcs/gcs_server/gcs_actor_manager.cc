@@ -124,6 +124,11 @@ const ray::rpc::ActorDeathCause GenActorRefDeletedCause(const ray::gcs::GcsActor
   return death_cause;
 }
 
+}  // namespace
+
+namespace ray {
+namespace gcs {
+
 // Returns true if an actor should be loaded to registered_actors_.
 // `false` Cases:
 // 0. state is DEAD, and is not restartable
@@ -162,10 +167,6 @@ bool OnInitializeActorShouldLoad(const ray::gcs::GcsInitData &gcs_init_data,
            root_detached_actor_iter->second.state() != ray::rpc::ActorTableData::DEAD;
   }
 };
-}  // namespace
-
-namespace ray {
-namespace gcs {
 
 bool is_uuid(const std::string &str) {
   static const boost::regex e(

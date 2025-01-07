@@ -394,12 +394,10 @@ class JobCluster : public IndivisibleCluster {
   /// Handle detached placement group destroy.
   void OnDetachedPlacementGroupDestroy(const PlacementGroupID &placement_group_id);
 
-  /// Check if job is in use
+  /// Check if job cluster is still in use
   ///
   /// \return True if the job is in use, false otherwise.
-  bool InUse() const override {
-    return !detached_actors_.empty() || !detached_placement_groups_.empty();
-  }
+  bool InUse() const override;
 
   /// Set Job as Finished
   void SetFinished() { finished = true; }

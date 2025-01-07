@@ -17,17 +17,21 @@ from ray._private.test_utils import (
     wait_for_condition,
     wait_until_server_available,
 )
+from ray._private.utils import hex_to_binary
+from ray._raylet import PlacementGroupID
 from ray.cluster_utils import Cluster, cluster_not_supported
 from ray.core.generated import gcs_service_pb2_grpc
 from ray.core.generated.gcs_service_pb2 import CreateOrUpdateVirtualClusterRequest
 from ray.dashboard.modules.job.common import (
     JOB_ACTOR_NAME_TEMPLATE,
     SUPERVISOR_ACTOR_RAY_NAMESPACE,
+    JobStatus,
 )
 from ray.dashboard.tests.conftest import *  # noqa
 from ray.job_submission import JobSubmissionClient
 from ray.runtime_env.runtime_env import RuntimeEnv
 from ray.tests.conftest import get_default_fixture_ray_kwargs
+from ray.util.placement_group import PlacementGroup
 
 TEMPLATE_ID_PREFIX = "template_id_"
 kPrimaryClusterID = "kPrimaryClusterID"
@@ -141,7 +145,7 @@ async def create_virtual_cluster(
     indirect=True,
 )
 @pytest.mark.asyncio
-async def test_mixed_virtual_cluster(job_sdk_client):
+async def test_indivisible_virtual_cluster(job_sdk_client):
     head_client, gcs_address, cluster = job_sdk_client
     virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
     node_to_virtual_cluster = {}

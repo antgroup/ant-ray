@@ -157,7 +157,7 @@ class GlobalState:
         }
         return actor_info
 
-    def node_table(self, virtual_cluster_id=""):
+    def node_table(self, virtual_cluster_id=None):
         """Fetch and parse the Gcs node info table.
 
         Returns:
@@ -723,7 +723,7 @@ class GlobalState:
             worker_id, num_paused_threads_delta
         )
 
-    def cluster_resources(self, virtual_cluster_id=""):
+    def cluster_resources(self, virtual_cluster_id=None):
         """Get the current total cluster resources.
 
         Note that this information can grow stale as nodes are added to or
@@ -743,11 +743,11 @@ class GlobalState:
 
         return dict(total_resources)
 
-    def _live_node_ids(self, virtual_cluster_id=""):
+    def _live_node_ids(self, virtual_cluster_id=None):
         """Returns a set of node IDs corresponding to nodes still alive."""
         return set(self.total_resources_per_node(virtual_cluster_id).keys())
 
-    def available_resources_per_node(self, virtual_cluster_id=""):
+    def available_resources_per_node(self, virtual_cluster_id=None):
         """Returns a dictionary mapping node id to available resources."""
         self._check_connected()
         available_resources_by_id = {}
@@ -768,7 +768,7 @@ class GlobalState:
         return available_resources_by_id
 
     # returns a dict that maps node_id(hex string) to a dict of {resource_id: capacity}
-    def total_resources_per_node(self, virtual_cluster_id="") -> Dict[str, Dict[str, int]]:
+    def total_resources_per_node(self, virtual_cluster_id=None) -> Dict[str, Dict[str, int]]:
         self._check_connected()
         total_resources_by_node = {}
 
@@ -785,7 +785,7 @@ class GlobalState:
 
         return total_resources_by_node
 
-    def available_resources(self, virtual_cluster_id=""):
+    def available_resources(self, virtual_cluster_id=None):
         """Get the current available cluster resources.
 
         This is different from `cluster_resources` in that this will return
@@ -867,7 +867,7 @@ def next_job_id():
 
 @DeveloperAPI
 @client_mode_hook
-def nodes(virtual_cluster_id=""):
+def nodes(virtual_cluster_id=None):
     """Get a list of the nodes in the cluster (for debugging only).
 
     Returns:
@@ -991,7 +991,7 @@ def object_transfer_timeline(filename=None):
 
 @DeveloperAPI
 @client_mode_hook
-def cluster_resources(virtual_cluster_id=""):
+def cluster_resources(virtual_cluster_id=None):
     """Get the current total cluster resources.
 
     Note that this information can grow stale as nodes are added to or removed
@@ -1010,7 +1010,7 @@ def cluster_resources(virtual_cluster_id=""):
 
 @DeveloperAPI
 @client_mode_hook
-def available_resources(virtual_cluster_id=""):
+def available_resources(virtual_cluster_id=None):
     """Get the current available cluster resources.
 
     This is different from `cluster_resources` in that this will return idle
@@ -1045,7 +1045,7 @@ def available_resources_per_node():
 
 
 @DeveloperAPI
-def total_resources_per_node(virtual_cluster_id=""):
+def total_resources_per_node(virtual_cluster_id=None):
     """Get the current total resources of each live node.
 
     Note that this information can grow stale as tasks start and finish.

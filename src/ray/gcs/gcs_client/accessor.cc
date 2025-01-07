@@ -650,32 +650,6 @@ Status NodeInfoAccessor::AsyncGetAll(const MultiItemCallback<GcsNodeInfo> &callb
   return Status::OK();
 }
 
-Status NodeInfoAccessor::AsyncGetByVirtualClusterID(
-    const std::optional<std::string> &virtual_cluster_id,
-    const MultiItemCallback<GcsNodeInfo> &callback, int64_t timeout_ms) {
-  RAY_LOG(DEBUG) << "Getting information of all nodes by virtual cluster id: "
-      << virtual_cluster_id.value();
-  if (!virtual_cluster_id) {
-    return AsyncGetAll(callback, timeout_ms);
-  }
-  rpc::GetAllNodeInfoRequest request;
-  request.mutable_filters()->set_virtual_cluster_id(virtual_cluster_id.value());
-  client_impl_->GetGcsRpcClient().GetAllNodeInfo(
-      request,
-      [callback](const Status &status, rpc::GetAllNodeInfoReply &&reply) {
-        std::vector<GcsNodeInfo> result;
-        result.reserve((reply.node_info_list_size()));
-        for (int index = 0; index < reply.node_info_list_size(); ++index) {
-          result.emplace_back(reply.node_info_list(index));
-        }
-        callback(status, std::move(result));
-        RAY_LOG(DEBUG) << "Finished getting information of all nodes by virtual cluster "
-                          "id, status = " << status;
-      },
-      timeout_ms);
-  return Status::OK();
-}
-
 Status NodeInfoAccessor::AsyncSubscribeToNodeChange(
     const SubscribeCallback<NodeID, GcsNodeInfo> &subscribe, const StatusCallback &done) {
   RAY_CHECK(subscribe != nullptr);
@@ -842,45 +816,9 @@ Status NodeResourceInfoAccessor::AsyncGetAllAvailableResources(
   return Status::OK();
 }
 
-Status NodeResourceInfoAccessor::AsyncGetAllAvailableResourcesByVirtualClusterID(
-    const std::optional<std::string> &virtual_cluster_id,
-    const MultiItemCallback<rpc::AvailableResources> &callback) {
-  if (!virtual_cluster_id) {
-    return AsyncGetAllAvailableResources(callback);
-  }
-  rpc::GetAllAvailableResourcesRequest request;
-  request.set_virtual_cluster_id(virtual_cluster_id.value());
-  client_impl_->GetGcsRpcClient().GetAllAvailableResources(
-      request,
-      [callback](const Status &status, rpc::GetAllAvailableResourcesReply &&reply) {
-        callback(status, VectorFromProtobuf(std::move(*reply.mutable_resources_list())));
-        RAY_LOG(DEBUG) << "Finished getting available resources of all nodes, status = "
-                       << status;
-      });
-  return Status::OK();
-}
-
 Status NodeResourceInfoAccessor::AsyncGetAllTotalResources(
     const MultiItemCallback<rpc::TotalResources> &callback) {
   rpc::GetAllTotalResourcesRequest request;
-  client_impl_->GetGcsRpcClient().GetAllTotalResources(
-      request, [callback](const Status &status, rpc::GetAllTotalResourcesReply &&reply) {
-        callback(status, VectorFromProtobuf(std::move(*reply.mutable_resources_list())));
-        RAY_LOG(DEBUG) << "Finished getting total resources of all nodes, status = "
-                       << status;
-      });
-  return Status::OK();
-}
-
-Status NodeResourceInfoAccessor::AsyncGetAllTotalResourcesByVirtualClusterID(
-    const std::optional<std::string> &virtual_cluster_id,
-    const MultiItemCallback<rpc::TotalResources> &callback) {
-  if (!virtual_cluster_id) {
-    return AsyncGetAllTotalResources(callback);
-  }
-
-  rpc::GetAllTotalResourcesRequest request;
-  request.set_virtual_cluster_id(virtual_cluster_id.value());
   client_impl_->GetGcsRpcClient().GetAllTotalResources(
       request, [callback](const Status &status, rpc::GetAllTotalResourcesReply &&reply) {
         callback(status, VectorFromProtobuf(std::move(*reply.mutable_resources_list())));

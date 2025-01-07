@@ -244,15 +244,13 @@ void GcsNodeManager::HandleGetAllNodeInfo(rpc::GetAllNodeInfoRequest request,
       return true;
     }
     auto virtual_cluster = gcs_virtual_cluster_manager_.GetVirtualCluster(filter_virtual_cluster_id);
-    if (virtual_cluster != nullptr) {
-      bool contains = virtual_cluster->ContainsNodeInstance(NodeID::FromBinary(node.node_id()).Hex());
-      RAY_LOG(DEBUG) << "Filtering node " << node.node_id() << " in virtual cluster "
-                << filter_virtual_cluster_id << " contains: " << contains;
-      return contains;
-    } else {
+    if (virtual_cluster == nullptr) {
       return false;
     }
-    return true;
+    bool contains = virtual_cluster->ContainsNodeInstance(NodeID::FromBinary(node.node_id()).Hex());
+    RAY_LOG(DEBUG) << "Filtering node " << node.node_id() << " in virtual cluster "
+              << filter_virtual_cluster_id << " contains: " << contains;
+    return contains;
   };
   int64_t num_added = 0;
   int64_t num_filtered = 0;

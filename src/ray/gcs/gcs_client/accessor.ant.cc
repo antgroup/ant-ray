@@ -76,7 +76,7 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
           if (virtual_cluster_data.revision() <
               virtual_cluster_revisions_[virtual_cluster_id]) {
             RAY_LOG(WARNING) << "The revision of the received virtual cluster ("
-                             << virtual_cluster_id << ") is outdated, ignore it.";
+                             << virtual_cluster_id << ") is outdated. Ignore it.";
             return;
           }
           if (virtual_cluster_data.is_removed()) {
@@ -105,6 +105,10 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
             virtual_cluster_revisions_copy.erase(virtual_cluster_id);
           }
           for (const auto &[virtual_cluster_id, _] : virtual_cluster_revisions_copy) {
+            // If there is any left data in `virtual_cluster_revisions_copy`, it means the
+            // local node may miss the pub messages (when gcs removed virtual clusters) in
+            // the past. So we have to mock a `virtual_cluster_table_data` (specifying
+            // removed) and notify the subscriber to clean its local cache.
             rpc::VirtualClusterTableData virtual_cluster_table_data;
             virtual_cluster_table_data.set_is_removed(true);
             updated_subscribe(virtual_cluster_id, std::move(virtual_cluster_table_data));

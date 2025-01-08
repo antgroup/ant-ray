@@ -10,6 +10,7 @@ from ray._private.ray_constants import DEFAULT_DASHBOARD_AGENT_LISTEN_PORT
 from ray._private.runtime_env.working_dir import upload_working_dir_if_needed
 from ray._private.test_utils import (
     wait_for_condition,
+    format_web_url,
 )
 from ray.cluster_utils import Cluster
 from ray.dashboard.tests.conftest import *  # noqa
@@ -80,7 +81,7 @@ def get_virtual_cluster_nodes(webui_url, virtual_cluster_id):
     return None
 
 
-def get_actors(webui_url, job_id=None):
+def get_job_actors(webui_url, job_id=None):
     resp = requests.get(
         webui_url + f"/logical/actors",
         timeout=10,
@@ -99,100 +100,101 @@ def get_actors(webui_url, job_id=None):
 
 
 def check_job_actor_in_virtual_cluster(webui_url, job_id, virtual_cluster_id):
+    webui_url = format_web_url(webui_url)
+    job_actors = get_job_actors(webui_url, job_id)
     target_virtual_cluster = get_virtual_cluster_nodes(webui_url, virtual_cluster_id)
     target_virtual_cluster_node_ids = set(target_virtual_cluster["nodeInstances"].keys())
-    job_actors = get_actors(webui_url, job_id)
     for actor_id, actor_info in job_actors.items():
         assert actor_info["address"]["rayletId"] in target_virtual_cluster_node_ids
 
 
-# @pytest.mark.parametrize('create_virtual_cluster', [{
-#     'node_instances': [("1c2g", 2), ("2c4g", 2), ("8c16g", 4)],
-#     'virtual_cluster': {
-#         "VIRTUAL_CLUSTER_0": {
-#             "allocation_mode": "mixed",
-#             "replica_sets": {
-#                 "1c2g": 2,
-#             },
-#         },
-#         "VIRTUAL_CLUSTER_1": {
-#             "allocation_mode": "mixed",
-#             "replica_sets": {
-#                 "2c4g": 2,
-#             },
-#         },
-#         "VIRTUAL_CLUSTER_2": {
-#             "allocation_mode": "mixed",
-#             "replica_sets": {
-#                 "8c16g": 4,
-#             },
-#         }
-#     }
-# }], indirect=True)
-# def test_auto_parallelism(create_virtual_cluster):
-#     cluster, job_client = create_virtual_cluster
-#     MiB = 1024 * 1024
-#     GiB = 1024 * MiB
-#     TEST_CASES = [
-#         (1024, (4, 8, 64)),         # avail_cpus * 2
-#         (10 * MiB, (10, 10, 64)),   # MAX_PARALLELISM, MAX_PARALLELISM, avail_cpus * 2
-#     ]
-
-#     with tempfile.TemporaryDirectory() as tmp_dir:
-#         for i in range(3):  # 3 virtual clusters in total
-#             signal_actor_name = f"storage_actor_{i}"
-#             signal_actor = JobSignalActor.options(
-#                 name=signal_actor_name, namespace="storage", num_cpus=0
-#             ).remote()
-#             ray.get(signal_actor.is_ready.remote())
-#             for data_size, expected_parallelism in TEST_CASES:
-#                 driver_script = """
-# import ray
-# from ray.data._internal.util import _autodetect_parallelism
-# from ray.data.context import DataContext
-
-
-# ray.init(address="auto")
-# signal_actor = ray.get_actor("{signal_actor_name}", namespace="storage")
-# ray.get(signal_actor.ready.remote())
-# target_max_block_size = DataContext.get_current().target_max_block_size
-# class MockReader:
-#     def estimate_inmemory_data_size(self):
-#         return {data_size}
-
-
-# final_parallelism, _, _ = _autodetect_parallelism(
-#     parallelism=-1,
-#     target_max_block_size=target_max_block_size,
-#     ctx=DataContext.get_current(),
-#     datasource_or_legacy_reader=MockReader(),
-# )
-
-# ray.get(signal_actor.data.remote(final_parallelism))
-# ray.get(signal_actor.unready.remote())
-# """
-#                 driver_script = driver_script.format(
-#                     signal_actor_name=signal_actor_name,
-#                     data_size=data_size)
-#                 submit_job_to_virtual_cluster(job_client, tmp_dir, driver_script, f"VIRTUAL_CLUSTER_{i}")
-#                 # wait for job running
-#                 wait_for_condition(
-#                     lambda: ray.get(signal_actor.is_ready.remote()), timeout=40
-#                 )
-#                 time.sleep(600)
-#                 # wait for job finish
-#                 wait_for_condition(
-#                     lambda: not ray.get(signal_actor.is_ready.remote()), timeout=30
-#                 )
-#                 # retrieve job data and check
-#                 res = ray.get(signal_actor.data.remote())
-#                 print(f"Driver detected parallelism: {res}, expect[{i}]: {expected_parallelism[i]}")
-#                 wait_for_condition(
-#                     lambda: ray.get(signal_actor.data.remote()) == expected_parallelism[i], timeout=30
-#                 )
-
-
+@pytest.mark.parametrize('create_virtual_cluster', [{
+    'node_instances': [("1c2g", 2), ("2c4g", 2), ("8c16g", 4)],
+    'virtual_cluster': {
+        "VIRTUAL_CLUSTER_0": {
+            "allocation_mode": "mixed",
+            "replica_sets": {
+                "1c2g": 2,
+            },
+        },
+        "VIRTUAL_CLUSTER_1": {
+            "allocation_mode": "mixed",
+            "replica_sets": {
+                "2c4g": 2,
+            },
+        },
+        "VIRTUAL_CLUSTER_2": {
+            "allocation_mode": "mixed",
+            "replica_sets": {
+                "8c16g": 4,
+            },
+        }
+    }
+}], indirect=True)
 def test_auto_parallelism(create_virtual_cluster):
+    cluster, job_client = create_virtual_cluster
+    MiB = 1024 * 1024
+    GiB = 1024 * MiB
+    TEST_CASES = [
+        (1024, (4, 8, 64)),         # avail_cpus * 2
+        (10 * MiB, (10, 10, 64)),   # MAX_PARALLELISM, MAX_PARALLELISM, avail_cpus * 2
+    ]
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        for i in range(3):  # 3 virtual clusters in total
+            signal_actor_name = f"storage_actor_{i}"
+            signal_actor = JobSignalActor.options(
+                name=signal_actor_name, namespace="storage", num_cpus=0
+            ).remote()
+            ray.get(signal_actor.is_ready.remote())
+            for data_size, expected_parallelism in TEST_CASES:
+                driver_script = """
+import ray
+from ray.data._internal.util import _autodetect_parallelism
+from ray.data.context import DataContext
+
+
+ray.init(address="auto")
+signal_actor = ray.get_actor("{signal_actor_name}", namespace="storage")
+ray.get(signal_actor.ready.remote())
+target_max_block_size = DataContext.get_current().target_max_block_size
+class MockReader:
+    def estimate_inmemory_data_size(self):
+        return {data_size}
+
+
+final_parallelism, _, _ = _autodetect_parallelism(
+    parallelism=-1,
+    target_max_block_size=target_max_block_size,
+    ctx=DataContext.get_current(),
+    datasource_or_legacy_reader=MockReader(),
+)
+
+ray.get(signal_actor.data.remote(final_parallelism))
+ray.get(signal_actor.unready.remote())
+"""
+                driver_script = driver_script.format(
+                    signal_actor_name=signal_actor_name,
+                    data_size=data_size)
+                submit_job_to_virtual_cluster(job_client, tmp_dir, driver_script, f"VIRTUAL_CLUSTER_{i}")
+                # wait for job running
+                wait_for_condition(
+                    lambda: ray.get(signal_actor.is_ready.remote()), timeout=40
+                )
+                time.sleep(600)
+                # wait for job finish
+                wait_for_condition(
+                    lambda: not ray.get(signal_actor.is_ready.remote()), timeout=30
+                )
+                # retrieve job data and check
+                res = ray.get(signal_actor.data.remote())
+                print(f"Driver detected parallelism: {res}, expect[{i}]: {expected_parallelism[i]}")
+                wait_for_condition(
+                    lambda: ray.get(signal_actor.data.remote()) == expected_parallelism[i], timeout=30
+                )
+
+
+def test_job_in_virtual_cluster(create_virtual_cluster):
     cluster, job_client = create_virtual_cluster
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -219,9 +221,8 @@ def flat_map_fn(row):
     new_row['species'] = row['variety'] + '???'
     return [row, new_row]
 
-ds = ray.data.read_csv("/home/admin/codes/X/ray/python/ray/data/examples/data/iris.csv")
+ds = ray.data.read_csv("s3://anonymous@air-example-data/iris.csv")
 ds = ds.map(map_fn).flat_map(flat_map_fn)
-ray.get(signal_actor.data.remote(final_parallelism))
 ray.get(signal_actor.unready.remote())
 """
             driver_script = driver_script.format(
@@ -231,16 +232,13 @@ ray.get(signal_actor.unready.remote())
             wait_for_condition(
                 lambda: ray.get(signal_actor.is_ready.remote()), timeout=40
             )
+            # wait for job finish
+            wait_for_condition(
+                lambda: not ray.get(signal_actor.is_ready.remote()), timeout=40
+            )
+            # time.sleep(600)
             check_job_actor_in_virtual_cluster(
-                    cluster.webui_url,
-                    job_id,
-                    f"VIRTUAL_CLUSTER_{i}")
-            # wait_for_condition(
-            #     check_job_actor_in_virtual_cluster(
-            #         cluster.webui_url,
-            #         job_id,
-            #         f"VIRTUAL_CLUSTER_{i}"),
-            #     timeout=30)
+                cluster.webui_url, job_id, f"VIRTUAL_CLUSTER_{i}")
             
 
 if __name__ == "__main__":

@@ -1039,6 +1039,9 @@ class VirtualClusterInfoAccessor {
   SubscribeOperation subscribe_operation_;
 
   GcsClient *client_impl_;
+
+  // The revision of each virtual cluster.
+  absl::flat_hash_map<VirtualClusterID, uint64_t> virtual_cluster_revisions_;
 };
 
 }  // namespace gcs

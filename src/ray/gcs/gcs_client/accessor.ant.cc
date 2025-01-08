@@ -69,14 +69,45 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
     const SubscribeCallback<VirtualClusterID, rpc::VirtualClusterTableData> &subscribe,
     const StatusCallback &done) {
   RAY_CHECK(subscribe != nullptr);
-  fetch_all_data_operation_ = [this, subscribe](const StatusCallback &done) {
+  const auto updated_subscribe =
+      [this, subscribe](const VirtualClusterID &virtual_cluster_id,
+                        rpc::VirtualClusterTableData &&virtual_cluster_data) {
+        if (virtual_cluster_revisions_.contains(virtual_cluster_id)) {
+          if (virtual_cluster_data.revision() <
+              virtual_cluster_revisions_[virtual_cluster_id]) {
+            RAY_LOG(WARNING) << "The revision of the received virtual cluster ("
+                             << virtual_cluster_id << ") is outdated, ignore it.";
+            return;
+          }
+          if (virtual_cluster_data.is_removed()) {
+            virtual_cluster_revisions_.erase(virtual_cluster_id);
+          } else {
+            virtual_cluster_revisions_[virtual_cluster_id] =
+                virtual_cluster_data.revision();
+          }
+        } else {
+          virtual_cluster_revisions_[virtual_cluster_id] =
+              virtual_cluster_data.revision();
+        }
+
+        subscribe(virtual_cluster_id, std::move(virtual_cluster_data));
+      };
+  fetch_all_data_operation_ = [this, updated_subscribe](const StatusCallback &done) {
     auto callback =
-        [subscribe, done](
+        [this, updated_subscribe, done](
             const Status &status,
             std::vector<rpc::VirtualClusterTableData> &&virtual_cluster_info_list) {
+          auto virtual_cluster_revisions_copy = virtual_cluster_revisions_;
           for (auto &virtual_cluster_info : virtual_cluster_info_list) {
-            subscribe(VirtualClusterID::FromBinary(virtual_cluster_info.id()),
-                      std::move(virtual_cluster_info));
+            auto virtual_cluster_id =
+                VirtualClusterID::FromBinary(virtual_cluster_info.id());
+            updated_subscribe(virtual_cluster_id, std::move(virtual_cluster_info));
+            virtual_cluster_revisions_copy.erase(virtual_cluster_id);
+          }
+          for (const auto &[virtual_cluster_id, _] : virtual_cluster_revisions_copy) {
+            rpc::VirtualClusterTableData virtual_cluster_table_data;
+            virtual_cluster_table_data.set_is_removed(true);
+            updated_subscribe(virtual_cluster_id, std::move(virtual_cluster_table_data));
           }
           if (done) {
             done(status);
@@ -87,8 +118,9 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
         /*only_include_indivisible_clusters=*/true,
         callback));
   };
-  subscribe_operation_ = [this, subscribe](const StatusCallback &done) {
-    return client_impl_->GetGcsSubscriber().SubscribeAllVirtualClusters(subscribe, done);
+  subscribe_operation_ = [this, updated_subscribe](const StatusCallback &done) {
+    return client_impl_->GetGcsSubscriber().SubscribeAllVirtualClusters(updated_subscribe,
+                                                                        done);
   };
   return subscribe_operation_(
       [this, done](const Status &status) { fetch_all_data_operation_(done); });

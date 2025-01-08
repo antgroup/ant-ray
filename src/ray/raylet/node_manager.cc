@@ -417,7 +417,7 @@ NodeManager::NodeManager(
       *store_client_, absl::bind_front(&NodeManager::CreateRayletClient, this));
 
   virtual_cluster_manager_ = std::make_shared<VirtualClusterManager>(
-      self_node_id_, /*on_local_node_instance_removed=*/[this]() {
+      self_node_id_, /*local_node_cleanup_fn=*/[this]() {
         auto tasks_canceled = cluster_task_manager_->CancelTasks(
             [](const std::shared_ptr<internal::Work> &work) { return true; },
             rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,

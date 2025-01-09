@@ -160,7 +160,10 @@ def test_auto_parallelism(create_virtual_cluster):
             signal_actor = JobSignalActor.options(
                 name=signal_actor_name, namespace="storage", num_cpus=0
             ).remote()
-            ray.get(signal_actor.is_ready.remote())
+            # Just to make sure the actor is running, signal actor
+            # should not be "ready" at this time until the submitted job
+            # is running
+            assert not ray.get(signal_actor.is_ready.remote())
             for data_size, expected_parallelism in TEST_CASES:
                 driver_script = """
 import ray
@@ -234,7 +237,10 @@ def test_job_in_virtual_cluster(create_virtual_cluster):
             signal_actor = JobSignalActor.options(
                 name=signal_actor_name, namespace="storage", num_cpus=0
             ).remote()
-            ray.get(signal_actor.is_ready.remote())
+            # Just to make sure the actor is running, signal actor
+            # should not be "ready" at this time until the submitted job
+            # is running
+            assert not ray.get(signal_actor.is_ready.remote())
             driver_script = """
 import ray
 import time
@@ -324,6 +330,9 @@ def test_start_actor_timeout(create_virtual_cluster):
             signal_actor = JobSignalActor.options(
                 name=signal_actor_name, namespace="storage", num_cpus=0
             ).remote()
+            # Just to make sure the actor is running, signal actor
+            # should not be "ready" at this time until the submitted job
+            # is running
             ray.get(signal_actor.is_ready.remote())
             driver_script = """
 import ray

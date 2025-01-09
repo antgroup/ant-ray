@@ -1,8 +1,8 @@
 import logging
-import sys
-
-import pytest
 import requests
+import sys
+import time
+import pytest
 
 import ray
 from ray._private.runtime_env.working_dir import upload_working_dir_if_needed
@@ -19,6 +19,7 @@ class JobSignalActor:
     def __init__(self):
         self._ready = False
         self._data = None
+        self._barrier = False
 
     def is_ready(self):
         return self._ready
@@ -28,6 +29,13 @@ class JobSignalActor:
 
     def unready(self):
         self._ready = False
+        self._barrier = False
+    
+    def set_barrier(self):
+        self._barrier = True
+    
+    def get_barrier(self):
+        return self._barrier
 
     def data(self, data=None):
         if data is not None:
@@ -132,11 +140,18 @@ def check_job_actor_in_virtual_cluster(webui_url, job_id, virtual_cluster_id):
     indirect=True,
 )
 def test_auto_parallelism(create_virtual_cluster):
+    """Tests that the parallelism can be auto-deduced by
+    data size and current virtual cluster's resources.
+    """
     _, job_client = create_virtual_cluster
     MiB = 1024 * 1024
+    # (data size, expected parallelism in each virtual cluster)
     TEST_CASES = [
-        (1024, (4, 8, 64)),  # avail_cpus * 2
-        (10 * MiB, (10, 10, 64)),  # MAX_PARALLELISM, MAX_PARALLELISM, avail_cpus * 2
+        # Should all be avail_cpus * 2
+        (1024, (4, 8, 64)),
+        # Should be MAX_PARALLELISM, MAX_PARALLELISM, avail_cpus * 2
+        # MAX_PARALLELISM = 10MB(data size) / 1MB(block size)
+        (10 * MiB, (10, 10, 64)),
     ]
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -149,6 +164,7 @@ def test_auto_parallelism(create_virtual_cluster):
             for data_size, expected_parallelism in TEST_CASES:
                 driver_script = """
 import ray
+import time
 from ray.data._internal.util import _autodetect_parallelism
 from ray.data.context import DataContext
 
@@ -172,6 +188,12 @@ final_parallelism, _, _ = _autodetect_parallelism(
     datasource_or_legacy_reader=MockReader(),
 )
 
+while(True):
+    barrier = ray.get(signal_actor.get_barrier.remote())
+    if barrier:
+        break
+    time.sleep(0.1)
+
 ray.get(signal_actor.data.remote(final_parallelism))
 ray.get(signal_actor.unready.remote())
 """
@@ -185,6 +207,9 @@ ray.get(signal_actor.unready.remote())
                 wait_for_condition(
                     lambda: ray.get(signal_actor.is_ready.remote()), timeout=40
                 )
+                # Give finish permission to the job in case it's finished
+                # before we catched the "ready" signal
+                ray.get(signal_actor.set_barrier.remote())
                 # wait for job finish
                 wait_for_condition(
                     lambda: not ray.get(signal_actor.is_ready.remote()), timeout=30
@@ -194,14 +219,13 @@ ray.get(signal_actor.unready.remote())
                 print(
                     f"Driver detected parallelism: {res}, expect[{i}]: {expected_parallelism[i]}"
                 )
-                wait_for_condition(
-                    lambda: ray.get(signal_actor.data.remote())
-                    == expected_parallelism[i],
-                    timeout=30,
-                )
+                assert res == expected_parallelism[i]
 
 
 def test_job_in_virtual_cluster(create_virtual_cluster):
+    """Tests that an e2e ray data job's actor can be restricted
+    only in the target virtual cluster
+    """
     cluster, job_client = create_virtual_cluster
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -213,7 +237,7 @@ def test_job_in_virtual_cluster(create_virtual_cluster):
             ray.get(signal_actor.is_ready.remote())
             driver_script = """
 import ray
-
+import time
 
 ray.init(address="auto")
 signal_actor = ray.get_actor("{signal_actor_name}", namespace="storage")
@@ -230,6 +254,13 @@ def flat_map_fn(row):
 
 ds = ray.data.read_csv("s3://anonymous@air-example-data/iris.csv")
 ds = ds.map(map_fn).flat_map(flat_map_fn)
+
+while(True):
+    barrier = ray.get(signal_actor.get_barrier.remote())
+    if barrier:
+        break
+    time.sleep(0.1)
+
 ray.get(signal_actor.unready.remote())
 """
             driver_script = driver_script.format(signal_actor_name=signal_actor_name)
@@ -240,6 +271,9 @@ ray.get(signal_actor.unready.remote())
             wait_for_condition(
                 lambda: ray.get(signal_actor.is_ready.remote()), timeout=40
             )
+            # Give finish permission to the job in case it's finished
+            # before we catched the "ready" signal
+            ray.get(signal_actor.set_barrier.remote())
             # wait for job finish
             wait_for_condition(
                 lambda: not ray.get(signal_actor.is_ready.remote()), timeout=40
@@ -273,8 +307,9 @@ ray.get(signal_actor.unready.remote())
     indirect=True,
 )
 def test_start_actor_timeout(create_virtual_cluster):
-    """Tests that ActorPoolMapOperator raises an exception on
-    timeout while waiting for actors."""
+    """Tests that when requesting resources that exceeding only
+    the virtual cluster but the whole cluster, will raise an exception
+    on timeout while waiting for actors."""
 
     cluster, job_client = create_virtual_cluster
 
@@ -292,6 +327,7 @@ def test_start_actor_timeout(create_virtual_cluster):
             ray.get(signal_actor.is_ready.remote())
             driver_script = """
 import ray
+import time
 from ray.exceptions import GetTimeoutError
 
 
@@ -335,6 +371,13 @@ except GetTimeoutError as e:
     result = result and True
 
 print("Final result: ", result)
+
+while(True):
+    barrier = ray.get(signal_actor.get_barrier.remote())
+    if barrier:
+        break
+    time.sleep(0.1)
+
 ray.get(signal_actor.data.remote(result))
 ray.get(signal_actor.unready.remote())
 """
@@ -351,6 +394,9 @@ ray.get(signal_actor.unready.remote())
             wait_for_condition(
                 lambda: ray.get(signal_actor.is_ready.remote()), timeout=30
             )
+            # Give finish permission to the job in case it's finished
+            # before we catched the "ready" signal
+            ray.get(signal_actor.set_barrier.remote())
             # wait for job finish
             wait_for_condition(
                 lambda: not ray.get(signal_actor.is_ready.remote()), timeout=600

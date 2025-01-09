@@ -12,23 +12,21 @@ import pytest
 import ray
 import ray.util.state
 from ray._private.internal_api import get_memory_info_reply, get_state_from_address
-from ray._private.utils import _get_pyarrow_version
 from ray._private.ray_constants import DEFAULT_DASHBOARD_AGENT_LISTEN_PORT
-from ray.job_submission import JobSubmissionClient
+from ray._private.test_utils import format_web_url, wait_until_server_available
+from ray._private.utils import _get_pyarrow_version
 from ray.air.constants import TENSOR_COLUMN_NAME
 from ray.air.util.tensor_extensions.arrow import ArrowTensorArray
 from ray.data import Schema
 from ray.data.block import BlockExecStats, BlockMetadata
 from ray.data.tests.mock_server import *  # noqa
+from ray.job_submission import JobSubmissionClient
 
 # Trigger pytest hook to automatically zip test cluster logs to archive dir on failure
 from ray.tests.conftest import *  # noqa
 from ray.tests.conftest import pytest_runtest_makereport  # noqa
 from ray.tests.conftest import _ray_start, wait_for_condition
-from ray._private.test_utils import (
-    format_web_url,
-    wait_until_server_available,
-)
+
 
 @pytest.fixture(scope="module")
 def ray_start_2_cpus_shared(request):
@@ -816,8 +814,8 @@ def create_virtual_cluster(request):
             num_cpus = node_type.split("c")[0]
             for _ in range(amount):
                 cluster.add_node(
-                    env_vars={"RAY_NODE_TYPE_NAME": node_type},
-                    num_cpus=int(num_cpus))
+                    env_vars={"RAY_NODE_TYPE_NAME": node_type}, num_cpus=int(num_cpus)
+                )
 
         for virtual_cluster_id, config in virtual_cluster.items():
             create_or_update_virtual_cluster(
@@ -832,4 +830,3 @@ def create_virtual_cluster(request):
             cluster,
             JobSubmissionClient(format_web_url(webui_url)),
         )
-

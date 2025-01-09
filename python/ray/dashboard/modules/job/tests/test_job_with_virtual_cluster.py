@@ -583,6 +583,7 @@ async def test_job_access_cluster_data(job_sdk_client):
     head_client, gcs_address, cluster = job_sdk_client
     virtual_cluster_id_prefix = "VIRTUAL_CLUSTER_"
     node_to_virtual_cluster = {}
+
     @ray.remote
     class StorageActor:
         def __init__(self):
@@ -602,7 +603,7 @@ async def test_job_access_cluster_data(job_sdk_client):
             return {
                 "driver": self._driver_info,
                 "actor": self._actor_info,
-                "normal_task": self._normal_task_info
+                "normal_task": self._normal_task_info,
             }
 
         def set_driver_info(self, key, value):
@@ -610,10 +611,9 @@ async def test_job_access_cluster_data(job_sdk_client):
 
         def set_actor_info(self, key, value):
             self._actor_info[key] = value
-        
+
         def set_normal_task_info(self, key, value):
             self._normal_task_info[key] = value
-
 
     ntemplates = 3
     for i in range(ntemplates):
@@ -733,20 +733,39 @@ ray.get(storage.set_normal_task_info.remote("available_resources", normal_task_a
             ):
                 cluster_info = ray.get(storage_actor.get_info.remote())
                 expect_nodes = ray.nodes(virtual_cluster_id)
-                expect_total_cluster_resources = ray.cluster_resources(virtual_cluster_id)
+                expect_total_cluster_resources = ray.cluster_resources(
+                    virtual_cluster_id
+                )
                 expect_available_resources = ray.available_resources(virtual_cluster_id)
-
 
                 assert len(cluster_info) > 0
                 assert cluster_info["driver"]["nodes"] == expect_nodes
-                assert cluster_info["driver"]["cluster_resources"]["CPU"] == expect_total_cluster_resources["CPU"]
-                assert cluster_info["driver"]["available_resources"]["CPU"] == expect_available_resources["CPU"]
+                assert (
+                    cluster_info["driver"]["cluster_resources"]["CPU"]
+                    == expect_total_cluster_resources["CPU"]
+                )
+                assert (
+                    cluster_info["driver"]["available_resources"]["CPU"]
+                    == expect_available_resources["CPU"]
+                )
                 assert cluster_info["actor"]["nodes"] == expect_nodes
-                assert cluster_info["actor"]["cluster_resources"]["CPU"] == expect_total_cluster_resources["CPU"]
-                assert cluster_info["actor"]["available_resources"]["CPU"] == expect_available_resources["CPU"]
+                assert (
+                    cluster_info["actor"]["cluster_resources"]["CPU"]
+                    == expect_total_cluster_resources["CPU"]
+                )
+                assert (
+                    cluster_info["actor"]["available_resources"]["CPU"]
+                    == expect_available_resources["CPU"]
+                )
                 assert cluster_info["normal_task"]["nodes"] == expect_nodes
-                assert cluster_info["normal_task"]["cluster_resources"]["CPU"] == expect_total_cluster_resources["CPU"]
-                assert cluster_info["normal_task"]["available_resources"]["CPU"] == expect_available_resources["CPU"]
+                assert (
+                    cluster_info["normal_task"]["cluster_resources"]["CPU"]
+                    == expect_total_cluster_resources["CPU"]
+                )
+                assert (
+                    cluster_info["normal_task"]["available_resources"]["CPU"]
+                    == expect_available_resources["CPU"]
+                )
 
                 for node in cluster_info["driver"]["nodes"]:
                     node_id = node["NodeID"]
@@ -854,26 +873,31 @@ async def test_list_cluster_resources(job_sdk_client):
     assert total_resources["CPU"] > 0
     for i in range(ntemplates):
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
-        virtual_cluster_resources = ray.cluster_resources(virtual_cluster_id=virtual_cluster_id_prefix + str(i))
+        virtual_cluster_resources = ray.cluster_resources(
+            virtual_cluster_id=virtual_cluster_id_prefix + str(i)
+        )
         assert int(virtual_cluster_resources["CPU"]) == 60
     assert len(ray.cluster_resources("NON_EXIST_VIRTUAL_CLUSTER")) == 0
     with pytest.raises(TypeError):
         ray.cluster_resources(1)
 
     available_resources = ray.available_resources()
-    assert len(available_resources) > 0, f"available_resources {available_resources} is empty"
+    assert (
+        len(available_resources) > 0
+    ), f"available_resources {available_resources} is empty"
     assert available_resources["CPU"] > 0
     assert available_resources["CPU"] <= total_resources["CPU"]
     assert ray.available_resources(None) == available_resources
     for i in range(ntemplates):
         virtual_cluster_id = virtual_cluster_id_prefix + str(i)
-        virtual_cluster_resources = ray.available_resources(virtual_cluster_id=virtual_cluster_id_prefix + str(i))
+        virtual_cluster_resources = ray.available_resources(
+            virtual_cluster_id=virtual_cluster_id_prefix + str(i)
+        )
         assert int(virtual_cluster_resources["CPU"]) > 0
         assert int(virtual_cluster_resources["CPU"]) < total_resources["CPU"]
     assert len(ray.available_resources("NON_EXIST_VIRTUAL_CLUSTER")) == 0
     with pytest.raises(TypeError):
         ray.available_resources(1)
-    
 
 
 if __name__ == "__main__":

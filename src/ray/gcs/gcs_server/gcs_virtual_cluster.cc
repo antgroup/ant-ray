@@ -544,6 +544,9 @@ bool IndivisibleCluster::IsUndividedNodeInstanceIdle(
 }
 
 bool IndivisibleCluster::InUse() const {
+  if (!detached_actors_.empty() || !detached_placement_groups_.empty()) {
+    return true;
+  }
   for (const auto &[template_id, job_cluster_instances] : visible_node_instances_) {
     for (const auto &[job_cluster_id, node_instances] : job_cluster_instances) {
       for (const auto &[node_instance_id, node_instance] : node_instances) {
@@ -561,29 +564,22 @@ bool IndivisibleCluster::ReplenishNodeInstances(
   return ReplenishUndividedNodeInstances(callback);
 }
 
-///////////////////////// JobCluster /////////////////////////
-void JobCluster::OnDetachedActorRegistration(const ActorID &actor_id) {
+void IndivisibleCluster::OnDetachedActorRegistration(const ActorID &actor_id) {
   detached_actors_.insert(actor_id);
 }
 
-void JobCluster::OnDetachedActorDestroy(const ActorID &actor_id) {
+void IndivisibleCluster::OnDetachedActorDestroy(const ActorID &actor_id) {
   detached_actors_.erase(actor_id);
 }
 
-void JobCluster::OnDetachedPlacementGroupRegistration(
+void IndivisibleCluster::OnDetachedPlacementGroupRegistration(
     const PlacementGroupID &placement_group_id) {
   detached_placement_groups_.insert(placement_group_id);
 }
 
-void JobCluster::OnDetachedPlacementGroupDestroy(
+void IndivisibleCluster::OnDetachedPlacementGroupDestroy(
     const PlacementGroupID &placement_group_id) {
   detached_placement_groups_.erase(placement_group_id);
-}
-
-bool JobCluster::InUse() const {
-  // TODO(xsuler) this should consider normal task if job cluster
-  // is removed asynchronously.
-  return !detached_actors_.empty() || !detached_placement_groups_.empty();
 }
 
 ///////////////////////// PrimaryCluster /////////////////////////
@@ -1054,6 +1050,33 @@ void PrimaryCluster::ReplenishAllClusterNodeInstances() {
   if (ReplenishNodeInstances(node_instance_replenish_callback)) {
     // Primary cluster proto data need not to flush.
   }
+}
+
+void PrimaryCluster::GCExpiredJobClusters() {
+  RAY_LOG(INFO) << "Start GC expired job clusters...";
+  size_t total_expired_job_clusters = 0;
+  auto gc_job_cluster = [&total_expired_job_clusters](
+                            const std::shared_ptr<DivisibleCluster> &divisible_cluster) {
+    std::vector<std::string> expired_job_clusters;
+    divisible_cluster->ForeachJobCluster(
+        [&expired_job_clusters, &total_expired_job_clusters](auto &job_cluster) {
+          if (!job_cluster->InUse() && job_cluster->IsFinished()) {
+            expired_job_clusters.emplace_back(job_cluster->GetID());
+            total_expired_job_clusters++;
+          }
+        });
+    for (auto &job_cluster_id : expired_job_clusters) {
+      divisible_cluster->RemoveJobCluster(job_cluster_id, nullptr);
+    }
+  };
+
+  gc_job_cluster(std::dynamic_pointer_cast<DivisibleCluster>(shared_from_this()));
+
+  for (auto &[_, logical_cluster] : logical_clusters_) {
+    gc_job_cluster(std::dynamic_pointer_cast<DivisibleCluster>(logical_cluster));
+  }
+  RAY_LOG(INFO) << "Finished GC expired job clusters, total expired job clusters: "
+                << total_expired_job_clusters;
 }
 
 }  // namespace gcs

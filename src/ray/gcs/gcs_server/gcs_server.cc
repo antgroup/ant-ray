@@ -79,7 +79,8 @@ GcsServer::GcsServer(const ray::gcs::GcsServerConfig &config,
     break;
   case StorageType::REDIS_PERSIST: {
     auto redis_client = CreateRedisClient(io_context);
-    gcs_table_storage_ = std::make_unique<gcs::RedisGcsTableStorage>(redis_client);
+    gcs_table_storage_ =
+        std::make_unique<gcs::RedisGcsTableStorage>(redis_client, io_context);
     // Init redis failure detector.
     gcs_redis_failure_detector_ =
         std::make_unique<GcsRedisFailureDetector>(io_context, redis_client, []() {
@@ -134,15 +135,16 @@ void GcsServer::Start() {
   // it can be used to retrieve the cluster ID.
   InitKVManager();
   gcs_init_data->AsyncLoad([this, gcs_init_data] {
-    GetOrGenerateClusterId([this, gcs_init_data](ClusterID cluster_id) {
-      rpc_server_.SetClusterId(cluster_id);
-      DoStart(*gcs_init_data);
-    });
+    GetOrGenerateClusterId({[this, gcs_init_data](ClusterID cluster_id) {
+                              rpc_server_.SetClusterId(cluster_id);
+                              DoStart(*gcs_init_data);
+                            },
+                            io_context_provider_.GetDefaultIOContext()});
   });
 }
 
 void GcsServer::GetOrGenerateClusterId(
-    std::function<void(ClusterID cluster_id)> &&continuation) {
+    Postable<void(ClusterID cluster_id)> continuation) {
   static std::string const kTokenNamespace = "cluster";
   kv_manager_->GetInstance().Get(
       kTokenNamespace,
@@ -161,12 +163,14 @@ void GcsServer::GetOrGenerateClusterId(
               [cluster_id,
                continuation = std::move(continuation)](bool added_entry) mutable {
                 RAY_CHECK(added_entry) << "Failed to persist new cluster ID!";
-                continuation(cluster_id);
+                std::move(continuation)
+                    .Post("GcsServer.GetOrGenerateClusterId.continuation", cluster_id);
               });
         } else {
           ClusterID cluster_id = ClusterID::FromBinary(provided_cluster_id.value());
           RAY_LOG(INFO) << "Found existing server token: " << cluster_id;
-          continuation(cluster_id);
+          std::move(continuation)
+              .Post("GcsServer.GetOrGenerateClusterId.continuation", cluster_id);
         }
       });
 }
@@ -507,6 +511,25 @@ void GcsServer::InitGcsActorManager(const GcsInitData &gcs_init_data) {
 
   // Initialize by gcs tables data.
   gcs_actor_manager_->Initialize(gcs_init_data);
+  // Add event listeners
+  gcs_actor_manager_->AddActorRegistrationListener(
+      [this](const std::shared_ptr<GcsActor> &actor) {
+        if (gcs_virtual_cluster_manager_ != nullptr) {
+          if (actor->IsDetached()) {
+            gcs_virtual_cluster_manager_->OnDetachedActorRegistration(
+                actor->GetVirtualClusterID(), actor->GetActorID());
+          }
+        }
+      });
+  gcs_actor_manager_->AddActorDestroyListener(
+      [this](const std::shared_ptr<GcsActor> &actor) {
+        if (gcs_virtual_cluster_manager_ != nullptr) {
+          if (actor->IsDetached()) {
+            gcs_virtual_cluster_manager_->OnDetachedActorDestroy(
+                actor->GetVirtualClusterID(), actor->GetActorID());
+          }
+        }
+      });
   // Register service.
   actor_info_service_ = std::make_unique<rpc::ActorInfoGrpcService>(
       io_context_provider_.GetDefaultIOContext(), *gcs_actor_manager_);
@@ -532,6 +555,27 @@ void GcsServer::InitGcsPlacementGroupManager(const GcsInitData &gcs_init_data) {
       });
   // Initialize by gcs tables data.
   gcs_placement_group_manager_->Initialize(gcs_init_data);
+  // Add event listeners
+  gcs_placement_group_manager_->AddPlacementGroupRegistrationListener(
+      [this](const std::shared_ptr<GcsPlacementGroup> &placement_group) {
+        if (gcs_virtual_cluster_manager_ != nullptr) {
+          if (placement_group->IsDetached()) {
+            gcs_virtual_cluster_manager_->OnDetachedPlacementGroupRegistration(
+                placement_group->GetVirtualClusterID(),
+                placement_group->GetPlacementGroupID());
+          }
+        }
+      });
+  gcs_placement_group_manager_->AddPlacementGroupDestroyListener(
+      [this](const std::shared_ptr<GcsPlacementGroup> &placement_group) {
+        if (gcs_virtual_cluster_manager_ != nullptr) {
+          if (placement_group->IsDetached()) {
+            gcs_virtual_cluster_manager_->OnDetachedPlacementGroupDestroy(
+                placement_group->GetVirtualClusterID(),
+                placement_group->GetPlacementGroupID());
+          }
+        }
+      });
   // Register service.
   placement_group_info_service_.reset(new rpc::PlacementGroupInfoGrpcService(
       io_context_provider_.GetDefaultIOContext(), *gcs_placement_group_manager_));
@@ -591,12 +635,12 @@ void GcsServer::InitKVManager() {
   switch (storage_type_) {
   case (StorageType::REDIS_PERSIST):
     instance = std::make_unique<StoreClientInternalKV>(
-        std::make_unique<RedisStoreClient>(CreateRedisClient(io_context)));
+        std::make_unique<RedisStoreClient>(CreateRedisClient(io_context)), io_context);
     break;
   case (StorageType::IN_MEMORY):
-    instance =
-        std::make_unique<StoreClientInternalKV>(std::make_unique<ObservableStoreClient>(
-            std::make_unique<InMemoryStoreClient>(io_context)));
+    instance = std::make_unique<StoreClientInternalKV>(
+        std::make_unique<ObservableStoreClient>(std::make_unique<InMemoryStoreClient>()),
+        io_context);
     break;
   default:
     RAY_LOG(FATAL) << "Unexpected storage type! " << storage_type_;

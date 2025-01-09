@@ -49,6 +49,14 @@ struct NodeInstance {
     return node_instance;
   }
 
+  std::shared_ptr<rpc::NodeInstanceView> ToView() const {
+    auto node_view = std::make_shared<rpc::NodeInstanceView>();
+    node_view->set_template_id(template_id_);
+    node_view->set_hostname(hostname_);
+    node_view->set_is_dead(is_dead_);
+    return node_view;
+  }
+
   std::string DebugString() const {
     std::ostringstream stream;
     stream << "NodeInstance(" << node_instance_id_ << "," << hostname_ << ","
@@ -63,7 +71,7 @@ struct NodeInstance {
   bool is_dead_ = false;
 };
 
-static const std::string kEmptyJobClusterId = "NIL";
+static const std::string kUndividedClusterId = "NIL";
 
 /// <template_id, _>
 ///               |
@@ -86,6 +94,9 @@ using RemoveVirtualClusterCallback = CreateOrUpdateVirtualClusterCallback;
 
 using VirtualClustersDataVisitCallback =
     std::function<void(std::shared_ptr<rpc::VirtualClusterTableData>)>;
+
+using VirtualClustersViewVisitCallback =
+    std::function<void(std::shared_ptr<rpc::VirtualClusterView>)>;
 
 using AsyncClusterDataFlusher = std::function<Status(
     std::shared_ptr<rpc::VirtualClusterTableData>, CreateOrUpdateVirtualClusterCallback)>;
@@ -116,7 +127,7 @@ ReplicaInstances toReplicaInstances(const T &node_instances) {
     auto inst = std::make_shared<NodeInstance>(id);
     inst->set_hostname(node_instance.hostname());
     inst->set_template_id(node_instance.template_id());
-    result[node_instance.template_id()][kEmptyJobClusterId].emplace(id, std::move(inst));
+    result[node_instance.template_id()][kUndividedClusterId].emplace(id, std::move(inst));
   }
   return result;
 }
@@ -161,7 +172,7 @@ class VirtualCluster {
   void UpdateNodeInstances(ReplicaInstances replica_instances_to_add,
                            ReplicaInstances replica_instances_to_remove);
 
-  /// Lookup node instances from queue of kEmptyJobClusterId in `visible_node_instances_`
+  /// Lookup undivided node instances from `visible_node_instances_`
   /// based on the desired final replica sets and node_instance_filter.
   ///
   /// \param replica_sets The demand final replica sets.
@@ -169,9 +180,9 @@ class VirtualCluster {
   /// node instances.
   /// \param node_instance_filter The filter to check if the node instance is desired.
   /// \return True if the lookup is successful, otherwise return an error.
-  bool LookupNodeInstances(const ReplicaSets &replica_sets,
-                           ReplicaInstances &replica_instances,
-                           NodeInstanceFilter node_instance_filter) const;
+  bool LookupUndividedNodeInstances(const ReplicaSets &replica_sets,
+                                    ReplicaInstances &replica_instances,
+                                    NodeInstanceFilter node_instance_filter) const;
 
   /// Mark the node instance as dead.
   ///
@@ -203,6 +214,11 @@ class VirtualCluster {
   /// \return A shared pointer to the proto data.
   std::shared_ptr<rpc::VirtualClusterTableData> ToProto() const;
 
+  /// Convert the virtual cluster to view which usually is used for displaying
+  /// to client
+  /// \return A shared pointer to the view.
+  std::shared_ptr<rpc::VirtualClusterView> ToView() const;
+
   /// Get the debug string of the virtual cluster.
   virtual std::string DebugString() const;
 
@@ -211,19 +227,26 @@ class VirtualCluster {
   ///
   /// \param node_instance The node instance to be checked.
   /// \return True if the node instance is idle, false otherwise.
-  virtual bool IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const = 0;
+  virtual bool IsUndividedNodeInstanceIdle(
+      const gcs::NodeInstance &node_instance) const = 0;
 
   /// Replenish the node instances of the virtual cluster.
   ///
   /// \param callback The callback to replenish the dead node instances.
   /// \return True if any dead node instances are replenished, false otherwise.
-  virtual bool ReplenishNodeInstances(const NodeInstanceReplenishCallback &callback);
+  virtual bool ReplenishNodeInstances(const NodeInstanceReplenishCallback &callback) = 0;
+
+  /// Replenish the undivided node instances of the virtual cluster.
+  ///
+  /// \param callback The callback to replenish the dead node instances.
+  /// \return True if any dead node instances are replenished, false otherwise.
+  bool ReplenishUndividedNodeInstances(const NodeInstanceReplenishCallback &callback);
 
   /// Replenish a node instance.
   ///
   /// \param node_instance_to_replenish The node instance to replenish.
   /// \return True if the node instances is replenished, false otherwise.
-  std::shared_ptr<NodeInstance> ReplenishNodeInstance(
+  std::shared_ptr<NodeInstance> ReplenishUndividedNodeInstance(
       std::shared_ptr<NodeInstance> node_instance_to_replenish);
 
  protected:
@@ -243,9 +266,12 @@ class VirtualCluster {
   ReplicaInstances visible_node_instances_;
   /// Replica sets to express the visible node instances.
   ReplicaSets replica_sets_;
-  // Version number of the last modification to the cluster.
+  /// Version number of the last modification to the cluster.
   uint64_t revision_{0};
-
+  /// The mapping from node instance id to `NodeInstance` instance.
+  /// `node_instances_map_` and `visible_node_instances_` are two views of the same node
+  /// instance.
+  absl::flat_hash_map<std::string, std::shared_ptr<NodeInstance>> node_instances_map_;
   const ClusterResourceManager &cluster_resource_manager_;
 };
 
@@ -316,7 +342,7 @@ class DivisibleCluster : public VirtualCluster {
   ///
   /// \param node_instance The node instance to be checked.
   /// \return True if the node instance is idle, false otherwise.
-  bool IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const override;
+  bool IsUndividedNodeInstanceIdle(const gcs::NodeInstance &node_instance) const override;
 
   /// Replenish the node instances of the virtual cluster.
   ///
@@ -359,12 +385,48 @@ class IndivisibleCluster : public VirtualCluster {
   ///
   /// \param node_instance The node instance to be checked.
   /// \return True if the node instance is idle, false otherwise.
-  bool IsIdleNodeInstance(const gcs::NodeInstance &node_instance) const override;
+  bool IsUndividedNodeInstanceIdle(const gcs::NodeInstance &node_instance) const override;
+
+  /// Replenish the node instances of the virtual cluster.
+  ///
+  /// \param callback The callback to replenish the dead node instances.
+  /// \return True if any dead node instances are replenished, false otherwise.
+  bool ReplenishNodeInstances(const NodeInstanceReplenishCallback &callback) override;
+
+  /// Handle detached actor registration.
+  void OnDetachedActorRegistration(const ActorID &actor_id);
+
+  /// Handle detached actor destroy.
+  void OnDetachedActorDestroy(const ActorID &actor_id);
+
+  /// Handle detached placement group registration.
+  void OnDetachedPlacementGroupRegistration(const PlacementGroupID &placement_group_id);
+
+  /// Handle detached placement group destroy.
+  void OnDetachedPlacementGroupDestroy(const PlacementGroupID &placement_group_id);
+
+ private:
+  // The references of detached actors
+  absl::flat_hash_set<ActorID> detached_actors_;
+  // The references of detached placement groups
+  absl::flat_hash_set<PlacementGroupID> detached_placement_groups_;
 };
 
 class JobCluster : public IndivisibleCluster {
  public:
   using IndivisibleCluster::IndivisibleCluster;
+
+  /// Set Job as dead
+  void SetJobDead() { job_dead = true; }
+
+  /// Check if job is dead
+  ///
+  /// \return True if the job is dead, false otherwise.
+  bool IsJobDead() const { return job_dead; }
+
+ private:
+  // If the job is dead
+  bool job_dead = false;
 };
 
 class PrimaryCluster : public DivisibleCluster,
@@ -453,6 +515,13 @@ class PrimaryCluster : public DivisibleCluster,
   void ForeachVirtualClustersData(rpc::GetVirtualClustersRequest request,
                                   VirtualClustersDataVisitCallback callback);
 
+  /// Iterate virtual clusters view matching the request.
+  ///
+  /// \param request The request to get the virtual clusters view.
+  /// \param callback The callback to visit each virtual cluster view.
+  void ForeachVirtualClustersView(rpc::GetAllVirtualClusterInfoRequest request,
+                                  VirtualClustersViewVisitCallback callback) const;
+
   /// Handle the node added event.
   ///
   /// \param node The node that is added.
@@ -465,6 +534,9 @@ class PrimaryCluster : public DivisibleCluster,
 
   /// Replenish dead node instances of all the virtual clusters.
   void ReplenishAllClusterNodeInstances();
+
+  /// Garbage collect expired job clusters.
+  void GCExpiredJobClusters();
 
  protected:
   /// Handle the node dead event.

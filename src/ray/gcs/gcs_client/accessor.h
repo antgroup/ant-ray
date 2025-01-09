@@ -382,6 +382,16 @@ class NodeInfoAccessor {
   virtual Status AsyncGetAll(const MultiItemCallback<rpc::GcsNodeInfo> &callback,
                              int64_t timeout_ms);
 
+  /// Get information of all nodes from GCS asynchronously.
+  ///
+  /// \param virtual_cluster_id The ID of the virtual cluster to look up in GCS.
+  /// \param callback Callback that will be called after lookup finishes.
+  /// \return Status
+  virtual Status AsyncGetByVirtualClusterID(
+      const std::optional<std::string> &virtual_cluster_id,
+      const MultiItemCallback<rpc::GcsNodeInfo> &callback,
+      int64_t timeout_ms);
+
   /// Subscribe to node addition and removal events from GCS and cache those information.
   ///
   /// \param subscribe Callback that will be called if a node is
@@ -501,6 +511,7 @@ class NodeResourceInfoAccessor {
   /// \param callback Callback that will be called after lookup finishes.
   /// \return Status
   virtual Status AsyncGetAllAvailableResources(
+      const std::optional<std::string> &virtual_cluster_id,
       const MultiItemCallback<rpc::AvailableResources> &callback);
 
   /// Get total resources of all nodes from GCS asynchronously.
@@ -508,6 +519,7 @@ class NodeResourceInfoAccessor {
   /// \param callback Callback that will be called after lookup finishes.
   /// \return Status
   virtual Status AsyncGetAllTotalResources(
+      const std::optional<std::string> &virtual_cluster_id,
       const MultiItemCallback<rpc::TotalResources> &callback);
 
   /// Get draining nodes from GCS asynchronously.
@@ -1028,6 +1040,13 @@ class VirtualClusterInfoAccessor {
   virtual Status AsyncSubscribeAll(
       const SubscribeCallback<VirtualClusterID, rpc::VirtualClusterTableData> &subscribe,
       const StatusCallback &done);
+
+  /// Reestablish subscription.
+  /// This should be called when GCS server restarts from a failure.
+  /// PubSub server restart will cause GCS server restart. In this case, we need to
+  /// resubscribe from PubSub server, otherwise we only need to fetch data from GCS
+  /// server.
+  virtual void AsyncResubscribe();
 
  private:
   /// Save the fetch data operation in this function, so we can call it again when GCS

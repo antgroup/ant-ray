@@ -229,6 +229,7 @@ message GetAllNodeInfoRequest {
     optional bytes node_id = 1;
     optional GcsNodeInfo.GcsNodeState state = 2;
     optional string node_name = 3;
+    optional string virtual_cluster_id = 4;
   }
 
   // Maximum number to return.
@@ -270,14 +271,18 @@ message DeleteResourcesReply {
   GcsStatus status = 1;
 }
 
-message GetAllAvailableResourcesRequest {}
+message GetAllAvailableResourcesRequest {
+  string virtual_cluster_id = 1;
+}
 
 message GetAllAvailableResourcesReply {
   GcsStatus status = 1;
   repeated AvailableResources resources_list = 2;
 }
 
-message GetAllTotalResourcesRequest {}
+message GetAllTotalResourcesRequest {
+  string virtual_cluster_id = 1;
+}
 
 message GetAllTotalResourcesReply {
   GcsStatus status = 1;
@@ -895,6 +900,40 @@ message RemoveVirtualClusterReply {
   GcsStatus status = 1;
 }
 
+message NodeInstanceView {
+  // The Hostname address of the node instance.
+  string hostname = 1;
+  // The template id of the node instance.
+  string template_id = 2;
+  // Whether the node is dead
+  bool is_dead = 3;
+}
+
+message VirtualClusterView {
+  // The virtual cluster id.
+  string id = 1;
+  // Whether the virtual cluster can splite into many child virtual clusters or not.
+  bool divisible = 2;
+  // Mapping from node id to it's instance.
+  map<string, NodeInstanceView> node_instance_views = 3;
+  // Version number of the last modification to the virtual cluster.
+  uint64 revision = 4;
+}
+
+message GetAllVirtualClusterInfoRequest {
+  // Maximum number to return.
+  // If set, the exact `limit` returned do not have any ordering or selection
+  // guarantee.
+  optional int64 limit = 1;
+}
+
+message GetAllVirtualClusterInfoReply {
+  GcsStatus status = 1;
+  repeated VirtualClusterView virtual_clusters_view = 2;
+  // Length of the corresponding resource without truncation.
+  int64 total = 3;
+}
+
 message GetVirtualClustersRequest {
   // ID of the virtual cluster to get.
   // It will reply all clusters data if virtual_cluster_id is empty.
@@ -934,9 +973,13 @@ service VirtualClusterInfoGcsService {
   rpc CreateOrUpdateVirtualCluster(CreateOrUpdateVirtualClusterRequest)
       returns (CreateOrUpdateVirtualClusterReply);
   // Remove a virtual cluster.
-  rpc RemoveVirtualCluster(RemoveVirtualClusterRequest) returns (RemoveVirtualClusterReply);
+  rpc RemoveVirtualCluster(RemoveVirtualClusterRequest)
+      returns (RemoveVirtualClusterReply);
   // Get virtual clusters.
   rpc GetVirtualClusters(GetVirtualClustersRequest) returns (GetVirtualClustersReply);
   // Create job cluster.
   rpc CreateJobCluster(CreateJobClusterRequest) returns (CreateJobClusterReply);
+  // Get all virtual clusters info for display.
+  rpc GetAllVirtualClusterInfo(GetAllVirtualClusterInfoRequest)
+      returns (GetAllVirtualClusterInfoReply);
 }

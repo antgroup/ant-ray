@@ -1,23 +1,20 @@
 import asyncio
-import dataclasses
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import fields
-from datetime import datetime
 from itertools import islice
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import ray.dashboard.memory_utils as memory_utils
 from ray._private.profiling import chrome_tracing_dump
 from ray._private.ray_constants import env_integer
 from ray._private.utils import get_or_create_event_loop
+from ray.dashboard.state_api_utils import do_filter
 from ray.dashboard.utils import compose_state_message
 from ray.runtime_env import RuntimeEnv
 from ray.util.state.common import (
     RAY_MAX_LIMIT_FROM_API_SERVER,
     ActorState,
     ActorSummaries,
-    ClusterEventState,
     JobState,
     ListApiOptions,
     ListApiResponse,
@@ -25,22 +22,18 @@ from ray.util.state.common import (
     ObjectState,
     ObjectSummaries,
     PlacementGroupState,
-    PredicateType,
     RuntimeEnvState,
-    StateSchema,
     StateSummary,
     SummaryApiOptions,
     SummaryApiResponse,
-    SupportedFilterType,
     TaskState,
     TaskSummaries,
+    VirtualClusterState,
     WorkerState,
-    filter_fields,
     protobuf_message_to_dict,
     protobuf_to_task_state_dict,
 )
 from ray.util.state.state_manager import DataSourceUnavailable, StateDataSourceClient
-from ray.util.state.util import convert_string_to_type
 
 logger = logging.getLogger(__name__)
 
@@ -62,76 +55,6 @@ NODE_QUERY_FAILURE_WARNING = (
 )
 
 
-def _convert_filters_type(
-    filter: List[Tuple[str, PredicateType, SupportedFilterType]],
-    schema: StateSchema,
-) -> List[Tuple[str, PredicateType, SupportedFilterType]]:
-    """Convert the given filter's type to SupportedFilterType.
-
-    This method is necessary because click can only accept a single type
-    for its tuple (which is string in this case).
-
-    Args:
-        filter: A list of filter which is a tuple of (key, val).
-        schema: The state schema. It is used to infer the type of the column for filter.
-
-    Returns:
-        A new list of filters with correct types that match the schema.
-    """
-    new_filter = []
-    if dataclasses.is_dataclass(schema):
-        schema = {field.name: field.type for field in fields(schema)}
-    else:
-        schema = schema.schema_dict()
-
-    for col, predicate, val in filter:
-        if col in schema:
-            column_type = schema[col]
-            try:
-                isinstance(val, column_type)
-            except TypeError:
-                # Calling `isinstance` to the Literal type raises a TypeError.
-                # Ignore this case.
-                pass
-            else:
-                if isinstance(val, column_type):
-                    # Do nothing.
-                    pass
-                elif column_type is int or column_type == "integer":
-                    try:
-                        val = convert_string_to_type(val, int)
-                    except ValueError:
-                        raise ValueError(
-                            f"Invalid filter `--filter {col} {val}` for a int type "
-                            "column. Please provide an integer filter "
-                            f"`--filter {col} [int]`"
-                        )
-                elif column_type is float or column_type == "number":
-                    try:
-                        val = convert_string_to_type(
-                            val,
-                            float,
-                        )
-                    except ValueError:
-                        raise ValueError(
-                            f"Invalid filter `--filter {col} {val}` for a float "
-                            "type column. Please provide an integer filter "
-                            f"`--filter {col} [float]`"
-                        )
-                elif column_type is bool or column_type == "boolean":
-                    try:
-                        val = convert_string_to_type(val, bool)
-                    except ValueError:
-                        raise ValueError(
-                            f"Invalid filter `--filter {col} {val}` for a boolean "
-                            "type column. Please provide "
-                            f"`--filter {col} [True|true|1]` for True or "
-                            f"`--filter {col} [False|false|0]` for False."
-                        )
-        new_filter.append((col, predicate, val))
-    return new_filter
-
-
 # TODO(sang): Move the class to state/state_manager.py.
 # TODO(sang): Remove *State and replaces with Pydantic or protobuf.
 # (depending on API interface standardization).
@@ -151,82 +74,6 @@ class StateAPIManager:
     @property
     def data_source_client(self):
         return self._client
-
-    def _filter(
-        self,
-        data: List[dict],
-        filters: List[Tuple[str, PredicateType, SupportedFilterType]],
-        state_dataclass: StateSchema,
-        detail: bool,
-    ) -> List[dict]:
-        """Return the filtered data given filters.
-
-        Args:
-            data: A list of state data.
-            filters: A list of KV tuple to filter data (key, val). The data is filtered
-                if data[key] != val.
-            state_dataclass: The state schema.
-
-        Returns:
-            A list of filtered state data in dictionary. Each state data's
-            unnecessary columns are filtered by the given state_dataclass schema.
-        """
-        filters = _convert_filters_type(filters, state_dataclass)
-        result = []
-        for datum in data:
-            match = True
-            for filter_column, filter_predicate, filter_value in filters:
-                filterable_columns = state_dataclass.filterable_columns()
-                filter_column = filter_column.lower()
-                if filter_column not in filterable_columns:
-                    raise ValueError(
-                        f"The given filter column {filter_column} is not supported. "
-                        "Enter filters with –-filter key=value "
-                        "or –-filter key!=value "
-                        f"Supported filter columns: {filterable_columns}"
-                    )
-
-                if filter_column not in datum:
-                    match = False
-                elif filter_predicate == "=":
-                    if isinstance(filter_value, str) and isinstance(
-                        datum[filter_column], str
-                    ):
-                        # Case insensitive match for string filter values.
-                        match = datum[filter_column].lower() == filter_value.lower()
-                    elif isinstance(filter_value, str) and isinstance(
-                        datum[filter_column], bool
-                    ):
-                        match = datum[filter_column] == convert_string_to_type(
-                            filter_value, bool
-                        )
-                    elif isinstance(filter_value, str) and isinstance(
-                        datum[filter_column], int
-                    ):
-                        match = datum[filter_column] == convert_string_to_type(
-                            filter_value, int
-                        )
-                    else:
-                        match = datum[filter_column] == filter_value
-                elif filter_predicate == "!=":
-                    if isinstance(filter_value, str) and isinstance(
-                        datum[filter_column], str
-                    ):
-                        match = datum[filter_column].lower() != filter_value.lower()
-                    else:
-                        match = datum[filter_column] != filter_value
-                else:
-                    raise ValueError(
-                        f"Unsupported filter predicate {filter_predicate} is given. "
-                        "Available predicates: =, !=."
-                    )
-
-                if not match:
-                    break
-
-            if match:
-                result.append(filter_fields(datum, state_dataclass, detail))
-        return result
 
     async def list_actors(self, *, option: ListApiOptions) -> ListApiResponse:
         """List all actor information from the cluster.
@@ -259,7 +106,7 @@ class StateAPIManager:
                 result.append(data)
 
             num_after_truncation = len(result) + reply.num_filtered
-            result = self._filter(result, option.filters, ActorState, option.detail)
+            result = do_filter(result, option.filters, ActorState, option.detail)
             num_filtered = len(result)
 
             # Sort to make the output deterministic.
@@ -304,7 +151,7 @@ class StateAPIManager:
                 result.append(data)
             num_after_truncation = len(result)
 
-            result = self._filter(
+            result = do_filter(
                 result, option.filters, PlacementGroupState, option.detail
             )
             num_filtered = len(result)
@@ -353,7 +200,7 @@ class StateAPIManager:
                 result.append(data)
 
             num_after_truncation = len(result) + reply.num_filtered
-            result = self._filter(result, option.filters, NodeState, option.detail)
+            result = do_filter(result, option.filters, NodeState, option.detail)
             num_filtered = len(result)
 
             # Sort to make the output deterministic.
@@ -402,7 +249,7 @@ class StateAPIManager:
                 result.append(data)
 
             num_after_truncation = len(result) + reply.num_filtered
-            result = self._filter(result, option.filters, WorkerState, option.detail)
+            result = do_filter(result, option.filters, WorkerState, option.detail)
             num_filtered = len(result)
             # Sort to make the output deterministic.
             result.sort(key=lambda entry: entry["worker_id"])
@@ -427,7 +274,7 @@ class StateAPIManager:
         def transform(reply) -> ListApiResponse:
             result = [job.dict() for job in reply]
             total = len(result)
-            result = self._filter(result, option.filters, JobState, option.detail)
+            result = do_filter(result, option.filters, JobState, option.detail)
             num_filtered = len(result)
             result.sort(key=lambda entry: entry["job_id"] or "")
             result = list(islice(result, option.limit))
@@ -474,7 +321,7 @@ class StateAPIManager:
 
             # Only certain filters are done on GCS, so here the filter function is still
             # needed to apply all the filters
-            result = self._filter(result, option.filters, TaskState, option.detail)
+            result = do_filter(result, option.filters, TaskState, option.detail)
             num_filtered = len(result)
 
             result.sort(key=lambda entry: entry["task_id"])
@@ -586,7 +433,7 @@ class StateAPIManager:
                 )
 
             num_after_truncation = len(result)
-            result = self._filter(result, option.filters, ObjectState, option.detail)
+            result = do_filter(result, option.filters, ObjectState, option.detail)
             num_filtered = len(result)
             # Sort to make the output deterministic.
             result.sort(key=lambda entry: entry["object_id"])
@@ -602,6 +449,121 @@ class StateAPIManager:
 
         return await get_or_create_event_loop().run_in_executor(
             self._thread_pool_executor, transform, replies
+        )
+
+    async def list_vclusters(self, *, option: ListApiOptions) -> ListApiResponse:
+        """List all virtrual cluster information from the cluster.
+
+        Returns:
+            {virtual_cluster_id -> virtual_cluster_data_in_dict}
+            virtual_cluster_data_in_dict's schema is in VirtualClusterState
+        """
+        try:
+            reply = await self._client.get_all_virtual_cluster_info(
+                timeout=option.timeout, filters=option.filters
+            )
+        except DataSourceUnavailable:
+            raise DataSourceUnavailable(GCS_QUERY_FAILURE_WARNING)
+
+        def transform(reply) -> ListApiResponse:
+            result = []
+            for message in reply.virtual_clusters_view:
+                data = protobuf_message_to_dict(
+                    message=message,
+                    fields_to_decode=[],
+                )
+                result.append(data)
+
+            entries = {}
+            for entry in result:
+                entry = {
+                    "virtual_cluster_id": entry["id"],
+                    "divided_clusters": [],
+                    "divisible": entry["divisible"],
+                    "replica_sets": {},
+                    "undivided_replica_sets": {},
+                    "visible_node_instances": entry.get("node_instance_views", {}),
+                    "undivided_nodes": {},
+                }
+                entries[entry["virtual_cluster_id"]] = entry
+
+            primary_cluster = entries["kPrimaryClusterID"]
+
+            all_nodes = {}
+            cluster_nodes = {}
+            for id, entry in entries.items():
+                cluster_nodes[id] = set()
+                if id != "kPrimaryClusterID":
+                    primary_cluster["divided_clusters"].append(id)
+                elif "##" in id:
+                    parent_cluster_id = id.split("##")[0]
+                    entries[parent_cluster_id]["divided_clusters"].append(id)
+                all_nodes.update(entry["visible_node_instances"])
+
+            # update cluster nodes to calculate template ids
+            for id, entry in entries.items():
+                for sub_cluster_id in entry["divided_clusters"]:
+                    cluster_nodes[id].update(
+                        entries[sub_cluster_id]["visible_node_instances"].keys()
+                    )
+                cluster_nodes[id].update(entry["visible_node_instances"].keys())
+
+            # calculate template ids
+            for id, entry in entries.items():
+                for node_id in cluster_nodes[id]:
+                    node = all_nodes[node_id]
+                    if not node["is_dead"]:
+                        entry["replica_sets"][node["template_id"]] = (
+                            entry["replica_sets"].get(node["template_id"], 0) + 1
+                        )
+
+            def collect_all_sub_nodes(virtual_cluster_id):
+                ret = set()
+                entry = entries[virtual_cluster_id]
+                for sub_cluster_id in entry["divided_clusters"]:
+                    ret.update(collect_all_sub_nodes(sub_cluster_id))
+                ret.update(entry["visible_node_instances"].keys())
+                return ret
+
+            for id, entry in entries.items():
+                divided_nodes = set()
+                for sub_cluster_id in entry["divided_clusters"]:
+                    divided_nodes.update(collect_all_sub_nodes(sub_cluster_id))
+                undivided_nodes = {}
+                for node_id, node in entry["visible_node_instances"].items():
+                    if node_id not in divided_nodes:
+                        undivided_nodes[node_id] = node
+                        if not node["is_dead"]:
+                            entry["undivided_replica_sets"][node["template_id"]] = (
+                                entry["undivided_replica_sets"].get(
+                                    node["template_id"], 0
+                                )
+                                + 1
+                            )
+                entry["undivided_nodes"] = undivided_nodes
+
+            result = list(entries.values())
+
+            num_after_truncation = len(result)
+            result = do_filter(
+                result, option.filters, VirtualClusterState, option.detail
+            )
+            num_filtered = len(result)
+
+            # Sort to make the output deterministic.
+            result.sort(key=lambda entry: entry["virtual_cluster_id"])
+
+            result = list(islice(result, option.limit))
+
+            return ListApiResponse(
+                result=result,
+                total=reply.total,
+                num_after_truncation=num_after_truncation,
+                num_filtered=num_filtered,
+            )
+
+        return await get_or_create_event_loop().run_in_executor(
+            self._thread_pool_executor, transform, reply
         )
 
     async def list_runtime_envs(self, *, option: ListApiOptions) -> ListApiResponse:
@@ -661,9 +623,7 @@ class StateAPIManager:
                     f"The returned data may contain incomplete result. {warning_msg}"
                 )
             num_after_truncation = len(result)
-            result = self._filter(
-                result, option.filters, RuntimeEnvState, option.detail
-            )
+            result = do_filter(result, option.filters, RuntimeEnvState, option.detail)
             num_filtered = len(result)
 
             # Sort to make the output deterministic.
@@ -690,43 +650,6 @@ class StateAPIManager:
 
         return await get_or_create_event_loop().run_in_executor(
             self._thread_pool_executor, transform, replies
-        )
-
-    async def list_cluster_events(self, *, option: ListApiOptions) -> ListApiResponse:
-        """List all cluster events from the cluster.
-
-        Returns:
-            A list of cluster events in the cluster.
-            The schema of returned "dict" is equivalent to the
-            `ClusterEventState` protobuf message.
-        """
-        reply = await self._client.get_all_cluster_events()
-
-        def transform(reply) -> ListApiResponse:
-            result = []
-            for _, events in reply.items():
-                for _, event in events.items():
-                    event["time"] = str(datetime.fromtimestamp(int(event["timestamp"])))
-                    result.append(event)
-
-            num_after_truncation = len(result)
-            result.sort(key=lambda entry: entry["timestamp"])
-            total = len(result)
-            result = self._filter(
-                result, option.filters, ClusterEventState, option.detail
-            )
-            num_filtered = len(result)
-            # Sort to make the output deterministic.
-            result = list(islice(result, option.limit))
-            return ListApiResponse(
-                result=result,
-                total=total,
-                num_after_truncation=num_after_truncation,
-                num_filtered=num_filtered,
-            )
-
-        return await get_or_create_event_loop().run_in_executor(
-            self._thread_pool_executor, transform, reply
         )
 
     async def summarize_tasks(self, option: SummaryApiOptions) -> SummaryApiResponse:

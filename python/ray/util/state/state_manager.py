@@ -29,6 +29,8 @@ from ray.core.generated.gcs_service_pb2 import (
     GetAllWorkerInfoRequest,
     GetTaskEventsReply,
     GetTaskEventsRequest,
+    GetAllVirtualClusterInfoRequest,
+    GetAllVirtualClusterInfoReply,
 )
 from ray.core.generated.node_manager_pb2 import (
     GetObjectsInfoReply,
@@ -47,11 +49,9 @@ from ray.core.generated.runtime_env_agent_pb2 import (
     GetRuntimeEnvsInfoReply,
     GetRuntimeEnvsInfoRequest,
 )
-from ray.dashboard.datacenter import DataSource
 from ray.dashboard.modules.job.common import JobInfoStorageClient
 from ray.dashboard.modules.job.pydantic_models import JobDetails, JobType
 from ray.dashboard.modules.job.utils import get_driver_jobs
-from ray.dashboard.utils import Dict as Dictionary
 from ray.util.state.common import (
     RAY_MAX_LIMIT_FROM_DATA_SOURCE,
     PredicateType,
@@ -179,6 +179,9 @@ class StateDataSourceClient:
         )
         self._gcs_task_info_stub = gcs_service_pb2_grpc.TaskInfoGcsServiceStub(
             gcs_channel
+        )
+        self._gcs_virtual_cluster_info_stub = (
+            gcs_service_pb2_grpc.VirtualClusterInfoGcsServiceStub(gcs_channel)
         )
 
     def register_raylet_client(
@@ -382,6 +385,8 @@ class StateDataSourceClient:
                 req_filters.state = GcsNodeInfo.GcsNodeState.Value(value)
             elif key == "node_name":
                 req_filters.node_name = value
+            elif key == "virtual_cluster_id":
+                req_filters.virtual_cluster_id = value
             else:
                 continue
 
@@ -448,9 +453,6 @@ class StateDataSourceClient:
 
         return list(driver_jobs.values()) + submission_jobs
 
-    async def get_all_cluster_events(self) -> Dictionary:
-        return DataSource.events
-
     @handle_grpc_network_errors
     async def get_task_info(
         self,
@@ -482,6 +484,19 @@ class StateDataSourceClient:
         reply = await stub.GetObjectsInfo(
             GetObjectsInfoRequest(limit=limit),
             timeout=timeout,
+        )
+        return reply
+
+    @handle_grpc_network_errors
+    async def get_all_virtual_cluster_info(
+        self,
+        timeout: int = None,
+        limit: int = RAY_MAX_LIMIT_FROM_DATA_SOURCE,
+        filters: Optional[List[Tuple[str, PredicateType, SupportedFilterType]]] = None,
+    ) -> Optional[GetAllVirtualClusterInfoReply]:
+        request = GetAllVirtualClusterInfoRequest(limit=limit)
+        reply = await self._gcs_virtual_cluster_info_stub.GetAllVirtualClusterInfo(
+            request, timeout=timeout
         )
         return reply
 

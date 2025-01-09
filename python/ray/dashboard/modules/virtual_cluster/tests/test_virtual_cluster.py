@@ -609,3 +609,7 @@ time.sleep(600)
             os.remove(file_path)
         if temp_dir:
             os.rmdir(temp_dir)
+
+
+if __name__ == "__main__":
+    pass

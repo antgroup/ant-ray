@@ -92,7 +92,7 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
       };
   fetch_all_data_operation_ = [this, updated_subscribe](const StatusCallback &done) {
     auto callback =
-        [this, updated_subscribe, done](
+        [this, subscribe, updated_subscribe, done](
             const Status &status,
             std::vector<rpc::VirtualClusterTableData> &&virtual_cluster_info_list) {
           absl::flat_hash_set<VirtualClusterID> virtual_cluster_id_set;
@@ -109,9 +109,10 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
             // clusters) in the past. So we have to explicitely notify the subscriber to
             // clean its local cache.
             if (!virtual_cluster_id_set.contains(curr_iter->first)) {
-              auto virtual_cluster_data = curr_iter->second;
+              auto virtual_cluster_data = std::move(curr_iter->second);
               virtual_cluster_data.set_is_removed(true);
-              updated_subscribe(curr_iter->first, std::move(virtual_cluster_data));
+              subscribe(curr_iter->first, std::move(virtual_cluster_data));
+              virtual_clusters_.erase(curr_iter);
             }
           }
           if (done) {

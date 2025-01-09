@@ -54,7 +54,7 @@ class VirtualClusterManager {
   std::string local_node_instance_id_;
   std::function<void()> local_node_cleanup_fn_;
   /// The (indivisible) virtual cluster to which the local node belongs.
-  std::string virtual_cluster_id_;
+  std::string local_virtual_cluster_id_;
 };
 
 }  // namespace raylet

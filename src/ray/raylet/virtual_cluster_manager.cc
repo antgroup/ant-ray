@@ -29,44 +29,37 @@ bool VirtualClusterManager::UpdateVirtualCluster(
     return false;
   }
 
-  const auto &virtual_cluster_id = virtual_cluster_data.id();
-  auto it = virtual_clusters_.find(virtual_cluster_id);
-  if (it == virtual_clusters_.end()) {
-    // Clean up the pending and running tasks at the local node. Make sure
-    // no leftover tasks moving to the new virtual cluster (it is a no-op in most cases).
-    if (virtual_cluster_data.node_instances().contains(local_node_instance_id_)) {
-      virtual_cluster_id_ = virtual_cluster_id;
-      local_node_cleanup_fn_();
-    }
-    virtual_clusters_[virtual_cluster_id] = std::move(virtual_cluster_data);
-  } else {
-    if (virtual_cluster_data.is_removed()) {
+  // The virtual cluster id of the input data.
+  const auto &input_virtual_cluster_id = virtual_cluster_data.id();
+
+  if (virtual_cluster_data.is_removed()) {
+    if (virtual_cluster_id_ == input_virtual_cluster_id) {
+      virtual_cluster_id_.clear();
       // The virtual cluster is removed, we have to clean up
       // the local tasks (it is a no-op in most cases).
-      if (virtual_cluster_id_ == virtual_cluster_id) {
-        virtual_cluster_id_.clear();
-        local_node_cleanup_fn_();
-      }
-      virtual_clusters_.erase(it);
-      return true;
+      local_node_cleanup_fn_();
     }
+    virtual_clusters_.erase(input_virtual_cluster_id);
+  } else {
+    // Whether the local node in the input data.
+    bool local_node_in_data =
+        virtual_cluster_data.node_instances().contains(local_node_instance_id_);
 
-    if (it->second.node_instances().contains(local_node_instance_id_) &&
-        !virtual_cluster_data.node_instances().contains(local_node_instance_id_)) {
+    // The local node is removed from its current virtual cluster.
+    if (virtual_cluster_id_ == input_virtual_cluster_id && !local_node_in_data) {
       virtual_cluster_id_.clear();
-      // If local node is removed from a virtual cluster, we have to clean up
-      // the local tasks (it is a no-op in most cases).
+      // Clean up the local tasks (it is a no-op in most cases).
       local_node_cleanup_fn_();
-    } else if (!it->second.node_instances().contains(local_node_instance_id_) &&
-               virtual_cluster_data.node_instances().contains(local_node_instance_id_)) {
-      virtual_cluster_id_ = virtual_cluster_id;
-      // If the pub message (removing the local node from a virtual cluster) was lost
-      // (miss the chance to clean up the local node), we have to clean up when adding the
-      // local node to a virtual cluster (it is a no-op in most cases).
+    } else if (virtual_cluster_id_ != input_virtual_cluster_id &&
+               local_node_in_data) {  // The local node is added to a new virtual cluster.
+      virtual_cluster_id_ = input_virtual_cluster_id;
+      // There are chances that the pub message (removing the local node from a virtual
+      // cluster) was lost in the past, so we also have to clean up when adding the local
+      // node to a new virtual cluster (it is a no-op in most cases).
       local_node_cleanup_fn_();
     }
 
-    it->second = std::move(virtual_cluster_data);
+    virtual_clusters_[input_virtual_cluster_id] = std::move(virtual_cluster_data);
   }
   return true;
 }

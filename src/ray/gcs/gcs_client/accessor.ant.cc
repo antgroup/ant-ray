@@ -72,22 +72,20 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
   const auto updated_subscribe =
       [this, subscribe](const VirtualClusterID &virtual_cluster_id,
                         rpc::VirtualClusterTableData &&virtual_cluster_data) {
-        if (virtual_cluster_revisions_.contains(virtual_cluster_id)) {
-          if (virtual_cluster_data.revision() <
-              virtual_cluster_revisions_[virtual_cluster_id]) {
+        auto iter = virtual_clusters_.find(virtual_cluster_id);
+        if (iter != virtual_clusters_.end()) {
+          if (virtual_cluster_data.revision() < iter->second.revision()) {
             RAY_LOG(WARNING) << "The revision of the received virtual cluster ("
                              << virtual_cluster_id << ") is outdated. Ignore it.";
             return;
           }
           if (virtual_cluster_data.is_removed()) {
-            virtual_cluster_revisions_.erase(virtual_cluster_id);
+            virtual_clusters_.erase(iter);
           } else {
-            virtual_cluster_revisions_[virtual_cluster_id] =
-                virtual_cluster_data.revision();
+            iter->second = virtual_cluster_data;
           }
         } else {
-          virtual_cluster_revisions_[virtual_cluster_id] =
-              virtual_cluster_data.revision();
+          virtual_clusters_[virtual_cluster_id] = virtual_cluster_data;
         }
 
         subscribe(virtual_cluster_id, std::move(virtual_cluster_data));
@@ -97,21 +95,24 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
         [this, updated_subscribe, done](
             const Status &status,
             std::vector<rpc::VirtualClusterTableData> &&virtual_cluster_info_list) {
-          auto virtual_cluster_revisions_copy = virtual_cluster_revisions_;
+          absl::flat_hash_set<VirtualClusterID> virtual_cluster_id_set;
           for (auto &virtual_cluster_info : virtual_cluster_info_list) {
             auto virtual_cluster_id =
                 VirtualClusterID::FromBinary(virtual_cluster_info.id());
             updated_subscribe(virtual_cluster_id, std::move(virtual_cluster_info));
-            virtual_cluster_revisions_copy.erase(virtual_cluster_id);
+            virtual_cluster_id_set.emplace(virtual_cluster_id);
           }
-          for (const auto &[virtual_cluster_id, _] : virtual_cluster_revisions_copy) {
-            // If there is any left data in `virtual_cluster_revisions_copy`, it means the
-            // local node may miss the pub messages (when gcs removed virtual clusters) in
-            // the past. So we have to mock a `virtual_cluster_table_data` (specifying
-            // removed) and notify the subscriber to clean its local cache.
-            rpc::VirtualClusterTableData virtual_cluster_table_data;
-            virtual_cluster_table_data.set_is_removed(true);
-            updated_subscribe(virtual_cluster_id, std::move(virtual_cluster_table_data));
+          for (auto iter = virtual_clusters_.begin(); iter != virtual_clusters_.end();) {
+            auto curr_iter = iter++;
+            // If there is any virtual cluster not in `virtual_cluster_id_set`, it means
+            // the local node may miss the pub messages (when gcs removed virtual
+            // clusters) in the past. So we have to explicitely notify the subscriber to
+            // clean its local cache.
+            if (!virtual_cluster_id_set.contains(curr_iter->first)) {
+              auto virtual_cluster_data = curr_iter->second;
+              virtual_cluster_data.set_is_removed(true);
+              updated_subscribe(curr_iter->first, std::move(virtual_cluster_data));
+            }
           }
           if (done) {
             done(status);

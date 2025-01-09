@@ -254,8 +254,8 @@ void GcsVirtualClusterManager::HandleGetAllVirtualClusterInfo(
   size_t total = 0;
 
   primary_cluster_->ForeachVirtualClustersView(
-      std::move(request), [reply,send_reply_callback, limit, &count, &total](auto data) {
-        total+=1;
+      std::move(request), [reply, send_reply_callback, limit, &count, &total](auto data) {
+        total += 1;
         if (count >= limit) {
           return;
         }

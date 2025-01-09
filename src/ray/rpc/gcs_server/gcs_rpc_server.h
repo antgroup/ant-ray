@@ -739,8 +739,8 @@ class VirtualClusterInfoGcsServiceHandler {
                                       SendReplyCallback send_reply_callback) = 0;
 
   virtual void HandleGetAllVirtualClusterInfo(GetAllVirtualClusterInfoRequest request,
-                                        GetAllVirtualClusterInfoReply *reply,
-                                        SendReplyCallback send_reply_callback) = 0;
+                                              GetAllVirtualClusterInfoReply *reply,
+                                              SendReplyCallback send_reply_callback) = 0;
 };
 
 class VirtualClusterInfoGrpcService : public GrpcService {

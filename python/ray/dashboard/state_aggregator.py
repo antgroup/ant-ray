@@ -482,7 +482,7 @@ class StateAPIManager:
                     "divisible": entry["divisible"],
                     "replica_sets": {},
                     "undivided_replica_sets": {},
-                    "visible_node_instances": entry.get("node_views", {}),
+                    "visible_node_instances": entry.get("node_instance_views", {}),
                     "undivided_nodes": {},
                 }
                 entries[entry["virtual_cluster_id"]] = entry

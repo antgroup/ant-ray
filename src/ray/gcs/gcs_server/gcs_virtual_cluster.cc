@@ -321,13 +321,12 @@ std::shared_ptr<rpc::VirtualClusterView> VirtualCluster::ToView() const {
   for (auto &[template_id, job_node_instances] : visible_node_instances_) {
     for (auto &[job_cluster_id, node_instances] : job_node_instances) {
       for (auto &[id, node_instance] : node_instances) {
-        (*data->mutable_node_views())[id] = std::move(*node_instance->ToView());
+        (*data->mutable_node_instance_views())[id] = std::move(*node_instance->ToView());
       }
     }
   }
   return data;
 }
-
 
 std::string VirtualCluster::DebugString() const {
   int indent = 2;
@@ -1056,7 +1055,8 @@ void PrimaryCluster::ForeachVirtualClustersData(
 }
 
 void PrimaryCluster::ForeachVirtualClustersView(
-    rpc::GetAllVirtualClusterInfoRequest request, VirtualClustersViewVisitCallback callback) {
+    rpc::GetAllVirtualClusterInfoRequest request,
+    VirtualClustersViewVisitCallback callback) const {
   std::vector<std::shared_ptr<rpc::VirtualClusterView>> virtual_cluster_view_list;
 
   auto visit_view_data = [&](const VirtualCluster *cluster) {

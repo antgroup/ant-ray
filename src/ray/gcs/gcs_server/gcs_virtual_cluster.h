@@ -49,8 +49,8 @@ struct NodeInstance {
     return node_instance;
   }
 
-  std::shared_ptr<rpc::NodeView> ToView() const {
-    auto node_view = std::make_shared<rpc::NodeView>();
+  std::shared_ptr<rpc::NodeInstanceView> ToView() const {
+    auto node_view = std::make_shared<rpc::NodeInstanceView>();
     node_view->set_template_id(template_id_);
     node_view->set_hostname(hostname_);
     node_view->set_is_dead(is_dead_);
@@ -523,8 +523,7 @@ class PrimaryCluster : public DivisibleCluster,
   /// \param request The request to get the virtual clusters view.
   /// \param callback The callback to visit each virtual cluster view.
   void ForeachVirtualClustersView(rpc::GetAllVirtualClusterInfoRequest request,
-                                  VirtualClustersViewVisitCallback callback);
-
+                                  VirtualClustersViewVisitCallback callback) const;
 
   /// Handle the node added event.
   ///

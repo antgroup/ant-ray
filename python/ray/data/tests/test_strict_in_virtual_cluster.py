@@ -90,6 +90,7 @@ def get_job_actors(webui_url, job_id=None):
     result = resp.json()
     assert result["result"] is True, resp.text
     actors = result["data"]["actors"]
+    print(f"Fetched {job_id} actors: {actors}")
     if job_id is not None:
         final_actors = {}
         for actor_id, info in actors.items():
@@ -239,7 +240,106 @@ ray.get(signal_actor.unready.remote())
             # time.sleep(600)
             check_job_actor_in_virtual_cluster(
                 cluster.webui_url, job_id, f"VIRTUAL_CLUSTER_{i}")
-            
+
+
+@pytest.mark.parametrize('create_virtual_cluster', [{
+    'node_instances': [("2c4g", 1), ("8c16g", 1)],
+    'virtual_cluster': {
+        "VIRTUAL_CLUSTER_0": {
+            "allocation_mode": "mixed",
+            "replica_sets": {
+                "2c4g": 1,
+            },
+        },
+        "VIRTUAL_CLUSTER_1": {
+            "allocation_mode": "mixed",
+            "replica_sets": {
+                "8c16g": 1,
+            },
+        },
+    }
+}], indirect=True)
+def test_start_actor_timeout(create_virtual_cluster):
+    """Tests that ActorPoolMapOperator raises an exception on
+    timeout while waiting for actors."""
+
+    cluster, job_client = create_virtual_cluster
+
+    # achievable & unachievable cpu requirements
+    TEST_CASES = [
+        (1, 4),  # for virtual cluster 0
+        (6, 36),  # for virtual cluster 1
+    ]
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        for i in range(1):  # 2 virtual clusters in total
+            signal_actor_name = f"storage_actor_{i}"
+            signal_actor = JobSignalActor.options(
+                name=signal_actor_name, namespace="storage", num_cpus=0
+            ).remote()
+            ray.get(signal_actor.is_ready.remote())
+            driver_script = """
+import ray
+from ray.exceptions import GetTimeoutError
+
+
+class UDFClass:
+    def __call__(self, x):
+        return x
+
+ray.init(address="auto")
+signal_actor = ray.get_actor("{signal_actor_name}", namespace="storage")
+ray.get(signal_actor.ready.remote())
+ray.data.DataContext.get_current().wait_for_min_actors_s = 10
+result = False
+# Specify an unachievable resource requirement to ensure
+# we timeout while waiting for actors.
+
+achievable_cpus = {achievable_cpus}
+unachievable_cpus = {unachievable_cpus}
+print("Requesting achievable_cpus: ", achievable_cpus)
+try:
+    ray.data.range(10).map_batches(
+        UDFClass,
+        batch_size=1,
+        compute=ray.data.ActorPoolStrategy(size=1),
+        num_cpus=achievable_cpus,
+    ).take_all()
+    result = True
+except GetTimeoutError as e:
+    print("This shouldn't happen")
+    result = False
+
+print("Requesting unachievable_cpus: ", unachievable_cpus)
+try:
+    ray.data.range(10).map_batches(
+        UDFClass,
+        batch_size=1,
+        compute=ray.data.ActorPoolStrategy(size=1),
+        num_cpus=unachievable_cpus,
+    ).take_all()
+    result = False
+except GetTimeoutError as e:
+    result = result and True
+
+print("Final result: ", result)
+ray.get(signal_actor.data.remote(result))
+ray.get(signal_actor.unready.remote())
+"""
+            driver_script = driver_script.format(
+                signal_actor_name=signal_actor_name,
+                achievable_cpus=TEST_CASES[i][0],
+                unachievable_cpus=TEST_CASES[i][1])
+        
+            submit_job_to_virtual_cluster(job_client, tmp_dir, driver_script, f"VIRTUAL_CLUSTER_{i}")
+            # wait for job running
+            wait_for_condition(
+                lambda: ray.get(signal_actor.is_ready.remote()), timeout=30
+            )
+            # wait for job finish
+            wait_for_condition(
+                lambda: not ray.get(signal_actor.is_ready.remote()), timeout=600
+            )
+            assert ray.get(signal_actor.data.remote())
 
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__]))

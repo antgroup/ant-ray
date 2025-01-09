@@ -880,7 +880,7 @@ async def test_list_cluster_resources(job_sdk_client):
     "job_sdk_client",
     [
         {
-            "ntemplates": 1,
+            "ntemplates": 2,
         },
     ],
     indirect=True,
@@ -895,6 +895,13 @@ async def test_detached_job_cluster(job_sdk_client):
         {TEMPLATE_ID_PREFIX + str(0): 2},
         True,
     )
+    await create_virtual_cluster(
+        gcs_address,
+        virtual_cluster_id + "_indivisible",
+        {TEMPLATE_ID_PREFIX + str(1): 2},
+        True,
+    )
+
     actor_name = "test_actor"
     pg_name = "test_pg"
     with tempfile.TemporaryDirectory() as tmp_dir:

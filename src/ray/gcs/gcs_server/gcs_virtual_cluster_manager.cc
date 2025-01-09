@@ -34,7 +34,7 @@ void GcsVirtualClusterManager::Initialize(const GcsInitData &gcs_init_data) {
     // clusters.
     periodical_runner_->RunFnPeriodically(
         [this]() { primary_cluster_->GCExpiredJobClusters(); },
-        RayConfig::instance().gc_expired_job_clusters_interval_ms(),
+        RayConfig::instance().expired_job_clusters_gc_interval_ms(),
         "GCExpiredJobClusters");
   }
   const auto &actor_task_specs = gcs_init_data.ActorTaskSpecs();
@@ -65,7 +65,7 @@ void GcsVirtualClusterManager::Initialize(const GcsInitData &gcs_init_data) {
         continue;
       }
       JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
-      job_cluster->SetFinished();
+      job_cluster->SetJobDead();
     }
   }
   for (auto &[placement_group_id, placement_group_table_data] :
@@ -125,7 +125,7 @@ void GcsVirtualClusterManager::OnJobFinished(const rpc::JobTableData &job_data) 
     return;
   }
   JobCluster *job_cluster = dynamic_cast<JobCluster *>(job_virtual_cluster.get());
-  job_cluster->SetFinished();
+  job_cluster->SetJobDead();
   if (job_cluster->InUse()) {
     // job cluster is detached, do not remove it
     RAY_LOG(INFO) << "Failed to remove job cluster " << job_cluster_id.Binary()
@@ -461,7 +461,7 @@ void GcsVirtualClusterManager::OnDetachedActorDestroy(
   }
   if (VirtualClusterID::FromBinary(virtual_cluster_id).IsJobClusterID()) {
     JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
-    if (!job_cluster->InUse() && job_cluster->IsFinished()) {
+    if (!job_cluster->InUse() && job_cluster->IsJobDead()) {
       auto status = primary_cluster_->RemoveVirtualCluster(virtual_cluster_id, nullptr);
       if (!status.ok()) {
         RAY_LOG(WARNING) << "Failed to remove virtual cluster " << virtual_cluster_id
@@ -504,7 +504,7 @@ void GcsVirtualClusterManager::OnDetachedPlacementGroupDestroy(
   }
   if (VirtualClusterID::FromBinary(virtual_cluster_id).IsJobClusterID()) {
     JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
-    if (!job_cluster->InUse() && job_cluster->IsFinished()) {
+    if (!job_cluster->InUse() && job_cluster->IsJobDead()) {
       auto status = primary_cluster_->RemoveVirtualCluster(virtual_cluster_id, nullptr);
       if (!status.ok()) {
         RAY_LOG(WARNING)

@@ -400,17 +400,17 @@ class JobCluster : public IndivisibleCluster {
  public:
   using IndivisibleCluster::IndivisibleCluster;
 
-  /// Set Job as Finished
-  void SetFinished() { finished = true; }
+  /// Set Job as dead
+  void SetJobDead() { job_dead = true; }
 
-  /// Check if job is finished
+  /// Check if job is dead
   ///
-  /// \return True if the job is finished, false otherwise.
-  bool IsFinished() const { return finished; }
+  /// \return True if the job is dead, false otherwise.
+  bool IsJobDead() const { return job_dead; }
 
  private:
-  // If the job is finished
-  bool finished = false;
+  // If the job is dead
+  bool job_dead = false;
 };
 
 class PrimaryCluster : public DivisibleCluster,

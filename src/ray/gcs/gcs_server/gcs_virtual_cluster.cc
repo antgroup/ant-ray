@@ -1071,20 +1071,26 @@ void PrimaryCluster::GCExpiredJobClusters() {
     std::vector<std::string> expired_job_clusters;
     divisible_cluster->ForeachJobCluster(
         [&expired_job_clusters, &total_expired_job_clusters](auto &job_cluster) {
-          if (!job_cluster->InUse() && job_cluster->IsFinished()) {
+          if (!job_cluster->InUse() && job_cluster->IsJobDead()) {
             expired_job_clusters.emplace_back(job_cluster->GetID());
             total_expired_job_clusters++;
           }
         });
     for (auto &job_cluster_id : expired_job_clusters) {
-      divisible_cluster->RemoveJobCluster(job_cluster_id, nullptr);
+      auto status = divisible_cluster->RemoveJobCluster(job_cluster_id, nullptr);
+      if (!status.ok()) {
+        RAY_LOG(ERROR) << "Failed to remove job cluster when gc expired job cluster: "
+                       << job_cluster_id << ", error: " << status.message();
+      }
     }
   };
 
   gc_job_cluster(std::dynamic_pointer_cast<DivisibleCluster>(shared_from_this()));
 
   for (auto &[_, logical_cluster] : logical_clusters_) {
-    gc_job_cluster(std::dynamic_pointer_cast<DivisibleCluster>(logical_cluster));
+    if (logical_cluster->Divisible()) {
+      gc_job_cluster(std::dynamic_pointer_cast<DivisibleCluster>(logical_cluster));
+    }
   }
   RAY_LOG(INFO) << "Finished GC expired job clusters, total expired job clusters: "
                 << total_expired_job_clusters;

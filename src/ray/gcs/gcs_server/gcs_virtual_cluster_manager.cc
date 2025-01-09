@@ -138,9 +138,9 @@ void GcsVirtualClusterManager::OnJobFinished(const rpc::JobTableData &job_data) 
 
   auto status = divisible_cluster->RemoveJobCluster(
       virtual_cluster_id,
-      [this, job_cluster_id](const Status &status,
-                             std::shared_ptr<rpc::VirtualClusterTableData> data,
-                             const ReplicaSets *replica_sets_to_recommend) {
+      [job_cluster_id](const Status &status,
+                       std::shared_ptr<rpc::VirtualClusterTableData> data,
+                       const ReplicaSets *replica_sets_to_recommend) {
         if (!status.ok() || !data->is_removed()) {
           RAY_LOG(WARNING) << "Failed to remove job cluster " << job_cluster_id.Binary()
                            << " when handling job finished event. status: "
@@ -462,7 +462,12 @@ void GcsVirtualClusterManager::OnDetachedActorDestroy(
   if (VirtualClusterID::FromBinary(virtual_cluster_id).IsJobClusterID()) {
     JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
     if (!job_cluster->InUse() && job_cluster->IsFinished()) {
-      primary_cluster_->RemoveVirtualCluster(virtual_cluster_id, nullptr);
+      auto status = primary_cluster_->RemoveVirtualCluster(virtual_cluster_id, nullptr);
+      if (!status.ok()) {
+        RAY_LOG(WARNING) << "Failed to remove virtual cluster " << virtual_cluster_id
+                         << " after handling detached actor destroy event. status: "
+                         << status.message();
+      }
     }
   }
 }
@@ -500,7 +505,13 @@ void GcsVirtualClusterManager::OnDetachedPlacementGroupDestroy(
   if (VirtualClusterID::FromBinary(virtual_cluster_id).IsJobClusterID()) {
     JobCluster *job_cluster = dynamic_cast<JobCluster *>(virtual_cluster.get());
     if (!job_cluster->InUse() && job_cluster->IsFinished()) {
-      primary_cluster_->RemoveVirtualCluster(virtual_cluster_id, nullptr);
+      auto status = primary_cluster_->RemoveVirtualCluster(virtual_cluster_id, nullptr);
+      if (!status.ok()) {
+        RAY_LOG(WARNING)
+            << "Failed to remove virtual cluster " << virtual_cluster_id
+            << " after handling detached placement group destroy event. status: "
+            << status.message();
+      }
     }
   }
 }

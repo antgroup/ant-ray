@@ -14,6 +14,7 @@ from ray._private.test_utils import (
     wait_for_condition,
     wait_until_server_available,
 )
+from ray._private.ray_constants import DEFAULT_DASHBOARD_AGENT_LISTEN_PORT
 from ray.cluster_utils import Cluster
 from ray.dashboard.tests.conftest import *  # noqa
 from ray.job_submission import JobStatus, JobSubmissionClient
@@ -475,12 +476,16 @@ def test_cleanup_tasks_after_removing_node_instance(
     disable_aiohttp_cache, ray_start_cluster_head
 ):
     cluster: Cluster = ray_start_cluster_head
-    assert wait_until_server_available(cluster.webui_url) is True
+    ip, _ = cluster.webui_url.split(":")
+    agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
+    assert wait_until_server_available(agent_address)
+    assert wait_until_server_available(cluster.webui_url)
     webui_url = cluster.webui_url
     webui_url = format_web_url(webui_url)
 
     # Add one 4c8g node to the primary cluster.
     cluster.add_node(env_vars={"RAY_NODE_TYPE_NAME": "4c8g"}, num_cpus=4)
+    cluster.wait_for_nodes()
 
     # Create a virtual cluster with one 4c8g node.
     result = create_or_update_virtual_cluster(

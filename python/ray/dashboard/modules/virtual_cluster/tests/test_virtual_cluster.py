@@ -467,6 +467,7 @@ def test_get_virtual_clusters(disable_aiohttp_cache, ray_start_cluster_head):
                 "gcs_actor_scheduling_enabled": False,
                 # Make the resource_view sync message lag.
                 "raylet_report_resources_period_milliseconds": 30000,
+                "local_node_cleanup_delay_interval_ms": 10,
             },
         }
     ],

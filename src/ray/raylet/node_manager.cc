@@ -416,65 +416,17 @@ NodeManager::NodeManager(
   mutable_object_provider_ = std::make_unique<core::experimental::MutableObjectProvider>(
       *store_client_, absl::bind_front(&NodeManager::CreateRayletClient, this), nullptr);
 
-  virtual_cluster_manager_ = std::make_shared<
-      VirtualClusterManager>(self_node_id_, /*local_node_cleanup_fn=*/[this]() {
-    auto timer = std::make_shared<boost::asio::deadline_timer>(
-        io_service_,
-        boost::posix_time::milliseconds(
-            RayConfig::instance().local_node_cleanup_delay_interval_ms()));
-    timer->async_wait([this, timer](const boost::system::error_code e) mutable {
-      const auto &local_virtual_cluster_id =
-          virtual_cluster_manager_->GetLocalVirtualClusterID();
-      bool skip_actor = RayConfig::instance().gcs_actor_scheduling_enabled();
-      auto predicate = [&local_virtual_cluster_id,
-                        skip_actor](const std::shared_ptr<internal::Work> &work) {
-        if (skip_actor && work->task.GetTaskSpecification().IsActorCreationTask()) {
-          return false;
-        }
-        if (work->task.GetTaskSpecification()
-                .GetSchedulingStrategy()
-                .virtual_cluster_id() != local_virtual_cluster_id) {
-          return true;
-        }
-        return false;
-      };
-      auto tasks_canceled = cluster_task_manager_->CancelTasks(
-          predicate,
-          rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
-          "The node is removed from a virtual cluster.");
-      if (tasks_canceled) {
-        RAY_LOG(INFO) << "Tasks are cleaned up from cluster_task_manager because the "
-                         "node is removed from virtual cluster.";
-      }
-      tasks_canceled = local_task_manager_->CancelTasks(
-          predicate,
-          rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
-          "The node is removed from a virtual cluster.");
-      if (tasks_canceled) {
-        RAY_LOG(INFO) << "Tasks are cleaned up from local_task_manager because the "
-                         "node is removed from virtual cluster.";
-      }
-      if (!cluster_resource_scheduler_->GetLocalResourceManager().IsLocalNodeIdle()) {
-        for (auto iter = leased_workers_.begin(); iter != leased_workers_.end();) {
-          auto curr_iter = iter++;
-          auto worker = curr_iter->second;
-          const auto &task_spec = worker->GetAssignedTask().GetTaskSpecification();
-          if (skip_actor && task_spec.IsActorCreationTask()) {
-            continue;
-          }
-          if (task_spec.GetSchedulingStrategy().virtual_cluster_id() !=
-              local_virtual_cluster_id) {
-            RAY_LOG(INFO).WithField(worker->WorkerId())
-                << "Worker is cleaned because the node is removed from virtual cluster.";
-            DestroyWorker(
-                worker,
-                rpc::WorkerExitType::INTENDED_SYSTEM_EXIT,
-                "Worker is cleaned because the node is removed from virtual cluster.");
-          }
-        }
-      }
-    });
-  });
+  virtual_cluster_manager_ = std::make_shared<VirtualClusterManager>(
+      self_node_id_, /*local_node_cleanup_fn=*/[this]() {
+        auto timer = std::make_shared<boost::asio::deadline_timer>(
+            io_service_,
+            boost::posix_time::milliseconds(
+                RayConfig::instance().local_node_cleanup_delay_interval_ms()));
+        timer->async_wait([this, timer](const boost::system::error_code e) mutable {
+          CancelMismatchedLocalTasks(
+              virtual_cluster_manager_->GetLocalVirtualClusterID());
+        });
+      });
 }
 
 std::shared_ptr<raylet::RayletClient> NodeManager::CreateRayletClient(

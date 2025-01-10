@@ -8,13 +8,13 @@ import pytest
 import requests
 
 import ray
+from ray._private.ray_constants import DEFAULT_DASHBOARD_AGENT_LISTEN_PORT
 from ray._private.test_utils import (
     format_web_url,
     get_resource_usage,
     wait_for_condition,
     wait_until_server_available,
 )
-from ray._private.ray_constants import DEFAULT_DASHBOARD_AGENT_LISTEN_PORT
 from ray.cluster_utils import Cluster
 from ray.dashboard.tests.conftest import *  # noqa
 from ray.job_submission import JobStatus, JobSubmissionClient

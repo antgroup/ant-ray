@@ -35,10 +35,18 @@ jobs:
           package-dir: ./python
           output-dir: ./python/dist
 
+      - name: Build doc
+        run: |
+          pushd doc
+          pip install -r requirements-doc.txt
+          make develop && open _build/html/index.html
+
       - uses: actions/upload-artifact@v4
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./python/dist/*.whl
+          path: |
+            ./python/dist/*.whl
+            ./doc/_build/html
 
   upload_pypi:
     needs: [build_wheels]

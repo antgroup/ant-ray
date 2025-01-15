@@ -29,13 +29,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_BEFORE_BUILD_LINUX: yum -y update && yum -y install npm && pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh && pushd python/ray/dashboard/client && npm ci && npm run build && popd
-          CIBW_BUILD: |
-            cp39-manylinux_x86_64
-            cp39-manylinux_aarch64
-            cp310-manylinux_x86_64
-            cp310-manylinux_aarch64
-            cp311-manylinux_x86_64
-            cp311-manylinux_aarch64
+          CIBW_BUILD: cp39-manylinux_x86_64
           CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly
         with:
           package-dir: ./python

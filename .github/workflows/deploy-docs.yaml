@@ -38,9 +38,18 @@ jobs:
       - name: Build documentation
         run: make develop
 
+      - name: Get branch name
+        id: get-branch
+        run: echo "branch=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p ../deploy/${{ steps.get-branch.outputs.branch }}
+          rsync -av _build/html/ ../deploy/${{ steps.get-branch.outputs.branch }}/
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: doc/_build/html/
-          keep_files: false
+          publish_dir: ../deploy
+          keep_files: true

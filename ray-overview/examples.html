@@ -1,0 +1,848 @@
+<!-- prettier-ignore -->
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Ray Examples &#8212; Ray 3.0.0.dev0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/termynal.css?v=2fc3cb5e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/csat.css?v=c8f39c76" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/assistant.css?v=d345c55e" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/examples.css?v=48711256" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=2df59da5" />
+    <link rel="stylesheet" type="text/css" href="../_static/docsearch.css?v=45fb5152" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydata-docsearch-custom.css?v=7fb92720" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
+
+    <script src="../_static/documentation_options.js?v=d1493c90"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=9a29e97e"></script>
+    <script defer="defer" src="../_static/js/termynal.js?v=67cfcf08"></script>
+    <script defer="defer" src="../_static/js/custom.js?v=9e3b357f"></script>
+    <script src="../_static/js/csat.js?v=8e649b1c"></script>
+    <script defer="defer" src="../_static/js/assistant.js?v=73fdc522"></script>
+    <script defer="defer" src="../_static/docsearch.js?v=77274085"></script>
+    <script defer="defer" src="../_static/docsearch_config.js?v=d25523ed"></script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/js/examples.js?v=5ec37523"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'ray-overview/examples';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://docs.ray.io/en/master/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'master';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="canonical" href="https://docs.ray.io/en/latest/ray-overview/examples.html" />
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="next" title="The Ray Ecosystem" href="ray-libraries.html" />
+    <link rel="prev" title="Ray for ML Infrastructure" href="../ray-air/getting-started.html" /><!-- Extra header to include at the top of each template.
+Kept separately so that it can easily be included in any templates
+that need to be overridden for individual pages; e.g. included
+both in the usual template (layout.html) as well as (index.html). -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;900&family=Roboto:wght@400;500;700&display=swap"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  title="light"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+  disabled="disabled"
+/>
+<link
+  rel="stylesheet"
+  title="dark"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+  disabled="disabled"
+/>
+<link
+  href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css"
+  rel="stylesheet"
+/>
+
+<!-- Used for text embedded in html on the index page  -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<!-- Parser used to call hljs on responses from Ray Assistant -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- Sanitizer for Ray Assistant AI -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
+
+<!-- Fathom - beautiful, simple website analytics -->
+<script src="https://deer.ray.io/script.js" data-site="WYYANYOS" defer></script>
+<!-- / Fathom -->
+
+<!-- Google Tag Manager -->
+<script>
+  (function (w, d, s, l, i) {
+    w[l] = w[l] || [];
+    w[l].push({
+      'gtm.start': new Date().getTime(),
+      event: 'gtm.js',
+    });
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s),
+      dl = l != 'dataLayer' ? '&l=' + l : '';
+    j.async = true;
+    j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+    f.parentNode.insertBefore(j, f);
+  })(window, document, 'script', 'dataLayer', 'GTM-P8H6KQG');
+</script>
+<!-- End Google Tag Manager -->
+<!-- Data to be shared with JS on every page -->
+<script>
+  window.data = {
+      copyIconSrc: "../_static/copy-button.svg"
+  };
+</script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+
+  <div class="bd-header-announcement container-fluid bd-header-announcement">
+    <div class="bd-header-announcement__content">Influence the future of Ray with our <a target="_blank" href="https://www.surveymonkey.com/r/RayPulse2025?utm_source=ray_docs&utm_medium=website&utm_campaign=banner">Ray Community Pulse survey</a>. Complete it by Monday, January 27th, 2025 to get exclusive swag for eligible participants.</div>
+  </div>
+
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  <svg
+   id="svg"
+   version="1.1"
+   viewBox="0, 0, 400,200.13540961408262"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <g id="g1">
+    <path id="ray-text" d="m 102.875,36.782 c 0.16,0.041 0.423,0.041 0.583,0 0.161,-0.042 0.029,-0.077 -0.291,-0.077 -0.321,0 -0.452,0.035 -0.292,0.077 m 89.958,63.206 v 30.345 h 3.584 3.583 v -9.487 -9.487 l 9.958,-0.059 c 10.822,-0.064 10.056,-0.121 10.664,0.804 0.113,0.172 0.394,0.597 0.625,0.945 0.231,0.348 0.42,0.693 0.42,0.766 0,0.073 0.15,0.269 0.333,0.435 0.183,0.166 0.333,0.358 0.333,0.427 0,0.069 0.366,0.676 0.814,1.349 0.925,1.393 2.687,4.088 2.936,4.493 0.092,0.149 0.312,0.486 0.489,0.751 1.348,2.013 2.261,3.416 2.261,3.474 0,0.038 0.338,0.561 0.75,1.164 0.413,0.602 0.755,1.151 0.761,1.219 0.006,0.067 0.267,0.46 0.58,0.873 0.313,0.412 0.692,0.975 0.843,1.25 0.622,1.138 0.378,1.083 4.846,1.083 h 4.062 l -0.254,-0.458 c -0.139,-0.252 -0.677,-1.058 -1.196,-1.792 -1.001,-1.416 -1.194,-1.694 -5.308,-7.666 -1.452,-2.109 -2.684,-3.871 -2.737,-3.917 -0.053,-0.046 -0.172,-0.213 -0.263,-0.372 -0.326,-0.563 -2.842,-4.226 -3.541,-5.154 -0.969,-1.287 -1.025,-1.162 0.832,-1.838 0.726,-0.263 2.976,-1.446 3.305,-1.737 0.145,-0.128 0.319,-0.232 0.388,-0.232 0.287,0 2.659,-2.095 3.515,-3.105 3.686,-4.345 5.22,-10.506 4.352,-17.484 -0.442,-3.559 -1.381,-5.956 -3.555,-9.078 -0.491,-0.706 -3.235,-3.333 -3.481,-3.333 -0.128,0 -0.232,-0.062 -0.232,-0.136 0,-0.075 -0.319,-0.313 -0.708,-0.53 -0.39,-0.216 -0.746,-0.439 -0.792,-0.496 -0.077,-0.096 -1.012,-0.546 -2.532,-1.218 -1.038,-0.459 -3.173,-1.141 -4.051,-1.293 -0.459,-0.08 -1.359,-0.273 -2,-0.429 -1.04,-0.253 -2.711,-0.292 -15.375,-0.353 l -14.209,-0.07 v 30.346 m 80.935,-28.446 c -0.448,1.031 -1.004,2.287 -1.235,2.791 -0.396,0.861 -0.579,1.27 -1.363,3.038 -0.403,0.911 -1.14,2.528 -1.903,4.177 -0.33,0.714 -0.6,1.373 -0.6,1.464 0,0.092 -0.107,0.333 -0.238,0.536 -0.13,0.203 -0.661,1.344 -1.179,2.535 -0.519,1.192 -1.085,2.467 -1.258,2.834 -0.464,0.979 -1.328,2.9 -2.324,5.166 -1.025,2.334 -1.477,3.34 -1.759,3.917 -0.113,0.229 -1.423,3.154 -2.913,6.5 -1.49,3.346 -2.951,6.608 -3.248,7.25 -1.302,2.818 -8.248,18.378 -8.248,18.475 0,0.06 1.714,0.108 3.808,0.108 h 3.809 l 1.04,-2.375 c 0.573,-1.306 1.191,-2.712 1.374,-3.125 0.183,-0.412 0.483,-1.087 0.665,-1.5 0.183,-0.412 0.467,-1.05 0.63,-1.416 0.164,-0.367 0.656,-1.492 1.093,-2.5 0.437,-1.009 0.93,-2.134 1.097,-2.5 0.166,-0.367 0.399,-0.911 0.517,-1.209 l 0.215,-0.541 h 16.448 16.447 l 0.369,0.791 c 0.203,0.436 0.464,1.017 0.581,1.292 0.209,0.494 1.042,2.363 1.485,3.333 0.21,0.46 2.5,5.679 2.998,6.834 0.118,0.275 0.406,0.912 0.638,1.416 0.232,0.504 0.465,1.048 0.516,1.209 0.085,0.267 0.426,0.291 4.003,0.291 h 3.91 l -0.137,-0.458 c -0.122,-0.41 -1.026,-2.462 -2.331,-5.292 -0.254,-0.55 -1.531,-3.4 -2.838,-6.333 -1.307,-2.933 -2.618,-5.858 -2.913,-6.5 -0.412,-0.894 -5.399,-12.071 -8.292,-18.583 -0.183,-0.413 -0.473,-1.05 -0.644,-1.417 -0.324,-0.694 -1.063,-2.353 -1.56,-3.5 -0.159,-0.367 -0.427,-0.967 -0.595,-1.333 -0.867,-1.885 -2.251,-4.97 -2.916,-6.5 -0.195,-0.45 -0.423,-0.958 -1.421,-3.167 -0.166,-0.367 -0.502,-1.117 -0.747,-1.667 -0.63,-1.413 -1.07,-2.395 -1.419,-3.166 -0.652,-1.443 -0.97,-2.18 -1.059,-2.459 -0.086,-0.266 -0.421,-0.291 -3.891,-0.291 h -3.798 l -0.814,1.875 M 306.5,69.745 c 0,0.096 0.45,0.894 1.132,2.005 0.281,0.458 0.75,1.283 1.042,1.833 0.293,0.55 0.625,1.113 0.738,1.25 0.114,0.138 0.649,1.029 1.189,1.982 0.54,0.952 1.147,2.002 1.348,2.333 0.201,0.331 0.669,1.127 1.04,1.769 0.372,0.641 0.874,1.504 1.117,1.916 0.452,0.769 0.799,1.371 1.408,2.446 0.19,0.337 0.586,0.993 0.878,1.458 0.293,0.466 0.625,1.034 0.738,1.263 0.113,0.229 0.393,0.717 0.622,1.083 0.229,0.367 0.735,1.218 1.124,1.891 0.389,0.673 0.857,1.477 1.041,1.787 0.183,0.31 0.775,1.334 1.316,2.276 0.541,0.942 1.066,1.817 1.167,1.944 0.101,0.127 0.446,0.704 0.767,1.282 0.32,0.579 0.948,1.675 1.393,2.436 0.446,0.762 0.963,1.647 1.149,1.968 0.186,0.32 0.476,0.808 0.644,1.083 0.168,0.275 0.497,0.837 0.73,1.25 0.234,0.412 0.563,0.975 0.731,1.25 0.168,0.275 0.456,0.763 0.64,1.083 0.183,0.321 0.607,1.046 0.94,1.612 l 0.606,1.028 v 10.18 10.18 h 3.583 3.584 v -10.55 c 0,-6.074 0.064,-10.617 0.151,-10.708 0.083,-0.087 0.32,-0.458 0.528,-0.825 0.869,-1.535 1.109,-1.954 1.881,-3.277 1.098,-1.882 1.383,-2.373 1.773,-3.056 0.183,-0.321 0.473,-0.827 0.644,-1.125 0.171,-0.298 0.587,-1.029 0.926,-1.625 0.338,-0.596 0.683,-1.196 0.765,-1.334 0.428,-0.714 1.259,-2.124 1.424,-2.416 0.186,-0.329 0.612,-1.07 1.22,-2.125 0.172,-0.298 0.634,-1.104 1.027,-1.792 0.393,-0.687 0.815,-1.368 0.938,-1.513 0.122,-0.145 0.223,-0.389 0.223,-0.542 0,-0.153 0.061,-0.278 0.137,-0.278 0.075,0 0.302,-0.319 0.503,-0.709 0.202,-0.389 0.551,-1.008 0.775,-1.375 0.225,-0.366 0.551,-0.929 0.724,-1.25 0.63,-1.167 2.234,-3.927 2.52,-4.336 0.161,-0.23 0.547,-0.889 0.858,-1.462 0.312,-0.574 0.732,-1.323 0.935,-1.664 0.203,-0.342 0.561,-0.959 0.796,-1.371 0.234,-0.413 0.585,-1.013 0.779,-1.333 0.325,-0.538 0.934,-1.61 1.374,-2.417 0.1,-0.183 0.267,-0.446 0.371,-0.583 0.103,-0.138 0.425,-0.7 0.715,-1.25 0.29,-0.55 0.647,-1.171 0.793,-1.379 l 0.265,-0.378 -3.801,0.045 -3.801,0.045 -0.3,0.5 c -0.165,0.275 -0.455,0.762 -0.644,1.083 -0.189,0.321 -0.565,0.921 -0.835,1.334 -0.27,0.412 -0.569,0.9 -0.664,1.083 -0.096,0.183 -0.395,0.671 -0.665,1.083 -0.27,0.413 -0.645,1.013 -0.834,1.334 -0.189,0.32 -0.49,0.808 -0.668,1.083 -0.178,0.275 -0.479,0.762 -0.669,1.083 -0.19,0.321 -0.712,1.184 -1.159,1.917 -0.448,0.733 -1.086,1.783 -1.417,2.333 -0.332,0.55 -0.824,1.338 -1.093,1.75 -0.27,0.413 -0.542,0.863 -0.605,1 -0.064,0.138 -0.427,0.738 -0.807,1.334 -0.38,0.596 -0.834,1.308 -1.009,1.583 -0.175,0.275 -0.402,0.65 -0.503,0.833 -0.102,0.184 -0.696,1.159 -1.321,2.167 -0.625,1.008 -1.316,2.133 -1.536,2.5 -0.219,0.367 -0.584,0.967 -0.81,1.333 -0.226,0.367 -0.461,0.777 -0.523,0.911 -0.061,0.134 -0.42,0.696 -0.797,1.25 -0.378,0.553 -0.737,1.118 -0.799,1.256 -0.061,0.138 -0.3,0.55 -0.531,0.917 -0.23,0.366 -0.507,0.837 -0.615,1.046 -0.292,0.563 -0.932,-0.03 -1.58,-1.463 -0.063,-0.138 -0.27,-0.473 -0.461,-0.747 -0.39,-0.556 -0.504,-0.738 -1.098,-1.753 -0.559,-0.954 -0.693,-1.171 -1.084,-1.754 -0.183,-0.274 -0.422,-0.647 -0.531,-0.83 -0.109,-0.183 -0.695,-1.12 -1.302,-2.083 -0.607,-0.962 -1.193,-1.897 -1.302,-2.077 -0.534,-0.884 -1.693,-2.723 -1.97,-3.124 -0.171,-0.249 -0.311,-0.495 -0.311,-0.549 0,-0.053 -0.141,-0.3 -0.312,-0.548 C 323.21,84.6 322,82.674 322,82.582 c 0,-0.053 -0.139,-0.299 -0.309,-0.547 -0.761,-1.11 -1.663,-2.54 -1.81,-2.868 -0.061,-0.138 -0.435,-0.724 -0.83,-1.303 -0.395,-0.578 -0.718,-1.088 -0.718,-1.133 0,-0.044 -0.3,-0.532 -0.666,-1.084 C 317.3,75.095 317,74.611 317,74.571 c 0,-0.039 -0.356,-0.628 -0.792,-1.308 -0.435,-0.681 -1.12,-1.768 -1.522,-2.417 l -0.731,-1.179 h -3.727 c -2.051,0 -3.728,0.035 -3.728,0.078 m -86.75,7.023 c 3.486,0.433 8.055,2.022 8.389,2.917 0.03,0.081 0.138,0.148 0.239,0.148 0.278,0 2.413,2.27 2.792,2.969 0.184,0.338 0.399,0.727 0.48,0.865 2.258,3.865 1.774,11.495 -0.942,14.836 -0.206,0.254 -0.375,0.504 -0.375,0.556 0,0.13 -1.451,1.504 -2.196,2.079 -1.372,1.059 -4.274,2.252 -6.804,2.797 -1.265,0.272 -2.482,0.311 -11.375,0.359 L 200,104.348 V 90.424 76.5 l 8.792,-0.001 c 7.089,0 9.211,0.052 10.958,0.269 m 58.745,1.979 c 0.003,0.09 0.235,0.653 0.516,1.25 0.281,0.598 0.662,1.424 0.846,1.836 0.185,0.413 0.48,1.05 0.656,1.417 0.177,0.367 0.321,0.719 0.321,0.783 -10e-4,0.101 0.437,1.075 1.82,4.05 0.17,0.367 1.189,2.654 2.263,5.084 1.075,2.429 2.18,4.904 2.456,5.5 0.276,0.596 0.76,1.683 1.075,2.416 0.581,1.349 0.792,1.826 1.478,3.334 0.209,0.458 0.542,1.208 0.74,1.666 0.198,0.459 0.498,1.115 0.666,1.459 l 0.307,0.625 h -13.32 c -8.524,0 -13.319,-0.059 -13.319,-0.163 0,-0.089 0.164,-0.52 0.365,-0.958 0.622,-1.356 1.332,-2.938 1.572,-3.504 0.126,-0.298 0.337,-0.786 0.469,-1.084 0.131,-0.298 0.814,-1.854 1.517,-3.458 0.704,-1.604 1.411,-3.217 1.573,-3.583 0.161,-0.367 0.406,-0.93 0.544,-1.25 0.137,-0.321 0.794,-1.821 1.459,-3.334 1.615,-3.672 1.781,-4.049 2.154,-4.875 0.175,-0.389 0.674,-1.533 1.108,-2.541 0.937,-2.177 1.685,-3.833 2.006,-4.443 0.128,-0.243 0.233,-0.576 0.233,-0.74 0,-0.333 0.484,0.168 0.495,0.513" />
+    <path id="ray-logo" d="m 101.476,36.871 c -1.303,0.145 -3.55,0.666 -4.332,1.004 -2.044,0.884 -2.472,1.092 -3.144,1.529 -7.177,4.661 -9.961,13.497 -6.746,21.409 0.465,1.144 0.582,1.352 1.707,3.057 0.986,1.494 3.928,4.463 4.424,4.463 0.054,0 0.429,0.223 0.832,0.496 4.639,3.13 12.64,3.283 17.395,0.332 0.457,-0.284 22.892,21.99 22.486,22.327 -0.218,0.181 -0.803,1.491 -1.437,3.22 l -0.352,0.959 h -6.238 c -5.795,0 -6.238,-0.021 -6.238,-0.288 0,-0.977 -1.759,-4.418 -3.151,-6.165 -4.027,-5.051 -11.482,-7.68 -17.226,-6.075 -0.711,0.198 -1.405,0.361 -1.542,0.361 -0.745,0 -4.681,2.22 -5.914,3.336 -0.321,0.291 -0.792,0.706 -1.046,0.923 -0.855,0.728 -2.606,3.23 -3.29,4.701 -0.372,0.801 -0.749,1.587 -0.837,1.746 -0.088,0.159 -0.16,0.434 -0.16,0.611 0,0.888 0.287,0.85 -6.415,0.85 H 74.04 l -0.198,-0.542 c -0.108,-0.298 -0.347,-0.917 -0.531,-1.375 -0.183,-0.458 -0.358,-0.946 -0.389,-1.083 -0.087,-0.39 -1.399,-2.503 -2.064,-3.324 -2.725,-3.366 -5.769,-5.225 -10.441,-6.377 -3.309,-0.816 -10.96,0.695 -12.419,2.453 -0.113,0.136 -0.278,0.248 -0.367,0.248 -0.392,0 -4.298,3.657 -4.298,4.024 0,0.086 -0.131,0.297 -0.291,0.469 -2.793,2.998 -3.936,11.297 -2.141,15.549 0.844,1.999 1.072,2.472 1.583,3.291 0.314,0.504 0.634,0.942 0.711,0.972 0.076,0.031 0.138,0.154 0.138,0.274 0,0.246 2.689,3.043 3.334,3.468 0.229,0.151 0.716,0.486 1.083,0.744 6.843,4.811 18.162,3.018 23.001,-3.643 0.093,-0.128 0.412,-0.542 0.709,-0.922 0.297,-0.38 0.54,-0.747 0.54,-0.815 0,-0.069 0.224,-0.489 0.498,-0.935 0.275,-0.445 0.461,-0.81 0.414,-0.81 -0.046,0 0.104,-0.372 0.335,-0.827 0.231,-0.456 0.42,-0.94 0.42,-1.076 0,-0.136 0.087,-0.439 0.193,-0.672 l 0.194,-0.425 h 6.22 6.22 l 0.101,0.459 c 1.063,4.828 6.623,10.565 11.322,11.682 0.366,0.087 1.154,0.288 1.75,0.446 7.975,2.118 18.533,-4.211 20.101,-12.05 l 0.107,-0.537 h 6.217 6.217 l 0.352,0.959 c 0.642,1.751 1.22,3.04 1.447,3.228 0.178,0.148 -2.094,2.503 -10.941,11.344 l -11.165,11.158 -0.793,-0.404 c -1.29,-0.658 -1.561,-0.769 -2.959,-1.21 -5.239,-1.651 -12.178,-0.296 -16.032,3.131 -1.412,1.256 -2.907,2.908 -3.508,3.878 -4.539,7.323 -3.445,16.326 2.69,22.138 0.992,0.939 3.39,2.578 4.35,2.972 1.875,0.771 2.482,1.005 2.729,1.053 0.149,0.03 0.849,0.174 1.556,0.32 10.388,2.155 20.37,-6.164 20.38,-16.983 0.002,-3.118 -0.379,-4.767 -1.788,-7.728 l -0.505,-1.061 11.107,-11.106 11.107,-11.105 0.873,0.447 c 1.444,0.739 3.341,1.372 5.068,1.691 1.606,0.297 5.042,0.225 6.39,-0.134 0.595,-0.159 1.37,-0.358 1.72,-0.442 1.198,-0.288 4.129,-1.822 5.32,-2.786 9.711,-7.857 8.716,-22.425 -1.957,-28.665 -3.504,-2.048 -8.663,-2.872 -12.167,-1.942 -0.55,0.146 -1.262,0.327 -1.583,0.403 -0.614,0.144 -1.774,0.627 -2.958,1.232 l -0.709,0.362 -11.105,-11.105 -11.105,-11.106 0.289,-0.561 c 3.009,-5.83 2.687,-12.491 -0.861,-17.825 -0.257,-0.386 -0.543,-0.821 -0.634,-0.965 -1.398,-2.203 -6.344,-5.524 -9.084,-6.099 -3.096,-0.651 -4.424,-0.766 -6.357,-0.551 m 4.095,8.912 c 6.101,1.712 8.316,9.521 3.993,14.078 -6.028,6.355 -16.205,1.325 -14.858,-7.345 0.559,-3.597 3.168,-6.047 7.544,-7.084 0.546,-0.13 2.249,0.05 3.321,0.351 M 59.946,91.812 c 2.314,0.806 4.061,2.37 5.152,4.615 l 0.644,1.323 v 2.25 2.25 l -0.648,1.332 c -3.748,7.711 -14.726,6.286 -16.362,-2.124 -1.223,-6.284 5.142,-11.76 11.214,-9.646 M 105,91.512 c 7.468,1.695 9.27,11.549 2.87,15.694 -7.325,4.746 -16.184,-3.082 -12.434,-10.986 0.56,-1.179 2.473,-3.387 2.935,-3.387 0.102,0 0.312,-0.113 0.465,-0.252 1.043,-0.944 4.259,-1.502 6.164,-1.069 m 46.441,0.171 c 4.417,1.35 7.025,5.54 6.148,9.877 -0.306,1.514 -0.863,2.879 -1.336,3.271 -0.139,0.116 -0.253,0.306 -0.253,0.424 0,0.307 -1.541,1.65 -2.554,2.224 -7.406,4.199 -15.743,-3.631 -12.051,-11.318 0.752,-1.565 3.286,-3.994 4.167,-3.994 0.112,0 0.276,-0.069 0.363,-0.153 0.713,-0.687 3.754,-0.87 5.516,-0.331 m -44.774,46.358 c 8.432,4.162 5.806,16.556 -3.5,16.523 C 100.595,154.555 96,152.103 96,150.74 c 0,-0.11 -0.106,-0.287 -0.236,-0.395 -1.065,-0.884 -1.517,-5.232 -0.754,-7.262 1.796,-4.781 7.334,-7.176 11.657,-5.042" />
+  </g>
+</svg>
+
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <div class="navbar-content docutils container">
+<ul class="navbar-toplevel">
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="getting-started.html" title="Get Started"><span class="navbar-link-title">Get Started</span></a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="use-cases.html" title="Use Cases"><span class="navbar-link-title">Use Cases</span></a></p>
+</div>
+</li>
+<li class="active-link"><div class="ref-container docutils container">
+<p><a class="reference internal" href="#" title="Example Gallery"><span class="navbar-link-title">Example Gallery</span></a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="installation.html" title="Library"><span class="navbar-link-title">Library</span></a></p>
+<i class="fa-solid fa-chevron-down"></i></div>
+<div class="navbar-dropdown docutils container">
+<ul class="navbar-sublevel">
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../ray-core/walkthrough.html" title="Ray Core"><span class="navbar-link-title">Ray Core</span>Scale general Python applications</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../data/data.html" title="Ray Data"><span class="navbar-link-title">Ray Data</span>Scale data ingest and preprocessing</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../train/train.html" title="Ray Train"><span class="navbar-link-title">Ray Train</span>Scale machine learning training</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../tune/index.html" title="Ray Tune"><span class="navbar-link-title">Ray Tune</span>Scale hyperparameter tuning</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../serve/index.html" title="Ray Serve"><span class="navbar-link-title">Ray Serve</span>Scale model serving</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../rllib/index.html" title="Ray RLlib"><span class="navbar-link-title">Ray RLlib</span>Scale reinforcement learning</a></p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../index.html" title="Docs"><span class="navbar-link-title">Docs</span></a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://discuss.ray.io" title="Resources"><span class="navbar-link-title">Resources</span></a></p>
+<i class="fa-solid fa-chevron-down"></i></div>
+<div class="navbar-dropdown docutils container">
+<ul class="navbar-sublevel">
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://discuss.ray.io" title="Discussion Forum"><span class="navbar-link-title">Discussion Forum</span>Get your Ray questions answered</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://github.com/ray-project/ray-educational-materials" title="Training"><span class="navbar-link-title">Training</span>Hands-on learning</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://www.anyscale.com/blog" title="Blog"><span class="navbar-link-title">Blog</span>Updates, best practices, user-stories</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://www.anyscale.com/events" title="Events"><span class="navbar-link-title">Events</span>Webinars, meetups, office hours</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://www.anyscale.com/blog/how-ray-and-anyscale-make-it-easy-to-do-massive-scale-machine-learning-on" title="Success Stories"><span class="navbar-link-title">Success Stories</span>Real-world workload examples</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="ray-libraries.html" title="Ecosystem"><span class="navbar-link-title">Ecosystem</span>Libraries integrated with Ray</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://www.ray.io/community" title="Community"><span class="navbar-link-title">Community</span>Connect with us</a></p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          <div id="docsearch"></div>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="versionswitcherlist" class="version-switcher__menu dropdown-menu list-group-flush py-0" role="listbox" aria-labelledby="versionswitcherbutton">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><a
+  id="try-anyscale-href"
+  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
+>
+  <div id="try-anyscale-text">
+    <span>Try Ray on Anyscale</span>
+  </div>
+</a></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile"><div id="docsearch"></div>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <div class="navbar-content docutils container">
+<ul class="navbar-toplevel">
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="getting-started.html" title="Get Started"><span class="navbar-link-title">Get Started</span></a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="use-cases.html" title="Use Cases"><span class="navbar-link-title">Use Cases</span></a></p>
+</div>
+</li>
+<li class="active-link"><div class="ref-container docutils container">
+<p><a class="reference internal" href="#" title="Example Gallery"><span class="navbar-link-title">Example Gallery</span></a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="installation.html" title="Library"><span class="navbar-link-title">Library</span></a></p>
+<i class="fa-solid fa-chevron-down"></i></div>
+<div class="navbar-dropdown docutils container">
+<ul class="navbar-sublevel">
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../ray-core/walkthrough.html" title="Ray Core"><span class="navbar-link-title">Ray Core</span>Scale general Python applications</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../data/data.html" title="Ray Data"><span class="navbar-link-title">Ray Data</span>Scale data ingest and preprocessing</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../train/train.html" title="Ray Train"><span class="navbar-link-title">Ray Train</span>Scale machine learning training</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../tune/index.html" title="Ray Tune"><span class="navbar-link-title">Ray Tune</span>Scale hyperparameter tuning</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../serve/index.html" title="Ray Serve"><span class="navbar-link-title">Ray Serve</span>Scale model serving</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../rllib/index.html" title="Ray RLlib"><span class="navbar-link-title">Ray RLlib</span>Scale reinforcement learning</a></p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="../index.html" title="Docs"><span class="navbar-link-title">Docs</span></a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://discuss.ray.io" title="Resources"><span class="navbar-link-title">Resources</span></a></p>
+<i class="fa-solid fa-chevron-down"></i></div>
+<div class="navbar-dropdown docutils container">
+<ul class="navbar-sublevel">
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://discuss.ray.io" title="Discussion Forum"><span class="navbar-link-title">Discussion Forum</span>Get your Ray questions answered</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://github.com/ray-project/ray-educational-materials" title="Training"><span class="navbar-link-title">Training</span>Hands-on learning</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://www.anyscale.com/blog" title="Blog"><span class="navbar-link-title">Blog</span>Updates, best practices, user-stories</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://www.anyscale.com/events" title="Events"><span class="navbar-link-title">Events</span>Webinars, meetups, office hours</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://www.anyscale.com/blog/how-ray-and-anyscale-make-it-easy-to-do-massive-scale-machine-learning-on" title="Success Stories"><span class="navbar-link-title">Success Stories</span>Real-world workload examples</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference internal" href="ray-libraries.html" title="Ecosystem"><span class="navbar-link-title">Ecosystem</span>Libraries integrated with Ray</a></p>
+</div>
+</li>
+<li><div class="ref-container docutils container">
+<p><a class="reference external" href="https://www.ray.io/community" title="Community"><span class="navbar-link-title">Community</span>Connect with us</a></p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="versionswitcherlist" class="version-switcher__menu dropdown-menu list-group-flush py-0" role="listbox" aria-labelledby="versionswitcherbutton">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><a
+  id="try-anyscale-href"
+  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
+>
+  <div id="try-anyscale-text">
+    <span>Try Ray on Anyscale</span>
+  </div>
+</a></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Ray Examples</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+
+
+<div class="content-wrapper">
+  <div class="content">
+    <div class="examples-search-area">
+      <label id="examples-search-input-label" for="examples-search-input">
+        <svg
+          id="examples-search-icon"
+          width="25"
+          height="25"
+          viewBox="0 0 25 25"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18.4295 16.6717L22.7125 20.9537L21.2975 22.3687L17.0155 18.0857C15.4223 19.3629 13.4405 20.0576 11.3985 20.0547C6.43053 20.0547 2.39853 16.0227 2.39853 11.0547C2.39853 6.08669 6.43053 2.05469 11.3985 2.05469C16.3665 2.05469 20.3985 6.08669 20.3985 11.0547C20.4014 13.0967 19.7068 15.0784 18.4295 16.6717ZM16.4235 15.9297C17.6926 14.6246 18.4014 12.8751 18.3985 11.0547C18.3985 7.18669 15.2655 4.05469 11.3985 4.05469C7.53053 4.05469 4.39853 7.18669 4.39853 11.0547C4.39853 14.9217 7.53053 18.0547 11.3985 18.0547C13.219 18.0576 14.9684 17.3488 16.2735 16.0797L16.4235 15.9297V15.9297Z"
+          />
+        </svg>
+      </label>
+      <input
+        type="text"
+        id="examples-search-input"
+        class="examples-search-term"
+        placeholder="Search examples"
+      />
+    </div>
+    <div id="dropdown-area">
+      <div class="filter-dropdown" id="use-case-dropdown"><input class="dropdown-checkbox" id="use-case-checkbox" type="checkbox"/><label class="dropdown-label" for="use-case-checkbox">Use Case<i class="fa-solid fa-chevron-down"></i></label><div class="dropdown-content"><label class="checkbox-container">Large Language Models<input class="filter-checkbox" id="Large Language Models-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Generative AI<input class="filter-checkbox" id="Generative AI-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Computer Vision<input class="filter-checkbox" id="Computer Vision-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Natural Language Processing<input class="filter-checkbox" id="Natural Language Processing-checkbox" type="checkbox"/><span class="checkmark"></span></label></div></div> <div class="filter-dropdown" id="library-dropdown"><input class="dropdown-checkbox" id="library-checkbox" type="checkbox"/><label class="dropdown-label" for="library-checkbox">Library<i class="fa-solid fa-chevron-down"></i></label><div class="dropdown-content"><label class="checkbox-container">Data<input class="filter-checkbox" id="Data-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Serve<input class="filter-checkbox" id="Serve-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Train<input class="filter-checkbox" id="Train-checkbox" type="checkbox"/><span class="checkmark"></span></label></div></div> <div class="filter-dropdown" id="framework-dropdown"><input class="dropdown-checkbox" id="framework-checkbox" type="checkbox"/><label class="dropdown-label" for="framework-checkbox">Framework<i class="fa-solid fa-chevron-down"></i></label><div class="dropdown-content"><label class="checkbox-container">AWS Neuron<input class="filter-checkbox" id="AWS Neuron-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">PyTorch<input class="filter-checkbox" id="PyTorch-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Lightning<input class="filter-checkbox" id="Lightning-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Transformers<input class="filter-checkbox" id="Transformers-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Accelerate<input class="filter-checkbox" id="Accelerate-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">DeepSpeed<input class="filter-checkbox" id="DeepSpeed-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">TensorFlow<input class="filter-checkbox" id="TensorFlow-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Horovod<input class="filter-checkbox" id="Horovod-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">XGBoost<input class="filter-checkbox" id="XGBoost-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Hugging Face<input class="filter-checkbox" id="Hugging Face-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Any<input class="filter-checkbox" id="Any-checkbox" type="checkbox"/><span class="checkmark"></span></label></div></div> <div class="filter-dropdown" id="all-examples-dropdown"><input class="dropdown-checkbox" id="all-examples-checkbox" type="checkbox"/><label class="dropdown-label" for="all-examples-checkbox">All Examples<i class="fa-solid fa-chevron-down"></i></label><div class="dropdown-content"><label class="checkbox-container">Maintained by the Ray Team<input class="filter-checkbox" id="ray-team-checkbox" type="checkbox"/><span class="checkmark"></span></label><label class="checkbox-container">Contributed by the Ray Community<input class="filter-checkbox" id="community-checkbox" type="checkbox"/><span class="checkmark"></span></label></div></div>
+    </div>
+    <div id="no-matches" class="hidden">
+      <div id="no-matches-inner-content">
+        <svg
+          width="119"
+          height="119"
+          viewBox="0 0 119 119"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="59.5"
+            cy="59.5"
+            r="59.5"
+            fill="url(#paint0_linear_362_3841)"
+            fill-opacity="0.2"
+          />
+          <path
+            d="M19.1665 6.66663C19.1665 5.8382 19.8381 5.16663 20.6665 5.16663H58.9165H78.0702C78.5301 5.16663 78.9647 5.37767 79.2491 5.73919L88.8648 17.9624L88.8658 17.9637L98.3484 30.0984C98.5545 30.3622 98.6665 30.6873 98.6665 31.0221V56V105.333C98.6665 106.162 97.9949 106.833 97.1665 106.833H20.6665C19.8381 106.833 19.1665 106.162 19.1665 105.333V6.66663Z"
+            fill="#FBFEFF"
+            stroke="#D0EAF9"
+          />
+          <path
+            d="M77.485 29.4856C76.3051 29.4097 75.4482 28.3324 75.6397 27.1657L79.2591 5.11847C79.2874 4.94627 79.5072 4.89033 79.6143 5.02808L99.477 30.5658C99.5829 30.702 99.4784 30.8993 99.3063 30.8882L77.485 29.4856Z"
+            fill="#11608D"
+          />
+          <rect
+            x="25.6665"
+            y="15.1666"
+            width="46.6667"
+            height="3.5"
+            rx="1.75"
+            fill="#D6EEFC"
+          />
+          <rect
+            x="25.6665"
+            y="31.5"
+            width="46.6667"
+            height="3.5"
+            rx="1.75"
+            fill="#D6EEFC"
+          />
+          <rect
+            x="25.6665"
+            y="23.3334"
+            width="16.3333"
+            height="3.5"
+            rx="1.75"
+            fill="#D6EEFC"
+          />
+          <rect
+            x="25.6665"
+            y="39.6666"
+            width="16.3333"
+            height="3.5"
+            rx="1.75"
+            fill="#D6EEFC"
+          />
+          <rect
+            x="45.5"
+            y="23.3334"
+            width="26.8333"
+            height="3.5"
+            rx="1.75"
+            fill="#D6EEFC"
+          />
+          <rect
+            x="22.1665"
+            y="98"
+            width="30.3333"
+            height="3.5"
+            rx="1.75"
+            fill="#D6EEFC"
+          />
+          <g clip-path="url(#clip0_362_3841)">
+            <path
+              d="M90.5158 91.8128L104.257 105.551L99.7173 110.091L85.9792 96.3494C80.8675 100.447 74.5094 102.676 67.958 102.667C52.019 102.667 39.083 89.7306 39.083 73.7916C39.083 57.8526 52.019 44.9166 67.958 44.9166C83.897 44.9166 96.833 57.8526 96.833 73.7916C96.8423 80.343 94.6135 86.7011 90.5158 91.8128ZM84.0799 89.4323C88.1516 85.245 90.4255 79.6322 90.4163 73.7916C90.4163 61.3818 80.3646 51.3333 67.958 51.3333C55.5482 51.3333 45.4997 61.3818 45.4997 73.7916C45.4997 86.1982 55.5482 96.25 67.958 96.25C73.7985 96.2592 79.4114 93.9852 83.5986 89.9135L84.0799 89.4323Z"
+              fill="#60ABD7"
+            />
+          </g>
+          <ellipse
+            cx="61.8335"
+            cy="71.1667"
+            rx="3.5"
+            ry="4.66667"
+            fill="#60ABD7"
+          />
+          <ellipse
+            cx="73.5"
+            cy="71.1667"
+            rx="3.5"
+            ry="4.66667"
+            fill="#60ABD7"
+          />
+          <path
+            d="M60.6665 84.5834V84.5834C65.0731 82.3801 70.2599 82.3801 74.6665 84.5834V84.5834"
+            stroke="#60ABD7"
+            stroke-width="2"
+          />
+          <defs>
+            <linearGradient
+              id="paint0_linear_362_3841"
+              x1="59.5"
+              y1="0"
+              x2="59.5"
+              y2="119"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stop-color="#19B1E2" />
+              <stop offset="1" stop-color="#3D89E9" />
+            </linearGradient>
+            <clipPath id="clip0_362_3841">
+              <rect
+                width="77"
+                height="77"
+                fill="white"
+                transform="translate(32.6665 38.5)"
+              />
+            </clipPath>
+          </defs>
+        </svg>
+        <h4>Sorry! We could not find an example matching that filter.</h4>
+        <a
+          id="new-example-issue-link"
+          href="https://github.com/ray-project/ray/issues/new?assignees=&labels=docs%2Ctriage&projects=&template=documentation-issue.yml&title=%5B%3CRay+component%3A+Core%7CRLlib%7Cetc...%3E%5D+"
+        >
+          <span id="new-example-issue-text">
+            Help us improve our examples by suggesting one. Tell us what example
+            you would like to have.
+          </span>
+        </a>
+      </div>
+    </div>
+    <div class="example-list-area"><div class="example"><a class="example-link" href="../data/examples/pytorch_resnet_batch_prediction.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_2.jpg"><i class="ri-box-3-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Image Classification Batch Inference with PyTorch ResNet152</b><span class="example-tags">Beginner. Data. PyTorch.</span><span class="example-other-keywords">Computer Vision ray-team</span></div></a></div><div class="example"><a class="example-link" href="../data/examples/batch_inference_object_detection.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_4.jpg"><i class="ri-puzzle-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Object Detection Batch Inference with PyTorch FasterRCNN_ResNet50</b><span class="example-tags">Beginner. Data. PyTorch.</span><span class="example-other-keywords">Computer Vision ray-team</span></div></a></div><div class="example"><a class="example-link" href="../data/examples/huggingface_vit_batch_prediction.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_3.jpg"><i class="ri-surgical-mask-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Image Classification Batch Inference with Hugging Face Vision Transformer</b><span class="example-tags">Beginner. Data. Transformers.</span><span class="example-other-keywords">Computer Vision ray-team</span></div></a></div><div class="example"><a class="example-link" href="../data/../train/examples/xgboost/xgboost_example.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_1.jpg"><i class="ri-chat-settings-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Tabular Data Training and Batch Inference with XGBoost</b><span class="example-tags">Beginner. Data. XGBoost.</span><span class="example-other-keywords"> ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/serve-ml-models.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_3.jpg"><i class="ri-layout-bottom-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve ML Models</b><span class="example-tags">Beginner. Serve. PyTorch.</span><span class="example-other-keywords">Computer Vision ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/stable-diffusion.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_1.jpg"><i class="ri-star-half-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve a Stable Diffusion Model</b><span class="example-tags">Beginner. Serve.</span><span class="example-other-keywords">Computer Vision Generative AI ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/vllm-example.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_2.jpg"><i class="ri-hard-drive-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve a Large Language Model (LLM)</b><span class="example-tags">Beginner. Serve.</span><span class="example-other-keywords">Generative AI Large Language Models Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/text-classification.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_2.jpg"><i class="ri-ai-generate remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve a Text Classification Model</b><span class="example-tags">Beginner. Serve.</span><span class="example-other-keywords">Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/object-detection.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_5.jpg"><i class="ri-chat-download-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve an Object Detection Model</b><span class="example-tags">Beginner. Serve.</span><span class="example-other-keywords">Computer Vision ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/aws-neuron-core-inference.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_1.jpg"><i class="ri-user-received-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve an Inference Model on AWS NeuronCores Using FastAPI</b><span class="example-tags">Intermediate. Serve.</span><span class="example-other-keywords">Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/aws-neuron-core-inference-stable-diffusion.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_3.jpg"><i class="ri-beer-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve an Inference with Stable Diffusion Model on AWS NeuronCores Using FastAPI</b><span class="example-tags">Intermediate. Serve.</span><span class="example-other-keywords">Computer Vision Generative AI ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/intel-gaudi-inference.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_4.jpg"><i class="ri-wallet-2-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve a model on Intel Gaudi Accelerator</b><span class="example-tags">Intermediate. Serve. PyTorch.</span><span class="example-other-keywords">Generative AI Large Language Models ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/gradio-integration.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_4.jpg"><i class="ri-planet-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Scale a Gradio App with Ray Serve</b><span class="example-tags">Intermediate. Serve.</span><span class="example-other-keywords">Generative AI Large Language Models Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/batch.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_1.jpg"><i class="ri-rewind-mini-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve a Text Generator with Request Batching</b><span class="example-tags">Intermediate. Serve.</span><span class="example-other-keywords">Generative AI Large Language Models Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/streaming.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_5.jpg"><i class="ri-mv-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve a Chatbot with Request and Response Streaming</b><span class="example-tags">Intermediate. Serve.</span><span class="example-other-keywords">Generative AI Large Language Models Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/triton-server-integration.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_5.jpg"><i class="ri-progress-4-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serving models with Triton Server in Ray Serve</b><span class="example-tags">Intermediate. Serve.</span><span class="example-other-keywords">Computer Vision Generative AI ray-team</span></div></a></div><div class="example"><a class="example-link" href="../serve/tutorials/java.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_2.jpg"><i class="ri-speed-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Serve a Java App</b><span class="example-tags">Advanced. Serve.</span><span class="example-other-keywords"> ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/pytorch/torch_fashion_mnist_example.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_3.jpg"><i class="ri-font-family remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train an image classifier with PyTorch</b><span class="example-tags">Beginner. Train. PyTorch.</span><span class="example-other-keywords">Computer Vision ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/lightning/lightning_mnist_example.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_1.jpg"><i class="ri-checkbox-indeterminate-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train an image classifier with Lightning</b><span class="example-tags">Beginner. Train. Lightning.</span><span class="example-other-keywords">Computer Vision ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/accelerate/accelerate_example.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_1.jpg"><i class="ri-rss-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train a text classifier with Hugging Face Accelerate</b><span class="example-tags">Beginner. Train. Accelerate. PyTorch. Hugging Face.</span><span class="example-other-keywords">Large Language Models Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/tf/tensorflow_mnist_example.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_5.jpg"><i class="ri-folder-6-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train an image classifier with TensorFlow</b><span class="example-tags">Beginner. Train. TensorFlow.</span><span class="example-other-keywords">Computer Vision ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/horovod/horovod_example.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_4.jpg"><i class="ri-focus-3-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train with Horovod and PyTorch</b><span class="example-tags">Beginner. Train. Horovod.</span><span class="example-other-keywords"> ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/intel_gaudi/resnet.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_1.jpg"><i class="ri-surround-sound-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train ResNet model with Intel Gaudi</b><span class="example-tags">Beginner. Train. PyTorch.</span><span class="example-other-keywords">Computer Vision community</span><div class="community-text-area"><i class="community-text">*Contributed by the Ray Community</i><span class="community-emojis">💪 ✨</span></div></div></a></div><div class="example"><a class="example-link" href="../train/examples/intel_gaudi/bert.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_4.jpg"><i class="ri-hexagon-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train BERT model with Intel Gaudi</b><span class="example-tags">Beginner. Train. Transformers.</span><span class="example-other-keywords">Natural Language Processing community</span><div class="community-text-area"><i class="community-text">*Contributed by the Ray Community</i><span class="community-emojis">💪 ✨</span></div></div></a></div><div class="example"><a class="example-link" href="../train/examples/deepspeed/deepspeed_example.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_2.jpg"><i class="ri-question-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train a text classifier with DeepSpeed</b><span class="example-tags">Intermediate. Train. DeepSpeed. PyTorch.</span><span class="example-other-keywords">Large Language Models Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/pytorch/dreambooth_finetuning.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_2.jpg"><i class="ri-github-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Fine-tune a personalized Stable Diffusion model</b><span class="example-tags">Intermediate. Train. PyTorch.</span><span class="example-other-keywords">Computer Vision Generative AI ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/intel_gaudi/sd.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_4.jpg"><i class="ri-check-double-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Finetune Stable Diffusion and generate images with Intel Gaudi</b><span class="example-tags">Intermediate. Train. Accelerate. Transformers.</span><span class="example-other-keywords">Computer Vision Generative AI community</span><div class="community-text-area"><i class="community-text">*Contributed by the Ray Community</i><span class="community-emojis">💪 ✨</span></div></div></a></div><div class="example"><a class="example-link" href="../train/examples/lightning/lightning_cola_advanced.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_1.jpg"><i class="ri-drizzle-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train a text classifier with PyTorch Lightning and Ray Data</b><span class="example-tags">Intermediate. Train. Lightning.</span><span class="example-other-keywords">Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/transformers/huggingface_text_classification.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_3.jpg"><i class="ri-creative-commons-zero-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Train a text classifier with Hugging Face Transformers</b><span class="example-tags">Intermediate. Train. Transformers.</span><span class="example-other-keywords">Natural Language Processing ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/intel_gaudi/llama.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_3.jpg"><i class="ri-thumb-down-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Fine-tune Llama-2-7b and Llama-2-70b with Intel Gaudi</b><span class="example-tags">Intermediate. Train. Accelerate. Transformers.</span><span class="example-other-keywords">Natural Language Processing Large Language Models community</span><div class="community-text-area"><i class="community-text">*Contributed by the Ray Community</i><span class="community-emojis">💪 ✨</span></div></div></a></div><div class="example"><a class="example-link" href="../train/examples/intel_gaudi/llama_pretrain.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_4.jpg"><i class="ri-coin-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Pre-train Llama-2 with Intel Gaudi</b><span class="example-tags">Intermediate. Train. Accelerate. Transformers. DeepSpeed.</span><span class="example-other-keywords">Natural Language Processing Large Language Models community</span><div class="community-text-area"><i class="community-text">*Contributed by the Ray Community</i><span class="community-emojis">💪 ✨</span></div></div></a></div><div class="example"><a class="example-link" href="../train/examples/aws-trainium/llama3.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_5.jpg"><i class="ri-calendar-check-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Fine-tune Llama3.1 with AWS Trainium</b><span class="example-tags">Advanced. Train. PyTorch. AWS Neuron.</span><span class="example-other-keywords">Natural Language Processing Large Language Models community</span><div class="community-text-area"><i class="community-text">*Contributed by the Ray Community</i><span class="community-emojis">💪 ✨</span></div></div></a></div><div class="example"><a class="example-link" href="https://github.com/ray-project/ray/tree/master/doc/source/templates/04_finetuning_llms_with_deepspeed"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_1.jpg"><i class="ri-mini-program-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Fine-tune a Llama-2 text generation model with DeepSpeed and Hugging Face Accelerate</b><span class="example-tags">Advanced. Train. Accelerate. DeepSpeed. Hugging Face.</span><span class="example-other-keywords">Natural Language Processing Large Language Models ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/deepspeed/gptj_deepspeed_fine_tuning.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_2.jpg"><i class="ri-increase-decrease-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Fine-tune a GPT-J-6B text generation model with DeepSpeed and Hugging Face Transformers</b><span class="example-tags">Advanced. Train. Hugging Face. DeepSpeed.</span><span class="example-other-keywords">Natural Language Processing Large Language Models Generative AI ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/lightning/vicuna_13b_lightning_deepspeed_finetune.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_2.jpg"><i class="ri-calendar-schedule-line remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Fine-tune a vicuna-13b text generation model with PyTorch Lightning and DeepSpeed</b><span class="example-tags">Advanced. Train. Lightning. DeepSpeed.</span><span class="example-other-keywords">Large Language Models Generative AI ray-team</span></div></a></div><div class="example"><a class="example-link" href="../train/examples/lightning/dolly_lightning_fsdp_finetuning.html"><div class="example-icon-area"><img class="example-icon" src="../_static/img/icon_bg_5.jpg"><i class="ri-footprint-fill remix-icon"></i></img></div><div class="example-text-area"><b class="example-title">Fine-tune a dolly-v2-7b text generation model with PyTorch Lightning and FSDP</b><span class="example-tags">Advanced. Train. Lightning.</span><span class="example-other-keywords">Large Language Models Generative AI Natural Language Processing ray-team</span></div></a></div></div> 
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../ray-air/getting-started.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Ray for ML Infrastructure</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="ray-libraries.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The Ray Ecosystem</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="footer-content-items footer-content__inner">
+  
+    <div class="footer-content-item"><div id="csat">
+  <div id="csat-feedback-received" class="csat-hidden">
+    <span>Thanks for the feedback!</span>
+  </div>
+  <div id="csat-inputs">
+    <span>Was this helpful?</span>
+    <div id="csat-yes" class="csat-button">
+      <svg id="csat-yes-icon" class="csat-hidden csat-icon" width="18" height="13" viewBox="0 0 18 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.00023 10.172L16.1922 0.979004L17.6072 2.393L7.00023 13L0.63623 6.636L2.05023 5.222L7.00023 10.172Z" />
+      </svg>
+      <span>Yes<span>
+    </div>
+    <div id="csat-no" class="csat-button">
+      <svg id="csat-no-icon" class="csat-hidden csat-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.00023 5.58599L11.9502 0.635986L13.3642 2.04999L8.41423 6.99999L13.3642 11.95L11.9502 13.364L7.00023 8.41399L2.05023 13.364L0.63623 11.95L5.58623 6.99999L0.63623 2.04999L2.05023 0.635986L7.00023 5.58599Z" />
+      </svg>
+      <span>No<span>
+    </div>
+  </div>
+  <div id="csat-textarea-group" class="csat-hidden">
+    <span id="csat-feedback-label">Feedback</span>
+    <textarea id="csat-textarea"></textarea>
+    <div id="csat-submit">Submit</div>
+  </div>
+</div></div>
+  
+</div>
+
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2025, The Ray Team.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

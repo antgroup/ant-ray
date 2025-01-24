@@ -2,12 +2,18 @@ name: Ant Ray PyPi Release
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Enter branch name to build wheels from (default: main)'
+        required: false
+        type: string
+        default: 'main'
   release:
     types:
       - published
 
 jobs:
-  build_wheels:
+  build_wheels_on_linux:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -18,6 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
@@ -39,8 +47,39 @@ jobs:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./python/dist/*.whl
 
+  build_wheels_on_macos:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [macos-13, macos-14]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.22.0
+        env:
+          CIBW_BEFORE_BUILD: pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh && python -m ensurepip --upgrade && sudo chmod a+x /Users/runner/bin/bazel && sudo chown -R runner /Users/runner/Library/Caches/bazelisk
+          CIBW_BUILD: |
+            cp39-macosx_*
+            cp310-macosx_*
+            cp311-macosx_*
+        with:
+          package-dir: ./python
+          output-dir: ./python/dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./python/dist/*.whl
+
   upload_pypi:
-    needs: [build_wheels]
+    needs: [build_wheels_on_linux, build_wheels_on_macos]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -61,7 +100,7 @@ jobs:
           packages-dir: python/dist
 
   upload_test_pypi:
-    needs: [build_wheels]
+    needs: [build_wheels_on_linux, build_wheels_on_macos]
     runs-on: ubuntu-latest
     environment: testpypi-publish
     permissions:

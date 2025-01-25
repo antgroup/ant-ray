@@ -286,7 +286,12 @@ ray_cc_library(
     hdrs = ["status.h"],
     deps = [
         ":source_location",
-        "//src/ray/util",
+        "//src/ray/util:logging",
+        "//src/ray/util:macros",
+        "//src/ray/util:visibility",
+        "@boost//:system",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/strings",
     ],
 )
 

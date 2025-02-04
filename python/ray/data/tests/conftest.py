@@ -30,8 +30,10 @@ from ray.tests.conftest import *  # noqa
 from ray.tests.conftest import (
     _ray_start,
     get_default_fixture_ray_kwargs,
+    pytest_runtest_makereport,  # noqa
     wait_for_condition,
 )
+from ray.util.debug import reset_log_once
 
 
 @pytest.fixture(scope="module")
@@ -295,6 +297,12 @@ def enable_auto_log_stats(request):
     ctx.enable_auto_log_stats = request.param
     yield request.param
     ctx.enable_auto_log_stats = original
+
+
+@pytest.fixture(autouse=True)
+def reset_log_once_fixture():
+    reset_log_once()
+    yield
 
 
 @pytest.fixture(params=[1024])

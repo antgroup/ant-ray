@@ -1,7 +1,16 @@
-name: Run CI
-
+name: CI
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Enter branch name to build wheels from (default: main)'
+        required: false
+        type: string
+        default: 'main'
+  push:
+    tags:
+      - 'ant-ray-*'
+
 
 jobs:
   ci:

@@ -1,11 +1,20 @@
 name: CI
-on: [push, pull_request]
 
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Enter branch name to build wheels from (default: main)'
+        required: false
+        type: string
+        default: 'main'
 jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
       
       - name: Set up environment
         run: |

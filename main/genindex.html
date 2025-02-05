@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=2df59da5" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=9b1aa6b9" />
     <link rel="stylesheet" type="text/css" href="_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -335,6 +335,17 @@ both in the usual template (layout.html) as well as (index.html). -->
         <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -489,6 +500,17 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -591,7 +613,10 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ray-core/compiled-graph/execution.html">Execution and failure semantics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/compiled-graph/visualization.html">Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ray-core/compiled-graph/profiling.html">Profiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ray-core/compiled-graph/overlap.html">Overlap communication and computation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -836,10 +861,11 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib/rllib-models.html">Models, Preprocessors, and Action Distributions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib/checkpoints.html">Checkpointing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rllib/metrics-logger.html">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib/single-agent-episode.html">Episodes</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="rllib/rllib-replay-buffers.html">Replay Buffers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rllib/rllib-offline.html">Working with Offline Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rllib/rllib-offline.html">Working with offline data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib/rllib-rlmodule.html">RL Modules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib/rllib-learner.html">Learner (Alpha)</a></li>
 
@@ -885,22 +911,17 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_actions.html">ray.rllib.algorithms.algorithm.Algorithm.compute_actions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_single_action.html">ray.rllib.algorithms.algorithm.Algorithm.compute_single_action</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html">ray.rllib.algorithms.algorithm.Algorithm.from_state</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html">ray.rllib.algorithms.algorithm.Algorithm.get_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html">ray.rllib.algorithms.algorithm.Algorithm.set_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore.html">ray.rllib.algorithms.algorithm.Algorithm.restore</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html">ray.rllib.algorithms.algorithm.Algorithm.restore_workers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save.html">ray.rllib.algorithms.algorithm.Algorithm.save</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.env_runner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.train.html">ray.rllib.algorithms.algorithm.Algorithm.train</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html">ray.rllib.algorithms.algorithm.Algorithm.training_step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_to_path.html">ray.rllib.algorithms.algorithm.Algorithm.save_to_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html">ray.rllib.algorithms.algorithm.Algorithm.restore_from_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html">ray.rllib.algorithms.algorithm.Algorithm.get_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html">ray.rllib.algorithms.algorithm.Algorithm.set_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html">ray.rllib.algorithms.algorithm.Algorithm.get_module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html">ray.rllib.algorithms.algorithm.Algorithm.add_policy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
@@ -1016,6 +1037,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value.html">ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value</a></li>
@@ -2531,6 +2558,8 @@ document.write(`
 </li>
         <li><a href="rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.__init__.html#ray.rllib.utils.checkpoints.Checkpointable.__init__">(ray.rllib.utils.checkpoints.Checkpointable method)</a>
 </li>
+        <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.__init__.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.__init__">(ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
         <li><a href="rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer.__init__.html#ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer.__init__">(ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer method)</a>
 </li>
         <li><a href="rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.__init__.html#ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.__init__">(ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer method)</a>
@@ -2724,6 +2753,8 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.actions.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.actions">actions (ray.rllib.env.single_agent_episode.SingleAgentEpisode attribute)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.activate_tensor_mode.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.activate_tensor_mode">activate_tensor_mode() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
       <li><a href="ray-references/glossary.html#term-Actor"><strong>Actor</strong></a>
 </li>
       <li><a href="ray-references/glossary.html#term-Actor-task"><strong>Actor task</strong></a>
@@ -2880,10 +2911,10 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.after_gradient_based_update.html#ray.rllib.core.learner.learner.Learner.after_gradient_based_update">after_gradient_based_update() (ray.rllib.core.learner.learner.Learner method)</a>
 </li>
-      <li><a href="ray-references/glossary.html#term-Agent"><strong>Agent</strong></a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ray-references/glossary.html#term-Agent"><strong>Agent</strong></a>
+</li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.agent_episode_ids.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.agent_episode_ids">agent_episode_ids (ray.rllib.env.multi_agent_episode.MultiAgentEpisode property)</a>
 </li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.agent_episodes.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.agent_episodes">agent_episodes (ray.rllib.env.multi_agent_episode.MultiAgentEpisode attribute)</a>
@@ -3513,9 +3544,11 @@ document.write(`
 </li>
       <li><a href="tune/api/doc/ray.tune.search.ConcurrencyLimiter.html#ray.tune.search.ConcurrencyLimiter">ConcurrencyLimiter (class in ray.tune.search)</a>
 </li>
-      <li><a href="train/api/doc/ray.train.Result.html#ray.train.Result.config">config (ray.train.Result property)</a>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.config.html#ray.rllib.algorithms.algorithm.Algorithm.config">config (ray.rllib.algorithms.algorithm.Algorithm attribute)</a>
 
       <ul>
+        <li><a href="train/api/doc/ray.train.Result.html#ray.train.Result.config">(ray.train.Result property)</a>
+</li>
         <li><a href="tune/api/internals.html#ray.tune.experiment.trial.Trial.config">(ray.tune.experiment.trial.Trial attribute)</a>
 </li>
       </ul></li>
@@ -3752,6 +3785,8 @@ document.write(`
 </li>
       <li><a href="data/api/doc/ray.data.Datasource.html#ray.data.Datasource">Datasource (class in ray.data)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.deactivate_tensor_mode.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.deactivate_tensor_mode">deactivate_tensor_mode() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
       <li><a href="ray-observability/reference/doc/ray.util.state.common.ActorState.html#ray.util.state.common.ActorState.death_cause">death_cause (ray.util.state.common.ActorState attribute)</a>
 </li>
       <li><a href="tune/api/doc/ray.tune.schedulers.AsyncHyperBandScheduler.html#ray.tune.schedulers.AsyncHyperBandScheduler.debug_string">debug_string() (ray.tune.schedulers.AsyncHyperBandScheduler method)</a>
@@ -3793,7 +3828,11 @@ document.write(`
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.delay_between_worker_restarts_s.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.delay_between_worker_restarts_s">delay_between_worker_restarts_s (ray.rllib.algorithms.algorithm_config.AlgorithmConfig property)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.delete.html#ray.serve.delete">delete() (in module ray.serve)</a>
+
+      <ul>
+        <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.delete.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.delete">(ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
+      </ul></li>
       <li><a href="cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.delete_job.html#ray.job_submission.JobSubmissionClient.delete_job">delete_job() (ray.job_submission.JobSubmissionClient method)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.schema.ApplicationStatus.DELETING.html#ray.serve.schema.ApplicationStatus.DELETING">DELETING (ray.serve.schema.ApplicationStatus attribute)</a>
@@ -4095,6 +4134,8 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html#ray.rllib.algorithms.algorithm.Algorithm.env_runner">env_runner (ray.rllib.algorithms.algorithm.Algorithm property)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner_group.html#ray.rllib.algorithms.algorithm.Algorithm.env_runner_group">env_runner_group (ray.rllib.algorithms.algorithm.Algorithm attribute)</a>
+</li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners">env_runners() (ray.rllib.algorithms.algorithm_config.AlgorithmConfig method)</a>
 </li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.env_steps.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.env_steps">env_steps() (ray.rllib.env.multi_agent_episode.MultiAgentEpisode method)</a>
@@ -4150,6 +4191,8 @@ document.write(`
       <li><a href="data/api/doc/ray.data.Datasource.estimate_inmemory_data_size.html#ray.data.Datasource.estimate_inmemory_data_size">estimate_inmemory_data_size() (ray.data.Datasource method)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html#ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner">eval_env_runner (ray.rllib.algorithms.algorithm.Algorithm property)</a>
+</li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner_group.html#ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner_group">eval_env_runner_group (ray.rllib.algorithms.algorithm.Algorithm attribute)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html#ray.rllib.algorithms.algorithm.Algorithm.evaluate">evaluate() (ray.rllib.algorithms.algorithm.Algorithm method)</a>
 </li>
@@ -4929,10 +4972,10 @@ document.write(`
       </ul></li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html#ray.rllib.algorithms.algorithm.Algorithm.get_module">get_module() (ray.rllib.algorithms.algorithm.Algorithm method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.get_multi_agent_setup.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.get_multi_agent_setup">get_multi_agent_setup() (ray.rllib.algorithms.algorithm_config.AlgorithmConfig method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.get_multi_rl_module_spec.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.get_multi_rl_module_spec">get_multi_rl_module_spec() (ray.rllib.algorithms.algorithm_config.AlgorithmConfig method)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.get_multiplexed_model_id.html#ray.serve.get_multiplexed_model_id">get_multiplexed_model_id() (in module ray.serve)</a>
@@ -5062,6 +5105,8 @@ document.write(`
 </li>
         <li><a href="tune/api/doc/ray.air.integrations.wandb.WandbLoggerCallback.get_state.html#ray.air.integrations.wandb.WandbLoggerCallback.get_state">(ray.air.integrations.wandb.WandbLoggerCallback method)</a>
 </li>
+        <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html#ray.rllib.algorithms.algorithm.Algorithm.get_state">(ray.rllib.algorithms.algorithm.Algorithm method)</a>
+</li>
         <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.get_state.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.get_state">(ray.rllib.algorithms.algorithm_config.AlgorithmConfig method)</a>
 </li>
         <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.get_state.html#ray.rllib.core.learner.learner.Learner.get_state">(ray.rllib.core.learner.learner.Learner method)</a>
@@ -5075,6 +5120,8 @@ document.write(`
         <li><a href="rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_state.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_state">(ray.rllib.env.single_agent_episode.SingleAgentEpisode method)</a>
 </li>
         <li><a href="rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.get_state.html#ray.rllib.utils.checkpoints.Checkpointable.get_state">(ray.rllib.utils.checkpoints.Checkpointable method)</a>
+</li>
+        <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.get_state.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.get_state">(ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
         <li><a href="rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer.get_state.html#ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer.get_state">(ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer method)</a>
 </li>
@@ -5916,6 +5963,8 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learner_class.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learner_class">learner_class (ray.rllib.algorithms.algorithm_config.AlgorithmConfig property)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.learner_group.html#ray.rllib.algorithms.algorithm.Algorithm.learner_group">learner_group (ray.rllib.algorithms.algorithm.Algorithm attribute)</a>
+</li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.learner_only.html#ray.rllib.core.rl_module.rl_module.RLModuleSpec.learner_only">learner_only (ray.rllib.core.rl_module.rl_module.RLModuleSpec attribute)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html#ray.rllib.core.learner.learner_group.LearnerGroup">LearnerGroup (class in ray.rllib.core.learner.learner_group)</a>
@@ -6006,6 +6055,8 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.utils.external_env_protocol.RLlink.LOG_ACTION.html#ray.rllib.env.utils.external_env_protocol.RLlink.LOG_ACTION">LOG_ACTION (ray.rllib.env.utils.external_env_protocol.RLlink attribute)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict">log_dict() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.schema.ReplicaDetails.log_file_path.html#ray.serve.schema.ReplicaDetails.log_file_path">log_file_path (ray.serve.schema.ReplicaDetails attribute)</a>
 
       <ul>
@@ -6024,14 +6075,16 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.default_model_config.DefaultModelConfig.log_std_clip_param.html#ray.rllib.core.rl_module.default_model_config.DefaultModelConfig.log_std_clip_param">log_std_clip_param (ray.rllib.core.rl_module.default_model_config.DefaultModelConfig attribute)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time">log_time() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="train/api/doc/ray.train.RunConfig.log_to_file.html#ray.train.RunConfig.log_to_file">log_to_file (ray.train.RunConfig attribute)</a>
 
       <ul>
         <li><a href="tune/api/doc/ray.tune.RunConfig.log_to_file.html#ray.tune.RunConfig.log_to_file">(ray.tune.RunConfig attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tune/api/doc/ray.tune.logger.LoggerCallback.log_trial_end.html#ray.tune.logger.LoggerCallback.log_trial_end">log_trial_end() (ray.tune.logger.LoggerCallback method)</a>
 </li>
       <li><a href="tune/api/doc/ray.air.integrations.comet.CometLoggerCallback.log_trial_restore.html#ray.air.integrations.comet.CometLoggerCallback.log_trial_restore">log_trial_restore() (ray.air.integrations.comet.CometLoggerCallback method)</a>
@@ -6080,6 +6133,8 @@ document.write(`
         <li><a href="tune/api/doc/ray.tune.logger.LoggerCallback.log_trial_start.html#ray.tune.logger.LoggerCallback.log_trial_start">(ray.tune.logger.LoggerCallback method)</a>
 </li>
       </ul></li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value">log_value() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.logdir.html#ray.rllib.algorithms.algorithm.Algorithm.logdir">logdir (ray.rllib.algorithms.algorithm.Algorithm property)</a>
 
       <ul>
@@ -6280,6 +6335,8 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.merge_algorithm_configs.html#ray.rllib.algorithms.algorithm.Algorithm.merge_algorithm_configs">merge_algorithm_configs() (ray.rllib.algorithms.algorithm.Algorithm class method)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts">merge_and_log_n_dicts() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
       <li><a href="data/api/doc/ray.data.block.BlockAccessor.merge_sorted_blocks.html#ray.data.block.BlockAccessor.merge_sorted_blocks">merge_sorted_blocks() (ray.data.block.BlockAccessor static method)</a>
 </li>
       <li><a href="cluster/running-applications/job-submission/doc/ray.job_submission.JobDetails.message.html#ray.job_submission.JobDetails.message">message (ray.job_submission.JobDetails attribute)</a>
@@ -6372,11 +6429,17 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="train/api/doc/ray.train.Result.html#ray.train.Result.metrics">metrics (ray.train.Result attribute)</a>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.metrics.html#ray.rllib.algorithms.algorithm.Algorithm.metrics">metrics (ray.rllib.algorithms.algorithm.Algorithm attribute)</a>
+
+      <ul>
+        <li><a href="train/api/doc/ray.train.Result.html#ray.train.Result.metrics">(ray.train.Result attribute)</a>
 </li>
+      </ul></li>
       <li><a href="train/api/doc/ray.train.Result.html#ray.train.Result.metrics_dataframe">metrics_dataframe (ray.train.Result attribute)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.config.AutoscalingConfig.metrics_interval_s.html#ray.serve.config.AutoscalingConfig.metrics_interval_s">metrics_interval_s (ray.serve.config.AutoscalingConfig attribute)</a>
+</li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger">MetricsLogger (class in ray.rllib.utils.metrics.metrics_logger)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.config.HTTPOptions.middlewares.html#ray.serve.config.HTTPOptions.middlewares">middlewares (ray.serve.config.HTTPOptions attribute)</a>
 </li>
@@ -6390,6 +6453,14 @@ document.write(`
       </ul></li>
       <li><a href="serve/api/doc/ray.serve.config.AutoscalingConfig.min_replicas.html#ray.serve.config.AutoscalingConfig.min_replicas">min_replicas (ray.serve.config.AutoscalingConfig attribute)</a>
 </li>
+      <li><a href="data/api/doc/ray.data.Datasink.min_rows_per_write.html#ray.data.Datasink.min_rows_per_write">min_rows_per_write (ray.data.Datasink property)</a>
+
+      <ul>
+        <li><a href="data/api/doc/ray.data.datasource.BlockBasedFileDatasink.min_rows_per_write.html#ray.data.datasource.BlockBasedFileDatasink.min_rows_per_write">(ray.data.datasource.BlockBasedFileDatasink property)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.datasource.RowBasedFileDatasink.min_rows_per_write.html#ray.data.datasource.RowBasedFileDatasink.min_rows_per_write">(ray.data.datasource.RowBasedFileDatasink property)</a>
+</li>
+      </ul></li>
       <li><a href="data/api/doc/ray.data.preprocessors.MinMaxScaler.html#ray.data.preprocessors.MinMaxScaler">MinMaxScaler (class in ray.data.preprocessors)</a>
 </li>
       <li><a href="tune/api/doc/ray.air.integrations.mlflow.MLflowLoggerCallback.html#ray.air.integrations.mlflow.MLflowLoggerCallback">MLflowLoggerCallback (class in ray.air.integrations.mlflow)</a>
@@ -6653,14 +6724,6 @@ document.write(`
       </ul></li>
       <li><a href="data/api/doc/ray.data.block.BlockAccessor.num_rows.html#ray.data.block.BlockAccessor.num_rows">num_rows() (ray.data.block.BlockAccessor method)</a>
 </li>
-      <li><a href="data/api/doc/ray.data.Datasink.num_rows_per_write.html#ray.data.Datasink.num_rows_per_write">num_rows_per_write (ray.data.Datasink property)</a>
-
-      <ul>
-        <li><a href="data/api/doc/ray.data.datasource.BlockBasedFileDatasink.num_rows_per_write.html#ray.data.datasource.BlockBasedFileDatasink.num_rows_per_write">(ray.data.datasource.BlockBasedFileDatasink property)</a>
-</li>
-        <li><a href="data/api/doc/ray.data.datasource.RowBasedFileDatasink.num_rows_per_write.html#ray.data.datasource.RowBasedFileDatasink.num_rows_per_write">(ray.data.datasource.RowBasedFileDatasink property)</a>
-</li>
-      </ul></li>
       <li><a href="tune/api/doc/ray.tune.TuneConfig.num_samples.html#ray.tune.TuneConfig.num_samples">num_samples (ray.tune.TuneConfig attribute)</a>
 </li>
       <li><a href="tune/api/doc/ray.tune.ResultGrid.num_terminated.html#ray.tune.ResultGrid.num_terminated">num_terminated (ray.tune.ResultGrid property)</a>
@@ -6748,6 +6811,8 @@ document.write(`
       <li><a href="ray-references/glossary.html#term-Offline-data"><strong>Offline data</strong></a>
 </li>
       <li><a href="ray-references/glossary.html#term-Offline-RL"><strong>Offline RL</strong></a>
+</li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.offline_data.html#ray.rllib.algorithms.algorithm.Algorithm.offline_data">offline_data (ray.rllib.algorithms.algorithm.Algorithm attribute)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data">offline_data() (ray.rllib.algorithms.algorithm_config.AlgorithmConfig method)</a>
 </li>
@@ -7125,6 +7190,10 @@ document.write(`
       </ul></li>
       <li><a href="tune/api/doc/ray.tune.schedulers.pb2.PB2.html#ray.tune.schedulers.pb2.PB2">PB2 (class in ray.tune.schedulers.pb2)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek">peek() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek_results.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek_results">peek_results() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger static method)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.peer.html#ray.serve.grpc_util.RayServegRPCContext.peer">peer() (ray.serve.grpc_util.RayServegRPCContext method)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.peer_identities.html#ray.serve.grpc_util.RayServegRPCContext.peer_identities">peer_identities() (ray.serve.grpc_util.RayServegRPCContext method)</a>
@@ -7219,10 +7288,10 @@ document.write(`
         <li><a href="ray-core/api/doc/ray.runtime_env.RuntimeEnvConfig.pop.html#ray.runtime_env.RuntimeEnvConfig.pop">(ray.runtime_env.RuntimeEnvConfig method)</a>
 </li>
       </ul></li>
-      <li><a href="ray-core/api/doc/ray.util.ActorPool.pop_idle.html#ray.util.ActorPool.pop_idle">pop_idle() (ray.util.ActorPool method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ray-core/api/doc/ray.util.ActorPool.pop_idle.html#ray.util.ActorPool.pop_idle">pop_idle() (ray.util.ActorPool method)</a>
+</li>
       <li><a href="ray-core/api/doc/ray.runtime_env.RuntimeEnv.popitem.html#ray.runtime_env.RuntimeEnv.popitem">popitem() (ray.runtime_env.RuntimeEnv method)</a>
 
       <ul>
@@ -8071,14 +8140,14 @@ document.write(`
 </li>
       <li><a href="ray-more-libs/doc/ray.util.dask.RayDaskCallback.html#ray.util.dask.RayDaskCallback">RayDaskCallback (class in ray.util.dask)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="train/api/doc/ray.train.lightning.RayDDPStrategy.html#ray.train.lightning.RayDDPStrategy">RayDDPStrategy (class in ray.train.lightning)</a>
 </li>
       <li><a href="train/api/doc/ray.train.lightning.RayDeepSpeedStrategy.html#ray.train.lightning.RayDeepSpeedStrategy">RayDeepSpeedStrategy (class in ray.train.lightning)</a>
 </li>
       <li><a href="ray-core/api/doc/ray.exceptions.RayError.html#ray.exceptions.RayError">RayError</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="train/api/doc/ray.train.lightning.RayFSDPStrategy.html#ray.train.lightning.RayFSDPStrategy">RayFSDPStrategy (class in ray.train.lightning)</a>
 </li>
       <li><a href="ray-references/glossary.html#term-Raylet"><strong>Raylet</strong></a>
@@ -8105,6 +8174,8 @@ document.write(`
         <li><a href="train/api/doc/ray.train.xgboost.RayTrainReportCallback.html#ray.train.xgboost.RayTrainReportCallback">(class in ray.train.xgboost)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/doc/ray.data.read_audio.html#ray.data.read_audio">read_audio() (in module ray.data)</a>
+</li>
       <li><a href="data/api/doc/ray.data.read_avro.html#ray.data.read_avro">read_avro() (in module ray.data)</a>
 </li>
       <li><a href="data/api/doc/ray.data.read_bigquery.html#ray.data.read_bigquery">read_bigquery() (in module ray.data)</a>
@@ -8147,6 +8218,8 @@ document.write(`
 </li>
       <li><a href="data/api/doc/ray.data.read_tfrecords.html#ray.data.read_tfrecords">read_tfrecords() (in module ray.data)</a>
 </li>
+      <li><a href="data/api/doc/ray.data.read_videos.html#ray.data.read_videos">read_videos() (in module ray.data)</a>
+</li>
       <li><a href="data/api/doc/ray.data.read_webdataset.html#ray.data.read_webdataset">read_webdataset() (in module ray.data)</a>
 </li>
       <li><a href="data/api/doc/ray.data.ReadTask.html#ray.data.ReadTask">ReadTask (class in ray.data)</a>
@@ -8166,7 +8239,11 @@ document.write(`
       <li><a href="ray-more-libs/ray-collective.html#ray.util.collective.collective.recv_multigpu">recv_multigpu() (in module ray.util.collective.collective)</a>
 </li>
       <li><a href="ray-more-libs/ray-collective.html#ray.util.collective.collective.reduce">reduce() (in module ray.util.collective.collective)</a>
+
+      <ul>
+        <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce">(ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
+      </ul></li>
       <li><a href="rllib/package_ref/doc/ray.rllib.utils.torch_utils.reduce_mean_ignore_inf.html#ray.rllib.utils.torch_utils.reduce_mean_ignore_inf">reduce_mean_ignore_inf() (in module ray.rllib.utils.torch_utils)</a>
 </li>
       <li><a href="ray-more-libs/ray-collective.html#ray.util.collective.collective.reduce_multigpu">reduce_multigpu() (in module ray.util.collective.collective)</a>
@@ -8360,6 +8437,8 @@ document.write(`
       <ul>
         <li><a href="rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.reset">(ray.rllib.env.multi_agent_env.MultiAgentEnv method)</a>
 </li>
+        <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reset.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reset">(ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
         <li><a href="tune/api/doc/ray.tune.Trainable.reset.html#ray.tune.Trainable.reset">(ray.tune.Trainable method)</a>
 </li>
       </ul></li>
@@ -8442,6 +8521,8 @@ document.write(`
         <li><a href="tune/api/doc/ray.tune.Tuner.restore.html#ray.tune.Tuner.restore">(ray.tune.Tuner class method)</a>
 </li>
       </ul></li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_env_runners.html#ray.rllib.algorithms.algorithm.Algorithm.restore_env_runners">restore_env_runners() (ray.rllib.algorithms.algorithm.Algorithm method)</a>
+</li>
       <li><a href="tune/api/doc/ray.tune.search.ax.AxSearch.restore_from_dir.html#ray.tune.search.ax.AxSearch.restore_from_dir">restore_from_dir() (ray.tune.search.ax.AxSearch method)</a>
 
       <ul>
@@ -8468,9 +8549,11 @@ document.write(`
         <li><a href="tune/api/doc/ray.tune.search.zoopt.ZOOptSearch.restore_from_dir.html#ray.tune.search.zoopt.ZOOptSearch.restore_from_dir">(ray.tune.search.zoopt.ZOOptSearch method)</a>
 </li>
       </ul></li>
-      <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.restore_from_path.html#ray.rllib.core.learner.learner.Learner.restore_from_path">restore_from_path() (ray.rllib.core.learner.learner.Learner method)</a>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html#ray.rllib.algorithms.algorithm.Algorithm.restore_from_path">restore_from_path() (ray.rllib.algorithms.algorithm.Algorithm method)</a>
 
       <ul>
+        <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.restore_from_path.html#ray.rllib.core.learner.learner.Learner.restore_from_path">(ray.rllib.core.learner.learner.Learner method)</a>
+</li>
         <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.restore_from_path.html#ray.rllib.core.learner.learner_group.LearnerGroup.restore_from_path">(ray.rllib.core.learner.learner_group.LearnerGroup method)</a>
 </li>
         <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.restore_from_path.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.restore_from_path">(ray.rllib.core.rl_module.multi_rl_module.MultiRLModule method)</a>
@@ -8482,8 +8565,6 @@ document.write(`
         <li><a href="rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.restore_from_path.html#ray.rllib.utils.checkpoints.Checkpointable.restore_from_path">(ray.rllib.utils.checkpoints.Checkpointable method)</a>
 </li>
       </ul></li>
-      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html#ray.rllib.algorithms.algorithm.Algorithm.restore_workers">restore_workers() (ray.rllib.algorithms.algorithm.Algorithm method)</a>
-</li>
       <li><a href="train/api/doc/ray.train.Result.html#ray.train.Result">Result (class in ray.train)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.handle.DeploymentResponse.html#ray.serve.handle.DeploymentResponse.result">result() (ray.serve.handle.DeploymentResponse method)</a>
@@ -9162,6 +9243,8 @@ document.write(`
 </li>
         <li><a href="tune/api/doc/ray.air.integrations.wandb.WandbLoggerCallback.set_state.html#ray.air.integrations.wandb.WandbLoggerCallback.set_state">(ray.air.integrations.wandb.WandbLoggerCallback method)</a>
 </li>
+        <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html#ray.rllib.algorithms.algorithm.Algorithm.set_state">(ray.rllib.algorithms.algorithm.Algorithm method)</a>
+</li>
         <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.set_state.html#ray.rllib.core.learner.learner.Learner.set_state">(ray.rllib.core.learner.learner.Learner method)</a>
 </li>
         <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state">(ray.rllib.core.rl_module.multi_rl_module.MultiRLModule method)</a>
@@ -9169,6 +9252,8 @@ document.write(`
         <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.set_state.html#ray.rllib.core.rl_module.rl_module.RLModule.set_state">(ray.rllib.core.rl_module.rl_module.RLModule method)</a>
 </li>
         <li><a href="rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.set_state.html#ray.rllib.utils.checkpoints.Checkpointable.set_state">(ray.rllib.utils.checkpoints.Checkpointable method)</a>
+</li>
+        <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.set_state.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.set_state">(ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
         <li><a href="rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer.set_state.html#ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer.set_state">(ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer.MultiAgentPrioritizedReplayBuffer method)</a>
 </li>
@@ -9207,6 +9292,8 @@ document.write(`
 </li>
       <li><a href="tune/api/doc/ray.tune.schedulers.ResourceChangingScheduler.set_trial_resources.html#ray.tune.schedulers.ResourceChangingScheduler.set_trial_resources">set_trial_resources() (ray.tune.schedulers.ResourceChangingScheduler method)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.set_value.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.set_value">set_value() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html#ray.rllib.algorithms.algorithm.Algorithm.set_weights">set_weights() (ray.rllib.algorithms.algorithm.Algorithm method)</a>
 
       <ul>
@@ -9219,6 +9306,8 @@ document.write(`
         <li><a href="ray-core/api/doc/ray.runtime_env.RuntimeEnvConfig.setdefault.html#ray.runtime_env.RuntimeEnvConfig.setdefault">(ray.runtime_env.RuntimeEnvConfig method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tune/api/doc/ray.air.integrations.comet.CometLoggerCallback.setup.html#ray.air.integrations.comet.CometLoggerCallback.setup">setup() (ray.air.integrations.comet.CometLoggerCallback method)</a>
 
       <ul>
@@ -9261,8 +9350,6 @@ document.write(`
         <li><a href="tune/api/doc/ray.tune.Trainable.setup.html#ray.tune.Trainable.setup">(ray.tune.Trainable method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cluster/vms/user-guides/community/spark.html#ray.util.spark.setup_global_ray_cluster">setup_global_ray_cluster() (in module ray.util.spark)</a>
 </li>
       <li><a href="tune/api/doc/ray.air.integrations.mlflow.setup_mlflow.html#ray.air.integrations.mlflow.setup_mlflow">setup_mlflow() (in module ray.air.integrations.mlflow)</a>
@@ -9809,9 +9896,13 @@ document.write(`
 </li>
       <li><a href="ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.teardown">teardown() (ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster method)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.tensor_mode.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.tensor_mode">tensor_mode (ray.rllib.utils.metrics.metrics_logger.MetricsLogger property)</a>
+</li>
       <li><a href="train/api/doc/ray.train.tensorflow.TensorflowConfig.html#ray.train.tensorflow.TensorflowConfig">TensorflowConfig (class in ray.train.tensorflow)</a>
 </li>
       <li><a href="train/api/doc/ray.train.tensorflow.TensorflowTrainer.html#ray.train.tensorflow.TensorflowTrainer">TensorflowTrainer (class in ray.train.tensorflow)</a>
+</li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.tensors_to_numpy.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.tensors_to_numpy">tensors_to_numpy() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
       <li><a href="data/api/doc/ray.data.TFXReadOptions.html#ray.data.TFXReadOptions">TFXReadOptions (class in ray.data)</a>
 </li>

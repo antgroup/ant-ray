@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=2df59da5" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=9b1aa6b9" />
     <link rel="stylesheet" type="text/css" href="../../../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -335,6 +335,17 @@ both in the usual template (layout.html) as well as (index.html). -->
         <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -489,6 +500,17 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -591,7 +613,10 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/execution.html">Execution and failure semantics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/visualization.html">Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/overlap.html">Overlap communication and computation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -836,10 +861,11 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-models.html">Models, Preprocessors, and Action Distributions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/checkpoints.html">Checkpointing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rllib/metrics-logger.html">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/single-agent-episode.html">Episodes</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-replay-buffers.html">Replay Buffers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-offline.html">Working with Offline Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-offline.html">Working with offline data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-rlmodule.html">RL Modules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-learner.html">Learner (Alpha)</a></li>
 
@@ -885,22 +911,17 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_actions.html">ray.rllib.algorithms.algorithm.Algorithm.compute_actions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_single_action.html">ray.rllib.algorithms.algorithm.Algorithm.compute_single_action</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html">ray.rllib.algorithms.algorithm.Algorithm.from_state</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html">ray.rllib.algorithms.algorithm.Algorithm.get_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html">ray.rllib.algorithms.algorithm.Algorithm.set_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore.html">ray.rllib.algorithms.algorithm.Algorithm.restore</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html">ray.rllib.algorithms.algorithm.Algorithm.restore_workers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save.html">ray.rllib.algorithms.algorithm.Algorithm.save</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.env_runner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.train.html">ray.rllib.algorithms.algorithm.Algorithm.train</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html">ray.rllib.algorithms.algorithm.Algorithm.training_step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_to_path.html">ray.rllib.algorithms.algorithm.Algorithm.save_to_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html">ray.rllib.algorithms.algorithm.Algorithm.restore_from_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html">ray.rllib.algorithms.algorithm.Algorithm.get_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html">ray.rllib.algorithms.algorithm.Algorithm.set_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html">ray.rllib.algorithms.algorithm.Algorithm.get_module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html">ray.rllib.algorithms.algorithm.Algorithm.add_policy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
@@ -1016,6 +1037,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value.html">ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value</a></li>
@@ -1637,8 +1664,8 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a slice of this block.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            start: The starting index of the slice.</span>
-<span class="sd">            end: The ending index of the slice.</span>
+<span class="sd">            start: The starting index of the slice (inclusive).</span>
+<span class="sd">            end: The ending index of the slice (exclusive).</span>
 <span class="sd">            copy: Whether to perform a data copy for the slice.</span>
 
 <span class="sd">        Returns:</span>
@@ -1939,6 +1966,86 @@ document.write(`
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 </div>
 
+
+
+<span class="k">def</span> <span class="nf">_get_block_boundaries</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute boundaries of the groups within a block, which is represented</span>
+<span class="sd">    by a list of 1D numpy arrays for each column. In each column,</span>
+<span class="sd">    NaNs/None are considered to be the same group.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        columns: a list of 1D numpy arrays. This is generally given by the</span>
+<span class="sd">        dictionary values of ``BlockAccessor.to_numpy()``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of starting indices of each group and an end index of the last</span>
+<span class="sd">        group, i.e., there are ``num_groups + 1`` entries and the first and last</span>
+<span class="sd">        entries are 0 and ``len(array)`` respectively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># There are 3 categories: general, numerics with NaN, and categorical with None.</span>
+    <span class="c1"># We only needed to check the last element for NaNs/None, as they are assumed to</span>
+    <span class="c1"># be sorted.</span>
+    <span class="n">general_arrays</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">num_arrays_with_nan</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cat_arrays_with_none</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">num_arrays_with_nan</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">)</span> <span class="ow">and</span> <span class="n">arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cat_arrays_with_none</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">general_arrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+
+    <span class="c1"># Compute the difference between each pair of elements. Handle the cases</span>
+    <span class="c1"># where neighboring elements are both NaN or None. Output as a list of</span>
+    <span class="c1"># boolean arrays.</span>
+    <span class="n">diffs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">general_arrays</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">diffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">general_arrays</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_arrays_with_nan</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Two neighboring numeric elements belong to the same group when they are</span>
+        <span class="c1"># 1) both finite and equal</span>
+        <span class="c1"># or 2) both np.nan</span>
+        <span class="n">diffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">num_arrays_with_nan</span>
+                <span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat_arrays_with_none</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Two neighboring str/object elements belong to the same group when they are</span>
+        <span class="c1"># 1) both finite and equal</span>
+        <span class="c1"># or 2) both None</span>
+        <span class="n">diffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="kc">None</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">cat_arrays_with_none</span>
+                <span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># A series of vectorized operations to compute the boundaries:</span>
+    <span class="c1"># - column_stack: stack the bool arrays into a single 2D bool array</span>
+    <span class="c1"># - any() and nonzero(): find the indices where any of the column diffs are True</span>
+    <span class="c1"># - add 1 to get the index of the first element of the next group</span>
+    <span class="c1"># - hstack(): include the 0 and last indices to the boundaries</span>
+    <span class="n">boundaries</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">])],</span>
+        <span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">boundaries</span>
 </pre></div>
 
                 </article>

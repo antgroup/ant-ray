@@ -37,7 +37,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2df59da5" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=9b1aa6b9" />
     <link rel="stylesheet" type="text/css" href="../../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -338,6 +338,17 @@ both in the usual template (layout.html) as well as (index.html). -->
         <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -496,6 +507,17 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -598,7 +620,10 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/execution.html">Execution and failure semantics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/visualization.html">Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/overlap.html">Overlap communication and computation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -843,10 +868,11 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib-models.html">Models, Preprocessors, and Action Distributions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../checkpoints.html">Checkpointing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metrics-logger.html">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../single-agent-episode.html">Episodes</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../rllib-replay-buffers.html">Replay Buffers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../rllib-offline.html">Working with Offline Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rllib-offline.html">Working with offline data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib-rlmodule.html">RL Modules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib-learner.html">Learner (Alpha)</a></li>
 
@@ -892,22 +918,17 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.compute_actions.html">ray.rllib.algorithms.algorithm.Algorithm.compute_actions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.compute_single_action.html">ray.rllib.algorithms.algorithm.Algorithm.compute_single_action</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html">ray.rllib.algorithms.algorithm.Algorithm.from_state</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html">ray.rllib.algorithms.algorithm.Algorithm.get_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html">ray.rllib.algorithms.algorithm.Algorithm.set_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.export_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.restore.html">ray.rllib.algorithms.algorithm.Algorithm.restore</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html">ray.rllib.algorithms.algorithm.Algorithm.restore_workers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.save.html">ray.rllib.algorithms.algorithm.Algorithm.save</a></li>
-<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.env_runner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.train.html">ray.rllib.algorithms.algorithm.Algorithm.train</a></li>
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html">ray.rllib.algorithms.algorithm.Algorithm.training_step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.save_to_path.html">ray.rllib.algorithms.algorithm.Algorithm.save_to_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html">ray.rllib.algorithms.algorithm.Algorithm.restore_from_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html">ray.rllib.algorithms.algorithm.Algorithm.get_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html">ray.rllib.algorithms.algorithm.Algorithm.set_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html">ray.rllib.algorithms.algorithm.Algorithm.get_module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html">ray.rllib.algorithms.algorithm.Algorithm.add_policy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
@@ -1023,6 +1044,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="doc/ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value.html">ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value</a></li>
@@ -1374,15 +1401,15 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <div class="admonition note">
+  <section id="algorithms">
+<span id="algorithm-reference-docs"></span><h1>Algorithms<a class="headerlink" href="#algorithms" title="Link to this heading">#</a></h1>
+<div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Ray 2.40 uses RLlib’s new API stack by default.
 The Ray team has mostly completed transitioning algorithms, example scripts, and
 documentation to the new code base.</p>
 <p>If you’re still using the old API stack, see <a class="reference internal" href="../new-api-stack-migration-guide.html"><span class="doc">New API stack migration guide</span></a> for details on how to migrate.</p>
 </div>
-<section id="algorithms">
-<span id="algorithm-reference-docs"></span><h1>Algorithms<a class="headerlink" href="#algorithms" title="Link to this heading">#</a></h1>
 <p>The <a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> class is the highest-level API in RLlib responsible for <strong>WHEN</strong> and <strong>WHAT</strong> of RL algorithms.
 Things like <strong>WHEN</strong> should we sample the algorithm, <strong>WHEN</strong> should we perform a neural network update, and so on.
 The <strong>HOW</strong> will be delegated to components such as <code class="docutils literal notranslate"><span class="pre">RolloutWorker</span></code>, etc..</p>
@@ -1422,12 +1449,12 @@ and override one or more of its methods. Those are in particular:</p>
 </section>
 <section id="algorithm-api">
 <span id="rllib-algorithm-api"></span><h2>Algorithm API<a class="headerlink" href="#algorithm-api" title="Link to this heading">#</a></h2>
-<section id="constructor">
-<h3>Constructor<a class="headerlink" href="#constructor" title="Link to this heading">#</a></h3>
+<section id="construction-and-setup">
+<h3>Construction and setup<a class="headerlink" href="#construction-and-setup" title="Link to this heading">#</a></h3>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Algorithm</span></code></a></p></td>
-<td><p>An RLlib algorithm responsible for optimizing one or more Policies.</p></td>
+<td><p>An RLlib algorithm responsible for training one or more neural network models.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html#ray.rllib.algorithms.algorithm.Algorithm.setup" title="ray.rllib.algorithms.algorithm.Algorithm.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a></p></td>
 <td><p>Subclasses should override this for custom initialization.</p></td>
@@ -1435,61 +1462,11 @@ and override one or more of its methods. Those are in particular:</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html#ray.rllib.algorithms.algorithm.Algorithm.get_default_config" title="ray.rllib.algorithms.algorithm.Algorithm.get_default_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default_config</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-</tbody>
-</table>
-</section>
-<section id="inference-and-evaluation">
-<h3>Inference and Evaluation<a class="headerlink" href="#inference-and-evaluation" title="Link to this heading">#</a></h3>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.compute_actions.html#ray.rllib.algorithms.algorithm.Algorithm.compute_actions" title="ray.rllib.algorithms.algorithm.Algorithm.compute_actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_actions</span></code></a></p></td>
-<td><p>Computes an action for the specified policy on the local Worker.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html#ray.rllib.algorithms.algorithm.Algorithm.env_runner" title="ray.rllib.algorithms.algorithm.Algorithm.env_runner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">env_runner</span></code></a></p></td>
+<td><p>The local EnvRunner instance within the algo's EnvRunnerGroup.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.compute_single_action.html#ray.rllib.algorithms.algorithm.Algorithm.compute_single_action" title="ray.rllib.algorithms.algorithm.Algorithm.compute_single_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_single_action</span></code></a></p></td>
-<td><p>Computes an action for the specified policy on the local worker.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html#ray.rllib.algorithms.algorithm.Algorithm.evaluate" title="ray.rllib.algorithms.algorithm.Algorithm.evaluate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate</span></code></a></p></td>
-<td><p>Evaluates current policy under <code class="code docutils literal notranslate"><span class="pre">evaluation_config</span></code> settings.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="saving-and-restoring">
-<h3>Saving and Restoring<a class="headerlink" href="#saving-and-restoring" title="Link to this heading">#</a></h3>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html#ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint" title="ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_checkpoint</span></code></a></p></td>
-<td><p>Creates a new algorithm instance from a given checkpoint.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html#ray.rllib.algorithms.algorithm.Algorithm.from_state" title="ray.rllib.algorithms.algorithm.Algorithm.from_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_state</span></code></a></p></td>
-<td><p>Recovers an Algorithm from a state object.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html#ray.rllib.algorithms.algorithm.Algorithm.get_weights" title="ray.rllib.algorithms.algorithm.Algorithm.get_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_weights</span></code></a></p></td>
-<td><p>Return a dict mapping Module/Policy IDs to weights.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html#ray.rllib.algorithms.algorithm.Algorithm.set_weights" title="ray.rllib.algorithms.algorithm.Algorithm.set_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_weights</span></code></a></p></td>
-<td><p>Set RLModule/Policy weights by Module/Policy ID.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.export_model.html#ray.rllib.algorithms.algorithm.Algorithm.export_model" title="ray.rllib.algorithms.algorithm.Algorithm.export_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_model</span></code></a></p></td>
-<td><p>Exports model based on export_formats.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html#ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint" title="ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_policy_checkpoint</span></code></a></p></td>
-<td><p>Exports Policy checkpoint to a local directory and returns an AIR Checkpoint.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html#ray.rllib.algorithms.algorithm.Algorithm.export_policy_model" title="ray.rllib.algorithms.algorithm.Algorithm.export_policy_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_policy_model</span></code></a></p></td>
-<td><p>Exports policy model with given policy_id to a local directory.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.restore.html#ray.rllib.algorithms.algorithm.Algorithm.restore" title="ray.rllib.algorithms.algorithm.Algorithm.restore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">restore</span></code></a></p></td>
-<td><p>Restores training state from a given model checkpoint.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html#ray.rllib.algorithms.algorithm.Algorithm.restore_workers" title="ray.rllib.algorithms.algorithm.Algorithm.restore_workers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">restore_workers</span></code></a></p></td>
-<td><p>Try bringing back unhealthy EnvRunners and - if successful - sync with local.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.save.html#ray.rllib.algorithms.algorithm.Algorithm.save" title="ray.rllib.algorithms.algorithm.Algorithm.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a></p></td>
-<td><p>Saves the current model state to a checkpoint.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html#ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint" title="ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_checkpoint</span></code></a></p></td>
-<td><p>Exports checkpoint to a local directory.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html#ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner" title="ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval_env_runner</span></code></a></p></td>
+<td><p>The local EnvRunner instance within the algo's evaluation EnvRunnerGroup.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1507,14 +1484,49 @@ and override one or more of its methods. Those are in particular:</p>
 </tbody>
 </table>
 </section>
+<section id="saving-and-restoring">
+<h3>Saving and restoring<a class="headerlink" href="#saving-and-restoring" title="Link to this heading">#</a></h3>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.save_to_path.html#ray.rllib.algorithms.algorithm.Algorithm.save_to_path" title="ray.rllib.algorithms.algorithm.Algorithm.save_to_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_to_path</span></code></a></p></td>
+<td><p>Saves the state of the implementing class (or <code class="code docutils literal notranslate"><span class="pre">state</span></code>) to <code class="code docutils literal notranslate"><span class="pre">path</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html#ray.rllib.algorithms.algorithm.Algorithm.restore_from_path" title="ray.rllib.algorithms.algorithm.Algorithm.restore_from_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">restore_from_path</span></code></a></p></td>
+<td><p>Restores the state of the implementing class from the given path.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html#ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint" title="ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_checkpoint</span></code></a></p></td>
+<td><p>Creates a new algorithm instance from a given checkpoint.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html#ray.rllib.algorithms.algorithm.Algorithm.get_state" title="ray.rllib.algorithms.algorithm.Algorithm.get_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_state</span></code></a></p></td>
+<td><p>Returns the implementing class's current state as a dict.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html#ray.rllib.algorithms.algorithm.Algorithm.set_state" title="ray.rllib.algorithms.algorithm.Algorithm.set_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_state</span></code></a></p></td>
+<td><p>Sets the implementing class' state to the given state dict.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="evaluation">
+<h3>Evaluation<a class="headerlink" href="#evaluation" title="Link to this heading">#</a></h3>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html#ray.rllib.algorithms.algorithm.Algorithm.evaluate" title="ray.rllib.algorithms.algorithm.Algorithm.evaluate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate</span></code></a></p></td>
+<td><p>Evaluates current policy under <code class="code docutils literal notranslate"><span class="pre">evaluation_config</span></code> settings.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="multi-agent">
 <h3>Multi Agent<a class="headerlink" href="#multi-agent" title="Link to this heading">#</a></h3>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html#ray.rllib.algorithms.algorithm.Algorithm.add_policy" title="ray.rllib.algorithms.algorithm.Algorithm.add_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_policy</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html#ray.rllib.algorithms.algorithm.Algorithm.get_module" title="ray.rllib.algorithms.algorithm.Algorithm.get_module"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_module</span></code></a></p></td>
+<td><p>Returns the (single-agent) RLModule with <code class="code docutils literal notranslate"><span class="pre">model_id</span></code> (None if ID not found).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html#ray.rllib.algorithms.algorithm.Algorithm.add_policy" title="ray.rllib.algorithms.algorithm.Algorithm.add_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_policy</span></code></a></p></td>
 <td><p>Adds a new policy to this Algorithm.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html#ray.rllib.algorithms.algorithm.Algorithm.remove_policy" title="ray.rllib.algorithms.algorithm.Algorithm.remove_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_policy</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html#ray.rllib.algorithms.algorithm.Algorithm.remove_policy" title="ray.rllib.algorithms.algorithm.Algorithm.remove_policy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_policy</span></code></a></p></td>
 <td><p>Removes a policy from this Algorithm.</p></td>
 </tr>
 </tbody>
@@ -1568,10 +1580,10 @@ and override one or more of its methods. Those are in particular:</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-custom-algorithm-classes">Building Custom Algorithm Classes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-api">Algorithm API</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#constructor">Constructor</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-and-evaluation">Inference and Evaluation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#saving-and-restoring">Saving and Restoring</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#construction-and-setup">Construction and setup</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training">Training</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#saving-and-restoring">Saving and restoring</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-agent">Multi Agent</a></li>
 </ul>
 </li>

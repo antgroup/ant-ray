@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=2df59da5" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=9b1aa6b9" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -335,6 +335,17 @@ both in the usual template (layout.html) as well as (index.html). -->
         <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -489,6 +500,17 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -591,7 +613,10 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/execution.html">Execution and failure semantics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/visualization.html">Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/overlap.html">Overlap communication and computation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -836,10 +861,11 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-models.html">Models, Preprocessors, and Action Distributions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/checkpoints.html">Checkpointing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rllib/metrics-logger.html">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/single-agent-episode.html">Episodes</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-replay-buffers.html">Replay Buffers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-offline.html">Working with Offline Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-offline.html">Working with offline data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-rlmodule.html">RL Modules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-learner.html">Learner (Alpha)</a></li>
 
@@ -885,22 +911,17 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_actions.html">ray.rllib.algorithms.algorithm.Algorithm.compute_actions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_single_action.html">ray.rllib.algorithms.algorithm.Algorithm.compute_single_action</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html">ray.rllib.algorithms.algorithm.Algorithm.from_state</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html">ray.rllib.algorithms.algorithm.Algorithm.get_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html">ray.rllib.algorithms.algorithm.Algorithm.set_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore.html">ray.rllib.algorithms.algorithm.Algorithm.restore</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html">ray.rllib.algorithms.algorithm.Algorithm.restore_workers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save.html">ray.rllib.algorithms.algorithm.Algorithm.save</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.env_runner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.train.html">ray.rllib.algorithms.algorithm.Algorithm.train</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html">ray.rllib.algorithms.algorithm.Algorithm.training_step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_to_path.html">ray.rllib.algorithms.algorithm.Algorithm.save_to_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html">ray.rllib.algorithms.algorithm.Algorithm.restore_from_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html">ray.rllib.algorithms.algorithm.Algorithm.get_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html">ray.rllib.algorithms.algorithm.Algorithm.set_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html">ray.rllib.algorithms.algorithm.Algorithm.get_module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html">ray.rllib.algorithms.algorithm.Algorithm.add_policy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
@@ -1016,6 +1037,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value.html">ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value</a></li>
@@ -1393,7 +1420,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.html#ray.tune.search.Searcher">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.html#ray.tune.search.bayesopt.Searcher">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="k">class</span> <span class="nc">Searcher</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for wrapping suggesting algorithms.</span>
@@ -1479,7 +1506,7 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mode most either be a list or string&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Searcher.set_search_properties">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.set_search_properties.html#ray.tune.search.Searcher.set_search_properties">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.set_search_properties.html#ray.tune.search.bayesopt.Searcher.set_search_properties">[docs]</a>
     <span class="k">def</span> <span class="nf">set_search_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="o">**</span><span class="n">spec</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -1502,7 +1529,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.on_trial_result">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.on_trial_result.html#ray.tune.search.Searcher.on_trial_result">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.on_trial_result.html#ray.tune.search.bayesopt.Searcher.on_trial_result">[docs]</a>
     <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional notification for result during training.</span>
 
@@ -1523,7 +1550,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.on_trial_complete">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.on_trial_complete.html#ray.tune.search.Searcher.on_trial_complete">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.on_trial_complete.html#ray.tune.search.bayesopt.Searcher.on_trial_complete">[docs]</a>
     <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1547,7 +1574,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.suggest">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.suggest.html#ray.tune.search.Searcher.suggest">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.suggest.html#ray.tune.search.bayesopt.Searcher.suggest">[docs]</a>
     <span class="k">def</span> <span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries the algorithm to retrieve the next set of parameters.</span>
 
@@ -1566,7 +1593,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.add_evaluated_point">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.add_evaluated_point.html#ray.tune.search.Searcher.add_evaluated_point">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.add_evaluated_point.html#ray.tune.search.bayesopt.Searcher.add_evaluated_point">[docs]</a>
     <span class="k">def</span> <span class="nf">add_evaluated_point</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
@@ -1597,7 +1624,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.add_evaluated_trials">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.add_evaluated_trials.html#ray.tune.search.Searcher.add_evaluated_trials">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.add_evaluated_trials.html#ray.tune.search.bayesopt.Searcher.add_evaluated_trials">[docs]</a>
     <span class="k">def</span> <span class="nf">add_evaluated_trials</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trials_or_analysis</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="s2">&quot;ExperimentAnalysis&quot;</span><span class="p">],</span>
@@ -1675,7 +1702,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.save">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.save.html#ray.tune.search.Searcher.save">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.save.html#ray.tune.search.bayesopt.Searcher.save">[docs]</a>
     <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Save state to path for this search algorithm.</span>
 
@@ -1712,7 +1739,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.restore">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.restore.html#ray.tune.search.Searcher.restore">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.restore.html#ray.tune.search.bayesopt.Searcher.restore">[docs]</a>
     <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restore state for this search algorithm</span>
 
@@ -1745,7 +1772,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.set_max_concurrency">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.set_max_concurrency.html#ray.tune.search.Searcher.set_max_concurrency">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.set_max_concurrency.html#ray.tune.search.bayesopt.Searcher.set_max_concurrency">[docs]</a>
     <span class="k">def</span> <span class="nf">set_max_concurrency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_concurrent</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set max concurrent trials this searcher can run.</span>
 
@@ -1770,7 +1797,7 @@ document.write(`
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="Searcher.save_to_dir">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.save_to_dir.html#ray.tune.search.Searcher.save_to_dir">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.save_to_dir.html#ray.tune.search.bayesopt.Searcher.save_to_dir">[docs]</a>
     <span class="k">def</span> <span class="nf">save_to_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Automatically saves the given searcher to the checkpoint_dir.</span>
 
@@ -1798,7 +1825,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.restore_from_dir">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.restore_from_dir.html#ray.tune.search.Searcher.restore_from_dir">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.restore_from_dir.html#ray.tune.search.bayesopt.Searcher.restore_from_dir">[docs]</a>
     <span class="k">def</span> <span class="nf">restore_from_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restores the state of a searcher from a given checkpoint_dir.</span>
 

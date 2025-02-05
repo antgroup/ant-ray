@@ -37,7 +37,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=2df59da5" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=9b1aa6b9" />
     <link rel="stylesheet" type="text/css" href="../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -338,6 +338,17 @@ both in the usual template (layout.html) as well as (index.html). -->
         <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -496,6 +507,17 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -598,7 +620,10 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/execution.html">Execution and failure semantics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/visualization.html">Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/profiling.html">Profiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/overlap.html">Overlap communication and computation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -843,10 +868,11 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-models.html">Models, Preprocessors, and Action Distributions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/checkpoints.html">Checkpointing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rllib/metrics-logger.html">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/single-agent-episode.html">Episodes</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-replay-buffers.html">Replay Buffers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-offline.html">Working with Offline Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-offline.html">Working with offline data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-rlmodule.html">RL Modules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-learner.html">Learner (Alpha)</a></li>
 
@@ -892,22 +918,17 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_actions.html">ray.rllib.algorithms.algorithm.Algorithm.compute_actions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_single_action.html">ray.rllib.algorithms.algorithm.Algorithm.compute_single_action</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html">ray.rllib.algorithms.algorithm.Algorithm.from_state</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html">ray.rllib.algorithms.algorithm.Algorithm.get_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html">ray.rllib.algorithms.algorithm.Algorithm.set_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore.html">ray.rllib.algorithms.algorithm.Algorithm.restore</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html">ray.rllib.algorithms.algorithm.Algorithm.restore_workers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save.html">ray.rllib.algorithms.algorithm.Algorithm.save</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.env_runner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.train.html">ray.rllib.algorithms.algorithm.Algorithm.train</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html">ray.rllib.algorithms.algorithm.Algorithm.training_step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_to_path.html">ray.rllib.algorithms.algorithm.Algorithm.save_to_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html">ray.rllib.algorithms.algorithm.Algorithm.restore_from_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html">ray.rllib.algorithms.algorithm.Algorithm.get_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html">ray.rllib.algorithms.algorithm.Algorithm.set_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html">ray.rllib.algorithms.algorithm.Algorithm.get_module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html">ray.rllib.algorithms.algorithm.Algorithm.add_policy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
@@ -1023,6 +1044,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value.html">ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value</a></li>
@@ -1439,7 +1466,7 @@ Advanced</label><div class="sd-tab-content docutils">
 <td><p>Core, Tune, RLlib</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-U</span> <span class="pre">&quot;ray[all]&quot;</span></code></p></td>
-<td><p>Core, Dashboard, Cluster Launcher, Data, Train, Tune, Serve, RLlib</p></td>
+<td><p>Core, Dashboard, Cluster Launcher, Data, Train, Tune, Serve, RLlib. This option isn’t recommended. Specify the extras you need as shown below instead.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1767,11 +1794,11 @@ required for Ray and its libraries.</p>
 <input checked="checked" id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
 </input><label class="sd-tab-label" data-sync-id="ray (Python 3.9)" for="sd-tab-item-5">
 ray (Python 3.9)</label><div class="sd-tab-content docutils">
-<p>Ray version: nightly (<a class="reference external" href="https://github.com/ray-project/ray/commit/37aa0c66110fc235762c29612b90f1c73869e6cf">37aa0c6</a>)</p>
+<p>Ray version: nightly (<a class="reference external" href="https://github.com/ray-project/ray/commit/916f534e571278b26733812b24a7b3dee08f24e4">916f534</a>)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aiohttp</span><span class="o">==</span><span class="mf">3.9.5</span>
 <span class="n">aiohttp</span><span class="o">-</span><span class="n">cors</span><span class="o">==</span><span class="mf">0.7.0</span>
 <span class="n">aiosignal</span><span class="o">==</span><span class="mf">1.3.1</span>
-<span class="n">anaconda</span><span class="o">-</span><span class="n">anon</span><span class="o">-</span><span class="n">usage</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">anaconda</span><span class="o">-</span><span class="n">anon</span><span class="o">-</span><span class="n">usage_1710965072196</span><span class="o">/</span><span class="n">work</span>
+<span class="n">anaconda</span><span class="o">-</span><span class="n">anon</span><span class="o">-</span><span class="n">usage</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">anaconda</span><span class="o">-</span><span class="n">anon</span><span class="o">-</span><span class="n">usage_1732732445543</span><span class="o">/</span><span class="n">work</span>
 <span class="n">annotated</span><span class="o">-</span><span class="n">types</span><span class="o">==</span><span class="mf">0.6.0</span>
 <span class="n">anyio</span><span class="o">==</span><span class="mf">3.7.1</span>
 <span class="n">archspec</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">archspec_1709217642129</span><span class="o">/</span><span class="n">work</span>
@@ -1781,7 +1808,7 @@ ray (Python 3.9)</label><div class="sd-tab-content docutils">
 <span class="n">boltons</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">boltons_1677628692245</span><span class="o">/</span><span class="n">work</span>
 <span class="n">boto3</span><span class="o">==</span><span class="mf">1.26.76</span>
 <span class="n">botocore</span><span class="o">==</span><span class="mf">1.29.76</span>
-<span class="n">Brotli</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">brotli</span><span class="o">-</span><span class="n">split_1714483155106</span><span class="o">/</span><span class="n">work</span>
+<span class="n">Brotli</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">brotli</span><span class="o">-</span><span class="n">split_1736182456865</span><span class="o">/</span><span class="n">work</span>
 <span class="n">cachetools</span><span class="o">==</span><span class="mf">5.3.2</span>
 <span class="n">certifi</span><span class="o">==</span><span class="mf">2023.11.17</span>
 <span class="n">cffi</span><span class="o">==</span><span class="mf">1.16.0</span>
@@ -1789,7 +1816,7 @@ ray (Python 3.9)</label><div class="sd-tab-content docutils">
 <span class="n">click</span><span class="o">==</span><span class="mf">8.1.7</span>
 <span class="n">cloudpickle</span><span class="o">==</span><span class="mf">2.2.0</span>
 <span class="n">colorful</span><span class="o">==</span><span class="mf">0.5.5</span>
-<span class="n">conda</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">home</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">feedstock_root</span><span class="o">/</span><span class="n">build_artifacts</span><span class="o">/</span><span class="n">conda_1729155160301</span><span class="o">/</span><span class="n">work</span>
+<span class="n">conda</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">home</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">feedstock_root</span><span class="o">/</span><span class="n">build_artifacts</span><span class="o">/</span><span class="n">conda_1736460206209</span><span class="o">/</span><span class="n">work</span>
 <span class="n">conda</span><span class="o">-</span><span class="n">content</span><span class="o">-</span><span class="n">trust</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">conda</span><span class="o">-</span><span class="n">content</span><span class="o">-</span><span class="n">trust_1714483159009</span><span class="o">/</span><span class="n">work</span>
 <span class="n">conda</span><span class="o">-</span><span class="n">libmamba</span><span class="o">-</span><span class="n">solver</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">conda</span><span class="o">-</span><span class="n">libmamba</span><span class="o">-</span><span class="n">solver_1706733287605</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span>
 <span class="n">conda</span><span class="o">-</span><span class="n">package</span><span class="o">-</span><span class="n">handling</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">conda</span><span class="o">-</span><span class="n">package</span><span class="o">-</span><span class="n">handling_1731369017509</span><span class="o">/</span><span class="n">work</span>
@@ -1821,14 +1848,12 @@ ray (Python 3.9)</label><div class="sd-tab-content docutils">
 <span class="n">httplib2</span><span class="o">==</span><span class="mf">0.20.4</span>
 <span class="n">httptools</span><span class="o">==</span><span class="mf">0.6.4</span>
 <span class="n">idna</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">idna_1714398848350</span><span class="o">/</span><span class="n">work</span>
-<span class="n">imageio</span><span class="o">==</span><span class="mf">2.34.2</span>
 <span class="n">importlib</span><span class="o">-</span><span class="n">metadata</span><span class="o">==</span><span class="mf">6.11.0</span>
 <span class="n">Jinja2</span><span class="o">==</span><span class="mf">3.1.2</span>
 <span class="n">jmespath</span><span class="o">==</span><span class="mf">1.0.1</span>
 <span class="n">jsonpatch</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">jsonpatch_1714483231291</span><span class="o">/</span><span class="n">work</span>
 <span class="n">jsonpointer</span><span class="o">==</span><span class="mf">2.1</span>
 <span class="n">jsonschema</span><span class="o">==</span><span class="mf">4.17.3</span>
-<span class="n">lazy_loader</span><span class="o">==</span><span class="mf">0.4</span>
 <span class="n">libmambapy</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">mamba</span><span class="o">-</span><span class="n">split_1714483352891</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">libmambapy</span>
 <span class="n">lz4</span><span class="o">==</span><span class="mf">4.3.3</span>
 <span class="n">markdown</span><span class="o">-</span><span class="n">it</span><span class="o">-</span><span class="n">py</span><span class="o">==</span><span class="mf">2.2.0</span>
@@ -1838,7 +1863,6 @@ ray (Python 3.9)</label><div class="sd-tab-content docutils">
 <span class="n">menuinst</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">menuinst_1731364904452</span><span class="o">/</span><span class="n">work</span>
 <span class="n">msgpack</span><span class="o">==</span><span class="mf">1.0.7</span>
 <span class="n">multidict</span><span class="o">==</span><span class="mf">6.0.5</span>
-<span class="n">networkx</span><span class="o">==</span><span class="mf">3.2.1</span>
 <span class="n">numpy</span><span class="o">==</span><span class="mf">1.26.4</span>
 <span class="n">opencensus</span><span class="o">==</span><span class="mf">0.11.3</span>
 <span class="n">opencensus</span><span class="o">-</span><span class="n">context</span><span class="o">==</span><span class="mf">0.1.3</span>
@@ -1848,15 +1872,15 @@ ray (Python 3.9)</label><div class="sd-tab-content docutils">
 <span class="n">opentelemetry</span><span class="o">-</span><span class="n">proto</span><span class="o">==</span><span class="mf">1.1.0</span>
 <span class="n">opentelemetry</span><span class="o">-</span><span class="n">sdk</span><span class="o">==</span><span class="mf">1.1.0</span>
 <span class="n">opentelemetry</span><span class="o">-</span><span class="n">semantic</span><span class="o">-</span><span class="n">conventions</span><span class="o">==</span><span class="mf">0.20</span><span class="n">b0</span>
+<span class="n">ormsgpack</span><span class="o">==</span><span class="mf">1.7.0</span>
 <span class="n">packaging</span><span class="o">==</span><span class="mf">23.0</span>
 <span class="n">pandas</span><span class="o">==</span><span class="mf">1.5.3</span>
-<span class="n">pillow</span><span class="o">==</span><span class="mf">10.3.0</span>
 <span class="n">platformdirs</span><span class="o">==</span><span class="mf">3.11.0</span>
-<span class="n">pluggy</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">tmp</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="mi">80754</span><span class="n">af9</span><span class="o">/</span><span class="n">pluggy_1648024445381</span><span class="o">/</span><span class="n">work</span>
+<span class="n">pluggy</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">pluggy_1733169602837</span><span class="o">/</span><span class="n">work</span>
 <span class="n">prometheus</span><span class="o">-</span><span class="n">client</span><span class="o">==</span><span class="mf">0.19.0</span>
 <span class="n">protobuf</span><span class="o">==</span><span class="mf">3.20.3</span>
 <span class="n">psutil</span><span class="o">==</span><span class="mf">5.9.6</span>
-<span class="n">py</span><span class="o">-</span><span class="n">spy</span><span class="o">==</span><span class="mf">0.3.14</span>
+<span class="n">py</span><span class="o">-</span><span class="n">spy</span><span class="o">==</span><span class="mf">0.4.0</span>
 <span class="n">pyarrow</span><span class="o">==</span><span class="mf">14.0.2</span>
 <span class="n">pyasn1</span><span class="o">==</span><span class="mf">0.5.1</span>
 <span class="n">pyasn1</span><span class="o">-</span><span class="n">modules</span><span class="o">==</span><span class="mf">0.3.0</span>
@@ -1873,7 +1897,7 @@ ray (Python 3.9)</label><div class="sd-tab-content docutils">
 <span class="n">python</span><span class="o">-</span><span class="n">dotenv</span><span class="o">==</span><span class="mf">1.0.1</span>
 <span class="n">pytz</span><span class="o">==</span><span class="mf">2022.7.1</span>
 <span class="n">PyYAML</span><span class="o">==</span><span class="mf">6.0.1</span>
-<span class="n">ray</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">home</span><span class="o">/</span><span class="n">ray</span><span class="o">/</span><span class="n">ray</span><span class="o">-</span><span class="mf">3.0.0</span><span class="o">.</span><span class="n">dev0</span><span class="o">-</span><span class="n">cp39</span><span class="o">-</span><span class="n">cp39</span><span class="o">-</span><span class="n">manylinux2014_x86_64</span><span class="o">.</span><span class="n">whl</span><span class="c1">#sha256=36169cec73a5f5d7b26f257726385ca67bfba32a19ef89e5fd96c4a050a335f4</span>
+<span class="n">ray</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">home</span><span class="o">/</span><span class="n">ray</span><span class="o">/</span><span class="n">ray</span><span class="o">-</span><span class="mf">3.0.0</span><span class="o">.</span><span class="n">dev0</span><span class="o">-</span><span class="n">cp39</span><span class="o">-</span><span class="n">cp39</span><span class="o">-</span><span class="n">manylinux2014_x86_64</span><span class="o">.</span><span class="n">whl</span><span class="c1">#sha256=661ffb9b4ceef8ab5b96864ebf590ffeb418af516cb6fca99579b045a85d377b</span>
 <span class="n">redis</span><span class="o">==</span><span class="mf">4.4.2</span>
 <span class="n">requests</span><span class="o">==</span><span class="mf">2.31.0</span>
 <span class="n">rich</span><span class="o">==</span><span class="mf">13.3.2</span>
@@ -1881,17 +1905,13 @@ ray (Python 3.9)</label><div class="sd-tab-content docutils">
 <span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">ruamel</span><span class="o">.</span><span class="n">yaml_1727980156079</span><span class="o">/</span><span class="n">work</span>
 <span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">clib</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">clib_1727769819935</span><span class="o">/</span><span class="n">work</span>
 <span class="n">s3transfer</span><span class="o">==</span><span class="mf">0.6.2</span>
-<span class="n">scikit</span><span class="o">-</span><span class="n">image</span><span class="o">==</span><span class="mf">0.24.0</span>
 <span class="n">scipy</span><span class="o">==</span><span class="mf">1.11.4</span>
-<span class="n">shellingham</span><span class="o">==</span><span class="mf">1.5.4</span>
 <span class="n">six</span><span class="o">==</span><span class="mf">1.16.0</span>
 <span class="n">smart</span><span class="o">-</span><span class="nb">open</span><span class="o">==</span><span class="mf">6.2.0</span>
 <span class="n">sniffio</span><span class="o">==</span><span class="mf">1.3.1</span>
 <span class="n">starlette</span><span class="o">==</span><span class="mf">0.36.3</span>
 <span class="n">tensorboardX</span><span class="o">==</span><span class="mf">2.6.2.2</span>
-<span class="n">tifffile</span><span class="o">==</span><span class="mf">2024.7.21</span>
 <span class="n">tqdm</span> <span class="o">@</span> <span class="n">file</span><span class="p">:</span><span class="o">///</span><span class="n">croot</span><span class="o">/</span><span class="n">tqdm_1724853939799</span><span class="o">/</span><span class="n">work</span>
-<span class="n">typer</span><span class="o">==</span><span class="mf">0.12.3</span>
 <span class="n">typing_extensions</span><span class="o">==</span><span class="mf">4.8.0</span>
 <span class="n">uritemplate</span><span class="o">==</span><span class="mf">4.1.1</span>
 <span class="n">urllib3</span><span class="o">==</span><span class="mf">1.26.19</span>

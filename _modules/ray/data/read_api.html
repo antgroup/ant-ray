@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=2df59da5" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=9b1aa6b9" />
     <link rel="stylesheet" type="text/css" href="../../../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -335,6 +335,17 @@ both in the usual template (layout.html) as well as (index.html). -->
         <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -489,6 +500,17 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -591,7 +613,10 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/execution.html">Execution and failure semantics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/visualization.html">Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/overlap.html">Overlap communication and computation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -836,10 +861,11 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-models.html">Models, Preprocessors, and Action Distributions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/checkpoints.html">Checkpointing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rllib/metrics-logger.html">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/single-agent-episode.html">Episodes</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-replay-buffers.html">Replay Buffers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-offline.html">Working with Offline Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-offline.html">Working with offline data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-rlmodule.html">RL Modules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-learner.html">Learner (Alpha)</a></li>
 
@@ -885,22 +911,17 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_actions.html">ray.rllib.algorithms.algorithm.Algorithm.compute_actions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_single_action.html">ray.rllib.algorithms.algorithm.Algorithm.compute_single_action</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html">ray.rllib.algorithms.algorithm.Algorithm.from_state</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html">ray.rllib.algorithms.algorithm.Algorithm.get_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html">ray.rllib.algorithms.algorithm.Algorithm.set_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore.html">ray.rllib.algorithms.algorithm.Algorithm.restore</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html">ray.rllib.algorithms.algorithm.Algorithm.restore_workers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save.html">ray.rllib.algorithms.algorithm.Algorithm.save</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.env_runner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.train.html">ray.rllib.algorithms.algorithm.Algorithm.train</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html">ray.rllib.algorithms.algorithm.Algorithm.training_step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_to_path.html">ray.rllib.algorithms.algorithm.Algorithm.save_to_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html">ray.rllib.algorithms.algorithm.Algorithm.restore_from_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html">ray.rllib.algorithms.algorithm.Algorithm.get_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html">ray.rllib.algorithms.algorithm.Algorithm.set_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html">ray.rllib.algorithms.algorithm.Algorithm.get_module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html">ray.rllib.algorithms.algorithm.Algorithm.add_policy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
@@ -1016,6 +1037,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value.html">ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value</a></li>
@@ -1387,6 +1414,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">ray</span>
 <span class="kn">from</span> <span class="nn">ray._private.auto_init_hook</span> <span class="kn">import</span> <span class="n">wrap_auto_init</span>
 <span class="kn">from</span> <span class="nn">ray.air.util.tensor_extensions.utils</span> <span class="kn">import</span> <span class="n">_create_possibly_ragged_ndarray</span>
+<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.audio_datasource</span> <span class="kn">import</span> <span class="n">AudioDatasource</span>
 <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.avro_datasource</span> <span class="kn">import</span> <span class="n">AvroDatasource</span>
 <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.bigquery_datasource</span> <span class="kn">import</span> <span class="n">BigQueryDatasource</span>
 <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.binary_datasource</span> <span class="kn">import</span> <span class="n">BinaryDatasource</span>
@@ -1412,6 +1440,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.text_datasource</span> <span class="kn">import</span> <span class="n">TextDatasource</span>
 <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.tfrecords_datasource</span> <span class="kn">import</span> <span class="n">TFRecordDatasource</span>
 <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.torch_datasource</span> <span class="kn">import</span> <span class="n">TorchDatasource</span>
+<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.video_datasource</span> <span class="kn">import</span> <span class="n">VideoDatasource</span>
 <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.webdataset_datasource</span> <span class="kn">import</span> <span class="n">WebDatasetDatasource</span>
 <span class="kn">from</span> <span class="nn">ray.data._internal.delegating_block_builder</span> <span class="kn">import</span> <span class="n">DelegatingBlockBuilder</span>
 <span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.from_operators</span> <span class="kn">import</span> <span class="p">(</span>
@@ -1798,6 +1827,183 @@ document.write(`
     <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span>
         <span class="n">plan</span><span class="o">=</span><span class="n">execution_plan</span><span class="p">,</span>
         <span class="n">logical_plan</span><span class="o">=</span><span class="n">logical_plan</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="read_audio">
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.read_audio.html#ray.data.read_audio">[docs]</a>
+<span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">read_audio</span><span class="p">(</span>
+    <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arrow_open_stream_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">partition_filter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PathPartitionFilter</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">partitioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Partitioning</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">include_paths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">ignore_missing_paths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">file_extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">AudioDatasource</span><span class="o">.</span><span class="n">_FILE_EXTENSIONS</span><span class="p">,</span>
+    <span class="n">shuffle</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">override_num_blocks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ray_remote_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a :class:`~ray.data.Dataset` from audio files.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import ray</span>
+<span class="sd">        &gt;&gt;&gt; path = &quot;s3://anonymous@air-example-data-2/6G-audio-data-LibriSpeech-train-clean-100-flac/train-clean-100/5022/29411/5022-29411-0000.flac&quot;</span>
+<span class="sd">        &gt;&gt;&gt; ds = ray.data.read_audio(path)</span>
+<span class="sd">        &gt;&gt;&gt; ds.schema()</span>
+<span class="sd">        Column       Type</span>
+<span class="sd">        ------       ----</span>
+<span class="sd">        amplitude    numpy.ndarray(shape=(1, 191760), dtype=float)</span>
+<span class="sd">        sample_rate  int64</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        paths: A single file or directory, or a list of file or directory paths.</span>
+<span class="sd">            A list of paths can contain both files and directories.</span>
+<span class="sd">        filesystem: The pyarrow filesystem</span>
+<span class="sd">            implementation to read from. These filesystems are specified in the</span>
+<span class="sd">            `pyarrow docs &lt;https://arrow.apache.org/docs/python/api/\</span>
+<span class="sd">            filesystems.html#filesystem-implementations&gt;`_. Specify this parameter if</span>
+<span class="sd">            you need to provide specific configurations to the filesystem. By default,</span>
+<span class="sd">            the filesystem is automatically selected based on the scheme of the paths.</span>
+<span class="sd">            For example, if the path begins with ``s3://``, the `S3FileSystem` is used.</span>
+<span class="sd">        arrow_open_stream_args: kwargs passed to</span>
+<span class="sd">            `pyarrow.fs.FileSystem.open_input_file &lt;https://arrow.apache.org/docs/\</span>
+<span class="sd">                python/generated/pyarrow.fs.FileSystem.html\</span>
+<span class="sd">                    #pyarrow.fs.FileSystem.open_input_file&gt;`_.</span>
+<span class="sd">            when opening input files to read.</span>
+<span class="sd">        partition_filter:  A</span>
+<span class="sd">            :class:`~ray.data.datasource.partitioning.PathPartitionFilter`. Use</span>
+<span class="sd">            with a custom callback to read only selected partitions of a dataset.</span>
+<span class="sd">        partitioning: A :class:`~ray.data.datasource.partitioning.Partitioning` object</span>
+<span class="sd">            that describes how paths are organized. Defaults to ``None``.</span>
+<span class="sd">        include_paths: If ``True``, include the path to each image. File paths are</span>
+<span class="sd">            stored in the ``&#39;path&#39;`` column.</span>
+<span class="sd">        ignore_missing_paths: If True, ignores any file/directory paths in ``paths``</span>
+<span class="sd">            that are not found. Defaults to False.</span>
+<span class="sd">        file_extensions: A list of file extensions to filter files by.</span>
+<span class="sd">        concurrency: The maximum number of Ray tasks to run concurrently. Set this</span>
+<span class="sd">            to control number of tasks to run concurrently. This doesn&#39;t change the</span>
+<span class="sd">            total number of tasks run or the total number of output blocks. By default,</span>
+<span class="sd">            concurrency is dynamically decided based on the available resources.</span>
+<span class="sd">        override_num_blocks: Override the number of output blocks from all read tasks.</span>
+<span class="sd">            By default, the number of output blocks is dynamically decided based on</span>
+<span class="sd">            input data size and available resources. You shouldn&#39;t manually set this</span>
+<span class="sd">            value in most cases.</span>
+<span class="sd">        ray_remote_args: kwargs passed to :meth:`~ray.remote` in the read tasks.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A :class:`~ray.data.Dataset` containing audio amplitudes and associated</span>
+<span class="sd">        metadata.</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+    <span class="n">datasource</span> <span class="o">=</span> <span class="n">AudioDatasource</span><span class="p">(</span>
+        <span class="n">paths</span><span class="p">,</span>
+        <span class="n">filesystem</span><span class="o">=</span><span class="n">filesystem</span><span class="p">,</span>
+        <span class="n">open_stream_args</span><span class="o">=</span><span class="n">arrow_open_stream_args</span><span class="p">,</span>
+        <span class="n">meta_provider</span><span class="o">=</span><span class="n">DefaultFileMetadataProvider</span><span class="p">(),</span>
+        <span class="n">partition_filter</span><span class="o">=</span><span class="n">partition_filter</span><span class="p">,</span>
+        <span class="n">partitioning</span><span class="o">=</span><span class="n">partitioning</span><span class="p">,</span>
+        <span class="n">ignore_missing_paths</span><span class="o">=</span><span class="n">ignore_missing_paths</span><span class="p">,</span>
+        <span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">,</span>
+        <span class="n">include_paths</span><span class="o">=</span><span class="n">include_paths</span><span class="p">,</span>
+        <span class="n">file_extensions</span><span class="o">=</span><span class="n">file_extensions</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">read_datasource</span><span class="p">(</span>
+        <span class="n">datasource</span><span class="p">,</span>
+        <span class="n">ray_remote_args</span><span class="o">=</span><span class="n">ray_remote_args</span><span class="p">,</span>
+        <span class="n">concurrency</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span>
+        <span class="n">override_num_blocks</span><span class="o">=</span><span class="n">override_num_blocks</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="read_videos">
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.read_videos.html#ray.data.read_videos">[docs]</a>
+<span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">read_videos</span><span class="p">(</span>
+    <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">arrow_open_stream_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">partition_filter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PathPartitionFilter</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">partitioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Partitioning</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">include_paths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">ignore_missing_paths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">file_extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">VideoDatasource</span><span class="o">.</span><span class="n">_FILE_EXTENSIONS</span><span class="p">,</span>
+    <span class="n">shuffle</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">override_num_blocks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ray_remote_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a :class:`~ray.data.Dataset` from video files.</span>
+
+<span class="sd">    Each row in the resulting dataset represents a video frame.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import ray</span>
+<span class="sd">        &gt;&gt;&gt; path = &quot;s3://anonymous@ray-example-data/basketball.mp4&quot;</span>
+<span class="sd">        &gt;&gt;&gt; ds = ray.data.read_videos(path)</span>
+<span class="sd">        &gt;&gt;&gt; ds.schema()</span>
+<span class="sd">        Column       Type</span>
+<span class="sd">        ------       ----</span>
+<span class="sd">        frame        numpy.ndarray(shape=(720, 1280, 3), dtype=uint8)</span>
+<span class="sd">        frame_index  int64</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        paths: A single file or directory, or a list of file or directory paths.</span>
+<span class="sd">            A list of paths can contain both files and directories.</span>
+<span class="sd">        filesystem: The pyarrow filesystem</span>
+<span class="sd">            implementation to read from. These filesystems are specified in the</span>
+<span class="sd">            `pyarrow docs &lt;https://arrow.apache.org/docs/python/api/\</span>
+<span class="sd">            filesystems.html#filesystem-implementations&gt;`_. Specify this parameter if</span>
+<span class="sd">            you need to provide specific configurations to the filesystem. By default,</span>
+<span class="sd">            the filesystem is automatically selected based on the scheme of the paths.</span>
+<span class="sd">            For example, if the path begins with ``s3://``, the `S3FileSystem` is used.</span>
+<span class="sd">        arrow_open_stream_args: kwargs passed to</span>
+<span class="sd">            `pyarrow.fs.FileSystem.open_input_file &lt;https://arrow.apache.org/docs/\</span>
+<span class="sd">                python/generated/pyarrow.fs.FileSystem.html\</span>
+<span class="sd">                    #pyarrow.fs.FileSystem.open_input_file&gt;`_.</span>
+<span class="sd">            when opening input files to read.</span>
+<span class="sd">        partition_filter:  A</span>
+<span class="sd">            :class:`~ray.data.datasource.partitioning.PathPartitionFilter`. Use</span>
+<span class="sd">            with a custom callback to read only selected partitions of a dataset.</span>
+<span class="sd">        partitioning: A :class:`~ray.data.datasource.partitioning.Partitioning` object</span>
+<span class="sd">            that describes how paths are organized. Defaults to ``None``.</span>
+<span class="sd">        include_paths: If ``True``, include the path to each image. File paths are</span>
+<span class="sd">            stored in the ``&#39;path&#39;`` column.</span>
+<span class="sd">        ignore_missing_paths: If True, ignores any file/directory paths in ``paths``</span>
+<span class="sd">            that are not found. Defaults to False.</span>
+<span class="sd">        file_extensions: A list of file extensions to filter files by.</span>
+<span class="sd">        concurrency: The maximum number of Ray tasks to run concurrently. Set this</span>
+<span class="sd">            to control number of tasks to run concurrently. This doesn&#39;t change the</span>
+<span class="sd">            total number of tasks run or the total number of output blocks. By default,</span>
+<span class="sd">            concurrency is dynamically decided based on the available resources.</span>
+<span class="sd">        ray_remote_args: kwargs passed to :meth:`~ray.remote` in the read tasks.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A :class:`~ray.data.Dataset` containing video frames from the video files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">datasource</span> <span class="o">=</span> <span class="n">VideoDatasource</span><span class="p">(</span>
+        <span class="n">paths</span><span class="p">,</span>
+        <span class="n">filesystem</span><span class="o">=</span><span class="n">filesystem</span><span class="p">,</span>
+        <span class="n">open_stream_args</span><span class="o">=</span><span class="n">arrow_open_stream_args</span><span class="p">,</span>
+        <span class="n">meta_provider</span><span class="o">=</span><span class="n">DefaultFileMetadataProvider</span><span class="p">(),</span>
+        <span class="n">partition_filter</span><span class="o">=</span><span class="n">partition_filter</span><span class="p">,</span>
+        <span class="n">partitioning</span><span class="o">=</span><span class="n">partitioning</span><span class="p">,</span>
+        <span class="n">ignore_missing_paths</span><span class="o">=</span><span class="n">ignore_missing_paths</span><span class="p">,</span>
+        <span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">,</span>
+        <span class="n">include_paths</span><span class="o">=</span><span class="n">include_paths</span><span class="p">,</span>
+        <span class="n">file_extensions</span><span class="o">=</span><span class="n">file_extensions</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">read_datasource</span><span class="p">(</span>
+        <span class="n">datasource</span><span class="p">,</span>
+        <span class="n">ray_remote_args</span><span class="o">=</span><span class="n">ray_remote_args</span><span class="p">,</span>
+        <span class="n">concurrency</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span>
+        <span class="n">override_num_blocks</span><span class="o">=</span><span class="n">override_num_blocks</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 

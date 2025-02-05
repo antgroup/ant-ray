@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Working with Offline Data &#8212; Ray 3.0.0.dev0</title>
+    <title>Working with offline data &#8212; Ray 3.0.0.dev0</title>
   
   
   
@@ -37,7 +37,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=2df59da5" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=9b1aa6b9" />
     <link rel="stylesheet" type="text/css" href="../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -338,6 +338,17 @@ both in the usual template (layout.html) as well as (index.html). -->
         <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -496,6 +507,17 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -598,7 +620,10 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/execution.html">Execution and failure semantics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/visualization.html">Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/profiling.html">Profiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/overlap.html">Overlap communication and computation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -843,10 +868,11 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib-models.html">Models, Preprocessors, and Action Distributions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="checkpoints.html">Checkpointing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metrics-logger.html">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="single-agent-episode.html">Episodes</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="rllib-replay-buffers.html">Replay Buffers</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">Working with Offline Data</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Working with offline data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib-rlmodule.html">RL Modules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib-learner.html">Learner (Alpha)</a></li>
 
@@ -892,22 +918,17 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_actions.html">ray.rllib.algorithms.algorithm.Algorithm.compute_actions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_single_action.html">ray.rllib.algorithms.algorithm.Algorithm.compute_single_action</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html">ray.rllib.algorithms.algorithm.Algorithm.from_state</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html">ray.rllib.algorithms.algorithm.Algorithm.get_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html">ray.rllib.algorithms.algorithm.Algorithm.set_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore.html">ray.rllib.algorithms.algorithm.Algorithm.restore</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html">ray.rllib.algorithms.algorithm.Algorithm.restore_workers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save.html">ray.rllib.algorithms.algorithm.Algorithm.save</a></li>
-<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.env_runner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.train.html">ray.rllib.algorithms.algorithm.Algorithm.train</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html">ray.rllib.algorithms.algorithm.Algorithm.training_step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_to_path.html">ray.rllib.algorithms.algorithm.Algorithm.save_to_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html">ray.rllib.algorithms.algorithm.Algorithm.restore_from_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html">ray.rllib.algorithms.algorithm.Algorithm.get_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html">ray.rllib.algorithms.algorithm.Algorithm.set_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html">ray.rllib.algorithms.algorithm.Algorithm.get_module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html">ray.rllib.algorithms.algorithm.Algorithm.add_policy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
@@ -1023,6 +1044,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value.html">ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value</a></li>
@@ -1374,17 +1401,15 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <div class="admonition note">
+  <section id="working-with-offline-data">
+<h1>Working with offline data<a class="headerlink" href="#working-with-offline-data" title="Link to this heading">#</a></h1>
+<div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Ray 2.40 uses RLlib’s new API stack by default.
 The Ray team has mostly completed transitioning algorithms, example scripts, and
 documentation to the new code base.</p>
 <p>If you’re still using the old API stack, see <a class="reference internal" href="new-api-stack-migration-guide.html"><span class="doc">New API stack migration guide</span></a> for details on how to migrate.</p>
 </div>
-<section id="working-with-offline-data">
-<h1>Working with Offline Data<a class="headerlink" href="#working-with-offline-data" title="Link to this heading">#</a></h1>
-<section id="getting-started">
-<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
 <p>RLlib’s offline RL API enables you to work with experiences read from offline storage (for example, disk, cloud storage,
 streaming systems, Hadoop Distributed File System (HDFS). For example, you might want to read experiences saved from previous training runs, collected
 from experts, or gathered from policies deployed in <a class="reference external" href="https://arxiv.org/abs/1811.00260">web applications</a>. You can
@@ -1420,9 +1445,8 @@ of the API is to apply as many data transformations as possible on-the-fly prior
 <code class="xref py py-class docutils literal notranslate"><span class="pre">SampleBatch</span></code> data recorded with the old API stack. To enable this feature set
 <code class="docutils literal notranslate"><span class="pre">config.offline_data(input_read_sample_batches=True)</span></code>.</p>
 </div>
-</section>
 <section id="example-training-an-expert-policy">
-<h2>Example: Training an Expert Policy<a class="headerlink" href="#example-training-an-expert-policy" title="Link to this heading">#</a></h2>
+<h2>Example: Training an expert policy<a class="headerlink" href="#example-training-an-expert-policy" title="Link to this heading">#</a></h2>
 <p>In this example you train a PPO agent on the <code class="docutils literal notranslate"><span class="pre">CartPole-v1</span></code> environment until it reaches an episode mean return of <code class="docutils literal notranslate"><span class="pre">450.0</span></code>. You checkpoint
 this agent and then use its policy to record expert data to local disk.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
@@ -1494,7 +1518,7 @@ this agent and then use its policy to record expert data to local disk.</p>
 example to record expert data to disk, which is later utilized for offline training to clone another agent.</p>
 </section>
 <section id="example-record-expert-data-to-local-disk">
-<h2>Example: Record Expert Data to Local Disk<a class="headerlink" href="#example-record-expert-data-to-local-disk" title="Link to this heading">#</a></h2>
+<h2>Example: Record expert data to local disk<a class="headerlink" href="#example-record-expert-data-to-local-disk" title="Link to this heading">#</a></h2>
 <p>After you train an expert policy to play <code class="code docutils literal notranslate"><span class="pre">CartPole-v1</span></code> you load its policy here to record expert data during evaluation. You use <code class="docutils literal notranslate"><span class="pre">5</span></code>
 <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_env_runner.OfflineSingleAgentEnvRunner.html#ray.rllib.offline.offline_env_runner.OfflineSingleAgentEnvRunner" title="ray.rllib.offline.offline_env_runner.OfflineSingleAgentEnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflineSingleAgentEnvRunner</span></code></a> instances to collect <code class="docutils literal notranslate"><span class="pre">50</span></code> complete episodes per <code class="code docutils literal notranslate"><span class="pre">sample()</span></code> call. In this
 example you store experiences directly in RLlib’s <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> objects with no more than
@@ -1608,7 +1632,7 @@ leading to differences in write operation counts. As a result, the second number
 </div>
 </section>
 <section id="example-training-on-previously-saved-experiences">
-<h2>Example: Training on Previously Saved Experiences<a class="headerlink" href="#example-training-on-previously-saved-experiences" title="Link to this heading">#</a></h2>
+<h2>Example: Training on previously saved experiences<a class="headerlink" href="#example-training-on-previously-saved-experiences" title="Link to this heading">#</a></h2>
 <p>In this example you are using behavior cloning with the previously recorded Parquet data from your expert policy playing <code class="docutils literal notranslate"><span class="pre">CartPole-v1</span></code>. The
 data needs to be linked in the configuration of the algorithm (through the <code class="docutils literal notranslate"><span class="pre">input_</span></code> attribute).</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span><span class="p">,</span> <span class="n">tune</span>
@@ -1705,7 +1729,7 @@ can be highly beneficial. Combining behavior cloning with subsequent fine-tuning
 reduce training time, resource consumption, and associated costs.</p>
 </section>
 <section id="using-external-expert-experiences">
-<h2>Using External Expert Experiences<a class="headerlink" href="#using-external-expert-experiences" title="Link to this heading">#</a></h2>
+<h2>Using external expert experiences<a class="headerlink" href="#using-external-expert-experiences" title="Link to this heading">#</a></h2>
 <p>Your expert data is often already available, either recorded from an operational system or directly provided by human experts. Typically,
 you might store this data in a tabular (columnar) format. RLlib’s new Offline RL API simplifies the use of such data by allowing direct ingestion
 through a specified schema that organizes the expert data. The API default schema for reading data is provided in
@@ -1740,7 +1764,7 @@ you provide this schema as follows:</p>
 </div>
 </section>
 <section id="converting-tabular-data-to-rllib-s-episode-format">
-<h2>Converting Tabular Data to RLlib’s Episode Format<a class="headerlink" href="#converting-tabular-data-to-rllib-s-episode-format" title="Link to this heading">#</a></h2>
+<h2>Converting tabular data to RLlib’s episode format<a class="headerlink" href="#converting-tabular-data-to-rllib-s-episode-format" title="Link to this heading">#</a></h2>
 <p>While the tabular format is widely compatible and seamlessly integrates with RLlib’s new Offline RL API, there are cases where you may prefer to use RLlib’s native episode format.
 As briefly mentioned earlier, such scenarios typically arise when full expert trajectories are required.</p>
 <div class="admonition note">
@@ -1947,7 +1971,7 @@ your own data into RLlib’s <a class="reference internal" href="package_ref/env
 </div>
 </section>
 <section id="using-old-api-stack-samplebatch-recordings">
-<h2>Using Old API Stack <code class="docutils literal notranslate"><span class="pre">SampleBatch</span></code> Recordings<a class="headerlink" href="#using-old-api-stack-samplebatch-recordings" title="Link to this heading">#</a></h2>
+<h2>Using old API stack <code class="docutils literal notranslate"><span class="pre">SampleBatch</span></code> recordings<a class="headerlink" href="#using-old-api-stack-samplebatch-recordings" title="Link to this heading">#</a></h2>
 <p>If you have expert data previously recorded using RLlib’s old API stack, it can be seamlessly utilized in the new stack’s Offline RL API by setting <code class="docutils literal notranslate"><span class="pre">input_read_sample_batches=True</span></code>. Alternatively,
 you can convert your <code class="docutils literal notranslate"><span class="pre">SampleBatch</span></code> recordings into <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> format using RLlib’s
 <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a> as demonstrated below:</p>
@@ -1986,7 +2010,7 @@ according to this assumption.</p>
 </div>
 </section>
 <section id="pre-processing-filtering-and-post-processing">
-<h2>Pre-Processing, Filtering and Post-Processing<a class="headerlink" href="#pre-processing-filtering-and-post-processing" title="Link to this heading">#</a></h2>
+<h2>Pre-processing, filtering and post-processing<a class="headerlink" href="#pre-processing-filtering-and-post-processing" title="Link to this heading">#</a></h2>
 <p>During recording, your expert policy may utilize pre-processing techniques for observations, such as <em>frame-stacking</em>, or filtering methods like <em>mean-std filtering</em>. Similarly, actions may undergo pre-processing, such as <em>action
 sampling</em> or <em>scaling</em>. In its <code class="docutils literal notranslate"><span class="pre">EnvRunner</span></code> instances, RLlib applies such pre-processing and filtering (through the <em>env-to-module</em> connector pipeline) <strong>before</strong> observations are passed to the <code class="docutils literal notranslate"><span class="pre">RLModule</span></code>. However, raw observations (as received
 directly from the environment) are stored in the episodes. Likewise, actions are recorded in their raw form (as output directly from the <code class="docutils literal notranslate"><span class="pre">RLModule</span></code>) while undergoing pre-processing (through RLlib’s <em>module-to-env</em> connectors) before being
@@ -1997,7 +2021,7 @@ policy, it’s essential to use the exact same filter during evaluation to avoid
 behavior of the expert policy.</p>
 </section>
 <section id="scaling-i-o-throughput">
-<h2>Scaling I/O Throughput<a class="headerlink" href="#scaling-i-o-throughput" title="Link to this heading">#</a></h2>
+<h2>Scaling I/O throughput<a class="headerlink" href="#scaling-i-o-throughput" title="Link to this heading">#</a></h2>
 <p>Just as online training can be scaled, offline recording I/O throughput can also be increased by configuring the number of RLlib env-runners. Use the <code class="docutils literal notranslate"><span class="pre">num_env_runners</span></code> setting to scale recording during training or <code class="docutils literal notranslate"><span class="pre">evaluation_num_env_runners</span></code>
 for scaling during evaluation-only recording. Each worker operates independently, writing experiences in parallel, enabling linear scaling of I/O throughput for write operations. Within each <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_env_runner.OfflineSingleAgentEnvRunner.html#ray.rllib.offline.offline_env_runner.OfflineSingleAgentEnvRunner" title="ray.rllib.offline.offline_env_runner.OfflineSingleAgentEnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflineSingleAgentEnvRunner</span></code></a>, episodes
 are sampled and serialized before being written to disk.</p>
@@ -2045,7 +2069,7 @@ the concurrency level specified in the keyword arguments for the mapping operati
 each of them using a single GPU.</p>
 </section>
 <section id="using-cloud-storage">
-<h2>Using Cloud Storage<a class="headerlink" href="#using-cloud-storage" title="Link to this heading">#</a></h2>
+<h2>Using cloud storage<a class="headerlink" href="#using-cloud-storage" title="Link to this heading">#</a></h2>
 <p>Unlike RLlib’s previous stack, the new Offline RL API is cloud-agnostic and fully integrates with PyArrow. You can utilize any available cloud storage path or PyArrow-compatible filesystem. If
 using a PyArrow or compatible filesystem, ensure that your <code class="docutils literal notranslate"><span class="pre">input_</span></code> path is a relative path within this filesystem. Similar to Ray Data, you can also use placeholders, lists of files
 or folders, or simply specify a single folder to read recursively from.</p>
@@ -2082,7 +2106,7 @@ use the following syntax:</p>
 </div>
 <p>You can learn more about PyArrow’s filesystems, particularly regarding cloud filesystems and required authentication, in <a class="reference external" href="https://arrow.apache.org/docs/python/filesystems.html#filesystem-interface">PyArrow Filesystem Interface</a>.</p>
 <section id="using-cloud-storage-for-recording">
-<h3>Using Cloud Storage for Recording<a class="headerlink" href="#using-cloud-storage-for-recording" title="Link to this heading">#</a></h3>
+<h3>Using cloud storage for recording<a class="headerlink" href="#using-cloud-storage-for-recording" title="Link to this heading">#</a></h3>
 <p>You can use cloud storage in a similar way when recording experiences from an expert policy:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2112,10 +2136,10 @@ space isn’t required on the nodes running RLlib.</p>
 </section>
 </section>
 <section id="how-to-tune-performance">
-<span id="id1"></span><h2>How to Tune Performance<a class="headerlink" href="#how-to-tune-performance" title="Link to this heading">#</a></h2>
+<span id="id1"></span><h2>How to tune performance<a class="headerlink" href="#how-to-tune-performance" title="Link to this heading">#</a></h2>
 <p>In RLlib’s Offline RL API the various key layers are managed by distinct modules and configurations, making it non-trivial to scale these layers effectively. It’s important to understand the specific parameters and their respective impact on system performance.</p>
 <section id="how-to-tune-reading-operations">
-<span id="id2"></span><h3>How to Tune Reading Operations<a class="headerlink" href="#how-to-tune-reading-operations" title="Link to this heading">#</a></h3>
+<span id="id2"></span><h3>How to tune reading operations<a class="headerlink" href="#how-to-tune-reading-operations" title="Link to this heading">#</a></h3>
 <p>As noted earlier, the <strong>Reading Operations</strong> layer is automatically handled and dynamically optimized by <a class="reference internal" href="../data/data.html#data"><span class="std std-ref">Ray Data</span></a>. It’s strongly recommended to avoid modifying this process. However, there are certain parameters that can enhance performance on this
 layer to some extent, including:</p>
 <ol class="arabic simple">
@@ -2125,7 +2149,7 @@ layer to some extent, including:</p>
 <li><p>Data pruning.</p></li>
 </ol>
 <section id="available-resources">
-<h4>Available Resources<a class="headerlink" href="#available-resources" title="Link to this heading">#</a></h4>
+<h4>Available resources<a class="headerlink" href="#available-resources" title="Link to this heading">#</a></h4>
 <p>The scheduling strategy employed by <a class="reference internal" href="../data/data.html#data"><span class="std std-ref">Ray Data</span></a> operates independently of any existing placement group, scheduling tasks and actors separately. Consequently, it’s essential to reserve adequate resources for other tasks and actors within your job. To
 optimize <a class="reference internal" href="../data/data.html#data"><span class="std std-ref">Ray Data</span></a>’s scalability for read operations and improve reading performance, consider increasing the available resources in your cluster while preserving the resource allocation for existing tasks and actors. The key resources to monitor and
 provision are CPUs and object store memory. Insufficient object store memory, especially under heavy backpressure, may lead to objects being spilled to disk, which can severely impact application performance.</p>
@@ -2137,7 +2161,7 @@ include:</p>
 </ul>
 </section>
 <section id="data-locality">
-<h4>Data Locality<a class="headerlink" href="#data-locality" title="Link to this heading">#</a></h4>
+<h4>Data locality<a class="headerlink" href="#data-locality" title="Link to this heading">#</a></h4>
 <p>Data locality is a critical factor in achieving fast data processing. For instance, if your data resides on GCP, running a Ray cluster on AWS S3 or a local machine inevitably results in low transfer rates and slow data processing. To ensure optimal performance, storing data within the same region, same zone and cloud provider as the Ray cluster is generally
 sufficient to enable efficient streaming for RLlib’s Offline RL API. Additional adjustments to consider include:</p>
 <ul class="simple">
@@ -2146,7 +2170,7 @@ sufficient to enable efficient streaming for RLlib’s Offline RL API. Additiona
 </ul>
 </section>
 <section id="data-sharding">
-<h4>Data Sharding<a class="headerlink" href="#data-sharding" title="Link to this heading">#</a></h4>
+<h4>Data sharding<a class="headerlink" href="#data-sharding" title="Link to this heading">#</a></h4>
 <p>Data sharding improves the efficiency of fetching, transferring, and reading data by balancing chunk sizes. If chunks are too large, they can cause delays during transfer and processing, leading to bottlenecks. Conversely, chunks that are too small can result in high metadata fetching overhead, slowing down overall performance. Finding an optimal chunk size is
 critical for balancing these trade-offs and maximizing throughput.</p>
 <ul class="simple">
@@ -2154,7 +2178,7 @@ critical for balancing these trade-offs and maximizing throughput.</p>
 </ul>
 </section>
 <section id="data-pruning">
-<h4>Data Pruning<a class="headerlink" href="#data-pruning" title="Link to this heading">#</a></h4>
+<h4>Data pruning<a class="headerlink" href="#data-pruning" title="Link to this heading">#</a></h4>
 <p>If your data is in <strong>Parquet</strong> format (the recommended offline data format for RLlib), you can leverage data pruning to optimize performance. <a class="reference internal" href="../data/data.html#data"><span class="std std-ref">Ray Data</span></a> supports pruning in its <a class="reference internal" href="../data/api/doc/ray.data.read_parquet.html#ray.data.read_parquet" title="ray.data.read_parquet"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_parquet()</span></code></a> method through projection pushdown (column filtering) and filter pushdown (row filtering). These filters are applied directly during file
 scans, reducing the amount of unnecessary data loaded into memory.</p>
 <p>For instance, if you only require specific columns from your offline data (for example, to avoid loading the <code class="docutils literal notranslate"><span class="pre">infos</span></code> column):</p>
@@ -2199,7 +2223,7 @@ scans, reducing the amount of unnecessary data loaded into memory.</p>
 </section>
 </section>
 <section id="how-to-tune-post-processing-prelearner">
-<h3>How to Tune Post-Processing (PreLearner)<a class="headerlink" href="#how-to-tune-post-processing-prelearner" title="Link to this heading">#</a></h3>
+<h3>How to tune post-processing (PreLearner)<a class="headerlink" href="#how-to-tune-post-processing-prelearner" title="Link to this heading">#</a></h3>
 <p>When enabling high throughput in Read Operations, it’s essential to ensure sufficient processing capacity in the Post-Processing (Pre-Learner) stage. Insufficient capacity in this stage can cause backpressure, leading to increased memory usage and, in severe cases,
 object spilling to disk or even Out-Of-Memory (see <a class="reference internal" href="../ray-core/scheduling/ray-oom-prevention.html#ray-oom-prevention"><span class="std std-ref">Out-Of-Memory Prevention</span></a>) errors.</p>
 <p>Tuning the <strong>Post-Processing (Pre-Learner)</strong> layer is generally more straightforward than optimizing the <strong>Read Operations</strong> layer. Tuning the Post-Processing (Pre-Learner) layer is generally more straightforward than optimizing the Read Operations layer. The following parameters can be adjusted to optimize its performance:</p>
@@ -2209,7 +2233,7 @@ object spilling to disk or even Out-Of-Memory (see <a class="reference internal"
 <li><p>Read Batch and Buffer Sizes.</p></li>
 </ul>
 <section id="actor-pool-size">
-<h4>Actor Pool Size<a class="headerlink" href="#actor-pool-size" title="Link to this heading">#</a></h4>
+<h4>Actor pool size<a class="headerlink" href="#actor-pool-size" title="Link to this heading">#</a></h4>
 <p>Internally, the <strong>Post-Processing (PreLearner)</strong> layer is defined by a <a class="reference internal" href="../data/api/doc/ray.data.Dataset.map_batches.html#ray.data.Dataset.map_batches" title="ray.data.Dataset.map_batches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">map_batches()</span></code></a> operation that starts an <code class="xref py py-class docutils literal notranslate"><span class="pre">_ActorPool</span></code>. Each actor in this pool runs an <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a>
 instances to transform batches on their way from disk to RLlib’s <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a>. Obviously, the size of this <code class="xref py py-class docutils literal notranslate"><span class="pre">_ActorPool</span></code> defines the throughput of this layer and needs to be fine-tuned in regard to the pervious layer’s
 throughput to avoid backpressure. You can use the <code class="docutils literal notranslate"><span class="pre">concurrency</span></code> in RLlib’s <code class="docutils literal notranslate"><span class="pre">map_batches_kwargs</span></code> parameter to define this pool size:</p>
@@ -2255,7 +2279,7 @@ are subject to fluctuations (for example, in shared or dynamic environments), an
 </div>
 </section>
 <section id="allocated-resources">
-<h4>Allocated Resources<a class="headerlink" href="#allocated-resources" title="Link to this heading">#</a></h4>
+<h4>Allocated resources<a class="headerlink" href="#allocated-resources" title="Link to this heading">#</a></h4>
 <p>Other than the number of post-processing actors you can tune performance on the <strong>Post-Processing (PreLearner)</strong> layer through defining resources to be allocated to each <code class="xref py py-class docutils literal notranslate"><span class="pre">OffLinePreLearner</span></code> in the actor pool. Such resources can be defined either through <code class="docutils literal notranslate"><span class="pre">num_cpus</span></code> and <code class="docutils literal notranslate"><span class="pre">num_gpus</span></code>
 or in the <code class="docutils literal notranslate"><span class="pre">ray_remote_args</span></code>.</p>
 <div class="admonition note">
@@ -2285,7 +2309,7 @@ the streaming pipeline, while the latter defines the batch size used for trainin
 </div>
 </section>
 <section id="read-batch-and-buffer-sizes">
-<h4>Read Batch- and Buffer Sizes<a class="headerlink" href="#read-batch-and-buffer-sizes" title="Link to this heading">#</a></h4>
+<h4>Read batch- and buffer sizes<a class="headerlink" href="#read-batch-and-buffer-sizes" title="Link to this heading">#</a></h4>
 <p>When working with data from <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> or the legacy <code class="xref py py-class docutils literal notranslate"><span class="pre">SampleBatch</span></code> format, fine-tuning the <code class="code docutils literal notranslate"><span class="pre">input_read_batch_size</span></code> parameter provides additional optimization opportunities. This parameter controls the size of batches retrieved from data
 files. Its effectiveness is particularly notable when handling episodic or legacy <code class="xref py py-class docutils literal notranslate"><span class="pre">SampleBatch</span></code> data because the streaming pipeline utilizes for these data an <code class="xref py py-class docutils literal notranslate"><span class="pre">EpisodeReplayBuffer</span></code> to handle the multiple timesteps contained in each
 data row. All incoming data is converted into <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> instances - if not already in this format - and stored in an episode replay buffer, which precisely manages the sampling of <code class="code docutils literal notranslate"><span class="pre">train_batch_size_per_learner</span></code> for training.</p>
@@ -2371,7 +2395,7 @@ the amount of data digested from read input and the variation of data sampled fr
 </section>
 </section>
 <section id="how-to-tune-updating-learner">
-<h3>How to Tune Updating (Learner)<a class="headerlink" href="#how-to-tune-updating-learner" title="Link to this heading">#</a></h3>
+<h3>How to tune updating (Learner)<a class="headerlink" href="#how-to-tune-updating-learner" title="Link to this heading">#</a></h3>
 <p><strong>Updating (Learner)</strong>  is the final downstream task in RLlib’s Offline RL pipeline, and its consumption speed determines the overall throughput of the data pipeline. If the learning process is slow, it can cause backpressure in upstream layers, potentially leading to object spilling or Out-Of-Memory (OOM) errors. Therefore, it’s essential to fine-tune this
 layer in coordination with the upstream components. Several parameters can be adjusted to optimize the learning speed in your Offline algorithm:</p>
 <ul class="simple">
@@ -2384,7 +2408,7 @@ layer in coordination with the upstream components. Several parameters can be ad
 </ul>
 </section>
 <section id="id3">
-<span id="id4"></span><h3>Actor Pool Size<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<span id="id4"></span><h3>Actor pool size<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
 <p>RLlib supports scaling <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> instances through the parameter <code class="code docutils literal notranslate"><span class="pre">num_learners</span></code>. When this value is <code class="docutils literal notranslate"><span class="pre">0</span></code>, RLlib uses a Learner instance in the local process, whereas for values <code class="docutils literal notranslate"><span class="pre">&gt;0</span></code>, RLlib scales out using a <code class="xref py py-class docutils literal notranslate"><span class="pre">backend_executor_BackendExecutor</span></code>. This executor spawns your specified
 number of <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> instances, manages distributed training and aggregates intermediate results across <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> actors. <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> scaling increases training throughput and you should only apply it, if the upstream components in your
 Offline Data pipeline can supply data at a rate sufficient to match the increased training capacity. RLlib’s Offline API offers powerful scalability at its final layer by utilizing <a class="reference internal" href="../data/api/doc/ray.data.Dataset.streaming_split.html#ray.data.Dataset.streaming_split" title="ray.data.Dataset.streaming_split"><code class="xref py py-class docutils literal notranslate"><span class="pre">streaming_split</span></code></a>. This functionality divides the data stream into multiple substreams, which are then processed by individual
@@ -2399,7 +2423,7 @@ Offline Data pipeline can supply data at a rate sufficient to match the increase
 </pre></div>
 </div>
 <section id="id5">
-<h4>Allocated Resources<a class="headerlink" href="#id5" title="Link to this heading">#</a></h4>
+<h4>Allocated resources<a class="headerlink" href="#id5" title="Link to this heading">#</a></h4>
 <p>Just as with the Post-Processing (Pre-Learner) layer, allocating additional resources can help address slow training issues. The primary resource to leverage is the GPU, as training involves forward and backward passes through the <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.html#ray.rllib.core.rl_module.rl_module.RLModule" title="ray.rllib.core.rl_module.rl_module.RLModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLModule</span></code></a>, which GPUs can accelerate significantly. If your training
 already utilizes GPUs and performance still remains an issue, consider scaling up by either adding more GPUs to each <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> to increase GPU memory and computational capacity (set <code class="code docutils literal notranslate"><span class="pre">config.learners(num_gpus_per_learner=...)</span></code>), or by adding additional <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> workers to further distribute the workload (by setting <code class="code docutils literal notranslate"><span class="pre">config.learners(num_learners=...)</span></code>). Additionally, ensure that data
 throughput and upstream components are optimized to keep the learners fully utilized, as insufficient upstream capacity can bottleneck the training process.</p>
@@ -2414,7 +2438,7 @@ throughput and upstream components are optimized to keep the learners fully util
 </div>
 </section>
 <section id="scheduling-strategy">
-<h4>Scheduling Strategy<a class="headerlink" href="#scheduling-strategy" title="Link to this heading">#</a></h4>
+<h4>Scheduling strategy<a class="headerlink" href="#scheduling-strategy" title="Link to this heading">#</a></h4>
 <p>The scheduling strategy in Ray plays a key role in task and actor placement by attempting to distribute them across multiple nodes in a cluster, thereby maximizing resource utilization and fault tolerance. When running on a single-node cluster (that’s: one large head node), the scheduling strategy has little to no noticeable impact. However, in a multi-node cluster,
 scheduling can significantly influence the performance of your Offline Data pipeline due to the importance of data locality. Data processing occurs across all nodes, and maintaining data locality during training can enhance performance.</p>
 <p>In such scenarios, you can improve data locality by changing RLlib’s default scheduling strategy from <code class="docutils literal notranslate"><span class="pre">&quot;PACK&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">&quot;SPREAD&quot;</span></code>. This strategy distributes the <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> actors across the cluster, allowing <code class="code docutils literal notranslate"><span class="pre">Ray</span> <span class="pre">Data</span> <span class="pre">&lt;data&gt;</span></code> to take advantage of locality-aware bundle selection, which can improve efficiency.</p>
@@ -2462,7 +2486,7 @@ scheduling can significantly influence the performance of your Offline Data pipe
 </div>
 </section>
 <section id="batch-size">
-<h4>Batch Size<a class="headerlink" href="#batch-size" title="Link to this heading">#</a></h4>
+<h4>Batch size<a class="headerlink" href="#batch-size" title="Link to this heading">#</a></h4>
 <p>Batch size is one of the simplest parameters to adjust for optimizing performance in RLlib’s new Offline RL API. Small batch sizes may under-utilize hardware, leading to inefficiencies, while overly large batch sizes can exceed memory limits. In a streaming pipeline, the selected batch size impacts how data is partitioned and processed across parallel workers. Larger
 batch sizes reduce the overhead of frequent task coordination, but if they exceed hardware constraints, they can slow down the entire pipeline. You can configure the training batch size using the <code class="code docutils literal notranslate"><span class="pre">train_batch_size_per_learner</span></code> attribute as shown below.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
@@ -2478,7 +2502,7 @@ batch sizes reduce the overhead of frequent task coordination, but if they excee
 <p>In <code class="code docutils literal notranslate"><span class="pre">Ray</span> <span class="pre">Data</span> <span class="pre">&lt;data&gt;</span></code>, it’s common practice to use batch sizes that are powers of two. However, you are free to select any integer value for the batch size based on your needs.</p>
 </section>
 <section id="batch-prefetching">
-<h4>Batch Prefetching<a class="headerlink" href="#batch-prefetching" title="Link to this heading">#</a></h4>
+<h4>Batch prefetching<a class="headerlink" href="#batch-prefetching" title="Link to this heading">#</a></h4>
 <p>Batch prefetching allows you to control data consumption on the downstream side of your offline data pipeline. The primary goal is to ensure that learners remain active, maintaining a continuous flow of data. This is achieved by preparing the next batch while the learner processes the current one. Prefetching determines how many batches are kept ready for learners
 and should be tuned based on the time required to produce the next batch and the learner’s update speed. Prefetching too many batches can lead to memory inefficiencies and, in some cases, backpressure in upstream tasks.</p>
 <p>You can configure batch prefetching in the <code class="code docutils literal notranslate"><span class="pre">iter_batches_kwargs</span></code>:</p>
@@ -2501,7 +2525,7 @@ in iterating over data output of the streaming pipeline, while the latter define
 </div>
 </section>
 <section id="learner-iterations">
-<h4>Learner Iterations<a class="headerlink" href="#learner-iterations" title="Link to this heading">#</a></h4>
+<h4>Learner iterations<a class="headerlink" href="#learner-iterations" title="Link to this heading">#</a></h4>
 <p>This tuning parameter is available only when using multiple instances of :<a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a>. In distributed learning, each <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> instance processes a sub-stream of the offline streaming pipeline, iterating over batches from that sub-stream. You can control the number of iterations each
 <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> instance runs per RLlib training iteration. Result reporting occurs after each RLlib training iteration. Setting this parameter too low results in inefficiencies, while excessively high values can hinder training monitoring and, in some cases - such as in RLlib’s <code class="xref py py-class docutils literal notranslate"><span class="pre">MARWIL</span></code>
 implementation - lead to stale training data. This happens because some data transformations rely on the same <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.html#ray.rllib.core.rl_module.rl_module.RLModule" title="ray.rllib.core.rl_module.rl_module.RLModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLModule</span></code></a> that the <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> instances are training on. The number of iterations per sub-stream is controlled by the attribute
@@ -2531,7 +2555,7 @@ implementation - lead to stale training data. This happens because some data tra
 <li><p>Pipeline Level.</p></li>
 </ul>
 <section id="connector-level">
-<h3>Connector Level<a class="headerlink" href="#connector-level" title="Link to this heading">#</a></h3>
+<h3>Connector level<a class="headerlink" href="#connector-level" title="Link to this heading">#</a></h3>
 <p>Small data transformations on instances of <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> can be easily implemented by modifying the <code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectorPipelineV2</span></code>, which is part of the <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a> and prepares episodes for training. You can leverage any connector from
 RLlib’s library (see <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/connectors">RLlib’s default connectors</a>) or create a custom connector (see <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/examples/connectors">RLlib’s ConnectorV2 examples</a>) to integrate into the <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a>’s <code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectorPipelineV2</span></code>.
 Careful consideration must be given to the order in which <code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectorV2</span></code> instances are applied, as demonstrated in the implementation of <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/algorithms/marwil">RLlib’s MARWIL algorithm</a> (see the <a class="reference external" href="https://www.nematilab.info/bmijc/assets/012819_paper.pdf">MARWIL paper</a>).</p>
@@ -2584,7 +2608,7 @@ it relies on fully prepared batches containing <code class="code docutils litera
 </pre></div>
 </div>
 <section id="define-a-primer-learnerconnector-pipeline">
-<h4>Define a Primer LearnerConnector Pipeline<a class="headerlink" href="#define-a-primer-learnerconnector-pipeline" title="Link to this heading">#</a></h4>
+<h4>Define a primer LearnerConnector pipeline<a class="headerlink" href="#define-a-primer-learnerconnector-pipeline" title="Link to this heading">#</a></h4>
 <p>There are multiple ways to customize the <code class="xref py py-class docutils literal notranslate"><span class="pre">LearnerConnectorPipeline</span></code>. One approach, as demonstrated above, is to override the <code class="code docutils literal notranslate"><span class="pre">build_learner_connector</span></code> method in the <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>. Alternatively, you can directly define a custom <code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectorV2</span></code> piece to the
 <code class="xref py py-class docutils literal notranslate"><span class="pre">LearnerConnectorPipeline</span></code> by utilizing the <code class="code docutils literal notranslate"><span class="pre">learner_connector</span></code> attribute:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_make_learner_connector</span><span class="p">(</span><span class="n">input_observation_space</span><span class="p">,</span> <span class="n">input_action_space</span><span class="p">):</span>
@@ -2609,7 +2633,7 @@ steps). If your goal is to modify data further along in the <code class="xref py
 </section>
 </section>
 <section id="prelearner-level">
-<h3>PreLearner Level<a class="headerlink" href="#prelearner-level" title="Link to this heading">#</a></h3>
+<h3>PreLearner level<a class="headerlink" href="#prelearner-level" title="Link to this heading">#</a></h3>
 <p>If you need to perform data transformations at a deeper level - before your data reaches the <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> stage - consider overriding the <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a>. This class orchestrates the complete data transformation pipeline, converting raw input data into
 <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiAgentBatch</span></code> objects ready for training. For instance, if your data is stored in specialized formats requiring pre-parsing and restructuring (for example, XML, HTML, Protobuf, images, or videos), you may need to handle these custom formats directly. You can leverage tools such as <code class="code docutils literal notranslate"><span class="pre">Ray</span> <span class="pre">Data's</span> <span class="pre">custom</span> <span class="pre">datasources</span> <span class="pre">&lt;custom_datasource&gt;</span></code> (for example, <a class="reference internal" href="../data/api/doc/ray.data.read_binary_files.html#ray.data.read_binary_files" title="ray.data.read_binary_files"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_binary_files()</span></code></a>) to manage the ingestion process. To ensure
 this data is appropriately structured and sorted into <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> objects, you can override the <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_to_episodes.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_to_episodes" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_to_episodes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_map_to_episodes()</span></code></a> static method.</p>
@@ -2970,7 +2994,7 @@ this data is appropriately structured and sorted into <a class="reference intern
 </div>
 <p>If these customization capabilities still don’t meet your requirements, consider moving to the <strong>Pipeline Level</strong> for even greater flexibility.</p>
 <section id="pipeline-level">
-<h4>Pipeline Level<a class="headerlink" href="#pipeline-level" title="Link to this heading">#</a></h4>
+<h4>Pipeline level<a class="headerlink" href="#pipeline-level" title="Link to this heading">#</a></h4>
 <p>On this level of RLlib’s Offline RL API you can redefine your complete pipeline from data reading to batch iteration by overriding the <code class="xref py py-class docutils literal notranslate"><span class="pre">OfflineData</span></code> class. In most cases however the other two levels should be sufficient for your requirements. Manipulating the complete pipeline needs sensible handling because it could degrade performance of your
 pipeline to a high degree. Study carefully the <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_data.OfflineData.html#ray.rllib.offline.offline_data.OfflineData" title="ray.rllib.offline.offline_data.OfflineData"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflineData</span></code></a> class to reach a good understanding of how the default pipeline works before going over to program your own one. There are mainly two methods that define this pipeline:</p>
 <ul class="simple">
@@ -3538,51 +3562,50 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-training-an-expert-policy">Example: Training an Expert Policy</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-record-expert-data-to-local-disk">Example: Record Expert Data to Local Disk</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-training-on-previously-saved-experiences">Example: Training on Previously Saved Experiences</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-external-expert-experiences">Using External Expert Experiences</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#converting-tabular-data-to-rllib-s-episode-format">Converting Tabular Data to RLlib’s Episode Format</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-old-api-stack-samplebatch-recordings">Using Old API Stack <code class="docutils literal notranslate"><span class="pre">SampleBatch</span></code> Recordings</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pre-processing-filtering-and-post-processing">Pre-Processing, Filtering and Post-Processing</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scaling-i-o-throughput">Scaling I/O Throughput</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-cloud-storage">Using Cloud Storage</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-cloud-storage-for-recording">Using Cloud Storage for Recording</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-training-an-expert-policy">Example: Training an expert policy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-record-expert-data-to-local-disk">Example: Record expert data to local disk</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-training-on-previously-saved-experiences">Example: Training on previously saved experiences</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-external-expert-experiences">Using external expert experiences</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#converting-tabular-data-to-rllib-s-episode-format">Converting tabular data to RLlib’s episode format</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-old-api-stack-samplebatch-recordings">Using old API stack <code class="docutils literal notranslate"><span class="pre">SampleBatch</span></code> recordings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pre-processing-filtering-and-post-processing">Pre-processing, filtering and post-processing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scaling-i-o-throughput">Scaling I/O throughput</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-cloud-storage">Using cloud storage</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-cloud-storage-for-recording">Using cloud storage for recording</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-tune-performance">How to Tune Performance</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-tune-reading-operations">How to Tune Reading Operations</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#available-resources">Available Resources</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#data-locality">Data Locality</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#data-sharding">Data Sharding</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#data-pruning">Data Pruning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-tune-performance">How to tune performance</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-tune-reading-operations">How to tune reading operations</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#available-resources">Available resources</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#data-locality">Data locality</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#data-sharding">Data sharding</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#data-pruning">Data pruning</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-tune-post-processing-prelearner">How to Tune Post-Processing (PreLearner)</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#actor-pool-size">Actor Pool Size</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#allocated-resources">Allocated Resources</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#read-batch-and-buffer-sizes">Read Batch- and Buffer Sizes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-tune-post-processing-prelearner">How to tune post-processing (PreLearner)</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#actor-pool-size">Actor pool size</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#allocated-resources">Allocated resources</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#read-batch-and-buffer-sizes">Read batch- and buffer sizes</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-tune-updating-learner">How to Tune Updating (Learner)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Actor Pool Size</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Allocated Resources</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#scheduling-strategy">Scheduling Strategy</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#batch-size">Batch Size</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#batch-prefetching">Batch Prefetching</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#learner-iterations">Learner Iterations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-tune-updating-learner">How to tune updating (Learner)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Actor pool size</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Allocated resources</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#scheduling-strategy">Scheduling strategy</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#batch-size">Batch size</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#batch-prefetching">Batch prefetching</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#learner-iterations">Learner iterations</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#customization">Customization</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connector-level">Connector Level</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#define-a-primer-learnerconnector-pipeline">Define a Primer LearnerConnector Pipeline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connector-level">Connector level</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#define-a-primer-learnerconnector-pipeline">Define a primer LearnerConnector pipeline</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prelearner-level">PreLearner Level</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline-level">Pipeline Level</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prelearner-level">PreLearner level</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline-level">Pipeline level</a></li>
 </ul>
 </li>
 </ul>

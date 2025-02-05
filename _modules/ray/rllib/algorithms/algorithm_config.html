@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=2df59da5" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=9b1aa6b9" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -335,6 +335,17 @@ both in the usual template (layout.html) as well as (index.html). -->
         <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -489,6 +500,17 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
   <div class="version-switcher__container dropdown">
     <button id="versionswitcherbutton" type="button" role="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="listbox" aria-controls="versionswitcherlist" aria-label="Version switcher list">
       Choose version  <!-- this text may get changed later by javascript -->
@@ -591,7 +613,10 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/execution.html">Execution and failure semantics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/visualization.html">Visualization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/overlap.html">Overlap communication and computation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -836,10 +861,11 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-models.html">Models, Preprocessors, and Action Distributions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/checkpoints.html">Checkpointing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rllib/metrics-logger.html">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/single-agent-episode.html">Episodes</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-replay-buffers.html">Replay Buffers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-offline.html">Working with Offline Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-offline.html">Working with offline data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-rlmodule.html">RL Modules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rllib/rllib-learner.html">Learner (Alpha)</a></li>
 
@@ -885,22 +911,17 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_actions.html">ray.rllib.algorithms.algorithm.Algorithm.compute_actions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.compute_single_action.html">ray.rllib.algorithms.algorithm.Algorithm.compute_single_action</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html">ray.rllib.algorithms.algorithm.Algorithm.from_state</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html">ray.rllib.algorithms.algorithm.Algorithm.get_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html">ray.rllib.algorithms.algorithm.Algorithm.set_weights</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html">ray.rllib.algorithms.algorithm.Algorithm.export_policy_model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore.html">ray.rllib.algorithms.algorithm.Algorithm.restore</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_workers.html">ray.rllib.algorithms.algorithm.Algorithm.restore_workers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save.html">ray.rllib.algorithms.algorithm.Algorithm.save</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.env_runner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner.html">ray.rllib.algorithms.algorithm.Algorithm.eval_env_runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.train.html">ray.rllib.algorithms.algorithm.Algorithm.train</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html">ray.rllib.algorithms.algorithm.Algorithm.training_step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_to_path.html">ray.rllib.algorithms.algorithm.Algorithm.save_to_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html">ray.rllib.algorithms.algorithm.Algorithm.restore_from_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html">ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html">ray.rllib.algorithms.algorithm.Algorithm.get_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html">ray.rllib.algorithms.algorithm.Algorithm.set_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html">ray.rllib.algorithms.algorithm.Algorithm.evaluate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html">ray.rllib.algorithms.algorithm.Algorithm.get_module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html">ray.rllib.algorithms.algorithm.Algorithm.add_policy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
@@ -1016,6 +1037,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value.html">ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value</a></li>
@@ -1733,6 +1760,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">num_learners</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_gpus_per_learner</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_cpus_per_learner</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_aggregator_actors_per_learner</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_requests_in_flight_per_aggregator_actor</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_gpu_idx</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1"># TODO (sven): This probably works even without any restriction</span>
         <span class="c1">#  (allowing for any arbitrary number of requests in-flight). Test with</span>
@@ -1777,9 +1806,6 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">learner_config_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># @OldAPIStack</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_learner_class</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="c1"># New API stack&#39;s aggregator actors.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_aggregator_actors_per_learner</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_requests_in_flight_per_aggregator_actor</span> <span class="o">=</span> <span class="mi">100</span>
 
         <span class="c1"># `self.callbacks()`</span>
         <span class="c1"># TODO (sven): Set this default to None, once the old API stack has been</span>
@@ -2369,6 +2395,7 @@ document.write(`
         <span class="kn">from</span> <span class="nn">ray.rllib.connectors.env_to_module</span> <span class="kn">import</span> <span class="p">(</span>
             <span class="n">AddObservationsFromEpisodesToBatch</span><span class="p">,</span>
             <span class="n">AddStatesFromEpisodesToBatch</span><span class="p">,</span>
+            <span class="n">AddTimeDimToBatchAndZeroPad</span><span class="p">,</span>
             <span class="n">AgentToModuleMapping</span><span class="p">,</span>
             <span class="n">BatchIndividualItems</span><span class="p">,</span>
             <span class="n">EnvToModulePipeline</span><span class="p">,</span>
@@ -2422,7 +2449,9 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_default_connectors_to_env_to_module_pipeline</span><span class="p">:</span>
             <span class="c1"># Append OBS handling.</span>
             <span class="n">pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AddObservationsFromEpisodesToBatch</span><span class="p">())</span>
-            <span class="c1"># Append STATE_IN/STATE_OUT (and time-rank) handler.</span>
+            <span class="c1"># Append time-rank handler.</span>
+            <span class="n">pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AddTimeDimToBatchAndZeroPad</span><span class="p">())</span>
+            <span class="c1"># Append STATE_IN/STATE_OUT handler.</span>
             <span class="n">pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AddStatesFromEpisodesToBatch</span><span class="p">())</span>
             <span class="c1"># If multi-agent -&gt; Map from AgentID-based data to ModuleID based data.</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_multi_agent</span><span class="p">:</span>
@@ -2544,6 +2573,7 @@ document.write(`
             <span class="n">AddColumnsFromEpisodesToTrainBatch</span><span class="p">,</span>
             <span class="n">AddObservationsFromEpisodesToBatch</span><span class="p">,</span>
             <span class="n">AddStatesFromEpisodesToBatch</span><span class="p">,</span>
+            <span class="n">AddTimeDimToBatchAndZeroPad</span><span class="p">,</span>
             <span class="n">AgentToModuleMapping</span><span class="p">,</span>
             <span class="n">BatchIndividualItems</span><span class="p">,</span>
             <span class="n">LearnerConnectorPipeline</span><span class="p">,</span>
@@ -2588,7 +2618,9 @@ document.write(`
             <span class="p">)</span>
             <span class="c1"># Append all other columns handling.</span>
             <span class="n">pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AddColumnsFromEpisodesToTrainBatch</span><span class="p">())</span>
-            <span class="c1"># Append STATE_IN/STATE_OUT (and time-rank) handler.</span>
+            <span class="c1"># Append time-rank handler.</span>
+            <span class="n">pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AddTimeDimToBatchAndZeroPad</span><span class="p">(</span><span class="n">as_learner_connector</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="c1"># Append STATE_IN/STATE_OUT handler.</span>
             <span class="n">pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AddStatesFromEpisodesToBatch</span><span class="p">(</span><span class="n">as_learner_connector</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
             <span class="c1"># If multi-agent -&gt; Map from AgentID-based data to ModuleID based data.</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_multi_agent</span><span class="p">:</span>
@@ -3566,6 +3598,8 @@ document.write(`
         <span class="n">num_learners</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">num_cpus_per_learner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">num_gpus_per_learner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">num_aggregator_actors_per_learner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">max_requests_in_flight_per_aggregator_actor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">local_gpu_idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">max_requests_in_flight_per_learner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
     <span class="p">):</span>
@@ -3588,6 +3622,14 @@ document.write(`
 <span class="sd">                the training on main process CPUs. If `num_gpus_per_learner` is &gt; 0,</span>
 <span class="sd">                then you shouldn&#39;t change `num_cpus_per_learner` (from its default</span>
 <span class="sd">                value of 1).</span>
+<span class="sd">            num_aggregator_actors_per_learner: The number of aggregator actors per</span>
+<span class="sd">                Learner (if num_learners=0, one local learner is created). Must be at</span>
+<span class="sd">                least 1. Aggregator actors perform the task of a) converting episodes</span>
+<span class="sd">                into a train batch and b) move that train batch to the same GPU that</span>
+<span class="sd">                the corresponding learner is located on. Good values are 1 or 2, but</span>
+<span class="sd">                this strongly depends on your setup and `EnvRunner` throughput.</span>
+<span class="sd">            max_requests_in_flight_per_aggregator_actor: How many in-flight requests</span>
+<span class="sd">                are allowed per aggregator actor before new requests are dropped?</span>
 <span class="sd">            local_gpu_idx: If `num_gpus_per_learner` &gt; 0, and</span>
 <span class="sd">                `num_learners` &lt; 2, then RLlib uses this GPU index for training. This is</span>
 <span class="sd">                an index into the available</span>
@@ -3612,6 +3654,12 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">num_cpus_per_learner</span> <span class="o">=</span> <span class="n">num_cpus_per_learner</span>
         <span class="k">if</span> <span class="n">num_gpus_per_learner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_gpus_per_learner</span> <span class="o">=</span> <span class="n">num_gpus_per_learner</span>
+        <span class="k">if</span> <span class="n">num_aggregator_actors_per_learner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_aggregator_actors_per_learner</span> <span class="o">=</span> <span class="n">num_aggregator_actors_per_learner</span>
+        <span class="k">if</span> <span class="n">max_requests_in_flight_per_aggregator_actor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_requests_in_flight_per_aggregator_actor</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">max_requests_in_flight_per_aggregator_actor</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">local_gpu_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">local_gpu_idx</span> <span class="o">=</span> <span class="n">local_gpu_idx</span>
         <span class="k">if</span> <span class="n">max_requests_in_flight_per_learner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
@@ -3642,9 +3690,9 @@ document.write(`
         <span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">add_default_connectors_to_learner_pipeline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">learner_config_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
-        <span class="n">num_aggregator_actors_per_learner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
-        <span class="n">max_requests_in_flight_per_aggregator_actor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="c1"># Deprecated args.</span>
+        <span class="n">num_aggregator_actors_per_learner</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
+        <span class="n">max_requests_in_flight_per_aggregator_actor</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
         <span class="n">num_sgd_iter</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
         <span class="n">max_requests_in_flight_per_sampler_worker</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">:</span>
@@ -3735,18 +3783,27 @@ document.write(`
 <span class="sd">                Learner subclasses and in case the user doesn&#39;t want to write an extra</span>
 <span class="sd">                `AlgorithmConfig` subclass just to add a few settings to the base Algo&#39;s</span>
 <span class="sd">                own config class.</span>
-<span class="sd">            num_aggregator_actors_per_learner: The number of aggregator actors per</span>
-<span class="sd">                Learner (if num_learners=0, one local learner is created). Must be at</span>
-<span class="sd">                least 1. Aggregator actors perform the task of a) converting episodes</span>
-<span class="sd">                into a train batch and b) move that train batch to the same GPU that</span>
-<span class="sd">                the corresponding learner is located on. Good values are 1 or 2, but</span>
-<span class="sd">                this strongly depends on your setup and `EnvRunner` throughput.</span>
-<span class="sd">            max_requests_in_flight_per_aggregator_actor: How many in-flight requests</span>
-<span class="sd">                are allowed per aggregator actor before new requests are dropped?</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            This updated AlgorithmConfig object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">num_aggregator_actors_per_learner</span> <span class="o">!=</span> <span class="n">DEPRECATED_VALUE</span><span class="p">:</span>
+            <span class="n">deprecation_warning</span><span class="p">(</span>
+                <span class="n">old</span><span class="o">=</span><span class="s2">&quot;config.training(num_aggregator_actors_per_learner=..)&quot;</span><span class="p">,</span>
+                <span class="n">new</span><span class="o">=</span><span class="s2">&quot;config.learners(num_aggregator_actors_per_learner=..)&quot;</span><span class="p">,</span>
+                <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_aggregator_actors_per_learner</span> <span class="o">=</span> <span class="n">num_aggregator_actors_per_learner</span>
+        <span class="k">if</span> <span class="n">max_requests_in_flight_per_aggregator_actor</span> <span class="o">!=</span> <span class="n">DEPRECATED_VALUE</span><span class="p">:</span>
+            <span class="n">deprecation_warning</span><span class="p">(</span>
+                <span class="n">old</span><span class="o">=</span><span class="s2">&quot;config.training(max_requests_in_flight_per_aggregator_actor=..)&quot;</span><span class="p">,</span>
+                <span class="n">new</span><span class="o">=</span><span class="s2">&quot;config.learners(max_requests_in_flight_per_aggregator_actor=..)&quot;</span><span class="p">,</span>
+                <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_requests_in_flight_per_aggregator_actor</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">max_requests_in_flight_per_aggregator_actor</span>
+            <span class="p">)</span>
+
         <span class="k">if</span> <span class="n">num_sgd_iter</span> <span class="o">!=</span> <span class="n">DEPRECATED_VALUE</span><span class="p">:</span>
             <span class="n">deprecation_warning</span><span class="p">(</span>
                 <span class="n">old</span><span class="o">=</span><span class="s2">&quot;config.training(num_sgd_iter=..)&quot;</span><span class="p">,</span>
@@ -3820,12 +3877,6 @@ document.write(`
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">learner_config_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">learner_config_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">learner_config_dict</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">num_aggregator_actors_per_learner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">num_aggregator_actors_per_learner</span> <span class="o">=</span> <span class="n">num_aggregator_actors_per_learner</span>
-        <span class="k">if</span> <span class="n">max_requests_in_flight_per_aggregator_actor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_requests_in_flight_per_aggregator_actor</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">max_requests_in_flight_per_aggregator_actor</span>
-            <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span></div>
 

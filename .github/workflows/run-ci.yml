@@ -36,6 +36,9 @@ jobs:
 
       - name: Run core tests
         run: |
+          . ./ci/ci.sh init && source ~/.bashenv
+          source ~/.bashrc
+          ./ci/ci.sh build
           ./ci/ci.sh test_core
           ./ci/ci.sh test_python
 

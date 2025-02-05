@@ -19,12 +19,17 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || 'main' }}
       
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          
       - name: Set up environment
         run: |
           sudo apt-get update
           ./ci/env/install-miniconda.sh
           ./ci/env/install-bazel.sh
-          pip install -r python/requirements.txt
+          python -m pip install -r python/requirements.txt
 
       - name: Run core tests
         run: |

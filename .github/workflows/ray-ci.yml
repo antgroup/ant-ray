@@ -1,0 +1,182 @@
+name: Ray CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to test'
+        required: false
+        default: 'main'
+        type: string
+
+env:
+  PYTHON_VERSION: '3.11'
+  DOCKER_BUILDKIT: 1
+  RAY_CI_POST_WHEEL_TESTS: 1
+
+jobs:
+  build-base-images:
+    name: Build Base Images
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        python: ['3.11']
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Check Test Image Existence
+      id: check_test_image
+      run: |
+        if docker manifest inspect ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }} > /dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build Base Test Image
+      if: steps.check_test_image.outputs.exists != 'true'
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ci/docker/base.test.Dockerfile
+        tags: |
+          ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }}
+        push: true
+
+    - name: Check Build Image Existence
+      id: check_build_image
+      run: |
+        if docker manifest inspect ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} > /dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build OSS CI Base
+      if: steps.check_build_image.outputs.exists != 'true'
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ci/docker/base.build.Dockerfile
+        tags: ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }}
+        build-args: |
+          DOCKER_IMAGE_BASE_TEST=ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }}
+        push: true
+
+  core-tests:
+    name: Core Tests
+    env:
+      BAZEL_DIR: ${{ github.workspace }}/../tmp/bazel/${{ github.sha }}
+      RAYCI_BUILD_ID: main
+      RAY_DIR: ${{ github.workspace }}
+      COMMIT_HASH: ${{ github.sha }}
+    needs: build-base-images
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        python: ['3.11']
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.branch || github.ref }}
+    
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Check Core Image Existence
+      id: check_core_image
+      run: |
+        if docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -q "localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild"; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build core CI Base
+      if: steps.check_core_image.outputs.exists != 'true'
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ci/docker/core.build.Dockerfile
+        tags: |
+          localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild
+        build-args: |
+          RAYCI_IS_GPU_BUILD=false
+          DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }}
+        push: true
+
+    - name: Run Core Python Tests
+      env:
+        RAYCI_WORK_REPO: localhost:5000/citemp
+
+      run: |
+        echo "Running core: python tests..."
+        bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... core \
+          --workers 1 --worker-id 0 --parallelism-per-worker 8 \
+          --except-tags debug_tests,asan_tests,post_wheel_build,ha_integration,mem_pressure,tmpfs,container,manual,use_all_core,multi_gpu,large_size_python_tests_shard_2 \
+          --test-env=BAZEL_DIR=$(realpath ${{ env.BAZEL_DIR }})
+        bazel run //ci/ray_ci:test_in_docker -- //python/ray/dag/... python/ray/autoscaler/v2/... core \
+          --workers 1 --worker-id 0 --parallelism-per-worker 8 --skip-ray-installation \
+          --except-tags debug_tests,asan_tests,post_wheel_build,ha_integration,mem_pressure,tmpfs,container,manual,use_all_core,multi_gpu,large_size_python_tests_shard_2 \
+          --test-env=BAZEL_DIR=$(realpath ${{ env.BAZEL_DIR }})
+        bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
+          --workers 1 --worker-id 0 --parallelism-per-worker 8 --skip-ray-installation \
+          --only-tags use_all_core \
+          --test-env=BAZEL_DIR=$(realpath ${{ env.BAZEL_DIR }})
+        bazel run //ci/ray_ci:test_in_docker -- //:all //src/... core --build-type clang \
+          --workers 1 --worker-id 0 --parallelism-per-worker 8 --skip-ray-installation \
+          --test-env=BAZEL_DIR=$(realpath ${{ env.BAZEL_DIR }})
+
+    - name: Workaround
+      if: always()
+      run: |
+        echo "artifacts_path=$(realpath ${{ env.BAZEL_DIR }})" >> $GITHUB_ENV
+
+    - name: Generate Report
+      if: always()
+      run: |
+        python ci/ray_ci/report_gen.py
+
+    - name: Cleanup Containers
+      if: always()
+      run: |
+        docker ps -a --filter ancestor=localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild -q | xargs -r docker rm --force
+
+    - name: Copy Report Files
+      if: always()
+      run: |
+        mkdir -p /data1/static/ci/${{ github.sha }}
+        cp -r ${{ env.BAZEL_DIR }}/reports/* /data1/static/ci/${{ github.sha }}/
+
+    - name: Get Public IP
+      if: always()
+      run: |
+        echo "RUNNER_PUBLIC_IP=$(curl -s https://api.ipify.org)" >> $GITHUB_ENV
+
+    - name: Show Report Location
+      if: always()
+      run: |
+        echo "Report files are available at: http://${{ env.RUNNER_PUBLIC_IP }}:8000/${{ github.sha }}/index.html"
+ 

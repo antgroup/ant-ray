@@ -33,6 +33,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
           ./ci/env/install-bazel.sh
           python -m pip install -r python/requirements.txt
+          python -m ensure-pip
 
       - name: Run core tests
         run: |

@@ -5,7 +5,7 @@ on:
   pull_request:
 
 env:
-  PYTHON_VERSION: '3.9'
+  PYTHON_VERSION: '3.11'
   DOCKER_BUILDKIT: 1
   RAY_CI_POST_WHEEL_TESTS: 1
 
@@ -15,14 +15,24 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ['3.9']
+        python: ['3.11']
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
-    
+
+    # First build base test image
+    - name: Build Base Test Image
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ci/docker/base.test.Dockerfile
+        tags: rayproject/oss-ci-base_test-py${{ matrix.python }}
+        load: true  # Make image available in local Docker daemon
+
+    # Then build build image using the test image as base
     - name: Build OSS CI Base
       uses: docker/build-push-action@v3
       with:
@@ -31,7 +41,8 @@ jobs:
         tags: rayproject/oss-ci-base_build-py${{ matrix.python }}
         build-args: |
           DOCKER_IMAGE_BASE_TEST=rayproject/oss-ci-base_test-py${{ matrix.python }}
-    
+        load: true
+
     - name: Build ML Base
       uses: docker/build-push-action@v3
       with:
@@ -47,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ['3.9']
+        python: ['3.11']
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -91,14 +102,14 @@ jobs:
     - name: Build Data Image
       run: |
         docker build -t ray-ci-data \
-          --build-arg BASE_IMAGE=rayproject/oss-ci-base_ml-py3.9 \
+          --build-arg BASE_IMAGE=rayproject/oss-ci-base_ml-py3.11 \
           -f ci/docker/data.build.Dockerfile .
     
     - name: Run Data Tests
       run: |
         docker run --rm -v $(pwd):/ray ray-ci-data \
           bazel test --config=ci //python/ray/data/... \
-          --test_env=PYTHON_VERSION=3.9 \
+          --test_env=PYTHON_VERSION=3.11 \
           --test_output=streamed
     
     - name: Upload Test Results

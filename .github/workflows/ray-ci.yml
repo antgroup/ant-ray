@@ -30,8 +30,17 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    # First build and push base test image
+    - name: Check Test Image Existence
+      id: check_test_image
+      run: |
+        if docker manifest inspect ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }} > /dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Build Base Test Image
+      if: steps.check_test_image.outputs.exists != 'true'
       uses: docker/build-push-action@v3
       with:
         context: .
@@ -40,8 +49,17 @@ jobs:
           ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }}
         push: true
 
-    # Then build build image using the test image from GHCR
+    - name: Check Build Image Existence
+      id: check_build_image
+      run: |
+        if docker manifest inspect ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} > /dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Build OSS CI Base
+      if: steps.check_build_image.outputs.exists != 'true'
       uses: docker/build-push-action@v3
       with:
         context: .
@@ -51,7 +69,17 @@ jobs:
           DOCKER_IMAGE_BASE_TEST=ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }}
         push: true
 
+    - name: Check ML Image Existence
+      id: check_ml_image
+      run: |
+        if docker manifest inspect ghcr.io/${{ github.repository }}/oss-ci-base_ml-py${{ matrix.python }} > /dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Build ML Base
+      if: steps.check_ml_image.outputs.exists != 'true'
       uses: docker/build-push-action@v3
       with:
         context: .

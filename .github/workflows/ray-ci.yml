@@ -3,6 +3,13 @@ name: Ray CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to test'
+        required: false
+        default: 'main'
+        type: string
 
 env:
   PYTHON_VERSION: '3.11'
@@ -99,6 +106,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.branch || github.ref }}
     
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -135,6 +144,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.branch || github.ref }}
     
     - name: Build Data Image
       run: |

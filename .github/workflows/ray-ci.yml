@@ -40,7 +40,7 @@ jobs:
         file: ci/docker/base.build.Dockerfile
         tags: rayproject/oss-ci-base_build-py${{ matrix.python }}
         build-args: |
-          DOCKER_IMAGE_BASE_TEST=rayproject/oss-ci-base_test-py${{ matrix.python }}
+          DOCKER_IMAGE_BASE_TEST=localhost/rayproject/oss-ci-base_test-py${{ matrix.python }}
         load: true
 
     - name: Build ML Base
@@ -50,7 +50,7 @@ jobs:
         file: ci/docker/base.ml.Dockerfile
         tags: rayproject/oss-ci-base_ml-py${{ matrix.python }}
         build-args: |
-          DOCKER_IMAGE_BASE_TEST=rayproject/oss-ci-base_test-py${{ matrix.python }}
+          DOCKER_IMAGE_BASE_TEST=localhost/rayproject/oss-ci-base_test-py${{ matrix.python }}
 
   core-tests:
     name: Core Tests

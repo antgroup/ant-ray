@@ -27,13 +27,15 @@ jobs:
       - name: Set up environment
         run: |
           sudo apt-get update
+          sudo apt-get install -y python-pip
           sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa -y
           sudo apt-get install -y build-essential gcc-10 g++-10
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
           ./ci/env/install-bazel.sh
+          python -m ensurepip --upgrade
+          python -m pip install --upgrade pip
           python -m pip install -r python/requirements.txt
-          python -m ensurepip
 
       - name: Run core tests
         run: |

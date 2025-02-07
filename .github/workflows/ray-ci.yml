@@ -1,0 +1,126 @@
+name: Ray CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  PYTHON_VERSION: '3.9'
+  DOCKER_BUILDKIT: 1
+  RAY_CI_POST_WHEEL_TESTS: 1
+
+jobs:
+  build-base-images:
+    name: Build Base Images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.9']
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Build OSS CI Base
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ci/docker/base.build.Dockerfile
+        tags: rayproject/oss-ci-base_build-py${{ matrix.python }}
+        build-args: |
+          DOCKER_IMAGE_BASE_TEST=rayproject/oss-ci-base_test-py${{ matrix.python }}
+    
+    - name: Build ML Base
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ci/docker/base.ml.Dockerfile
+        tags: rayproject/oss-ci-base_ml-py${{ matrix.python }}
+        build-args: |
+          DOCKER_IMAGE_BASE_TEST=rayproject/oss-ci-base_test-py${{ matrix.python }}
+
+  core-tests:
+    name: Core Tests
+    needs: build-base-images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.9']
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    
+    - name: Build Core Image
+      run: |
+        docker build -t ray-ci-core \
+          --build-arg BASE_IMAGE=rayproject/oss-ci-base_build-py${{ matrix.python }} \
+          -f ci/docker/core.build.Dockerfile .
+    
+    - name: Run Core Tests
+      run: |
+        docker run --rm -v $(pwd):/ray ray-ci-core \
+          bazel test --config=ci //python/ray/tests/... //python/ray/dag/... \
+          --test_env=PYTHON_VERSION=${{ matrix.python }} \
+          --build_tests_only \
+          --test_output=streamed
+    
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: core-test-results-${{ matrix.python }}
+        path: |
+          test-results.xml
+          /tmp/artifacts/**/*
+
+  data-tests:
+    name: Data Tests
+    needs: build-base-images
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Build Data Image
+      run: |
+        docker build -t ray-ci-data \
+          --build-arg BASE_IMAGE=rayproject/oss-ci-base_ml-py3.9 \
+          -f ci/docker/data.build.Dockerfile .
+    
+    - name: Run Data Tests
+      run: |
+        docker run --rm -v $(pwd):/ray ray-ci-data \
+          bazel test --config=ci //python/ray/data/... \
+          --test_env=PYTHON_VERSION=3.9 \
+          --test_output=streamed
+    
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: data-test-results
+        path: |
+          test-results.xml
+          /tmp/artifacts/**/*
+
+  report:
+    name: Generate Report
+    needs: [core-tests, data-tests]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all test results
+      uses: actions/download-artifact@v3
+    
+    - name: Test Summary
+      uses: test-summary/action@v2
+      with:
+        paths: '**/test-results.xml'
+        name: Test Results Summary
+        show_passed: false 

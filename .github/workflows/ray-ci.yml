@@ -106,15 +106,22 @@ jobs:
       with:
         context: .
         file: ci/docker/core.build.Dockerfile
-        tags: local/citemp:unknown-corebuild
+        tags: citemp:unknown-corebuild
         build-args: |
           RAYCI_IS_GPU_BUILD=false
           DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} 
+        cache-from: |
+          type=registry,ref=citemp:cache
+        cache-to: |
+          type=registry,ref=citemp:cache,mode=max
+        outputs: type=docker,dest=./myimage.tar
+
 
     - name: Run Core Python Tests
       env:
         RAYCI_WORK_REPO: local/citemp
       run: |
+        docker load --input ./myimage.tar
         echo "Running core: python tests..."
         # First command set (excluding debug, asan, etc.)
         bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \

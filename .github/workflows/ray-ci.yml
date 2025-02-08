@@ -109,6 +109,13 @@ jobs:
       with:
         ref: ${{ github.event.inputs.branch || github.ref }}
     
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
     - name: Set up Python
       uses: actions/setup-python@v4
       with:

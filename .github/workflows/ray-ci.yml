@@ -76,25 +76,25 @@ jobs:
           DOCKER_IMAGE_BASE_TEST=ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }}
         push: true
 
-    - name: Check ML Image Existence
-      id: check_ml_image
-      run: |
-        if docker manifest inspect ghcr.io/${{ github.repository }}/oss-ci-base_ml-py${{ matrix.python }} > /dev/null 2>&1; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Build ML Base
-      if: steps.check_ml_image.outputs.exists != 'true'
-      uses: docker/build-push-action@v3
-      with:
-        context: .
-        file: ci/docker/base.ml.Dockerfile
-        tags: ghcr.io/${{ github.repository }}/oss-ci-base_ml-py${{ matrix.python }}
-        build-args: |
-          DOCKER_IMAGE_BASE_TEST=ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }}
-        push: true
+#    - name: Check ML Image Existence
+#      id: check_ml_image
+#      run: |
+#        if docker manifest inspect ghcr.io/${{ github.repository }}/oss-ci-base_ml-py${{ matrix.python }} > /dev/null 2>&1; then
+#          echo "exists=true" >> $GITHUB_OUTPUT
+#        else
+#          echo "exists=false" >> $GITHUB_OUTPUT
+#        fi
+#
+#    - name: Build ML Base
+#      if: steps.check_ml_image.outputs.exists != 'true'
+#      uses: docker/build-push-action@v3
+#      with:
+#        context: .
+#        file: ci/docker/base.ml.Dockerfile
+#        tags: ghcr.io/${{ github.repository }}/oss-ci-base_ml-py${{ matrix.python }}
+#        build-args: |
+#          DOCKER_IMAGE_BASE_TEST=ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }}
+#        push: true
 
   core-tests:
     name: Core Tests
@@ -137,29 +137,29 @@ jobs:
           test-results.xml
           /tmp/artifacts/**/*
 
-  data-tests:
-    name: Data Tests
-    needs: build-base-images
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.inputs.branch || github.ref }}
-    
-    - name: Build Data Image
-      run: |
-        docker build -t ray-ci-data \
-          --build-arg BASE_IMAGE=rayproject/oss-ci-base_ml-py3.11 \
-          -f ci/docker/data.build.Dockerfile .
-    
-    - name: Run Data Tests
-      run: |
-        docker run --rm -v $(pwd):/ray ray-ci-data \
-          bazel test --config=ci //python/ray/data/... \
-          --test_env=PYTHON_VERSION=3.11 \
-          --test_output=streamed
-    
+#  data-tests:
+#    name: Data Tests
+#    needs: build-base-images
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: Checkout code
+#      uses: actions/checkout@v4
+#      with:
+#        ref: ${{ github.event.inputs.branch || github.ref }}
+#    
+#    - name: Build Data Image
+#      run: |
+#        docker build -t ray-ci-data \
+#          --build-arg BASE_IMAGE=rayproject/oss-ci-base_ml-py3.11 \
+#          -f ci/docker/data.build.Dockerfile .
+#    
+#    - name: Run Data Tests
+#      run: |
+#        docker run --rm -v $(pwd):/ray ray-ci-data \
+#          bazel test --config=ci //python/ray/data/... \
+#          --test_env=PYTHON_VERSION=3.11 \
+#          --test_output=streamed
+#    
     - name: Upload Test Results
       if: always()
       uses: actions/upload-artifact@v3

@@ -121,16 +121,17 @@ jobs:
         docker build -t ray-ci-core \
           --build-arg DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} \
           -f ci/docker/core.build.Dockerfile .
-        docker run --rm -v $(pwd):/ray ray-ci-core \
-          pip install -r release/requirements_buildkite.txt
 
     - name: Run Core Tests
       run: |
-        docker run --rm -v $(pwd):/ray ray-ci-core \
+        docker run --rm -v $(pwd):/ray ray-ci-core /bin/bash -c "\
+          python -m ensurepip && \
+          pip install --upgrade pip && \
+          pip install -r ci/repro-ci-requirements.txt pytest && \
           bazel test --config=ci //python/ray/tests/... //python/ray/dag/... \
-          --test_env=PYTHON_VERSION=${{ matrix.python }} \
-          --build_tests_only \
-          --test_output=streamed
+            --test_env=PYTHON_VERSION=${{ matrix.python }} \
+            --build_tests_only \
+            --test_output=streamed"
     
     - name: Upload Test Results
       if: always()

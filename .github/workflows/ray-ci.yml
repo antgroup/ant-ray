@@ -124,14 +124,11 @@ jobs:
 
     - name: Run Core Tests
       run: |
-        docker run --rm -v $(pwd):/ray ray-ci-core /bin/bash -c "\
-          python -m ensurepip && \
-          pip install --upgrade pip && \
-          pip install -r ci/repro-ci-requirements.txt pytest && \
-          bazel test --config=ci //python/ray/tests/... //python/ray/dag/... \
-            --test_env=PYTHON_VERSION=${{ matrix.python }} \
-            --build_tests_only \
-            --test_output=streamed"
+        docker run --rm -v $(pwd):/ray ray-ci-core \
+          /bin/bash -c "DL=1 ./ci/env/install-dependencies.sh && bazel test --config=ci //python/ray/tests/... //python/ray/dag/... \
+          --test_env=PYTHON_VERSION=${{ matrix.python }} \
+          --build_tests_only \
+          --test_output=streamed"
     
     - name: Upload Test Results
       if: always()

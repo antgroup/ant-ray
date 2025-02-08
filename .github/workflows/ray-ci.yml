@@ -102,19 +102,17 @@ jobs:
           --build-arg DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} \
           -f ci/docker/core.build.Dockerfile .
 
-      # --- Begin test groups (translated from .buildkite/core.rayci.yml) ---
-
-    - name: Run Core Python Tests (Group 1)
+    - name: Run Core Python Tests
       run: |
         echo "Running core: python tests..."
         # First command set (excluding debug, asan, etc.)
         docker run ray-ci-core \
-          bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
+          pip install -r release/requirements_buildkite.txt && bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
           --workers 4 --worker-id 0 --parallelism-per-worker 3 \
           --except-tags debug_tests,asan_tests,post_wheel_build,ha_integration,mem_pressure,tmpfs,container,manual,use_all_core,multi_gpu
         
         docker run ray-ci-core \
-          bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
+          pip install -r release/requirements_buildkite.txt && bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
           --workers 4 --worker-id 0 \
           --only-tags use_all_core --skip-ray-installation
 
@@ -122,7 +120,7 @@ jobs:
       run: |
         echo "Running core: dashboard tests..."
         docker run ray-ci-core \
-          bazel run //ci/ray_ci:test_in_docker -- python/ray/dashboard/... core \
+          pip install -r release/requirements_buildkite.txt && bazel run //ci/ray_ci:test_in_docker -- python/ray/dashboard/... core \
           --parallelism-per-worker 3
         
         # Run UI tests – note that this uses a docker run with a mounted volume
@@ -134,7 +132,7 @@ jobs:
       run: |
         echo "Running core: wheel tests..."
         docker run ray-ci-core \
-          bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //doc/... core \
+          pip install -r release/requirements_buildkite.txt && bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //doc/... core \
           --build-type wheel --parallelism-per-worker 3 \
           --only-tags post_wheel_build --test-env=RAY_CI_POST_WHEEL_TESTS=True
 

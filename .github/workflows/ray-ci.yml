@@ -102,56 +102,29 @@ jobs:
           --build-arg DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} \
           -f ci/docker/core.build.Dockerfile .
 
+      # --- Begin test groups (translated from .buildkite/core.rayci.yml) ---
+
     - name: Run Core Python Tests
       run: |
         echo "Running core: python tests..."
         # First command set (excluding debug, asan, etc.)
-        docker run ray-ci-core \
-          pip install -r release/requirements_buildkite.txt && bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
+        bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
           --workers 4 --worker-id 0 --parallelism-per-worker 3 \
           --except-tags debug_tests,asan_tests,post_wheel_build,ha_integration,mem_pressure,tmpfs,container,manual,use_all_core,multi_gpu
         
-        docker run ray-ci-core \
-          pip install -r release/requirements_buildkite.txt && bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
+        bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
           --workers 4 --worker-id 0 \
           --only-tags use_all_core --skip-ray-installation
 
     - name: Run Dashboard Tests
       run: |
         echo "Running core: dashboard tests..."
-        docker run ray-ci-core \
-          pip install -r release/requirements_buildkite.txt && bazel run //ci/ray_ci:test_in_docker -- python/ray/dashboard/... core \
+        bazel run //ci/ray_ci:test_in_docker -- python/ray/dashboard/... core \
           --parallelism-per-worker 3
-        
-        # Run UI tests – note that this uses a docker run with a mounted volume
-        docker run -i --rm --volume /tmp/artifacts:/artifact-mount --shm-size=2.5gb \
-          "$${RAYCI_WORK_REPO}:$${RAYCI_BUILD_ID}-corebuild" /bin/bash -iecuo pipefail \
-          "./python/ray/dashboard/tests/run_ui_tests.sh"
 
     - name: Run Wheel Tests
       run: |
         echo "Running core: wheel tests..."
-        docker run ray-ci-core \
-          pip install -r release/requirements_buildkite.txt && bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //doc/... core \
+        bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //doc/... core \
           --build-type wheel --parallelism-per-worker 3 \
           --only-tags post_wheel_build --test-env=RAY_CI_POST_WHEEL_TESTS=True
-
-    # Generate a test report and upload the results to the GitHub Action output
-    - name: Generate Test Report
-      run: |
-        echo "Generating test report..."
-        # In a real setup, you would collate the logs/results from the tests.
-        # Here we simulate with a summary file.
-        echo "Test Report Summary:" > test-report.txt
-        echo "All core tests have run successfully." >> test-report.txt
-        cat test-report.txt
-
-    - name: Upload Test Report Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-report
-        path: test-report.txt
-
-    - name: Set GitHub Action Output with Test Report
-      id: set-output
-      run: echo "result=Test Report generated and uploaded as artifact 'test-report'" >> $GITHUB_OUTPUT

@@ -106,14 +106,14 @@ jobs:
       with:
         context: .
         file: ci/docker/core.build.Dockerfile
-        tags: citemp:unknown-corebuild
+        tags: local/citemp:unknown-corebuild
         build-args: |
           RAYCI_IS_GPU_BUILD=false
           DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} 
 
     - name: Run Core Python Tests
       env:
-        RAYCI_WORK_REPO: citemp
+        RAYCI_WORK_REPO: local/citemp
       run: |
         echo "Running core: python tests..."
         # First command set (excluding debug, asan, etc.)

@@ -117,7 +117,7 @@ jobs:
     - name: Build Core Image
       run: |
         docker build -t ray-ci-core \
-          --build-arg BASE_IMAGE=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} \
+          --build-arg DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} \
           -f ci/docker/core.build.Dockerfile .
     
     - name: Run Core Tests

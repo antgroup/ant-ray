@@ -100,14 +100,16 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Build Core Image
-      run: |
-        docker build -t ray-ci-core \
-          --build-arg DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} \
-          -f ci/docker/core.build.Dockerfile .
 
-      # --- Begin test groups (translated from .buildkite/core.rayci.yml) ---
+    - name: Build core CI Base
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ci/docker/core.build.Dockerfile
+        tags: ghcr.io/${{ github.repository }}/citemp:unknown-corebuild
+        build-args: |
+          DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} \
+        push: true
 
     - name: Run Core Python Tests
       env:

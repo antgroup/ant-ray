@@ -122,8 +122,8 @@ jobs:
           --build-arg DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} \
           -f ci/docker/core.build.Dockerfile .
         docker run --rm -v $(pwd):/ray ray-ci-core \
-          pip install pytest
-    
+          pip install -r release/requirements_buildkite.txt
+
     - name: Run Core Tests
       run: |
         docker run --rm -v $(pwd):/ray ray-ci-core \

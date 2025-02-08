@@ -105,6 +105,8 @@ jobs:
       # --- Begin test groups (translated from .buildkite/core.rayci.yml) ---
 
     - name: Run Core Python Tests
+      env:
+        RAYCI_WORK_REPO: ghcr.io/antgroup/citemp
       run: |
         echo "Running core: python tests..."
         # First command set (excluding debug, asan, etc.)

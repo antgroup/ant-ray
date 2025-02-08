@@ -116,19 +116,13 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
-
-    - name: Install dependencies
-      run: pip install -r release/requirements_buildkite.txt
-    
     - name: Build Core Image
       run: |
         docker build -t ray-ci-core \
           --build-arg DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }} \
           -f ci/docker/core.build.Dockerfile .
+        docker run --rm -v $(pwd):/ray ray-ci-core \
+          pip install pytest
     
     - name: Run Core Tests
       run: |

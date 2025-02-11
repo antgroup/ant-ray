@@ -1628,6 +1628,40 @@ For Actors, you can also see the system logs for the corresponding Worker proces
 <p>You can easily identify failed Tasks or Actors by looking at the Job progress bar.</p>
 <p>The Task and Actor tables display the name of the failed Tasks or Actors, respectively. They also provide access to their corresponding log or error messages.</p>
 </section>
+<section id="virtual-clusters-view">
+<span id="id1"></span><h2>Virtual Clusters View<a class="headerlink" href="#virtual-clusters-view" title="Link to this heading">#</a></h2>
+<img alt="Virtual Clusters View screenshot" class="align-center" src="../_images/virtual-cluster-view.jpg" />
+<p>The Virtual Clusters view in the Ray Dashboard offers a real‐time, hierarchical
+representation of the virtual clusters running on your Ray cluster. This view
+is designed to provide an at-a-glance overview of resource allocations, node
+status, and replica set configurations across both divisible and indivisible
+clusters.</p>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Hierarchical Organization:</strong>
+Virtual clusters are displayed as a tree structure. Divisible clusters can be
+subdivided into logical (or job) clusters while also listing “undivided” nodes.
+This structure makes it easy to visualize parent–child relationships and resource
+distribution among clusters.</p></li>
+<li><p><strong>Resource Overview:</strong>
+For each virtual cluster, key resources – such as CPU, memory, and object store
+memory – are presented in a clear, formatted overview. Values are aggregated and
+displayed in real time, so you can quickly see resource utilization and identify
+potential bottlenecks.</p></li>
+<li><p><strong>Search and Filtering:</strong>
+A search bar at the top of the Virtual Clusters panel lets you filter clusters
+by name or other properties. This is especially useful in large deployments where
+numerous virtual clusters are active simultaneously.</p></li>
+<li><p><strong>Detailed Node Information:</strong>
+Expanding a virtual cluster node reveals detailed data about the underlying
+nodes. For each node, you can view its hostname, status (e.g., ALIVE or DEAD),
+and configured node type.</p></li>
+</ul>
+<p>For more in-depth information, please refer to the complete
+<a class="reference internal" href="../virtual-cluster/getting-started.html#virtual-cluster-index"><span class="std std-ref">Ray Virtual Clusters Overview</span></a> documentation.</p>
+</section>
 <section id="overview-view">
 <span id="dash-overview"></span><h2>Overview view<a class="headerlink" href="#overview-view" title="Link to this heading">#</a></h2>
 <img alt="../_images/dashboard-overview.png" class="align-center" src="../_images/dashboard-overview.png" />
@@ -1729,6 +1763,8 @@ For Actors, you can also see the system logs for the corresponding Worker proces
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logs-view">Logs view</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#virtual-clusters-view">Virtual Clusters View</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview-view">Overview view</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
 </ul>

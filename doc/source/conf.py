@@ -70,7 +70,7 @@ extensions = [
     "sphinx_remove_toctrees",
     "sphinx_design",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.search",
+    "myst_nb",
 ]
 
 # Configuration for algolia

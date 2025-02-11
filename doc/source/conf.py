@@ -70,15 +70,15 @@ extensions = [
     "sphinx_remove_toctrees",
     "sphinx_design",
     "sphinx.ext.intersphinx",
-    "sphinx_docsearch",
+    "sphinx.ext.search",
 ]
 
 # Configuration for algolia
 # Note: This API key grants read access to our indexes and is intended to be public.
 # See https://www.algolia.com/doc/guides/security/api-keys/ for more information.
-docsearch_app_id = "LBHF0PABBL"
-docsearch_api_key = "6c42f30d9669d8e42f6fc92f44028596"
-docsearch_index_name = "docs-ray"
+# docsearch_app_id = "LBHF0PABBL"
+# docsearch_api_key = "6c42f30d9669d8e42f6fc92f44028596"
+# docsearch_index_name = "docs-ray"
 
 remove_from_toctrees = [
     "cluster/running-applications/job-submission/doc/*",
@@ -331,6 +331,8 @@ html_theme_options = {
         "json_url": "https://antgroup.github.io/ant-ray/versions.json",
         "version_match": os.getenv("READTHEDOCS_VERSION", "main"),
     },
+    "search_bar_text": "Search the docs...",
+    "search_bar_position": "navbar",
 }
 
 html_context = {
@@ -689,3 +691,15 @@ intersphinx_mapping = {
 assert (
     "ray" not in sys.modules
 ), "If ray is already imported, we will not render documentation correctly!"
+
+# Enable search-related builder
+html_js_files = [
+    'searchtools.js',
+    'language_data.js',
+]
+
+# Configure local search
+html_search_language = 'en'
+html_search_options = {
+    'dict_size': 9000,
+}

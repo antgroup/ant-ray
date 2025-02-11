@@ -373,7 +373,7 @@ The Task and Actor tables display the name of the failed Tasks or Actors, respec
 .. _virtual-clusters-view:
 
 Virtual Clusters View
-=====================
+---------------------
 
 .. image:: ./images/virtual-cluster-view.jpg
     :align: center
@@ -412,7 +412,6 @@ Key Features
   and configured node type.
 
 For more in-depth information, please refer to the complete
-:ref:`virtual-cluster <virtual-cluster>` documentation.
 
 .. _dash-overview:
 

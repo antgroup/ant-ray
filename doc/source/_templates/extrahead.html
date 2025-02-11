@@ -62,3 +62,14 @@ both in the usual template (layout.html) as well as (index.html). -->
       copyIconSrc: "{{ pathto('_static/copy-button.svg', 1) }}"
   };
 </script>
+
+<!-- Sphinx Search -->
+<script src="{{ pathto('_static/searchtools.js', 1) }}"></script>
+<script src="{{ pathto('_static/language_data.js', 1) }}"></script>
+<script src="{{ pathto('searchindex.js', 1) }}"></script>
+<script>
+  // Initialize the search functionality once the page is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    Search.init();
+  });
+</script>

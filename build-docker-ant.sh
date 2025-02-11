@@ -6,6 +6,7 @@
 GPU=""
 BASE_IMAGE="ubuntu:22.04"
 PYTHON_VERSION="3.9"
+ANT_RAY_VERSION=""
 
 BUILD_ARGS=()
 
@@ -37,14 +38,26 @@ while [[ $# -gt 0 ]]; do
             shift
             PYTHON_VERSION="$1"
         ;;
+        --ant-ray-version)
+            # Specify the ant-ray version. e.g., 1.2.3. If not provided, the latest version is used.
+            shift
+            ANT_RAY_VERSION="$1"
+        ;;
         *)
-            echo "Usage: build-docker.sh [ --gpu ] [ --base-image ] [ --no-cache-build ] [ --shas-only ] [ --build-development-image ] [ --build-examples ] [ --python-version ]"
+            echo "Usage: build-docker-ant.sh [ --gpu ] [ --base-image <image> ] [ --no-cache-build ] [ --shas-only ] [ --python-version <version> ] [ --ant-ray-version <version> ]"
             exit 1
     esac
     shift
 done
 
 export DOCKER_BUILDKIT=1
+
+# Determine ant-ray package specification
+if [[ -n "$ANT_RAY_VERSION" ]]; then
+    ANT_RAY_PACKAGE="ant-ray==$ANT_RAY_VERSION"
+else
+    ANT_RAY_PACKAGE="ant-ray"
+fi
 
 # Build base-deps image
 if [[ "$OUTPUT_SHA" != "YES" ]]; then
@@ -74,19 +87,19 @@ RAY_BUILD_DIR="$(mktemp -d)"
 mkdir -p "$RAY_BUILD_DIR/.whl"
 chmod 777 "$RAY_BUILD_DIR/.whl"
 
+# Download ant-ray wheel using the defined package version spec
 docker run --rm \
     -v "$RAY_BUILD_DIR/.whl":/wheels \
     --user "$(id -u):$(id -g)" \
     antgroup/base-deps:dev$GPU \
-    pip download --no-cache-dir --quiet --no-deps --only-binary=:all: ant-ray -d /wheels
+    pip download --no-cache-dir --quiet --no-deps --only-binary=:all: "$ANT_RAY_PACKAGE" -d /wheels
 
 WHEEL_FILE=$(ls "$RAY_BUILD_DIR"/.whl/*.whl 2>/dev/null | head -n1)
 if [[ -z "$WHEEL_FILE" ]]; then
     echo "Error: No wheel downloaded for ant-ray" >&2
     exit 1
 fi
-WHEEL="$(basename "$WHEEL_DIR"/.whl/ant*.whl)"
-
+WHEEL="$(basename "$RAY_BUILD_DIR"/.whl/ant*.whl)"
 
 cp python/requirements_compiled.txt "$RAY_BUILD_DIR"
 cp docker/ray/Dockerfile "$RAY_BUILD_DIR"

@@ -70,7 +70,7 @@ extensions = [
     "sphinx_remove_toctrees",
     "sphinx_design",
     "sphinx.ext.intersphinx",
-    "myst_nb",
+    "sphinx_docsearch"  # Use sphinx-docsearch for popup search interface
 ]
 
 # Configuration for algolia
@@ -79,6 +79,40 @@ extensions = [
 # docsearch_app_id = "LBHF0PABBL"
 # docsearch_api_key = "6c42f30d9669d8e42f6fc92f44028596"
 # docsearch_index_name = "docs-ray"
+
+# Configure sphinx-docsearch to use local index
+docsearch_use_local = True  # Use local search index
+docsearch_api_key = "local"  # Use local API key
+docsearch_app_id = "local"  # Use local app ID
+docsearch_index_name = "local"  # Use local index name
+
+# Configure search parameters
+docsearch_search_parameters = {
+    "attributesToRetrieve": [
+        "hierarchy.lvl0",
+        "hierarchy.lvl1",
+        "hierarchy.lvl2",
+        "hierarchy.lvl3",
+        "hierarchy.lvl4",
+        "hierarchy.lvl5",
+        "content",
+        "type",
+        "url"
+    ],
+    "attributesToHighlight": ["*"],
+    "attributesToSnippet": ["content:10"],
+    "distinct": True,
+    "attributeForDistinct": "url",
+    "typoTolerance": True,
+    "queryType": "prefixAll",
+    "minWordSizefor1Typo": 3,
+    "minWordSizefor2Typos": 7,
+    "allowTyposOnNumericTokens": False,
+    "minProximity": 1,
+    "ignorePlurals": True,
+    "advancedSyntax": True,
+    "removeWordsIfNoResults": "allOptional"
+}
 
 remove_from_toctrees = [
     "cluster/running-applications/job-submission/doc/*",
@@ -215,6 +249,12 @@ exclude_patterns = [
     "templates/*",
     "cluster/running-applications/doc/ray.*",
     "data/api/ray.data.*.rst",
+    "**/generated/*",  # Exclude generated files
+    "**/_build/*",     # Exclude build artifacts
+    "**/_static/*",    # Exclude static assets
+    "**/_templates/*", # Exclude templates
+    "**/node_modules/*", # Exclude node modules
+    "**/.ipynb_checkpoints/*", # Exclude notebook checkpoints
 ] + autogen_files
 
 # If "DOC_LIB" is found, only build that top-level navigation item.
@@ -701,5 +741,60 @@ html_js_files = [
 # Configure local search
 html_search_language = 'en'
 html_search_options = {
-    'dict_size': 9000,
+    'dict_size': 2000,  # Reduced from 9000 to optimize index size
+    'skip_short_words': 3,  # Skip words shorter than 3 characters
+}
+
+# Search settings to optimize index size and relevance
+html_search_scorer = 'scorer.js'
+search_ignore_files = [
+    'search.html',
+    'searchindex.js',
+    '*/.ipynb_checkpoints/*',
+    '**/*.ipynb',  # Exclude Jupyter notebooks from search
+    'examples/*',  # Exclude example files from search
+    'api/doc/*',   # Exclude auto-generated API docs
+]
+
+# Common English stopwords to exclude from indexing
+search_words_to_ignore = [
+    'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for',
+    'from', 'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on',
+    'that', 'the', 'to', 'was', 'were', 'will', 'with'
+]
+
+# Prioritize certain sections in search results
+search_rankings = {
+    'tutorial': 1,
+    'guide': 2,
+    'api': 3,
+    'examples': 4
+}
+
+# Configure sphinx-docsearch for local search
+docsearch_config = {
+    "index_name": "local",
+    "start_urls": [""],
+    "sitemap_urls": [],
+    "use_local_index": True,  # Use local search index instead of Algolia
+    "min_chars": 3,  # Minimum characters before triggering search
+    "search_parameters": {
+        "attributesToRetrieve": [
+            "hierarchy.lvl0",
+            "hierarchy.lvl1",
+            "hierarchy.lvl2",
+            "hierarchy.lvl3",
+            "hierarchy.lvl4",
+            "hierarchy.lvl5",
+            "content",
+            "type",
+            "url"
+        ],
+        "attributesToHighlight": ["*"],
+        "attributesToSnippet": ["content:10"],
+        "distinct": True,
+        "attributeForDistinct": "url",
+        "typoTolerance": True,
+        "queryType": "prefixAll",
+    }
 }

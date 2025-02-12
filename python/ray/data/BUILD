@@ -579,6 +579,15 @@ py_test(
     deps = ["//:ray_lib", ":conftest"],
 )
 
+
+py_test(
+    name = "test_union",
+    size = "small",
+    srcs = ["tests/test_union.py"],
+    tags = ["team:data", "exclusive"],
+    deps = ["//:ray_lib", ":conftest"],
+)
+
 py_test(
     name = "test_video",
     size = "small",

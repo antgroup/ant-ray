@@ -441,7 +441,7 @@ class ObjectRefGenerator:
 
     def _next_sync(
         self,
-        timeout_s: Optional[float] = None
+        timeout_s: Optional[int | float] = None
     ) -> ObjectRef:
         """Waits for timeout_s and returns the object ref if available.
 
@@ -510,7 +510,7 @@ class ObjectRefGenerator:
 
     async def _next_async(
             self,
-            timeout_s: Optional[float] = None
+            timeout_s: Optional[int | float] = None
     ):
         """Same API as _next_sync, but it is for async context."""
         core_worker = self.worker.core_worker
@@ -1530,7 +1530,7 @@ cdef create_generator_return_obj(
         worker, [output],
         caller_address,
         &intermediate_result,
-        generator_id)
+        generator_id.Binary())
 
     return_object[0] = intermediate_result.back()
 
@@ -1658,7 +1658,7 @@ cdef execute_dynamic_generator_and_store_task_outputs(
             worker, generator,
             caller_address,
             dynamic_returns,
-            generator_id)
+            generator_id.Binary())
     except Exception as error:
         is_retryable_error[0] = determine_if_retryable(
             should_retry_exceptions,
@@ -4323,7 +4323,7 @@ cdef class CoreWorker:
                             const CAddress &caller_address,
                             c_vector[c_pair[CObjectID, shared_ptr[CRayObject]]]
                             *returns,
-                            CObjectID ref_generator_id=CObjectID.Nil()):
+                            ref_generator_id=None):
         cdef:
             CObjectID return_id
             size_t data_size
@@ -4331,10 +4331,14 @@ cdef class CoreWorker:
             c_vector[CObjectID] contained_id
             int64_t task_output_inlined_bytes
             int64_t num_returns = -1
+            CObjectID c_ref_generator_id = CObjectID.Nil()
             shared_ptr[CRayObject] *return_ptr
 
+        if ref_generator_id:
+            c_ref_generator_id = CObjectID.FromBinary(ref_generator_id)
+
         num_outputs_stored = 0
-        if not ref_generator_id.IsNil():
+        if not c_ref_generator_id.IsNil():
             # The task specified a dynamic number of return values. Determine
             # the expected number of return values.
             if returns[0].size() > 0:
@@ -4404,7 +4408,7 @@ cdef class CoreWorker:
 
             if not self.store_task_output(
                     serialized_object, return_id,
-                    ref_generator_id,
+                    c_ref_generator_id,
                     data_size, metadata, contained_id, caller_address,
                     &task_output_inlined_bytes, return_ptr):
                 # If the object already exists, but we fail to pin the copy, it
@@ -4412,7 +4416,7 @@ cdef class CoreWorker:
                 # create another copy.
                 self.store_task_output(
                         serialized_object, return_id,
-                        ref_generator_id,
+                        c_ref_generator_id,
                         data_size, metadata,
                         contained_id, caller_address, &task_output_inlined_bytes,
                         return_ptr)

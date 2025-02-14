@@ -198,9 +198,7 @@ def parse_uri(pkg_uri: str) -> Tuple[Protocol, str]:
 
     """
     uri = urlparse(pkg_uri)
-    default_logger.info(f"show the uri {uri}")
     try:
-        default_logger.info(f"show the scheme {uri.scheme}")
         protocol = Protocol(uri.scheme)
     except ValueError as e:
         raise ValueError(

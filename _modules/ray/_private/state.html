@@ -2290,7 +2290,9 @@ document.write(`
 <span class="sd">        Information about the Ray clients in the cluster.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">virtual_cluster_id</span><span class="p">:</span>
-        <span class="n">virtual_cluster_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">virtual_cluster_id</span>
+        <span class="n">virtual_cluster_id</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span><span class="o">.</span><span class="n">current_virtual_cluster_id</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;virtual_cluster_id must be a string, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -2426,7 +2428,9 @@ document.write(`
 <span class="sd">            resource in the cluster.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">virtual_cluster_id</span><span class="p">:</span>
-        <span class="n">virtual_cluster_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">virtual_cluster_id</span>
+        <span class="n">virtual_cluster_id</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span><span class="o">.</span><span class="n">current_virtual_cluster_id</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;virtual_cluster_id must be a string, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -2454,7 +2458,9 @@ document.write(`
 <span class="sd">            be included in this dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">virtual_cluster_id</span><span class="p">:</span>
-        <span class="n">virtual_cluster_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">virtual_cluster_id</span>
+        <span class="n">virtual_cluster_id</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span><span class="o">.</span><span class="n">current_virtual_cluster_id</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;virtual_cluster_id must be a string, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -2487,7 +2493,9 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">virtual_cluster_id</span><span class="p">:</span>
-        <span class="n">virtual_cluster_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">virtual_cluster_id</span>
+        <span class="n">virtual_cluster_id</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span><span class="o">.</span><span class="n">current_virtual_cluster_id</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;virtual_cluster_id must be a string, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>

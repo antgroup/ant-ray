@@ -34,6 +34,7 @@ import { ClusterDetailInfoPage } from "./pages/node/ClusterDetailInfoPage";
 import { ClusterLayout } from "./pages/node/ClusterLayout";
 import NodeDetailPage from "./pages/node/NodeDetail";
 import { OverviewPage } from "./pages/overview/OverviewPage";
+import { UnifiedStatsLayout } from "./pages/unified-stats/UnifiedStatsLayout";
 import {
   ServeApplicationDetailLayout,
   ServeApplicationDetailPage,
@@ -216,6 +217,7 @@ const App = () => {
                 <Route element={<MainNavLayout />} path="/">
                   <Route element={<Navigate replace to="overview" />} path="" />
                   <Route element={<OverviewPage />} path="overview" />
+                  <Route element={<UnifiedStatsLayout />} path="unified-stats" />
                   <Route element={<ClusterMainPageLayout />} path="cluster">
                     <Route element={<ClusterLayout />} path="">
                       <Route

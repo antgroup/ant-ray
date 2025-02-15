@@ -73,6 +73,11 @@ const NAV_ITEMS = [
     id: "overview",
   },
   {
+    title: "Unified Stats",
+    path: "/unified-stats",
+    id: "unified-stats",
+  },
+  {
     title: "Jobs",
     path: "/jobs",
     id: "jobs",

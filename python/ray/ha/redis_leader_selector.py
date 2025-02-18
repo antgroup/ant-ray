@@ -95,6 +95,7 @@ class RedisBasedLeaderSelector(HeadNodeLeaderSelector):
     def __init__(self, ray_params, redis_address, node_ip_address):
         super().__init__()
         self._redis_address = redis_address
+        self._redis_username = ray_params.redis_username
         self._redis_password = ray_params.redis_password
         self._node_ip_address = node_ip_address
         gcs_server_port = (
@@ -109,11 +110,15 @@ class RedisBasedLeaderSelector(HeadNodeLeaderSelector):
         self._is_running = True
         redis_ip_address, redis_port = self._redis_address.split(":")
         ray._private.services.wait_for_redis_to_start(
-            redis_ip_address, redis_port, password=self._redis_password
+            redis_ip_address,
+            redis_port,
+            username=self._redis_username,
+            password=self._redis_password,
         )
-        self._redis_client = redis.StrictRedis(
+        self._redis_client = redis.Redis(
             host=redis_ip_address,
             port=int(redis_port),
+            username=self._redis_username,
             password=self._redis_password,
             socket_timeout=self._config.connect_timeout_s,
             socket_connect_timeout=self._config.connect_timeout_s,

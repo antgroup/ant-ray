@@ -804,7 +804,7 @@ def create_redis_client(redis_address, password=None, username=None):
             redis_ip_address, redis_port = extract_ip_port(
                 canonicalize_bootstrap_address_or_die(redis_address)
             )
-            cli = redis.StrictRedis(
+            cli = redis.Redis(
                 host=redis_ip_address,
                 port=int(redis_port),
                 username=username,
@@ -2291,7 +2291,7 @@ def start_ray_client_server(
     return process_info
 
 
-def wait_for_redis_to_start(redis_ip_address, redis_port, password=None):
+def wait_for_redis_to_start(redis_ip_address, redis_port, username=None, password=None):
     """Wait for a Redis server to be available.
 
     This is accomplished by creating a Redis client and sending a random
@@ -2300,7 +2300,8 @@ def wait_for_redis_to_start(redis_ip_address, redis_port, password=None):
     Args:
         redis_ip_address (str): The IP address of the redis server.
         redis_port (int): The port of the redis server.
-        password (str): The password of the redis server.
+        username (str): The username of the Redis server.
+        password (str): The password of the Redis server.
 
     Raises:
         Exception: An exception is raised if we could not connect with Redis.
@@ -2308,7 +2309,7 @@ def wait_for_redis_to_start(redis_ip_address, redis_port, password=None):
     import redis
 
     redis_client = create_redis_client(
-        "%s:%s" % (redis_ip_address, redis_port), password=password
+        "%s:%s" % (redis_ip_address, redis_port), password=password, username=username
     )
     # Wait for the Redis server to start.
     num_retries = ray_constants.START_REDIS_WAIT_RETRIES

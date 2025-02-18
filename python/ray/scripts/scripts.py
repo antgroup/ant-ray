@@ -88,6 +88,34 @@ def _check_ray_version(gcs_client):
         )
 
 
+def handle_process_fo(node, process_name):
+    logger.info("process {} failover".format(process_name))
+    if process_name == ray.ray_constants.PROCESS_TYPE_GCS_SERVER:
+        node.kill_gcs_server(check_alive=False)
+        node.start_gcs_server()
+    elif process_name == ray.ray_constants.PROCESS_TYPE_DASHBOARD:
+        node.kill_dashboard(check_alive=False)
+        node.start_dashboard(require_dashboard=True)
+    elif process_name == ray.ray_constants.PROCESS_TYPE_MONITOR:
+        node.kill_monitor(check_alive=False)
+        node.start_monitor()
+    else:
+        logger.error("No FO policy defined for {}".format(process_name))
+
+
+def check_ray_processes(node):
+    for name, infos in node.all_processes.items():
+        for info in infos:
+            # find exit process
+            if info.process.poll() is not None:
+                logger.error(
+                    "Process {} (pid={}) is dead, try to restart.".format(
+                        name, info.process.pid
+                    )
+                )
+                handle_process_fo(node, name)
+
+
 @click.group()
 @click.option(
     "--logging-level",
@@ -1113,8 +1141,11 @@ def start(
             time.sleep(1)
 
             # Head HA
-            if head and ray_params.enable_head_ha and node.check_leadership_downgrade():
-                raise RuntimeError("leadership downgrade")
+            if head and ray_params.enable_head_ha:
+                if node.check_leadership_downgrade():
+                    raise RuntimeError("leadership downgrade")
+                else:
+                    check_ray_processes(node)
 
             if block:
                 deceased = node.dead_processes()

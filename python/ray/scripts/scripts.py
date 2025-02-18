@@ -811,6 +811,8 @@ def start(
         include_log_monitor=include_log_monitor,
     )
 
+    clean_processes_at_exit = block or (ray_params.enable_head_ha and head)
+
     if ray_constants.RAY_START_HOOK in os.environ:
         load_class(os.environ[ray_constants.RAY_START_HOOK])(ray_params, head)
 
@@ -907,12 +909,11 @@ def start(
                     " flag of `ray start` command."
                 )
 
-        if ray_params.enable_head_ha:
-            # block to check leadership of this head
-            block = True
-
         node = ray._private.node.Node(
-            ray_params, head=True, shutdown_at_exit=block, spawn_reaper=block
+            ray_params,
+            head=True,
+            shutdown_at_exit=clean_processes_at_exit,
+            spawn_reaper=clean_processes_at_exit,
         )
 
         bootstrap_address = node.address
@@ -1093,9 +1094,11 @@ def start(
     assert ray_params.gcs_address is not None
     ray._private.utils.write_ray_address(ray_params.gcs_address, temp_dir)
 
-    if block:
+    if clean_processes_at_exit:
         cli_logger.newline()
-        with cli_logger.group(cf.bold("--block")):
+        msg = "--block" if block else ""
+        msg = msg + "\nenable_head_ha" if head and ray_params.enable_head_ha else ""
+        with cli_logger.group(cf.bold(msg)):
             cli_logger.print(
                 "This command will now block forever until terminated by a signal."
             )
@@ -1113,44 +1116,47 @@ def start(
             if head and ray_params.enable_head_ha and node.check_leadership_downgrade():
                 raise RuntimeError("leadership downgrade")
 
-            deceased = node.dead_processes()
+            if block:
+                deceased = node.dead_processes()
 
-            # Report unexpected exits of subprocesses with unexpected return codes.
-            # We are explicitly expecting SIGTERM because this is how `ray stop` sends
-            # shutdown signal to subprocesses, i.e. log_monitor, raylet...
-            # NOTE(rickyyx): We are treating 128+15 as an expected return code since
-            # this is what autoscaler/_private/monitor.py does upon SIGTERM
-            # handling.
-            expected_return_codes = [
-                0,
-                signal.SIGTERM,
-                -1 * signal.SIGTERM,
-                128 + signal.SIGTERM,
-            ]
-            unexpected_deceased = [
-                (process_type, process)
-                for process_type, process in deceased
-                if process.returncode not in expected_return_codes
-            ]
-            if len(unexpected_deceased) > 0:
-                cli_logger.newline()
-                cli_logger.error("Some Ray subprocesses exited unexpectedly:")
+                # Report unexpected exits of subprocesses with unexpected return codes.
+                # We are explicitly expecting SIGTERM because this is how `ray stop` sends
+                # shutdown signal to subprocesses, i.e. log_monitor, raylet...
+                # NOTE(rickyyx): We are treating 128+15 as an expected return code since
+                # this is what autoscaler/_private/monitor.py does upon SIGTERM
+                # handling.
+                expected_return_codes = [
+                    0,
+                    signal.SIGTERM,
+                    -1 * signal.SIGTERM,
+                    128 + signal.SIGTERM,
+                ]
+                unexpected_deceased = [
+                    (process_type, process)
+                    for process_type, process in deceased
+                    if process.returncode not in expected_return_codes
+                ]
+                if len(unexpected_deceased) > 0:
+                    cli_logger.newline()
+                    cli_logger.error("Some Ray subprocesses exited unexpectedly:")
 
-                with cli_logger.indented():
-                    for process_type, process in unexpected_deceased:
-                        cli_logger.error(
-                            "{}",
-                            cf.bold(str(process_type)),
-                            _tags={"exit code": str(process.returncode)},
-                        )
+                    with cli_logger.indented():
+                        for process_type, process in unexpected_deceased:
+                            cli_logger.error(
+                                "{}",
+                                cf.bold(str(process_type)),
+                                _tags={"exit code": str(process.returncode)},
+                            )
 
-                cli_logger.newline()
-                cli_logger.error("Remaining processes will be killed.")
-                # explicitly kill all processes since atexit handlers
-                # will not exit with errors.
-                node.kill_all_processes(check_alive=False, allow_graceful=False)
-                os._exit(1)
-        # not-reachable
+                    cli_logger.newline()
+                    cli_logger.error("Remaining processes will be killed.")
+                    # explicitly kill all processes since atexit handlers
+                    # will not exit with errors.
+                    node.kill_all_processes(check_alive=False, allow_graceful=False)
+                    os._exit(1)
+
+
+# not-reachable
 
 
 @cli.command()

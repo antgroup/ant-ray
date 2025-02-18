@@ -21,9 +21,7 @@ def is_service_available(ip, port):
         sock.settimeout(0.2)
         result = sock.connect_ex((ip, int(port)))
         sock.close()
-        if 0 == result:
-            return True
-        return False
+        return 0 == result
     except Exception:
         if sock is not None:
             sock.close()

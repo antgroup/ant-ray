@@ -1798,7 +1798,7 @@ void NodeManager::ProcessWaitRequestMessage(
                         current_task_id,
                         /*ray_get=*/false);
   }
-  if (message->num_ready_objects() == 0) {
+  if (message->num_required_objects() == 0) {
     // If we don't need to wait for any, return immediately after making the pull
     // requests through AsyncResolveObjects above.
     flatbuffers::FlatBufferBuilder fbb;
@@ -1823,7 +1823,7 @@ void NodeManager::ProcessWaitRequestMessage(
     }
     return;
   }
-  uint64_t num_required_objects = static_cast<uint64_t>(message->num_ready_objects());
+  uint64_t num_required_objects = static_cast<uint64_t>(message->num_required_objects());
   wait_manager_.Wait(
       object_ids,
       message->timeout(),

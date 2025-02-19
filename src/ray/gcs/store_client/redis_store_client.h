@@ -275,6 +275,32 @@ bool RedisDelKeyPrefixSync(const std::string &host,
                            bool use_ssl,
                            const std::string &external_storage_namespace);
 
+class Scanner {
+ public:
+  Scanner(std::unique_ptr<RedisClient> &redis_client)
+      : redis_client_(redis_client), cursor_(0) {}
+  void ScanKeys(std::string match_pattern,
+                std::function<void(std::vector<std::string> result)> callback);
+
+ private:
+  void Scan(const std::function<void()> on_done);
+  void OnScanCallback(const std::shared_ptr<CallbackReply> &reply,
+                      std::function<void()> on_done);
+  std::unique_ptr<RedisClient> &redis_client_;
+  std::string match_pattern_;
+  size_t cursor_;
+  std::vector<std::string> keys_;
+};
+
+class Deleter {
+ public:
+  Deleter(std::unique_ptr<RedisClient> &redis_client) : redis_client_(redis_client) {}
+  void DeleteKeys(std::vector<std::string> keys, std::function<void(int64_t)> callback);
+
+ private:
+  std::unique_ptr<RedisClient> &redis_client_;
+};
+
 }  // namespace gcs
 
 }  // namespace ray

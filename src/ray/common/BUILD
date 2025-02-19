@@ -296,6 +296,11 @@ ray_cc_library(
 )
 
 ray_cc_library(
+    name = "parallel_async_task_runner",
+    hdrs = ["parallel_async_task_runner.h"],
+)
+
+ray_cc_library(
     name = "status_or",
     hdrs = ["status_or.h"],
     deps = [

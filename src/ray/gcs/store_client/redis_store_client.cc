@@ -22,6 +22,7 @@
 #include "absl/cleanup/cleanup.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
+#include "ray/common/parallel_async_task_runner.h"
 #include "ray/gcs/redis_context.h"
 #include "ray/util/container_util.h"
 #include "ray/util/logging.h"
@@ -518,48 +519,107 @@ bool RedisDelKeyPrefixSync(const std::string &host,
   auto status = cli->Connect(io_service);
   RAY_CHECK_OK(status) << "Failed to connect to redis";
 
-  auto *context = cli->GetPrimaryContext();
   // Delete all such keys by using empty table name.
   RedisKey redis_key{external_storage_namespace, /*table_name=*/""};
-  std::vector<std::string> cmd{"KEYS",
-                               RedisMatchPattern::Prefix(redis_key.ToString()).escaped};
-  std::promise<std::shared_ptr<CallbackReply>> promise;
-  context->RunArgvAsync(cmd, [&promise](const std::shared_ptr<CallbackReply> &reply) {
-    promise.set_value(reply);
-  });
-  auto reply = promise.get_future().get();
-  const auto &keys = reply->ReadAsStringArray();
+  // Get all keys
+  std::promise<std::vector<std::string>> scan_promise;
+  auto scanner = std::make_shared<Scanner>(cli);
+  auto on_scan_done = [&scan_promise](std::vector<std::string> keys) {
+    scan_promise.set_value(std::move(keys));
+  };
+  scanner->ScanKeys(RedisMatchPattern::Prefix(redis_key.ToString()).escaped,
+                    std::move(on_scan_done));
+  auto keys = scan_promise.get_future().get();
   if (keys.empty()) {
     RAY_LOG(INFO) << "No keys found for external storage namespace "
                   << external_storage_namespace;
     return true;
   }
-  auto delete_one_sync = [context](const std::string &key) {
-    auto del_cmd = std::vector<std::string>{"DEL", key};
-    std::promise<std::shared_ptr<CallbackReply>> promise;
-    context->RunArgvAsync(del_cmd,
-                          [&promise](const std::shared_ptr<CallbackReply> &reply) {
-                            promise.set_value(reply);
-                          });
-    auto del_reply = promise.get_future().get();
-    return del_reply->ReadAsInteger() > 0;
-  };
-  size_t num_deleted = 0;
-  size_t num_failed = 0;
-  for (const auto &key : keys) {
-    if ((!key.has_value()) || key->empty()) {
-      continue;
-    }
-    if (delete_one_sync(*key)) {
-      num_deleted++;
-    } else {
-      num_failed++;
-    }
-  }
+  // Delete all keys
+  std::promise<int64_t> del_promise;
+  auto deleter = std::make_shared<Deleter>(cli);
+  auto on_del_done = [&del_promise](int64_t num) { del_promise.set_value(num); };
+  size_t num_total = keys.size();
+  deleter->DeleteKeys(std::move(keys), std::move(on_del_done));
+  size_t num_deleted = del_promise.get_future().get();
+  size_t num_failed = num_total - num_deleted;
   RAY_LOG(INFO) << "Finished deleting keys with external storage namespace "
                 << external_storage_namespace << ". Deleted table count: " << num_deleted
                 << ", Failed table count: " << num_failed;
   return num_failed == 0;
+}
+
+void Scanner::ScanKeys(std::string match_pattern,
+                       std::function<void(std::vector<std::string> result)> callback) {
+  auto on_done = [this, callback = std::move(callback)]() { callback(std::move(keys_)); };
+  match_pattern_ = std::move(match_pattern);
+  Scan(std::move(on_done));
+}
+
+void Scanner::Scan(const std::function<void()> on_done) {
+  size_t batch_count = RayConfig::instance().maximum_gcs_storage_operation_batch_size();
+  std::vector<std::string> cmd = {"SCAN",
+                                  std::to_string(cursor_),
+                                  "MATCH",
+                                  match_pattern_,
+                                  "COUNT",
+                                  std::to_string(batch_count)};
+  auto scan_callback =
+      [this, on_done = std::move(on_done)](const std::shared_ptr<CallbackReply> &reply) {
+        OnScanCallback(reply, std::move(on_done));
+      };
+  redis_client_->GetPrimaryContext()->RunArgvAsync(cmd, std::move(scan_callback));
+}
+
+void Scanner::OnScanCallback(const std::shared_ptr<CallbackReply> &reply,
+                             std::function<void()> on_done) {
+  RAY_CHECK(reply);
+  std::vector<std::string> scan_result;
+  cursor_ = reply->ReadAsScanArray(&scan_result);
+  keys_.reserve(keys_.size() + scan_result.size());
+  keys_.insert(keys_.end(),
+               std::make_move_iterator(scan_result.begin()),
+               std::make_move_iterator(scan_result.end()));
+  if (cursor_ == 0) {
+    on_done();
+  } else {
+    Scan(std::move(on_done));
+  }
+}
+
+void Deleter::DeleteKeys(std::vector<std::string> keys,
+                         std::function<void(int64_t)> callback) {
+  size_t batch_size = RayConfig::instance().redis_del_batch_size();
+  RAY_CHECK(batch_size != 0);
+  int total = (keys.size() + batch_size - 1) / batch_size;
+  auto count = std::make_shared<int>(total);
+  auto del_keys = std::make_shared<int>(0);
+  auto on_done = [callback = std::move(callback), count, del_keys](
+                     const std::shared_ptr<CallbackReply> &reply) {
+    *del_keys += reply->ReadAsInteger();
+    if (--(*count) == 0) {
+      if (callback) {
+        callback(*del_keys);
+      }
+    }
+  };
+  size_t parallel = RayConfig::instance().redis_del_parallel_limit();
+  RAY_CHECK(parallel != 0);
+  ray::AsyncParallelRunner<void, const std::shared_ptr<CallbackReply> &> runner(parallel);
+  for (int i = 0; i < total; ++i) {
+    std::vector<std::string> del_cmd = {"UNLINK"};
+    size_t len = i != total - 1 ? batch_size : keys.size() - batch_size * i;
+    del_cmd.reserve(len + 1);
+    del_cmd.insert(del_cmd.end(),
+                   std::make_move_iterator(keys.begin() + i * batch_size),
+                   std::make_move_iterator(keys.begin() + i * batch_size + len));
+    runner.addTask(
+        [del_cmd = std::move(del_cmd), this](auto on_done) {
+          redis_client_->GetPrimaryContext()->RunArgvAsync(del_cmd, on_done);
+        },
+        on_done);
+  }
+  runner.run();
 }
 
 }  // namespace gcs

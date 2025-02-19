@@ -468,6 +468,7 @@ ray_cc_library(
         "//src/ray/common:id",
         "//src/ray/common:memory_monitor",
         "//src/ray/common:network",
+        "//src/ray/common:parallel_async_task_runner",
         "//src/ray/common:ray_config",
         "//src/ray/common:ray_syncer",
         "//src/ray/common:status",
@@ -2254,6 +2255,7 @@ ray_cc_library(
         "src/ray/gcs/store_client/store_client.h",
     ],
     deps = [
+        ":ray_common",
         "redis_client",
         "@com_google_absl//absl/strings:str_format",
         "@com_google_absl//absl/synchronization",

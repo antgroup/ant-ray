@@ -1,0 +1,247 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Report - 9ff197f0</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    :root {
+        --bs-body-bg: #0f172a;
+        --bs-body-color: #e2e8f0;
+        --bs-primary: #3b82f6;
+        --bs-border-color: #334155;
+    }
+    body { 
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+    }
+    .card {
+        background-color: #1e293b;
+        border: 1px solid var(--bs-border-color);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .list-group-item {
+        background-color: #1e293b;
+        color: #e2e8f0;
+        border-color: var(--bs-border-color);
+    }
+    /* Fixed navigation styling */
+    .nav-sidebar {
+        width: 280px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: #1e293b;
+        border-right: 1px solid var(--bs-border-color);
+        padding-right: 0.5rem; /* Add scrollbar space */
+    }
+    .main-content {
+        margin-left: 280px;
+        padding: 2rem;
+        min-height: 100vh;
+    }
+    /* Search bar styling */
+    .search-container {
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+        background-color: var(--bs-body-bg);
+        padding: 1rem 0;
+        margin: -1rem -0.5rem 1rem;
+    }
+
+    /* Search input styling */
+    .search-container input {
+        background-color: #1e293b;
+        border-color: var(--bs-border-color);
+        color: white;
+    }
+
+    .search-container input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+    /* Active state styling */
+    .list-group-item.active {
+        background-color: #1e40af !important;
+        border-color: #3b82f6 !important;
+        color: white !important;
+        border-left: 4px solid var(--bs-primary);
+    }
+    /* Improved code blocks */
+    pre {
+        background-color: #0f172a;
+        color: #7dd3fc;
+        padding: 1rem;
+        border-radius: 0.375rem;
+        border: 1px solid var(--bs-border-color);
+        overflow-x: auto;
+    }
+    /* Table styling */
+    .table {
+        color: #e2e8f0;
+    }
+    .table td {
+        border-color: var(--bs-border-color);
+    }
+    /* Updated text colors */
+    .text-primary {
+        color: white !important;
+    }
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+
+    /* Scrollable log list */
+    .log-list {
+        max-height: 400px;
+        overflow-y: auto;
+        background-color: #1e293b;
+        border-radius: 0.375rem;
+        border: 1px solid var(--bs-border-color);
+    }
+    .log-list::-webkit-scrollbar {
+        width: 8px;
+        background-color: #1e293b;
+    }
+    .log-list::-webkit-scrollbar-thumb {
+        background-color: #334155;
+        border-radius: 4px;
+    }
+
+    /* Ensure white text in code blocks and tables */
+    pre {
+        color: white !important;
+    }
+    .environment-table {
+        color: white !important;
+    }
+
+    /* Hover states for log links */
+    .log-list a {
+        color: white !important;
+        text-decoration: none;
+    }
+    .log-list a:hover {
+        color: var(--bs-primary) !important;
+    }
+
+    /* Tab navigation styling */
+    .nav-tabs .nav-link {
+        color: white !important;
+        border-color: var(--bs-border-color);
+    }
+    .nav-tabs .nav-link:hover {
+        color: var(--bs-primary) !important;
+        border-color: var(--bs-border-color);
+    }
+    .nav-tabs .nav-link.active {
+        color: var(--bs-primary) !important;
+        background-color: #1e293b;
+        border-color: var(--bs-border-color);
+    }
+
+    /* Navigation text overflow prevention */
+    #test-case-nav a,
+    #error-list a {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+        padding: 8px 12px !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Ensure proper spacing in nav sidebar */
+    .nav-sidebar .list-group-item {
+        border-radius: 0;
+        margin-bottom: 2px;
+    }
+</style>
+
+    </head>
+    <body>
+        <div class="d-flex">
+            <!-- Navigation Sidebar -->
+            <nav class="nav-sidebar">
+                <h5 class="mt-4 mb-3 text-white">Common Errors</h5>
+                <div id="error-list" class="list-group small">
+
+                </div>
+
+                <h5 class="mb-3 text-white">Test Cases</h5>
+                <div id="test-case-nav" class="list-group small">
+
+                </div>
+           </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <h1 class="mb-4">Test Report <small class="text-muted">9ff197f0</small></h1>
+
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <input type="text" class="form-control" placeholder="Search test cases..." 
+                           id="searchInput" onkeyup="filterTests()">
+                </div>
+
+                <div class="card mb-4" id="summary-section">
+                    <div class="card-body">
+                        <h5 class="card-title">Summary</h5>
+                        <div class="row">
+                            <div class="col-md-4">Total Tests: 1</div>
+                            <div class="col-md-4 text-danger">Failed: 1</div>
+                            <div class="col-md-4">Success Rate: 0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="test-cases-section">
+
+                </div>
+
+                <div class="card mt-4" id="logs-section">
+                    <div class="card-body">
+                        <h5 class="card-title">Log Files</h5>
+                        <div class="log-list">
+                            <ul class="list-group">
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <script>
+            function filterTests() {
+                const input = document.getElementById('searchInput');
+                const filter = input.value.toLowerCase();
+                const cards = document.getElementsByClassName('test-card');
+
+                Array.from(cards).forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    card.style.display = text.includes(filter) ? 'block' : 'none';
+                });
+            }
+
+            // Add smooth scroll behavior for navigation links
+            document.querySelectorAll('#test-case-nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    document.querySelector(targetId).scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                });
+            });
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    </html>

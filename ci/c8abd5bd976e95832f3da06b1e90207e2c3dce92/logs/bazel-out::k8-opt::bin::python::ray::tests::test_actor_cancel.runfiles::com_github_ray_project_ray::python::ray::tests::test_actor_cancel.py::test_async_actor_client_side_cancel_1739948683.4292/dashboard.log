@@ -1,0 +1,90 @@
+2025-02-19 07:04:42,572	INFO head.py:138 -- Dashboard head grpc address: 0.0.0.0:46451
+2025-02-19 07:04:42,584	INFO head.py:237 -- Starting dashboard metrics server on port 44227
+2025-02-19 07:04:42,585	INFO utils.py:313 -- Get all modules by type: DashboardHeadModule
+2025-02-19 07:04:42,912	INFO utils.py:346 -- Available modules: [<class 'ray.dashboard.modules.actor.actor_head.ActorHead'>, <class 'ray.dashboard.modules.metrics.metrics_head.MetricsHead'>, <class 'ray.dashboard.modules.data.data_head.DataHead'>, <class 'ray.dashboard.modules.event.event_head.EventHead'>, <class 'ray.dashboard.modules.healthz.healthz_head.HealthzHead'>, <class 'ray.dashboard.modules.job.job_head.JobHead'>, <class 'ray.dashboard.modules.node.node_head.NodeHead'>, <class 'ray.dashboard.modules.reporter.reporter_head.ReportHead'>, <class 'ray.dashboard.modules.serve.serve_rest_api_impl.create_serve_rest_api.<locals>.ServeRestApiImpl'>, <class 'ray.dashboard.modules.snapshot.snapshot_head.APIHead'>, <class 'ray.dashboard.modules.state.state_head.StateHead'>, <class 'ray.dashboard.modules.train.train_head.TrainHead'>, <class 'ray.dashboard.modules.usage_stats.usage_stats_head.UsageStatsHead'>, <class 'ray.dashboard.modules.virtual_cluster.virtual_cluster_head.VirtualClusterHead'>]
+2025-02-19 07:04:42,912	INFO head.py:205 -- Modules to load: {'NodeHead', 'VirtualClusterHead', 'HealthzHead', 'ActorHead', 'TrainHead', 'StateHead', 'EventHead', 'ServeRestApiImpl', 'MetricsHead', 'JobHead', 'UsageStatsHead', 'APIHead', 'DataHead', 'ReportHead'}
+2025-02-19 07:04:42,912	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.actor.actor_head.ActorHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.metrics.metrics_head.MetricsHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.data.data_head.DataHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.event.event_head.EventHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.healthz.healthz_head.HealthzHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.job.job_head.JobHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.node.node_head.NodeHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.reporter.reporter_head.ReportHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.serve.serve_rest_api_impl.create_serve_rest_api.<locals>.ServeRestApiImpl'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.snapshot.snapshot_head.APIHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.state.state_head.StateHead'>
+2025-02-19 07:04:42,913	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.train.train_head.TrainHead'>
+2025-02-19 07:04:42,914	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.usage_stats.usage_stats_head.UsageStatsHead'>
+2025-02-19 07:04:42,914	INFO head.py:208 -- Loading DashboardHeadModule: <class 'ray.dashboard.modules.virtual_cluster.virtual_cluster_head.VirtualClusterHead'>
+2025-02-19 07:04:42,914	INFO head.py:222 -- Loaded 14 modules. [<ray.dashboard.modules.actor.actor_head.ActorHead object at 0x7f2ad9be1ca0>, <ray.dashboard.modules.metrics.metrics_head.MetricsHead object at 0x7f2acdeda820>, <ray.dashboard.modules.data.data_head.DataHead object at 0x7f2acdee6940>, <ray.dashboard.modules.event.event_head.EventHead object at 0x7f2acdee69d0>, <ray.dashboard.modules.healthz.healthz_head.HealthzHead object at 0x7f2acdee68e0>, <ray.dashboard.modules.job.job_head.JobHead object at 0x7f2acdee6910>, <ray.dashboard.modules.node.node_head.NodeHead object at 0x7f2acdee6a30>, <ray.dashboard.modules.reporter.reporter_head.ReportHead object at 0x7f2acdee6b80>, <ray.dashboard.modules.serve.serve_rest_api_impl.create_serve_rest_api.<locals>.ServeRestApiImpl object at 0x7f2acdee6eb0>, <ray.dashboard.modules.snapshot.snapshot_head.APIHead object at 0x7f2acdee6fa0>, <ray.dashboard.modules.state.state_head.StateHead object at 0x7f2acdee6fd0>, <ray.dashboard.modules.train.train_head.TrainHead object at 0x7f2acdef9280>, <ray.dashboard.modules.usage_stats.usage_stats_head.UsageStatsHead object at 0x7f2acdef92b0>, <ray.dashboard.modules.virtual_cluster.virtual_cluster_head.VirtualClusterHead object at 0x7f2acdef9310>]
+2025-02-19 07:04:42,914	INFO head.py:303 -- Initialize the http server.
+2025-02-19 07:04:42,914	INFO http_server_head.py:96 -- Setup static dir for dashboard: /rayci/python/ray/dashboard/client/build
+2025-02-19 07:04:42,923	INFO http_server_head.py:278 -- Dashboard head http address: 127.0.0.1:8265
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /logical/actors> -> <function ActorHead.get_all_actors[cache ttl=2, max_size=128] at 0x7f2ad4b56790>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <DynamicResource  /logical/actors/{actor_id}> -> <function ActorHead.get_actor[cache ttl=2, max_size=128] at 0x7f2ad4b56940>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/grafana_health> -> <function MetricsHead.grafana_health at 0x7f2ad3ed0700>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/prometheus_health> -> <function MetricsHead.prometheus_health at 0x7f2ad3ed0820>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <DynamicResource  /api/data/datasets/{job_id}> -> <function DataHead.get_datasets at 0x7f2ad3ed0ca0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /events> -> <function EventHead.get_event[cache ttl=2, max_size=128] at 0x7f2acff27430>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/cluster_events> -> <function EventHead.list_cluster_events at 0x7f2acff27670>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/gcs_healthz> -> <function HealthzHead.health_check at 0x7f2acff290d0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/version> -> <function JobHead.get_version at 0x7f2acffc50d0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <DynamicResource  /api/packages/{protocol}/{package_name}> -> <function JobHead.get_package at 0x7f2acffc51f0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [PUT] <DynamicResource  /api/packages/{protocol}/{package_name}> -> <function JobHead.upload_package at 0x7f2acffc5310>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [POST] <PlainResource  /api/jobs/> -> <function JobHead.submit_job at 0x7f2acffc5430>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [POST] <DynamicResource  /api/jobs/{job_or_submission_id}/stop> -> <function JobHead.stop_job at 0x7f2acffc5550>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [DELETE] <DynamicResource  /api/jobs/{job_or_submission_id}> -> <function JobHead.delete_job at 0x7f2acffc5670>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <DynamicResource  /api/jobs/{job_or_submission_id}> -> <function JobHead.get_job_info at 0x7f2acffc5790>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/jobs/> -> <function JobHead.list_jobs at 0x7f2acffc58b0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <DynamicResource  /api/jobs/{job_or_submission_id}/logs> -> <function JobHead.get_job_logs at 0x7f2acffc59d0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <DynamicResource  /api/jobs/{job_or_submission_id}/logs/tail> -> <function JobHead.tail_job_logs at 0x7f2acffc5af0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /internal/node_module> -> <function NodeHead.get_node_module_internal_state at 0x7f2acf15e4c0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /nodes> -> <function NodeHead.get_all_nodes[cache ttl=2, max_size=128] at 0x7f2acf15e670>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <DynamicResource  /nodes/{node_id}> -> <function NodeHead.get_node[cache ttl=2, max_size=128] at 0x7f2acf15e820>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/cluster_metadata> -> <function ReportHead.get_cluster_metadata at 0x7f2acdf338b0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/cluster_status> -> <function ReportHead.get_cluster_status at 0x7f2acdf339d0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /task/traceback> -> <function ReportHead.get_task_traceback at 0x7f2acdf33c10>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /task/cpu_profile> -> <function ReportHead.get_task_cpu_profile at 0x7f2acdf33d30>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /worker/traceback> -> <function ReportHead.get_traceback at 0x7f2acdf33e50>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /worker/cpu_profile> -> <function ReportHead.cpu_profile at 0x7f2acdf33f70>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /memory_profile> -> <function ReportHead.memory_profile at 0x7f2acdf360d0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/ray/version> -> <function create_serve_rest_api.<locals>.ServeRestApiImpl.get_version at 0x7f2acdf3e5e0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/serve/applications/> -> <function create_serve_rest_api.<locals>.ServeRestApiImpl.get_serve_instance_details at 0x7f2acdf3e670>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [DELETE] <PlainResource  /api/serve/applications/> -> <function create_serve_rest_api.<locals>.ServeRestApiImpl.delete_serve_applications at 0x7f2acdf3e8b0>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [PUT] <PlainResource  /api/serve/applications/> -> <function create_serve_rest_api.<locals>.ServeRestApiImpl.put_all_applications at 0x7f2acdf3ea60>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/actors/kill> -> <function APIHead.kill_actor_gcs at 0x7f2acdec9670>
+2025-02-19 07:04:42,924	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/component_activities> -> <function APIHead.get_component_activities at 0x7f2acdec9790>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/actors> -> <function StateHead.list_actors at 0x7f2acdec9ee0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/jobs> -> <function StateHead.list_jobs at 0x7f2acded30d0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/nodes> -> <function StateHead.list_nodes at 0x7f2acded3280>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/placement_groups> -> <function StateHead.list_placement_groups at 0x7f2acded3430>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/workers> -> <function StateHead.list_workers at 0x7f2acded35e0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/tasks> -> <function StateHead.list_tasks at 0x7f2acded3790>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/objects> -> <function StateHead.list_objects at 0x7f2acded3940>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/vclusters> -> <function StateHead.list_vclusters at 0x7f2acded3af0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/runtime_envs> -> <function StateHead.list_runtime_envs at 0x7f2acded3ca0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/logs> -> <function StateHead.list_logs at 0x7f2acded3e50>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <DynamicResource  /api/v0/logs/{media_type}> -> <function StateHead.get_logs at 0x7f2acded8040>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/tasks/summarize> -> <function StateHead.summarize_tasks at 0x7f2acded81f0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/actors/summarize> -> <function StateHead.summarize_actors at 0x7f2acded83a0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/objects/summarize> -> <function StateHead.summarize_objects at 0x7f2acded8550>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/v0/tasks/timeline> -> <function StateHead.tasks_timeline at 0x7f2acded8700>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <DynamicResource  /api/v0/delay/{delay_s}> -> <function StateHead.delayed_response at 0x7f2acded8820>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /api/train/v2/runs> -> <function TrainHead.get_train_runs at 0x7f2acded8ca0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /usage_stats_enabled> -> <function UsageStatsHead.get_usage_stats_enabled at 0x7f2acdedf3a0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /cluster_id> -> <function UsageStatsHead.get_cluster_id at 0x7f2acdedf4c0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /virtual_clusters> -> <function VirtualClusterHead.get_all_virtual_clusters[cache ttl=10, max_size=128] at 0x7f2acdedfdc0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [POST] <PlainResource  /virtual_clusters> -> <function VirtualClusterHead.create_or_update_virtual_cluster at 0x7f2acdee9040>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [DELETE] <DynamicResource  /virtual_clusters/{virtual_cluster_id}> -> <function VirtualClusterHead.remove_virtual_cluster at 0x7f2acdee9160>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /> -> <function HttpServerDashboardHead.get_index at 0x7f2acdee95e0>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /favicon.ico> -> <function HttpServerDashboardHead.get_favicon at 0x7f2acdee9700>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <PlainResource  /timezone> -> <function HttpServerDashboardHead.get_timezone at 0x7f2acdee9820>
+2025-02-19 07:04:42,925	INFO http_server_head.py:284 -- <ResourceRoute [GET] <StaticResource  /static -> PosixPath('/rayci/python/ray/dashboard/client/build/static')> -> <bound method StaticResource._handle of <StaticResource  /static -> PosixPath('/rayci/python/ray/dashboard/client/build/static')>>
+2025-02-19 07:04:42,925	INFO http_server_head.py:285 -- Registered 60 routes.
+2025-02-19 07:04:42,925	INFO head.py:306 -- http server initialized at 127.0.0.1:8265
+2025-02-19 07:04:42,943	INFO metrics_head.py:435 -- Generated prometheus and grafana configurations in: /tmp/ray/session_2025-02-19_07-04-42_200828_8667/metrics
+2025-02-19 07:04:42,944	INFO event_utils.py:130 -- Monitor events logs modified after 1739946882.660472 on /tmp/ray/session_2025-02-19_07-04-42_200828_8667/logs/events, the source types are all.
+2025-02-19 07:04:42,945	INFO usage_stats_head.py:197 -- Usage reporting is disabled.
+2025-02-19 07:04:42,954	INFO actor_head.py:136 -- Getting all actor info from GCS.
+2025-02-19 07:04:42,955	INFO actor_head.py:153 -- Received 0 actor info from GCS.

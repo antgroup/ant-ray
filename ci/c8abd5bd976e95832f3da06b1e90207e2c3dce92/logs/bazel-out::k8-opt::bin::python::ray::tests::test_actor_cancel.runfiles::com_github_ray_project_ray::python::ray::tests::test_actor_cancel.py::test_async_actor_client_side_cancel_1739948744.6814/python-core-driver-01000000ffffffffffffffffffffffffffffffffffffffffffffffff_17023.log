@@ -1,0 +1,56 @@
+[2025-02-19 07:05:44,264 I 17023 17023] core_worker_process.cc:114: Constructing CoreWorkerProcess. pid: 17023
+[2025-02-19 07:05:44,268 I 17023 17023] io_service_pool.cc:35: IOServicePool is running with 1 io_service.
+[2025-02-19 07:05:44,270 I 17023 17023] grpc_server.cc:135: driver server started, listening on port 45323.
+[2025-02-19 07:05:44,271 I 17023 17023] core_worker.cc:522: Initializing worker at address: 172.17.0.6:45323 worker_id=01000000ffffffffffffffffffffffffffffffffffffffffffffffff node_id=7bc1e58acd8ad388328ffa48f53085e1c7aebb1c939a2c8b3a676d7b
+[2025-02-19 07:05:44,272 I 17023 17023] task_event_buffer.cc:281: Reporting task events to GCS every 1000ms.
+[2025-02-19 07:05:44,273 I 17023 18629] core_worker.cc:910: Event stats:
+
+
+Global stats: 13 total (8 active)
+Queueing time: mean = 1.601 us, max = 7.609 us, min = 6.312 us, total = 20.819 us
+Execution time:  mean = 54.018 us, total = 702.228 us
+Event stats:
+	PeriodicalRunner.RunFnPeriodically - 6 total (5 active, 1 running), Execution time: mean = 1.876 us, total = 11.258 us, Queueing time: mean = 1.150 us, max = 6.898 us, min = 6.898 us, total = 6.898 us
+	ray::rpc::WorkerInfoGcsService.grpc_client.AddWorkerInfo.OnReplyReceived - 1 total (0 active), Execution time: mean = 19.899 us, total = 19.899 us, Queueing time: mean = 7.609 us, max = 7.609 us, min = 7.609 us, total = 7.609 us
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberCommandBatch - 1 total (0 active), Execution time: mean = 248.396 us, total = 248.396 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::NodeInfoGcsService.grpc_client.GetAllNodeInfo - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	Publisher.CheckDeadSubscribers - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberPoll - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberCommandBatch.OnReplyReceived - 1 total (0 active), Execution time: mean = 115.103 us, total = 115.103 us, Queueing time: mean = 6.312 us, max = 6.312 us, min = 6.312 us, total = 6.312 us
+	ray::rpc::WorkerInfoGcsService.grpc_client.AddWorkerInfo - 1 total (0 active), Execution time: mean = 307.572 us, total = 307.572 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+
+-----------------
+Task execution event stats:
+
+Global stats: 0 total (0 active)
+Queueing time: mean = -nan s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+Execution time:  mean = -nan s, total = 0.000 s
+Event stats:
+
+-----------------
+Task Event stats:
+
+IO Service Stats:
+
+Global stats: 4 total (1 active)
+Queueing time: mean = 3.272 us, max = 6.720 us, min = 6.370 us, total = 13.090 us
+Execution time:  mean = 103.026 us, total = 412.103 us
+Event stats:
+	PeriodicalRunner.RunFnPeriodically - 1 total (0 active), Execution time: mean = 83.865 us, total = 83.865 us, Queueing time: mean = 6.720 us, max = 6.720 us, min = 6.720 us, total = 6.720 us
+	ray::rpc::TaskInfoGcsService.grpc_client.AddTaskEventData - 1 total (0 active), Execution time: mean = 309.291 us, total = 309.291 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	CoreWorker.deadline_timer.flush_task_events - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::TaskInfoGcsService.grpc_client.AddTaskEventData.OnReplyReceived - 1 total (0 active), Execution time: mean = 18.947 us, total = 18.947 us, Queueing time: mean = 6.370 us, max = 6.370 us, min = 6.370 us, total = 6.370 us
+Other Stats:
+	grpc_in_progress:0
+	current number of task status events in buffer: 1
+	current number of profile events in buffer: 0
+	current number of dropped task attempts tracked: 0
+	total task events sent: 0 MiB
+	total number of task attempts sent: 0
+	total number of task attempts dropped reported: 0
+	total number of sent failure: 0
+	num status task events dropped: 0
+	num profile task events dropped: 0
+
+
+[2025-02-19 07:05:44,273 I 17023 18629] accessor.cc:804: Received notification for node, IsAlive = 1 node_id=7bc1e58acd8ad388328ffa48f53085e1c7aebb1c939a2c8b3a676d7b

@@ -1,0 +1,54 @@
+[2025-02-19 07:04:43,048 I 8667 8667] core_worker_process.cc:114: Constructing CoreWorkerProcess. pid: 8667
+[2025-02-19 07:04:43,051 I 8667 8667] io_service_pool.cc:35: IOServicePool is running with 1 io_service.
+[2025-02-19 07:04:43,053 I 8667 8667] grpc_server.cc:135: driver server started, listening on port 41003.
+[2025-02-19 07:04:43,054 I 8667 8667] core_worker.cc:522: Initializing worker at address: 172.17.0.6:41003 worker_id=01000000ffffffffffffffffffffffffffffffffffffffffffffffff node_id=00829ba94850b94d763ec3bcc315c399506911f19020380c47101631
+[2025-02-19 07:04:43,055 I 8667 8667] task_event_buffer.cc:281: Reporting task events to GCS every 1000ms.
+[2025-02-19 07:04:43,055 I 8667 10273] core_worker.cc:910: Event stats:
+
+
+Global stats: 11 total (8 active)
+Queueing time: mean = 1.186 us, max = 8.089 us, min = 4.962 us, total = 13.051 us
+Execution time:  mean = 31.521 us, total = 346.734 us
+Event stats:
+	PeriodicalRunner.RunFnPeriodically - 6 total (5 active, 1 running), Execution time: mean = 1.493 us, total = 8.957 us, Queueing time: mean = 827.000 ns, max = 4.962 us, min = 4.962 us, total = 4.962 us
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberPoll - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::WorkerInfoGcsService.grpc_client.AddWorkerInfo.OnReplyReceived - 1 total (0 active), Execution time: mean = 32.453 us, total = 32.453 us, Queueing time: mean = 8.089 us, max = 8.089 us, min = 8.089 us, total = 8.089 us
+	Publisher.CheckDeadSubscribers - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::WorkerInfoGcsService.grpc_client.AddWorkerInfo - 1 total (0 active), Execution time: mean = 305.324 us, total = 305.324 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberCommandBatch - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+
+-----------------
+Task execution event stats:
+
+Global stats: 0 total (0 active)
+Queueing time: mean = -nan s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+Execution time:  mean = -nan s, total = 0.000 s
+Event stats:
+
+-----------------
+Task Event stats:
+
+IO Service Stats:
+
+Global stats: 4 total (1 active)
+Queueing time: mean = 3.753 us, max = 8.673 us, min = 6.339 us, total = 15.012 us
+Execution time:  mean = 95.850 us, total = 383.400 us
+Event stats:
+	PeriodicalRunner.RunFnPeriodically - 1 total (0 active), Execution time: mean = 106.554 us, total = 106.554 us, Queueing time: mean = 6.339 us, max = 6.339 us, min = 6.339 us, total = 6.339 us
+	CoreWorker.deadline_timer.flush_task_events - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::TaskInfoGcsService.grpc_client.AddTaskEventData.OnReplyReceived - 1 total (0 active), Execution time: mean = 28.585 us, total = 28.585 us, Queueing time: mean = 8.673 us, max = 8.673 us, min = 8.673 us, total = 8.673 us
+	ray::rpc::TaskInfoGcsService.grpc_client.AddTaskEventData - 1 total (0 active), Execution time: mean = 248.261 us, total = 248.261 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+Other Stats:
+	grpc_in_progress:0
+	current number of task status events in buffer: 1
+	current number of profile events in buffer: 0
+	current number of dropped task attempts tracked: 0
+	total task events sent: 0 MiB
+	total number of task attempts sent: 0
+	total number of task attempts dropped reported: 0
+	total number of sent failure: 0
+	num status task events dropped: 0
+	num profile task events dropped: 0
+
+
+[2025-02-19 07:04:43,056 I 8667 10273] accessor.cc:804: Received notification for node, IsAlive = 1 node_id=00829ba94850b94d763ec3bcc315c399506911f19020380c47101631

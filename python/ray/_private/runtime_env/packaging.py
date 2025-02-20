@@ -255,6 +255,22 @@ def is_jar_uri(uri: str) -> bool:
     return Path(path).suffix == ".jar"
 
 
+def is_tar_uri(uri: str) -> bool:
+    import sys
+
+    try:
+        _, path = parse_uri(uri)
+    except ValueError:
+        return False
+
+    return (
+        path.endswith(".tar")
+        or path.endswith(".tar.gz")
+        or path.endswith(".tar.bz")
+        or path.endswith(".tar.xz")
+    )
+
+
 def _get_excludes(path: Path, excludes: List[str]) -> Callable:
     path = path.absolute()
     pathspec = PathSpec.from_lines("gitwildmatch", excludes)
@@ -380,9 +396,26 @@ def _store_package_in_gcs(
     return len(data)
 
 
-def _get_local_path(base_directory: str, pkg_uri: str) -> str:
+def _get_local_path(base_directory: str, pkg_uri: str, is_tmp: bool = False) -> str:
     _, pkg_name = parse_uri(pkg_uri)
+    if is_tmp:
+        pkg_name = "." + pkg_name
     return os.path.join(base_directory, pkg_name)
+
+
+def _get_tmp_file_path(base_directory: str, pkg_uri: str):
+    return _get_local_path(base_directory, pkg_uri, True)
+
+
+def _seal_tmp_file(tmp_file, dst_dir=None):
+    pkg_directory, tmp_file_name = os.path.split(tmp_file)
+    file_name = tmp_file_name.lstrip(".")
+    if dst_dir:
+        pkg_file = os.path.join(dst_dir, file_name)
+    else:
+        pkg_file = os.path.join(pkg_directory, file_name)
+    os.rename(tmp_file, pkg_file)
+    return pkg_file
 
 
 def _zip_files(
@@ -657,6 +690,8 @@ async def download_and_unpack_package(
     base_directory: str,
     gcs_aio_client: Optional["GcsAioClient"] = None,  # noqa: F821
     logger: Optional[logging.Logger] = default_logger,
+    move_file_to_dir: bool = False,
+    remove_top_level_directory: bool = True,
     overwrite: bool = False,
 ) -> str:
     """Download the package corresponding to this URI and unpack it if zipped.
@@ -683,34 +718,34 @@ async def download_and_unpack_package(
                     or if package URI is invalid.
 
     """
-    pkg_file = Path(_get_local_path(base_directory, pkg_uri))
-    if pkg_file.suffix == "":
+    tmp_pkg_file = Path(_get_tmp_file_path(base_directory, pkg_uri))
+    if tmp_pkg_file.suffix == "":
         raise ValueError(
             f"Invalid package URI: {pkg_uri}."
             "URI must have a file extension and the URI must be valid."
         )
 
-    async with _AsyncFileLock(str(pkg_file) + ".lock"):
+    async with _AsyncFileLock(str(tmp_pkg_file) + ".lock"):
         if logger is None:
             logger = default_logger
 
         logger.debug(f"Fetching package for URI: {pkg_uri}")
 
         local_dir = get_local_dir_from_uri(pkg_uri, base_directory)
-        assert local_dir != pkg_file, "Invalid pkg_file!"
+        assert local_dir != tmp_pkg_file, "Invalid pkg_file!"
 
         download_package: bool = True
         if local_dir.exists() and not overwrite:
             download_package = False
             assert local_dir.is_dir(), f"{local_dir} is not a directory"
         elif local_dir.exists():
-            logger.info(f"Removing {local_dir} with pkg_file {pkg_file}")
+            logger.info(f"Removing {local_dir} with pkg_file {tmp_pkg_file}")
             shutil.rmtree(local_dir)
 
         if download_package:
             protocol, _ = parse_uri(pkg_uri)
             logger.info(
-                f"Downloading package from {pkg_uri} to {pkg_file} "
+                f"Downloading package from {pkg_uri} to {tmp_pkg_file} "
                 f"with protocol {protocol}"
             )
             if protocol == Protocol.GCS:
@@ -740,36 +775,52 @@ async def download_and_unpack_package(
                         "after making any change to a file in the file package."
                     )
                 code = code or b""
-                pkg_file.write_bytes(code)
+                tmp_pkg_file.write_bytes(code)
 
                 if is_zip_uri(pkg_uri):
                     unzip_package(
-                        package_path=pkg_file,
-                        target_dir=local_dir,
+                        package_path=str(tmp_pkg_file),
+                        target_dir=str(local_dir),
                         remove_top_level_directory=False,
                         unlink_zip=True,
                         logger=logger,
                     )
                 else:
+                    pkg_file = _seal_tmp_file(tmp_pkg_file)
                     return str(pkg_file)
             elif protocol in Protocol.remote_protocols():
-                protocol.download_remote_uri(source_uri=pkg_uri, dest_file=pkg_file)
+                protocol.download_remote_uri(source_uri=pkg_uri, dest_file=tmp_pkg_file)
 
-                if pkg_file.suffix in [".zip", ".jar"]:
-                    unzip_package(
-                        package_path=pkg_file,
-                        target_dir=local_dir,
-                        remove_top_level_directory=True,
-                        unlink_zip=True,
-                        logger=logger,
-                    )
-                elif pkg_file.suffix == ".whl":
-                    return str(pkg_file)
+                if move_file_to_dir:
+                    try:
+                        os.mkdir(local_dir)
+                    except FileExistsError:
+                        logger.info(f"Directory at {local_dir} already exists")
+                    pkg_file = _seal_tmp_file(tmp_pkg_file, local_dir)
                 else:
-                    raise NotImplementedError(
-                        f"Package format {pkg_file.suffix} is ",
-                        "not supported for remote protocols",
-                    )
+                    if tmp_pkg_file.suffix in [".zip", ".jar"]:
+                        unzip_package(
+                            package_path=str(tmp_pkg_file),
+                            target_dir=str(local_dir),
+                            remove_top_level_directory=True,
+                            unlink_zip=True,
+                            logger=logger,
+                        )
+                    elif is_tar_uri(pkg_uri):
+                        await untar_package(
+                            file_path=str(tmp_pkg_file),
+                            target_dir=str(local_dir),
+                            unlink_tar=True,
+                            logger=logger,
+                        )
+                    elif tmp_pkg_file.suffix == ".whl":
+                        pkg_file = _seal_tmp_file(tmp_pkg_file)
+                        return str(pkg_file)
+                    else:
+                        raise NotImplementedError(
+                            f"Package format {tmp_pkg_file.suffix} is ",
+                            "not supported for remote protocols",
+                        )
             else:
                 raise NotImplementedError(f"Protocol {protocol} is not supported")
 
@@ -895,6 +946,25 @@ def unzip_package(
 
     if unlink_zip:
         Path(package_path).unlink()
+
+
+async def untar_package(
+    file_path: str,
+    target_dir: str,
+    unlink_tar: bool,
+    logger: Optional[logging.Logger] = default_logger,
+):
+    try:
+        os.mkdir(target_dir)
+    except FileExistsError:
+        logger.info(f"Directory at {target_dir} already exists")
+
+    logger.debug(f"Unpacking {file_path} to {target_dir}")
+    with tarfile.open(file_path, "r") as tar:
+        tar.extractall(path=target_dir)
+
+    if unlink_tar:
+        Path(file_path).unlink()
 
 
 def delete_package(pkg_uri: str, base_directory: str) -> Tuple[bool, int]:

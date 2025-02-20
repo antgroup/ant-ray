@@ -76,6 +76,14 @@ class LinuxContainer(Container):
         if gpu_ids:
             extra_args += ["--gpus", f'"device={",".join(map(str, gpu_ids))}"']
         extra_args += [
+            "--mount",
+            "type=bind,source=/root/.aws,destination=/root/.aws",
+        ]
+        extra_args += [
+            "--network",
+            "myNetwork",
+        ]
+        extra_args += [
             "--workdir",
             "/rayci",
             "--shm-size=2.5gb",

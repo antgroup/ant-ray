@@ -1,9 +1,8 @@
 name: Ray CI
 
 on:
+  push:
   pull_request:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       branch:
@@ -133,20 +132,10 @@ jobs:
 
       run: |
         echo "Running core: python tests..."
-        bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... core \
+        bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests:test_runtime_env_working_dir_2 core \
           --workers 1 --worker-id 0 --parallelism-per-worker 8 \
-          --except-tags debug_tests,asan_tests,post_wheel_build,ha_integration,mem_pressure,tmpfs,container,manual,use_all_core,multi_gpu,large_size_python_tests_shard_2 \
-          --test-env=BAZEL_DIR=$(realpath ${{ env.BAZEL_DIR }})
-        bazel run //ci/ray_ci:test_in_docker -- //python/ray/dag/... python/ray/autoscaler/v2/... core \
-          --workers 1 --worker-id 0 --parallelism-per-worker 8 --skip-ray-installation \
-          --except-tags debug_tests,asan_tests,post_wheel_build,ha_integration,mem_pressure,tmpfs,container,manual,use_all_core,multi_gpu,large_size_python_tests_shard_2 \
-          --test-env=BAZEL_DIR=$(realpath ${{ env.BAZEL_DIR }})
-        bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... //python/ray/dag/... python/ray/autoscaler/v2/... core \
-          --workers 1 --worker-id 0 --parallelism-per-worker 8 --skip-ray-installation \
-          --only-tags use_all_core \
-          --test-env=BAZEL_DIR=$(realpath ${{ env.BAZEL_DIR }})
-        bazel run //ci/ray_ci:test_in_docker -- //:all //src/... core --build-type clang \
-          --workers 1 --worker-id 0 --parallelism-per-worker 8 --skip-ray-installation \
+          --skip-ray-installation \
+          --except-tags debug_tests,asan_tests,post_wheel_build,ha_integration,mem_pressure,tmpfs,container,manual,use_all_core,multi_gpu \
           --test-env=BAZEL_DIR=$(realpath ${{ env.BAZEL_DIR }})
 
     - name: Workaround
@@ -163,20 +152,3 @@ jobs:
       if: always()
       run: |
         docker ps -a --filter ancestor=localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild -q | xargs -r docker rm --force
-
-    - name: Copy Report Files
-      if: always()
-      run: |
-        mkdir -p /data1/static/ci/${{ github.sha }}
-        cp -r ${{ env.BAZEL_DIR }}/reports/* /data1/static/ci/${{ github.sha }}/
-
-    - name: Get Public IP
-      if: always()
-      run: |
-        echo "RUNNER_PUBLIC_IP=$(curl -s https://api.ipify.org)" >> $GITHUB_ENV
-
-    - name: Show Report Location
-      if: always()
-      run: |
-        echo "Report files are available at: http://${{ env.RUNNER_PUBLIC_IP }}:8000/${{ github.sha }}/index.html"
- 

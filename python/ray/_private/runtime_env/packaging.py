@@ -4,6 +4,7 @@ import hashlib
 import logging
 import os
 import shutil
+import tarfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Callable, List, Optional, Tuple
@@ -221,7 +222,17 @@ def parse_uri(pkg_uri: str) -> Tuple[Protocol, str]:
 
             # Remove all periods except the last, which is part of the
             # file extension
-            package_name = package_name.replace(".", "_", package_name.count(".") - 1)
+            if is_commpressed_tar_str(package_name):
+                last_dot_index = package_name.rfind(".")
+                second_last_dot_index = package_name.rfind(".", 0, last_dot_index)
+                package_name = (
+                    package_name[:second_last_dot_index].replace(".", "_")
+                    + package_name[second_last_dot_index:]
+                )
+            else:
+                package_name = package_name.replace(
+                    ".", "_", package_name.count(".") - 1
+                )
     else:
         package_name = uri.netloc
 
@@ -256,19 +267,20 @@ def is_jar_uri(uri: str) -> bool:
 
 
 def is_tar_uri(uri: str) -> bool:
-    import sys
-
     try:
         _, path = parse_uri(uri)
     except ValueError:
         return False
-
     return (
         path.endswith(".tar")
         or path.endswith(".tar.gz")
         or path.endswith(".tar.bz")
         or path.endswith(".tar.xz")
     )
+
+
+def is_commpressed_tar_str(uri: str) -> bool:
+    return uri.endswith(".tar.gz") or uri.endswith(".tar.bz") or uri.endswith(".tar.xz")
 
 
 def _get_excludes(path: Path, excludes: List[str]) -> Callable:
@@ -681,6 +693,11 @@ def get_local_dir_from_uri(uri: str, base_directory: str) -> Path:
     """Return the local directory corresponding to this URI."""
     pkg_file = Path(_get_local_path(base_directory, uri))
     local_dir = pkg_file.with_suffix("")
+    # NOTE(Jacky): If the URls have.tar.gz,.tar.bz, or.tar.xz suffixes,
+    # then the URIs have double suffixes,
+    # which need to be removed twice to get local_dir
+    if local_dir.suffix == ".tar":
+        local_dir = local_dir.with_suffix("")
     return local_dir
 
 

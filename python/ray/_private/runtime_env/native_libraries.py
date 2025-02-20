@@ -95,7 +95,7 @@ class NativeLibrariesPlugin(RuntimeEnvPlugin):
                 context.native_libraries["code_search_path"].append(str(library_dir))
             else:
                 library_dir = self._get_local_dir_from_uri(lib_info["url"])
-                for path in lib_info.get("lib_path", "./"):
+                for path in lib_info.get("lib_path", ["./"]):
                     if isinstance(path, dict):
                         rel_lib_path = path.get("path", "./")
                         abs_lib_path = library_dir / rel_lib_path

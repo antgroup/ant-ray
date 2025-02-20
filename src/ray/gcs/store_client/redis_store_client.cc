@@ -22,7 +22,6 @@
 #include "absl/cleanup/cleanup.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
-#include "ray/common/parallel_async_task_runner.h"
 #include "ray/gcs/redis_context.h"
 #include "ray/util/container_util.h"
 #include "ray/util/logging.h"
@@ -536,13 +535,26 @@ bool RedisDelKeyPrefixSync(const std::string &host,
     return true;
   }
   // Delete all keys
-  std::promise<int64_t> del_promise;
-  auto deleter = std::make_shared<Deleter>(cli);
-  auto on_del_done = [&del_promise](int64_t num) { del_promise.set_value(num); };
-  size_t num_total = keys.size();
-  deleter->DeleteKeys(std::move(keys), std::move(on_del_done));
-  size_t num_deleted = del_promise.get_future().get();
-  size_t num_failed = num_total - num_deleted;
+  auto *context = cli->GetPrimaryContext();
+  auto delete_one_sync = [context](const std::string &key) {
+    auto del_cmd = std::vector<std::string>{"UNLINK", key};
+    std::promise<std::shared_ptr<CallbackReply>> promise;
+    context->RunArgvAsync(del_cmd,
+                          [&promise](const std::shared_ptr<CallbackReply> &reply) {
+                            promise.set_value(reply);
+                          });
+    auto del_reply = promise.get_future().get();
+    return del_reply->ReadAsInteger() > 0;
+  };
+  size_t num_deleted = 0;
+  size_t num_failed = 0;
+  for (const auto &key : keys) {
+    if (delete_one_sync(key)) {
+      num_deleted++;
+    } else {
+      num_failed++;
+    }
+  }
   RAY_LOG(INFO) << "Finished deleting keys with external storage namespace "
                 << external_storage_namespace << ". Deleted table count: " << num_deleted
                 << ", Failed table count: " << num_failed;
@@ -585,41 +597,6 @@ void Scanner::OnScanCallback(const std::shared_ptr<CallbackReply> &reply,
   } else {
     Scan(std::move(on_done));
   }
-}
-
-void Deleter::DeleteKeys(std::vector<std::string> keys,
-                         std::function<void(int64_t)> callback) {
-  size_t batch_size = RayConfig::instance().redis_del_batch_size();
-  RAY_CHECK(batch_size != 0);
-  int total = (keys.size() + batch_size - 1) / batch_size;
-  auto count = std::make_shared<int>(total);
-  auto del_keys = std::make_shared<int>(0);
-  auto on_done = [callback = std::move(callback), count, del_keys](
-                     const std::shared_ptr<CallbackReply> &reply) {
-    *del_keys += reply->ReadAsInteger();
-    if (--(*count) == 0) {
-      if (callback) {
-        callback(*del_keys);
-      }
-    }
-  };
-  size_t parallel = RayConfig::instance().redis_del_parallel_limit();
-  RAY_CHECK(parallel != 0);
-  ray::AsyncParallelRunner<void, const std::shared_ptr<CallbackReply> &> runner(parallel);
-  for (int i = 0; i < total; ++i) {
-    std::vector<std::string> del_cmd = {"UNLINK"};
-    size_t len = i != total - 1 ? batch_size : keys.size() - batch_size * i;
-    del_cmd.reserve(len + 1);
-    del_cmd.insert(del_cmd.end(),
-                   std::make_move_iterator(keys.begin() + i * batch_size),
-                   std::make_move_iterator(keys.begin() + i * batch_size + len));
-    runner.addTask(
-        [del_cmd = std::move(del_cmd), this](auto on_done) {
-          redis_client_->GetPrimaryContext()->RunArgvAsync(del_cmd, on_done);
-        },
-        on_done);
-  }
-  runner.run();
 }
 
 }  // namespace gcs

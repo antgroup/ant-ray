@@ -292,15 +292,6 @@ class Scanner {
   std::vector<std::string> keys_;
 };
 
-class Deleter {
- public:
-  Deleter(std::unique_ptr<RedisClient> &redis_client) : redis_client_(redis_client) {}
-  void DeleteKeys(std::vector<std::string> keys, std::function<void(int64_t)> callback);
-
- private:
-  std::unique_ptr<RedisClient> &redis_client_;
-};
-
 }  // namespace gcs
 
 }  // namespace ray

@@ -126,7 +126,22 @@ def get_file_bytes(file_path):
         return f.read()
 
 def main():
-    st.set_page_config(layout="wide")
+    # Remove the default page config and set to wide layout without toolbar
+    st.set_page_config(
+        layout="wide",
+        initial_sidebar_state="expanded",
+        menu_items={},  # This removes the toolbar menu
+    )
+    
+    # Hide streamlit default elements using CSS
+    hide_streamlit_style = """
+        <style>
+            #MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
+        </style>
+    """
+    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
     
     # Get run_id and artifact_id from query parameters
     query_params = st.query_params
@@ -160,7 +175,7 @@ def main():
         
         # Get GitHub token if needed
         if 'github_token' not in st.session_state:
-            github_token = os.environ.get("GITHUB_TOKEN") or st.text_input(
+            github_token = os.environ.get("GITHUB_TOKEN_X") or st.text_input(
                 "Enter GitHub Token (needed for downloading artifacts)",
                 type="password",
                 key="token_input"
@@ -216,8 +231,33 @@ def main():
             try:
                 with open(full_path, 'r', encoding='utf-8') as f:
                     html_content = f.read()
-                    # Use the full height of the page
-                    st.components.v1.html(html_content, height=1200, scrolling=True)
+                    
+                    # Inject CSS to remove padding from all main containers and set iframe height to full viewport
+                    st.markdown("""
+                    <style>
+                        /* Remove default padding on the main app container */
+                        [data-testid="stAppViewContainer"],
+                        .block-container,
+                        section.main > div:first-child {
+                            padding: 0 !important;
+                            margin: 0 !important;
+                        }
+                        
+                        /* Make the iframe take full viewport height */
+                        iframe {
+                            height: 100vh !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                    </style>
+                    """, unsafe_allow_html=True)
+                    
+                    # Render the HTML preview filling the entire right side
+                    st.components.v1.html(
+                        html_content, 
+                        height=0,  # Allow CSS to take over the height
+                        scrolling=True
+                    )
             except Exception as e:
                 st.error(f"Error reading HTML file: {str(e)}")
 

@@ -27,7 +27,6 @@ jobs:
           ref: ${{ github.event.ref }}
           workflow: aliyun-instance-manager.yml
           inputs: '{"action": "start"}'
-          token: ${{ secrets.GITHUB_TOKEN }}
           wait-completion: true
 
       - name: Get output
@@ -519,5 +518,4 @@ jobs:
           workflow: aliyun-instance-manager.yml
           ref: ${{ github.event.ref }}
           inputs: '{"action": "stop", "instance_id": "${{ needs.start-ecs-runner.outputs.instance_id }}"}'
-          token: ${{ secrets.GITHUB_TOKEN }}
  

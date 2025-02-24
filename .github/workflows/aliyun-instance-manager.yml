@@ -1,0 +1,117 @@
+name: Aliyun Instance Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'start'
+
+# Ensure only one instance of this workflow runs at a time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-aliyun-instance-manager
+  cancel-in-progress: false
+
+jobs:
+  manage-instance:
+    name: Manage Aliyun Instance
+    runs-on: ubuntu-latest
+    environment: aliyun
+    outputs:
+      instance_id: ${{ steps.manage.outputs.instance_id }}
+    
+    steps:
+      - name: Configure Aliyun CLI
+        run: |
+          wget https://aliyuncli.alicdn.com/aliyun-cli-linux-latest-amd64.tgz
+          tar -xvf aliyun-cli-linux-latest-amd64.tgz
+          ./aliyun configure set --profile default \
+            --access-key-id ${{ secrets.ALIYUN_ACCESS_KEY }} \
+            --access-key-secret ${{ secrets.ALIYUN_ACCESS_SECRET }} \
+            --region us-west-1
+
+      - name: Lease Available Instance
+        if: inputs.action == 'start'
+        id: lease-instance
+        run: |
+          IFS=',' read -ra INSTANCE_PAIRS <<< "${{ secrets.ALIYUN_ECS_INSTANCE_IDS }}"
+          
+          while true; do
+            for pair in "${INSTANCE_PAIRS[@]}"; do
+              # Split instance:disk pair
+              IFS=':' read -r instance_id disk_id <<< "$pair"
+              
+              # Check instance status
+              status=$(./aliyun ecs DescribeInstanceStatus --InstanceId "$instance_id" --region us-west-1)
+              
+
+              if echo "$status" | grep -q "Stopped"; then
+                # Try to start the instance
+                if ./aliyun ecs StartInstance --InstanceId "$instance_id" --region us-west-1; then
+                  echo "Successfully leased instance: $instance_id"
+                  echo "instance_id=$instance_id" >> $GITHUB_OUTPUT
+                  
+                  # Wait for instance to be running
+                  while ! ./aliyun ecs DescribeInstanceStatus --InstanceId "$instance_id" --region us-west-1 | grep -q "Running"; do
+                    sleep 10
+                  done
+                  
+                  # Attach disk with retry logic
+                  max_attempts=3
+                  for i in $(seq 1 $max_attempts); do
+                    if ./aliyun ecs AttachDisk --InstanceId "$instance_id" --DiskId "$disk_id" --region us-west-1; then
+                      echo "AttachDisk succeeded on attempt $i"
+                      break
+                    else
+                      echo "AttachDisk failed on attempt $i"
+                      if [ $i -eq $max_attempts ]; then
+                        echo "All attempts failed - exiting"
+                        exit 1
+                      fi
+                      sleep 10
+                    fi
+                  done
+                  
+                  exit 0
+                fi
+              fi
+            done
+            
+            echo "No available instances found. Waiting before retry..."
+            sleep 30
+          done
+
+      - name: Stop Instance
+        if: inputs.action == 'stop'
+        run: |
+          instance_id="${{ inputs.instance_id }}"
+          if [ -n "$instance_id" ]; then
+            max_attempts=3
+            for i in $(seq 1 $max_attempts); do
+              if ./aliyun ecs StopInstance --InstanceId "$instance_id" --ForceStop true --region us-west-1; then
+                echo "StopInstance succeeded on attempt $i"
+                break
+              else
+                echo "StopInstance failed on attempt $i"
+                if [ $i -eq $max_attempts ]; then
+                  echo "All attempts failed - exiting"
+                  exit 1
+                fi
+                sleep 10
+              fi
+            done
+
+            until ./aliyun ecs DescribeInstanceStatus --InstanceId "$instance_id" --region us-west-1 | grep "Stopped"; do
+              sleep 10
+            done
+          else
+            echo "No instance ID provided for stopping"
+            exit 1
+          fi
+
+      - name: Manage instance
+        id: manage
+        run: |
+          # Your existing instance management logic
+          echo "instance_id=your-instance-id" >> $GITHUB_OUTPUT 

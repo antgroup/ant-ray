@@ -45,6 +45,7 @@ jobs:
               # Check instance status
               status=$(./aliyun ecs DescribeInstanceStatus --InstanceId "$instance_id" --region us-west-1)
               
+
               if echo "$status" | grep -q "Stopped"; then
                 # Try to start the instance
                 if ./aliyun ecs StartInstance --InstanceId "$instance_id" --region us-west-1; then

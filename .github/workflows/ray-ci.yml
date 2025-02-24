@@ -24,7 +24,7 @@ jobs:
         id: trigger-workflow
         uses: benc-uk/workflow-dispatch@v1.2.2
         with:
-          ref: ${{ github.event.ref }}
+          ref: ${{ github.event.pull_request.head.ref }}
           workflow: aliyun-instance-manager.yml
           inputs: '{"action": "start"}'
           wait-completion: true
@@ -516,6 +516,6 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1.2.2
         with:
           workflow: aliyun-instance-manager.yml
-          ref: ${{ github.event.ref }}
+          ref: ${{ github.event.pull_request.head.ref }}
           inputs: '{"action": "stop", "instance_id": "${{ needs.start-ecs-runner.outputs.instance_id }}"}'
  

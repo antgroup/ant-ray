@@ -22,8 +22,9 @@ jobs:
       
       - name: Trigger Aliyun workflow
         id: trigger-workflow
-        uses: benc-uk/workflow-dispatch@v1
+        uses: benc-uk/workflow-dispatch@v1.2.2
         with:
+          ref: ${{ github.event.ref }}
           workflow: aliyun-instance-manager.yml
           inputs: '{"action": "start"}'
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -513,9 +514,10 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Trigger Stop Workflow
-        uses: benc-uk/workflow-dispatch@v1
+        uses: benc-uk/workflow-dispatch@v1.2.2
         with:
           workflow: aliyun-instance-manager.yml
+          ref: ${{ github.event.ref }}
           inputs: '{"action": "stop", "instance_id": "${{ needs.start-ecs-runner.outputs.instance_id }}"}'
           token: ${{ secrets.GITHUB_TOKEN }}
  

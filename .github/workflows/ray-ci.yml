@@ -27,7 +27,6 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           workflow: aliyun-instance-manager.yml
           inputs: '{"action": "start"}'
-          wait-completion: true
 
       - name: Get output
         id: get-output
@@ -37,7 +36,7 @@ jobs:
   check-permissions:
     name: Check User Permissions
     needs: start-ecs-runner
-    runs-on: self-hosted
+    runs-on: ${{ needs.start-ecs-runner.outputs.instance_id }}
     outputs:
       allowed: ${{ steps.check_user.outputs.allowed }}
     steps:
@@ -61,7 +60,7 @@ jobs:
     name: Build Base Images
     needs: check-permissions
     if: needs.check-permissions.outputs.allowed == 'true'
-    runs-on: self-hosted
+    runs-on: ${{ needs.start-ecs-runner.outputs.instance_id }}
     strategy:
       matrix:
         python: ['3.11']
@@ -136,7 +135,7 @@ jobs:
       REPORT_LABEL_8: asan_tests
     needs: [build-base-images, check-permissions]
     if: needs.check-permissions.outputs.allowed == 'true'
-    runs-on: self-hosted
+    runs-on: ${{ needs.start-ecs-runner.outputs.instance_id }}
     strategy:
       matrix:
         python: ['3.11']

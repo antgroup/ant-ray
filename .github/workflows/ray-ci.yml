@@ -11,6 +11,9 @@ env:
   DOCKER_BUILDKIT: 1
   RAY_CI_POST_WHEEL_TESTS: 1
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   start-ecs-runner:
@@ -18,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: aliyun
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}
       cancel-in-progress: false
     outputs:
       leased_instance_id: ${{ steps.lease_instance.outputs.instance_id }}
@@ -96,8 +99,8 @@ jobs:
 
 
   check-permissions:
-    name: Check User Permissions
     needs: start-ecs-runner
+    name: Check User Permissions
     runs-on: ${{ needs.start-ecs-runner.outputs.leased_instance_id }}
     outputs:
       allowed: ${{ steps.check_user.outputs.allowed }}
@@ -178,7 +181,6 @@ jobs:
         build-args: |
           DOCKER_IMAGE_BASE_TEST=ghcr.io/${{ github.repository }}/oss-ci-base_test-py${{ matrix.python }}
         push: true
-
 
   core-tests:
     name: Core Tests

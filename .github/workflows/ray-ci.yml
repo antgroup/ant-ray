@@ -94,6 +94,7 @@ jobs:
             sleep 60  # Wait 1 minute before trying again
           done
 
+
   check-permissions:
     name: Check User Permissions
     needs: start-ecs-runner
@@ -104,8 +105,9 @@ jobs:
       - name: Check if user is allowed
         id: check_user
         run: |
-          if [ -f "~/.workflow.cfg" ]; then
-            if grep -qE "^allowed_users=(${GITHUB_ACTOR}|.*,${GITHUB_ACTOR}|${GITHUB_ACTOR},.*|.*,${GITHUB_ACTOR},.*)\$" ~/.workflow.cfg; then
+          cat /home/runner/.workflow.cfg
+          if [ -f "/home/runner/.workflow.cfg" ]; then
+            if grep -qE "^allowed_users=(${GITHUB_ACTOR}|.*,${GITHUB_ACTOR}|${GITHUB_ACTOR},.*|.*,${GITHUB_ACTOR},.*)\$" /home/runner/.workflow.cfg; then
               echo "allowed=true" >> $GITHUB_OUTPUT
             else
               echo "allowed=false" >> $GITHUB_OUTPUT
@@ -165,6 +167,7 @@ jobs:
         else
           echo "exists=false" >> $GITHUB_OUTPUT
         fi
+
     - name: Build OSS CI Base
       if: steps.check_build_image.outputs.exists != 'true'
       uses: docker/build-push-action@v3

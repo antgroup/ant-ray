@@ -5,10 +5,11 @@ import subprocess
 import shlex
 import sys
 from typing import Dict, List, Optional
+import ray._private.runtime_env.constants as runtime_env_constants
 
 from ray.util.annotations import DeveloperAPI
 from ray.core.generated.common_pb2 import Language
-from ray._private.services import get_ray_jars_dir
+from ray._private.services import get_ray_jars_dir, get_ray_native_library_dir
 from ray._private.utils import update_envs
 
 logger = logging.getLogger(__name__)
@@ -25,12 +26,19 @@ class RuntimeEnvContext:
         py_executable: Optional[str] = None,
         override_worker_entrypoint: Optional[str] = None,
         java_jars: List[str] = None,
+        native_libraries: List[Dict[str, str]] = None,
+        preload_libraries: List[str] = None,
     ):
         self.command_prefix = command_prefix or []
         self.env_vars = env_vars or {}
         self.py_executable = py_executable or sys.executable
         self.override_worker_entrypoint: Optional[str] = override_worker_entrypoint
         self.java_jars = java_jars or []
+        self.native_libraries = native_libraries or {
+            "lib_path": [],
+            "code_search_path": [],
+        }
+        self.preload_libraries = preload_libraries or []
 
     def serialize(self) -> str:
         return json.dumps(self.__dict__)
@@ -57,6 +65,45 @@ class RuntimeEnvContext:
 
             class_path_args = ["-cp", ray_jars + ":" + str(":".join(local_java_jars))]
             passthrough_args = class_path_args + passthrough_args
+        elif language == Language.CPP:
+            executable = ["exec"]
+
+            # set library path
+            all_library_paths = get_ray_native_library_dir()
+            ld_preload_env = os.environ.get(runtime_env_constants.PRELOAD_ENV_NAME, "")
+
+            if self.native_libraries.get("lib_path", []):
+                all_library_paths += ":"
+                all_library_paths += ":".join(self.native_libraries["lib_path"])
+            if self.preload_libraries:
+                if ld_preload_env:
+                    ld_preload_env += ":"
+                ld_preload_env += ":".join(self.preload_libraries)
+            os_paths = os.environ.get(runtime_env_constants.LIBRARY_PATH_ENV_NAME, None)
+            if os_paths:
+                all_library_paths += ":"
+                all_library_paths += os_paths
+            # TODO(Jacky Ma): Add working dir to library path of C++ workers.
+
+            os.environ[runtime_env_constants.LIBRARY_PATH_ENV_NAME] = all_library_paths
+            os.environ[runtime_env_constants.PRELOAD_ENV_NAME] = ld_preload_env
+            # set code search path
+            if self.native_libraries.get("code_search_path", []):
+                old_path = None
+                index = 0
+                for args in passthrough_args:
+                    if args.startswith("--ray_code_search_path="):
+                        old_path = args.split("--ray_code_search_path=", 1)[-1]
+                        break
+                    index += 1
+                new_path = ":".join(self.native_libraries["code_search_path"])
+                if old_path:
+                    passthrough_args[
+                        index
+                    ] = f"--ray_code_search_path={new_path}:{old_path}"
+                else:
+                    passthrough_args += [f"--ray_code_search_path={new_path}"]
+
         elif sys.platform == "win32":
             executable = []
         else:
@@ -99,7 +146,7 @@ class RuntimeEnvContext:
                     f"{MACOS_LIBRARY_PATH_ENV_NAME}="
                     f"{os.environ[MACOS_LIBRARY_PATH_ENV_NAME]}",
                 )
-            logger.debug(f"Exec'ing worker with command: {cmd}")
+            logger.info(f"Exec'ing worker with command: {cmd}")
             # PyCharm will monkey patch the os.execvp at
             # .pycharm_helpers/pydev/_pydev_bundle/pydev_monkey.py
             # The monkey patched os.execvp function has a different

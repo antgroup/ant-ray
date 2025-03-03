@@ -30,6 +30,7 @@ message GetOrCreateRuntimeEnvRequest {
   /// For details, checkout "//src/ray/common/id.h".
   bytes job_id = 3;
   string source_process = 4;
+  bytes worker_id = 5;
 }
 
 message GetOrCreateRuntimeEnvReply {
@@ -43,7 +44,10 @@ message GetOrCreateRuntimeEnvReply {
 message DeleteRuntimeEnvIfPossibleRequest {
   /// Json serialized [RuntimeEnv].
   string serialized_runtime_env = 1;
-  string source_process = 2;
+  RuntimeEnvConfig runtime_env_config = 2;
+  string source_process = 3;
+  bytes worker_id = 4;
+  bytes job_id = 5;
 }
 
 message DeleteRuntimeEnvIfPossibleReply {

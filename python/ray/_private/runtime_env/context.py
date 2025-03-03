@@ -25,12 +25,20 @@ class RuntimeEnvContext:
         py_executable: Optional[str] = None,
         override_worker_entrypoint: Optional[str] = None,
         java_jars: List[str] = None,
+        cwd: Optional[str] = None,
+        symlink_dirs_to_cwd: List[str] = None,
+        job_dir: Optional[str] = None,
+        symlink_dirs_to_job_dir: List[str] = None,
     ):
         self.command_prefix = command_prefix or []
         self.env_vars = env_vars or {}
         self.py_executable = py_executable or sys.executable
         self.override_worker_entrypoint: Optional[str] = override_worker_entrypoint
         self.java_jars = java_jars or []
+        self.cwd = cwd
+        self.symlink_dirs_to_cwd = symlink_dirs_to_cwd or []
+        self.job_dir = job_dir
+        self.symlink_dirs_to_job_dir = symlink_dirs_to_job_dir
 
     def serialize(self) -> str:
         return json.dumps(self.__dict__)
@@ -99,7 +107,7 @@ class RuntimeEnvContext:
                     f"{MACOS_LIBRARY_PATH_ENV_NAME}="
                     f"{os.environ[MACOS_LIBRARY_PATH_ENV_NAME]}",
                 )
-            logger.debug(f"Exec'ing worker with command: {cmd}")
+            logger.info(f"Exec'ing worker with command: {cmd}")
             # PyCharm will monkey patch the os.execvp at
             # .pycharm_helpers/pydev/_pydev_bundle/pydev_monkey.py
             # The monkey patched os.execvp function has a different

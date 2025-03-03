@@ -255,6 +255,20 @@ def is_jar_uri(uri: str) -> bool:
     return Path(path).suffix == ".jar"
 
 
+def is_tar_uri(uri: str) -> bool:
+    try:
+        _, path = parse_uri(uri)
+    except ValueError:
+        return False
+
+    return (
+        path.endswith(".tar")
+        or path.endswith(".tar.gz")
+        or path.endswith(".tar.bz")
+        or path.endswith(".tar.xz")
+    )
+
+
 def _get_excludes(path: Path, excludes: List[str]) -> Callable:
     path = path.absolute()
     pathspec = PathSpec.from_lines("gitwildmatch", excludes)
@@ -755,7 +769,7 @@ async def download_and_unpack_package(
             elif protocol in Protocol.remote_protocols():
                 protocol.download_remote_uri(source_uri=pkg_uri, dest_file=pkg_file)
 
-                if pkg_file.suffix in [".zip", ".jar"]:
+                if pkg_file.suffix in [".zip"]:
                     unzip_package(
                         package_path=pkg_file,
                         target_dir=local_dir,
@@ -765,6 +779,8 @@ async def download_and_unpack_package(
                     )
                 elif pkg_file.suffix == ".whl":
                     return str(pkg_file)
+                elif pkg_file.suffix == ".jar":
+                    pass
                 else:
                     raise NotImplementedError(
                         f"Package format {pkg_file.suffix} is ",

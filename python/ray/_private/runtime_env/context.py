@@ -27,6 +27,8 @@ class RuntimeEnvContext:
         java_jars: List[str] = None,
         cwd: Optional[str] = None,
         symlink_dirs_to_cwd: List[str] = None,
+        job_dir: Optional[str] = None,
+        symlink_dirs_to_job_dir: List[str] = None,
     ):
         self.command_prefix = command_prefix or []
         self.env_vars = env_vars or {}
@@ -35,6 +37,8 @@ class RuntimeEnvContext:
         self.java_jars = java_jars or []
         self.cwd = cwd
         self.symlink_dirs_to_cwd = symlink_dirs_to_cwd or []
+        self.job_dir = job_dir
+        self.symlink_dirs_to_job_dir = symlink_dirs_to_job_dir
 
     def serialize(self) -> str:
         return json.dumps(self.__dict__)

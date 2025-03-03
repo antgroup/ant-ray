@@ -29,6 +29,7 @@ from ray._private.utils import get_or_create_event_loop
 from ray._private.runtime_env.plugin import RuntimeEnvPluginManager
 from ray._private.runtime_env.py_modules import PyModulesPlugin
 from ray._private.runtime_env.working_dir import WorkingDirPlugin
+from ray._private.runtime_env.job_dir import JobDirPlugin
 from ray._private.runtime_env.nsight import NsightPlugin
 from ray._private.runtime_env.mpi import MPIPlugin
 from ray.core.generated import (
@@ -222,6 +223,7 @@ class RuntimeEnvAgent:
         self._working_dir_plugin = WorkingDirPlugin(
             self._runtime_env_dir, self._gcs_aio_client
         )
+        self._job_dir_plugin = JobDirPlugin(self._runtime_env_dir, self._gcs_aio_client)
         self._container_plugin = ContainerPlugin(temp_dir)
         # TODO(jonathan-anyscale): change the plugin to ProfilerPlugin
         # and unify with nsight and other profilers.
@@ -234,6 +236,7 @@ class RuntimeEnvAgent:
         # self._xxx_plugin, we should just iterate through self._plugins.
         self._base_plugins: List[RuntimeEnvPlugin] = [
             self._working_dir_plugin,
+            self._job_dir_plugin,
             self._uv_plugin,
             self._pip_plugin,
             self._conda_plugin,
@@ -546,6 +549,21 @@ class RuntimeEnvAgent:
                         self._logger,
                     )
 
+            # Trigger `pre_job_startup` of plugins to prepare something to
+            # handle job starting by eager install, such as making a unique
+            # job directory
+            if runtime_env_context and not request.worker_id:
+                runtime_env_context = deepcopy(runtime_env_context)
+                for (
+                    plugin_setup_context
+                ) in self._plugin_manager.sorted_plugin_setup_contexts():
+                    await plugin_setup_context.class_instance.pre_job_startup(
+                        runtime_env,
+                        runtime_env_context,
+                        request.job_id.decode(),
+                        self._logger,
+                    )
+
             # Need to write runtime env context here because `pre_worker_startup`
             # could rewrite the context.
             if runtime_env_context:
@@ -563,11 +581,13 @@ class RuntimeEnvAgent:
         self._logger.info(
             f"Got request from {request.source_process} to decrease "
             "reference for runtime env: "
-            f"{request.serialized_runtime_env}, worker_id {request.worker_id}"
+            f"{request.serialized_runtime_env}, worker_id {request.worker_id}, "
+            f"job id {request.job_id}"
         )
 
         try:
             runtime_env = RuntimeEnv.deserialize(request.serialized_runtime_env)
+            runtime_env_config = RuntimeEnvConfig.from_proto(request.runtime_env_config)
         except Exception as e:
             self._logger.exception(
                 "[Decrease] Failed to parse runtime env: "
@@ -579,6 +599,24 @@ class RuntimeEnvAgent:
                     traceback.format_exception(type(e), e, e.__traceback__)
                 ),
             )
+
+        if not request.worker_id:
+            for (
+                plugin_setup_context
+            ) in self._plugin_manager.sorted_plugin_setup_contexts():
+                await plugin_setup_context.class_instance.post_job_exit(
+                    runtime_env,
+                    request.job_id.decode(),
+                    self._logger,
+                )
+            if not runtime_env_config["eager_install"]:
+                self._logger.info(
+                    "Will not handle runtime_env at the job level "
+                    "if eager_install is False. "
+                )
+                return runtime_env_agent_pb2.DeleteRuntimeEnvIfPossibleReply(
+                    status=agent_manager_pb2.AGENT_RPC_STATUS_OK
+                )
 
         self._reference_table.decrease_reference(
             runtime_env, request.serialized_runtime_env, request.source_process

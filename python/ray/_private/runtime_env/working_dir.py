@@ -20,7 +20,11 @@ from ray._private.runtime_env.packaging import (
     upload_package_to_gcs,
 )
 from ray._private.runtime_env.plugin import RuntimeEnvPlugin
-from ray._private.utils import get_directory_size_bytes, try_to_create_directory
+from ray._private.utils import (
+    get_directory_size_bytes,
+    try_to_create_directory,
+    try_to_symlink,
+)
 from ray.exceptions import RuntimeEnvSetupError
 
 default_logger = logging.getLogger(__name__)
@@ -127,6 +131,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
     # it's specially treated to happen before all other plugins.
     priority = 5
     working_dir_placeholder = "$WORKING_DIR_PLACEHOLDER"
+    job_dir_placeholder = "$JOB_DIR_PLACEHOLDER"
 
     def __init__(
         self, resources_dir: str, gcs_aio_client: "GcsAioClient"  # noqa: F821
@@ -246,6 +251,20 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 link_path = os.path.join(working_dir, name)
                 logger.info(f"Creating symlink from {src_path} to {link_path}.")
                 os.symlink(src_path, link_path)
+        # Add symlink to job dir
+        job_dir = os.path.join(self._job_dirs, job_id)
+        if not os.path.exists(job_dir):
+            logger.info(f"Creating job dir for job {job_id}")
+            os.makedirs(job_dir, exist_ok=True)
+        symlink_working_dir = os.path.join(job_dir, worker_id)
+        logger.info(f"Creating symlink from {working_dir} to {symlink_working_dir}")
+        try_to_symlink(symlink_working_dir, working_dir)
+        
+        # Replace the placeholder with the real job dir.
+        for k, v in context.env_vars.copy().items():
+            context.env_vars[k] = v.replace(
+                WorkingDirPlugin.job_dir_placeholder, job_dir
+            ).replace("${RAY_RUNTIME_ENV_JOB_DIR}", job_dir)
         return
 
     async def post_worker_exit(
@@ -264,6 +283,16 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "won't be deleted."
             )
             return
+        logger.info(
+            f"Deleting symlink working dir for worker {worker_id}, job_id {job_id}"
+        )
+        job_dir = os.path.join(self._job_dirs, job_id)
+        symlink_working_dir = os.path.join(job_dir, worker_id)
+        if os.path.exists(symlink_working_dir):
+            if os.path.islink(symlink_working_dir):
+                os.unlink(symlink_working_dir)
+            else:
+                shutil.rmtree(symlink_working_dir)
         logger.info(f"Deleting working dir for worker {worker_id}, job id {job_id}")
         working_dir = os.path.join(self._working_dirs, worker_id)
         # TODO(Jacky): Use async method to remove, such as aiofiles.os.removedirs

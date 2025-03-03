@@ -12,7 +12,11 @@ BAD_RUNTIME_ENV_CACHE_TTL_SECONDS = ray_constants.env_integer(
     "BAD_RUNTIME_ENV_CACHE_TTL_SECONDS", 60 * 10
 )
 
+# Disable working dir GC or not
 DISABLE_WORKING_DIR_GC = ray_constants.env_bool("RAY_DISABLE_WORKING_DIR_GC", False)
+
+# Disable job dir GC or not
+DISABLE_JOB_DIR_GC = ray_constants.env_bool("RAY_DISABLE_JOB_DIR_GC", False)
 
 RUNTIME_ENV_LOG_FILENAME = "runtime_env.log"
 RUNTIME_ENV_AGENT_PORT_PREFIX = "RUNTIME_ENV_AGENT_PORT_PREFIX:"

@@ -101,3 +101,4 @@ class JavaJarsPlugin(RuntimeEnvPlugin):
                     "downloading, unpacking or installing the java jar files."
                 )
             context.java_jars.append(str(module_dir))
+            context.symlink_dirs_to_cwd.append(str(module_dir))

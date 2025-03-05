@@ -8,6 +8,7 @@ import ray._private.signature as signature
 import ray._private.worker
 import ray._raylet
 from ray import ActorClassID, Language, cross_language
+from ray.util.insight import record_call
 from ray._private import ray_option_utils
 from ray._private.async_compat import has_async_methods
 from ray._private.auto_init_hook import wrap_auto_init
@@ -214,71 +215,13 @@ class ActorMethod:
             ray.ObjectRef: A reference to the output of the actor method.
         """
         # Get caller information using traceback
-        import ray
-        
         callee_func = self._method_name
-        
-        # Get callee class from the actor
         actor = self._actor_ref()
         callee_class = None
         if actor is not None and hasattr(actor, "_ray_actor_creation_function_descriptor"):
             callee_class = actor._ray_actor_creation_function_descriptor.class_name +":"+ actor._ray_actor_id.hex()
-        caller_class = None
-
-        try:
-            caller_actor = ray.get_runtime_context().current_actor
-            if caller_actor is not None and hasattr(caller_actor, "_ray_actor_creation_function_descriptor"):
-                caller_class = caller_actor._ray_actor_creation_function_descriptor.class_name +":"+ caller_actor._ray_actor_id.hex()
-            else:
-                caller_class = None
-        except Exception as e:
-            pass
-        
-        if ray.get_runtime_context().get_task_name() is not None:
-            caller_func = ray.get_runtime_context().get_task_name().split(".")[-1]
-        else:
-            caller_func = "main"
-
-        # Create a record for this call
-        call_record = {
-            "caller_class": caller_class,
-            "caller_func": caller_func,
-            "callee_class": callee_class,
-            "callee_func": callee_func,
-            "call_times": 1,
-            "job_id": ray.get_runtime_context().get_job_id()
-        }
-        
-        # Submit the record to dashboard
-        self._submit_call_record_to_dashboard(call_record)
+        record_call(callee_class, callee_func)
         return self._remote(args, kwargs)
-
-    def _submit_call_record_to_dashboard(self, call_record):
-        """Submit a call record to the Ray dashboard.
-        
-        Args:
-            call_record: Dictionary containing call information
-        """
-        import uuid
-        request_uid = str(uuid.uuid4())
-        from ray._private.services import get_webui_url_from_internal_kv
-        dashboard_url = get_webui_url_from_internal_kv()
-        if not dashboard_url:
-            return
-        dashboard_url = f"http://{dashboard_url}"
-        while True:
-            try:
-                import requests
-                endpoint_url = f"{dashboard_url}/record_call"
-                resp = requests.post(
-                    endpoint_url,
-                    json={"call_record": call_record, "uid": request_uid},
-                    timeout=50  # 50 second timeout
-                )
-                if resp.status_code == 200:
-                    break
-            except Exception as e:
-                logger.error(f"Failed to submit call record to dashboard: {e}")
 
     def options(self, **options):
         """Convenience method for executing an actor method call with options.
@@ -715,33 +658,6 @@ class ActorClass:
             "ActorClass.__init__ should not be called. Please use "
             "the @ray.remote decorator instead."
         )
-
-    def _submit_call_record_to_dashboard(self, call_record):
-        """Submit a call record to the Ray dashboard.
-        
-        Args:
-            call_record: Dictionary containing call information
-        """
-        import uuid
-        request_uid = str(uuid.uuid4())
-        from ray._private.services import get_webui_url_from_internal_kv
-        dashboard_url = get_webui_url_from_internal_kv()
-        if not dashboard_url:
-            return
-        dashboard_url = f"http://{dashboard_url}"
-        while True:
-            try:
-                import requests
-                endpoint_url = f"{dashboard_url}/record_call"
-                resp = requests.post(
-                    endpoint_url,
-                    json={"call_record": call_record, "uid": request_uid},
-                    timeout=50  # 50 second timeout
-                )
-                if resp.status_code == 200:
-                    break
-            except Exception as e:
-                logger.error(f"Failed to submit call record to dashboard: {e}")
 
     def __call__(self, *args, **kwargs):
         """Prevents users from directly instantiating an ActorClass.
@@ -1358,41 +1274,12 @@ class ActorClass:
         )
         
         callee_func = "__init__"
-        
-        # Get callee class from the actor
         actor = actor_handle
         callee_class = None
         if actor is not None and hasattr(actor, "_ray_actor_creation_function_descriptor"):
             callee_class = actor._ray_actor_creation_function_descriptor.class_name +":"+ actor._ray_actor_id.hex()
-        caller_class = None
+        record_call(callee_class, callee_func)
 
-        try:
-            caller_actor = ray.get_runtime_context().current_actor
-            if caller_actor is not None and hasattr(caller_actor, "_ray_actor_creation_function_descriptor"):
-                caller_class = caller_actor._ray_actor_creation_function_descriptor.class_name +":"+ caller_actor._ray_actor_id.hex()
-            else:
-                caller_class = None
-        except Exception as e:
-            pass
-        
-        if ray.get_runtime_context().get_task_name() is not None:
-            caller_func = ray.get_runtime_context().get_task_name().split(".")[-1]
-        else:
-            caller_func = "main"
-
-        # Create a record for this call
-        call_record = {
-            "caller_class": caller_class,
-            "caller_func": caller_func,
-            "callee_class": callee_class,
-            "callee_func": callee_func,
-            "call_times": 1,
-            "job_id": ray.get_runtime_context().get_job_id()
-        }
-        
-        # Submit the record to dashboard
-        self._submit_call_record_to_dashboard(call_record)
- 
         return actor_handle
 
     @DeveloperAPI

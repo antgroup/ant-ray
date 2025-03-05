@@ -7,6 +7,7 @@ from threading import Lock
 from typing import Optional
 
 import ray._private.signature
+from ray.util.insight import record_call
 from ray import Language, cross_language
 from ray._private import ray_option_utils
 from ray._private.auto_init_hook import wrap_auto_init
@@ -298,35 +299,6 @@ class RemoteFunction:
 
         return FuncWrapper()
 
-    def _submit_call_record_to_dashboard(self, call_record):
-        """Submit a call record to the Ray dashboard.
-        
-        Args:
-            call_record: Dictionary containing call information
-        """
-        import uuid
-        request_uid = str(uuid.uuid4())
-        from ray._private.services import get_webui_url_from_internal_kv
-        dashboard_url = get_webui_url_from_internal_kv()
-        if not dashboard_url:
-            return
-        dashboard_url = f"http://{dashboard_url}"
-        while True:
-            try:
-                import requests
-                endpoint_url = f"{dashboard_url}/record_call"
-                resp = requests.post(
-                    endpoint_url,
-                    json={"call_record": call_record, "uid": request_uid},
-                    timeout=50  # 50 second timeout
-                )
-                if resp.status_code == 200:
-                    break
-            except Exception as e:
-                logger.error(f"Failed to submit call record to dashboard: {e}")
-
-
-
     @wrap_auto_init
     @_tracing_task_invocation
     def _remote(
@@ -336,40 +308,14 @@ class RemoteFunction:
         serialized_runtime_env_info: Optional[str] = None,
         **task_options,
     ):
-        # Get callee information
-        callee_func = self._function_name.split(".")[-1]
-        caller_class = None
-        try:
-            caller_actor = ray.get_runtime_context().current_actor
-            if caller_actor is not None and hasattr(caller_actor, "_ray_actor_creation_function_descriptor"):
-                caller_class = caller_actor._ray_actor_creation_function_descriptor.class_name +":"+ caller_actor._ray_actor_id.hex()
-        except Exception as e:
-            pass
-
-        current_task_name = ray.get_runtime_context().get_task_name()
-        if current_task_name is not None:
-            caller_func = current_task_name.split(".")[-1]
-        else:
-            caller_func = "main"
-        # Create a record for this call
-        call_record = {
-            "caller_class": caller_class,
-            "caller_func": caller_func,
-            "callee_class": None,
-            "callee_func": callee_func,
-            "call_times": 1,
-            "job_id": ray.get_runtime_context().get_job_id()
-        }
-        
-        # Submit the record to dashboard
-        self._submit_call_record_to_dashboard(call_record)
- 
         """Submit the remote function for execution."""
         # We pop the "max_calls" coming from "@ray.remote" here. We no longer need
         # it in "_remote()".
         task_options.pop("max_calls", None)
         if client_mode_should_convert():
             return client_mode_convert_function(self, args, kwargs, **task_options)
+
+        record_call(None, self._function_name.split(".")[-1])
 
         worker = ray._private.worker.global_worker
         worker.check_connected()

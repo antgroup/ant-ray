@@ -7,8 +7,10 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from itertools import islice
 from typing import Dict, Union
+import json
 
 import aiohttp.web
+import ray
 
 import ray.dashboard.optional_utils as dashboard_optional_utils
 import ray.dashboard.utils as dashboard_utils
@@ -101,6 +103,9 @@ class EventHead(
         self.module_started = time.monotonic()
         # {job_id hex(str): {event_id (str): event (dict)}}
         self.events: Dict[str, JobEvents] = defaultdict(JobEvents)
+        
+        # Initialize InsightMonitor actor reference
+        self.insight_monitor = None
         
         # New data structure for call graph
         # {job_id: {caller_class.caller_func -> callee_class.callee_func: count}}
@@ -213,182 +218,23 @@ class EventHead(
 
         return await handle_list_api(list_api_fn, req)
 
-    @routes.post("/record_call")
-    async def record_function_call(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
-        """Handle function call records sent from the record_calls decorator.
-        
-        This endpoint receives call records with information about function calls
-        including caller/callee class and function names, and call counts.
-        
-        The records are stored in a call graph data structure instead of events.
-        """
-        try:
-            # Parse the request data
-            data = await req.json()
-            call_record = data.get("call_record", {})
-            job_id = call_record.get("job_id", "default_job")
-
-            uid = data.get("uid", "")
-            if uid in self.remote_call_uids[job_id]:
-                return dashboard_optional_utils.rest_response(
-                    success=True,
-                    message="Function call record already received."
-                )
-            self.remote_call_uids[job_id].add(uid)
-            
-            # Extract call record information
-            caller_class = call_record.get("caller_class", "")
-            caller_func = call_record.get("caller_func", "")
-            callee_class = call_record.get("callee_class", "")
-            callee_func = call_record.get("callee_func", "")
-            call_times = call_record.get("call_times", 1)
-            
-            # Create caller and callee identifiers
-            caller_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
-            callee_id = f"{callee_class}.{callee_func}" if callee_class else callee_func
-            
-            # Update call graph
-            self.call_graph[job_id][f"{caller_id}->{callee_id}"] += call_times
-            
-            # Track actors and methods
-            if caller_class is not None:
-                self.actors[job_id].add(caller_class)
-                # Get or create actor ID using the map
-                actor_id = self._get_actor_id(job_id, caller_class)
-                
-                if caller_id not in self.methods[job_id]:
-                    self.method_counter[job_id] += 1
-                    self.methods[job_id][caller_id] = {
-                        "id": f"method{self.method_counter[job_id]}",
-                        "actorId": actor_id,
-                        "name": caller_func,
-                        "class": caller_class
-                    }
-            else:
-                self.functions[job_id].add(caller_func)
-                # Get or create function ID using the map
-                self._get_function_id(job_id, caller_func)
-            
-            if callee_class is not None:
-                self.actors[job_id].add(callee_class)
-                # Get or create actor ID using the map
-                actor_id = self._get_actor_id(job_id, callee_class)
-                
-                if callee_id not in self.methods[job_id]:
-                    self.method_counter[job_id] += 1
-                    self.methods[job_id][callee_id] = {
-                        "id": f"method{self.method_counter[job_id]}",
-                        "actorId": actor_id,
-                        "name": callee_func,
-                        "class": callee_class
-                    }
-            else:
-                self.functions[job_id].add(callee_func)
-                # Get or create function ID using the map
-                self._get_function_id(job_id, callee_func)
-
-            if "main" not in self.functions[job_id]:
-                self.functions[job_id].add("main")
-            
-            return dashboard_optional_utils.rest_response(
-                success=True,
-                message="Function call record received and stored in call graph.",
-            )
-        except Exception as e:
-            logger.error(f"Error processing function call record: {str(e)}")
-            return dashboard_optional_utils.rest_response(
-                success=False,
-                message=f"Error processing function call record: {str(e)}"
-            )
-    
-    def _get_actor_id(self, job_id, actor_class):
-        self.actor_id_map[job_id][actor_class] = actor_class.split(":")[1]
-        return actor_class.split(":")[1]
-    
-    def _get_function_id(self, job_id, func_name):
-        """Helper method to get or create function ID using a map for efficient lookup"""
-        if func_name == "main":
-            self.function_id_map[job_id]["main"] = "main"
-            return "main"
-        if func_name in self.function_id_map[job_id]:
-            return self.function_id_map[job_id][func_name]
-        
-        self.function_counter[job_id] += 1
-        function_id = f"function{self.function_counter[job_id]}"
-        self.function_id_map[job_id][func_name] = function_id
-        return function_id
         
     @routes.get("/call_graph")
     async def get_call_graph(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
-        """Return the call graph data in the requested format for visualization."""
+        """Return the call graph data by reading from the InsightMonitor actor."""
         try:
-            # Get job_id from query parameters, default to "default_job" if not provided
             job_id = req.query.get("job_id", "default_job")
             
-            # Build the graph data structure
-            graph_data = {
-                "actors": [],
-                "methods": [],
-                "functions": [],
-                "callFlows": [],
-                "dataFlows": []
-            }
+            if self.insight_monitor is None:
+                try:
+                    self.insight_monitor = ray.get_actor(name="insight_monitor", namespace="flowinsight")
+                except ValueError:
+                    return dashboard_optional_utils.rest_response(
+                        success=False,
+                        message="InsightMonitor actor not found"
+                    )
             
-            # Add actors
-            for actor_class, actor_id in self.actor_id_map[job_id].items():
-                graph_data["actors"].append({
-                    "id": actor_id,
-                    "name": actor_class.split(":")[0],
-                    "language": "python"
-                })
-            
-            # Add methods
-            for method_id, method_info in self.methods[job_id].items():
-                graph_data["methods"].append({
-                    "id": method_info["id"],
-                    "actorId": method_info["actorId"],
-                    "name": method_info["name"],
-                    "language": "python"
-                })
-            
-            # Add functions
-            for func_name, function_id in self.function_id_map[job_id].items():
-                if "." not in func_name:  # Ensure it's not a method
-                    graph_data["functions"].append({
-                        "id": function_id,
-                        "name": func_name,
-                        "language": "python"
-                    })
-            
-            # Add call flows
-            for call_edge, count in self.call_graph[job_id].items():
-                caller, callee = call_edge.split("->")
-                
-                # Get source ID
-                source_id = None
-                if caller in self.methods[job_id]:
-                    source_id = self.methods[job_id][caller]["id"]
-                else:
-                    # Check if it's a function
-                    if caller in self.function_id_map[job_id]:
-                        source_id = self.function_id_map[job_id][caller]
-                
-                # Get target ID
-                target_id = None
-                if callee in self.methods[job_id]:
-                    target_id = self.methods[job_id][callee]["id"]
-                else:
-                    # Check if it's a function
-                    if callee in self.function_id_map[job_id]:
-                        target_id = self.function_id_map[job_id][callee]
-                
-                if source_id and target_id:
-                    graph_data["callFlows"].append({
-                        "source": source_id,
-                        "target": target_id,
-                        "count": count
-                    })
-                    
+            graph_data = await self.insight_monitor.get_call_graph_data.remote(job_id)
             
             return dashboard_optional_utils.rest_response(
                 success=True,
@@ -401,25 +247,6 @@ class EventHead(
             return dashboard_optional_utils.rest_response(
                 success=False,
                 message=f"Error retrieving call graph data: {str(e)}"
-            )
-
-    @routes.get("/call_graph_jobs")
-    async def list_call_graph_jobs(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
-        """Return a list of job_ids for which we have call graph data."""
-        try:
-            # Get all job_ids that have call graph data
-            job_ids = list(self.call_graph.keys())
-            
-            return dashboard_optional_utils.rest_response(
-                success=True,
-                message="Call graph job_ids retrieved successfully.",
-                job_ids=job_ids
-            )
-        except Exception as e:
-            logger.error(f"Error retrieving call graph job_ids: {str(e)}")
-            return dashboard_optional_utils.rest_response(
-                success=False,
-                message=f"Error retrieving call graph job_ids: {str(e)}"
             )
 
     async def run(self, server):

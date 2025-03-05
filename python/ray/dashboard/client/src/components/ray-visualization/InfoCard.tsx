@@ -483,9 +483,6 @@ const InfoCard = ({ data, visible, graphData }: InfoCardProps) => {
         return (
           <div className="default-state">
             <h3>{unknownData.name}</h3>
-            <div className="info-description">
-              {unknownData.type}
-            </div>
           </div>
         );
     }

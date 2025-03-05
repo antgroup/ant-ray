@@ -234,6 +234,9 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(({ gr
     // If there's already a selected element, focus on it after rendering
     if (selectedElementId) {
       setTimeout(() => focusOnNode(selectedElementId), 100);
+    } else {
+      // Focus on main node if no selected element
+      setTimeout(() => focusOnNode('main'), 100);
     }
   }, [graphData, isCircularLayout]);
 
@@ -1115,10 +1118,11 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(({ gr
     
     // Step 5: Set up the initial view to fit everything
     // Calculate required scale to see all nodes
-    const visualRadius = radius * 1.2; // Give some margin
-    const scaleX = svgWidth / (visualRadius * 2);
-    const scaleY = svgHeight / (visualRadius * 2);
-    const scale = Math.min(scaleX, scaleY, 1); // Don't zoom in past 1:1
+    const contentWidth = radius * 2 + 60 * 2;
+    const contentHeight = radius * 2 + 60 * 2;
+    const scaleX = svgWidth / contentWidth;
+    const scaleY = svgHeight / contentHeight;
+    const finalScale = Math.min(scaleX, scaleY, 1) * 0.9;
     
     // Update the zoom behavior to allow better navigation
     zoom.scaleExtent([0.1, 2])  // Allow zooming from 0.1x to 2x
@@ -1126,10 +1130,11 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(({ gr
         inner.attr('transform', event.transform);
       });
     
-    // Apply the initial transform to center everything
+    
     svg.call(zoom.transform, d3.zoomIdentity
-      .translate(svgWidth/2, svgHeight/2)
-      .scale(scale));
+      .translate(centerX, centerY)
+      .scale(finalScale)
+      .translate(-centerX, -centerY)); // Double translate to ensure centering
     
     // Set viewBox to contain the graph
     svg.attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
@@ -1287,22 +1292,27 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(({ gr
     inner.selectAll('g.cluster')
       .attr('id', d => d as string);
     
-    // Center the graph
-    const initialScale = 0.75;
-    const svgWidth = parseInt(svg.style('width'));
-    const svgHeight = parseInt(svg.style('height'));
-    const graphWidth = g.graph().width!;
-    const graphHeight = g.graph().height!;
-    
-    const translateX = (svgWidth - graphWidth * initialScale) / 2;
-    const translateY = (svgHeight - graphHeight * initialScale) / 2;
-    
-    svg.call(zoom.transform, d3.zoomIdentity
-      .translate(translateX, translateY)
-      .scale(initialScale));
+    // Center the main node if it exists
+    const mainNode = g.node('main');
+    if (mainNode) {
+      const centerX = svg.style('width') ? parseInt(svg.style('width')) / 2 : 0;
+      const centerY = svg.style('height') ? parseInt(svg.style('height')) / 2 : 0;
+      const scale = 0.75;
+      
+      svg.call(zoom.transform, d3.zoomIdentity
+        .translate(centerX - mainNode.x * scale, centerY - mainNode.y * scale)
+        .scale(scale));
+    } else {
+      const translateX = (svg.style('width') ? parseInt(svg.style('width')) : 0) / 2;
+      const translateY = (svg.style('height') ? parseInt(svg.style('height')) : 0) / 2;
+      const initialScale = 0.75;
+      svg.call(zoom.transform, d3.zoomIdentity
+        .translate(translateX, translateY)
+        .scale(initialScale));
+    }
     
     // Set viewBox to contain the graph
-    svg.attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+    svg.attr('viewBox', `0 0 ${svg.style('width') || '100%'} ${svg.style('height') || '600'}`);
     
     // Add explicit pointer-events styling for click targets
     inner.selectAll('g.node, g.cluster')

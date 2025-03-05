@@ -185,17 +185,22 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(({ gr
   // Watch for changes to selectedElementId and focus on the node
   useEffect(() => {
     if (selectedElementId) {
-      // Use current graph data directly instead of waiting for re-render
       const g = dagreGraphRef.current;
-      if (g) {
-        const nodeData = g.node(selectedElementId);
-        if (nodeData) {
-          focusOnNode(selectedElementId);
-          return;
-        }
+      const nodeData = g?.node(selectedElementId);
+      
+      // Immediate focus if data exists
+      if (nodeData) {
+        focusOnNode(selectedElementId);
+        return;
       }
-      // If graph data not ready, wait 100ms and try again
-      const timeout = setTimeout(() => focusOnNode(selectedElementId), 100);
+      
+      // Fallback with cleanup
+      const timeout = setTimeout(() => {
+        if (dagreGraphRef.current?.node(selectedElementId)) {
+          focusOnNode(selectedElementId);
+        }
+      }, 100);
+      
       return () => clearTimeout(timeout);
     }
   }, [selectedElementId, focusOnNode]);
@@ -230,7 +235,7 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(({ gr
     if (selectedElementId) {
       setTimeout(() => focusOnNode(selectedElementId), 100);
     }
-  }, [graphData, isCircularLayout, selectedElementId, focusOnNode]);
+  }, [graphData, isCircularLayout]);
 
   // Find connected subgraphs (excluding main node)
   const findConnectedSubgraphs = () => {

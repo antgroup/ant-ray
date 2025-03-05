@@ -298,6 +298,33 @@ class RemoteFunction:
 
         return FuncWrapper()
 
+    def _submit_call_record_to_dashboard(self, call_record):
+        """Submit a call record to the Ray dashboard.
+        
+        Args:
+            call_record: Dictionary containing call information
+        """
+        try:
+            import requests
+            import ray
+            from ray._private.worker import _global_node
+            
+            dashboard_url = _global_node.webui_url
+            if not dashboard_url:
+                return
+            
+            dashboard_url = f"http://{dashboard_url}"
+            endpoint_url = f"{dashboard_url}/record_call"
+            requests.post(
+                endpoint_url,
+                json={"call_record": call_record},
+                timeout=50
+            )
+        except Exception:
+            # Silently fail if we can't submit the record
+            pass
+
+
     @wrap_auto_init
     @_tracing_task_invocation
     def _remote(
@@ -307,6 +334,34 @@ class RemoteFunction:
         serialized_runtime_env_info: Optional[str] = None,
         **task_options,
     ):
+        # Get callee information
+        callee_func = self._function_name.split(".")[-1]
+        caller_class = None
+        try:
+            caller_actor = ray.get_runtime_context().current_actor
+            if caller_actor is not None and hasattr(caller_actor, "_ray_actor_creation_function_descriptor"):
+                caller_class = caller_actor._ray_actor_creation_function_descriptor.class_name +":"+ caller_actor._ray_actor_id.hex()
+        except Exception as e:
+            pass
+
+        current_task_name = ray.get_runtime_context().get_task_name()
+        if current_task_name is not None:
+            caller_func = current_task_name.split(".")[-1]
+        else:
+            caller_func = "main"
+        # Create a record for this call
+        call_record = {
+            "caller_class": caller_class,
+            "caller_func": caller_func,
+            "callee_class": None,
+            "callee_func": callee_func,
+            "call_times": 1,
+            "job_id": ray.get_runtime_context().get_job_id()
+        }
+        
+        # Submit the record to dashboard
+        self._submit_call_record_to_dashboard(call_record)
+ 
         """Submit the remote function for execution."""
         # We pop the "max_calls" coming from "@ray.remote" here. We no longer need
         # it in "_remote()".

@@ -1,0 +1,242 @@
+.elements-panel {
+  width: 300px;
+  height: 100%;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e1e4e8;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.elements-header {
+  padding: 15px;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.elements-header h3 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #24292e;
+}
+
+.search-container {
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5da;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.tab-container {
+  display: flex;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #586069;
+  transition: all 0.2s ease;
+}
+
+.tab.active {
+  color: #0366d6;
+  border-bottom: 2px solid #0366d6;
+  font-weight: 600;
+}
+
+.tab:hover:not(.active) {
+  background-color: #f1f2f3;
+}
+
+.elements-table-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.elements-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.elements-table th {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa;
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #e1e4e8;
+  color: #586069;
+  font-weight: 600;
+}
+
+.elements-table tbody tr {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.elements-table tbody tr:hover {
+  background-color: #f1f8ff;
+}
+
+.elements-table td {
+  padding: 8px;
+  border-bottom: 1px solid #eaecef;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .elements-panel {
+    width: 100%;
+    height: 300px;
+    border-right: none;
+    border-bottom: 1px solid #e1e4e8;
+  }
+}
+
+/* Actor row styles */
+.actor-row {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eaecef;
+}
+
+.actor-row td:first-child {
+  font-weight: 500;
+  padding-left: 0;
+}
+
+/* Expand button */
+.expand-button {
+  background: none;
+  border: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin-right: 8px;
+  margin-left: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: #586069;
+  background-color: #f1f2f3;
+  transition: all 0.2s ease;
+  order: -1;
+}
+
+.expand-button:hover {
+  background-color: #e1e4e8;
+}
+
+.expand-button.expanded {
+  background-color: #0366d6;
+  color: white;
+}
+
+/* Methods container */
+.methods-container {
+  background-color: #f6f8fa;
+  margin-left: 0;
+  padding-left: 0;
+  border-left: none;
+}
+
+.actor-methods {
+  padding: 4px 0;
+  margin-left: 36px; /* align with the actor name after the button */
+}
+
+.actor-methods h4 {
+  display: none;
+}
+
+/* Methods table */
+.methods-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  margin-top: 0;
+}
+
+.methods-table tr {
+  display: flex;
+  align-items: center;
+}
+
+.methods-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #eaecef;
+  cursor: pointer;
+  flex: 1;
+  text-align: left;
+}
+
+.methods-table td:first-child {
+  padding-left: 8px;
+  position: relative;
+}
+
+.methods-table td:first-child::before {
+  display: none;
+}
+
+.methods-table td:first-child::after {
+  display: none;
+}
+
+.methods-table tr:hover {
+  background-color: #f1f8ff;
+}
+
+/* Tree lines for methods */
+.methods-table tr:last-child td:first-child::after {
+  display: none;
+}
+
+.elements-table tbody tr.selected {
+  background-color: #e6f7ff;
+  border-left: 3px solid #1890ff;
+}
+
+.elements-table tbody tr.selected:hover {
+  background-color: #e6f7ff;
+}
+
+.actor-row.selected {
+  background-color: #e6f7ff;
+  border-left: 3px solid #1890ff;
+}
+
+.actor-row.selected:hover {
+  background-color: #e6f7ff;
+}
+
+.methods-table tr.selected {
+  background-color: #e6f7ff;
+  border-left: 3px solid #1890ff;
+}
+
+.methods-table tr.selected:hover {
+  background-color: #e6f7ff;
+}

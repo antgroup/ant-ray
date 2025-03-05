@@ -206,7 +206,78 @@ class ActorMethod:
         return self._bind(args, kwargs)
 
     def remote(self, *args, **kwargs):
+        """Execute the actor method.
+        
+        Records call information and sends it to the Ray dashboard.
+        
+        Returns:
+            ray.ObjectRef: A reference to the output of the actor method.
+        """
+        # Get caller information using traceback
+        import ray
+        
+        callee_func = self._method_name
+        
+        # Get callee class from the actor
+        actor = self._actor_ref()
+        callee_class = None
+        if actor is not None and hasattr(actor, "_ray_actor_creation_function_descriptor"):
+            callee_class = actor._ray_actor_creation_function_descriptor.class_name +":"+ actor._ray_actor_id.hex()
+        caller_class = None
+
+        try:
+            caller_actor = ray.get_runtime_context().current_actor
+            if caller_actor is not None and hasattr(caller_actor, "_ray_actor_creation_function_descriptor"):
+                caller_class = caller_actor._ray_actor_creation_function_descriptor.class_name +":"+ caller_actor._ray_actor_id.hex()
+            else:
+                caller_class = None
+        except Exception as e:
+            pass
+        
+        if ray.get_runtime_context().get_task_name() is not None:
+            caller_func = ray.get_runtime_context().get_task_name().split(".")[-1]
+        else:
+            caller_func = "main"
+
+        # Create a record for this call
+        call_record = {
+            "caller_class": caller_class,
+            "caller_func": caller_func,
+            "callee_class": callee_class,
+            "callee_func": callee_func,
+            "call_times": 1,
+            "job_id": ray.get_runtime_context().get_job_id()
+        }
+        
+        # Submit the record to dashboard
+        self._submit_call_record_to_dashboard(call_record)
         return self._remote(args, kwargs)
+
+    def _submit_call_record_to_dashboard(self, call_record):
+        """Submit a call record to the Ray dashboard.
+        
+        Args:
+            call_record: Dictionary containing call information
+        """
+        try:
+            import requests
+            import ray
+            from ray._private.worker import _global_node
+            
+            dashboard_url = _global_node.webui_url
+            if not dashboard_url:
+                return
+            
+            dashboard_url = f"http://{dashboard_url}"
+            endpoint_url = f"{dashboard_url}/record_call"
+            requests.post(
+                endpoint_url,
+                json={"call_record": call_record},
+                timeout=50  # 50 second timeout
+            )
+        except Exception:
+            # Silently fail if we can't submit the record
+            pass
 
     def options(self, **options):
         """Convenience method for executing an actor method call with options.
@@ -1568,7 +1639,7 @@ class ActorHandle:
             False,  # retry_exceptions
             False,  # is_generator
             self._ray_method_generator_backpressure_num_objects.get(item, -1),
-            self._ray_enable_task_events,  # enable_task_events
+            self._ray_method_enable_task_events,  # enable_task_events
             # Currently, cross-lang actor method not support decorator
             decorator=None,
             signature=None,
@@ -1582,11 +1653,11 @@ class ActorHandle:
         return (
             "Actor("
             f"{self._ray_actor_creation_function_descriptor.class_name}, "
-            f"{self._actor_id.hex()})"
+            f"{self._ray_actor_id.hex()})"
         )
 
     def __hash__(self):
-        return hash(self._actor_id)
+        return hash(self._ray_actor_id)
 
     def __eq__(self, __value):
         return hash(self) == hash(__value)
@@ -1628,7 +1699,7 @@ class ActorHandle:
                     "actor_language": self._ray_actor_language,
                     "actor_id": self._ray_actor_id,
                     "max_task_retries": self._ray_max_task_retries,
-                    "enable_task_events": self._enable_task_events,
+                    "enable_task_events": self._ray_enable_task_events,
                     "method_is_generator": self._ray_method_is_generator,
                     "method_decorators": self._ray_method_decorators,
                     "method_signatures": self._ray_method_signatures,

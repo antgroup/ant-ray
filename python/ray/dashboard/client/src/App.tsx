@@ -58,6 +58,7 @@ import { TaskPage } from "./pages/task/TaskPage";
 import { VirtualClustersPage } from "./pages/virtual_cluster/VirtualClusters";
 import { getNodeList } from "./service/node";
 import { lightTheme } from "./theme";
+import ActorGraph from "./pages/job/ActorGraph";
 
 dayjs.extend(duration);
 
@@ -239,6 +240,7 @@ const App = () => {
                   </Route>
                   <Route element={<JobsLayout />} path="jobs">
                     <Route element={<JobList />} path="" />
+                    <Route element={<ActorGraph />} path=":jobId/graph" />
                     <Route element={<JobPage />} path=":id">
                       <Route element={<JobDetailLayout />} path="">
                         <Route

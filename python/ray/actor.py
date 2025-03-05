@@ -259,25 +259,26 @@ class ActorMethod:
         Args:
             call_record: Dictionary containing call information
         """
-        try:
-            import requests
-            import ray
-            from ray._private.worker import _global_node
-            
-            dashboard_url = _global_node.webui_url
-            if not dashboard_url:
-                return
-            
-            dashboard_url = f"http://{dashboard_url}"
-            endpoint_url = f"{dashboard_url}/record_call"
-            requests.post(
-                endpoint_url,
-                json={"call_record": call_record},
-                timeout=50  # 50 second timeout
-            )
-        except Exception:
-            # Silently fail if we can't submit the record
-            pass
+        import uuid
+        request_uid = str(uuid.uuid4())
+        from ray._private.services import get_webui_url_from_internal_kv
+        dashboard_url = get_webui_url_from_internal_kv()
+        if not dashboard_url:
+            return
+        dashboard_url = f"http://{dashboard_url}"
+        while True:
+            try:
+                import requests
+                endpoint_url = f"{dashboard_url}/record_call"
+                resp = requests.post(
+                    endpoint_url,
+                    json={"call_record": call_record, "uid": request_uid},
+                    timeout=50  # 50 second timeout
+                )
+                if resp.status_code == 200:
+                    break
+            except Exception as e:
+                logger.error(f"Failed to submit call record to dashboard: {e}")
 
     def options(self, **options):
         """Convenience method for executing an actor method call with options.
@@ -721,27 +722,26 @@ class ActorClass:
         Args:
             call_record: Dictionary containing call information
         """
-        try:
-            import requests
-            import ray
-            from ray._private.worker import _global_node
-            
-            dashboard_url = _global_node.webui_url
-            if not dashboard_url:
-                return
-            
-            dashboard_url = f"http://{dashboard_url}"
-            endpoint_url = f"{dashboard_url}/record_call"
-            requests.post(
-                endpoint_url,
-                json={"call_record": call_record},
-                timeout=50  # 50 second timeout
-            )
-        except Exception:
-            # Silently fail if we can't submit the record
-            pass
-
-
+        import uuid
+        request_uid = str(uuid.uuid4())
+        from ray._private.services import get_webui_url_from_internal_kv
+        dashboard_url = get_webui_url_from_internal_kv()
+        if not dashboard_url:
+            return
+        dashboard_url = f"http://{dashboard_url}"
+        while True:
+            try:
+                import requests
+                endpoint_url = f"{dashboard_url}/record_call"
+                resp = requests.post(
+                    endpoint_url,
+                    json={"call_record": call_record, "uid": request_uid},
+                    timeout=50  # 50 second timeout
+                )
+                if resp.status_code == 200:
+                    break
+            except Exception as e:
+                logger.error(f"Failed to submit call record to dashboard: {e}")
 
     def __call__(self, *args, **kwargs):
         """Prevents users from directly instantiating an ActorClass.

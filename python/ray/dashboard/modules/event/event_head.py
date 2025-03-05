@@ -114,6 +114,7 @@ class EventHead(
         self.actor_counter = defaultdict(int)
         self.method_counter = defaultdict(int)
         self.function_counter = defaultdict(int)
+        self.remote_call_uids = defaultdict(set)  # {job_id: {uid}}
 
         self._executor = ThreadPoolExecutor(
             max_workers=RAY_DASHBOARD_EVENT_HEAD_TPE_MAX_WORKERS,
@@ -225,9 +226,17 @@ class EventHead(
             # Parse the request data
             data = await req.json()
             call_record = data.get("call_record", {})
+            job_id = call_record.get("job_id", "default_job")
+
+            uid = data.get("uid", "")
+            if uid in self.remote_call_uids[job_id]:
+                return dashboard_optional_utils.rest_response(
+                    success=True,
+                    message="Function call record already received."
+                )
+            self.remote_call_uids[job_id].add(uid)
             
             # Extract call record information
-            job_id = call_record.get("job_id", "default_job")
             caller_class = call_record.get("caller_class", "")
             caller_func = call_record.get("caller_func", "")
             callee_class = call_record.get("callee_class", "")

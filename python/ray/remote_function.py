@@ -314,6 +314,10 @@ class RemoteFunction:
         if client_mode_should_convert():
             return client_mode_convert_function(self, args, kwargs, **task_options)
 
+        from ray.util.insight import record_call
+
+        record_call(None, self._function_name.split(".")[-1])
+
         worker = ray._private.worker.global_worker
         worker.check_connected()
 

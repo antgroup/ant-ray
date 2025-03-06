@@ -180,7 +180,7 @@ class ActorMethod:
         # This is a decorator that is used to wrap the function invocation (as
         # opposed to the function execution). The decorator must return a
         # function that takes in two arguments ("args" and "kwargs"). In most
-        # cases, it should call the function that was passed into the decorator
+        # cases, it should call the function that was pass
         # and return the resulting ObjectRefs.
         self._decorator = decorator
 
@@ -205,7 +205,28 @@ class ActorMethod:
         """
         return self._bind(args, kwargs)
 
+    def _get_callee_info(self):
+        """
+        get the callee info of the actor method
+        this is needed for the insight monitor to record the call
+        """
+        callee_func = self._method_name
+        actor = self._actor_ref()
+        callee_class = None
+        if actor is not None:
+            callee_class = (
+                actor._ray_actor_creation_function_descriptor.class_name
+                + ":"
+                + actor._ray_actor_id.hex()
+            )
+        return callee_class, callee_func
+
     def remote(self, *args, **kwargs):
+        from ray.util.insight import record_call
+
+        callee_class, callee_func = self._get_callee_info()
+        # report the call info to the insight monitor
+        record_call(callee_class, callee_func)
         return self._remote(args, kwargs)
 
     def options(self, **options):
@@ -754,6 +775,7 @@ class ActorClass:
         Returns:
             A handle to the newly created actor.
         """
+
         return self._remote(args=args, kwargs=kwargs, **self._default_options)
 
     def options(self, **actor_options):
@@ -1254,7 +1276,28 @@ class ActorClass:
             original_handle=True,
         )
 
+        callee_class, callee_func = self._get_callee_info(actor_handle)
+        from ray.util.insight import record_call
+
+        # report the call info to the insight monitor
+        record_call(callee_class, callee_func)
+
         return actor_handle
+
+    def _get_callee_info(self, actor_handle):
+        """
+        get the callee info of the actor method
+        this is needed for the insight monitor to record the call
+        """
+        callee_func = "__init__"
+        callee_class = None
+        if actor_handle is not None:
+            callee_class = (
+                actor_handle._ray_actor_creation_function_descriptor.class_name
+                + ":"
+                + actor_handle._ray_actor_id.hex()
+            )
+        return callee_class, callee_func
 
     @DeveloperAPI
     def bind(self, *args, **kwargs):

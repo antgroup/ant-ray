@@ -247,3 +247,50 @@ def record_call(callee_class, callee_func):
         ).remote()
 
     ray.get(monitor.emit_call_record.remote(call_record))
+
+def record_object(object_id, is_put=True):
+    caller_class = None
+    try:
+        # caller actor can be fetched from the runtime context
+        # but it may raise Exception if called in the driver or in a task
+        caller_actor = ray.get_runtime_context().current_actor
+        if caller_actor is not None and hasattr(
+            caller_actor, "_ray_actor_creation_function_descriptor"
+        ):
+            caller_class = (
+                caller_actor._ray_actor_creation_function_descriptor.class_name
+                + ":"
+                + caller_actor._ray_actor_id.hex()
+            )
+    except Exception:
+        pass
+
+    # Get the task name from the runtime context
+    # if there is no task name, it should be the driver
+    current_task_name = ray.get_runtime_context().get_task_name()
+    if current_task_name is not None:
+        caller_func = current_task_name.split(".")[-1]
+    else:
+        caller_func = "main"
+    # Create a record for this call
+    object_record = {
+        "object_id": object_id,
+        "is_put": is_put,
+        "caller_class": caller_class,
+        "caller_func": caller_func,
+        "job_id": ray.get_runtime_context().get_job_id(),
+    }
+
+    monitor = None
+    try:
+        monitor = ray.get_actor(
+            name="_ray_internal_insight_monitor", namespace="flowinsight"
+        )
+    except ValueError:
+        monitor = _ray_internal_insight_monitor.options(
+            name="_ray_internal_insight_monitor",
+            namespace="flowinsight",
+            lifetime="detached",
+        ).remote()
+
+    ray.get(monitor.emit_object_record.remote(object_record))

@@ -834,7 +834,7 @@ class Worker:
         # reference will be created. If another reference is created and
         # removed before this one, it will corrupt the state in the
         # reference counter.
-        return ray.ObjectRef(
+        ref = ray.ObjectRef(
             self.core_worker.put_serialized_object_and_increment_local_ref(
                 serialized_value,
                 object_ref=object_ref,
@@ -845,6 +845,10 @@ class Worker:
             # The initial local reference is already acquired internally.
             skip_adding_local_ref=True,
         )
+        from ray.util.insight import record_object_put
+
+        record_object_put(ref.hex(), serialized_value.total_bytes)
+        return ref
 
     def raise_errors(self, data_metadata_pairs, object_refs):
         out = self.deserialize_objects(data_metadata_pairs, object_refs)
@@ -891,6 +895,8 @@ class Worker:
             bytes: UUID of the debugger breakpoint we should drop
                 into or b"" if there is no breakpoint.
         """
+        from ray.util.insight import record_object_get
+
         # Make sure that the values are object refs.
         for object_ref in object_refs:
             if not isinstance(object_ref, ObjectRef):
@@ -933,6 +939,10 @@ class Worker:
                         raise value.as_instanceof_cause()
                     else:
                         raise value
+
+        for value, object_ref in zip(values, object_refs):
+            if value is not None:
+                record_object_get(object_ref.hex(), object_ref.task_id())
 
         return values, debugger_breakpoint
 

@@ -180,7 +180,7 @@ class ActorMethod:
         # This is a decorator that is used to wrap the function invocation (as
         # opposed to the function execution). The decorator must return a
         # function that takes in two arguments ("args" and "kwargs"). In most
-        # cases, it should call the function that was pass
+        # cases, it should call the function that was passed into the decorator
         # and return the resulting ObjectRefs.
         self._decorator = decorator
 
@@ -222,11 +222,11 @@ class ActorMethod:
         return callee_class, callee_func
 
     def remote(self, *args, **kwargs):
-        from ray.util.insight import record_call
+        from ray.util.insight import record_control_flow
 
         callee_class, callee_func = self._get_callee_info()
         # report the call info to the insight monitor
-        record_call(callee_class, callee_func)
+        record_control_flow(callee_class, callee_func)
         return self._remote(args, kwargs)
 
     def options(self, **options):
@@ -1277,10 +1277,10 @@ class ActorClass:
         )
 
         callee_class, callee_func = self._get_callee_info(actor_handle)
-        from ray.util.insight import record_call
+        from ray.util.insight import record_control_flow
 
         # report the call info to the insight monitor
-        record_call(callee_class, callee_func)
+        record_control_flow(callee_class, callee_func)
 
         return actor_handle
 

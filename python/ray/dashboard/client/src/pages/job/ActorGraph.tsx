@@ -45,6 +45,9 @@ const ActorGraph = () => {
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updateKey, setUpdateKey] = useState(0);
+  const [updating, setUpdating] = useState(false);
+  const [currentJobId, setCurrentJobId] = useState<string | undefined>(jobId);
 
   // State management similar to App.tsx
   const [infoCardData, setInfoCardData] = useState<ElementData>({
@@ -57,35 +60,46 @@ const ActorGraph = () => {
   const [selectedElementId, setSelectedElementId] =
     useState<string | null>(null);
 
-  // Add useEffect to fetch data
+  const fetchGraphData = async (id?: string) => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      const response = await fetch(`/call_graph?job_id=${id}`);
+      const data = await response.json();
+
+      if (data.result) {
+        setGraphData(data.data.graphData);
+        setError(null);
+        setUpdateKey((prev) => prev + 1);
+      } else {
+        setError(data.msg || "Failed to fetch graph data");
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch graph data",
+      );
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  // Update currentJobId when route jobId changes
   useEffect(() => {
-    const fetchGraphData = async () => {
-      if (!jobId) {
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const response = await fetch(`/call_graph?job_id=${jobId}`);
-        const data = await response.json();
-
-        if (data.result) {
-          setGraphData(data.data.graphData);
-          setError(null);
-        } else {
-          setError(data.msg || "Failed to fetch graph data");
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch graph data",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGraphData();
+    if (jobId) {
+      setCurrentJobId(jobId);
+    }
   }, [jobId]);
+
+  // Initial data fetch
+  useEffect(() => {
+    if (currentJobId) {
+      setLoading(true);
+      fetchGraphData(currentJobId).finally(() => setLoading(false));
+    }
+  }, [currentJobId]);
 
   const handleElementClick = useCallback((data: ElementData) => {
     console.log("Element clicked:", data);
@@ -95,6 +109,10 @@ const ActorGraph = () => {
       setSelectedElementId(data.id);
     }
   }, []);
+
+  const handleUpdate = () => {
+    fetchGraphData(currentJobId);
+  };
 
   if (loading) {
     return <Box>Loading...</Box>;
@@ -108,7 +126,7 @@ const ActorGraph = () => {
     <Box
       sx={{
         display: "flex",
-        height: "calc(100vh - 64px)", // Adjust based on your header height
+        height: "calc(100vh - 64px)",
         width: "100%",
         position: "relative",
       }}
@@ -141,7 +159,10 @@ const ActorGraph = () => {
             onElementClick={handleElementClick}
             showInfoCard={true}
             selectedElementId={selectedElementId}
-            jobId={jobId}
+            jobId={currentJobId}
+            updateKey={updateKey}
+            onUpdate={handleUpdate}
+            updating={updating}
           />
         )}
 

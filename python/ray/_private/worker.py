@@ -899,7 +899,6 @@ class Worker:
         from ray.util.insight import record_object_get
         # Make sure that the values are object refs.
         for object_ref in object_refs:
-            record_object_get(object_ref.hex(), object_ref.task_id())
             if not isinstance(object_ref, ObjectRef):
                 raise TypeError(
                     f"Attempting to call `get` on the value {object_ref}, "
@@ -940,6 +939,10 @@ class Worker:
                         raise value.as_instanceof_cause()
                     else:
                         raise value
+
+        for value, object_ref in zip(values, object_refs):
+            if value is not None:
+                record_object_get(object_ref.hex(), object_ref.task_id())
 
         return values, debugger_breakpoint
 

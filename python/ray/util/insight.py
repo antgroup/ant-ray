@@ -232,8 +232,6 @@ class _ray_internal_insight_monitor:
         job_id = recv_record["job_id"]
         object_id = recv_record["object_id"]
         timestamp = recv_record["timestamp"]
-        if object_id not in self.object_events[job_id]:
-            return
         object_event = self.object_events[job_id][object_id]
         caller_class = object_event["caller_class"]
         caller_func = object_event["caller_func"]
@@ -478,7 +476,9 @@ def record_object_arg_put(object_id, size, callee):
 def record_object_return_put(object_id, size):
     if object_id == "ffffffffffffffffffffffffffffffffffffffffffffffffffffffff":
         return
-    
+
+    if size == 0:
+        return
 
     caller_class = None
     try:
@@ -532,7 +532,6 @@ def record_object_return_put(object_id, size):
 def record_object_get(object_id, task_id):
     if object_id is None or object_id == "ffffffffffffffffffffffffffffffffffffffffffffffffffffffff":
         return
-
 
     caller_class = None
     try:

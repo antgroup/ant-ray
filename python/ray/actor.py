@@ -775,7 +775,6 @@ class ActorClass:
         Returns:
             A handle to the newly created actor.
         """
-
         return self._remote(args=args, kwargs=kwargs, **self._default_options)
 
     def options(self, **actor_options):

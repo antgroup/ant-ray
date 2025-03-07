@@ -895,8 +895,6 @@ class Worker:
             bytes: UUID of the debugger breakpoint we should drop
                 into or b"" if there is no breakpoint.
         """
-        from ray.util.insight import record_object_get
-
         # Make sure that the values are object refs.
         for object_ref in object_refs:
             if not isinstance(object_ref, ObjectRef):
@@ -939,6 +937,8 @@ class Worker:
                         raise value.as_instanceof_cause()
                     else:
                         raise value
+
+        from ray.util.insight import record_object_get
 
         for value, object_ref in zip(values, object_refs):
             if value is not None:

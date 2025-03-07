@@ -399,6 +399,53 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
       // First, identify the connected subgraphs
       const subgraphs = findConnectedSubgraphs();
 
+      // Helper function to extract speed value from flow
+      const getSpeedValue = (flow: any) => {
+        if (flow.speed) {
+          const speedMatch = flow.speed.match(/(\d+)/);
+          return speedMatch ? parseInt(speedMatch[0]) : 0;
+        }
+        return 0;
+      };
+
+      // Helper function to calculate normalized line width
+      const calculateLineWidth = (
+        speedValue: number,
+        minSpeed: number,
+        maxSpeed: number,
+      ) => {
+        const minWidth = 2;
+        const maxWidth = 8;
+        let normalizedWidth = minWidth;
+
+        if (speedValue > 0 && maxSpeed > minSpeed) {
+          const normalizedSpeed =
+            (speedValue - minSpeed) / (maxSpeed - minSpeed);
+          normalizedWidth = minWidth + normalizedSpeed * (maxWidth - minWidth);
+        }
+
+        return `${normalizedWidth}px`;
+      };
+
+      // Calculate global min and max speeds for ALL data flows
+      let minSpeed = Infinity;
+      let maxSpeed = -Infinity;
+
+      // Check speeds in main graph data flows
+      graphData.dataFlows.forEach((flow) => {
+        const speedValue = getSpeedValue(flow);
+        if (speedValue > 0) {
+          minSpeed = Math.min(minSpeed, speedValue);
+          maxSpeed = Math.max(maxSpeed, speedValue);
+        }
+      });
+
+      // If no valid speeds found, set defaults
+      if (minSpeed === Infinity || maxSpeed === -Infinity) {
+        minSpeed = 0;
+        maxSpeed = 100;
+      }
+
       // Find the main node
       const mainNode = graphData.functions.find(
         (func) => func.id === "main",
@@ -613,15 +660,19 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
             subgraph.includes(flow.source) &&
             subgraph.includes(flow.target)
           ) {
+            const speedValue = getSpeedValue(flow);
+            const lineWidth = calculateLineWidth(
+              speedValue,
+              minSpeed,
+              maxSpeed,
+            );
+
             subG.setEdge(
               flow.source,
               flow.target,
               {
-                label: flow.speed,
-                style:
-                  "stroke: #f5222d; stroke-width: 2px; stroke-dasharray: 5, 5; fill: none;",
+                style: `stroke: #f5222d; stroke-width: ${lineWidth}; stroke-dasharray: 5, 5; fill: none;`,
                 arrowheadStyle: "fill: #f5222d; stroke: none;",
-                labelStyle: "fill: #f5222d;",
                 curve: d3.curveBasis,
               },
               `data_${i}`,
@@ -826,6 +877,13 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
                   ? (groupIndex - (edges.length - 1) / 2) * 15
                   : 0;
 
+              // For data flows, calculate normalized line width based on speed
+              let lineWidth = "2px";
+              if (isDataFlow && flow.speed) {
+                const speedValue = getSpeedValue(flow);
+                lineWidth = calculateLineWidth(speedValue, minSpeed, maxSpeed);
+              }
+
               // Create a path for this edge
               mainContainer
                 .append("path")
@@ -937,7 +995,7 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
                 .attr(
                   "style",
                   isDataFlow
-                    ? "stroke: #f5222d; stroke-width: 2px; stroke-dasharray: 5, 5; fill: none;"
+                    ? `stroke: #f5222d; stroke-width: ${lineWidth}; stroke-dasharray: 5, 5; fill: none;`
                     : "stroke: #000; stroke-width: 2px; fill: none;",
                 )
                 .attr(
@@ -945,31 +1003,8 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
                   isDataFlow ? "url(#redarrowhead)" : "url(#arrowhead)",
                 );
 
-              // Add a label if needed
-              if (isDataFlow) {
-                // For data flows, only add label if speed is provided
-                if (flow.speed) {
-                  const dataFlowLabel = mainContainer
-                    .append("text")
-                    .attr("class", "edge-label data-flow-label")
-                    .attr("text-anchor", "middle")
-                    .attr("fill", "#f5222d")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .text(flow.speed);
-
-                  // Position the label after rendering
-                  positionEdgeLabel(
-                    dataFlowLabel,
-                    flow,
-                    sourceNode,
-                    targetNode,
-                    centerX,
-                    centerY,
-                    edgeOffset,
-                  );
-                }
-              } else {
+              // Add a label if needed (only for call flows)
+              if (!isDataFlow) {
                 // For call flows, always add the count label
                 const callFlowLabel = mainContainer
                   .append("text")

@@ -737,511 +737,459 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
       });
 
       // Step 4: Add cross-subgraph edges and edges to/from main
-      // Add call flows (solid edges)
+      // Create a map to track combined edges
+      const edgeMap = new Map<string, {
+        calls: { source: string; target: string; count: number }[];
+        dataFlows: { source: string; target: string; speed: string }[];
+      }>();
+
+      // First collect all edges
       graphData.callFlows.forEach((flow) => {
-        // Add only edges that haven't been added to subgraphs
-        // or edges that connect to the main node
-        const sourceNode = g.node(flow.source);
-        const targetNode = g.node(flow.target);
-
-        if (sourceNode && targetNode) {
-          // If either node is main or they're in different subgraphs
-          if (
-            flow.source === "main" ||
-            flow.target === "main" ||
-            !subgraphs.some(
-              (subgraph) =>
-                subgraph.includes(flow.source) &&
-                subgraph.includes(flow.target),
-            )
-          ) {
-            // Create a path for this edge
-            mainContainer
-              .append("path")
-              .attr("d", () => {
-                let sourceX = flow.source === "main" ? centerX : sourceNode.x;
-                let sourceY = flow.source === "main" ? centerY : sourceNode.y;
-                let targetX = flow.target === "main" ? centerX : targetNode.x;
-                let targetY = flow.target === "main" ? centerY : targetNode.y;
-
-                // Calculate control points to create a curved path
-                // For edges to/from main, create a curve that looks more natural
-                let cp1x, cp1y, cp2x, cp2y;
-
-                if (flow.source === "main" || flow.target === "main") {
-                  // Calculate a better connection point on the main node perimeter
-                  let mainNodeX = centerX;
-                  let mainNodeY = centerY;
-
-                  // Main node dimensions - using a circle with radius of 60px
-                  const mainNodeRadius = 60;
-
-                  // Calculate the angle between main node and the other node
-                  const otherNodeX = flow.source === "main" ? targetX : sourceX;
-                  const otherNodeY = flow.source === "main" ? targetY : sourceY;
-
-                  // Calculate angle between main node and other node
-                  const dx = otherNodeX - centerX;
-                  const dy = otherNodeY - centerY;
-                  const angle = Math.atan2(dy, dx);
-
-                  // Find point on the main node's perimeter in the direction of the other node
-                  if (flow.source === "main") {
-                    mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                    mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                    // Update source point
-                    sourceX = mainNodeX;
-                    sourceY = mainNodeY;
-                  } else if (flow.target === "main") {
-                    mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                    mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                    // Update target point
-                    targetX = mainNodeX;
-                    targetY = mainNodeY;
-                  }
-
-                  // Then calculate the curve
-                  const curveStrength = 0.5; // Higher values make more curved paths
-                  const midX = sourceX + (targetX - sourceX) * 0.5;
-                  const midY = sourceY + (targetY - sourceY) * 0.5;
-
-                  // Create perpendicular offset for curve
-                  const perpX = -(targetY - sourceY) * curveStrength;
-                  const perpY = (targetX - sourceX) * curveStrength;
-
-                  cp1x = midX + perpX;
-                  cp1y = midY + perpY;
-                  cp2x = cp1x;
-                  cp2y = cp1y;
-                } else {
-                  // For edges between subgraphs, make a nice curved path that avoids the center
-                  // Calculate the midpoint of the line connecting source and target
-                  const midX = (sourceX + targetX) / 2;
-                  const midY = (sourceY + targetY) / 2;
-
-                  // Calculate the vector from the center to this midpoint
-                  const fromCenterX = midX - centerX;
-                  const fromCenterY = midY - centerY;
-
-                  // Calculate the distance from center to midpoint
-                  const distFromCenter = Math.sqrt(
-                    fromCenterX * fromCenterX + fromCenterY * fromCenterY,
-                  );
-
-                  // Calculate a point that's a bit further away from the center
-                  const factor = 1.4; // Make the curve pull outward more
-                  const curvePointX =
-                    centerX +
-                    (fromCenterX / distFromCenter) * distFromCenter * factor;
-                  const curvePointY =
-                    centerY +
-                    (fromCenterY / distFromCenter) * distFromCenter * factor;
-
-                  cp1x = curvePointX;
-                  cp1y = curvePointY;
-                  cp2x = curvePointX;
-                  cp2y = curvePointY;
-                }
-
-                return `M${sourceX},${sourceY}C${cp1x},${cp1y} ${cp2x},${cp2y} ${targetX},${targetY}`;
-              })
-              .attr("style", "stroke: #000; stroke-width: 2px; fill: none;")
-              .attr("marker-end", "url(#arrowhead)");
-
-            // Add a label if needed
-            const callFlowLabel = mainContainer
-              .append("text")
-              .attr("class", "edge-label flow-label")
-              .attr("text-anchor", "middle")
-              .attr("fill", "#000")
-              .attr("font-size", "12px")
-              .attr("font-weight", "bold")
-              .text(`${flow.count}次`);
-
-            // Position the label after rendering
-            callFlowLabel
-              .attr("x", () => {
-                const sourceX = flow.source === "main" ? centerX : sourceNode.x;
-                const targetX = flow.target === "main" ? centerX : targetNode.x;
-                const sourceY = flow.source === "main" ? centerY : sourceNode.y;
-                const targetY = flow.target === "main" ? centerY : targetNode.y;
-
-                if (flow.source === "main" || flow.target === "main") {
-                  // For main node connections, calculate control points the same way as the path
-                  const otherNodeX = flow.source === "main" ? targetX : sourceX;
-                  const otherNodeY = flow.source === "main" ? targetY : sourceY;
-
-                  // Calculate a better connection point on the main node perimeter
-                  let mainNodeX = centerX;
-                  let mainNodeY = centerY;
-
-                  // Main node dimensions - using a circle with radius of 60px
-                  const mainNodeRadius = 60;
-
-                  // Calculate angle between main node and other node
-                  const dx = otherNodeX - centerX;
-                  const dy = otherNodeY - centerY;
-                  const angle = Math.atan2(dy, dx);
-
-                  // Find point on the main node's perimeter in the direction of the other node
-                  if (flow.source === "main") {
-                    mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                    mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                  } else if (flow.target === "main") {
-                    mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                    mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                  }
-
-                  // Calculate control points for the curve - using the same logic as the edge path
-                  const curveStrength = 0.5;
-                  const midX = mainNodeX + (otherNodeX - mainNodeX) * 0.5;
-
-                  // Create perpendicular offset for curve
-                  const perpX = -(otherNodeY - mainNodeY) * curveStrength;
-
-                  const cp1x = midX + perpX;
-
-                  // Position label at a point ~60% along the Bezier curve
-                  // Using the Bezier formula to find a point along the curve
-                  const t = 0.6; // Parameter between 0 and 1
-                  const labelX =
-                    Math.pow(1 - t, 3) * mainNodeX +
-                    3 * Math.pow(1 - t, 2) * t * cp1x +
-                    3 * (1 - t) * Math.pow(t, 2) * cp1x +
-                    Math.pow(t, 3) * otherNodeX;
-
-                  return labelX;
-                } else {
-                  // For other connections, use midpoint
-                  return (sourceX + targetX) / 2;
-                }
-              })
-              .attr("y", () => {
-                const sourceX = flow.source === "main" ? centerX : sourceNode.x;
-                const targetX = flow.target === "main" ? centerX : targetNode.x;
-                const sourceY = flow.source === "main" ? centerY : sourceNode.y;
-                const targetY = flow.target === "main" ? centerY : targetNode.y;
-
-                if (flow.source === "main" || flow.target === "main") {
-                  // For main node connections, calculate control points the same way as the path
-                  const otherNodeX = flow.source === "main" ? targetX : sourceX;
-                  const otherNodeY = flow.source === "main" ? targetY : sourceY;
-
-                  // Calculate a better connection point on the main node perimeter
-                  let mainNodeX = centerX;
-                  let mainNodeY = centerY;
-
-                  // Main node dimensions - using a circle with radius of 60px
-                  const mainNodeRadius = 60;
-
-                  // Calculate angle between main node and other node
-                  const dx = otherNodeX - centerX;
-                  const dy = otherNodeY - centerY;
-                  const angle = Math.atan2(dy, dx);
-
-                  // Find point on the main node's perimeter in the direction of the other node
-                  if (flow.source === "main") {
-                    mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                    mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                  } else if (flow.target === "main") {
-                    mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                    mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                  }
-
-                  // Calculate control points for the curve - using the same logic as the edge path
-                  const curveStrength = 0.5;
-                  const midY = mainNodeY + (otherNodeY - mainNodeY) * 0.5;
-
-                  // Create perpendicular offset for curve
-                  const perpY = (otherNodeX - mainNodeX) * curveStrength;
-
-                  const cp1y = midY + perpY;
-
-                  // Position label at a point ~60% along the Bezier curve
-                  // Using the Bezier formula to find a point along the curve
-                  const t = 0.6; // Parameter between 0 and 1
-                  const labelY =
-                    Math.pow(1 - t, 3) * mainNodeY +
-                    3 * Math.pow(1 - t, 2) * t * cp1y +
-                    3 * (1 - t) * Math.pow(t, 2) * cp1y +
-                    Math.pow(t, 3) * otherNodeY -
-                    5; // Small offset
-
-                  return labelY;
-                } else {
-                  // For other connections, use midpoint
-                  return (sourceY + targetY) / 2 - 5;
-                }
-              });
-          }
+        const key = `${flow.source}-${flow.target}`;
+        if (!edgeMap.has(key)) {
+          edgeMap.set(key, { calls: [], dataFlows: [] });
         }
+        edgeMap.get(key)!.calls.push(flow);
       });
 
-      // Add data flows (dashed edges)
       graphData.dataFlows.forEach((flow) => {
-        // Add only edges that haven't been added to subgraphs
-        // or edges that connect to the main node
-        const sourceNode = g.node(flow.source);
-        const targetNode = g.node(flow.target);
+        const key = `${flow.source}-${flow.target}`;
+        if (!edgeMap.has(key)) {
+          edgeMap.set(key, { calls: [], dataFlows: [] });
+        }
+        edgeMap.get(key)!.dataFlows.push(flow);
+      });
+
+      // Then render combined edges
+      edgeMap.forEach((edgeData, key) => {
+        const [source, target] = key.split('-');
+        const sourceNode = g.node(source);
+        const targetNode = g.node(target);
 
         if (sourceNode && targetNode) {
           // If either node is main or they're in different subgraphs
           if (
-            flow.source === "main" ||
-            flow.target === "main" ||
+            source === "main" ||
+            target === "main" ||
             !subgraphs.some(
               (subgraph) =>
-                subgraph.includes(flow.source) &&
-                subgraph.includes(flow.target),
+                subgraph.includes(source) &&
+                subgraph.includes(target),
             )
           ) {
-            // Create a path for this edge
-            mainContainer
-              .append("path")
-              .attr("d", () => {
-                let sourceX = flow.source === "main" ? centerX : sourceNode.x;
-                let sourceY = flow.source === "main" ? centerY : sourceNode.y;
-                let targetX = flow.target === "main" ? centerX : targetNode.x;
-                let targetY = flow.target === "main" ? centerY : targetNode.y;
+            // Create paths for each combined edge
+            const totalEdges = Math.max(edgeData.calls.length, edgeData.dataFlows.length);
+            
+            for (let index = 0; index < totalEdges; index++) {
+              const callFlow = edgeData.calls[index];
+              const dataFlow = edgeData.dataFlows[index];
+              
+              // Calculate offset based on the number of parallel edges
+              const offset = totalEdges > 1 ? (index - (totalEdges - 1) / 2) * 20 : 0;
 
-                // Calculate control points to create a curved path
-                // For edges to/from main, create a curve that looks more natural
-                let cp1x, cp1y, cp2x, cp2y;
+              // Create the path element
+              const path = mainContainer
+                .append("path")
+                .attr("d", () => {
+                  let sourceX = source === "main" ? centerX : sourceNode.x;
+                  let sourceY = source === "main" ? centerY : sourceNode.y;
+                  let targetX = target === "main" ? centerX : targetNode.x;
+                  let targetY = target === "main" ? centerY : targetNode.y;
 
-                if (flow.source === "main" || flow.target === "main") {
-                  // Calculate a better connection point on the main node perimeter
-                  let mainNodeX = centerX;
-                  let mainNodeY = centerY;
+                  // Calculate control points to create a curved path
+                  let cp1x, cp1y, cp2x, cp2y;
 
-                  // Main node dimensions - using a circle with radius of 60px
-                  const mainNodeRadius = 60;
-
-                  // Calculate the angle between main node and the other node
-                  const otherNodeX = flow.source === "main" ? targetX : sourceX;
-                  const otherNodeY = flow.source === "main" ? targetY : sourceY;
-
-                  // Calculate angle between main node and other node
-                  const dx = otherNodeX - centerX;
-                  const dy = otherNodeY - centerY;
-                  const angle = Math.atan2(dy, dx);
-
-                  // Find point on the main node's perimeter in the direction of the other node
-                  if (flow.source === "main") {
-                    mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                    mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                    // Update source point
-                    sourceX = mainNodeX;
-                    sourceY = mainNodeY;
-                  } else if (flow.target === "main") {
-                    mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                    mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                    // Update target point
-                    targetX = mainNodeX;
-                    targetY = mainNodeY;
-                  }
-
-                  // Then calculate the curve
-                  const curveStrength = 0.5; // Higher values make more curved paths
-                  const midX = sourceX + (targetX - sourceX) * 0.5;
-                  const midY = sourceY + (targetY - sourceY) * 0.5;
-
-                  // Create perpendicular offset for curve
-                  const perpX = -(targetY - sourceY) * curveStrength;
-                  const perpY = (targetX - sourceX) * curveStrength;
-
-                  cp1x = midX + perpX;
-                  cp1y = midY + perpY;
-                  cp2x = cp1x;
-                  cp2y = cp1y;
-                } else {
-                  // For edges between subgraphs, make a nice curved path that avoids the center
-                  // Calculate the midpoint of the line connecting source and target
-                  const midX = (sourceX + targetX) / 2;
-                  const midY = (sourceY + targetY) / 2;
-
-                  // Calculate the vector from the center to this midpoint
-                  const fromCenterX = midX - centerX;
-                  const fromCenterY = midY - centerY;
-
-                  // Calculate the distance from center to midpoint
-                  const distFromCenter = Math.sqrt(
-                    fromCenterX * fromCenterX + fromCenterY * fromCenterY,
-                  );
-
-                  // Calculate a point that's a bit further away from the center
-                  const factor = 1.4; // Make the curve pull outward more
-                  const curvePointX =
-                    centerX +
-                    (fromCenterX / distFromCenter) * distFromCenter * factor;
-                  const curvePointY =
-                    centerY +
-                    (fromCenterY / distFromCenter) * distFromCenter * factor;
-
-                  cp1x = curvePointX;
-                  cp1y = curvePointY;
-                  cp2x = curvePointX;
-                  cp2y = curvePointY;
-                }
-
-                return `M${sourceX},${sourceY}C${cp1x},${cp1y} ${cp2x},${cp2y} ${targetX},${targetY}`;
-              })
-              .attr(
-                "style",
-                "stroke: #f5222d; stroke-width: 2px; stroke-dasharray: 5, 5; fill: none;",
-              )
-              .attr("marker-end", "url(#redarrowhead)");
-
-            // Add a label if needed
-            if (flow.speed) {
-              const dataFlowLabel = mainContainer
-                .append("text")
-                .attr("class", "edge-label data-flow-label")
-                .attr("text-anchor", "middle")
-                .attr("fill", "#f5222d")
-                .attr("font-size", "12px")
-                .attr("font-weight", "bold")
-                .text(flow.speed);
-
-              // Position the label after rendering
-              dataFlowLabel
-                .attr("x", () => {
-                  const sourceX =
-                    flow.source === "main" ? centerX : sourceNode.x;
-                  const targetX =
-                    flow.target === "main" ? centerX : targetNode.x;
-                  const sourceY =
-                    flow.source === "main" ? centerY : sourceNode.y;
-                  const targetY =
-                    flow.target === "main" ? centerY : targetNode.y;
-
-                  if (flow.source === "main" || flow.target === "main") {
-                    // For main node connections, calculate control points the same way as the path
-                    const otherNodeX =
-                      flow.source === "main" ? targetX : sourceX;
-                    const otherNodeY =
-                      flow.source === "main" ? targetY : sourceY;
-
-                    // Calculate a better connection point on the main node perimeter
+                  if (source === "main" || target === "main") {
+                    // Calculate main node connection points
                     let mainNodeX = centerX;
                     let mainNodeY = centerY;
-
-                    // Main node dimensions - using a circle with radius of 60px
                     const mainNodeRadius = 60;
-
-                    // Calculate angle between main node and other node
+                    const otherNodeX = source === "main" ? targetX : sourceX;
+                    const otherNodeY = source === "main" ? targetY : sourceY;
                     const dx = otherNodeX - centerX;
                     const dy = otherNodeY - centerY;
                     const angle = Math.atan2(dy, dx);
 
-                    // Find point on the main node's perimeter in the direction of the other node
-                    if (flow.source === "main") {
+                    if (source === "main") {
                       mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
                       mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                    } else if (flow.target === "main") {
+                      sourceX = mainNodeX;
+                      sourceY = mainNodeY;
+                    } else if (target === "main") {
                       mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
                       mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
+                      targetX = mainNodeX;
+                      targetY = mainNodeY;
                     }
 
-                    // Calculate control points for the curve - using the same logic as the edge path
+                    // Calculate perpendicular vector for offset
+                    const perpX = -dy / Math.sqrt(dx * dx + dy * dy);
+                    const perpY = dx / Math.sqrt(dx * dx + dy * dy);
+
+                    // Apply offset to source and target points
+                    sourceX += perpX * offset;
+                    sourceY += perpY * offset;
+                    targetX += perpX * offset;
+                    targetY += perpY * offset;
+
                     const curveStrength = 0.5;
-                    const midX = mainNodeX + (otherNodeX - mainNodeX) * 0.5;
+                    const midX = sourceX + (targetX - sourceX) * 0.5;
+                    const midY = sourceY + (targetY - sourceY) * 0.5;
 
-                    // Create perpendicular offset for curve
-                    const perpX = -(otherNodeY - mainNodeY) * curveStrength;
+                    const perpOffsetX = -(targetY - sourceY) * curveStrength;
+                    const perpOffsetY = (targetX - sourceX) * curveStrength;
 
-                    const cp1x = midX + perpX;
-
-                    // Position label at a point ~60% along the Bezier curve
-                    // Using the Bezier formula to find a point along the curve
-                    const t = 0.6; // Parameter between 0 and 1
-                    const labelX =
-                      Math.pow(1 - t, 3) * mainNodeX +
-                      3 * Math.pow(1 - t, 2) * t * cp1x +
-                      3 * (1 - t) * Math.pow(t, 2) * cp1x +
-                      Math.pow(t, 3) * otherNodeX;
-
-                    return labelX;
+                    cp1x = midX + perpOffsetX;
+                    cp1y = midY + perpOffsetY;
+                    cp2x = cp1x;
+                    cp2y = cp1y;
                   } else {
-                    // For other connections, use midpoint
-                    return (sourceX + targetX) / 2;
+                    // For edges between subgraphs
+                    // Calculate perpendicular vector for offset
+                    const dx = targetX - sourceX;
+                    const dy = targetY - sourceY;
+                    const perpX = -dy / Math.sqrt(dx * dx + dy * dy);
+                    const perpY = dx / Math.sqrt(dx * dx + dy * dy);
+
+                    // Apply offset to source and target points
+                    sourceX += perpX * offset;
+                    sourceY += perpY * offset;
+                    targetX += perpX * offset;
+                    targetY += perpY * offset;
+
+                    const midX = (sourceX + targetX) / 2;
+                    const midY = (sourceY + targetY) / 2;
+                    const fromCenterX = midX - centerX;
+                    const fromCenterY = midY - centerY;
+                    const distFromCenter = Math.sqrt(
+                      fromCenterX * fromCenterX + fromCenterY * fromCenterY,
+                    );
+                    const factor = 1.4;
+                    const curvePointX =
+                      centerX +
+                      (fromCenterX / distFromCenter) * distFromCenter * factor;
+                    const curvePointY =
+                      centerY +
+                      (fromCenterY / distFromCenter) * distFromCenter * factor;
+
+                    cp1x = curvePointX;
+                    cp1y = curvePointY;
+                    cp2x = curvePointX;
+                    cp2y = curvePointY;
                   }
-                })
-                .attr("y", () => {
-                  const sourceX =
-                    flow.source === "main" ? centerX : sourceNode.x;
-                  const targetX =
-                    flow.target === "main" ? centerX : targetNode.x;
-                  const sourceY =
-                    flow.source === "main" ? centerY : sourceNode.y;
-                  const targetY =
-                    flow.target === "main" ? centerY : targetNode.y;
 
-                  if (flow.source === "main" || flow.target === "main") {
-                    // For main node connections, calculate control points the same way as the path
-                    const otherNodeX =
-                      flow.source === "main" ? targetX : sourceX;
-                    const otherNodeY =
-                      flow.source === "main" ? targetY : sourceY;
-
-                    // Calculate a better connection point on the main node perimeter
-                    let mainNodeX = centerX;
-                    let mainNodeY = centerY;
-
-                    // Main node dimensions - using a circle with radius of 60px
-                    const mainNodeRadius = 60;
-
-                    // Calculate angle between main node and other node
-                    const dx = otherNodeX - centerX;
-                    const dy = otherNodeY - centerY;
-                    const angle = Math.atan2(dy, dx);
-
-                    // Find point on the main node's perimeter in the direction of the other node
-                    if (flow.source === "main") {
-                      mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                      mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                    } else if (flow.target === "main") {
-                      mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
-                      mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                    }
-
-                    // Calculate control points for the curve - using the same logic as the edge path
-                    const curveStrength = 0.5;
-                    const midY = mainNodeY + (otherNodeY - mainNodeY) * 0.5;
-
-                    // Create perpendicular offset for curve
-                    const perpY = (otherNodeX - mainNodeX) * curveStrength;
-
-                    const cp1y = midY + perpY;
-
-                    // Position label at a point ~60% along the Bezier curve
-                    // Using the Bezier formula to find a point along the curve
-                    const t = 0.6; // Parameter between 0 and 1
-                    const labelY =
-                      Math.pow(1 - t, 3) * mainNodeY +
-                      3 * Math.pow(1 - t, 2) * t * cp1y +
-                      3 * (1 - t) * Math.pow(t, 2) * cp1y +
-                      Math.pow(t, 3) * otherNodeY -
-                      5; // Small offset
-
-                    return labelY;
-                  } else {
-                    // For other connections, use midpoint
-                    return (sourceY + targetY) / 2 - 5;
-                  }
+                  return `M${sourceX},${sourceY}C${cp1x},${cp1y} ${cp2x},${cp2y} ${targetX},${targetY}`;
                 });
+
+              // If both call and data flow exist, create a combined style
+              if (callFlow && dataFlow) {
+                path.attr("style", `
+                  stroke: url(#combined-gradient-${index}); 
+                  stroke-width: 2px; 
+                  fill: none;
+                `);
+
+                // Add gradient definition for combined flow
+                const gradient = svg.select("defs")
+                  .append("linearGradient")
+                  .attr("id", `combined-gradient-${index}`)
+                  .attr("gradientUnits", "userSpaceOnUse");
+
+                gradient.append("stop")
+                  .attr("offset", "0%")
+                  .attr("style", "stop-color: #000;");
+
+                gradient.append("stop")
+                  .attr("offset", "50%")
+                  .attr("style", "stop-color: #f5222d;");
+
+                path.attr("marker-end", "url(#combined-arrowhead)");
+              } else if (callFlow) {
+                // Only call flow
+                path.attr("style", "stroke: #000; stroke-width: 2px; fill: none;")
+                  .attr("marker-end", "url(#arrowhead)");
+              } else if (dataFlow) {
+                // Only data flow
+                path.attr("style", "stroke: #f5222d; stroke-width: 2px; stroke-dasharray: 5, 5; fill: none;")
+                  .attr("marker-end", "url(#redarrowhead)");
+              }
+
+              // Add labels
+              if (callFlow) {
+                const callFlowLabel = mainContainer
+                  .append("text")
+                  .attr("class", "edge-label flow-label")
+                  .attr("text-anchor", "middle")
+                  .attr("fill", "#000")
+                  .attr("font-size", "12px")
+                  .attr("font-weight", "bold")
+                  .text(`${callFlow.count}次`);
+
+                // Position the label (existing label positioning code)
+                callFlowLabel
+                  .attr("x", () => {
+                    const sourceX = source === "main" ? centerX : sourceNode.x;
+                    const targetX = target === "main" ? centerX : targetNode.x;
+                    const sourceY = source === "main" ? centerY : sourceNode.y;
+                    const targetY = target === "main" ? centerY : targetNode.y;
+
+                    if (source === "main" || target === "main") {
+                      // For main node connections, calculate control points the same way as the path
+                      const otherNodeX = source === "main" ? targetX : sourceX;
+                      const otherNodeY = source === "main" ? targetY : sourceY;
+
+                      // Calculate a better connection point on the main node perimeter
+                      let mainNodeX = centerX;
+                      let mainNodeY = centerY;
+
+                      // Main node dimensions - using a circle with radius of 60px
+                      const mainNodeRadius = 60;
+
+                      // Calculate angle between main node and other node
+                      const dx = otherNodeX - centerX;
+                      const dy = otherNodeY - centerY;
+                      const angle = Math.atan2(dy, dx);
+
+                      // Find point on the main node's perimeter in the direction of the other node
+                      if (source === "main") {
+                        mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
+                        mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
+                      } else if (target === "main") {
+                        mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
+                        mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
+                      }
+
+                      // Calculate control points for the curve - using the same logic as the edge path
+                      const curveStrength = 0.5;
+                      const midX = mainNodeX + (otherNodeX - mainNodeX) * 0.5;
+
+                      // Create perpendicular offset for curve
+                      const perpX = -(otherNodeY - mainNodeY) * curveStrength;
+
+                      const cp1x = midX + perpX;
+
+                      // Position label at a point ~60% along the Bezier curve
+                      // Using the Bezier formula to find a point along the curve
+                      const t = 0.6; // Parameter between 0 and 1
+                      const labelX =
+                        Math.pow(1 - t, 3) * mainNodeX +
+                        3 * Math.pow(1 - t, 2) * t * cp1x +
+                        3 * (1 - t) * Math.pow(t, 2) * cp1x +
+                        Math.pow(t, 3) * otherNodeX;
+
+                      return labelX;
+                    } else {
+                      // For other connections, use midpoint
+                      return (sourceX + targetX) / 2;
+                    }
+                  })
+                  .attr("y", () => {
+                    const sourceX = source === "main" ? centerX : sourceNode.x;
+                    const targetX = target === "main" ? centerX : targetNode.x;
+                    const sourceY = source === "main" ? centerY : sourceNode.y;
+                    const targetY = target === "main" ? centerY : targetNode.y;
+
+                    if (source === "main" || target === "main") {
+                      // For main node connections, calculate control points the same way as the path
+                      const otherNodeX = source === "main" ? targetX : sourceX;
+                      const otherNodeY = source === "main" ? targetY : sourceY;
+
+                      // Calculate a better connection point on the main node perimeter
+                      let mainNodeX = centerX;
+                      let mainNodeY = centerY;
+
+                      // Main node dimensions - using a circle with radius of 60px
+                      const mainNodeRadius = 60;
+
+                      // Calculate angle between main node and other node
+                      const dx = otherNodeX - centerX;
+                      const dy = otherNodeY - centerY;
+                      const angle = Math.atan2(dy, dx);
+
+                      // Find point on the main node's perimeter in the direction of the other node
+                      if (source === "main") {
+                        mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
+                        mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
+                      } else if (target === "main") {
+                        mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
+                        mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
+                      }
+
+                      // Calculate control points for the curve - using the same logic as the edge path
+                      const curveStrength = 0.5;
+                      const midY = mainNodeY + (otherNodeY - mainNodeY) * 0.5;
+
+                      // Create perpendicular offset for curve
+                      const perpY = (otherNodeX - mainNodeX) * curveStrength;
+
+                      const cp1y = midY + perpY;
+
+                      // Position label at a point ~60% along the Bezier curve
+                      // Using the Bezier formula to find a point along the curve
+                      const t = 0.6; // Parameter between 0 and 1
+                      const labelY =
+                        Math.pow(1 - t, 3) * mainNodeY +
+                        3 * Math.pow(1 - t, 2) * t * cp1y +
+                        3 * (1 - t) * Math.pow(t, 2) * cp1y +
+                        Math.pow(t, 3) * otherNodeY -
+                        5; // Small offset
+
+                      return labelY;
+                    } else {
+                      // For other connections, use midpoint
+                      return (sourceY + targetY) / 2 - 5;
+                    }
+                  });
+              }
+
+              if (dataFlow) {
+                const dataFlowLabel = mainContainer
+                  .append("text")
+                  .attr("class", "edge-label data-flow-label")
+                  .attr("text-anchor", "middle")
+                  .attr("fill", "#f5222d")
+                  .attr("font-size", "12px")
+                  .attr("font-weight", "bold")
+                  .text(dataFlow.speed);
+
+                // Position the label after rendering
+                dataFlowLabel
+                  .attr("x", () => {
+                    const sourceX =
+                      source === "main" ? centerX : sourceNode.x;
+                    const targetX =
+                      target === "main" ? centerX : targetNode.x;
+                    const sourceY =
+                      source === "main" ? centerY : sourceNode.y;
+                    const targetY =
+                      target === "main" ? centerY : targetNode.y;
+
+                    if (source === "main" || target === "main") {
+                      // For main node connections, calculate control points the same way as the path
+                      const otherNodeX =
+                        source === "main" ? targetX : sourceX;
+                      const otherNodeY =
+                        source === "main" ? targetY : sourceY;
+
+                      // Calculate a better connection point on the main node perimeter
+                      let mainNodeX = centerX;
+                      let mainNodeY = centerY;
+
+                      // Main node dimensions - using a circle with radius of 60px
+                      const mainNodeRadius = 60;
+
+                      // Calculate angle between main node and other node
+                      const dx = otherNodeX - centerX;
+                      const dy = otherNodeY - centerY;
+                      const angle = Math.atan2(dy, dx);
+
+                      // Find point on the main node's perimeter in the direction of the other node
+                      if (source === "main") {
+                        mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
+                        mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
+                      } else if (target === "main") {
+                        mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
+                        mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
+                      }
+
+                      // Calculate control points for the curve - using the same logic as the edge path
+                      const curveStrength = 0.5;
+                      const midY = mainNodeY + (otherNodeY - mainNodeY) * 0.5;
+
+                      // Create perpendicular offset for curve
+                      const perpY = (otherNodeX - mainNodeX) * curveStrength;
+
+                      const cp1y = midY + perpY;
+
+                      // Position label at a point ~60% along the Bezier curve
+                      // Using the Bezier formula to find a point along the curve
+                      const t = 0.6; // Parameter between 0 and 1
+                      const labelY =
+                        Math.pow(1 - t, 3) * mainNodeY +
+                        3 * Math.pow(1 - t, 2) * t * cp1y +
+                        3 * (1 - t) * Math.pow(t, 2) * cp1y +
+                        Math.pow(t, 3) * otherNodeY -
+                        5; // Small offset
+
+                      return labelY;
+                    } else {
+                      // For other connections, use midpoint
+                      return (sourceY + targetY) / 2 - 5;
+                    }
+                  })
+                  .attr("y", () => {
+                    const sourceX =
+                      source === "main" ? centerX : sourceNode.x;
+                    const targetX =
+                      target === "main" ? centerX : targetNode.x;
+                    const sourceY =
+                      source === "main" ? centerY : sourceNode.y;
+                    const targetY =
+                      target === "main" ? centerY : targetNode.y;
+
+                    if (source === "main" || target === "main") {
+                      // For main node connections, calculate control points the same way as the path
+                      const otherNodeX =
+                        source === "main" ? targetX : sourceX;
+                      const otherNodeY =
+                        source === "main" ? targetY : sourceY;
+
+                      // Calculate a better connection point on the main node perimeter
+                      let mainNodeX = centerX;
+                      let mainNodeY = centerY;
+
+                      // Main node dimensions - using a circle with radius of 60px
+                      const mainNodeRadius = 60;
+
+                      // Calculate angle between main node and other node
+                      const dx = otherNodeX - centerX;
+                      const dy = otherNodeY - centerY;
+                      const angle = Math.atan2(dy, dx);
+
+                      // Find point on the main node's perimeter in the direction of the other node
+                      if (source === "main") {
+                        mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
+                        mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
+                      } else if (target === "main") {
+                        mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
+                        mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
+                      }
+
+                      // Calculate control points for the curve - using the same logic as the edge path
+                      const curveStrength = 0.5;
+                      const midY = mainNodeY + (otherNodeY - mainNodeY) * 0.5;
+
+                      // Create perpendicular offset for curve
+                      const perpY = (otherNodeX - mainNodeX) * curveStrength;
+
+                      const cp1y = midY + perpY;
+
+                      // Position label at a point ~60% along the Bezier curve
+                      // Using the Bezier formula to find a point along the curve
+                      const t = 0.6; // Parameter between 0 and 1
+                      const labelY =
+                        Math.pow(1 - t, 3) * mainNodeY +
+                        3 * Math.pow(1 - t, 2) * t * cp1y +
+                        3 * (1 - t) * Math.pow(t, 2) * cp1y +
+                        Math.pow(t, 3) * otherNodeY -
+                        5; // Small offset
+
+                      return labelY;
+                    } else {
+                      // For other connections, use midpoint
+                      return (sourceY + targetY) / 2 - 5;
+                    }
+                  });
+              }
             }
           }
         }
       });
 
-      // Add arrowhead markers
-      svg
-        .append("defs")
-        .selectAll("marker")
-        .data(["arrowhead", "redarrowhead"])
-        .enter()
+      // Add combined arrowhead marker
+      svg.select("defs")
         .append("marker")
-        .attr("id", (d) => d)
+        .attr("id", "combined-arrowhead")
         .attr("viewBox", "0 0 10 10")
         .attr("refX", 9)
         .attr("refY", 5)
@@ -1250,7 +1198,21 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
         .attr("orient", "auto")
         .append("path")
         .attr("d", "M 0 0 L 10 5 L 0 10 z")
-        .attr("fill", (d) => (d === "arrowhead" ? "#000" : "#f5222d"));
+        .attr("fill", "url(#combined-gradient-marker)");
+
+      // Add gradient for combined arrowhead
+      const markerGradient = svg.select("defs")
+        .append("linearGradient")
+        .attr("id", "combined-gradient-marker")
+        .attr("gradientUnits", "userSpaceOnUse");
+
+      markerGradient.append("stop")
+        .attr("offset", "0%")
+        .attr("style", "stop-color: #000;");
+
+      markerGradient.append("stop")
+        .attr("offset", "100%")
+        .attr("style", "stop-color: #f5222d;");
 
       // Step 5: Set up the initial view to fit everything
       // Calculate required scale to see all nodes

@@ -31,9 +31,13 @@ class _ray_internal_insight_monitor:
         self.data_flows = defaultdict(list)
         self.object_events = defaultdict(lambda: defaultdict())
 
+        # Context info
+        self.context_info = defaultdict(lambda: defaultdict(list))
+
         # Start HTTP server
         self.app = aiohttp.web.Application()
         self.app.router.add_get("/get_call_graph_data", self.handle_get_call_graph_data)
+        self.app.router.add_get("/get_context_info", self.handle_get_context_info)
         self.runner = None
         self.site = None
         self.node_ip_address = ray._private.services.get_node_ip_address()
@@ -69,6 +73,12 @@ class _ray_internal_insight_monitor:
         """Handle HTTP request for call graph data."""
         job_id = request.query.get("job_id", "default_job")
         data = self.get_call_graph_data(job_id)
+        return aiohttp.web.json_response(data)
+
+    async def handle_get_context_info(self, request):
+        """Handle HTTP request for context info data."""
+        job_id = request.query.get("job_id", "default_job")
+        data = self.get_context(job_id)
         return aiohttp.web.json_response(data)
 
     def emit_call_record(self, call_record):
@@ -263,6 +273,16 @@ class _ray_internal_insight_monitor:
         job_id = object_record["job_id"]
         object_id = object_record["object_id"]
         self.object_events[job_id][object_id] = object_record
+
+    def emit_context(self, context_info):
+        """Record context info."""
+        job_id = context_info["job_id"]
+        actor_id = context_info["actor_id"]
+        self.context_info[job_id][actor_id].append(context_info)
+
+    def get_context(self, job_id):
+        """Get context info."""
+        return self.context_info[job_id]
 
 
 _inner_class_name = "_ray_internal_insight_monitor"
@@ -500,3 +520,20 @@ def record_object_get(object_id, task_id):
         return
 
     ray.get(get_monitor_actor().emit_object_record_get.remote(object_recv_record))
+
+
+def register_current_context(key: str, value):
+    """
+    register the current context info of the current node
+    """
+    current_class = _get_caller_class()
+    current_func = _get_current_task_name()
+    actor_info = current_class.split(":")
+    ray.get(get_monitor_actor().emit_context.remote({
+        "actor_name": actor_info[0],
+        "actor_id": actor_info[1],
+        "job_id": ray.get_runtime_context().get_job_id(),
+        "func": current_func,
+        "key": key,
+        "value": value,
+    }))

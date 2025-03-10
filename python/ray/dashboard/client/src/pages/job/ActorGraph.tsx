@@ -101,9 +101,12 @@ const ActorGraph = () => {
     }
   }, [currentJobId]);
 
-  const handleElementClick = useCallback((data: ElementData) => {
+  const handleElementClick = useCallback((data: ElementData, skip_zoom=false) => {
     console.log("Element clicked:", data);
     setInfoCardData({ ...data });
+    if (skip_zoom){
+      return;
+    }
 
     if (data && data.id) {
       setSelectedElementId(data.id);

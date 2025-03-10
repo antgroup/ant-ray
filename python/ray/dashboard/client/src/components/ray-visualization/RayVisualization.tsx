@@ -1,12 +1,14 @@
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { IconButton, Tooltip } from "@mui/material";
+import { IconButton, Tooltip, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import * as d3 from "d3";
 import { Selection, ZoomBehavior } from "d3";
 import * as dagre from "dagre";
 import * as dagreD3 from "dagre-d3";
-import React, { forwardRef, useCallback, useEffect, useRef } from "react";
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { colorScheme } from "./graphData";
 import "./RayVisualization.css";
+import PhysicalVisualization from "./PhysicalVisualization";
+import { getPhysicalViewData, PhysicalViewData } from "../../service/physical-view";
 
 type RayVisualizationProps = {
   graphData: GraphData;
@@ -117,6 +119,11 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
     },
     ref,
   ) => {
+    // Add view state
+    const [viewType, setViewType] = useState<'logical' | 'physical'>('logical');
+    const [physicalViewData, setPhysicalViewData] = useState<PhysicalViewData | null>(null);
+    const [loadingPhysicalView, setLoadingPhysicalView] = useState<boolean>(false);
+    
     const svgRef = useRef<SVGSVGElement | null>(null);
     const zoomRef =
       useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
@@ -1285,22 +1292,57 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
       renderGraph();
     }, [renderGraph, updateKey]);
 
+    // Function to fetch physical view data
+    const fetchPhysicalViewData = useCallback(async () => {
+      if (viewType === 'physical') {
+        try {
+          setLoadingPhysicalView(true);
+          const data = await getPhysicalViewData(jobId);
+          setPhysicalViewData(data);
+        } catch (error) {
+          console.error("Error fetching physical view data:", error);
+        } finally {
+          setLoadingPhysicalView(false);
+        }
+      }
+    }, [viewType, jobId]);
+
+    // Fetch physical view data when view type changes to physical
+    useEffect(() => {
+      if (viewType === 'physical') {
+        fetchPhysicalViewData();
+      }
+    }, [viewType, fetchPhysicalViewData]);
+
+    // Update physical view data when updateKey changes
+    useEffect(() => {
+      if (viewType === 'physical') {
+        fetchPhysicalViewData();
+      }
+    }, [updateKey, fetchPhysicalViewData]);
+
+    // Handle view type change
+    const handleViewTypeChange = (
+      event: React.MouseEvent<HTMLElement>,
+      newViewType: 'logical' | 'physical' | null,
+    ) => {
+      if (newViewType !== null) {
+        setViewType(newViewType);
+        if (newViewType === 'logical') {
+          onUpdate?.();
+        }
+      }
+    };
+
     return (
-      <div className={`ray-visualization ${showInfoCard ? "panel-open" : ""}`}>
-        <div className="visualization-header">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              gap: "12px",
-              marginBottom: "16px",
-            }}
-          >
+      <div ref={ref} className="ray-visualization-container">
+        <div className="header">
+          <div className="title-container">
             {onUpdate && (
               <Tooltip title="Update graph">
                 <IconButton
                   onClick={onUpdate}
-                  disabled={updating}
+                  disabled={updating || loadingPhysicalView}
                   size="small"
                   sx={{
                     backgroundColor: "white",
@@ -1313,7 +1355,7 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
                 >
                   <RefreshIcon
                     sx={{
-                      animation: updating ? "spin 1s linear infinite" : "none",
+                      animation: (updating || loadingPhysicalView) ? "spin 1s linear infinite" : "none",
                       "@keyframes spin": {
                         "0%": {
                           transform: "rotate(0deg)",
@@ -1330,34 +1372,69 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
             <h1 className="title" style={{ margin: 0 }}>
               Ray Flow Insight
             </h1>
+            <ToggleButtonGroup
+              value={viewType}
+              exclusive
+              onChange={handleViewTypeChange}
+              aria-label="view type"
+              size="small"
+              sx={{ ml: 2 }}
+            >
+              <ToggleButton value="logical" aria-label="logical view">
+                Logical
+              </ToggleButton>
+              <ToggleButton value="physical" aria-label="physical view">
+                Physical
+              </ToggleButton>
+            </ToggleButtonGroup>
           </div>
-          <div className="legends">
-            <div className="legend-item">
-              <span
-                className="legend-color"
-                style={{ backgroundColor: colorScheme.actorPython }}
-              ></span>
-              <span>Python Actor</span>
+          {viewType === 'logical' && (
+            <div className="legends">
+              <div className="legend-item">
+                <span
+                  className="legend-color"
+                  style={{ backgroundColor: colorScheme.actorPython }}
+                ></span>
+                <span>Python Actor</span>
+              </div>
+              <div className="legend-item">
+                <span
+                  className="legend-color"
+                  style={{ backgroundColor: colorScheme.method }}
+                ></span>
+                <span>Method</span>
+              </div>
+              <div className="legend-item">
+                <span
+                  className="legend-color"
+                  style={{ backgroundColor: colorScheme.functionPython }}
+                ></span>
+                <span>Python Function</span>
+              </div>
             </div>
-            <div className="legend-item">
-              <span
-                className="legend-color"
-                style={{ backgroundColor: colorScheme.method }}
-              ></span>
-              <span>Method</span>
-            </div>
-            <div className="legend-item">
-              <span
-                className="legend-color"
-                style={{ backgroundColor: colorScheme.functionPython }}
-              ></span>
-              <span>Python Function</span>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="graph-container">
-          <svg ref={svgRef} width="100%" height="600"></svg>
+          {viewType === 'logical' ? (
+            <svg ref={svgRef} width="100%" height="600"></svg>
+          ) : (
+            physicalViewData ? (
+              <PhysicalVisualization
+                physicalViewData={physicalViewData}
+                onElementClick={onElementClick}
+                selectedElementId={selectedElementId}
+                jobId={jobId}
+                updateKey={updateKey}
+                onUpdate={onUpdate}
+                updating={updating || loadingPhysicalView}
+              />
+            ) : (
+              <div className="loading-container">
+                <p>Loading physical view data...</p>
+              </div>
+            )
+          )}
         </div>
       </div>
     );

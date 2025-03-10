@@ -1624,7 +1624,28 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bind</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
 
 
+    <span class="k">def</span> <span class="nf">_get_callee_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the callee info of the actor method</span>
+<span class="sd">        this is needed for the insight monitor to record the call</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">callee_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_name</span>
+        <span class="n">actor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actor_ref</span><span class="p">()</span>
+        <span class="n">callee_class</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">actor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">callee_class</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">actor</span><span class="o">.</span><span class="n">_ray_actor_creation_function_descriptor</span><span class="o">.</span><span class="n">class_name</span>
+                <span class="o">+</span> <span class="s2">&quot;:&quot;</span>
+                <span class="o">+</span> <span class="n">actor</span><span class="o">.</span><span class="n">_ray_actor_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span>
+
     <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">record_control_flow</span>
+
+        <span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_callee_info</span><span class="p">()</span>
+        <span class="c1"># report the call info to the insight monitor</span>
+        <span class="n">record_control_flow</span><span class="p">(</span><span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ActorMethod.options">
@@ -2691,7 +2712,28 @@ document.write(`
             <span class="n">original_handle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
+        <span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_callee_info</span><span class="p">(</span><span class="n">actor_handle</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">record_control_flow</span>
+
+        <span class="c1"># report the call info to the insight monitor</span>
+        <span class="n">record_control_flow</span><span class="p">(</span><span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">actor_handle</span>
+
+    <span class="k">def</span> <span class="nf">_get_callee_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor_handle</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the callee info of the actor method</span>
+<span class="sd">        this is needed for the insight monitor to record the call</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">callee_func</span> <span class="o">=</span> <span class="s2">&quot;__init__&quot;</span>
+        <span class="n">callee_class</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">actor_handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">callee_class</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">actor_handle</span><span class="o">.</span><span class="n">_ray_actor_creation_function_descriptor</span><span class="o">.</span><span class="n">class_name</span>
+                <span class="o">+</span> <span class="s2">&quot;:&quot;</span>
+                <span class="o">+</span> <span class="n">actor_handle</span><span class="o">.</span><span class="n">_ray_actor_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span>
 
 <div class="viewcode-block" id="ActorClass.bind">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorClass.bind.html#ray.ActorClass.bind">[docs]</a>

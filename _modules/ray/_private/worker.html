@@ -2245,7 +2245,7 @@ document.write(`
         <span class="c1"># reference will be created. If another reference is created and</span>
         <span class="c1"># removed before this one, it will corrupt the state in the</span>
         <span class="c1"># reference counter.</span>
-        <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">(</span>
+        <span class="n">ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">core_worker</span><span class="o">.</span><span class="n">put_serialized_object_and_increment_local_ref</span><span class="p">(</span>
                 <span class="n">serialized_value</span><span class="p">,</span>
                 <span class="n">object_ref</span><span class="o">=</span><span class="n">object_ref</span><span class="p">,</span>
@@ -2256,6 +2256,10 @@ document.write(`
             <span class="c1"># The initial local reference is already acquired internally.</span>
             <span class="n">skip_adding_local_ref</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">record_object_put</span>
+
+        <span class="n">record_object_put</span><span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span> <span class="n">serialized_value</span><span class="o">.</span><span class="n">total_bytes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ref</span>
 
     <span class="k">def</span> <span class="nf">raise_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_metadata_pairs</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_objects</span><span class="p">(</span><span class="n">data_metadata_pairs</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">)</span>
@@ -2344,6 +2348,12 @@ document.write(`
                         <span class="k">raise</span> <span class="n">value</span><span class="o">.</span><span class="n">as_instanceof_cause</span><span class="p">()</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">value</span>
+
+        <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">record_object_get</span>
+
+        <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">object_ref</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">record_object_get</span><span class="p">(</span><span class="n">object_ref</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span> <span class="n">object_ref</span><span class="o">.</span><span class="n">task_id</span><span class="p">())</span>
 
         <span class="k">return</span> <span class="n">values</span><span class="p">,</span> <span class="n">debugger_breakpoint</span>
 

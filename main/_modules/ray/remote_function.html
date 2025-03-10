@@ -1728,6 +1728,10 @@ document.write(`
         <span class="k">if</span> <span class="n">client_mode_should_convert</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">client_mode_convert_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">task_options</span><span class="p">)</span>
 
+        <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">record_control_flow</span>
+
+        <span class="n">record_control_flow</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_function_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
         <span class="n">worker</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span>
         <span class="n">worker</span><span class="o">.</span><span class="n">check_connected</span><span class="p">()</span>
 

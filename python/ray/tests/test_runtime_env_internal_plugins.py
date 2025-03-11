@@ -47,7 +47,7 @@ def test_archive_plugin_with_signal_package(set_runtime_env_plugins, start_clust
             message = f.read()
             assert message == "test_2\n", message
         return True
-    
+
     _, address = start_cluster
     with tempfile.TemporaryDirectory() as working_dir:
         ray.init(address, runtime_env={"working_dir": working_dir})
@@ -135,7 +135,6 @@ def test_archive_plugin_with_mutiple_packages(set_runtime_env_plugins, start_clu
             ).remote()
         )
         assert output
-
 
 
 if __name__ == "__main__":

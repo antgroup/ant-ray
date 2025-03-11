@@ -35,7 +35,7 @@ def test_archive_plugin_with_signal_package(set_runtime_env_plugins, start_clust
     #     - test_1.txt
     #     - test_1:
     #         - test_1.txt
-    archive_url = "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/test_runtime_env/test.zip"  # noqa: E501
+    archive_url = "https://github.com/antgroup/ant-ray/raw/refs/heads/dev_add_archives_plugin/test_files/test.zip"  # noqa: E501
 
     @ray.remote
     def check_file():
@@ -74,13 +74,13 @@ def test_archive_plugin_with_mutiple_packages(set_runtime_env_plugins, start_clu
     #     - test_1.txt
     #     - test_1:
     #         - test_1.txt
-    archive_url_1 = "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/test_runtime_env/test.zip"  # noqa: E501
+    archive_url_1 = "https://github.com/antgroup/ant-ray/raw/refs/heads/dev_add_archives_plugin/test_files/test.zip"  # noqa: E501
 
     # test_2.zip
     #     - test_2.txt
     #     - test_2:
     #         - test_2.txt
-    archive_url_2 = "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/test_runtime_env/test_2.zip"  # noqa: E501
+    archive_url_2 = "https://github.com/antgroup/ant-ray/raw/refs/heads/dev_add_archives_plugin/test_files/test_2.zip"  # noqa: E501
 
     @ray.remote
     def check_file():

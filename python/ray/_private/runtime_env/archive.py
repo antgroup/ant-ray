@@ -16,19 +16,23 @@ default_logger = logging.getLogger(__name__)
 
 
 def get_context():
+    """Return value example
+
+    If archives plugin value is a instance of dict, like
+        {"url1": "https://xxx.zip", "url2": "https://ooo.zip"},
+    archives context value is like
+        {"url1": "{resources_dir}/https_xxx/", "url2": "{resources_dir}/https_ooo/"}.
+
+    If value is a instance of str, like "s3://xxx.zip", archives context value is like "{resources_dir}/s3_xxx/".
+    """
     return json.loads(os.environ["RAY_ARCHIVE_PATH"])
 
 
-def set_archive_path_in_context(local_archive_uris: str, context: RuntimeEnvContext):
+def set_archive_path_in_context(
+    local_archive_uris: str, context: RuntimeEnvContext, logger: logging.Logger
+):
     """Insert the path in RAY_ARCHIVE_PATH in the runtime env."""
-    default_logger.info(
-        f"Setting archive path {local_archive_uris} to context {context}."
-    )
-    if "RAY_ARCHIVE_PATH" in context.env_vars:
-        raise RuntimeError(
-            f"RAY_ARCHIVE_PATH already exists in context.env_vars {context.env_vars}, "
-            "this is not allowed, please check your in runtime_env."
-        )
+    logger.info(f"Setting archive path {local_archive_uris} to context {context}.")
     context.env_vars["RAY_ARCHIVE_PATH"] = local_archive_uris
 
 
@@ -59,10 +63,12 @@ class DownloadAndUnpackArchivePlugin(RuntimeEnvPlugin):
             return []
         archive_uris = runtime_env[self.name]
         if isinstance(archive_uris, str):
+            # NOTE(Jacky): archives uris pattern is like "archives": "s3://xxx.zip".
             if archive_uris != "":
                 return [archive_uris]
             return []
         elif isinstance(archive_uris, dict):
+            # NOTE(Jacky): archives uris pattern is like "archives": {"url1": "https://xxx.zip", "url2": "https://ooo.zip"}.
             return list(archive_uris.values())
         else:
             raise TypeError(f"Except dict or str, got {type(archive_uris)}")
@@ -93,20 +99,7 @@ class DownloadAndUnpackArchivePlugin(RuntimeEnvPlugin):
             return
 
         archive_uris = runtime_env_dict[self.name]
-        if isinstance(archive_uris, dict):
-            local_archive_uris = dict()
-            for key, uri in archive_uris.items():
-                local_dir = get_local_dir_from_uri(uri, self._resources_dir)
-                if not local_dir.exists():
-                    raise ValueError(
-                        f"Local directory {local_dir} for URI {uri} does "
-                        "not exist on the cluster. Something may have gone wrong while "
-                        "downloading or unpacking the archive package."
-                    )
-                local_archive_uris[key] = str(local_dir)
-                # TODO(Jacky): The Working Dir plugin has not been revamped, so this interface is blocked for now
-                # context.symlink_dirs_to_cwd.append(str(local_dir))
-        elif isinstance(archive_uris, str):
+        if isinstance(archive_uris, str):
             local_archive_uris = get_local_dir_from_uri(
                 archive_uris, self._resources_dir
             )
@@ -119,8 +112,25 @@ class DownloadAndUnpackArchivePlugin(RuntimeEnvPlugin):
             local_archive_uris = str(local_archive_uris)
             # TODO(Jacky): The Working Dir plugin has not been revamped, so this interface is blocked for now
             # context.symlink_dirs_to_cwd.append(local_archive_uris)
+        elif isinstance(archive_uris, dict):
+            local_archive_uris = dict()
+            for key, uri in archive_uris.items():
+                local_dir = get_local_dir_from_uri(uri, self._resources_dir)
+                if not local_dir.exists():
+                    raise ValueError(
+                        f"Local directory {local_dir} for URI {uri} does "
+                        "not exist on the cluster. Something may have gone wrong while "
+                        "downloading or unpacking the archive package."
+                    )
+                local_archive_uris[key] = str(local_dir)
+                # TODO(Jacky): The Working Dir plugin has not been revamped, so this interface is blocked for now
+                # context.symlink_dirs_to_cwd.append(str(local_dir))
         else:
+            # NOTE(Jacky): archive_uris can not be instance of list, cause users need to find
+            # the local directory corresponding to the downloaded file based on the index.
             raise TypeError(f"Except dict or str, got {type(archive_uris)}")
         set_archive_path_in_context(
-            local_archive_uris=json.dumps(local_archive_uris), context=context
+            local_archive_uris=json.dumps(local_archive_uris),
+            context=context,
+            logger=logger,
         )

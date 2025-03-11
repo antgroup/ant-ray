@@ -26,3 +26,12 @@ RAY_RUNTIME_ENV_PLUGIN_SCHEMAS_ENV_VAR = "RAY_RUNTIME_ENV_PLUGIN_SCHEMAS"
 
 # The file suffix of runtime env plugin schemas.
 RAY_RUNTIME_ENV_PLUGIN_SCHEMA_SUFFIX = ".json"
+
+# Container or image uri plugin placeholder, which will be replaced by env_vars.
+CONTAINER_ENV_PLACEHOLDER = "$CONTAINER_ENV_PLACEHOLDER"
+
+# ANT-INTERNAL: Alipay internal system config dynamic depot
+INTERNAL_SYSTEM_CONFIG_DYNAMIC_FILE = "/lib/libsysconf-alipay.so"
+
+# the key for java jar dirs in the environment variable.
+RAY_JAVA_JARS_DIRS = "RAY_JAVA_JARS_DIRS"

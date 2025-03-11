@@ -142,8 +142,10 @@ class WorkerPoolInterface {
   /// Case 2: An suitable worker registered to raylet.
   /// The corresponding PopWorkerStatus will be passed to the callback.
   /// \return Void.
-  virtual void PopWorker(const TaskSpecification &task_spec,
-                         const PopWorkerCallback &callback) = 0;
+  virtual void PopWorker(
+      const TaskSpecification &task_spec,
+      const PopWorkerCallback &callback,
+      const std::string &allocated_instances_serialized_json = "{}") = 0;
   /// Add an idle worker to the pool.
   ///
   /// \param The idle worker to add.
@@ -415,7 +417,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
 
   /// See interface.
   void PopWorker(const TaskSpecification &task_spec,
-                 const PopWorkerCallback &callback) override;
+                 const PopWorkerCallback &callback,
+                 const std::string &allocated_instances_serialized_json = "{}") override;
 
   /// Try to prestart a number of workers suitable the given task spec. Prestarting
   /// is needed since core workers request one lease at a time, if starting is slow,
@@ -469,7 +472,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   const NodeID &GetNodeID() const;
 
   /// Internal implementation of PopWorker.
-  void PopWorker(std::shared_ptr<PopWorkerRequest> pop_worker_request);
+  void PopWorker(std::shared_ptr<PopWorkerRequest> pop_worker_request,
+                 const std::string &allocated_instances_serialized_json);
 
   // Find an idle worker that can serve the task. If found, pop it out and return it.
   // Otherwise, return nullptr.
@@ -483,7 +487,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   //
   // Note: NONE of these methods guarantee that pop_worker_request.callback will be called
   // with the started worker. It may be called with any fitting workers.
-  void StartNewWorker(const std::shared_ptr<PopWorkerRequest> &pop_worker_request);
+  void StartNewWorker(const std::shared_ptr<PopWorkerRequest> &pop_worker_request,
+                      const std::string &allocated_instances_serialized_json = "{}");
 
  protected:
   void update_worker_startup_token_counter();
@@ -520,7 +525,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
       const std::string &serialized_runtime_env_context = "{}",
       const rpc::RuntimeEnvInfo &runtime_env_info = rpc::RuntimeEnvInfo(),
       std::optional<absl::Duration> worker_startup_keep_alive_duration = std::nullopt,
-      const WorkerID &worker_id = WorkerID::Nil());
+      const WorkerID &worker_id = WorkerID::Nil(),
+      const std::string &allocated_instances_serialized_json = "{}");
 
   /// The implementation of how to start a new worker process with command arguments.
   /// The lifetime of the process is tied to that of the returned object,
@@ -580,6 +586,7 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
     std::optional<absl::Duration> worker_startup_keep_alive_duration;
     // The external worker id which is assigned to the worker process.
     WorkerID worker_id;
+    std::string allocated_instances_serialized_json;
   };
 
   /// An internal data structure that maintains the pool state per language.
@@ -745,16 +752,20 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// assume that the worker process has tree worker instances totally.
 
   /// Create runtime env asynchronously by runtime env agent.
-  void GetOrCreateRuntimeEnv(const std::string &serialized_runtime_env,
-                             const rpc::RuntimeEnvConfig &runtime_env_config,
-                             const JobID &job_id,
-                             const GetOrCreateRuntimeEnvCallback &callback,
-                             const WorkerID &worker_id = WorkerID::Nil());
+  void GetOrCreateRuntimeEnv(
+      const std::string &serialized_runtime_env,
+      const rpc::RuntimeEnvConfig &runtime_env_config,
+      const JobID &job_id,
+      const GetOrCreateRuntimeEnvCallback &callback,
+      const WorkerID &worker_id = WorkerID::Nil(),
+      const std::string &allocated_instances_serialized_json = "{}");
 
   /// Delete runtime env asynchronously by runtime env agent.
-  void DeleteRuntimeEnvIfPossible(const std::string &serialized_runtime_env, 
-                                  const JobID &job_id,
-                                  const WorkerID &worker_id = WorkerID::Nil());
+  void DeleteRuntimeEnvIfPossible(
+      const std::string &serialized_runtime_env,
+      const JobID &job_id,
+      const WorkerID &worker_id = WorkerID::Nil(),
+      const std::string &allocated_instances_serialized_json = "{}");
 
   void AddWorkerProcess(State &state,
                         rpc::WorkerType worker_type,
@@ -763,7 +774,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
                         const rpc::RuntimeEnvInfo &runtime_env_info,
                         const std::vector<std::string> &dynamic_options,
                         std::optional<absl::Duration> worker_startup_keep_alive_duration,
-                        const WorkerID &worker_id);
+                        const WorkerID &worker_id,
+                        const std::string &allocated_instances_serialized_json);
 
   void RemoveWorkerProcess(State &state, const StartupToken &proc_startup_token);
 

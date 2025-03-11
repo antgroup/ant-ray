@@ -1969,11 +1969,15 @@ def update_envs(env_vars: Dict[str, str]):
     if not env_vars:
         return
 
+    update_envs = {}
     for key, value in env_vars.items():
         expanded = os.path.expandvars(value)
         # Replace non-existant env vars with an empty string.
         result = re.sub(r"\$\{[A-Z0-9_]+\}", "", expanded)
         os.environ[key] = result
+        update_envs[key] = os.environ[key]
+
+    return update_envs
 
 
 def parse_node_labels_json(
@@ -2098,3 +2102,30 @@ def get_current_node_cpu_model_name() -> Optional[str]:
     except Exception:
         logger.debug("Failed to get CPU model name", exc_info=True)
         return None
+
+
+def get_ray_whl_dir():
+    return ray_constants.RAY_WHL_DIR
+
+
+def get_ray_site_packages_path():
+    """
+    Get ray package site path
+    """
+    ray_path = Path(ray.__path__[0])
+    return str(ray_path.parent.absolute())
+
+
+def get_dependencies_installer_path():
+    return os.path.join(
+        get_ray_site_packages_path(),
+        "ray",
+        "_private",
+        "runtime_env",
+        "install_ray_or_pip_packages.py",
+    )
+
+
+def get_pyenv_path():
+    # Get the pyenv path automatically instead of hard code.
+    return "/home/admin/.pyenv"

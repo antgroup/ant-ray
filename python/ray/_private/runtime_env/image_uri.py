@@ -1,14 +1,55 @@
 import logging
 import os
+import json
 from typing import List, Optional
 
+import ray._private.runtime_env.constants as runtime_env_constants
 from ray._private.runtime_env.context import RuntimeEnvContext
 from ray._private.runtime_env.plugin import RuntimeEnvPlugin
 from ray._private.runtime_env.utils import check_output_cmd
 
+from ray._private.utils import (
+    get_ray_site_packages_path,
+    get_pyenv_path,
+    get_ray_whl_dir,
+    get_dependencies_installer_path,
+)
+
 default_logger = logging.getLogger(__name__)
 
+dependencies_installer_path = "/tmp/scripts/dependencies_installer.py"
 
+# NOTE(chenk008): it is moved from setup_worker. And it will be used
+# to setup resource limit.
+def parse_allocated_resource(allocated_instances_serialized_json):
+    container_resource_args = []
+    allocated_resource = json.loads(allocated_instances_serialized_json)
+    if "CPU" in allocated_resource.keys():
+        cpu_resource = allocated_resource["CPU"]
+        if isinstance(cpu_resource, list):
+            # cpuset: because we may split one cpu core into some pieces,
+            # we need set cpuset.cpu_exclusive=0 and set cpuset-cpus
+            cpu_ids = []
+            cpus = 0
+            for idx, val in enumerate(cpu_resource):
+                if val > 0:
+                    cpu_ids.append(idx)
+                    cpus += val
+            container_resource_args.append("--cpus=" + str(int(cpus)))
+            container_resource_args.append(
+                "--cpuset-cpus=" + ",".join(str(e) for e in cpu_ids)
+            )
+        else:
+            # cpushare
+            container_resource_args.append("--cpus=" + str(int(cpu_resource)))
+    if "memory" in allocated_resource.keys():
+        container_resource_args.append(
+            "--memory=" + str(int(allocated_resource["memory"] / 10000)) + "m"
+        )
+    return container_resource_args
+
+
+'''
 async def _create_impl(image_uri: str, logger: logging.Logger):
     # Pull image if it doesn't exist
     # Also get path to `default_worker.py` inside the image.
@@ -192,4 +233,326 @@ class ContainerPlugin(RuntimeEnvPlugin):
             context,
             logger,
             self._ray_tmp_dir,
+        )
+'''
+
+
+class ContainerPlugin(RuntimeEnvPlugin):
+    """Starts worker in container."""
+
+    name = "container"
+
+    def __init__(self, resources_dir: str):
+        self._resources_dir = os.path.join(resources_dir, "container_image")
+
+    def get_uris(self, runtime_env: "RuntimeEnv") -> List[str]:  # noqa: F821
+        if self.name not in runtime_env:
+            return []
+        container_uris = runtime_env[self.name]
+        if isinstance(container_uris, dict):
+            return [container_uris.get("image", "")]
+        else:
+            raise TypeError(f"Except dict, got {type(container_uris)}")
+
+
+class ImageURIPlugin(RuntimeEnvPlugin):
+    """Starts worker in container."""
+
+    name = "image_uri"
+
+    def __init__(self, resource_dir: str):
+        self._resources_dir = os.path.join(resource_dir, "container_image")
+
+    def get_uris(self, runtime_env: "RuntimeEnv") -> List[str]:  # noqa: F821
+        if self.name not in runtime_env:
+            return []
+        container_uris = runtime_env[self.name]
+        if isinstance(container_uris, dict):
+            return [container_uris.get("image", "")]
+        else:
+            raise TypeError(f"Except dict, got {type(container_uris)}")
+
+
+'''
+class ImageURIPlugin(RuntimeEnvPlugin):
+    """Starts worker in a container of a custom image."""
+
+    name = "image_uri"
+
+    @staticmethod
+    def get_compatible_keys():
+        return {"image_uri", "config", "env_vars"}
+
+    def __init__(self, ray_tmp_dir: str):
+        self._ray_tmp_dir = ray_tmp_dir
+
+    async def create(
+        self,
+        uri: Optional[str],
+        runtime_env: "RuntimeEnv",  # noqa: F821
+        context: RuntimeEnvContext,
+        logger: logging.Logger,
+    ) -> float:
+        if not runtime_env.image_uri():
+            return
+
+        self.worker_path = await _create_impl(runtime_env.image_uri(), logger)
+
+    def modify_context(
+        self,
+        uris: List[str],
+        runtime_env: "RuntimeEnv",  # noqa: F821
+        context: RuntimeEnvContext,
+        logger: Optional[logging.Logger] = default_logger,
+    ):
+        if not runtime_env.image_uri():
+            return
+
+        _modify_context_impl(
+            runtime_env.image_uri(),
+            self.worker_path,
+            [],
+            context,
+            logger,
+            self._ray_tmp_dir,
+        )
+'''
+
+
+class ContainerManager:
+    def __init__(self, tmp_dir: str):
+        # _ray_tmp_dir will be mounted into container, so the worker process
+        # can connect to raylet.
+        self._ray_tmp_dir = tmp_dir
+
+    container_placeholder = runtime_env_constants.CONTAINER_ENV_PLACEHOLDER
+
+    async def setup(
+        self,
+        runtime_env: "RuntimeEnv",  # noqa: F821
+        serialized_allocated_resource_instances,
+        context: RuntimeEnvContext,
+        logger: Optional[logging.Logger] = default_logger,
+    ):
+        if not runtime_env.has_py_container() or not runtime_env.py_container_image():
+            return
+
+        logger.info(f"container setup for {runtime_env}")
+        container_option = runtime_env.get("container")
+        if not container_option or not container_option.get("image"):
+            return
+
+        # Use the user's python executable if py_executable is not None.
+        py_executable = container_option.get("py_executable")
+
+        install_ray = runtime_env.container_install_ray()
+        pip_install_without_python_path = (
+            runtime_env.container_pip_install_without_python_path()
+        )
+
+        container_driver = "podman"
+        # todo add cgroup config
+        container_command = [
+            container_driver,
+            "run",
+            "--rm",
+            "-v",
+            self._ray_tmp_dir + ":" + self._ray_tmp_dir,
+            "--cgroup-manager=cgroupfs",
+            "--network=host",
+            "--pid=host",
+            "--ipc=host",
+            "--env-host",
+            "--cgroups=no-conmon",  # ANT-INTERNAL
+        ]
+
+        # in ANT-INTERNAL, we need mount /home/admin/ray-pack,
+        # because some config generated on starting
+        tmp_dir = "/home/admin/ray-pack"
+        if os.path.exists(tmp_dir):
+            container_command.append("-v")
+            container_command.append(f"{tmp_dir}:{tmp_dir}")
+
+        entrypoint_args = []
+        if install_ray and pip_install_without_python_path:
+            raise RuntimeError(
+                "_install_ray and _pip_install_without_python_path can't both be True, "
+                "please check your runtime_env field."
+            )
+        container_pip_packages = runtime_env.py_container_pip_list()
+        pip_packages = runtime_env.pip_config().get("packages", [])
+
+        install_ray_or_pip_packages_command = None
+        if install_ray:
+            if install_ray_or_pip_packages_command is None:
+                install_ray_or_pip_packages_command = [
+                    "python",
+                    dependencies_installer_path,
+                    "--whl-dir",
+                    get_ray_whl_dir(),
+                ]
+                if pip_packages or container_pip_packages:
+                    merge_pip_packages = list(
+                        set(pip_packages) | set(container_pip_packages)
+                    )
+                    install_ray_or_pip_packages_command.extend(
+                        [
+                            "--packages",
+                            json.dumps(merge_pip_packages),
+                        ]
+                    )
+                context.py_executable = "python"
+
+        if container_pip_packages:
+            if install_ray_or_pip_packages_command is None:
+                install_ray_or_pip_packages_command = [
+                    "python",
+                    dependencies_installer_path,
+                    "--packages",
+                    json.dumps(container_pip_packages),
+                ]
+                if pip_install_without_python_path:
+                    install_ray_or_pip_packages_command.extend(
+                        ["--without-python-path", "true"]
+                    )
+
+        if install_ray_or_pip_packages_command is not None:
+            install_ray_or_pip_packages_command.append("&&")
+            entrypoint_args.extend(install_ray_or_pip_packages_command)
+
+        context.entrypoint_prefix = entrypoint_args
+        context.env_vars["RAY_RAYLET_PID"] = os.getenv("RAY_RAYLET_PID")
+        container_command.extend(
+            parse_allocated_resource(serialized_allocated_resource_instances)
+        )
+        # in ANT-INTERNAL, we need 'sudo' and 'admin', mount logs
+        container_command = ["sudo", "-E"] + container_command
+        container_command.append("-u")
+        user = container_option.get("user")
+        if user:
+            container_command.append(user)
+        else:
+            container_command.append("admin")
+        container_command.append("-w")
+        if context.cwd:
+            container_command.append(context.cwd)
+        else:
+            container_command.append(os.getcwd())
+        container_command.append("--cap-add=AUDIT_WRITE")
+        # Note(Jacky): If the same target_path is present in the container mount,
+        # the image will not start due to the duplicate mount target path error,
+        # so we create a reverse dict mapping,
+        # which can modify the latest source_path.
+        container_to_host_mount_dict = {}
+        if container_option.get("customize_log_dir"):
+            customize_log_path = container_option.get("customize_log_dir")
+            if not os.path.exists(customize_log_path):
+                os.makedirs(customize_log_path)
+            container_to_host_mount_dict["/home/admin/logs"] = customize_log_path
+            container_to_host_mount_dict[
+                "/home/admin/logs/ray-logs/"
+            ] = "/home/admin/logs/ray-logs/"
+            container_to_host_mount_dict["/home/admin/logs/share"] = "/home/admin/logs"
+        else:
+            container_to_host_mount_dict["/home/admin/logs"] = "/home/admin/logs"
+        container_to_host_mount_dict["/apsara"] = "/apsara"
+        if install_ray or container_pip_packages:
+            container_to_host_mount_dict[
+                dependencies_installer_path
+            ] = get_dependencies_installer_path()
+            container_to_host_mount_dict[get_ray_whl_dir()] = get_ray_whl_dir()
+        if not install_ray:
+            host_site_packages_path = get_ray_site_packages_path()
+            if py_executable:
+                # Replace the pyenv path in container to
+                # avoid overwriting the user's pyenv.
+                pyenv_folder = "ray/.pyenv"
+            else:
+                pyenv_folder = ".pyenv"
+            host_pyenv_path = get_pyenv_path()
+            container_pyenv_path = host_pyenv_path.replace(".pyenv", pyenv_folder)
+            container_to_host_mount_dict[container_pyenv_path] = host_pyenv_path
+            context.pyenv_folder = pyenv_folder
+            container_to_host_mount_dict[
+                host_site_packages_path
+            ] = host_site_packages_path
+
+        # ANT-INTERNAL for maya
+        if os.path.exists(runtime_env_constants.INTERNAL_SYSTEM_CONFIG_DYNAMIC_FILE):
+            system_dynamic_config_file_path = (
+                runtime_env_constants.INTERNAL_SYSTEM_CONFIG_DYNAMIC_FILE
+            )
+            container_to_host_mount_dict[
+                system_dynamic_config_file_path
+            ] = system_dynamic_config_file_path
+        if runtime_env.py_container_run_options():
+            run_options_list = runtime_env.py_container_run_options()
+            index = 0
+            while index < len(run_options_list):
+                run_option = run_options_list[index]
+                if run_option == "-v":
+                    if index == len(run_options_list) - 1:
+                        raise RuntimeError(
+                            "Incorrect mount path command, "
+                            "please check the container field "
+                            "in the run_options field mount path, "
+                            "`-v host_path:container_path`."
+                        )
+                    next_option = run_options_list[index + 1]
+                    paths = next_option.split(":")
+                    if len(paths) != 2:
+                        raise RuntimeError(
+                            "Incorrect mount path command, "
+                            "please check the container field "
+                            "in the run_options field mount path, "
+                            f"got {next_option}"
+                        )
+                    source_path = paths[0].strip()
+                    target_path = paths[1].strip()
+                    # Iterate over the key of
+                    # 'container_to_host_mount_dict'
+                    # to find if target_path already exists
+                    container_to_host_mount_dict[target_path] = source_path
+                    index += 2
+                else:
+                    container_command.append(run_option)
+                    index += 1
+
+        for (
+            target_path,
+            source_path,
+        ) in container_to_host_mount_dict.items():
+            container_command.append("-v")
+            container_command.append(f"{source_path}:{target_path}")
+        if container_option.get("native_libraries"):
+            container_native_libraries = container_option["native_libraries"]
+            context.native_libraries["code_search_path"].append(
+                container_native_libraries
+            )
+        context.env_vars["RAY_JOB_DATA_DIR_BASE"] = os.getenv(
+            "RAY_JOB_DATA_DIR_BASE", ""
+        )
+        # unset PYENV_VERSION, the image may use pyenv with other python.
+        context.env_vars["PYENV_VERSION"] = ""
+        # Append env vars to container
+        if context.env_vars.get("PYTHONPATH") and py_executable:
+            context.env_vars["PYTHONPATH"] = context.env_vars["PYTHONPATH"].replace(
+                ".pyenv", "ray/.pyenv"
+            )
+        container_command.append(self.container_placeholder)
+        container_command.append("--entrypoint")
+        # Some docker image use conda to run python, it depend on ~/.bashrc.
+        # So we need to use bash as container entrypoint.
+        container_command.append("bash")
+        # in ANT-INTERNAL, we use nydus image as rootfs
+        container_command.append("--rootfs")
+        container_command.append(runtime_env.py_container_image() + ":O")
+        container_command.extend(["-l", "-c"])
+        context.container["container_command"] = container_command
+        if py_executable:
+            context.py_executable = py_executable
+        logger.info(
+            "start worker in container with prefix: {}".format(
+                " ".join(container_command)
+            )
         )

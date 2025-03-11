@@ -554,3 +554,5 @@ RAY_EXPORT_EVENT_MAX_FILE_SIZE_BYTES = env_bool(
 )
 
 RAY_EXPORT_EVENT_MAX_BACKUP_COUNT = env_bool("RAY_EXPORT_EVENT_MAX_BACKUP_COUNT", 20)
+
+RAY_WHL_DIR = os.environ.get("RAY_WHL_DIR", "/home/admin/build/whl")

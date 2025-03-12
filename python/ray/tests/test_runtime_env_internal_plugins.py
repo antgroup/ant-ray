@@ -25,7 +25,7 @@ default_logger = logging.getLogger(__name__)
     ],
     indirect=True,
 )
-def test_archive_plugin_with_signal_package(set_runtime_env_plugins, start_cluster):
+def test_archive_plugin_with_single_package(set_runtime_env_plugins, start_cluster):
     # test.zip
     #     - test_1.txt
     #     - test_1:

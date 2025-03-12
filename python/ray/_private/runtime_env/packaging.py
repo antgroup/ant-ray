@@ -693,9 +693,9 @@ def get_local_dir_from_uri(uri: str, base_directory: str) -> Path:
     """Return the local directory corresponding to this URI."""
     pkg_file = Path(_get_local_path(base_directory, uri))
     local_dir = pkg_file.with_suffix("")
-    # NOTE(Jacky): If the URls have.tar.gz,.tar.bz, or.tar.xz suffixes,
+    # NOTE(Jacky): If the URls have.tar.gz, .tar.bz, or.tar.xz suffixes,
     # then the URIs have double suffixes,
-    # which need to be removed twice to get local_dir
+    # which needs to be removed twice to get local_dir
     if local_dir.suffix == ".tar":
         local_dir = local_dir.with_suffix("")
     return local_dir
@@ -715,6 +715,8 @@ async def download_and_unpack_package(
 
     Will be written to a file or directory named {base_directory}/{uri}.
     Returns the path to this file or directory.
+    If move_file_to_dir is True, we do decompress the file into target_dir.
+    Instead, we just move file to target_dir and do not decompress.
 
     Args:
         pkg_uri: URI of the package to download.
@@ -722,6 +724,9 @@ async def download_and_unpack_package(
             directory for the unpacked files.
         gcs_aio_client: Client to use for downloading from the GCS.
         logger: The logger to use.
+        remove_top_level_directory: Whether to remove the top-level directory
+            from the zip contents.
+        move_file_to_dir: Whether to decompress the file into target_dir.
         overwrite: If True, overwrite the existing package.
 
     Returns:

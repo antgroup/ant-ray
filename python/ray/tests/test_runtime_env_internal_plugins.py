@@ -158,7 +158,6 @@ def test_get_local_dir_from_tar_url(set_url):
     url = set_url
     assert is_tar_uri(url)
     per_local_dir = get_local_dir_from_uri(url, "/tmp/ray/runtime_resources")
-    print(per_local_dir)
     global test_local_dir
     if test_local_dir is None:
         test_local_dir = per_local_dir

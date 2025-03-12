@@ -56,10 +56,11 @@ class NativeLibrariesPlugin(RuntimeEnvPlugin):
         runtime_env: "RuntimeEnv",  # noqa: F821
         context: RuntimeEnvContext,
         logger: Optional[logging.Logger] = default_logger,
-        enable_d7y_proxy: bool = False,
     ) -> int:
         if not uri:
             return 0
+        # NOTE: (Jacky) if uri endwith zip or tar, we download and unpack uri file to local dir.
+        # Instead, we do not decompress, but directly move the file to local_dir
         move_file_to_dir = not (is_zip_uri(uri) or is_tar_uri(uri))
         library_dir = await download_and_unpack_package(
             uri,
@@ -79,6 +80,7 @@ class NativeLibrariesPlugin(RuntimeEnvPlugin):
         logger: Optional[logging.Logger] = default_logger,
     ):
         def _check_library_dir(library_dir, uri):
+            """Check local library_dir if exist"""
             if not library_dir.exists():
                 raise ValueError(
                     f"Local directory {library_dir} for URI {uri} does "
@@ -120,18 +122,3 @@ class NativeLibrariesPlugin(RuntimeEnvPlugin):
                     context.native_libraries["code_search_path"].append(
                         str(abs_code_search_path)
                     )
-
-    def calculate_uri_total_size(
-        self,
-        uri: Optional[str],
-        logger: Optional[logging.Logger] = default_logger,
-    ):
-        local_dir = get_local_dir_from_uri(uri, self._resources_dir)
-        if not local_dir.exists():
-            raise ValueError(
-                f"Local directory {local_dir} for URI {uri} does "
-                "not exist on the cluster. Something may have gone wrong when "
-                "agent crush."
-            )
-
-        return get_directory_size_bytes(local_dir)

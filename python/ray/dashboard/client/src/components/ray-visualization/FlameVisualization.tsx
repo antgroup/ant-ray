@@ -16,6 +16,7 @@ type FlameVisualizationProps = {
 type FlameNode = {
   name: string;
   value: number;
+  originalValue?: number; // Store original value for display
   count?: number;
   children?: FlameNode[];
   hide?: boolean;
@@ -89,6 +90,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
     // Transform data
     const transformedData = transformFlameData(flameData);
+    console.log("Transformed data for flame graph:", transformedData);
     
     // Create flame graph
     const chart: any = createFlameGraph();
@@ -117,12 +119,17 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
         if (!tooltipRef.current) return;
         
         const tooltip = d3.select(tooltipRef.current);
+        const valueInSeconds = d.data.originalValue || 0;
+        const formattedValue = valueInSeconds < 0.001 
+          ? valueInSeconds.toExponential(2) 
+          : valueInSeconds.toFixed(valueInSeconds < 0.1 ? 4 : 2);
+        
         tooltip
           .style("visibility", "visible")
           .html(`
             <div>
               <strong>${d.data.name}</strong><br/>
-              Value: ${d.value ? d.value.toFixed(2) : '0.00'}ms<br/>
+              Duration: ${formattedValue}s<br/>
               ${d.data.count ? `Count: ${d.data.count}` : ""}
             </div>
           `);
@@ -244,19 +251,164 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       return { name: "root", value: 0, children: [] };
     }
 
-    return {
-      name: "root",
-      value: 0,
-      children: data.aggregated.map(node => ({
+    console.log("Original flame data:", data);
+
+    // Find max value for normalization
+    let maxValue = 0;
+    let minValue = Infinity;
+    data.aggregated.forEach(node => {
+      if (node.value && node.value > maxValue) {
+        maxValue = node.value;
+      }
+      if (node.value && node.value < minValue && node.value > 0) {
+        minValue = node.value;
+      }
+    });
+    
+    // If no positive values found, set minValue to 0
+    if (minValue === Infinity) minValue = 0;
+    
+    console.log(`Value range: min=${minValue}, max=${maxValue}`);
+
+    // Create a map of function names to their nodes for quick lookup
+    const nodeMap = new Map<string, FlameNode>();
+    
+    // First pass: create all nodes with normalized values
+    data.aggregated.forEach(node => {
+      // Store the original value for display
+      const originalValue = node.value || 0;
+      
+      // Calculate normalized value for sizing
+      let normalizedValue = originalValue;
+      
+      // Ensure small values are still visible in the visualization
+      if (normalizedValue > 0 && maxValue > minValue) {
+        // Apply a log-scale normalization for better visualization of small values
+        if (maxValue / minValue > 1000) {
+          // For very large ranges, use logarithmic scaling
+          normalizedValue = Math.max(normalizedValue, minValue);
+          const logMin = Math.log(minValue || 0.0001);
+          const logMax = Math.log(maxValue);
+          const logValue = Math.log(normalizedValue);
+          
+          // Scale to ensure small values are visible but proportions are maintained
+          normalizedValue = minValue + (maxValue - minValue) * 
+            ((logValue - logMin) / (logMax - logMin));
+        }
+      }
+      
+      nodeMap.set(node.name, {
         name: node.name,
-        value: node.value || 0,
+        value: normalizedValue, // Use normalized value for sizing
+        originalValue: originalValue, // Store original value for display
         count: node.count || 0,
-        children: (node.children || []).map(child => ({
-          name: child.name,
-          value: child.value || 0,
-        })),
-      })),
-    };
+        children: []
+      });
+    });
+    
+    // Find the main node or create one
+    let mainNode: FlameNode = nodeMap.get("main") || { name: "root", value: 0, children: [] };
+    
+    // If main node has zero value, set it to the max value since it's the base node
+    if (mainNode.value === 0 && maxValue > 0) {
+      console.log("Setting main node value to max value:", maxValue);
+      mainNode.value = maxValue;
+      // Update the node in the map if it exists
+      if (nodeMap.has("main")) {
+        nodeMap.set("main", mainNode);
+      } else if (nodeMap.has("root")) {
+        nodeMap.set("root", mainNode);
+      }
+    }
+    
+    // Create a set to track which nodes have been added as children
+    const addedAsChild = new Set<string>();
+    
+    // Second pass: build the hierarchy
+    // For each node with children, add those children to the node
+    data.aggregated.forEach(node => {
+      if (node.children && node.children.length > 0) {
+        const parentNode = nodeMap.get(node.name);
+        if (parentNode && parentNode.children) {
+          // Clear existing children to avoid duplicates
+          parentNode.children = [];
+          
+          // Convert children to full nodes
+          node.children.forEach(child => {
+            const childName = typeof child === 'string' ? child : child.name;
+            const childNode = nodeMap.get(childName);
+            
+            if (childNode) {
+              parentNode.children!.push(childNode);
+              addedAsChild.add(childName);
+            } else {
+              // If child not found in map, create a simple node
+              const childValue = typeof child === 'string' ? 0 : (child.value || 0);
+              const newChild = { name: childName, value: childValue, children: [] };
+              parentNode.children!.push(newChild);
+              addedAsChild.add(childName);
+            }
+          });
+        }
+      }
+    });
+    
+    // Add any nodes that haven't been added as children to the main node
+    // (except for the main node itself)
+    if (mainNode.children) {
+      data.aggregated.forEach(node => {
+        if (!addedAsChild.has(node.name) && node.name !== "main" && node.name !== "root") {
+          const nodeObj = nodeMap.get(node.name);
+          if (nodeObj && !mainNode.children!.includes(nodeObj)) {
+            mainNode.children!.push(nodeObj);
+          }
+        }
+      });
+    }
+    
+    // Special case: if we have a "hello" node with children but no main node,
+    // use the hello node as the root
+    const helloNode = nodeMap.get("hello");
+    if (helloNode && helloNode.children && helloNode.children.length > 0 && 
+        (!mainNode.children || mainNode.children.length === 0)) {
+      mainNode = helloNode;
+      
+      // If hello node is now the main node and has zero value, set it to max value
+      if (mainNode.value === 0 && maxValue > 0) {
+        mainNode.value = maxValue;
+      }
+    }
+    
+    // If main node still has no children but we have nodes, add all nodes
+    if (mainNode.children && mainNode.children.length === 0 && data.aggregated.length > 0) {
+      data.aggregated.forEach(node => {
+        if (node.name !== mainNode.name) {
+          const nodeObj = nodeMap.get(node.name);
+          if (nodeObj && mainNode.children) {
+            mainNode.children.push(nodeObj);
+          }
+        }
+      });
+    }
+    
+    // Calculate total value of all children
+    let totalChildrenValue = 0;
+    if (mainNode.children) {
+      mainNode.children.forEach(child => {
+        totalChildrenValue += child.value || 0;
+      });
+    }
+    
+    // If main node value is less than total children value, adjust it
+    if (mainNode.value < totalChildrenValue) {
+      console.log(`Adjusting main node value from ${mainNode.value} to ${totalChildrenValue}`);
+      mainNode.value = totalChildrenValue;
+    }
+    
+    // Log the transformed data for debugging
+    console.log("Transformed flame data:", mainNode);
+    
+    return mainNode;
   };
 
   // Implementation of the flame graph chart function
@@ -275,7 +427,6 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     let hoverHandler: ((d: PartitionHierarchyNode) => void) | null = null;
     let minFrameSize = 0;
     let detailsElement: HTMLElement | null = null;
-    const searchDetails: (() => void) | null = null;
     let selfValue = false;
     let resetHeightOnZoom = false;
     let minHeight: number | null = null;
@@ -285,7 +436,13 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     };
 
     const getValue = (d: PartitionHierarchyNode) => {
+      // Return the normalized value for sizing
       return d.customValue !== undefined ? d.customValue : (d.value || 0);
+    };
+
+    const getOriginalValue = (d: PartitionHierarchyNode) => {
+      // Return the original value for display
+      return d.data.originalValue !== undefined ? d.data.originalValue : (d.data.value || 0);
     };
 
     const getChildren = (d: FlameNode) => {
@@ -293,7 +450,13 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     };
 
     const labelHandler = (d: PartitionHierarchyNode) => {
-      return getName(d) + ' (' + d3.format('.3f')(100 * (d.x1 - d.x0)) + '%, ' + getValue(d) + ' ms)';
+      // Show the actual value in seconds with appropriate precision
+      const valueInSeconds = getOriginalValue(d);
+      const formattedValue = valueInSeconds < 0.001 
+        ? valueInSeconds.toExponential(2) 
+        : valueInSeconds.toFixed(valueInSeconds < 0.1 ? 4 : 2);
+      
+      return getName(d) + ' (' + d3.format('.3f')(100 * (d.x1 - d.x0)) + '%, ' + formattedValue + ' s)';
     };
 
     const colorMapper = (d: PartitionHierarchyNode) => {
@@ -615,6 +778,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       selection.datum((data: FlameNode) => {
         // Creating a root hierarchical structure
         const root = d3.hierarchy(data, getChildren)
+          // Use the value directly for sizing, not count
           .sum(d => d.value || 0);
 
         // Augmenting nodes with ids

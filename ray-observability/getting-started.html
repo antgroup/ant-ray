@@ -1679,8 +1679,170 @@ and configured node type.</p></li>
 <p>For more in-depth information, please refer to the complete
 <a class="reference internal" href="../virtual-cluster/getting-started.html#virtual-cluster-index"><span class="std std-ref">Ray Virtual Clusters Overview</span></a> documentation.</p>
 </section>
+<section id="flow-insight-view">
+<h2>Flow Insight View<a class="headerlink" href="#flow-insight-view" title="Link to this heading">#</a></h2>
+<p>The Flow Insight view provides a powerful visualization of your Ray application’s
+execution flow, helping you understand the relationships between actors, tasks, and
+data transfers in your distributed application. This view offers both logical and
+physical perspectives of your application’s execution, making it easier to analyze
+performance, identify bottlenecks, and optimize your Ray workloads.</p>
+<section id="id2">
+<h3>Key Features<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p><strong>Dual Visualization Modes:</strong></p>
+<ul class="simple">
+<li><p><strong>Logical View:</strong> Displays the call graph between functions and actors, showing the control flow and data dependencies in your application.</p></li>
+<li><p><strong>Physical View:</strong> Shows the physical distribution of actors across nodes with their resource usage and placement groups.</p></li>
+</ul>
+<p><strong>Interactive Exploration:</strong></p>
+<ul class="simple">
+<li><p><strong>Zoom and Pan:</strong> Navigate through complex graphs with intuitive zoom and pan controls.</p></li>
+<li><p><strong>Element Selection:</strong> Click on any node to view detailed information in the info card.</p></li>
+<li><p><strong>Highlighting:</strong> Automatically highlights related nodes and edges when selecting an element.</p></li>
+<li><p><strong>Search:</strong> Filter the visualization to highlight elements matching your search term.</p></li>
+</ul>
+<p><strong>Resource Usage Visualization:</strong></p>
+<ul class="simple">
+<li><p>Monitor CPU, memory, and GRAM usage of actors in the physical view.</p></li>
+<li><p>View detailed GPU memory utilization for actors using GPU resources.</p></li>
+<li><p>Select different resource metrics to visualize (GRAM, CPU, memory).</p></li>
+</ul>
+<p><strong>Context-Based Filtering:</strong></p>
+<ul class="simple">
+<li><p>Filter actors based on custom context information registered by your application.</p></li>
+<li><p>Visualize actors with different colors based on their context values.</p></li>
+</ul>
+</section>
+<section id="enabling-flow-insight">
+<h3>Enabling Flow Insight<a class="headerlink" href="#enabling-flow-insight" title="Link to this heading">#</a></h3>
+<p>To enable Flow Insight, set the <code class="code docutils literal notranslate"><span class="pre">RAY_FLOW_INSIGHT</span></code> environment variable to “1” before starting your Ray cluster.</p>
+</section>
+<section id="accessing-flow-insight">
+<h3>Accessing Flow Insight<a class="headerlink" href="#accessing-flow-insight" title="Link to this heading">#</a></h3>
+<img alt="Flow Insight View screenshot" class="align-center" src="../_images/flow-insight-entry.jpg" />
+<p>To access the Flow Insight view, click on the “Insight” link in the Jobs view for a specific job.
+This will open the Flow Insight visualization for that job, showing the execution graph and
+relationships between components.</p>
+</section>
+<section id="logical-view">
+<h3>Logical View<a class="headerlink" href="#logical-view" title="Link to this heading">#</a></h3>
+<img alt="Flow Insight View screenshot" class="align-center" src="../_images/flow-insight-logical-view.jpg" />
+<p>The logical view displays the call graph of your Ray application, showing the relationships
+between functions, actors, and methods. This view helps you understand the control flow
+and data dependencies in your application.</p>
+<ul class="simple">
+<li><p><strong>Nodes:</strong> Represent functions, actors, and methods in your application.</p></li>
+<li><p><strong>Edges:</strong> Show the call relationships and data transfers between nodes.</p></li>
+<li><p><strong>Edge Thickness:</strong> Indicates the frequency or volume of calls/data transfers.</p></li>
+</ul>
+<p>The logical view is particularly useful for understanding the high-level structure of your
+application and identifying communication patterns between components.</p>
+</section>
+<section id="physical-view">
+<h3>Physical View<a class="headerlink" href="#physical-view" title="Link to this heading">#</a></h3>
+<img alt="Flow Insight View screenshot" class="align-center" src="../_images/flow-insight-physical-view.jpg" />
+<p>The physical view shows how actors are distributed across nodes in your Ray cluster,
+organized by placement groups. This view helps you understand the physical deployment
+of your application and resource utilization.</p>
+<ul class="simple">
+<li><p><strong>Nodes:</strong> Represent physical machines in your Ray cluster.</p></li>
+<li><p><strong>Placement Groups:</strong> Show how actors are grouped together for locality.</p></li>
+<li><p><strong>Actor Boxes:</strong> Display individual actors with their resource usage.</p></li>
+<li><p><strong>Color Coding:</strong> Indicates resource utilization levels or context-based grouping.</p></li>
+</ul>
+<p>The physical view is valuable for identifying resource bottlenecks, understanding actor
+placement, and optimizing resource utilization in your Ray cluster.</p>
+</section>
+<section id="resource-visualization">
+<h3>Resource Visualization<a class="headerlink" href="#resource-visualization" title="Link to this heading">#</a></h3>
+<p>Flow Insight provides detailed resource usage visualization for your Ray application:</p>
+<ul class="simple">
+<li><p><strong>CPU Usage:</strong> View CPU utilization for each actor and node.</p></li>
+<li><p><strong>Memory Usage:</strong> Monitor memory consumption across your application.</p></li>
+<li><p><strong>GPU Usage:</strong> Track GPU memory utilization for actors using GPUs.</p></li>
+<li><p><strong>Resource Selection:</strong> Switch between different resource metrics to visualize.</p></li>
+</ul>
+<p>This helps you identify resource-intensive components and optimize resource allocation
+in your Ray application.</p>
+</section>
+<section id="context-based-filtering">
+<h3>Context-Based Filtering<a class="headerlink" href="#context-based-filtering" title="Link to this heading">#</a></h3>
+<p>You can register custom context information for your actors to enable context-based
+filtering and visualization in the Flow Insight view. This is particularly useful for
+categorizing actors by their role, status, or other application-specific attributes.</p>
+<p>To register context information for an actor:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">register_current_context</span><span class="p">,</span> <span class="n">async_register_current_context</span>
+
+<span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
+<span class="k">class</span> <span class="nc">MyActor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="c1"># Register context synchronously</span>
+        <span class="n">register_current_context</span><span class="p">({</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">role</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;initialized&quot;</span><span class="p">})</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">update_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+        <span class="c1"># Register context asynchronously</span>
+        <span class="k">await</span> <span class="n">async_register_current_context</span><span class="p">({</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">})</span>
+
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Update context with current processing information</span>
+        <span class="n">register_current_context</span><span class="p">({</span><span class="s2">&quot;processing&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+        <span class="c1"># ... processing logic ...</span>
+        <span class="n">register_current_context</span><span class="p">({</span><span class="s2">&quot;processing&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>In the Flow Insight physical view, you can then select the context key (e.g., “role” or “status”)
+to color-code actors based on their context values, making it easy to identify actors with
+specific roles or states.</p>
+</section>
+<section id="info-card">
+<h3>Info Card<a class="headerlink" href="#info-card" title="Link to this heading">#</a></h3>
+<p>When you click on an element in either the logical or physical view, the info card displays
+detailed information about that element:</p>
+<ul class="simple">
+<li><p><strong>For Actors:</strong>
+- Basic information (name, ID, language)
+- State and PID
+- GPU devices and memory usage
+- Methods implemented by the actor
+- Callers and callees (who calls this actor and who this actor calls)
+- Data dependencies</p></li>
+<li><p><strong>For Methods:</strong>
+- Basic information (name, actor, language)
+- Callers and callees
+- Data dependencies</p></li>
+<li><p><strong>For Functions:</strong>
+- Basic information (name, language)
+- Callers and callees
+- Data dependencies</p></li>
+</ul>
+<p>The info card helps you understand the detailed characteristics and relationships of
+individual components in your Ray application.</p>
+</section>
+<section id="search-functionality">
+<h3>Search Functionality<a class="headerlink" href="#search-functionality" title="Link to this heading">#</a></h3>
+<p>The search functionality allows you to filter the visualization to show only elements
+matching your search term. This is particularly useful for finding specific actors,
+methods, or functions in complex applications.</p>
+<p>Simply enter your search term in the search box, and the visualization will highlight
+matching elements while fading out non-matching ones.</p>
+</section>
+<section id="best-practices">
+<h3>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading">#</a></h3>
+<p>To get the most out of Flow Insight:</p>
+<ol class="arabic simple">
+<li><p><strong>Enable Flow Insight:</strong> Set the <code class="code docutils literal notranslate"><span class="pre">RAY_FLOW_INSIGHT</span></code> environment variable to “1” before starting your Ray cluster.</p></li>
+<li><p><strong>Register Context Information:</strong> Use <code class="code docutils literal notranslate"><span class="pre">register_current_context</span></code> or <code class="code docutils literal notranslate"><span class="pre">async_register_current_context</span></code> to provide additional filtering capabilities.</p></li>
+<li><p><strong>Use Meaningful Names:</strong> Give your actors and tasks descriptive names to make the visualization more informative.</p></li>
+<li><p><strong>Explore Both Views:</strong> Switch between logical and physical views to understand both the structural and deployment aspects of your application.</p></li>
+<li><p><strong>Use Search and Filtering:</strong> For complex applications, use search and context-based filtering to focus on specific components.</p></li>
+</ol>
+<p>Flow Insight is a powerful tool for understanding, debugging, and optimizing Ray applications,
+providing insights into both the logical structure and physical deployment of your distributed workloads.
+.. _dash-overview:</p>
+</section>
+</section>
 <section id="overview-view">
-<span id="dash-overview"></span><h2>Overview view<a class="headerlink" href="#overview-view" title="Link to this heading">#</a></h2>
+<h2>Overview view<a class="headerlink" href="#overview-view" title="Link to this heading">#</a></h2>
 <img alt="../_images/dashboard-overview.png" class="align-center" src="../_images/dashboard-overview.png" />
 <p>The Overview view provides a high-level status of the Ray Cluster.</p>
 <p><strong>Overview metrics</strong></p>
@@ -1782,6 +1944,19 @@ and configured node type.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logs-view">Logs view</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#virtual-clusters-view">Virtual Clusters View</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flow-insight-view">Flow Insight View</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Key Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#enabling-flow-insight">Enabling Flow Insight</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-flow-insight">Accessing Flow Insight</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logical-view">Logical View</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#physical-view">Physical View</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resource-visualization">Resource Visualization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context-based-filtering">Context-Based Filtering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#info-card">Info Card</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#search-functionality">Search Functionality</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices">Best Practices</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview-view">Overview view</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
 </ul>

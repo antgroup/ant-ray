@@ -39,11 +39,22 @@ class _ray_internal_insight_monitor:
             lambda: defaultdict(lambda: defaultdict(dict))
         )
 
+        # Flame graph data
+        # {job_id: {task_id: {start_time, end_time, duration, caller_class, caller_func, actor_name}}}
+        self.flame_graph_data = defaultdict(dict)
+        # {job_id: {caller_class.caller_func: {total_time, call_count, children: {callee: time}}}}
+        self.flame_graph_aggregated = defaultdict(lambda: defaultdict(lambda: {"total_time": 0, "call_count": 0, "children": defaultdict(float)}))
+
+        # Task parent-child relationship tracking
+        # {job_id: {callee_task_id: caller_task_id}}
+        self.task_parent_map = defaultdict(dict)
+
         # Start HTTP server
         self.app = aiohttp.web.Application()
         self.app.router.add_get("/get_call_graph_data", self.handle_get_call_graph_data)
         self.app.router.add_get("/get_context_info", self.handle_get_context_info)
         self.app.router.add_get("/get_resource_usage", self.handle_get_resource_usage)
+        self.app.router.add_get("/get_flame_graph_data", self.handle_get_flame_graph_data)
         self.runner = None
         self.site = None
         self.node_ip_address = ray._private.services.get_node_ip_address()
@@ -93,6 +104,12 @@ class _ray_internal_insight_monitor:
         data = self.get_resource_usage(job_id)
         return aiohttp.web.json_response(data)
 
+    async def handle_get_flame_graph_data(self, request):
+        """Handle HTTP request for flame graph data."""
+        job_id = request.query.get("job_id", "default_job")
+        data = self.get_flame_graph_data(job_id)
+        return aiohttp.web.json_response(data)
+
     async def async_emit_call_record(self, call_record):
         self.emit_call_record(call_record)
 
@@ -103,6 +120,14 @@ class _ray_internal_insight_monitor:
         callee_class = call_record["callee_class"]
         callee_func = call_record["callee_func"]
         call_times = call_record.get("call_times", 1)
+        
+        # Create caller and callee identifiers for parent-child relationship
+        caller_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
+        callee_id = f"{callee_class}.{callee_func}" if callee_class else callee_func
+        
+        # Update parent-child relationship map
+        if caller_id and callee_id:
+            self.task_parent_map[job_id][callee_id] = caller_id
 
         # Create caller and callee identifiers
         caller_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
@@ -316,6 +341,106 @@ class _ray_internal_insight_monitor:
         """Get resource usage."""
         return self.resource_usage[job_id]
 
+    def get_flame_graph_data(self, job_id):
+        """Return the flame graph data for a specific job."""
+        flame_data = {
+            "nodes": [],
+            "aggregated": []
+        }
+        
+        # Add individual execution data
+        for task_id, task_data in self.flame_graph_data.get(job_id, {}).items():
+            node_id = task_data["node_id"]
+            
+            node_data = {
+                "id": task_id,  # Use task_id as unique identifier
+                "node_id": node_id,  # Keep node_id for parent relationship
+                "start_time": task_data["start_time"],
+                "end_time": task_data.get("end_time"),
+                "duration": task_data.get("duration"),
+                "caller_class": task_data["caller_class"],
+                "caller_func": task_data["caller_func"],
+                "actor_name": task_data["actor_name"],
+            }
+            
+            # Add parent_id if available in the parent map using node_id
+            if node_id in self.task_parent_map.get(job_id, {}):
+                parent_node_id = self.task_parent_map[job_id][node_id]
+                # Find the task_id of the parent by looking up its node_id
+                for parent_task_id, parent_data in self.flame_graph_data[job_id].items():
+                    if parent_data["node_id"] == parent_node_id:
+                        node_data["parent_id"] = parent_task_id
+                        break
+                
+            flame_data["nodes"].append(node_data)
+        
+        # Add aggregated data for flame graph
+        for func_id, func_data in self.flame_graph_aggregated.get(job_id, {}).items():
+            children = []
+            for child_func, child_time in func_data["children"].items():
+                children.append({
+                    "name": child_func,
+                    "value": child_time
+                })
+            
+            flame_data["aggregated"].append({
+                "name": func_id,
+                "value": func_data["total_time"],
+                "count": func_data["call_count"],
+                "children": children
+            })
+        
+        return flame_data
+
+    async def async_emit_task_start(self, task_record):
+        self.emit_task_start(task_record)
+        
+    def emit_task_start(self, task_record):
+        """Record the start of a task execution for flame graph visualization."""
+        job_id = task_record["job_id"]
+        caller_class = task_record["caller_class"]
+        caller_func = task_record["caller_func"]
+        task_id = task_record["task_id"]
+        
+        # Create node_id from caller class and function for parent tracking
+        node_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
+        
+        self.flame_graph_data[job_id][task_id] = {
+            "start_time": task_record["timestamp"],
+            "caller_class": caller_class,
+            "caller_func": caller_func,
+            "node_id": node_id,  # Store node_id for parent relationship lookup
+            "actor_name": task_record["actor_name"]
+        }
+    
+    async def async_emit_task_end(self, task_record):
+        self.emit_task_end(task_record)
+        
+    def emit_task_end(self, task_record):
+        """Record the end of a task execution and calculate duration."""
+        job_id = task_record["job_id"]
+        task_id = task_record["task_id"]
+        
+        if task_id in self.flame_graph_data[job_id]:
+            start_data = self.flame_graph_data[job_id][task_id]
+            end_time = task_record["timestamp"]
+            duration = end_time - start_data["start_time"]
+            
+            # Update the task data with end time and duration
+            self.flame_graph_data[job_id][task_id]["end_time"] = end_time
+            self.flame_graph_data[job_id][task_id]["duration"] = duration
+            
+            # Get node_id from start data for parent relationship lookup
+            node_id = start_data["node_id"]
+            
+            # Update aggregated data using node_id
+            self.flame_graph_aggregated[job_id][node_id]["total_time"] += duration
+            self.flame_graph_aggregated[job_id][node_id]["call_count"] += 1
+            
+            # If there's a parent node, update the children data using node_ids
+            if node_id in self.task_parent_map.get(job_id, {}):
+                parent_id = self.task_parent_map[job_id][node_id]
+                self.flame_graph_aggregated[job_id][parent_id]["children"][node_id] += duration
 
 _inner_class_name = "_ray_internal_insight_monitor"
 _null_object_id = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
@@ -343,6 +468,14 @@ def _get_current_task_name():
         if current_task_name is not None:
             return current_task_name.split(".")[-1]
     return "main"
+
+def _get_caller_actor():
+    caller_actor = None
+    try:
+        caller_actor = ray.get_runtime_context().current_actor
+    except Exception:
+        pass
+    return caller_actor
 
 
 def _get_caller_class():
@@ -399,6 +532,10 @@ def record_control_flow(callee_class, callee_func):
 
     caller_class = _get_caller_class()
     caller_func = _get_current_task_name()
+    
+    # Get caller and callee task IDs if available
+    caller_task_id = ray.get_runtime_context().get_task_id()
+    
     # Create a record for this call
     call_record = {
         "caller_class": caller_class,
@@ -407,7 +544,9 @@ def record_control_flow(callee_class, callee_func):
         "callee_func": callee_func,
         "call_times": 1,
         "job_id": ray.get_runtime_context().get_job_id(),
+        "caller_task_id": caller_task_id,
     }
+    
     if ray._private.worker.global_worker.core_worker.current_actor_is_asyncio():
 
         async def _emit():
@@ -776,3 +915,75 @@ async def async_report_torch_gram():
             },
         }
     )
+
+def record_task_start():
+    """
+    Record the start of a task execution for flame graph visualization.
+    This should be called at the beginning of a task or actor method.
+    """
+    if not is_flow_insight_enabled():
+        return
+
+    caller_class = _get_caller_class()
+    caller_func = _get_current_task_name()
+
+    if caller_class is not None and (caller_class.startswith(_inner_class_name) or caller_class.startswith("JobSupervisor")):
+        return
+    
+    # Get actor name if available
+    actor_name = None
+    try:
+        actor_name = ray.get_runtime_context().get_actor_name()
+    except Exception:
+        pass
+    
+    task_id = ray.get_runtime_context().get_task_id()
+
+    # Create a record for this task start
+    task_record = {
+        "caller_class": caller_class,
+        "caller_func": caller_func,
+        "actor_name": actor_name,
+        "timestamp": time.time(),
+        "job_id": ray.get_runtime_context().get_job_id(),
+        "task_id": task_id,
+    }
+    
+    if ray._private.worker.global_worker.core_worker.current_actor_is_asyncio():
+        async def _emit():
+            await get_monitor_actor().async_emit_task_start.remote(task_record)
+        run_async(_emit())
+    else:
+        ray.get(get_monitor_actor().emit_task_start.remote(task_record))
+
+def record_task_end():
+    """
+    Record the end of a task execution for flame graph visualization.
+    This should be called at the end of a task or actor method.
+    """
+    if not is_flow_insight_enabled():
+        return
+
+    caller_class = _get_caller_class()
+    caller_func = _get_current_task_name()
+
+    if caller_class is not None and (caller_class.startswith(_inner_class_name) or caller_class.startswith("JobSupervisor")):
+        return
+
+    task_id = ray.get_runtime_context().get_task_id()
+    
+    # Create a record for this task end
+    task_record = {
+        "caller_class": caller_class,
+        "caller_func": caller_func,
+        "timestamp": time.time(),
+        "job_id": ray.get_runtime_context().get_job_id(),
+        "task_id": task_id,
+    }
+    
+    if ray._private.worker.global_worker.core_worker.current_actor_is_asyncio():
+        async def _emit():
+            await get_monitor_actor().async_emit_task_end.remote(task_record)
+        run_async(_emit())
+    else:
+        ray.get(get_monitor_actor().emit_task_end.remote(task_record))

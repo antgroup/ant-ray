@@ -23,6 +23,8 @@ import {
 import { colorScheme } from "./graphData";
 import "./RayVisualization.css";
 import PhysicalVisualization from "./PhysicalVisualization";
+import { FlameVisualization } from "./FlameVisualization";
+import { getFlameGraphData, FlameGraphData } from "../../service/flame-graph";
 
 type RayVisualizationProps = {
   graphData: GraphData;
@@ -153,11 +155,13 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
     ref,
   ) => {
     // Add view state
-    const [viewType, setViewType] = useState<"logical" | "physical">("logical");
+    const [viewType, setViewType] = useState<"logical" | "physical" | "flame">("logical");
     const [physicalViewData, setPhysicalViewData] =
       useState<PhysicalViewData | null>(null);
     const [loadingPhysicalView, setLoadingPhysicalView] =
       useState<boolean>(false);
+    const [flameData, setFlameData] = useState<FlameGraphData | null>(null);
+    const [loadingFlameData, setLoadingFlameData] = useState<boolean>(false);
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const zoomRef =
@@ -1905,7 +1909,7 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
     // Handle view type change
     const handleViewTypeChange = (
       event: React.MouseEvent<HTMLElement>,
-      newViewType: "logical" | "physical" | null,
+      newViewType: "logical" | "physical" | "flame" | null,
     ) => {
       if (newViewType !== null) {
         setViewType(newViewType);
@@ -1914,6 +1918,33 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
         }
       }
     };
+
+    useEffect(() => {
+      const fetchFlameData = async () => {
+        if (viewType === "flame") {
+          try {
+            setLoadingFlameData(true);
+            const data = await getFlameGraphData(jobId);
+            console.log("Raw response from getFlameGraphData:", data); // Debug the raw response
+            
+            if (data && data.data.flameData) {
+              // If the data is nested inside a flameData property, extract it
+              setFlameData(data.data.flameData);
+            } else {
+              console.error("No valid flame graph data received");
+              setFlameData(null);
+            }
+          } catch (error) {
+            console.error("Error fetching flame graph data:", error);
+            setFlameData(null);
+          } finally {
+            setLoadingFlameData(false);
+          }
+        }
+      };
+
+      fetchFlameData();
+    }, [viewType, jobId]);
 
     return (
       <div ref={ref} className="ray-visualization-container">
@@ -1970,6 +2001,9 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
               <ToggleButton value="physical" aria-label="physical view">
                 Physical
               </ToggleButton>
+              <ToggleButton value="flame" aria-label="flame graph view">
+                Flame Graph
+              </ToggleButton>
             </ToggleButtonGroup>
           </div>
           {viewType === "logical" && (
@@ -2016,22 +2050,47 @@ const RayVisualization = forwardRef<HTMLDivElement, RayVisualizationProps>(
         <div className="graph-container">
           {viewType === "logical" ? (
             <svg ref={svgRef} width="100%" height="600"></svg>
-          ) : physicalViewData ? (
-            <PhysicalVisualization
-              physicalViewData={physicalViewData}
-              onElementClick={onElementClick}
-              selectedElementId={selectedElementId}
-              jobId={jobId}
-              updateKey={updateKey}
-              onUpdate={onUpdate}
-              updating={updating || loadingPhysicalView}
-              searchTerm={searchTerm}
-            />
-          ) : (
-            <div className="loading-container">
-              <p>Loading physical view data...</p>
+          ) : viewType === "physical" ? (
+            physicalViewData ? (
+              <PhysicalVisualization
+                physicalViewData={physicalViewData}
+                onElementClick={onElementClick}
+                selectedElementId={selectedElementId}
+                jobId={jobId}
+                updateKey={updateKey}
+                onUpdate={onUpdate}
+                updating={updating || loadingPhysicalView}
+                searchTerm={searchTerm}
+              />
+            ) : (
+              <div className="loading-container">
+                <p>Loading physical view data...</p>
+              </div>
+            )
+          ) : viewType === "flame" ? (
+            <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '600px' }}>
+              {loadingFlameData ? (
+                <div className="loading-container">
+                  <p>Loading flame graph data...</p>
+                </div>
+              ) : flameData ? (
+                <FlameVisualization
+                  flameData={flameData}
+                  onElementClick={onElementClick}
+                  selectedElementId={selectedElementId}
+                  jobId={jobId}
+                  updateKey={updateKey}
+                  onUpdate={onUpdate}
+                  updating={updating}
+                  searchTerm={searchTerm}
+                />
+              ) : (
+                <div className="loading-container">
+                  <p>No flame graph data available</p>
+                </div>
+              )}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     );

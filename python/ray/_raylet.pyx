@@ -1836,7 +1836,9 @@ cdef void execute_task(
 
             return function(actor, *arguments, **kwarguments)
 
-    from ray.util.insight import record_object_arg_get
+    from ray.util.insight import record_object_arg_get, record_task_start, record_task_end
+
+    record_task_start()
 
     with core_worker.profile_event(b"task::" + name, extra_data=extra_data), \
          ray._private.worker._changeproctitle(title, next_title):
@@ -1900,7 +1902,8 @@ cdef void execute_task(
                         ray.util.pdb.set_trace(
                             breakpoint_uuid=debugger_breakpoint)
                     outputs = function_executor(*args, **kwargs)
-
+                    record_task_end()
+                    
                     if is_streaming_generator:
                         # Streaming generator always has a single return value
                         # which is the generator task return.

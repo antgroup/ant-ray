@@ -59,9 +59,31 @@ class RuntimeEnvContext:
             ray_jars = os.path.join(get_ray_jars_dir(), "*")
 
             local_java_jars = []
+            local_java_code_search_path = []
             for java_jar in self.java_jars:
                 local_java_jars.append(f"{java_jar}/*")
                 local_java_jars.append(java_jar)
+                local_java_code_search_path.append(java_jar)
+
+            # TODO(Jacky): Add working dir to classpath of Java workers.
+            if self.native_libraries["code_search_path"]:
+                local_java_code_search_path += self.native_libraries["code_search_path"]
+
+            if local_java_code_search_path:
+                old_path = None
+                index = 0
+                for args in passthrough_args:
+                    if args.startswith("-Dray.job.code-search-path="):
+                        old_path = args.split("-Dray.job.code-search-path=", 1)[-1]
+                        break
+                    index += 1
+                new_path = ":".join(local_java_code_search_path)
+                if old_path:
+                    passthrough_args[
+                        index
+                    ] = f"-Dray.job.code-search-path={new_path}:{old_path}"
+                else:
+                    passthrough_args += [f"-Dray.job.code-search-path={new_path}"]
 
             class_path_args = ["-cp", ray_jars + ":" + str(":".join(local_java_jars))]
             passthrough_args = class_path_args + passthrough_args

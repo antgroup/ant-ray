@@ -15,7 +15,7 @@ type FlameVisualizationProps = {
 
 type FlameNode = {
   name: string;
-  value: number;
+  customValue: number;
   originalValue?: number; // Store original value for display
   count?: number;
   children?: FlameNode[];
@@ -33,7 +33,7 @@ type PartitionHierarchyNode = d3.HierarchyNode<FlameNode> & {
   delta?: number;
   originalValue?: number;
   id?: string | number;
-  customValue?: number;
+  customValue?: number; // Make sure this is defined as a mutable property
 }
 
 // Generate a color based on the function name
@@ -90,7 +90,6 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
     // Transform data
     const transformedData = transformFlameData(flameData);
-    console.log("Transformed data for flame graph:", transformedData);
     
     // Create flame graph
     const chart: any = createFlameGraph();
@@ -104,7 +103,6 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       .transitionDuration(750)
       .transitionEase(d3.easeCubic)
       .inverted(false)
-      .title("Flame Graph")
       .onClick((d: PartitionHierarchyNode) => {
         onElementClick({
           id: d.data.name,
@@ -186,7 +184,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     const style = document.createElement('style');
     style.textContent = `
       .d3-flame-graph rect {
-        stroke: #EEEEEE;
+        stroke: none;
         fill-opacity: .8;
       }
       
@@ -231,6 +229,11 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
         color: white;
         z-index: 10;
       }
+
+      .partition {
+        border: none;
+        outline: none;
+      }
     `;
     document.head.appendChild(style);
 
@@ -248,7 +251,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
   const transformFlameData = (data: FlameGraphData): FlameNode => {
     if (!data || !data.aggregated || !Array.isArray(data.aggregated)) {
       console.warn("Invalid flame graph data format:", data);
-      return { name: "root", value: 0, children: [] };
+      return { name: "root", customValue: 0, children: [] };
     }
 
     console.log("Original flame data:", data);
@@ -279,131 +282,97 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       const originalValue = node.value || 0;
       
       // Calculate normalized value for sizing
+      // For flame graphs, we want to preserve the relative proportions
+      // but ensure small values are still visible
       let normalizedValue = originalValue;
       
-      // Ensure small values are still visible in the visualization
+      // Apply a more conservative normalization to prevent excessive scaling
       if (normalizedValue > 0 && maxValue > minValue) {
-        // Apply a log-scale normalization for better visualization of small values
-        if (maxValue / minValue > 1000) {
-          // For very large ranges, use logarithmic scaling
-          normalizedValue = Math.max(normalizedValue, minValue);
-          const logMin = Math.log(minValue || 0.0001);
-          const logMax = Math.log(maxValue);
-          const logValue = Math.log(normalizedValue);
+        // For very large ranges, use a more moderate scaling approach
+        if (maxValue / minValue > 100) {
+          // Use square root scaling for better distribution
+          normalizedValue = Math.sqrt(normalizedValue / maxValue) * maxValue;
           
-          // Scale to ensure small values are visible but proportions are maintained
-          normalizedValue = minValue + (maxValue - minValue) * 
-            ((logValue - logMin) / (logMax - logMin));
+          // Ensure minimum visible size
+          if (normalizedValue < maxValue * 0.01) {
+            normalizedValue = maxValue * 0.01;
+          }
         }
       }
       
+      // Create node with empty children array
       nodeMap.set(node.name, {
         name: node.name,
-        value: normalizedValue, // Use normalized value for sizing
-        originalValue: originalValue, // Store original value for display
+        customValue: normalizedValue,
+        originalValue: originalValue,
         count: node.count || 0,
-        children: []
+        children: []  // Initialize with empty array
       });
     });
     
-    // Find the main node or create one
-    let mainNode: FlameNode = nodeMap.get("main") || { name: "root", value: 0, children: [] };
-    
-    // If main node has zero value, set it to the max value since it's the base node
-    if (mainNode.value === 0 && maxValue > 0) {
-      console.log("Setting main node value to max value:", maxValue);
-      mainNode.value = maxValue;
-      // Update the node in the map if it exists
-      if (nodeMap.has("main")) {
-        nodeMap.set("main", mainNode);
-      } else if (nodeMap.has("root")) {
-        nodeMap.set("root", mainNode);
-      }
-    }
-    
-    // Create a set to track which nodes have been added as children
+    // Add this before the second pass:
     const addedAsChild = new Set<string>();
     
     // Second pass: build the hierarchy
-    // For each node with children, add those children to the node
     data.aggregated.forEach(node => {
-      if (node.children && node.children.length > 0) {
-        const parentNode = nodeMap.get(node.name);
-        if (parentNode && parentNode.children) {
-          // Clear existing children to avoid duplicates
-          parentNode.children = [];
+      const parentNode = nodeMap.get(node.name);
+      if (parentNode && node.children) {
+        parentNode.children = node.children.map(child => {
+          const childName = typeof child === 'string' ? child : child.name;
+          let childNode = nodeMap.get(childName);
           
-          // Convert children to full nodes
-          node.children.forEach(child => {
-            const childName = typeof child === 'string' ? child : child.name;
-            const childNode = nodeMap.get(childName);
-            
-            if (childNode) {
-              parentNode.children!.push(childNode);
-              addedAsChild.add(childName);
-            } else {
-              // If child not found in map, create a simple node
-              const childValue = typeof child === 'string' ? 0 : (child.value || 0);
-              const newChild = { name: childName, value: childValue, children: [] };
-              parentNode.children!.push(newChild);
-              addedAsChild.add(childName);
-            }
-          });
-        }
+          if (!childNode) {
+            childNode = {
+              name: childName,
+              customValue: 0,
+              children: []
+            };
+            nodeMap.set(childName, childNode);
+          }
+          addedAsChild.add(childName);  // Track child nodes
+          return childNode;
+        });
       }
     });
     
-    // Add any nodes that haven't been added as children to the main node
-    // (except for the main node itself)
-    if (mainNode.children) {
-      data.aggregated.forEach(node => {
-        if (!addedAsChild.has(node.name) && node.name !== "main" && node.name !== "root") {
-          const nodeObj = nodeMap.get(node.name);
-          if (nodeObj && !mainNode.children!.includes(nodeObj)) {
-            mainNode.children!.push(nodeObj);
-          }
-        }
-      });
-    }
-    
-    // Special case: if we have a "hello" node with children but no main node,
-    // use the hello node as the root
-    const helloNode = nodeMap.get("hello");
-    if (helloNode && helloNode.children && helloNode.children.length > 0 && 
-        (!mainNode.children || mainNode.children.length === 0)) {
-      mainNode = helloNode;
-      
-      // If hello node is now the main node and has zero value, set it to max value
-      if (mainNode.value === 0 && maxValue > 0) {
-        mainNode.value = maxValue;
-      }
-    }
-    
-    // If main node still has no children but we have nodes, add all nodes
-    if (mainNode.children && mainNode.children.length === 0 && data.aggregated.length > 0) {
-      data.aggregated.forEach(node => {
-        if (node.name !== mainNode.name) {
-          const nodeObj = nodeMap.get(node.name);
-          if (nodeObj && mainNode.children) {
-            mainNode.children.push(nodeObj);
-          }
-        }
-      });
-    }
+    // Build root hierarchy correctly
+    const mainNode: FlameNode = {
+      name: "root",
+      customValue: maxValue,  // Use the pre-calculated maxValue
+      children: Array.from(nodeMap.values()).filter(node => 
+        !addedAsChild.has(node.name) && node.name !== "root"
+      )
+    };
     
     // Calculate total value of all children
     let totalChildrenValue = 0;
     if (mainNode.children) {
       mainNode.children.forEach(child => {
-        totalChildrenValue += child.value || 0;
+        totalChildrenValue += child.customValue || 0;
       });
     }
     
     // If main node value is less than total children value, adjust it
-    if (mainNode.value < totalChildrenValue) {
-      console.log(`Adjusting main node value from ${mainNode.value} to ${totalChildrenValue}`);
-      mainNode.value = totalChildrenValue;
+    if (mainNode.customValue < totalChildrenValue) {
+      console.log(`Adjusting main node value from ${mainNode.customValue} to ${totalChildrenValue}`);
+      mainNode.customValue = totalChildrenValue;
     }
+    
+    // IMPORTANT: Make sure no nodes are hidden by default
+    // This is the key fix - ensure no nodes have hide=true initially
+    const ensureNodesVisible = (node: FlameNode) => {
+      // Remove hide and fade properties or set them to false
+      node.hide = false;
+      node.fade = false;
+      
+      // Recursively process children
+      if (node.children && node.children.length > 0) {
+        node.children.forEach(child => ensureNodesVisible(child));
+      }
+    };
+    
+    // Apply the fix to make all nodes visible
+    ensureNodesVisible(mainNode);
     
     // Log the transformed data for debugging
     console.log("Transformed flame data:", mainNode);
@@ -440,50 +409,49 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       return d.customValue !== undefined ? d.customValue : (d.value || 0);
     };
 
-    const getOriginalValue = (d: PartitionHierarchyNode) => {
-      // Return the original value for display
-      return d.data.originalValue !== undefined ? d.data.originalValue : (d.data.value || 0);
-    };
-
     const getChildren = (d: FlameNode) => {
       return d.children;
-    };
-
-    const labelHandler = (d: PartitionHierarchyNode) => {
-      // Show the actual value in seconds with appropriate precision
-      const valueInSeconds = getOriginalValue(d);
-      const formattedValue = valueInSeconds < 0.001 
-        ? valueInSeconds.toExponential(2) 
-        : valueInSeconds.toFixed(valueInSeconds < 0.1 ? 4 : 2);
-      
-      return getName(d) + ' (' + d3.format('.3f')(100 * (d.x1 - d.x0)) + '%, ' + formattedValue + ' s)';
     };
 
     const colorMapper = (d: PartitionHierarchyNode) => {
       return d.data.highlight ? '#E600E6' : generateColor(getName(d));
     };
 
-    function show(d: PartitionHierarchyNode) {
-      d.data.fade = false;
-      d.data.hide = false;
-      if (d.children) {
-        d.children.forEach(child => show(child as PartitionHierarchyNode));
-      }
-    }
 
     function hideSiblings(node: PartitionHierarchyNode) {
       let child = node;
       let parent = child.parent as PartitionHierarchyNode;
       
+      // First, show the path to the selected node and hide its siblings
       while (parent) {
+        parent.data.hide = false; // Ensure the ancestor path is visible
         parent.children?.forEach(sibling => {
           if (sibling !== child) {
             (sibling as PartitionHierarchyNode).data.hide = true;
+            // Hide all descendants of hidden siblings
+            hideDescendants(sibling as PartitionHierarchyNode);
           }
         });
         
         child = parent;
         parent = parent.parent as PartitionHierarchyNode;
+      }
+
+      // Show the selected node and its descendants
+      node.data.hide = false;
+      if (node.children) {
+        node.children.forEach(child => {
+          (child as PartitionHierarchyNode).data.hide = false;
+        });
+      }
+    }
+
+    function hideDescendants(node: PartitionHierarchyNode) {
+      node.data.hide = true;
+      if (node.children) {
+        node.children.forEach(child => {
+          hideDescendants(child as PartitionHierarchyNode);
+        });
       }
     }
 
@@ -496,9 +464,54 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
     function zoom(d: PartitionHierarchyNode) {
       if (tooltip) tooltip.hide();
+      
+      // Calculate the scale factor based on root width vs node width
+      const root = d.ancestors().pop() || d; // Get the root node
+      const scaleFactor = (root.x1 - root.x0) / (d.x1 - d.x0);
+      
+      // Hide siblings and fade ancestors
       hideSiblings(d);
-      show(d);
       fadeAncestors(d);
+
+      // Extend all parent nodes to root.x1
+      let current = d;
+      while (current.parent) {
+        current.parent.x1 = root.x1;
+        current.parent.x0 = root.x0;
+        current = current.parent;
+      }
+
+      // Scale the node and its descendants
+      function scaleSubtree(node: PartitionHierarchyNode, baseX0: number, baseX1: number) {
+        // For the root node of subtree, use the exact base coordinates
+        node.x0 = baseX0;
+        node.x1 = baseX1;
+
+        // Handle children sequentially if they exist
+        if (node.children && node.children.length > 0) {
+          let currentX = node.x0; // Start from parent's x0
+          node.children.forEach((child, index) => {
+            const childNode = child as PartitionHierarchyNode;
+            const childWidth = (childNode.x1 - childNode.x0) * scaleFactor;
+            
+            // Set child coordinates
+            childNode.x0 = currentX;
+            childNode.x1 = currentX + childWidth;
+            
+            // Update currentX for next child
+            currentX = childNode.x1;
+            
+            // Recursively handle this child's children
+            if (childNode.children) {
+              scaleSubtree(childNode, childNode.x0, childNode.x1);
+            }
+          });
+        }
+      }
+
+      // Scale the selected node and its subtree to fill the root width
+      scaleSubtree(d, root.x0, root.x1);
+      
       update();
       if (typeof clickHandler === 'function') {
         clickHandler(d);
@@ -568,14 +581,8 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     const partition = d3.partition<FlameNode>();
 
     function filterNodes(root: PartitionHierarchyNode) {
-      let nodeList = root.descendants();
-      if (minFrameSize > 0) {
-        const kx = width / (root.x1 - root.x0);
-        nodeList = nodeList.filter(function(el) {
-          return ((el.x1 - el.x0) * kx) > minFrameSize;
-        });
-      }
-      return nodeList;
+      // Filter out nodes that are marked as hidden
+      return root.descendants().filter(node => !node.data.hide);
     }
 
     function reappraiseNode(root: PartitionHierarchyNode) {
@@ -660,41 +667,81 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
     function update() {
       selection.each(function(this: Element, root: PartitionHierarchyNode) {
-        const x = d3.scaleLinear().range([0, width]);
-        const y = d3.scaleLinear().range([0, cellHeight]);
-
+        // Create proper scales with domains
         reappraiseNode(root);
 
         if (sort) root.sort(doSort);
 
-        const rootWithPartition = partition.size([width, 0])(root);
+        // Store current coordinates before partition layout
+        const nodeMap = new Map<string, {x0: number, x1: number}>();
+        root.descendants().forEach(d => {
+          if (d.x0 !== undefined && d.x1 !== undefined) {
+            nodeMap.set((d as any).pathId, {x0: d.x0, x1: d.x1});
+          }
+        });
 
-        const kx = width / (rootWithPartition.x1 - rootWithPartition.x0);
-        function frameWidth(d: PartitionHierarchyNode) { 
-          return (d.x1 - d.x0) * kx; 
+        // Configure partition layout with correct dimensions
+        const maxDepth = d3.max(root.descendants(), d => d.depth) || 0;
+        const totalHeight = (maxDepth + 1) * cellHeight;
+        
+        // Apply partition layout only if coordinates haven't been set
+        if (root.x0 === undefined || root.x1 === undefined) {
+          partition.size([width, totalHeight])(root);
         }
 
-        const descendants = filterNodes(rootWithPartition);
+        // Restore scaled coordinates
+        root.descendants().forEach(d => {
+          const stored = nodeMap.get((d as any).pathId);
+          if (stored) {
+            d.x0 = stored.x0;
+            d.x1 = stored.x1;
+          }
+        });
+
+        root.x1 = root.children?.[0]?.x1 || root.x1;
+
+        // Calculate width based on the node's proportion of the total width
+        function frameWidth(d: PartitionHierarchyNode) { 
+          return d.x1 - d.x0; 
+        }
+
+        const descendants = filterNodes(root);
+        
+        // Log some sample node dimensions for debugging
+        if (descendants.length > 0) {
+          const sample = descendants[0];
+          console.log("Sample node dimensions:", {
+            x0: sample.x0,
+            x1: sample.x1,
+            width: sample.x1 - sample.x0,
+            depth: sample.depth
+          });
+        }
+        
         const svg = d3.select(this).select('svg');
         svg.attr('width', width);
 
         let g = svg.selectAll<SVGGElement, PartitionHierarchyNode>('g')
-          .data(descendants, d => d.id!);
+          .data(descendants, d => (d as any).pathId);
 
         // Set height on first update
         if (!height || resetHeightOnZoom) {
-          const maxDepth = Math.max(...descendants.map(n => n.depth));
-          height = (maxDepth + 3) * cellHeight;
+          height = totalHeight + cellHeight; // Add some padding
           if (minHeight && height < minHeight) height = minHeight;
           svg.attr('height', height);
         }
 
-        // Update existing nodes
+        // Create a proper y scale for vertical positioning
+        const yScale = d3.scaleLinear()
+          .domain([0, maxDepth])
+          .range([0, (height || totalHeight) - cellHeight]);
+
+        // Update existing nodes with correct positioning
         g.transition()
           .duration(transitionDuration)
           .ease(transitionEase)
           .attr('transform', d => 
-            `translate(${x(d.x0)},${inverted ? y(d.depth) : (height! - y(d.depth) - cellHeight)})`
+            `translate(${d.x0},${inverted ? yScale(d.depth) : ((height || totalHeight) - yScale(d.depth) - cellHeight)})`
           );
 
         g.select('rect')
@@ -703,11 +750,11 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
           .ease(transitionEase)
           .attr('width', frameWidth);
 
-        // Enter new nodes
+        // Enter new nodes with correct positioning
         const node = g.enter()
           .append('svg:g')
           .attr('transform', d => 
-            `translate(${x(d.x0)},${inverted ? y(d.depth) : (height! - y(d.depth) - cellHeight)})`
+            `translate(${d.x0},${inverted ? yScale(d.depth) : ((height || totalHeight) - yScale(d.depth) - cellHeight)})`
           );
 
         node.append('svg:rect')
@@ -724,7 +771,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
         // Re-select to see the new elements
         g = svg.selectAll<SVGGElement, PartitionHierarchyNode>('g')
-          .data(descendants, d => d.id!);
+          .data(descendants, d => (d as any).pathId);
 
         g.attr('width', frameWidth)
           .attr('height', cellHeight)
@@ -734,11 +781,6 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
         g.select('rect')
           .attr('height', cellHeight)
           .attr('fill', colorMapper);
-
-        if (!tooltip) {
-          g.select('title')
-            .text(labelHandler);
-        }
 
         g.select('foreignObject')
           .attr('width', frameWidth)
@@ -759,9 +801,6 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
         g.on('mouseover', function(event, d) {
           if (tooltip) tooltip.show(d, this);
-          if (detailsElement) {
-            detailsElement.textContent = labelHandler(d);
-          }
           if (typeof hoverHandler === 'function') {
             hoverHandler(d);
           }
@@ -776,22 +815,27 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
     function processData() {
       selection.datum((data: FlameNode) => {
-        // Creating a root hierarchical structure
+        // Create hierarchy with proper value assignment
         const root = d3.hierarchy(data, getChildren)
-          // Use the value directly for sizing, not count
-          .sum(d => d.value || 0);
+          // Use customValue for sizing, falling back to value if not available
+          .sum(d => {
+            // Ensure we're using the correct value for sizing
+            return d.customValue !== undefined ? d.customValue : 0;
+          });
+        
+        // Log the root node for debugging
+        console.log("Hierarchy root:", root);
 
-        // Augmenting nodes with ids
-        let id = 0;
+        // Generate path-based IDs
         root.descendants().forEach(node => {
-          (node as PartitionHierarchyNode).id = String(id++);
+          const path: string[] = [];
+          let current: typeof node | null = node;
+          while (current && current !== root) {
+            path.unshift(current.data.name);
+            current = current.parent;
+          }
+          (node as any).pathId = path.join("->");
         });
-
-        // Calculate actual value
-        reappraiseNode(root as PartitionHierarchyNode);
-
-        // Store value for later use
-        (root as PartitionHierarchyNode).originalValue = root.value;
 
         return root as PartitionHierarchyNode;
       });
@@ -812,7 +856,9 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
           const svg = d3.select(this)
             .append('svg:svg')
             .attr('width', width)
-            .attr('class', 'partition d3-flame-graph');
+            .attr('class', 'partition d3-flame-graph')
+            .style('margin', '0 auto')
+            .style('display', 'block');
 
           if (height) {
             if (minHeight && height < minHeight) height = minHeight;
@@ -994,8 +1040,13 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
         width: "100%",
         height: "500px",
         position: "relative",
-        backgroundColor: "#fff",
+        backgroundColor: "transparent",
         fontFamily: "Verdana, sans-serif",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        margin: "20px auto",
+        maxWidth: "1200px"
       }}
     />
   );

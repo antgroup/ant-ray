@@ -314,8 +314,20 @@ class RemoteFunction:
         if client_mode_should_convert():
             return client_mode_convert_function(self, args, kwargs, **task_options)
 
+        from ray.util.insight import record_control_flow
+
+        record_control_flow(None, self._function_name.split(".")[-1])
+
         worker = ray._private.worker.global_worker
         worker.check_connected()
+
+        if worker.mode != ray._private.worker.WORKER_MODE:
+            # Only need to record on the driver side
+            # since workers are created via tasks or actors
+            # launched from the driver.
+            from ray._private.usage import usage_lib
+
+            usage_lib.record_library_usage("core")
 
         # We cannot do this when the function is first defined, because we need
         # ray.init() to have been called when this executes

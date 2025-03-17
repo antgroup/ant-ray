@@ -453,8 +453,11 @@ class HttpRuntimeEnvAgentClient : public RuntimeEnvAgentClient {
     RetryInvokeOnNotFoundWithDeadline<rpc::DeleteRuntimeEnvIfPossibleReply>(
         [=](SuccCallback<rpc::DeleteRuntimeEnvIfPossibleReply> succ_callback,
             FailCallback fail_callback) {
-          return TryDeleteRuntimeEnvIfPossible(
-              serialized_runtime_env, std::move(succ_callback), std::move(fail_callback), worker_id, job_id);
+          return TryDeleteRuntimeEnvIfPossible(serialized_runtime_env,
+                                               std::move(succ_callback),
+                                               std::move(fail_callback),
+                                               worker_id,
+                                               job_id);
         },
         /*succ_callback=*/
         [=](rpc::DeleteRuntimeEnvIfPossibleReply reply) {

@@ -5,7 +5,7 @@ import time
 import traceback
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Set, Tuple
+from typing import Callable, Dict, List, Set, Tuple, Optional
 from copy import deepcopy
 from ray._private.ray_constants import (
     DEFAULT_RUNTIME_ENV_TIMEOUT_SECONDS,
@@ -53,10 +53,10 @@ class CreatedEnvResult:
     success: bool
     # If success is True, will be a RuntimeEnvContext
     # If success is False, will be None
-    context: RuntimeEnvContext
+    context: Optional[RuntimeEnvContext]
     # If success is True, will be None
     # If success is False, error message will be filled in
-    error_message: str
+    error_message: Optional[str]
     # The time to create a runtime env in ms.
     creation_time_ms: int
 
@@ -304,7 +304,8 @@ class RuntimeEnvAgent:
         self._logger.info(
             f"Got request from {request.source_process} to increase "
             "reference for runtime env: "
-            f"{request.serialized_runtime_env}, worker_id {request.worker_id}"
+            f"{request.serialized_runtime_env} to be used by worker : "
+            f"{request.worker_id}"
         )
 
         async def _setup_runtime_env(
@@ -563,7 +564,8 @@ class RuntimeEnvAgent:
         self._logger.info(
             f"Got request from {request.source_process} to decrease "
             "reference for runtime env: "
-            f"{request.serialized_runtime_env}, worker_id {request.worker_id}"
+            f"{request.serialized_runtime_env} used by worker : "
+            f"{request.worker_id}"
         )
 
         try:
@@ -621,7 +623,7 @@ class RuntimeEnvAgent:
             runtime_env_states[runtime_env].runtime_env = runtime_env
             runtime_env_states[runtime_env].success = result.success
             if not result.success:
-                runtime_env_states[runtime_env].error = result.result
+                runtime_env_states[runtime_env].error = result.error_message
             runtime_env_states[runtime_env].creation_time_ms = result.creation_time_ms
 
         reply = runtime_env_agent_pb2.GetRuntimeEnvsInfoReply()

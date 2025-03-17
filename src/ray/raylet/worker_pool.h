@@ -752,7 +752,7 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
                              const WorkerID &worker_id = WorkerID::Nil());
 
   /// Delete runtime env asynchronously by runtime env agent.
-  void DeleteRuntimeEnvIfPossible(const std::string &serialized_runtime_env, 
+  void DeleteRuntimeEnvIfPossible(const std::string &serialized_runtime_env,
                                   const JobID &job_id,
                                   const WorkerID &worker_id = WorkerID::Nil());
 

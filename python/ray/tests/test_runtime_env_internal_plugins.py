@@ -142,10 +142,10 @@ test_local_dir = None
 @pytest.mark.parametrize(
     "set_url",
     [
-        "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/mcq_test.tar.gz",
-        "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/mcq_test.tar",
-        "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/mcq_test.tar.bz",
-        "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/mcq_test.tar.xz",
+        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.bz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.gz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.xz",  # noqa: E501
     ],
 )
 def test_get_local_dir_from_tar_url(set_url):
@@ -169,10 +169,10 @@ def test_get_local_dir_from_tar_url(set_url):
 @pytest.mark.parametrize(
     "set_url",
     [
-        "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci%2Fut%2Fmcq_test.tar.gz",  # noqa: E501
-        "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci%2Fut%2Fmcq_test.tar.bz",  # noqa: E501
-        "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci%2Fut%2Fmcq_test.tar.xz",  # noqa: E501
-        "http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci%2Fut%2Fmcq_test.tar",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.bz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.gz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.xz",  # noqa: E501
     ],
 )
 def test_tar_package_for_runtime_env(

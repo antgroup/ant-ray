@@ -592,6 +592,13 @@ The ``runtime_env`` is a Python dictionary or a Python class :class:`ray.runtime
     # archives plugin a instance of str, like runtime_env = {"archives": "https://bucket/my_project.zip"}
     ray.get(get_archives_context.options(runtime_env={"archives": {"url1": "https://bucket/my_project.zip", "url2": "https://bucket/my_project.zip"}))
 
+- ``native_libraries`` (List[str | dict]): Specifies dynamically loaded files to Ray workers, such as dynamic libraries required by C++ workers and 
+  dynamically loaded jar packages required by Java workers. The element in List must either be (1) a URI to a remote-stored zip or tar file (no file size limit if enforced by Ray) 
+  See :ref:`remote-uris` for details, (2) a native libraries url dictionary which containing three fileds: (a) ``url``: (required, str): a URI to a remote-stored zip of tar file.
+  (b): ``lib_path``: (optional, List): a List containing where Ray workers load dynamic libraries from. If your dynamic library is in the second-level directory
+  after package is unzipped. you need to add the library name of the second-level dictionary lib_path, defaults to ``["./"]``
+  (c): ``code_search_path``: (optional, List): a List containing where Ray looks for dependent files.
+
 - ``image_uri`` (dict): Require a given Docker image. The worker process runs in a container with this image.
   - Example: ``{"image_uri": "anyscale/ray:2.31.0-py39-cpu"}``
 

@@ -142,10 +142,10 @@ test_local_dir = None
 @pytest.mark.parametrize(
     "set_url",
     [
-        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar",  # noqa: E501
-        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.bz",  # noqa: E501
-        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.gz",  # noqa: E501
-        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.xz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar.bz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar.gz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar.xz",  # noqa: E501
     ],
 )
 def test_get_local_dir_from_tar_url(set_url):
@@ -169,10 +169,10 @@ def test_get_local_dir_from_tar_url(set_url):
 @pytest.mark.parametrize(
     "set_url",
     [
-        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar",  # noqa: E501
-        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.bz",  # noqa: E501
-        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.gz",  # noqa: E501
-        "https://github.com/antgroup/ant-ray/blob/test_files/runtime_env_test_files/mcq_test.tar.xz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar.bz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar.gz",  # noqa: E501
+        "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar.xz",  # noqa: E501
     ],
 )
 def test_tar_package_for_runtime_env(

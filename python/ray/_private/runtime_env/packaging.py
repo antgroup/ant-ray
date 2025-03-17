@@ -224,6 +224,8 @@ def parse_uri(pkg_uri: str) -> Tuple[Protocol, str]:
             # Remove all periods except the last, which is part of the
             # file extension
             if is_commpressed_tar_str(package_name):
+                # The compressed tar package has two suffixes. When generating the path, 
+                # we need to keep the last two dots.
                 last_dot_index = package_name.rfind(".")
                 second_last_dot_index = package_name.rfind(".", 0, last_dot_index)
                 package_name = (
@@ -274,9 +276,7 @@ def is_tar_uri(uri: str) -> bool:
         return False
     return (
         path.endswith(".tar")
-        or path.endswith(".tar.gz")
-        or path.endswith(".tar.bz")
-        or path.endswith(".tar.xz")
+        or is_commpressed_tar_str(path)
     )
 
 
@@ -821,7 +821,7 @@ async def download_and_unpack_package(
                         logger.info(f"Directory at {local_dir} already exists")
                     pkg_file = _seal_tmp_file(tmp_pkg_file, local_dir)
                 else:
-                    if tmp_pkg_file.suffix in [".zip", ".jar"]:
+                    if is_zip_uri(pkg_uri):
                         unzip_package(
                             package_path=str(tmp_pkg_file),
                             target_dir=str(local_dir),

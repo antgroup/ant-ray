@@ -240,10 +240,6 @@ class RuntimeEnvAgent:
             self._mpi_plugin,
             self._image_uri_plugin,
         ]
-        # TODO(Jacky): Currently, since new plugins such as 'archives' require the runtime_env_dir variable,
-        # this parameter is passed in the plugin_manager instance.
-        # In the future, the parameters supported by third-party plugins
-        # will be placed in the environment variable 'RAY_RUNTIME_ENV_PLUGINS_ENV_VAR'
         self._plugin_manager = RuntimeEnvPluginManager(self._runtime_env_dir)
         for plugin in self._base_plugins:
             self._plugin_manager.add_plugin(plugin)

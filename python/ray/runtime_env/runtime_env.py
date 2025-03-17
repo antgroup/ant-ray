@@ -409,8 +409,8 @@ class RuntimeEnv(dict):
 
         if self.get("archives") and self.env_vars().get("RAY_ARCHIVE_PATH"):
             raise ValueError(
-                f"'RAY_ARCHIVE_PATH' already exists in env_vars {self.env_vars()}, "
-                "this is not allowed, please check your in runtime_env."
+                f"'RAY_ARCHIVE_PATH' can not be set in env_vars {self.env_vars()}, "
+                "this is not allowed, please check your env_vars in runtime_env."
             )
 
         for option, validate_fn in OPTION_TO_VALIDATION_FN.items():

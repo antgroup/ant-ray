@@ -30,7 +30,7 @@ def test_archive_plugin_with_single_package(set_runtime_env_plugins, start_clust
     #     - test_1.txt
     #     - test_1:
     #         - test_1.txt
-    archive_url = "https://github.com/antgroup/ant-ray/raw/refs/heads/dev_add_archives_plugin/test_files/test.zip"  # noqa: E501
+    archive_url = "https://github.com/antgroup/ant-ray/raw/refs/heads/test_files/runtime_env_test_files/test.zip"  # noqa: E501
 
     @ray.remote
     def check_file():
@@ -69,13 +69,13 @@ def test_archive_plugin_with_mutiple_packages(set_runtime_env_plugins, start_clu
     #     - test_1.txt
     #     - test_1:
     #         - test_1.txt
-    archive_url_1 = "https://github.com/antgroup/ant-ray/raw/refs/heads/dev_add_archives_plugin/test_files/test.zip"  # noqa: E501
+    archive_url_1 = "https://github.com/antgroup/ant-ray/raw/refs/heads/test_files/runtime_env_test_files/test.zip"  # noqa: E501
 
     # test_2.zip
     #     - test_2.txt
     #     - test_2:
     #         - test_2.txt
-    archive_url_2 = "https://github.com/antgroup/ant-ray/raw/refs/heads/dev_add_archives_plugin/test_files/test_2.zip"  # noqa: E501
+    archive_url_2 = "https://github.com/antgroup/ant-ray/raw/refs/heads/test_files/runtime_env_test_files/test_2.zip"  # noqa: E501
 
     @ray.remote
     def check_file():
@@ -110,12 +110,6 @@ def test_archive_plugin_with_mutiple_packages(set_runtime_env_plugins, start_clu
         with open(test_2, "rt") as f:
             message = f.read()
             assert message == "test_2\n", message
-
-        # check archive symbol link
-        # assert os.path.exists("test_1.txt")
-        # assert os.path.exists("test_1/test_1.txt")
-        # assert os.path.exists("test_2.txt")
-        # assert os.path.exists("test_2/test_2.txt")
 
         return True
 

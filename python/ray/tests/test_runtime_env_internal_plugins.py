@@ -26,11 +26,11 @@ default_logger = logging.getLogger(__name__)
     indirect=True,
 )
 def test_archive_plugin_with_single_package(set_runtime_env_plugins, start_cluster):
-    # test.zip
+    # test_internal_plugins.zip
     #     - test_1.txt
     #     - test_1:
     #         - test_1.txt
-    archive_url = "https://github.com/antgroup/ant-ray/raw/refs/heads/test_files/runtime_env_test_files/test.zip"  # noqa: E501
+    archive_url = "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_plugins.zip"  # noqa: E501
 
     @ray.remote
     def check_file():
@@ -65,17 +65,17 @@ def test_archive_plugin_with_single_package(set_runtime_env_plugins, start_clust
     indirect=True,
 )
 def test_archive_plugin_with_mutiple_packages(set_runtime_env_plugins, start_cluster):
-    # test.zip
+    # test_internal_plugins.zip
     #     - test_1.txt
     #     - test_1:
     #         - test_1.txt
-    archive_url_1 = "https://github.com/antgroup/ant-ray/raw/refs/heads/test_files/runtime_env_test_files/test.zip"  # noqa: E501
+    archive_url_1 = "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_plugins.zip"  # noqa: E501
 
-    # test_2.zip
+    # test_internal_plugins_2.zip
     #     - test_2.txt
     #     - test_2:
     #         - test_2.txt
-    archive_url_2 = "https://github.com/antgroup/ant-ray/raw/refs/heads/test_files/runtime_env_test_files/test_2.zip"  # noqa: E501
+    archive_url_2 = "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_plugins_2.zip"  # noqa: E501
 
     @ray.remote
     def check_file():

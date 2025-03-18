@@ -5,12 +5,16 @@ import subprocess
 import shlex
 import sys
 from typing import Dict, List, Optional
-import ray._private.runtime_env.constants as runtime_env_constants
 
 from ray.util.annotations import DeveloperAPI
 from ray.core.generated.common_pb2 import Language
-from ray._private.services import get_ray_jars_dir, get_ray_native_library_dir
-from ray._private.utils import update_envs
+from ray._private.services import get_ray_jars_dir
+from ray._private.utils import (
+    update_envs,
+    try_update_code_search_path,
+    try_update_ld_preload,
+    try_update_ld_library_path,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -59,77 +63,33 @@ class RuntimeEnvContext:
             ray_jars = os.path.join(get_ray_jars_dir(), "*")
 
             local_java_jars = []
-            local_java_code_search_path = []
             for java_jar in self.java_jars:
                 local_java_jars.append(f"{java_jar}/*")
                 local_java_jars.append(java_jar)
-                local_java_code_search_path.append(java_jar)
-
-            # TODO(Jacky): Add working dir to classpath of Java workers.
-            if self.native_libraries["code_search_path"]:
-                local_java_code_search_path += self.native_libraries["code_search_path"]
-
-            if local_java_code_search_path:
-                old_path = None
-                index = 0
-                for args in passthrough_args:
-                    if args.startswith("-Dray.job.code-search-path="):
-                        old_path = args.split("-Dray.job.code-search-path=", 1)[-1]
-                        break
-                    index += 1
-                new_path = ":".join(local_java_code_search_path)
-                if old_path:
-                    passthrough_args[
-                        index
-                    ] = f"-Dray.job.code-search-path={new_path}:{old_path}"
-                else:
-                    passthrough_args += [f"-Dray.job.code-search-path={new_path}"]
 
             class_path_args = ["-cp", ray_jars + ":" + str(":".join(local_java_jars))]
+            # set code search path
+            passthrough_args = try_update_code_search_path(
+                passthrough_args, language, self.java_jars, self.native_libraries
+            )
             passthrough_args = class_path_args + passthrough_args
         elif language == Language.CPP:
             executable = ["exec"]
-
-            # set library path
-            all_library_paths = get_ray_native_library_dir()
-            ld_preload_env = os.environ.get(runtime_env_constants.PRELOAD_ENV_NAME, "")
-
-            if self.native_libraries.get("lib_path", []):
-                all_library_paths += ":"
-                all_library_paths += ":".join(self.native_libraries["lib_path"])
-            if self.preload_libraries:
-                if ld_preload_env:
-                    ld_preload_env += ":"
-                ld_preload_env += ":".join(self.preload_libraries)
-            os_paths = os.environ.get(runtime_env_constants.LIBRARY_PATH_ENV_NAME, None)
-            if os_paths:
-                all_library_paths += ":"
-                all_library_paths += os_paths
-            # TODO(Jacky Ma): Add working dir to library path of C++ workers.
-
-            os.environ[runtime_env_constants.LIBRARY_PATH_ENV_NAME] = all_library_paths
-            os.environ[runtime_env_constants.PRELOAD_ENV_NAME] = ld_preload_env
             # set code search path
-            if self.native_libraries.get("code_search_path", []):
-                old_path = None
-                index = 0
-                for args in passthrough_args:
-                    if args.startswith("--ray_code_search_path="):
-                        old_path = args.split("--ray_code_search_path=", 1)[-1]
-                        break
-                    index += 1
-                new_path = ":".join(self.native_libraries["code_search_path"])
-                if old_path:
-                    passthrough_args[
-                        index
-                    ] = f"--ray_code_search_path={new_path}:{old_path}"
-                else:
-                    passthrough_args += [f"--ray_code_search_path={new_path}"]
+            passthrough_args = try_update_code_search_path(
+                passthrough_args, language, self.java_jars, self.native_libraries
+            )
 
         elif sys.platform == "win32":
             executable = []
         else:
             executable = ["exec"]
+
+        # set ld library path
+        try_update_ld_library_path(language, self.native_libraries)
+
+        # set ld preload
+        try_update_ld_preload(self.native_libraries)
 
         # By default, raylet uses the path to default_worker.py on host.
         # However, the path to default_worker.py inside the container

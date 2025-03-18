@@ -279,7 +279,7 @@ class PipPlugin(RuntimeEnvPlugin):
         context: "RuntimeEnvContext",  # noqa: F821
         logger: Optional[logging.Logger] = default_logger,
     ) -> int:
-        if not runtime_env.has_pip():
+        if not runtime_env.has_pip() or runtime_env.container_install_ray():
             return 0
 
         protocol, hash_val = parse_uri(uri)
@@ -317,7 +317,7 @@ class PipPlugin(RuntimeEnvPlugin):
         context: "RuntimeEnvContext",  # noqa: F821
         logger: logging.Logger = default_logger,
     ):
-        if not runtime_env.has_pip():
+        if not runtime_env.has_pip() or runtime_env.container_install_ray():
             return
         # PipPlugin only uses a single URI.
         uri = uris[0]

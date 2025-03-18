@@ -2,7 +2,7 @@ import logging
 import os
 import json
 from typing import List, Optional
-
+import ray
 import ray._private.runtime_env.constants as runtime_env_constants
 from ray._private.runtime_env.context import RuntimeEnvContext
 from ray._private.runtime_env.plugin import RuntimeEnvPlugin
@@ -35,16 +35,16 @@ def parse_allocated_resource(allocated_instances_serialized_json):
                 if val > 0:
                     cpu_ids.append(idx)
                     cpus += val
-            container_resource_args.append("--cpus=" + str(int(cpus)))
+            container_resource_args.append("--cpus=" + str(int(cpus / 10000)))
             container_resource_args.append(
                 "--cpuset-cpus=" + ",".join(str(e) for e in cpu_ids)
             )
         else:
             # cpushare
-            container_resource_args.append("--cpus=" + str(int(cpu_resource)))
+            container_resource_args.append("--cpus=" + str(int(cpu_resource / 10000)))
     if "memory" in allocated_resource.keys():
         container_resource_args.append(
-            "--memory=" + str(int(allocated_resource["memory"] / 10000)) + "m"
+            "--memory=" + str(int(allocated_resource["memory"] / 10000 / 10000)) + "m"
         )
     return container_resource_args
 
@@ -385,11 +385,14 @@ class ContainerManager:
         install_ray_or_pip_packages_command = None
         if install_ray:
             if install_ray_or_pip_packages_command is None:
+                extra_packages = runtime_env.container_install_ray_extra_package()
                 install_ray_or_pip_packages_command = [
                     "python",
                     dependencies_installer_path,
-                    "--whl-dir",
-                    get_ray_whl_dir(),
+                    "--extra-packages",
+                    ",".join(extra_packages),
+                    "--ray-version",
+                    f"{ray.__version__}",
                 ]
                 if pip_packages or container_pip_packages:
                     merge_pip_packages = list(

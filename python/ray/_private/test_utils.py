@@ -2310,3 +2310,13 @@ def close_common_connections(pid):
         if fd != -1:  # FD is -1 if it's not accessible or if it's a pseudo FD.
             os.close(fd)
             print(f"Closed FD: {fd}, laddr: {laddr}, raddr: {raddr}")
+
+
+def check_logs_by_keyword(keyword, log_file_pattern):
+    command = f'grep "{keyword}" -r ' f"/tmp/ray/session_latest/logs/{log_file_pattern}"
+    try:
+        result = subprocess.run(command, shell=True)
+        # If the grep command caught nothing, the return code should be 1.
+        return result.returncode == 0
+    except Exception:
+        return False

@@ -148,6 +148,9 @@ class RuntimeEnvContext:
                     ).decode("utf-8")
                 passthrough_args = self.entrypoint_prefix + passthrough_args
             container_command.append(" ".join(passthrough_args))
+            logger.info(
+                "Exec'ing worker with command: {}".format(" ".join(container_command))
+            )
             os.execvp(container_command[0], container_command)
             return
 

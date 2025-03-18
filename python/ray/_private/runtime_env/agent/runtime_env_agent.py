@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import traceback
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Set, Tuple
@@ -310,10 +311,15 @@ class RuntimeEnvAgent:
         async def _setup_runtime_env(
             runtime_env: RuntimeEnv,
             runtime_env_config: RuntimeEnvConfig,
+            serialized_allocated_resource_instances,
         ):
+            allocated_resource: dict = json.loads(
+                serialized_allocated_resource_instances or "{}"
+            )
             log_files = runtime_env_config.get("log_files", [])
             # Use a separate logger for each job.
             per_job_logger = self.get_or_create_logger(request.job_id, log_files)
+            per_job_logger.info(f"Worker has resource :" f"{allocated_resource}")
             context = RuntimeEnvContext(env_vars=runtime_env.env_vars())
 
             # Warn about unrecognized fields in the runtime env.
@@ -358,7 +364,7 @@ class RuntimeEnvAgent:
             # Container setup should be done after other plugins.
             await self._container_manager.setup(
                 runtime_env,
-                request.serialized_allocated_resource_instances,
+                request.allocated_instances_serialized_json,
                 context,
                 logger=per_job_logger,
             )
@@ -392,7 +398,9 @@ class RuntimeEnvAgent:
             for _ in range(runtime_env_consts.RUNTIME_ENV_RETRY_TIMES):
                 try:
                     runtime_env_setup_task = _setup_runtime_env(
-                        runtime_env, runtime_env_config
+                        runtime_env,
+                        runtime_env_config,
+                        request.allocated_instances_serialized_json,
                     )
                     runtime_env_context = await asyncio.wait_for(
                         runtime_env_setup_task, timeout=setup_timeout_seconds

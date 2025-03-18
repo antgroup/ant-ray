@@ -272,6 +272,14 @@ class RedisBasedLeaderSelector(HeadNodeLeaderSelector):
                     pre_gcs_address,
                 )
                 return False
+        else:
+            self._redis_client.set(
+                ray_constants.GCS_ADDRESS_KEY, self._init_gcs_address
+            )
+            logger.info(
+                "Reset gcs address to %s",
+                self._init_gcs_address,
+            )
         return True
 
     def node_wait_to_be_active(self):

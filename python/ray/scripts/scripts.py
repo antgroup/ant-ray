@@ -1125,7 +1125,7 @@ def start(
     if clean_processes_at_exit:
         cli_logger.newline()
         msg = "--block" if block else ""
-        msg = msg + "\nenable_head_ha" if head and ray_params.enable_head_ha else ""
+        msg = msg + "\nenable_head_ha" if head and ray_params.enable_head_ha else msg
         with cli_logger.group(cf.bold(msg)):
             cli_logger.print(
                 "This command will now block forever until terminated by a signal."

@@ -658,12 +658,15 @@ async def download_and_unpack_package(
     base_directory: str,
     gcs_aio_client: Optional["GcsAioClient"] = None,  # noqa: F821
     logger: Optional[logging.Logger] = default_logger,
+    move_file_to_dir: bool = False,
     overwrite: bool = False,
 ) -> str:
     """Download the package corresponding to this URI and unpack it if zipped.
 
     Will be written to a file or directory named {base_directory}/{uri}.
     Returns the path to this file or directory.
+    If move_file_to_dir is False, we do decompress the file into target_dir,
+    otherwise, we just move file to target_dir and do not decompress.
 
     Args:
         pkg_uri: URI of the package to download.
@@ -671,6 +674,7 @@ async def download_and_unpack_package(
             directory for the unpacked files.
         gcs_aio_client: Client to use for downloading from the GCS.
         logger: The logger to use.
+        move_file_to_dir: Whether to decompress the file into target_dir.
         overwrite: If True, overwrite the existing package.
 
     Returns:
@@ -756,21 +760,31 @@ async def download_and_unpack_package(
             elif protocol in Protocol.remote_protocols():
                 protocol.download_remote_uri(source_uri=pkg_uri, dest_file=pkg_file)
 
-                if pkg_file.suffix in [".zip", ".jar"]:
-                    unzip_package(
-                        package_path=pkg_file,
-                        target_dir=local_dir,
-                        remove_top_level_directory=True,
-                        unlink_zip=True,
-                        logger=logger,
+                if move_file_to_dir:
+                    try:
+                        os.mkdir(local_dir)
+                    except FileExistsError:
+                        logger.info(f"Directory at {local_dir} already exists")
+                    os.rename(
+                        pkg_file,
+                        os.path.join(local_dir, os.path.basename(pkg_file)),
                     )
-                elif pkg_file.suffix == ".whl":
-                    return str(pkg_file)
                 else:
-                    raise NotImplementedError(
-                        f"Package format {pkg_file.suffix} is ",
-                        "not supported for remote protocols",
-                    )
+                    if pkg_file.suffix in [".zip", ".jar"]:
+                        unzip_package(
+                            package_path=pkg_file,
+                            target_dir=local_dir,
+                            remove_top_level_directory=True,
+                            unlink_zip=True,
+                            logger=logger,
+                        )
+                    elif pkg_file.suffix == ".whl":
+                        return str(pkg_file)
+                    else:
+                        raise NotImplementedError(
+                            f"Package format {pkg_file.suffix} is ",
+                            "not supported for remote protocols",
+                        )
             else:
                 raise NotImplementedError(f"Protocol {protocol} is not supported")
 

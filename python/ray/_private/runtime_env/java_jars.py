@@ -56,7 +56,7 @@ class JavaJarsPlugin(RuntimeEnvPlugin):
                 self._resources_dir,
                 self._gcs_aio_client,
                 logger=logger,
-                move_file_to_dir=True,
+                move_file_to_dir=False,
             )
         except Exception as e:
             raise RuntimeEnvSetupError(

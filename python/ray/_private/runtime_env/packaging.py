@@ -821,7 +821,7 @@ async def download_and_unpack_package(
                         logger.info(f"Directory at {local_dir} already exists")
                     pkg_file = _seal_tmp_file(pkg_file, local_dir)
                 else:
-                    if is_zip_uri(pkg_uri):
+                    if pkg_file.suffix in [".zip", ".jar"]:
                         unzip_package(
                             package_path=str(pkg_file),
                             target_dir=str(local_dir),

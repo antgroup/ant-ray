@@ -163,6 +163,7 @@ def test_get_local_dir_from_tar_url(set_url):
     "set_runtime_env_plugins",
     [
         '[{"class":"' + NATIVE_LIBRARIES_CLASS_PATH + '"}]',
+        '[{"class":"' + ARCHIVE_PLUGIN_CLASS_PATH + '"}]'
     ],
     indirect=True,
 )
@@ -186,25 +187,22 @@ def test_tar_package_for_runtime_env(
         def get_count(self):
             return self._count
 
+        def get_archive_path(self):
+            return get_archives_context()
+
     session_dir = ray_start_regular.address_info["session_dir"]
     url = set_url
     a = Test_Actor.options(
         runtime_env={
-            NATIVE_LIBRARIES_PLUGIN_NAME: [
-                {
-                    "url": url,
-                    "lib_path": ["./"],
-                    "code_search_path": ["./"],
-                }
-            ]
+            ARCHIVE_PLUGIN_NAME: set_url,
         }
     ).remote()
     assert ray.get(a.get_count.remote()) == 0
-    native_libraries_dir = os.path.join(
-        session_dir, "runtime_resources/native_libraries_files"
-    )
-    local_dir = get_local_dir_from_uri(url, native_libraries_dir)
+    archive_path = ray.get(a.get_archive_path.remote())
+    archive_file_dir = os.path.join(session_dir, "runtime_resources/archive_files")
+    local_dir = get_local_dir_from_uri(url, archive_file_dir)
     assert os.path.exists(local_dir), local_dir
+    assert str(local_dir) == archive_path
 
 
 if __name__ == "__main__":

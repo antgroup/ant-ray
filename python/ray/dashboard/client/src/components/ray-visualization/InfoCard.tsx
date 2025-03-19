@@ -697,7 +697,7 @@ const InfoCard = ({
 
         return (
           <React.Fragment>
-            <h3>{data.name}</h3>
+            <h3>{data.name === "_main" ? "main" : data.name}</h3>
             {renderNavigateButton(data.id)}
             <div className="info-row">
               <span className="info-label">Type:</span>

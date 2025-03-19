@@ -1,8 +1,7 @@
 import * as d3 from "d3";
 import React, { useCallback, useEffect, useRef } from "react";
-import { FlameGraphData, FlameGraphNode } from "../../service/flame-graph";
+import { FlameGraphData } from "../../service/flame-graph";
 import { PhysicalViewData } from "../../service/physical-view";
-import { add } from "lodash";
 
 // Import the GraphData type from RayVisualization
 type Method = {
@@ -83,7 +82,11 @@ type FlameVisualizationProps = {
 type FlameNode = {
   name: string;
   customValue: number;
-  totalInParent?: Map<string, number>;
+  totalInParent?: Array<{
+    callerNodeId: string;
+    duration: number;
+    count: number;
+  }>;
   originalValue?: number; // Store original value for display
   count?: number;
   children?: FlameNode[];
@@ -435,6 +438,9 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       const name = d.data.name;
       if (!name) {
         return "";
+      }
+      if (name === "_main") {
+        return "main";
       }
 
       // Check if the name follows the expected format: actor_class:actor_id.func
@@ -791,7 +797,13 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
           }
         });
 
-        root.x1 = root.children?.[0]?.x1 || root.x1;
+        let maxX = 0;
+        root.children?.forEach((d) => {
+          if (d.x1 > maxX) {
+            maxX = d.x1;
+          }
+        });
+        root.x1 = maxX;
 
         // Calculate width based on the node's proportion of the total width
         const frameWidth = (d: PartitionHierarchyNode) => {
@@ -1292,7 +1304,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       .style("position", "fixed")
       .style("visibility", "hidden")
       .style("pointer-events", "none")
-      .style("z-index", "9999")
+      .style("z-index", "100000")
       .style("background", "rgba(0, 0, 0, 0.8)")
       .style("color", "white")
       .style("padding", "8px")
@@ -1422,6 +1434,33 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
             }
           }
 
+          if (graphData) {
+            const method = graphData.methods.find(
+              (m) => m.name === funcName && m.actorId === actorId,
+            );
+
+            if (method) {
+              // If we found the function in graphData, use that data
+              onElementClick(
+                {
+                  id: method.id,
+                  type: "method",
+                  name: method.name,
+                  language: method.language || "python",
+                  devices: actorDevices,
+                  gpuDevices: actorGpuDevices,
+                  data: {
+                    ...d.data,
+                    duration: d.data.originalValue,
+                    count: d.data.count,
+                  },
+                },
+                true,
+              );
+              return;
+            }
+          }
+
           onElementClick(
             {
               id: actorId,
@@ -1501,6 +1540,14 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
             ? valueInSeconds.toExponential(2)
             : valueInSeconds.toFixed(valueInSeconds < 0.1 ? 4 : 2);
 
+        // Calculate percentage relative to parent's width
+        let percentageOfParent = 0;
+        if (d.parent) {
+          const parentWidth = d.parent.x1 - d.parent.x0;
+          const currentWidth = d.x1 - d.x0;
+          percentageOfParent = (currentWidth / parentWidth) * 100;
+        }
+
         // Format name consistently with node display
         let displayName = d.data.name;
         const match = displayName.match(/^(.+?):(.+?)\.(.+)$/);
@@ -1518,25 +1565,40 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
         tooltip.style("visibility", "visible").html(`
             <div style="font-family: Verdana, sans-serif;">
               <strong>${displayName}</strong><br/>
-              ${actorId ? `Actor ID: ${actorId}` : ""}
+              ${actorId ? `Actor ID: ${actorId}<br/>` : ""}
               Duration: ${formattedValue}s<br/>
-              ${d.data.count ? `Count: ${d.data.count}` : ""}
+              ${d.data.count ? `Count: ${d.data.count}<br/>` : ""}
+              ${
+                d.parent
+                  ? `Percentage in parent: ${percentageOfParent.toFixed(1)}%`
+                  : ""
+              }
             </div>
           `);
 
         // Update tooltip position on mousemove
         const updatePosition = (event: MouseEvent) => {
           const offset = { x: 15, y: 15 }; // Offset from cursor
-          let left = event.clientX + window.scrollX + offset.x;
+          const screenRightEdge = window.innerWidth;
+          const tooltipWidth =
+            tooltipRef.current!.getBoundingClientRect().width; // eslint-disable-line
+
+          // Check if tooltip would be too close to right edge
+          const wouldBeCloseToRightEdge =
+            event.clientX + tooltipWidth + offset.x > screenRightEdge - 400;
+
+          // Position tooltip to the left of cursor if too close to right edge
+          const left = wouldBeCloseToRightEdge
+            ? event.clientX + window.scrollX - tooltipWidth - offset.x
+            : event.clientX + window.scrollX + offset.x;
+
           let top = event.clientY + window.scrollY + offset.y;
 
           // Ensure tooltip stays within viewport
           // eslint-disable-next-line
           const tooltipRect = tooltipRef.current!.getBoundingClientRect();
-          if (left + tooltipRect.width > window.innerWidth) {
-            left =
-              event.clientX + window.scrollX - tooltipRect.width - offset.x;
-          }
+
+          // Adjust vertical position if too close to bottom
           if (top + tooltipRect.height > window.innerHeight) {
             top =
               event.clientY + window.scrollY - tooltipRect.height - offset.y;
@@ -1637,7 +1699,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
         border-radius: 4px;
         padding: 8px;
         position: fixed;
-        z-index: 9999;
+        z-index: 10000;
         visibility: hidden;
         pointer-events: none;
         max-width: 300px;
@@ -1661,14 +1723,8 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       }
       document.head.removeChild(style);
     };
-  }, [
-    flameData,
-    onElementClick,
-    graphData,
-    physicalViewData,
-    colorMode,
-    createFlameGraph,
-  ]);
+    // eslint-disable-next-line
+  }, [flameData, onElementClick, graphData, colorMode, createFlameGraph]);
 
   useEffect(() => {
     if (searchTerm && searchTerm.trim() !== "") {
@@ -1678,35 +1734,11 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     }
   }, [searchTerm]);
 
-  // Add effect for selectedElementId
-  useEffect(() => {
-    if (selectedElementId && !searchTerm) {
-      // Search for the exact element ID/name
-      const func = graphData?.functions.find((f) => f.id === selectedElementId);
-      if (func) {
-        chartRef.current?.search(func.name);
-      }
-      const actor = graphData?.actors.find((a) => a.id === selectedElementId);
-      if (actor) {
-        chartRef.current?.search(actor.name + ".");
-      }
-      const method = graphData?.methods.find((m) => m.id === selectedElementId);
-      if (method) {
-        chartRef.current?.search(method.actorName + "." + method.name);
-      }
-    } else if (!searchTerm) {
-      // Only clear if no search term
-      chartRef.current?.clear();
-    }
-  }, [selectedElementId, graphData, searchTerm]);
-
   const transformFlameData = (data: FlameGraphData): FlameNode => {
     if (!data || !data.aggregated || !Array.isArray(data.aggregated)) {
       console.warn("Invalid flame graph data format:", data);
-      return { name: "root", customValue: 0, children: [] };
+      return { name: "_root", customValue: 0, children: [] };
     }
-
-    console.log("Original flame data:", data);
 
     // Find max value for normalization
     let maxValue = 0;
@@ -1724,8 +1756,6 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     if (minValue === Infinity) {
       minValue = 0;
     }
-
-    console.log(`Value range: min=${minValue}, max=${maxValue}`);
 
     // Create a map of function names to their nodes for quick lookup
     const nodeMap = new Map<string, FlameNode>();
@@ -1768,37 +1798,82 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
     // Add this before the second pass:
     const addedAsChild = new Set<string>();
-    const mainNode = {
-      name: "main",
+    const mainNode: FlameNode = {
+      name: "_main",
       customValue: 0, // Will be calculated based on children
       originalValue: 0,
       children: [],
-      actorName: "main",
-      totalInParent: new Map(),
+      actorName: "_main",
+      totalInParent: [],
     };
-    nodeMap.set("main", mainNode);
-
+    nodeMap.set("_main", mainNode);
 
     // Second pass: build the hierarchy
     nodeMap.forEach((node) => {
       const nodeName = node.name;
       const nodeData = nodeMap.get(nodeName);
-      
+
       if (!nodeData) {
         return;
       }
 
       // Look at totalInParent to find parent nodes
-      const parentData = node.totalInParent || {};
-      
+      const parentData = node.totalInParent || [];
+
       // If this node has parents, add it as a child to each parent
-      Object.entries(parentData).forEach(([parentName, timeInParent]) => {
+      parentData.forEach(({ callerNodeId, duration, count }) => {
         addedAsChild.add(node.name);
-        const parentNode = nodeMap.get(parentName);
+        const parentNode = nodeMap.get(callerNodeId);
         const nodeDataCopy: FlameNode = {
           name: nodeData.name,
           customValue: nodeData.customValue,
-          originalValue: timeInParent as number,
+          originalValue: duration,
+          count: count,
+          children: nodeData.children ? [...nodeData.children] : [],
+          actorName: nodeData.actorName,
+          hide: nodeData.hide,
+          fade: nodeData.fade,
+          highlight: nodeData.highlight,
+          dimmed: nodeData.dimmed,
+          value: nodeData.value,
+          delta: nodeData.delta,
+          totalInParent: nodeData.totalInParent,
+          extras: nodeData.extras ? { ...nodeData.extras } : undefined,
+        };
+        if (parentNode) {
+          // Only add if not already added as a child
+          if (!parentNode.children) {
+            parentNode.children = [];
+          }
+
+          parentNode.children.push(nodeDataCopy);
+        } else {
+          nodeMap.set(callerNodeId, {
+            name: callerNodeId,
+            customValue: 0,
+            originalValue: 0,
+            children: [nodeDataCopy],
+            actorName: nodeData.actorName,
+            totalInParent: [],
+          });
+        }
+      });
+    });
+
+    nodeMap.forEach((node) => {
+      const updateChildren = (nodeData: FlameNode): FlameNode => {
+        const realnode = nodeMap.get(nodeData.name);
+        const children = [];
+        if (realnode) {
+          for (const child of realnode.children || []) {
+            children.push(updateChildren(child));
+          }
+        }
+        nodeData.children = children;
+        return {
+          name: nodeData.name,
+          customValue: nodeData.customValue,
+          originalValue: nodeData.originalValue,
           count: nodeData.count,
           children: nodeData.children ? [...nodeData.children] : [],
           actorName: nodeData.actorName,
@@ -1809,74 +1884,23 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
           value: nodeData.value,
           delta: nodeData.delta,
           totalInParent: nodeData.totalInParent,
-          extras: nodeData.extras ? { ...nodeData.extras } : undefined
+          extras: nodeData.extras ? { ...nodeData.extras } : undefined,
         };
-        if (parentNode) {
-          // Only add if not already added as a child
-          if (!parentNode.children) {
-            parentNode.children = [];
-          }
-
-          parentNode.children.push(nodeDataCopy);
-        }else{
-          nodeMap.set(parentName, {
-            name: parentName,
-            customValue: 0,
-            originalValue: 0,
-            children: [nodeDataCopy],
-            actorName: nodeData.actorName,
-            totalInParent: new Map(),
-          });
-        }
-      });
-    });
-
-    nodeMap.forEach((node) => {
-      const updateChildren = (node: FlameNode) => {
-        const realnode = nodeMap.get(node.name);
-        if (realnode) {
-          node.children = realnode.children;
-        }
-        for (const child of node.children || []) {
-          updateChildren(child);
-        }
       };
       updateChildren(node);
     });
 
-
-
-    // If main node doesn't exist, create one and add orphaned nodes as its children
-    // Build root hierarchy correctly
-    const rootNode: FlameNode = {
-      name: "root",
-      customValue: maxValue, // Use the pre-calculated maxValue
-      children: [],
-      actorName: nodeMap.get("root")?.actorName, // Add actorName property
-    };
-    console.log(nodeMap);
-
-    // Add main nodes as children of root
-    // If main exists, find and add all main nodes
-    // If we created a main node, add that
-    rootNode.children = Array.from(nodeMap.values()).filter(
-      (node) => node.totalInParent && node.totalInParent.size === 0,
-    );
-
     // Calculate total value of all children
     let totalChildrenValue = 0;
-    if (rootNode.children) {
-      rootNode.children.forEach((child) => {
+    if (mainNode.children) {
+      mainNode.children.forEach((child) => {
         totalChildrenValue += child.customValue || 0;
       });
     }
 
     // If root node value is less than total children value, adjust it
-    if (rootNode.customValue < totalChildrenValue) {
-      console.log(
-        `Adjusting root node value from ${rootNode.customValue} to ${totalChildrenValue}`,
-      );
-      rootNode.customValue = totalChildrenValue;
+    if (mainNode.customValue < totalChildrenValue) {
+      mainNode.customValue = totalChildrenValue;
     }
 
     // IMPORTANT: Make sure no nodes are hidden by default
@@ -1893,12 +1917,9 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     };
 
     // Apply the fix to make all nodes visible
-    ensureNodesVisible(rootNode);
+    ensureNodesVisible(mainNode);
 
-    // Log the transformed data for debugging
-    console.log("Transformed flame data:", rootNode);
-
-    return rootNode;
+    return mainNode;
   };
 
   return (

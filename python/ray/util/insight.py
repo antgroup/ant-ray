@@ -8,6 +8,51 @@ import socket
 from contextlib import contextmanager
 from ray.experimental import internal_kv
 import ray.dashboard.consts as dashboard_consts
+import queue
+import threading
+
+# Global queue and thread for processing async coroutines
+_async_queue = queue.Queue()
+_async_thread = None
+_async_thread_lock = threading.Lock()
+
+
+def _process_async_queue():
+    """Worker function that processes coroutines from the queue."""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    while True:
+        try:
+            coro = _async_queue.get()
+            if coro is None:  # Sentinel to stop the thread
+                break
+
+            # Add timeout of 20 seconds for each coroutine
+            try:
+                future = asyncio.wait_for(coro, timeout=20.0)
+                loop.run_until_complete(future)
+            except asyncio.TimeoutError:
+                print(f"Coroutine execution timed out after 20 seconds")
+        except Exception as e:
+            print(f"Error processing coroutine: {e}")
+        finally:
+            _async_queue.task_done()
+
+
+def run_async(coro):
+    """
+    Run a coroutine asynchronously using a shared worker thread and queue.
+    This avoids creating a new thread for each coroutine.
+    """
+    global _async_thread
+
+    with _async_thread_lock:
+        if _async_thread is None or not _async_thread.is_alive():
+            _async_thread = threading.Thread(target=_process_async_queue, daemon=True)
+            _async_thread.start()
+
+    _async_queue.put(coro)
 
 
 @ray.remote
@@ -32,6 +77,7 @@ class _ray_internal_insight_monitor:
         # Data flow tracking
         self.data_flows = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
         self.object_events = defaultdict(lambda: defaultdict())
+        self.caller_info = defaultdict(lambda: defaultdict(list))
 
         # Context info
         self.context_info = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
@@ -46,14 +92,11 @@ class _ray_internal_insight_monitor:
                     "actor_name": "",
                     "total_time": 0,
                     "call_count": 0,
+                    "durations": defaultdict(float),
                     "total_in_parent": defaultdict(float),
                 }
             )
         )
-
-        # Task parent-child relationship tracking
-        # {job_id: {callee_task_id: caller_task_id}}
-        self.task_parent_map = defaultdict(dict)
 
         # Start HTTP server
         self.app = aiohttp.web.Application()
@@ -128,16 +171,7 @@ class _ray_internal_insight_monitor:
         callee_class = call_record["callee_class"]
         callee_func = call_record["callee_func"]
         call_times = call_record.get("call_times", 1)
-
         # Create caller and callee identifiers for parent-child relationship
-        caller_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
-        callee_id = f"{callee_class}.{callee_func}" if callee_class else callee_func
-
-        # Update parent-child relationship map
-        if caller_id and callee_id:
-            self.task_parent_map[job_id][callee_id] = caller_id
-
-        # Create caller and callee identifiers
         caller_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
         callee_id = f"{callee_class}.{callee_func}" if callee_class else callee_func
 
@@ -161,8 +195,8 @@ class _ray_internal_insight_monitor:
         else:
             self.functions[job_id].add(caller_func)
             if caller_func not in self.function_id_map[job_id]:
-                if caller_func == "main":
-                    self.function_id_map[job_id][caller_func] = "main"
+                if caller_func == "_main":
+                    self.function_id_map[job_id][caller_func] = "_main"
                 else:
                     self.function_counter[job_id] += 1
                     self.function_id_map[job_id][
@@ -185,8 +219,8 @@ class _ray_internal_insight_monitor:
         else:
             self.functions[job_id].add(callee_func)
             if callee_func not in self.function_id_map[job_id]:
-                if callee_func == "main":
-                    self.function_id_map[job_id][callee_func] = "main"
+                if callee_func == "_main":
+                    self.function_id_map[job_id][callee_func] = "_main"
                 else:
                     self.function_counter[job_id] += 1
                     self.function_id_map[job_id][
@@ -354,14 +388,38 @@ class _ray_internal_insight_monitor:
         flame_data = {"aggregated": []}
 
         # Add aggregated data for flame graph
+        visited = {}
         for func_id, func_data in self.flame_graph_aggregated.get(job_id, {}).items():
+            if func_id in visited:
+                total_in_parent = visited[func_id]
+            else:
+                total_in_parent = defaultdict(lambda: {"duration": 0, "count": 0})
+            for current_task_id, duration in func_data["durations"].items():
+                caller_infos = self.caller_info[job_id][current_task_id]
+                for caller_info in caller_infos:
+                    caller_class = caller_info["class"]
+                    caller_func = caller_info["func"]
+                    caller_node_id = (
+                        f"{caller_class}.{caller_func}" if caller_class else caller_func
+                    )
+                    total_in_parent[caller_node_id]["duration"] += duration
+                    total_in_parent[caller_node_id]["count"] += 1
+            visited[func_id] = total_in_parent
+
             flame_data["aggregated"].append(
                 {
                     "name": func_id,
                     "actor_name": func_data["actor_name"],
                     "value": func_data["total_time"],
                     "count": func_data["call_count"],
-                    "total_in_parent": func_data["total_in_parent"],
+                    "total_in_parent": [
+                        {
+                            "caller_node_id": k,
+                            "duration": v["duration"],
+                            "count": v["count"],
+                        }
+                        for k, v in total_in_parent.items()
+                    ],
                 }
             )
 
@@ -375,7 +433,7 @@ class _ray_internal_insight_monitor:
         job_id = task_record["job_id"]
         caller_class = task_record["caller_class"]
         caller_func = task_record["caller_func"]
-
+        current_task_id = task_record["current_task_id"]
         # Create node_id from caller class and function for parent tracking
         node_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
 
@@ -384,16 +442,25 @@ class _ray_internal_insight_monitor:
         # Update aggregated data using node_id
         self.flame_graph_aggregated[job_id][node_id]["total_time"] += duration
         self.flame_graph_aggregated[job_id][node_id]["call_count"] += 1
+        self.flame_graph_aggregated[job_id][node_id]["durations"].update(
+            {
+                current_task_id: duration,
+            }
+        )
         self.flame_graph_aggregated[job_id][node_id]["actor_name"] = task_record[
             "actor_name"
         ]
 
-        # If there's a parent node, update the children data using node_ids
-        if node_id in self.task_parent_map.get(job_id, {}):
-            parent_id = self.task_parent_map[job_id][node_id]
-            self.flame_graph_aggregated[job_id][node_id]["total_in_parent"][
-                parent_id
-            ] += duration
+    async def emit_caller_info(self, caller_info):
+        """Record caller info."""
+        job_id = caller_info["job_id"]
+        caller_task_id = caller_info["caller_task_id"]
+        self.caller_info[job_id][caller_task_id].append(
+            {
+                "class": caller_info["caller_class"],
+                "func": caller_info["caller_func"],
+            }
+        )
 
 
 _inner_class_name = "_ray_internal_insight_monitor"
@@ -421,7 +488,7 @@ def _get_current_task_name():
         current_task_name = ray.get_runtime_context().get_task_name()
         if current_task_name is not None:
             return current_task_name.split(".")[-1]
-    return "main"
+    return "_main"
 
 
 def _get_caller_class():
@@ -449,24 +516,6 @@ def is_flow_insight_enabled():
     return os.getenv(dashboard_consts.FLOW_INSIGHT_ENABLED_ENV_VAR, "0") == "1"
 
 
-def run_async(coro):
-    from threading import Thread
-
-    def start_loop(loop):
-        asyncio.set_event_loop(loop)
-        loop.run_forever()
-
-    if not hasattr(run_async, "_loop_thread"):
-        loop = asyncio.new_event_loop()
-        run_async._loop_thread = Thread(
-            target=start_loop, args=(loop,), daemon=True
-        )
-        run_async._loop = loop
-        run_async._loop_thread.start()
-
-    asyncio.run_coroutine_threadsafe(coro, run_async._loop)
-
-
 def record_control_flow(callee_class, callee_func):
     """
     record the control flow between the caller and the callee
@@ -485,12 +534,6 @@ def record_control_flow(callee_class, callee_func):
     caller_class = _get_caller_class()
     caller_func = _get_current_task_name()
 
-    # Get caller and callee task IDs if available
-    if ray.get_runtime_context().worker.mode == ray._private.worker.WORKER_MODE:
-        caller_task_id = ray.get_runtime_context().get_task_id()
-    else:
-        caller_task_id = None
-
     # Create a record for this call
     call_record = {
         "caller_class": caller_class,
@@ -499,7 +542,6 @@ def record_control_flow(callee_class, callee_func):
         "callee_func": callee_func,
         "call_times": 1,
         "job_id": ray.get_runtime_context().get_job_id(),
-        "caller_task_id": caller_task_id,
     }
 
     async def _emit():
@@ -698,7 +740,7 @@ def record_object_get(object_id, task_id):
         "job_id": ray.get_runtime_context().get_job_id(),
     }
 
-    if task_id.actor_id() == monitor_actor._ray_actor_id:
+    if task_id.actor_id() == get_monitor_actor()._ray_actor_id:
         return
 
     if caller_class is not None and caller_class.startswith(_inner_class_name):
@@ -877,6 +919,15 @@ def record_task_duration(duration):
     if ray.get_runtime_context().worker.mode == ray._private.worker.WORKER_MODE:
         actor_name = ray.get_runtime_context().get_actor_name()
 
+    try:
+        current_task_id = ray._private.worker.global_worker.current_task_id
+        if current_task_id.is_nil():
+            current_task_id = "_main"
+        else:
+            current_task_id = current_task_id.hex()
+    except:
+        current_task_id = "_main"
+
     # Create a record for this task end
     task_record = {
         "caller_class": caller_class,
@@ -884,6 +935,7 @@ def record_task_duration(duration):
         "actor_name": actor_name,
         "duration": duration,
         "job_id": ray.get_runtime_context().get_job_id(),
+        "current_task_id": current_task_id,
     }
 
     async def _emit():
@@ -920,3 +972,50 @@ def timeit():
         yield
     finally:
         record_task_duration(time.time() - start_time)
+
+
+def report_trace_info(caller_info):
+    """
+    Report the trace info of the current task
+    """
+    if not is_flow_insight_enabled():
+        return
+
+    try:
+        current_task_id = ray._private.worker.global_worker.current_task_id
+        if current_task_id.is_nil():
+            current_task_id = "_main"
+        else:
+            current_task_id = current_task_id.hex()
+    except:
+        current_task_id = "_main"
+
+    current_class = _get_caller_class()
+    if current_class is not None and current_class.startswith(_inner_class_name):
+        return
+
+    trace_info = {
+        "job_id": ray.get_runtime_context().get_job_id(),
+        "caller_class": caller_info.get("caller_class"),
+        "caller_func": caller_info.get("caller_func"),
+        "caller_task_id": current_task_id,
+    }
+
+    async def _emit():
+        await get_monitor_actor().emit_caller_info.remote(trace_info)
+
+    run_async(_emit())
+
+
+def get_caller_info():
+    """
+    Get the caller info of the current task
+    """
+    if not is_flow_insight_enabled():
+        return
+    caller_class = _get_caller_class()
+    caller_func = _get_current_task_name()
+    return {
+        "caller_class": caller_class,
+        "caller_func": caller_func,
+    }

@@ -4,7 +4,11 @@ export type FlameGraphNode = {
   name: string;
   value: number;
   count?: number;
-  totalInParent?: Map<string, number>;
+  totalInParent?: Array<{
+    callerNodeId: string;
+    duration: number;
+    count: number;
+  }>;
   actorName?: string;
 };
 

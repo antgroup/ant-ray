@@ -449,7 +449,7 @@ const RayVisualization = forwardRef<
         setTimeout(() => focusOnNode(selectedElementId), 100);
       } else {
         // Focus on main node if no selected element
-        setTimeout(() => focusOnNode("main"), 100);
+        setTimeout(() => focusOnNode("_main"), 100);
       }
     }, [graphData]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -512,7 +512,7 @@ const RayVisualization = forwardRef<
 
           // Add edges from call flows
           graphData.callFlows.forEach((flow) => {
-            if (flow.source !== "main" && flow.target !== "main") {
+            if (flow.source !== "_main" && flow.target !== "_main") {
               graph[flow.source].push(flow.target);
               graph[flow.target].push(flow.source);
 
@@ -540,7 +540,7 @@ const RayVisualization = forwardRef<
 
           // Add edges from data flows
           graphData.dataFlows.forEach((flow) => {
-            if (flow.source !== "main" && flow.target !== "main") {
+            if (flow.source !== "_main" && flow.target !== "_main") {
               graph[flow.source].push(flow.target);
               graph[flow.target].push(flow.source);
 
@@ -579,7 +579,7 @@ const RayVisualization = forwardRef<
           const subgraphs: string[][] = [];
 
           allNodes.forEach((node) => {
-            if (node !== "main" && !visited[node]) {
+            if (node !== "_main" && !visited[node]) {
               const subgraph: string[] = [];
               const queue: string[] = [node];
               visited[node] = true;
@@ -591,7 +591,7 @@ const RayVisualization = forwardRef<
 
                   const neighbors = graph[current] || [];
                   neighbors.forEach((neighbor) => {
-                    if (neighbor !== "main" && !visited[neighbor]) {
+                    if (neighbor !== "_main" && !visited[neighbor]) {
                       visited[neighbor] = true;
                       queue.push(neighbor);
                     }
@@ -694,10 +694,10 @@ const RayVisualization = forwardRef<
 
         // Find the main node
         const mainNode = graphData.functions.find(
-          (func) => func.id === "main",
+          (func) => func.id === "_main",
         ) || {
-          id: "main",
-          name: "main",
+          id: "_main",
+          name: "_main",
           language: "python",
         };
 
@@ -716,7 +716,7 @@ const RayVisualization = forwardRef<
         g.setDefaultEdgeLabel(() => ({}));
 
         // Step 1: Add the main node in the center
-        g.setNode("main", {
+        g.setNode("_main", {
           label: mainNode.name,
           class: "function main-node",
           style: nodeMatchesSearch(mainNode)
@@ -1000,15 +1000,15 @@ const RayVisualization = forwardRef<
         const mainNodeContainer = mainContainer
           .append("g")
           .attr("transform", `translate(${centerX},${centerY})`)
-          .attr("class", "main-node-container")
-          .attr("id", "main")
+          .attr("class", "_main-node-container")
+          .attr("id", "_main")
           .style("cursor", "pointer")
           .on("click", (event) => {
             event.stopPropagation();
             // Update graph node position before focusing
             const g = dagreGraphRef.current;
             if (g) {
-              const mainNode = g.node("main");
+              const mainNode = g.node("_main");
               if (mainNode) {
                 mainNode.x = centerX;
                 mainNode.y = centerY;
@@ -1041,7 +1041,7 @@ const RayVisualization = forwardRef<
           .attr("font-size", "14px")
           .attr("font-weight", "bold")
           .attr("fill", "#000")
-          .text(mainNode.name);
+          .text("main");
 
         // Add each subgraph to the main visualization
         subgraphLayouts.forEach((subLayout, index) => {
@@ -1246,8 +1246,8 @@ const RayVisualization = forwardRef<
             if (sourceNode && targetNode) {
               // If either node is main or they're in different subgraphs
               if (
-                flow.source === "main" ||
-                flow.target === "main" ||
+                flow.source === "_main" ||
+                flow.target === "_main" ||
                 !subgraphs.some(
                   (subgraph) =>
                     subgraph.includes(flow.source) &&
@@ -1277,19 +1277,19 @@ const RayVisualization = forwardRef<
                   .append("path")
                   .attr("d", () => {
                     let sourceX =
-                      flow.source === "main" ? centerX : sourceNode.x;
+                      flow.source === "_main" ? centerX : sourceNode.x;
                     let sourceY =
-                      flow.source === "main" ? centerY : sourceNode.y;
+                      flow.source === "_main" ? centerY : sourceNode.y;
                     let targetX =
-                      flow.target === "main" ? centerX : targetNode.x;
+                      flow.target === "_main" ? centerX : targetNode.x;
                     let targetY =
-                      flow.target === "main" ? centerY : targetNode.y;
+                      flow.target === "_main" ? centerY : targetNode.y;
 
                     // Calculate control points to create a curved path
                     // For edges to/from main, create a curve that looks more natural
                     let cp1x, cp1y, cp2x, cp2y;
 
-                    if (flow.source === "main" || flow.target === "main") {
+                    if (flow.source === "_main" || flow.target === "_main") {
                       // Calculate a better connection point on the main node perimeter
                       let mainNodeX = centerX;
                       let mainNodeY = centerY;
@@ -1299,9 +1299,9 @@ const RayVisualization = forwardRef<
 
                       // Calculate the angle between main node and the other node
                       const otherNodeX =
-                        flow.source === "main" ? targetX : sourceX;
+                        flow.source === "_main" ? targetX : sourceX;
                       const otherNodeY =
-                        flow.source === "main" ? targetY : sourceY;
+                        flow.source === "_main" ? targetY : sourceY;
 
                       // Calculate angle between main node and other node
                       const dx = otherNodeX - centerX;
@@ -1309,13 +1309,13 @@ const RayVisualization = forwardRef<
                       const angle = Math.atan2(dy, dx);
 
                       // Find point on the main node's perimeter in the direction of the other node
-                      if (flow.source === "main") {
+                      if (flow.source === "_main") {
                         mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
                         mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
                         // Update source point
                         sourceX = mainNodeX;
                         sourceY = mainNodeY;
-                      } else if (flow.target === "main") {
+                      } else if (flow.target === "_main") {
                         mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
                         mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
                         // Update target point
@@ -1449,15 +1449,15 @@ const RayVisualization = forwardRef<
         ) {
           label
             .attr("x", () => {
-              const sourceX = flow.source === "main" ? centerX : sourceNode.x;
-              const targetX = flow.target === "main" ? centerX : targetNode.x;
-              const sourceY = flow.source === "main" ? centerY : sourceNode.y;
-              const targetY = flow.target === "main" ? centerY : targetNode.y;
+              const sourceX = flow.source === "_main" ? centerX : sourceNode.x;
+              const targetX = flow.target === "_main" ? centerX : targetNode.x;
+              const sourceY = flow.source === "_main" ? centerY : sourceNode.y;
+              const targetY = flow.target === "_main" ? centerY : targetNode.y;
 
-              if (flow.source === "main" || flow.target === "main") {
+              if (flow.source === "_main" || flow.target === "_main") {
                 // For main node connections, calculate control points the same way as the path
-                const otherNodeX = flow.source === "main" ? targetX : sourceX;
-                const otherNodeY = flow.source === "main" ? targetY : sourceY;
+                const otherNodeX = flow.source === "_main" ? targetX : sourceX;
+                const otherNodeY = flow.source === "_main" ? targetY : sourceY;
 
                 // Calculate a better connection point on the main node perimeter
                 let mainNodeX = centerX;
@@ -1472,23 +1472,23 @@ const RayVisualization = forwardRef<
                 const angle = Math.atan2(dy, dx);
 
                 // Find point on the main node's perimeter in the direction of the other node
-                if (flow.source === "main") {
+                if (flow.source === "_main") {
                   mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
                   mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                } else if (flow.target === "main") {
+                } else if (flow.target === "_main") {
                   mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
                   mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
                 }
 
                 // Update source and target points based on which is the main node
                 const updatedSourceX =
-                  flow.source === "main" ? mainNodeX : sourceX;
+                  flow.source === "_main" ? mainNodeX : sourceX;
                 const updatedSourceY =
-                  flow.source === "main" ? mainNodeY : sourceY;
+                  flow.source === "_main" ? mainNodeY : sourceY;
                 const updatedTargetX =
-                  flow.target === "main" ? mainNodeX : targetX;
+                  flow.target === "_main" ? mainNodeX : targetX;
                 const updatedTargetY =
-                  flow.target === "main" ? mainNodeY : targetY;
+                  flow.target === "_main" ? mainNodeY : targetY;
 
                 // Calculate control points for the curve - using the same logic as the edge path
                 const curveStrength = 0.5;
@@ -1527,15 +1527,15 @@ const RayVisualization = forwardRef<
               }
             })
             .attr("y", () => {
-              const sourceX = flow.source === "main" ? centerX : sourceNode.x;
-              const targetX = flow.target === "main" ? centerX : targetNode.x;
-              const sourceY = flow.source === "main" ? centerY : sourceNode.y;
-              const targetY = flow.target === "main" ? centerY : targetNode.y;
+              const sourceX = flow.source === "_main" ? centerX : sourceNode.x;
+              const targetX = flow.target === "_main" ? centerX : targetNode.x;
+              const sourceY = flow.source === "_main" ? centerY : sourceNode.y;
+              const targetY = flow.target === "_main" ? centerY : targetNode.y;
 
-              if (flow.source === "main" || flow.target === "main") {
+              if (flow.source === "_main" || flow.target === "_main") {
                 // For main node connections, calculate control points the same way as the path
-                const otherNodeX = flow.source === "main" ? targetX : sourceX;
-                const otherNodeY = flow.source === "main" ? targetY : sourceY;
+                const otherNodeX = flow.source === "_main" ? targetX : sourceX;
+                const otherNodeY = flow.source === "_main" ? targetY : sourceY;
 
                 // Calculate a better connection point on the main node perimeter
                 let mainNodeX = centerX;
@@ -1550,23 +1550,23 @@ const RayVisualization = forwardRef<
                 const angle = Math.atan2(dy, dx);
 
                 // Find point on the main node's perimeter in the direction of the other node
-                if (flow.source === "main") {
+                if (flow.source === "_main") {
                   mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
                   mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                } else if (flow.target === "main") {
+                } else if (flow.target === "_main") {
                   mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
                   mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
                 }
 
                 // Update source and target points based on which is the main node
                 const updatedSourceX =
-                  flow.source === "main" ? mainNodeX : sourceX;
+                  flow.source === "_main" ? mainNodeX : sourceX;
                 const updatedSourceY =
-                  flow.source === "main" ? mainNodeY : sourceY;
+                  flow.source === "_main" ? mainNodeY : sourceY;
                 const updatedTargetX =
-                  flow.target === "main" ? mainNodeX : targetX;
+                  flow.target === "_main" ? mainNodeX : targetX;
                 const updatedTargetY =
-                  flow.target === "main" ? mainNodeY : targetY;
+                  flow.target === "_main" ? mainNodeY : targetY;
 
                 // Calculate control points for the curve - using the same logic as the edge path
                 const curveStrength = 0.5;
@@ -1801,7 +1801,7 @@ const RayVisualization = forwardRef<
             highlightRelatedEdges(nodeId);
 
             let nodeData;
-            if (nodeId === "main") {
+            if (nodeId === "_main") {
               nodeData = { originalData: { ...mainNode, type: "function" } };
             } else {
               nodeData = g.node(nodeId);
@@ -1816,7 +1816,7 @@ const RayVisualization = forwardRef<
           });
 
         // Update main node position in graph structure
-        const mainGraphNode = g.node("main");
+        const mainGraphNode = g.node("_main");
         if (mainGraphNode) {
           mainGraphNode.x = centerX;
           mainGraphNode.y = centerY;
@@ -1904,7 +1904,7 @@ const RayVisualization = forwardRef<
 
     // Function to fetch physical view data
     const fetchPhysicalViewData = useCallback(async () => {
-      if (viewType === "physical") {
+      if (viewType === "physical" || viewType === "flame") {
         try {
           setLoadingPhysicalView(true);
           const data = await getPhysicalViewData(jobId);
@@ -1919,14 +1919,14 @@ const RayVisualization = forwardRef<
 
     // Fetch physical view data when view type changes to physical
     useEffect(() => {
-      if (viewType === "physical") {
+      if (viewType === "physical" || viewType === "flame") {
         fetchPhysicalViewData();
       }
     }, [viewType, fetchPhysicalViewData]);
 
     // Update physical view data when updateKey changes
     useEffect(() => {
-      if (viewType === "physical") {
+      if (viewType === "physical" || viewType === "flame") {
         fetchPhysicalViewData();
       }
     }, [updateKey, fetchPhysicalViewData, viewType]);
@@ -1951,7 +1951,6 @@ const RayVisualization = forwardRef<
           try {
             setLoadingFlameData(true);
             const data = await getFlameGraphData(jobId);
-            console.log("Raw response from getFlameGraphData:", data); // Debug the raw response
 
             if (data && data.data.flameData) {
               // If the data is nested inside a flameData property, extract it

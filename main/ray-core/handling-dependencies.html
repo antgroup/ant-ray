@@ -1881,6 +1881,31 @@ See <a class="reference internal" href="../ray-observability/user-guides/profili
 <li><p>Example: <code class="docutils literal notranslate"><span class="pre">{&quot;stop-on-exit&quot;:</span> <span class="pre">&quot;true&quot;,</span> <span class="pre">&quot;t&quot;:</span> <span class="pre">&quot;cuda,cublas,cudnn&quot;,</span> <span class="pre">&quot;ftrace&quot;:</span> <span class="pre">&quot;&quot;}</span></code></p></li>
 </ul>
 </li>
+<li><p><code class="docutils literal notranslate"><span class="pre">archives</span></code> (Dict[str, str] | str): Specifies the packages or files for the Ray workers. This must either be (1) a URI to a remotely-stored zip or tar file (no file size limit if enforced by Ray).
+See <a class="reference internal" href="#remote-uris"><span class="std std-ref">Remote URIs</span></a> for details, (2) a Dict which containing a user-defined key and a remote-stored zip or tar file.</p>
+<ul class="simple">
+<li><p>Example: <code class="docutils literal notranslate"><span class="pre">&quot;https://bucket/my_project.zip&quot;</span></code></p></li>
+<li><p>Example: <code class="docutils literal notranslate"><span class="pre">{&quot;url1&quot;:</span> <span class="pre">&quot;https://bucket/my_project.zip&quot;,</span> <span class="pre">&quot;url2&quot;:</span> <span class="pre">&quot;https://bucket/my_project_2.zip&quot;}</span></code></p></li>
+</ul>
+<p>Note: <code class="docutils literal notranslate"><span class="pre">archives</span></code> plugin is not a built-in plugin of Runtime Env Agent. if users need to use this plugin, you need to specify environment variables
+<code class="code docutils literal notranslate"><span class="pre">RAY_RUNTIME_ENV_PLUGINS='[{&quot;class&quot;:</span> <span class="pre">&quot;ray._private.runtime_env.archive.DownloadAndUnpackArchivePlugin&quot;}]'</span></code></p>
+<p>Note: <code class="docutils literal notranslate"><span class="pre">archives</span></code> plugin provides a user interface that can get the path of the file downloaded by the corresponding archives plugin.
+user can use <code class="code docutils literal notranslate"><span class="pre">get_context</span></code> interface to get archives path, the test code is like the following.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This example runs on a local machine, but you can also do</span>
+<span class="c1"># ray.init(address=..., runtime_env=...) to connect to a cluster.</span>
+<span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+
+<span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
+<span class="k">def</span> <span class="nf">get_archives_context</span><span class="p">():</span>
+    <span class="n">archive_path</span> <span class="o">=</span> <span class="n">get_context</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">archive_path</span>
+
+<span class="c1"># This exmaple just show the archives plugin is instance of dict, but you can also set</span>
+<span class="c1"># archives plugin a instance of str, like runtime_env = {&quot;archives&quot;: &quot;https://bucket/my_project.zip&quot;}</span>
+<span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">get_archives_context</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;archives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;url1&quot;</span><span class="p">:</span> <span class="s2">&quot;https://bucket/my_project.zip&quot;</span><span class="p">,</span> <span class="s2">&quot;url2&quot;</span><span class="p">:</span> <span class="s2">&quot;https://bucket/my_project.zip&quot;</span><span class="p">}))</span>
+</pre></div>
+</div>
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">image_uri</span></code> (dict): Require a given Docker image. The worker process runs in a container with this image.
 - Example: <code class="docutils literal notranslate"><span class="pre">{&quot;image_uri&quot;:</span> <span class="pre">&quot;anyscale/ray:2.31.0-py39-cpu&quot;}</span></code></p>
 <p>Note: <code class="docutils literal notranslate"><span class="pre">image_uri</span></code> is experimental. If you have some requirements or run into any problems, raise issues in <a class="reference external" href="https://github.com/ray-project/ray/issues">github</a>.</p>

@@ -658,14 +658,16 @@ async def download_and_unpack_package(
     base_directory: str,
     gcs_aio_client: Optional["GcsAioClient"] = None,  # noqa: F821
     logger: Optional[logging.Logger] = default_logger,
-    move_file_to_dir: bool = False,
+    unpack: bool = True,
     overwrite: bool = False,
 ) -> str:
     """Download the package corresponding to this URI and unpack it if zipped.
 
     Will be written to a file or directory named {base_directory}/{uri}.
     Returns the path to this file or directory.
-    If move_file_to_dir is False, we do decompress the file into target_dir,
+    We define target_dir as the directory to write to,
+    specified by {base_directory}/{uri}
+    If unpack is True, we do decompress the file into target_dir,
     otherwise, we just move file to target_dir and do not decompress.
 
     Args:
@@ -674,7 +676,7 @@ async def download_and_unpack_package(
             directory for the unpacked files.
         gcs_aio_client: Client to use for downloading from the GCS.
         logger: The logger to use.
-        move_file_to_dir: Whether to decompress the file into target_dir.
+        unpack: Whether to decompress the file into target_dir.
         overwrite: If True, overwrite the existing package.
 
     Returns:
@@ -759,8 +761,11 @@ async def download_and_unpack_package(
                     return str(pkg_file)
             elif protocol in Protocol.remote_protocols():
                 protocol.download_remote_uri(source_uri=pkg_uri, dest_file=pkg_file)
-
-                if move_file_to_dir:
+                # NOTE(Jacky): Assuming `base_directory` is "/tmp", `pkg_uri` is https://xxx.zip,
+                # then the generated `local_dir` is /tmp/https_xxx.
+                # If `unpack` is False, we just put file into `local_dir`, the absolute path is
+                # /tmp/https_xxx/https_xxx.zip.
+                if not unpack:
                     try:
                         os.mkdir(local_dir)
                     except FileExistsError:
@@ -769,22 +774,23 @@ async def download_and_unpack_package(
                         pkg_file,
                         os.path.join(local_dir, os.path.basename(pkg_file)),
                     )
+                    return str(local_dir)
+
+                if pkg_file.suffix in [".zip", ".jar"]:
+                    unzip_package(
+                        package_path=pkg_file,
+                        target_dir=local_dir,
+                        remove_top_level_directory=True,
+                        unlink_zip=True,
+                        logger=logger,
+                    )
+                elif pkg_file.suffix == ".whl":
+                    return str(pkg_file)
                 else:
-                    if pkg_file.suffix in [".zip", ".jar"]:
-                        unzip_package(
-                            package_path=pkg_file,
-                            target_dir=local_dir,
-                            remove_top_level_directory=True,
-                            unlink_zip=True,
-                            logger=logger,
-                        )
-                    elif pkg_file.suffix == ".whl":
-                        return str(pkg_file)
-                    else:
-                        raise NotImplementedError(
-                            f"Package format {pkg_file.suffix} is ",
-                            "not supported for remote protocols",
-                        )
+                    raise NotImplementedError(
+                        f"Package format {pkg_file.suffix} is ",
+                        "not supported for remote protocols",
+                    )
             else:
                 raise NotImplementedError(f"Protocol {protocol} is not supported")
 

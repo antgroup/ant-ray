@@ -737,6 +737,9 @@ class TestDownloadAndUnpackPackage:
 
         assert "Invalid package URI" in str(excinfo.value)
 
+    async def test_download_and_unpack_package_without_suffix():
+        pass
+
 
 def test_get_gitignore(tmp_path):
     gitignore_path = tmp_path / ".gitignore"

@@ -665,10 +665,10 @@ async def download_and_unpack_package(
 
     Will be written to a file or directory named {base_directory}/{uri}.
     Returns the path to this file or directory.
-    We define target_dir as the directory to write to,
+    Target_dir refers to the directory to unpack to,
     specified by {base_directory}/{uri}
-    If unpack is True, we do decompress the file into target_dir,
-    otherwise, we just move file to target_dir and do not decompress.
+    If unpack is True, we do decompress the downloaded file into target_dir,
+    otherwise, we just move the file to target_dir and do not decompress.
 
     Args:
         pkg_uri: URI of the package to download.

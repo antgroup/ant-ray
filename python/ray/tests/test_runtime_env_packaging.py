@@ -755,14 +755,14 @@ class TestDownloadAndUnpackPackage:
                 base_directory=temp_dest_dir,
                 unpack=True,
             )
-            package_name = Path(local_dir).name
+            package_name = Path(local_dir).name + ".log"
             assert (Path(local_dir) / package_name).exists()
             absolute_package_path = str(Path(local_dir) / package_name)
 
             with open(absolute_package_path, "r") as file:
                 content = file.read()
 
-            assert content == "test suffix log"
+            assert content == "test suffix log\n"
 
 
 def test_get_gitignore(tmp_path):

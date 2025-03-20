@@ -716,10 +716,14 @@ def ensure_trailing_slash(local_dir):
     Returns:
         Path: A Path object representing the directory path ending with a '/'.
     """
+    # Convert Path object to string and ensure trailing slash
     local_dir_str = str(local_dir)
-    if local_dir_str.endswith("/"):
-        return local_dir_str
-    return Path(local_dir_str + "/")
+
+    # Return a new Path object with a trailing slash if it's not present
+    if not local_dir_str.endswith("/"):
+        local_dir_str += "/"
+
+    return Path(local_dir_str)
 
 
 @DeveloperAPI

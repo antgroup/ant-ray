@@ -61,16 +61,11 @@ class NativeLibrariesPlugin(RuntimeEnvPlugin):
             return 0
         # NOTE: (Jacky) if uri endwith zip or tar, we download and unpack uri file to local dir.
         # Instead, we do not decompress, but directly move the file to local_dir
-        move_file_to_dir = not (is_zip_uri(uri) or is_tar_uri(uri))
-        library_dir = await download_and_unpack_package(
-            uri,
-            self._resources_dir,
-            None,
-            logger=logger,
-            move_file_to_dir=move_file_to_dir,
+        local_dir = await download_and_unpack_package(
+            uri, self._resources_dir, None, logger=logger
         )
 
-        return get_directory_size_bytes(library_dir)
+        return get_directory_size_bytes(local_dir)
 
     def modify_context(
         self,

@@ -162,8 +162,7 @@ def test_get_local_dir_from_tar_url(set_url):
 @pytest.mark.parametrize(
     "set_runtime_env_plugins",
     [
-        '[{"class":"' + NATIVE_LIBRARIES_CLASS_PATH + '"}]',
-        '[{"class":"' + ARCHIVE_PLUGIN_CLASS_PATH + '"}]'
+        '[{"class":"' + ARCHIVE_PLUGIN_CLASS_PATH + '"}]',
     ],
     indirect=True,
 )

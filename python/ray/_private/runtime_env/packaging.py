@@ -421,26 +421,9 @@ def _store_package_in_gcs(
     return len(data)
 
 
-def _get_local_path(base_directory: str, pkg_uri: str, is_tmp: bool = False) -> str:
+def _get_local_path(base_directory: str, pkg_uri: str) -> str:
     _, pkg_name = parse_uri(pkg_uri)
-    if is_tmp:
-        pkg_name = "." + pkg_name
     return os.path.join(base_directory, pkg_name)
-
-
-def _get_tmp_file_path(base_directory: str, pkg_uri: str):
-    return _get_local_path(base_directory, pkg_uri, True)
-
-
-def _seal_tmp_file(tmp_file, dst_dir=None):
-    pkg_directory, tmp_file_name = os.path.split(tmp_file)
-    file_name = tmp_file_name.lstrip(".")
-    if dst_dir:
-        pkg_file = os.path.join(dst_dir, file_name)
-    else:
-        pkg_file = os.path.join(pkg_directory, file_name)
-    os.rename(tmp_file, pkg_file)
-    return pkg_file
 
 
 def _zip_files(
@@ -771,7 +754,7 @@ async def download_and_unpack_package(
                     or if package URI is invalid.
 
     """
-    pkg_file = Path(_get_tmp_file_path(base_directory, pkg_uri))
+    pkg_file = Path(_get_local_path(base_directory, pkg_uri))
     # NOTE(Jacky): If pkg_uri has no suffix, local_dir and pkg_file will be the same,
     # so it will block the subsequent `assert local_dir != pkg_file`.
     # Thus changing the downloaded intermediate file into a temporary file.
@@ -853,7 +836,6 @@ async def download_and_unpack_package(
                         logger=logger,
                     )
                 else:
-                    pkg_file = _seal_tmp_file(pkg_file)
                     return str(pkg_file)
             elif protocol in Protocol.remote_protocols():
                 protocol.download_remote_uri(source_uri=pkg_uri, dest_file=pkg_file)
@@ -890,29 +872,10 @@ async def download_and_unpack_package(
                 elif pkg_file.suffix == ".whl":
                     return str(pkg_file)
                 else:
-                    if pkg_file.suffix in [".zip", ".jar"]:
-                        unzip_package(
-                            package_path=str(pkg_file),
-                            target_dir=str(local_dir),
-                            remove_top_level_directory=True,
-                            unlink_zip=True,
-                            logger=logger,
-                        )
-                    elif is_tar_uri(pkg_uri):
-                        untar_package(
-                            file_path=str(pkg_file),
-                            target_dir=str(local_dir),
-                            unlink_tar=True,
-                            logger=logger,
-                        )
-                    elif pkg_file.suffix == ".whl":
-                        pkg_file = _seal_tmp_file(pkg_file)
-                        return str(pkg_file)
-                    else:
-                        raise NotImplementedError(
-                            f"Package format {pkg_file.suffix} is ",
-                            "not supported for remote protocols",
-                        )
+                    raise NotImplementedError(
+                        f"Package format {pkg_file.suffix} is ",
+                        "not supported for remote protocols",
+                    )
             else:
                 raise NotImplementedError(f"Protocol {protocol} is not supported")
 

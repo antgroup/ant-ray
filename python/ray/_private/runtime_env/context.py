@@ -68,14 +68,14 @@ class RuntimeEnvContext:
                 local_java_jars.append(java_jar)
 
             class_path_args = ["-cp", ray_jars + ":" + str(":".join(local_java_jars))]
-            # set code search path
+            # try update code search path
             passthrough_args = try_update_code_search_path(
                 passthrough_args, language, self.java_jars, self.native_libraries
             )
             passthrough_args = class_path_args + passthrough_args
         elif language == Language.CPP:
             executable = ["exec"]
-            # set code search path
+            # try update code search path
             passthrough_args = try_update_code_search_path(
                 passthrough_args, language, self.java_jars, self.native_libraries
             )
@@ -85,10 +85,10 @@ class RuntimeEnvContext:
         else:
             executable = ["exec"]
 
-        # set ld library path
+        # try update ld_library path
         try_update_ld_library_path(language, self.native_libraries)
 
-        # set ld preload
+        # try update ld_preload
         try_update_ld_preload(self.native_libraries)
 
         # By default, raylet uses the path to default_worker.py on host.

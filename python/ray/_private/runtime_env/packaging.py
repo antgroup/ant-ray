@@ -19,6 +19,7 @@ from ray._private.ray_constants import (
     RAY_RUNTIME_ENV_URI_PIN_EXPIRATION_S_ENV_VAR,
     RAY_RUNTIME_ENV_IGNORE_GITIGNORE,
     GRPC_CPP_MAX_MESSAGE_SIZE,
+    RAY_UNPACKABLE_FILE_SUFFIXS,
 )
 from ray._private.runtime_env.conda_utils import exec_cmd_stream_to_logger
 from ray._private.runtime_env.protocol import Protocol
@@ -710,10 +711,7 @@ def is_unpack_or_not(pkg_file: str) -> bool:
     Returns:
         bool: True if the file should be unpacked, False otherwise.
     """
-    unpackable_file_suffixs = os.environ.get(
-        "RAY_UNPACKABLE_FILE_SUFFIXS", ".zip,.jar,.whl,.tar,.tar.gz,.tar.bz,.tar.xz"
-    )
-    unpack_suffixs = unpackable_file_suffixs.split(",")
+    unpack_suffixs = RAY_UNPACKABLE_FILE_SUFFIXS
 
     # Loop through the list of unpack suffixes and check against the pkg_file
     for suffix in unpack_suffixs:

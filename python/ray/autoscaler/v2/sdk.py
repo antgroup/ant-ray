@@ -8,6 +8,8 @@ from ray.autoscaler.v2.utils import ClusterStatusParser
 from ray.core.generated.autoscaler_pb2 import (
     ClusterResourceState,
     GetClusterResourceStateReply,
+    VirtualClusterResourceStates,
+    GetVirtualClusterResourceStatesReply,
     GetClusterStatusReply,
     NodeState,
 )
@@ -95,6 +97,24 @@ def get_cluster_resource_state(gcs_client: GcsClient) -> ClusterResourceState:
     reply = GetClusterResourceStateReply()
     reply.ParseFromString(str_reply)
     return reply.cluster_resource_state
+
+
+def get_virtual_cluster_resource_states(
+    gcs_client: GcsClient,
+) -> VirtualClusterResourceStates:
+    """
+    Get the cluster resource state from GCS.
+    Args:
+        gcs_client: The GCS client to query.
+    Returns:
+        A VirtualClusterResourceStates object
+    Raises:
+        Exception: If the request times out or failed.
+    """
+    str_reply = gcs_client.get_virtual_cluster_resource_states()
+    reply = GetVirtualClusterResourceStatesReply()
+    reply.ParseFromString(str_reply)
+    return reply.virtual_cluster_resource_states
 
 
 def is_head_node(node_state: NodeState) -> bool:

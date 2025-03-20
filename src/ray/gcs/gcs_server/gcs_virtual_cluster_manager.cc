@@ -261,7 +261,7 @@ void GcsVirtualClusterManager::HandleGetAllVirtualClusterInfo(
   size_t total = 0;
 
   primary_cluster_->ForeachVirtualClustersView(
-      std::move(request), [reply, send_reply_callback, limit, &count, &total](auto data) {
+      [reply, send_reply_callback, limit, &count, &total](auto data) {
         total += 1;
         if (count >= limit) {
           return;
@@ -550,6 +550,10 @@ void GcsVirtualClusterManager::OnDetachedPlacementGroupDestroy(
       }
     }
   }
+}
+
+std::shared_ptr<const PrimaryCluster> GcsVirtualClusterManager::GetPrimaryCluster() {
+  return primary_cluster_;
 }
 
 }  // namespace gcs

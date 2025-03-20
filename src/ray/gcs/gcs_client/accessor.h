@@ -1002,6 +1002,9 @@ class AutoscalerStateAccessor {
   virtual Status GetClusterResourceState(int64_t timeout_ms,
                                          std::string &serialized_reply);
 
+  virtual Status GetVirtualClusterResourceStates(int64_t timeout_ms,
+                                                 std::string &serialized_reply);
+
   virtual Status GetClusterStatus(int64_t timeout_ms, std::string &serialized_reply);
 
   virtual Status ReportAutoscalingState(int64_t timeout_ms,
@@ -1060,6 +1063,14 @@ class VirtualClusterInfoAccessor {
   /// resubscribe from PubSub server, otherwise we only need to fetch data from GCS
   /// server.
   virtual void AsyncResubscribe();
+
+  virtual Status SyncCreateOrUpdateVirtualCluster(
+      const std::string &virtual_cluster_id,
+      bool divisible,
+      const std::unordered_map<std::string, int32_t> &replica_sets,
+      int64_t revision,
+      int64_t timeout_ms,
+      std::string &serialized_reply);
 
  private:
   /// Save the fetch data operation in this function, so we can call it again when GCS

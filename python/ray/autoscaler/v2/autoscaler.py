@@ -1,4 +1,5 @@
 import logging
+import os
 from queue import Queue
 from typing import List, Optional
 
@@ -33,7 +34,10 @@ from ray.autoscaler.v2.instance_manager.subscribers.cloud_instance_updater impor
 from ray.autoscaler.v2.instance_manager.subscribers.ray_stopper import RayStopper
 from ray.autoscaler.v2.metrics_reporter import AutoscalerMetricsReporter
 from ray.autoscaler.v2.scheduler import ResourceDemandScheduler
-from ray.autoscaler.v2.sdk import get_cluster_resource_state
+from ray.autoscaler.v2.sdk import (
+    get_cluster_resource_state,
+    get_virtual_cluster_resource_states,
+)
 from ray.core.generated.autoscaler_pb2 import AutoscalingState
 
 logger = logging.getLogger(__name__)
@@ -176,7 +180,12 @@ class Autoscaler:
                 ray_install_errors.append(self._ray_install_errors_queue.get())
 
             # Get the current state of the ray cluster resources.
-            ray_cluster_resource_state = get_cluster_resource_state(self._gcs_client)
+            if os.getenv("VIRTUAL_CLUSTER_ENABLED", "false") == "true":
+                ray_resource_state = get_virtual_cluster_resource_states(
+                    self._gcs_client
+                )
+            else:
+                ray_resource_state = get_cluster_resource_state(self._gcs_client)
 
             # Refresh the config from the source
             self._config_reader.refresh_cached_autoscaling_config()
@@ -186,7 +195,7 @@ class Autoscaler:
                 instance_manager=self._instance_manager,
                 scheduler=self._scheduler,
                 cloud_provider=self._cloud_instance_provider,
-                ray_cluster_resource_state=ray_cluster_resource_state,
+                ray_cluster_resource_state=ray_resource_state,
                 non_terminated_cloud_instances=(
                     self._cloud_instance_provider.get_non_terminated()
                 ),
@@ -195,6 +204,7 @@ class Autoscaler:
                 ray_stop_errors=ray_stop_errors,
                 autoscaling_config=autoscaling_config,
                 metrics_reporter=self._metrics_reporter,
+                gcs_client=self._gcs_client,
             )
         except Exception as e:
             logger.exception(e)

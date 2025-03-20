@@ -16,6 +16,7 @@
 
 #include "ray/gcs/gcs_server/gcs_init_data.h"
 #include "ray/gcs/gcs_server/gcs_kv_manager.h"
+#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
 #include "ray/rpc/gcs_server/gcs_rpc_server.h"
 #include "ray/rpc/node_manager/node_manager_client_pool.h"
 #include "ray/util/thread_checker.h"
@@ -31,17 +32,24 @@ class GcsResourceManager;
 
 class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler {
  public:
-  GcsAutoscalerStateManager(std::string session_name,
-                            GcsNodeManager &gcs_node_manager,
-                            GcsActorManager &gcs_actor_manager,
-                            const GcsPlacementGroupManager &gcs_placement_group_manager,
-                            rpc::NodeManagerClientPool &raylet_client_pool,
-                            InternalKVInterface &kv,
-                            instrumented_io_context &io_context);
+  GcsAutoscalerStateManager(
+      std::string session_name,
+      GcsNodeManager &gcs_node_manager,
+      GcsActorManager &gcs_actor_manager,
+      const GcsPlacementGroupManager &gcs_placement_group_manager,
+      rpc::NodeManagerClientPool &raylet_client_pool,
+      InternalKVInterface &kv,
+      instrumented_io_context &io_context,
+      std::shared_ptr<GcsVirtualClusterManager> gcs_virtual_cluster_manager = nullptr);
 
   void HandleGetClusterResourceState(
       rpc::autoscaler::GetClusterResourceStateRequest request,
       rpc::autoscaler::GetClusterResourceStateReply *reply,
+      rpc::SendReplyCallback send_reply_callback) override;
+
+  void HandleGetVirtualClusterResourceStates(
+      rpc::autoscaler::GetVirtualClusterResourceStatesRequest request,
+      rpc::autoscaler::GetVirtualClusterResourceStatesReply *reply,
       rpc::SendReplyCallback send_reply_callback) override;
 
   void HandleReportAutoscalingState(
@@ -146,6 +154,8 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   /// more details. This is requested through autoscaler SDK for request_resources().
   void GetClusterResourceConstraints(rpc::autoscaler::ClusterResourceState *state);
 
+  void GetVirtualClusterResources(rpc::autoscaler::VirtualClusterState *state);
+
   // Ray cluster session name.
   const std::string session_name_;
 
@@ -164,6 +174,8 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   // Handler for internal KV
   InternalKVInterface &kv_;
   instrumented_io_context &io_context_;
+
+  std::shared_ptr<GcsVirtualClusterManager> gcs_virtual_cluster_manager_;
 
   // The default value of the last seen version for the request is 0, which indicates
   // no version has been reported. So the first reported version should be 1.

@@ -524,10 +524,8 @@ class PrimaryCluster : public DivisibleCluster,
 
   /// Iterate virtual clusters view matching the request.
   ///
-  /// \param request The request to get the virtual clusters view.
   /// \param callback The callback to visit each virtual cluster view.
-  void ForeachVirtualClustersView(rpc::GetAllVirtualClusterInfoRequest request,
-                                  VirtualClustersViewVisitCallback callback) const;
+  void ForeachVirtualClustersView(VirtualClustersViewVisitCallback callback) const;
 
   /// Handle the node added event.
   ///

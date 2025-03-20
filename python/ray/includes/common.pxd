@@ -550,6 +550,11 @@ cdef extern from "ray/gcs/gcs_client/accessor.h" nogil:
             c_string &serialized_reply
         )
 
+        CRayStatus GetVirtualClusterResourceStates(
+            int64_t timeout_ms,
+            c_string &serialized_reply
+        )
+
         CRayStatus GetClusterStatus(
             int64_t timeout_ms,
             c_string &serialized_reply
@@ -573,6 +578,16 @@ cdef extern from "ray/gcs/gcs_client/accessor.h" nogil:
             int64_t timeout_ms,
             c_bool &is_accepted,
             c_string &rejection_reason_message
+        )
+
+    cdef cppclass CVirtualClusterInfoAccessor "ray::gcs::VirtualClusterInfoAccessor":
+        CRayStatus SyncCreateOrUpdateVirtualCluster(
+            const c_string &virtual_cluster_id,
+            c_bool divisible,
+            const unordered_map[c_string, int32_t] &replica_sets,
+            int64_t revision,
+            int64_t timeout_ms,
+            const c_string &serialized_reply
         )
 
 
@@ -602,6 +617,7 @@ cdef extern from "ray/gcs/gcs_client/gcs_client.h" nogil:
         CNodeResourceInfoAccessor& NodeResources()
         CRuntimeEnvAccessor& RuntimeEnvs()
         CAutoscalerStateAccessor& Autoscaler()
+        CVirtualClusterInfoAccessor& VirtualCluster()
 
     cdef CRayStatus ConnectOnSingletonIoContext(CGcsClient &gcs_client, int timeout_ms)
 

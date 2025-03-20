@@ -38,6 +38,11 @@ class AutoscalerStateServiceHandler {
                                              GetClusterResourceStateReply *reply,
                                              SendReplyCallback send_reply_callback) = 0;
 
+  virtual void HandleGetVirtualClusterResourceStates(
+      GetVirtualClusterResourceStatesRequest request,
+      GetVirtualClusterResourceStatesReply *reply,
+      SendReplyCallback send_reply_callback) = 0;
+
   virtual void HandleReportAutoscalingState(ReportAutoscalingStateRequest request,
                                             ReportAutoscalingStateReply *reply,
                                             SendReplyCallback send_reply_callback) = 0;
@@ -77,6 +82,7 @@ class AutoscalerStateGrpcService : public GrpcService {
       std::vector<std::unique_ptr<ServerCallFactory>> *server_call_factories,
       const ClusterID &cluster_id) override {
     AUTOSCALER_STATE_SERVICE_RPC_HANDLER(GetClusterResourceState);
+    AUTOSCALER_STATE_SERVICE_RPC_HANDLER(GetVirtualClusterResourceStates);
     AUTOSCALER_STATE_SERVICE_RPC_HANDLER(ReportAutoscalingState);
     AUTOSCALER_STATE_SERVICE_RPC_HANDLER(ReportClusterConfig);
     AUTOSCALER_STATE_SERVICE_RPC_HANDLER(RequestClusterResourceConstraint);

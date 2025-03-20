@@ -1,11 +1,15 @@
+import copy
 import logging
 import math
 import time
 import uuid
 from collections import defaultdict
-from typing import Dict, List, Optional, Set, Tuple
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Set, Tuple, Union
 
+from ray._raylet import GcsClient
 from ray._private.utils import binary_to_hex
+from ray.autoscaler._private.constants import PRIMARY_CLUSTER_ID
 from ray.autoscaler.v2.instance_manager.common import InstanceUtil
 from ray.autoscaler.v2.instance_manager.config import (
     AutoscalingConfig,
@@ -26,7 +30,7 @@ from ray.autoscaler.v2.instance_manager.subscribers.ray_stopper import RayStopEr
 from ray.autoscaler.v2.metrics_reporter import AutoscalerMetricsReporter
 from ray.autoscaler.v2.scheduler import IResourceScheduler, SchedulingRequest
 from ray.autoscaler.v2.schema import AutoscalerInstance, NodeType
-from ray.autoscaler.v2.sdk import is_head_node
+from ray.autoscaler.v2.sdk import is_head_node, get_virtual_cluster_resource_states
 from ray.core.generated.autoscaler_pb2 import (
     AutoscalingState,
     ClusterResourceState,
@@ -35,6 +39,8 @@ from ray.core.generated.autoscaler_pb2 import (
     NodeStatus,
     PendingInstance,
     PendingInstanceRequest,
+    VirtualClusterResourceStates,
+    VirtualClusterState,
 )
 from ray.core.generated.instance_manager_pb2 import GetInstanceManagerStateRequest
 from ray.core.generated.instance_manager_pb2 import Instance as IMInstance
@@ -45,9 +51,20 @@ from ray.core.generated.instance_manager_pb2 import (
     NodeKind,
     StatusCode,
     UpdateInstanceManagerStateRequest,
+    TerminationRequest,
+    LaunchRequest,
 )
+from ray.core.generated.gcs_service_pb2 import CreateOrUpdateVirtualClusterReply
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class BufferedNodePool:
+    launching_nodes: Dict[str, List[LaunchRequest]] = field(default_factory=dict)
+    # ray node type to list of nodes.
+    unassigned_nodes: Dict[str, List[str]] = field(default_factory=dict)
+    all_node_states: Dict[str, NodeState] = field(default_factory=dict)
 
 
 class Reconciler:
@@ -62,7 +79,9 @@ class Reconciler:
         instance_manager: InstanceManager,
         scheduler: IResourceScheduler,
         cloud_provider: ICloudInstanceProvider,
-        ray_cluster_resource_state: ClusterResourceState,
+        ray_cluster_resource_state: Union[
+            ClusterResourceState, VirtualClusterResourceStates
+        ],
         non_terminated_cloud_instances: Dict[CloudInstanceId, CloudInstance],
         autoscaling_config: AutoscalingConfig,
         cloud_provider_errors: Optional[List[CloudInstanceProviderError]] = None,
@@ -70,6 +89,7 @@ class Reconciler:
         ray_stop_errors: Optional[List[RayStopError]] = None,
         metrics_reporter: Optional[AutoscalerMetricsReporter] = None,
         _logger: Optional[logging.Logger] = None,
+        gcs_client: GcsClient = None,
     ) -> AutoscalingState:
         """
         The reconcile method computes InstanceUpdateEvents for the instance manager
@@ -106,6 +126,7 @@ class Reconciler:
         autoscaling_state.last_seen_cluster_resource_state_version = (
             ray_cluster_resource_state.cluster_resource_state_version
         )
+
         Reconciler._sync_from(
             instance_manager=instance_manager,
             ray_nodes=ray_cluster_resource_state.node_states,
@@ -125,6 +146,7 @@ class Reconciler:
             non_terminated_cloud_instances=non_terminated_cloud_instances,
             autoscaling_config=autoscaling_config,
             _logger=_logger,
+            gcs_client=gcs_client,
         )
 
         Reconciler._report_metrics(
@@ -226,10 +248,13 @@ class Reconciler:
         instance_manager: InstanceManager,
         scheduler: IResourceScheduler,
         cloud_provider: ICloudInstanceProvider,
-        ray_cluster_resource_state: ClusterResourceState,
+        ray_cluster_resource_state: Union[
+            ClusterResourceState, VirtualClusterResourceStates
+        ],
         non_terminated_cloud_instances: Dict[CloudInstanceId, CloudInstance],
         autoscaling_config: AutoscalingConfig,
         _logger: Optional[logging.Logger] = None,
+        gcs_client: GcsClient = None,
     ):
         """
         Step the reconciler to the next state by computing instance status transitions
@@ -271,13 +296,60 @@ class Reconciler:
             _logger=_logger or logger,
         )
 
-        Reconciler._scale_cluster(
-            autoscaling_state=autoscaling_state,
-            instance_manager=instance_manager,
-            ray_state=ray_cluster_resource_state,
-            scheduler=scheduler,
-            autoscaling_config=autoscaling_config,
-        )
+        if isinstance(ray_cluster_resource_state, ClusterResourceState):
+            Reconciler._scale_cluster(
+                autoscaling_state=autoscaling_state,
+                instance_manager=instance_manager,
+                ray_state=ray_cluster_resource_state,
+                scheduler=scheduler,
+                autoscaling_config=autoscaling_config,
+            )
+        else:
+            ray_cluster_resource_state: VirtualClusterResourceStates
+
+            buffered_node_pool = BufferedNodePool()
+            for node_state in ray_cluster_resource_state.node_states:
+                buffered_node_pool.all_node_states[
+                    binary_to_hex(node_state.node_id)
+                ] = node_state
+
+            for node_id in ray_cluster_resource_state.states[PRIMARY_CLUSTER_ID].nodes:
+                if node_id in buffered_node_pool.all_node_states:
+                    node_list = buffered_node_pool.unassigned_nodes.setdefault(
+                        buffered_node_pool.all_node_states[node_id].ray_node_type_name,
+                        [],
+                    )
+                    node_list.append(node_id)
+
+            for (
+                virtual_cluster_id,
+                virtual_cluster_state,
+            ) in ray_cluster_resource_state.states.items():
+                if (
+                    virtual_cluster_id == PRIMARY_CLUSTER_ID
+                    or virtual_cluster_state.divisible
+                ):
+                    continue
+
+                Reconciler._scale_virtual_cluster(
+                    autoscaling_state=autoscaling_state,
+                    instance_manager=instance_manager,
+                    ray_state=virtual_cluster_state,
+                    scheduler=scheduler,
+                    autoscaling_config=autoscaling_config,
+                    virtual_cluster_id=virtual_cluster_id,
+                    buffered_node_pool=buffered_node_pool,
+                    gcs_client=gcs_client,
+                )
+            Reconciler._scale_primary_cluster(
+                autoscaling_state=autoscaling_state,
+                instance_manager=instance_manager,
+                ray_state=ray_cluster_resource_state,
+                scheduler=scheduler,
+                autoscaling_config=autoscaling_config,
+                buffered_node_pool=buffered_node_pool,
+                gcs_client=gcs_client,
+            )
 
         Reconciler._handle_instances_launch(
             instance_manager=instance_manager, autoscaling_config=autoscaling_config
@@ -1151,6 +1223,274 @@ class Reconciler:
             )
 
         # Add new instances.
+        for launch_request in to_launch:
+            for _ in range(launch_request.count):
+                instance_id = InstanceUtil.random_instance_id()
+                updates[instance_id] = IMInstanceUpdateEvent(
+                    instance_id=instance_id,
+                    new_instance_status=IMInstance.QUEUED,
+                    instance_type=launch_request.instance_type,
+                    upsert=True,
+                    details=(
+                        f"queuing new instance of {launch_request.instance_type} "
+                        "from scheduler"
+                    ),
+                )
+
+        Reconciler._update_instance_manager(instance_manager, version, updates)
+
+    @staticmethod
+    def _scale_virtual_cluster(
+        autoscaling_state: AutoscalingState,
+        instance_manager: InstanceManager,
+        ray_state: VirtualClusterState,
+        scheduler: IResourceScheduler,
+        autoscaling_config: AutoscalingConfig,
+        virtual_cluster_id: str,
+        buffered_node_pool: BufferedNodePool,
+        gcs_client: GcsClient,
+    ) -> None:
+        """
+        Scale the cluster based on the resource state and the resource scheduler's
+        decision:
+
+        - It launches new instances if needed.
+        - It terminates extra ray nodes if they should be shut down (preemption
+            or idle termination)
+
+        Args:
+            autoscaling_state: The autoscaling state to reconcile.
+            instance_manager: The instance manager to reconcile.
+            ray_state: The ray cluster's resource state.
+            scheduler: The resource scheduler to make scaling decisions.
+            autoscaling_config: The autoscaling config.
+
+        """
+
+        # Get the current instance states.
+        im_instances, version = Reconciler._get_im_instances(instance_manager)
+        autoscaler_instances = []
+        node_set = set(ray_state.nodes)
+        for im_instance in im_instances:
+            if im_instance.node_id in node_set:
+                ray_node = buffered_node_pool.all_node_states.get(im_instance.node_id)
+                autoscaler_instances.append(
+                    AutoscalerInstance(
+                        ray_node=ray_node,
+                        im_instance=im_instance,
+                        cloud_instance_id=(
+                            im_instance.cloud_instance_id
+                            if im_instance.cloud_instance_id
+                            else None
+                        ),
+                    )
+                )
+
+        # TODO(rickyx): We should probably name it as "Planner" or "Scaler"
+        # or "ClusterScaler"
+        sched_request = SchedulingRequest(
+            node_type_configs=autoscaling_config.get_node_type_configs(),
+            max_num_nodes=autoscaling_config.get_max_num_nodes(),
+            resource_requests=ray_state.pending_resource_requests,
+            gang_resource_requests=ray_state.pending_gang_resource_requests,
+            cluster_resource_constraints=ray_state.cluster_resource_constraints,
+            current_instances=autoscaler_instances,
+            idle_timeout_s=autoscaling_config.get_idle_timeout_s(),
+            disable_launch_config_check=(
+                autoscaling_config.disable_launch_config_check()
+            ),
+        )
+
+        # Ask scheduler for updates to the cluster shape.
+        reply = scheduler.schedule(sched_request)
+
+        # Populate the autoscaling state.
+        autoscaling_state.infeasible_resource_requests.extend(
+            reply.infeasible_resource_requests
+        )
+        autoscaling_state.infeasible_gang_resource_requests.extend(
+            reply.infeasible_gang_resource_requests
+        )
+        autoscaling_state.infeasible_cluster_resource_constraints.extend(
+            reply.infeasible_cluster_resource_constraints
+        )
+
+        if autoscaling_config.provider == Provider.READ_ONLY:
+            # We shouldn't be scaling the cluster if the provider is read-only.
+            return
+
+        # Scale the clusters if needed.
+        to_terminate = reply.to_terminate
+        shrinking_nodes = []
+
+        # Buffer terminating requests.
+        for terminate_request in to_terminate:
+            node_list = buffered_node_pool.unassigned_nodes.setdefault(
+                terminate_request.ray_node_type, []
+            )
+            node_list.append(terminate_request.ray_node_id)
+            node_set.remove(terminate_request.ray_node_id)
+            shrinking_nodes.append(terminate_request.ray_node_id)
+
+        ray_state.nodes = list(node_set)
+
+        # TODO: shrink a virtual cluster with specified nodes.
+        shrink_virtual_cluster(gcs_client, virtual_cluster_id, shrinking_nodes)
+
+        # Buffer launching requests.
+        launch_reqs = buffered_node_pool.launching_nodes.setdefault(
+            virtual_cluster_id, []
+        )
+        launch_reqs.extend(reply.to_launch)
+
+    @staticmethod
+    def _scale_primary_cluster(
+        autoscaling_state: AutoscalingState,
+        instance_manager: InstanceManager,
+        ray_state: VirtualClusterResourceStates,
+        scheduler: IResourceScheduler,
+        autoscaling_config: AutoscalingConfig,
+        buffered_node_pool: BufferedNodePool,
+        gcs_client: GcsClient,
+    ) -> None:
+        # Try satisfying the pending launch requests from the unassigned node.
+        for (
+            virtual_cluster_id,
+            launch_requests,
+        ) in buffered_node_pool.launching_nodes.items():
+            expanding_replica_sets: Dict[str, int] = {}
+            for index in range(len(launch_requests) - 1, -1, -1):
+                launch_request = launch_requests[index]
+                if launch_request.ray_node_type in buffered_node_pool.unassigned_nodes:
+                    available_node_list = buffered_node_pool.unassigned_nodes[
+                        launch_request.ray_node_type
+                    ]
+                    if len(available_node_list) >= launch_request.count:
+                        expanding_replica_sets[
+                            launch_request.ray_node_type
+                        ] = launch_request.count
+                        launch_requests.pop(index)
+                        available_node_list = available_node_list[
+                            launch_request.count :
+                        ]
+                    else:
+                        expanding_replica_sets[launch_request.ray_node_type] = len(
+                            available_node_list
+                        )
+                        launch_request.count -= len(available_node_list)
+                        buffered_node_pool.unassigned_nodes.pop(
+                            launch_request.ray_node_type
+                        )
+
+            replica_sets: Dict[str, int] = {}
+            for node_id in ray_state.states[virtual_cluster_id].nodes:
+                replica_sets[
+                    buffered_node_pool.all_node_states[node_id].ray_node_type_name
+                ] = (
+                    replica_sets.get(
+                        buffered_node_pool.all_node_states[node_id].ray_node_type_name,
+                        0,
+                    )
+                    + 1
+                )
+
+            for template_id, count in expanding_replica_sets.items():
+                replica_sets[template_id] = replica_sets.get(template_id, 0) + count
+
+            str_reply = gcs_client.update_virtual_cluster(
+                virtual_cluster_id,
+                ray_state.states[virtual_cluster_id].divisible,
+                replica_sets,
+                ray_state.states[virtual_cluster_id].revision,
+            )
+            reply = CreateOrUpdateVirtualClusterReply()
+            reply.ParseFromString(str_reply)
+            if reply.status.code == 0:
+                # TODO: retry if needed.
+                logger.warning(
+                    "Failed to update virtual cluster %s", virtual_cluster_id
+                )
+
+        # Get the current instance states.
+        im_instances, version = Reconciler._get_im_instances(instance_manager)
+        autoscaler_instances = []
+
+        unassigned_node_set = set()
+        for _, node_list in buffered_node_pool.unassigned_nodes.items():
+            unassigned_node_set.update(node_list)
+        for im_instance in im_instances:
+            if im_instance.node_id in unassigned_node_set:
+                ray_node = buffered_node_pool.all_node_states.get(im_instance.node_id)
+                autoscaler_instances.append(
+                    AutoscalerInstance(
+                        ray_node=ray_node,
+                        im_instance=im_instance,
+                        cloud_instance_id=(
+                            im_instance.cloud_instance_id
+                            if im_instance.cloud_instance_id
+                            else None
+                        ),
+                    )
+                )
+
+        # TODO(rickyx): We should probably name it as "Planner" or "Scaler"
+        # or "ClusterScaler"
+        sched_request = SchedulingRequest(
+            node_type_configs=autoscaling_config.get_node_type_configs(),
+            max_num_nodes=autoscaling_config.get_max_num_nodes(),
+            resource_requests=[],
+            gang_resource_requests=[],
+            cluster_resource_constraints=[],
+            current_instances=autoscaler_instances,
+            idle_timeout_s=autoscaling_config.get_idle_timeout_s(),
+            disable_launch_config_check=(
+                autoscaling_config.disable_launch_config_check()
+            ),
+        )
+
+        # Ask scheduler for updates to the cluster shape.
+        reply = scheduler.schedule(sched_request)
+
+        # Populate the autoscaling state.
+        autoscaling_state.infeasible_resource_requests.extend(
+            reply.infeasible_resource_requests
+        )
+        autoscaling_state.infeasible_gang_resource_requests.extend(
+            reply.infeasible_gang_resource_requests
+        )
+        autoscaling_state.infeasible_cluster_resource_constraints.extend(
+            reply.infeasible_cluster_resource_constraints
+        )
+
+        if not Reconciler._is_head_node_running(instance_manager):
+            # We shouldn't be scaling the cluster until the head node is ready.
+            # This could happen when the head node (i.e. the raylet) is still
+            # pending registration even though GCS is up.
+            # We will wait until the head node is running and ready to avoid
+            # scaling the cluster from min worker nodes constraint.
+            return
+
+        if autoscaling_config.provider == Provider.READ_ONLY:
+            # We shouldn't be scaling the cluster if the provider is read-only.
+            return
+
+        # Scale the clusters if needed.
+        to_launch = reply.to_launch
+        to_terminate = reply.to_terminate
+        updates = {}
+        # Add terminating instances.
+        for terminate_request in to_terminate:
+            instance_id = terminate_request.instance_id
+            updates[terminate_request.instance_id] = IMInstanceUpdateEvent(
+                instance_id=instance_id,
+                new_instance_status=IMInstance.RAY_STOP_REQUESTED,
+                termination_request=terminate_request,
+                details=f"draining ray: {terminate_request.details}",
+            )
+
+        # Add new instances.
+        for _, launch_requests in buffered_node_pool.launching_nodes.items():
+            to_launch.extend(launch_requests)
         for launch_request in to_launch:
             for _ in range(launch_request.count):
                 instance_id = InstanceUtil.random_instance_id()

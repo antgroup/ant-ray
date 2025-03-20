@@ -15,6 +15,11 @@ ARCHIVE_PLUGIN_CLASS_PATH = (
 )
 ARCHIVE_PLUGIN_NAME = "archives"
 
+NATIVE_LIBRARIES_CLASS_PATH = (
+    "ray._private.runtime_env.native_libraries.NativeLibrariesPlugin"  # noqa: E501
+)
+NATIVE_LIBRARIES_PLUGIN_NAME = "native_libraries"
+
 default_logger = logging.getLogger(__name__)
 
 

@@ -694,36 +694,34 @@ def get_local_dir_from_uri(uri: str, base_directory: str) -> Path:
     if local_dir.suffix == ".tar":
         local_dir = local_dir.with_suffix("")
 
-    # NOTE(Jacky): If pkg_file has no suffix,
-    # then pkg_file and local_dir are the same,
-    # it will block in the <download_and_unpack_package> function.
-    # We add a slash after local_dir to distinguish it from pkg_file.
-    local_dir = ensure_trailing_slash(local_dir)
     return local_dir
 
 
-def ensure_trailing_slash(local_dir):
-    """Ensures that the given local directory path ends with a trailing slash ('/').
+def is_unpack_or_not(pkg_file: str) -> bool:
+    """Determines whether the given pkg_file should be unpacked based on its suffix.
 
-    This function converts the provided Path object to a string, checks if the
-    string representation ends with a '/', indicating that it is a directory
-    path. If not, the function appends '/' to the string and returns a new Path
-    object with the modified string.
+    This function checks the suffix of the pkg_file to see if it matches one of
+    the specified compression or packaging formats. If the suffix matches, the
+    function returns True, indicating that the file should be unpacked.
+    Otherwise, it returns False.
 
     Args:
-        local_dir: The directory path to check and possibly modify.
+        pkg_file: The file name or path to check.
 
     Returns:
-        Path: A Path object representing the directory path ending with a '/'.
+        bool: True if the file should be unpacked, False otherwise.
     """
-    # Convert Path object to string and ensure trailing slash
-    local_dir_str = str(local_dir)
+    unpackable_file_suffixs = os.environ.get(
+        "RAY_UNPACKABLE_FILE_SUFFIXS", ".tar.gz,.zip,.jar,.tar,.tar.bz,.tar.xz"
+    )
+    unpack_suffixs = unpackable_file_suffixs.split(",")
 
-    # Return a new Path object with a trailing slash if it's not present
-    if not local_dir_str.endswith("/"):
-        local_dir_str += "/"
+    # Loop through the list of unpack suffixes and check against the pkg_file
+    for suffix in unpack_suffixs:
+        if pkg_file.endswith(suffix):
+            return True
 
-    return Path(local_dir_str)
+    return False
 
 
 @DeveloperAPI
@@ -732,17 +730,12 @@ async def download_and_unpack_package(
     base_directory: str,
     gcs_aio_client: Optional["GcsAioClient"] = None,  # noqa: F821
     logger: Optional[logging.Logger] = default_logger,
-    unpack: bool = True,
     overwrite: bool = False,
 ) -> str:
     """Download the package corresponding to this URI and unpack it if zipped.
 
     Will be written to a file or directory named {base_directory}/{uri}.
     Returns the path to this file or directory.
-    Target_dir refers to the directory to unpack to,
-    specified by {base_directory}/{uri}
-    If unpack is True, we do decompress the downloaded file into target_dir,
-    otherwise, we just move the file to target_dir and do not decompress.
 
     Args:
         pkg_uri: URI of the package to download.
@@ -780,8 +773,7 @@ async def download_and_unpack_package(
     # and ensures that only files with supported formats are processed
     # for unpacking. This check helps in maintaining robustness and stability
     # in handling various files.
-    if pkg_file.suffix not in ["zip", "jar", ".whl"] and not is_tar_file(str(pkg_file)):
-        unpack = False
+    unpack = is_unpack_or_not(str(pkg_file))
 
     async with _AsyncFileLock(str(pkg_file) + ".lock"):
         if logger is None:

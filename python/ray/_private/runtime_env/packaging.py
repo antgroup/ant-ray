@@ -693,7 +693,6 @@ def get_local_dir_from_uri(uri: str, base_directory: str) -> Path:
     # which needs to be removed twice to get local_dir
     if local_dir.suffix == ".tar":
         local_dir = local_dir.with_suffix("")
-
     return local_dir
 
 
@@ -712,7 +711,7 @@ def is_unpack_or_not(pkg_file: str) -> bool:
         bool: True if the file should be unpacked, False otherwise.
     """
     unpackable_file_suffixs = os.environ.get(
-        "RAY_UNPACKABLE_FILE_SUFFIXS", ".tar.gz,.zip,.jar,.tar,.tar.bz,.tar.xz"
+        "RAY_UNPACKABLE_FILE_SUFFIXS", ".zip,.jar,.whl,.tar,.tar.gz,.tar.bz,.tar.xz"
     )
     unpack_suffixs = unpackable_file_suffixs.split(",")
 

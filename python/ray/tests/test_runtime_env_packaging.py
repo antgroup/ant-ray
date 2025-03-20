@@ -870,7 +870,7 @@ def test_get_uri_for_package():
 def test_get_local_dir_from_uri():
     uri = "gcs://<working_dir_content_hash>.zip"
     assert get_local_dir_from_uri(uri, "base_dir") == Path(
-        "base_dir/<working_dir_content_hash>/"
+        "base_dir/<working_dir_content_hash>"
     )
 
 

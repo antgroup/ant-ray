@@ -697,7 +697,7 @@ def get_local_dir_from_uri(uri: str, base_directory: str) -> Path:
     return local_dir
 
 
-def is_unpack_or_not(pkg_file: str) -> bool:
+def is_file_unpackable(pkg_file: str) -> bool:
     """Determines whether the given pkg_file should be unpacked based on its suffix.
 
     This function checks the suffix of the pkg_file to see if it matches one of
@@ -770,7 +770,7 @@ async def download_and_unpack_package(
     # and ensures that only files with supported formats are processed
     # for unpacking. This check helps in maintaining robustness and stability
     # in handling various files.
-    unpack = is_unpack_or_not(str(pkg_file))
+    unpack = is_file_unpackable(str(pkg_file))
 
     async with _AsyncFileLock(str(pkg_file) + ".lock"):
         if logger is None:

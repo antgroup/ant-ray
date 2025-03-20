@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ElementsPanel from "../../components/ray-visualization/ElementsPanel";
@@ -6,7 +6,16 @@ import InfoCard from "../../components/ray-visualization/InfoCard";
 import RayVisualization, {
   RayVisualizationHandle,
 } from "../../components/ray-visualization/RayVisualization";
+import { FlameGraphData, getFlameGraphData } from "../../service/flame-graph";
+import { getPhysicalViewData, PhysicalViewData } from "../../service/physical-view";
 import { get } from "../../service/requestHandlers";
+import { FlameVisualization } from "../../components/ray-visualization/FlameVisualization";
+import PhysicalVisualization from "../../components/ray-visualization/PhysicalVisualization";
+import { Tooltip, IconButton } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { colorScheme } from "../../components/ray-visualization/graphData";
+import Switch from "@mui/material/Switch";
 
 type BaseNode = {
   id: string;
@@ -59,15 +68,19 @@ type GraphDataRsp = {
 const ActorGraph = () => {
   const { jobId } = useParams<RouteParams>();
   const [graphData, setGraphData] = useState<GraphData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [stackGraphData, setStackGraphData] = useState<GraphData | null>(null);
+  const [physicalViewData, setPhysicalViewData] = useState<PhysicalViewData | null>(null);
+  const [flameData, setFlameData] = useState<FlameGraphData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [updateKey, setUpdateKey] = useState(0);
-  const [updating, setUpdating] = useState(false);
   const [currentJobId, setCurrentJobId] = useState<string | undefined>(jobId);
   const [searchTerm, setSearchTerm] = useState("");
+  const [autoRefresh, setAutoRefresh] = useState(false);
   const [currentViewType, setCurrentViewType] =
-    useState<"logical" | "physical" | "flame">("logical");
+    useState<"logical" | "call_stack" | "physical" | "flame">("logical");
   const visualizationRef = useRef<RayVisualizationHandle>(null);
+  const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [updating, setUpdating] = useState(false);
 
   // State management similar to App.tsx
   const [infoCardData, setInfoCardData] = useState<ElementData>({
@@ -81,27 +94,29 @@ const ActorGraph = () => {
     useState<string | null>(null);
 
   const fetchGraphData = useCallback(
-    async (id?: string) => {
+    async (id?: string, stackMode?: boolean) => {
       if (!id) {
         return;
       }
 
       try {
-        setUpdating(true);
-        const path = jobId ? `call_graph?job_id=${jobId}` : "call_graph";
+        const path = jobId
+          ? `call_graph?job_id=${jobId}${stackMode ? "&stack_mode=1" : ""}`
+          : "call_graph";
         const result = await get<GraphDataRsp>(path);
 
         if (result.data) {
-          setGraphData(result.data.data.graphData);
+          if (stackMode) {
+            setStackGraphData(result.data.data.graphData);
+          } else {
+            setGraphData(result.data.data.graphData);
+          }
           setError(null);
-          setUpdateKey((prev) => prev + 1);
         }
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to fetch graph data",
         );
-      } finally {
-        setUpdating(false);
       }
     },
     [jobId],
@@ -117,10 +132,55 @@ const ActorGraph = () => {
   // Initial data fetch
   useEffect(() => {
     if (currentJobId) {
-      setLoading(true);
-      fetchGraphData(currentJobId).finally(() => setLoading(false));
+      (async () => {
+        await fetchGraphData(currentJobId, false);
+        await fetchGraphData(currentJobId,true);
+          const data = await getPhysicalViewData(currentJobId);
+          setPhysicalViewData(data);
+          const flameData = await getFlameGraphData(currentJobId);
+          setFlameData(flameData);
+      })();
     }
-  }, [currentJobId, fetchGraphData]);
+  }, [currentJobId, fetchGraphData, updateKey]);
+
+  // Auto-refresh effect for call stack view
+  useEffect(() => {
+    if (autoRefresh) {
+      const intervalId = setInterval(async () => {
+        if (currentViewType === "call_stack") {
+          await fetchGraphData(currentJobId, true);
+        }
+        if (currentViewType === "logical") {
+          await fetchGraphData(currentJobId, false);
+        }
+        if (currentViewType === "physical") {
+          await fetchGraphData(currentJobId, false);
+          const data = await getPhysicalViewData(currentJobId);
+          setPhysicalViewData(data);
+        }
+        if (currentViewType === "flame") {
+          await fetchGraphData(currentJobId, false);
+          const data = await getPhysicalViewData(currentJobId);
+          setPhysicalViewData(data);
+          const flameData = await getFlameGraphData(currentJobId);
+          setFlameData(flameData);
+        }
+
+      }, 2000);
+
+      autoRefreshIntervalRef.current = intervalId;
+
+      return () => {
+        if (autoRefreshIntervalRef.current) {
+          clearInterval(autoRefreshIntervalRef.current);
+          autoRefreshIntervalRef.current = null;
+        }
+      };
+    } else if (autoRefreshIntervalRef.current) {
+      clearInterval(autoRefreshIntervalRef.current);
+      autoRefreshIntervalRef.current = null;
+    }
+  }, [autoRefresh, currentJobId, fetchGraphData, currentViewType]);
 
   const handleElementClick = useCallback(
     (data: ElementData, skip_zoom = false) => {
@@ -138,23 +198,23 @@ const ActorGraph = () => {
   );
 
   const handleUpdate = useCallback(() => {
-    fetchGraphData(currentJobId);
-  }, [fetchGraphData, currentJobId]);
+    setUpdateKey((prev) => prev + 1);
+  }, []);
 
   const handleSearchChange = useCallback((term: string) => {
     setSearchTerm(term);
   }, []);
 
   const handleViewTypeChange = useCallback(
-    (viewType: "logical" | "physical" | "flame") => {
+    (viewType: "logical" |"call_stack" | "physical" | "flame") => {
       setCurrentViewType(viewType);
     },
-    [],
+    [fetchGraphData, currentJobId],
   );
 
-  if (loading) {
-    return <Box>Loading...</Box>;
-  }
+  const handleAutoRefreshChange = useCallback((enabled: boolean) => {
+    setAutoRefresh(enabled);
+  }, []);
 
   if (error) {
     return <Box color="error.main">Error: {error}</Box>;
@@ -182,9 +242,7 @@ const ActorGraph = () => {
             dataFlows: [],
           }
         }
-      />
-
-      <Box
+      />      <Box
         sx={{
           flex: 1,
           display: "flex",
@@ -192,22 +250,198 @@ const ActorGraph = () => {
           position: "relative",
         }}
       >
-        {graphData && (
+ 
+        <div className="header">
+          <div className="title-container">
+            {handleUpdate && (
+              <Tooltip title="Update graph">
+                <IconButton
+                  onClick={handleUpdate}
+                  size="small"
+                  disabled={updating}
+                  sx={{
+                    backgroundColor: "white",
+                    boxShadow: 1,
+                    "&:hover": {
+                      backgroundColor: "grey.100",
+                    },
+                    mt: "4px",
+                  }}
+                >
+                  <RefreshIcon
+                    sx={{
+                      animation:
+                        updating
+                          ? "spin 1s linear infinite"
+                          : "none",
+                      "@keyframes spin": {
+                        "0%": {
+                          transform: "rotate(0deg)",
+                        },
+                        "100%": {
+                          transform: "rotate(360deg)",
+                        },
+                      },
+                    }}
+                  />
+                </IconButton>
+              </Tooltip>
+            )}
+            <h1 className="title" style={{ margin: 0 }}>
+              Ray Flow Insight
+            </h1>
+           <React.Fragment>
+            <ToggleButtonGroup
+              value={currentViewType}
+              exclusive
+              onChange={(event, value) => {
+                if (value !== null) {
+                  handleViewTypeChange(value);
+                }
+              }}
+              aria-label="view type"
+              size="small"
+              sx={{ ml: 2 }}
+            >
+              <ToggleButton value="logical" aria-label="logical view">
+                Logical
+              </ToggleButton>
+              <ToggleButton value="call_stack" aria-label="call stack view">
+                Call Stack
+              </ToggleButton>
+              <ToggleButton value="physical" aria-label="physical view">
+                Physical
+              </ToggleButton>
+              <ToggleButton value="flame" aria-label="flame graph view">
+                Flame Graph
+              </ToggleButton>
+            </ToggleButtonGroup>
+ 
+                <FormControlLabel
+                control={
+                  <Switch
+                    checked={autoRefresh}
+                    onChange={(e) => handleAutoRefreshChange(e.target.checked)}
+                    name="autoRefresh"
+                    color="primary"
+                  />
+                }
+                label="Auto Refresh"
+                sx={{ ml: 2 }}
+              />
+           </React.Fragment>
+          </div>
+            <div className="legends">
+              <div className="legend-item">
+                <span
+                  className="legend-color"
+                  style={{ backgroundColor: colorScheme.actorPython }}
+                ></span>
+                <span>Python Actor</span>
+              </div>
+              <div className="legend-item">
+                <span
+                  className="legend-color"
+                  style={{ backgroundColor: colorScheme.method }}
+                ></span>
+                <span>Method</span>
+              </div>
+              <div className="legend-item">
+                <span
+                  className="legend-color"
+                  style={{ backgroundColor: colorScheme.functionPython }}
+                ></span>
+                <span>Python Function</span>
+              </div>
+              {searchTerm && searchTerm.trim() !== "" && (
+                <div className="legend-item">
+                  <span
+                    className="legend-color"
+                    style={{
+                      backgroundColor: "white",
+                      border: "4px solid #4caf50",
+                      borderRadius: "2px",
+                      boxSizing: "border-box",
+                    }}
+                  ></span>
+                  <span>Search Match</span>
+                </div>
+              )}
+            </div>
+        </div>
+
+ 
+       {(graphData) && (currentViewType === "logical") && (
           <RayVisualization
             ref={visualizationRef}
-            graphData={graphData}
+            graphData={graphData!}
+            physicalViewData={physicalViewData}
+            flameData={flameData}
             onElementClick={handleElementClick}
             showInfoCard={true}
             selectedElementId={selectedElementId}
             jobId={currentJobId}
-            updateKey={updateKey}
             onUpdate={handleUpdate}
-            updating={updating}
             searchTerm={searchTerm}
-            onViewTypeChange={handleViewTypeChange}
+            autoRefresh={autoRefresh}
+            setViewType={setCurrentViewType}
           />
         )}
-
+        {(currentViewType === "call_stack") && (
+          <RayVisualization
+            ref={visualizationRef}
+            graphData={stackGraphData!}
+            physicalViewData={physicalViewData}
+            flameData={flameData}
+            onElementClick={handleElementClick}
+            showInfoCard={true}
+            selectedElementId={selectedElementId}
+            jobId={currentJobId}
+            onUpdate={handleUpdate}
+            searchTerm={searchTerm}
+            autoRefresh={autoRefresh}
+            setViewType={setCurrentViewType}
+          />
+        )}
+        {(graphData) && (currentViewType === "physical") && (
+            <PhysicalVisualization
+                physicalViewData={physicalViewData!}
+                onElementClick={handleElementClick}
+                selectedElementId={selectedElementId}
+                jobId={currentJobId}
+                onUpdate={handleUpdate}
+                updating={false}
+                searchTerm={searchTerm}
+              />
+        )}
+        {(flameData) && (currentViewType === "flame") && (
+            <div
+              style={{
+                position: "relative",
+                zIndex: 1,
+                width: "100%",
+                height: "600px",
+              }}
+            >
+              {flameData ? (
+                <FlameVisualization
+                  flameData={flameData}
+                  onElementClick={handleElementClick}
+                  selectedElementId={selectedElementId}
+                  jobId={currentJobId}
+                  onUpdate={handleUpdate}
+                  updating={false}
+                  searchTerm={searchTerm}
+                  graphData={graphData!}
+                  physicalViewData={physicalViewData || undefined}
+                />
+              ) : (
+                <div className="loading-container">
+                  <p>No flame graph data available</p>
+                </div>
+              )}
+            </div>
+        )}
         <InfoCard
           data={infoCardData}
           visible={true}

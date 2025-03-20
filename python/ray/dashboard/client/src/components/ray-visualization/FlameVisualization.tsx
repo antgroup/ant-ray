@@ -58,11 +58,10 @@ type FlameVisualizationProps = {
   onElementClick: (data: any, skip_zoom?: boolean) => void;
   selectedElementId: string | null;
   jobId?: string;
-  updateKey?: number;
   onUpdate?: () => void;
   updating?: boolean;
   searchTerm?: string;
-  graphData?: GraphData;
+  graphData: GraphData;
   physicalViewData?: PhysicalViewData | null;
   colorMode?:
     | "warm"
@@ -338,7 +337,6 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
   onElementClick,
   selectedElementId,
   jobId,
-  updateKey,
   onUpdate,
   updating,
   searchTerm,
@@ -877,15 +875,23 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
         node
           .append("svg:rect")
-          .transition()
-          .delay(transitionDuration / 2)
-          .attr("width", frameWidth);
+          .attr("width", frameWidth)
+          .attr("height", cellHeight)
+          .attr("fill", colorMapperWrapper);
 
         if (!tooltip) {
           node.append("svg:title");
         }
+        console.log("name", node);
 
-        node.append("foreignObject").append("xhtml:div");
+        node
+          .append("foreignObject")
+          .attr("width", frameWidth)
+          .attr("height", cellHeight)
+          .append("xhtml:div")
+          .attr("class", "d3-flame-graph-label")
+          .style("display", "block")
+          .text(getName);
 
         // Re-select to see the new elements
         g = svg
@@ -969,6 +975,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
 
         return root as PartitionHierarchyNode;
       });
+
     };
 
     // eslint-disable-next-line
@@ -1724,7 +1731,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       document.head.removeChild(style);
     };
     // eslint-disable-next-line
-  }, [flameData, onElementClick, graphData, colorMode, createFlameGraph]);
+  }, [flameData, onElementClick, colorMode, createFlameGraph]);
 
   useEffect(() => {
     if (searchTerm && searchTerm.trim() !== "") {

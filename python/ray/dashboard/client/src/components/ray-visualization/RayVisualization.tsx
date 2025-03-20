@@ -1,10 +1,3 @@
-import RefreshIcon from "@mui/icons-material/Refresh";
-import {
-  IconButton,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip,
-} from "@mui/material";
 import * as d3 from "d3";
 import { Selection, ZoomBehavior } from "d3";
 import * as dagre from "dagre";
@@ -15,29 +8,26 @@ import React, {
   useEffect,
   useImperativeHandle,
   useRef,
-  useState,
 } from "react";
-import { FlameGraphData, getFlameGraphData } from "../../service/flame-graph";
-import {
-  getPhysicalViewData,
-  PhysicalViewData,
-} from "../../service/physical-view";
-import { FlameVisualization } from "./FlameVisualization";
+import { FlameGraphData } from "../../service/flame-graph";
+import { PhysicalViewData } from "../../service/physical-view";
 import { colorScheme } from "./graphData";
 import "./RayVisualization.css";
-import PhysicalVisualization from "./PhysicalVisualization";
 
 type RayVisualizationProps = {
   graphData: GraphData;
+  physicalViewData: PhysicalViewData | null;
+  flameData: FlameGraphData | null;
   onElementClick: (data: any, skip_zoom?: boolean) => void;
   showInfoCard: boolean;
   selectedElementId: string | null;
   jobId?: string;
-  updateKey?: number;
   onUpdate?: () => void;
   updating?: boolean;
   searchTerm?: string;
-  onViewTypeChange?: (viewType: "logical" | "physical" | "flame") => void;
+  onAutoRefreshChange?: (enabled: boolean) => void;
+  autoRefresh?: boolean;
+  setViewType: (viewType: "logical" | "physical" | "flame" | "call_stack") => void;
 };
 
 type NodeData = {
@@ -143,7 +133,7 @@ type GraphData = {
 
 // Add export for the handle type
 export type RayVisualizationHandle = {
-  navigateToView: (viewType: "logical" | "physical" | "flame") => void;
+  navigateToView: (viewType: "logical" | "physical" | "flame" | "call_stack") => void;
 };
 
 const RayVisualization = forwardRef<
@@ -153,29 +143,29 @@ const RayVisualization = forwardRef<
   (
     {
       graphData,
+      physicalViewData,
+      flameData,
       onElementClick,
       showInfoCard,
       selectedElementId,
       jobId,
-      updateKey,
       onUpdate,
       updating = false,
       searchTerm,
-      onViewTypeChange,
+      onAutoRefreshChange,
+      autoRefresh = false,
+      setViewType,
     },
     ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
 
+    // Add refs for tracking the position of the main node
+    const previousCenterXRef = useRef<number | null>(null);
+    const previousCenterYRef = useRef<number | null>(null);
+    const previousScaleRef = useRef<number | null>(null);
+
     // Add view state
-    const [viewType, setViewType] =
-      useState<"logical" | "physical" | "flame">("logical");
-    const [physicalViewData, setPhysicalViewData] =
-      useState<PhysicalViewData | null>(null);
-    const [loadingPhysicalView, setLoadingPhysicalView] =
-      useState<boolean>(false);
-    const [flameData, setFlameData] = useState<FlameGraphData | null>(null);
-    const [loadingFlameData, setLoadingFlameData] = useState<boolean>(false);
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const zoomRef =
@@ -186,12 +176,8 @@ const RayVisualization = forwardRef<
 
     // Expose navigateToView method
     useImperativeHandle(ref, () => ({
-      navigateToView: (newViewType: "logical" | "physical" | "flame") => {
+      navigateToView: (newViewType: "logical" | "physical" | "flame" | "call_stack") => {
         setViewType(newViewType);
-        onViewTypeChange?.(newViewType);
-        if (newViewType === "logical") {
-          onUpdate?.();
-        }
       },
     }));
 
@@ -205,9 +191,9 @@ const RayVisualization = forwardRef<
         const svg = d3.select(svgRef.current);
         const inner = svg.select("g");
         const g = dagreGraphRef.current;
-
         // Try to find node data from graph structure
         const nodeData = g?.node(nodeId) as NodeData | undefined;
+        console.log("nodeData", nodeData);
 
         if (nodeData && nodeData.x && nodeData.y) {
           const svgWidth = parseInt(svg.style("width"));
@@ -260,11 +246,9 @@ const RayVisualization = forwardRef<
             .selectAll(".node, .cluster, .main-node-container")
             .classed("selected-node", false);
           inner.select(`[id="${nodeId}"]`).classed("selected-node", true);
-          return;
+          updateParnetRef(inner);
+         return;
         }
-
-        // If we can't find node data, log warning
-        console.warn(`Node data not found for ID: ${nodeId}`);
       },
       [dagreGraphRef],
     );
@@ -398,7 +382,7 @@ const RayVisualization = forwardRef<
 
         return () => clearTimeout(timeout);
       }
-    }, [selectedElementId, focusOnNode, graphData.methods]);
+    }, [selectedElementId, focusOnNode, graphData]);
 
     // Memoize the renderGraph function with useCallback
     const renderGraph = useCallback(() => {
@@ -434,6 +418,19 @@ const RayVisualization = forwardRef<
         .zoom<SVGSVGElement, unknown>()
         .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
           inner.attr("transform", event.transform.toString());
+        })
+        .on("end", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+          // Track position changes from drag operations and scroll events
+          if (
+            event.sourceEvent &&
+            (event.sourceEvent.type === "mouseup" ||
+              event.sourceEvent.type === "touchend" ||
+              event.sourceEvent.type === "wheel" ||
+              event.sourceEvent.type === "mousewheel")
+          ) {
+            // Get the inner group's transform
+            updateParnetRef(inner);
+          }
         });
       (svg as any).call(zoom);
       zoomRef.current = zoom as unknown as ZoomBehavior<SVGSVGElement, unknown>;
@@ -443,14 +440,6 @@ const RayVisualization = forwardRef<
         inner,
         zoom as ZoomBehavior<SVGSVGElement, unknown>,
       );
-
-      // If there's already a selected element, focus on it after rendering
-      if (selectedElementId) {
-        setTimeout(() => focusOnNode(selectedElementId), 100);
-      } else {
-        // Focus on main node if no selected element
-        setTimeout(() => focusOnNode("_main"), 100);
-      }
     }, [graphData]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Find connected subgraphs (excluding main node)
@@ -460,6 +449,7 @@ const RayVisualization = forwardRef<
         inner: Selection<SVGGElement, unknown, null, undefined>,
         zoom: ZoomBehavior<SVGSVGElement, unknown>,
       ) => {
+
         // Function to check if a node matches the search term
         const nodeMatchesSearch = (node: any): boolean => {
           if (!searchTerm || searchTerm.trim() === "") {
@@ -499,7 +489,7 @@ const RayVisualization = forwardRef<
           // Create graph representation
           const graph: GraphMap = {};
 
-          // Initialize graph with all nodes
+         // Initialize graph with all nodes
           const allNodes = [
             ...graphData.actors.map((actor) => actor.id),
             ...graphData.methods.map((method) => method.id),
@@ -568,7 +558,7 @@ const RayVisualization = forwardRef<
 
           // Add parent-child relationships for methods to their actors
           graphData.methods.forEach((method) => {
-            if (method.actorId) {
+            if (method.actorId && !graph[method.id].includes(method.actorId)) {
               graph[method.id].push(method.actorId);
               graph[method.actorId].push(method.id);
             }
@@ -990,6 +980,8 @@ const RayVisualization = forwardRef<
 
         const svgWidth = parseInt(svg.style("width"));
         const svgHeight = parseInt(svg.style("height"));
+
+        // Default center position
         const centerX = svgWidth / 2;
         const centerY = svgHeight / 2;
 
@@ -1632,20 +1624,21 @@ const RayVisualization = forwardRef<
         const scaleY = svgHeight / contentHeight;
         const finalScale = Math.min(scaleX, scaleY, 1) * 0.9;
 
-        // Update the zoom behavior to allow better navigation
-        zoom
-          .scaleExtent([0.1, 2]) // Allow zooming from 0.1x to 2x
-          .on("zoom", (event) => {
-            inner.attr("transform", event.transform);
-          });
-
-        svg.call(
-          zoom.transform,
-          d3.zoomIdentity
-            .translate(centerX, centerY)
-            .scale(finalScale)
-            .translate(-centerX, -centerY),
-        ); // Double translate to ensure centering
+        if (previousScaleRef.current === null) {
+          // Update the zoom behavior to allow better navigation
+          zoom
+            .scaleExtent([0.1, 2]) // Allow zooming from 0.1x to 2x
+            .on("zoom", (event) => {
+              inner.attr("transform", event.transform);
+            });
+          svg.call(
+            zoom.transform,
+            d3.zoomIdentity
+              .translate(centerX, centerY)
+              .scale(finalScale)
+              .translate(-centerX, -centerY),
+          ); // Double translate to ensure centering
+        }
 
         // Set viewBox to contain the graph
         svg.attr("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
@@ -1815,13 +1808,22 @@ const RayVisualization = forwardRef<
             }
           });
 
-        // Update main node position in graph structure
-        const mainGraphNode = g.node("_main");
-        if (mainGraphNode) {
-          mainGraphNode.x = centerX;
-          mainGraphNode.y = centerY;
+        if (
+          previousCenterXRef.current !== null &&
+          previousCenterYRef.current !== null &&
+          previousScaleRef.current !== null &&
+          !isNaN(previousCenterXRef.current) &&
+          !isNaN(previousCenterYRef.current) &&
+          !isNaN(previousScaleRef.current)
+        ) {
+          inner.attr(
+            "transform",
+            `translate(${previousCenterXRef.current},${previousCenterYRef.current}) scale(${previousScaleRef.current})`,
+          );
         }
-
+        if (previousCenterXRef.current === null || previousCenterYRef.current === null || previousScaleRef.current === null) {
+          updateParnetRef(inner);
+        }
         // Update main node style if search is active
         const mainNodeCircle = mainContainer.select(
           ".main-node-container circle",
@@ -1834,297 +1836,46 @@ const RayVisualization = forwardRef<
       [graphData, onElementClick, searchTerm],
     );
 
+    const updateParnetRef = (inner: any)=>{
+      if (inner && !inner.empty()) {
+            const innerTransform = inner.attr("transform");
+            const match = innerTransform?.match(
+              /translate\(([^,]+),([^)]+)\) scale\(([^)]+)\)/,
+            );
+
+            if (match) {
+              // Store the transform values - this is what we need to track
+              const x = parseFloat(match[1]);
+              const y = parseFloat(match[2]);
+              const scale = parseFloat(match[3]);
+              
+              // Only set values if they are valid numbers
+              if (!isNaN(x) && !isNaN(y) && !isNaN(scale)) {
+                previousCenterXRef.current = x;
+                previousCenterYRef.current = y;
+                previousScaleRef.current = scale;
+              }
+            }
+          }
+    }
+
     // Add an effect to re-render when searchTerm changes
     useEffect(() => {
-      if (viewType === "logical" && svgRef.current) {
-        const svg = d3.select(svgRef.current);
-        svg.selectAll("*").remove();
-
-        // Create the main group element
-        const inner = svg.append("g");
-        graphRef.current = inner;
-
-        // Set up zoom behavior
-        const zoom = d3
-          .zoom<SVGSVGElement, unknown>()
-          .scaleExtent([0.1, 3])
-          .on("zoom", (event) => {
-            inner.attr("transform", event.transform);
-          });
-
-        zoomRef.current = zoom;
-        svg.call(zoom);
-
-        renderCircularSubgraphLayout(svg, inner, zoom);
+      if (svgRef.current) {
+        renderGraph();
       }
     }, [
-      graphData,
-      updateKey,
-      viewType,
+      renderGraph,
       searchTerm,
       renderCircularSubgraphLayout,
     ]);
 
-    // Initial render and on data change
-    useEffect(() => {
-      if (viewType === "logical" && svgRef.current) {
-        const svg = d3.select(svgRef.current);
-        svg.selectAll("*").remove();
 
-        // Create the main group element
-        const inner = svg.append("g");
-        graphRef.current = inner;
-
-        // Set up zoom behavior
-        const zoom = d3
-          .zoom<SVGSVGElement, unknown>()
-          .scaleExtent([0.1, 3])
-          .on("zoom", (event) => {
-            inner.attr("transform", event.transform);
-          });
-
-        zoomRef.current = zoom;
-        svg.call(zoom);
-
-        renderCircularSubgraphLayout(svg, inner, zoom);
-      }
-    }, [
-      graphData,
-      updateKey,
-      viewType,
-      searchTerm,
-      renderCircularSubgraphLayout,
-    ]);
-
-    // Handle refresh button click
-    // Initial render and on layout direction change - now with proper dependencies
-    useEffect(() => {
-      renderGraph();
-    }, [renderGraph, updateKey]);
-
-    // Function to fetch physical view data
-    const fetchPhysicalViewData = useCallback(async () => {
-      if (viewType === "physical" || viewType === "flame") {
-        try {
-          setLoadingPhysicalView(true);
-          const data = await getPhysicalViewData(jobId);
-          setPhysicalViewData(data);
-        } catch (error) {
-          console.error("Error fetching physical view data:", error);
-        } finally {
-          setLoadingPhysicalView(false);
-        }
-      }
-    }, [viewType, jobId]);
-
-    // Fetch physical view data when view type changes to physical
-    useEffect(() => {
-      if (viewType === "physical" || viewType === "flame") {
-        fetchPhysicalViewData();
-      }
-    }, [viewType, fetchPhysicalViewData]);
-
-    // Update physical view data when updateKey changes
-    useEffect(() => {
-      if (viewType === "physical" || viewType === "flame") {
-        fetchPhysicalViewData();
-      }
-    }, [updateKey, fetchPhysicalViewData, viewType]);
-
-    // Handle view type change
-    const handleViewTypeChange = (
-      event: React.MouseEvent<HTMLElement>,
-      newViewType: "logical" | "physical" | "flame" | null,
-    ) => {
-      if (newViewType !== null) {
-        setViewType(newViewType);
-        onViewTypeChange?.(newViewType);
-        if (newViewType === "logical") {
-          onUpdate?.();
-        }
-      }
-    };
-
-    useEffect(() => {
-      const fetchFlameData = async () => {
-        if (viewType === "flame") {
-          try {
-            setLoadingFlameData(true);
-            const data = await getFlameGraphData(jobId);
-
-            if (data && data.data.flameData) {
-              // If the data is nested inside a flameData property, extract it
-              setFlameData(data.data.flameData);
-            } else {
-              console.error("No valid flame graph data received");
-              setFlameData(null);
-            }
-          } catch (error) {
-            console.error("Error fetching flame graph data:", error);
-            setFlameData(null);
-          } finally {
-            setLoadingFlameData(false);
-          }
-        }
-      };
-
-      fetchFlameData();
-    }, [viewType, jobId, updateKey]); // Add updateKey to dependencies
 
     return (
       <div ref={containerRef} className="ray-visualization-container">
-        <div className="header">
-          <div className="title-container">
-            {onUpdate && (
-              <Tooltip title="Update graph">
-                <IconButton
-                  onClick={onUpdate}
-                  disabled={updating || loadingPhysicalView}
-                  size="small"
-                  sx={{
-                    backgroundColor: "white",
-                    boxShadow: 1,
-                    "&:hover": {
-                      backgroundColor: "grey.100",
-                    },
-                    mt: "4px",
-                  }}
-                >
-                  <RefreshIcon
-                    sx={{
-                      animation:
-                        updating || loadingPhysicalView
-                          ? "spin 1s linear infinite"
-                          : "none",
-                      "@keyframes spin": {
-                        "0%": {
-                          transform: "rotate(0deg)",
-                        },
-                        "100%": {
-                          transform: "rotate(360deg)",
-                        },
-                      },
-                    }}
-                  />
-                </IconButton>
-              </Tooltip>
-            )}
-            <h1 className="title" style={{ margin: 0 }}>
-              Ray Flow Insight
-            </h1>
-            <ToggleButtonGroup
-              value={viewType}
-              exclusive
-              onChange={handleViewTypeChange}
-              aria-label="view type"
-              size="small"
-              sx={{ ml: 2 }}
-            >
-              <ToggleButton value="logical" aria-label="logical view">
-                Logical
-              </ToggleButton>
-              <ToggleButton value="physical" aria-label="physical view">
-                Physical
-              </ToggleButton>
-              <ToggleButton value="flame" aria-label="flame graph view">
-                Flame Graph
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </div>
-          {viewType === "logical" && (
-            <div className="legends">
-              <div className="legend-item">
-                <span
-                  className="legend-color"
-                  style={{ backgroundColor: colorScheme.actorPython }}
-                ></span>
-                <span>Python Actor</span>
-              </div>
-              <div className="legend-item">
-                <span
-                  className="legend-color"
-                  style={{ backgroundColor: colorScheme.method }}
-                ></span>
-                <span>Method</span>
-              </div>
-              <div className="legend-item">
-                <span
-                  className="legend-color"
-                  style={{ backgroundColor: colorScheme.functionPython }}
-                ></span>
-                <span>Python Function</span>
-              </div>
-              {searchTerm && searchTerm.trim() !== "" && (
-                <div className="legend-item">
-                  <span
-                    className="legend-color"
-                    style={{
-                      backgroundColor: "white",
-                      border: "4px solid #4caf50",
-                      borderRadius: "2px",
-                      boxSizing: "border-box",
-                    }}
-                  ></span>
-                  <span>Search Match</span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="graph-container">
-          {viewType === "logical" ? (
+       <div className="graph-container">
             <svg ref={svgRef} width="100%" height="600"></svg>
-          ) : viewType === "physical" ? (
-            physicalViewData ? (
-              <PhysicalVisualization
-                physicalViewData={physicalViewData}
-                onElementClick={onElementClick}
-                selectedElementId={selectedElementId}
-                jobId={jobId}
-                updateKey={updateKey}
-                onUpdate={onUpdate}
-                updating={updating || loadingPhysicalView}
-                searchTerm={searchTerm}
-              />
-            ) : (
-              <div className="loading-container">
-                <p>Loading physical view data...</p>
-              </div>
-            )
-          ) : viewType === "flame" ? (
-            <div
-              style={{
-                position: "relative",
-                zIndex: 1,
-                width: "100%",
-                height: "600px",
-              }}
-            >
-              {loadingFlameData ? (
-                <div className="loading-container">
-                  <p>Loading flame graph data...</p>
-                </div>
-              ) : flameData ? (
-                <FlameVisualization
-                  flameData={flameData}
-                  onElementClick={onElementClick}
-                  selectedElementId={selectedElementId}
-                  jobId={jobId}
-                  updateKey={updateKey} // This prop will trigger a re-render when changed
-                  onUpdate={onUpdate}
-                  updating={updating}
-                  searchTerm={searchTerm}
-                  graphData={graphData}
-                  physicalViewData={physicalViewData || undefined}
-                />
-              ) : (
-                <div className="loading-container">
-                  <p>No flame graph data available</p>
-                </div>
-              )}
-            </div>
-          ) : null}
         </div>
       </div>
     );

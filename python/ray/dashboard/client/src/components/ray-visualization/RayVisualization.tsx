@@ -22,7 +22,6 @@ type RayVisualizationProps = {
   showInfoCard: boolean;
   selectedElementId: string | null;
   jobId?: string;
-  onUpdate?: () => void;
   updating?: boolean;
   searchTerm?: string;
   onAutoRefreshChange?: (enabled: boolean) => void;
@@ -149,7 +148,6 @@ const RayVisualization = forwardRef<
       showInfoCard,
       selectedElementId,
       jobId,
-      onUpdate,
       updating = false,
       searchTerm,
       onAutoRefreshChange,
@@ -382,10 +380,10 @@ const RayVisualization = forwardRef<
 
         return () => clearTimeout(timeout);
       }
-    }, [selectedElementId, focusOnNode, graphData]);
+    }, [selectedElementId, focusOnNode]);
 
     // Memoize the renderGraph function with useCallback
-    const renderGraph = useCallback(() => {
+    const renderGraph = () => {
       if (!svgRef.current) {
         return;
       }
@@ -440,10 +438,10 @@ const RayVisualization = forwardRef<
         inner,
         zoom as ZoomBehavior<SVGSVGElement, unknown>,
       );
-    }, [graphData]); // eslint-disable-line react-hooks/exhaustive-deps
+    };
 
     // Find connected subgraphs (excluding main node)
-    const renderCircularSubgraphLayout = useCallback(
+    const renderCircularSubgraphLayout = 
       (
         svg: Selection<SVGSVGElement, unknown, null, undefined>,
         inner: Selection<SVGGElement, unknown, null, undefined>,
@@ -1310,7 +1308,6 @@ const RayVisualization = forwardRef<
                       } else if (flow.target === "_main") {
                         mainNodeX = centerX + Math.cos(angle) * mainNodeRadius;
                         mainNodeY = centerY + Math.sin(angle) * mainNodeRadius;
-                        // Update target point
                         targetX = mainNodeX;
                         targetY = mainNodeY;
                       }
@@ -1832,9 +1829,7 @@ const RayVisualization = forwardRef<
           const matches = nodeMatchesSearch(mainNode);
           mainNodeCircle.style("opacity", searchTerm && !matches ? 0.3 : 1);
         }
-      },
-      [graphData, onElementClick, searchTerm],
-    );
+      }
 
     const updateParnetRef = (inner: any)=>{
       if (inner && !inner.empty()) {

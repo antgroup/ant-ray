@@ -72,7 +72,6 @@ const ActorGraph = () => {
   const [physicalViewData, setPhysicalViewData] = useState<PhysicalViewData | null>(null);
   const [flameData, setFlameData] = useState<FlameGraphData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [updateKey, setUpdateKey] = useState(0);
   const [currentJobId, setCurrentJobId] = useState<string | undefined>(jobId);
   const [searchTerm, setSearchTerm] = useState("");
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -141,12 +140,9 @@ const ActorGraph = () => {
           setFlameData(flameData);
       })();
     }
-  }, [currentJobId, fetchGraphData, updateKey]);
+  }, [currentJobId, fetchGraphData]);
 
-  // Auto-refresh effect for call stack view
-  useEffect(() => {
-    if (autoRefresh) {
-      const intervalId = setInterval(async () => {
+  const fetchDatas = async () => {
         if (currentViewType === "call_stack") {
           await fetchGraphData(currentJobId, true);
         }
@@ -165,7 +161,12 @@ const ActorGraph = () => {
           const flameData = await getFlameGraphData(currentJobId);
           setFlameData(flameData);
         }
-
+  }
+  // Auto-refresh effect for call stack view
+  useEffect(() => {
+    if (autoRefresh) {
+      const intervalId = setInterval(async () => {
+        await fetchDatas();
       }, 2000);
 
       autoRefreshIntervalRef.current = intervalId;
@@ -197,9 +198,9 @@ const ActorGraph = () => {
     [],
   );
 
-  const handleUpdate = useCallback(() => {
-    setUpdateKey((prev) => prev + 1);
-  }, []);
+  const handleUpdate = useCallback(async () => {
+    await fetchDatas();
+  }, [fetchDatas]);
 
   const handleSearchChange = useCallback((term: string) => {
     setSearchTerm(term);
@@ -381,7 +382,6 @@ const ActorGraph = () => {
             showInfoCard={true}
             selectedElementId={selectedElementId}
             jobId={currentJobId}
-            onUpdate={handleUpdate}
             searchTerm={searchTerm}
             autoRefresh={autoRefresh}
             setViewType={setCurrentViewType}
@@ -397,7 +397,6 @@ const ActorGraph = () => {
             showInfoCard={true}
             selectedElementId={selectedElementId}
             jobId={currentJobId}
-            onUpdate={handleUpdate}
             searchTerm={searchTerm}
             autoRefresh={autoRefresh}
             setViewType={setCurrentViewType}

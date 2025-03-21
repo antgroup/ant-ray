@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { FlameGraphData } from "../../service/flame-graph";
 import { PhysicalViewData } from "../../service/physical-view";
 
@@ -353,7 +353,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   // Wrap createFlameGraph in useCallback
-  const createFlameGraph = useCallback(() => {
+  const createFlameGraph = () => {
     let width = containerRef.current ? containerRef.current.clientWidth : 960; // graph width
     let height: number | null = null; // graph height
     let cellHeight = 18; // cell height
@@ -882,7 +882,6 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
         if (!tooltip) {
           node.append("svg:title");
         }
-        console.log("name", node);
 
         node
           .append("foreignObject")
@@ -1247,40 +1246,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     };
 
     return chart as any;
-  }, [colorMode]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const handleResize = () => {
-      if (container && flameChartRef.current) {
-        // Update the chart width to match container width
-        const containerWidth = container.clientWidth;
-        flameChartRef.current.width(containerWidth);
-
-        // Update the SVG width
-        if (svgRef.current) {
-          d3.select(svgRef.current).attr("width", containerWidth);
-        }
-      }
-    };
-
-    // Create a ResizeObserver to handle container size changes
-    const resizeObserver = new ResizeObserver(handleResize);
-
-    if (container) {
-      resizeObserver.observe(container);
-    }
-
-    // Also listen for window resize events
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      if (container) {
-        resizeObserver.unobserve(container);
-      }
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -1739,7 +1705,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
     } else {
       chartRef.current?.clear();
     }
-  }, [searchTerm]);
+  }, [searchTerm, flameData]);
 
   const transformFlameData = (data: FlameGraphData): FlameNode => {
     if (!data || !data.aggregated || !Array.isArray(data.aggregated)) {

@@ -1697,7 +1697,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       document.head.removeChild(style);
     };
     // eslint-disable-next-line
-  }, [flameData, onElementClick, colorMode, createFlameGraph]);
+  }, [flameData, colorMode]);
 
   useEffect(() => {
     if (searchTerm && searchTerm.trim() !== "") {

@@ -244,8 +244,10 @@ const RayVisualization = forwardRef<
             .selectAll(".node, .cluster, .main-node-container")
             .classed("selected-node", false);
           inner.select(`[id="${nodeId}"]`).classed("selected-node", true);
-          updateParnetRef(inner);
-         return;
+          const timeout = setTimeout(() => {
+            updateParnetRef(inner);
+          }, 751);
+          return () => clearTimeout(timeout);
         }
       },
       [dagreGraphRef],
@@ -384,6 +386,7 @@ const RayVisualization = forwardRef<
 
     // Memoize the renderGraph function with useCallback
     const renderGraph = () => {
+      console.log("renderGraph");
       if (!svgRef.current) {
         return;
       }
@@ -1859,11 +1862,7 @@ const RayVisualization = forwardRef<
       if (svgRef.current) {
         renderGraph();
       }
-    }, [
-      renderGraph,
-      searchTerm,
-      renderCircularSubgraphLayout,
-    ]);
+    }, [searchTerm, graphData]);
 
 
 

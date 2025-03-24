@@ -607,23 +607,11 @@ The ``runtime_env`` is a Python dictionary or a Python class :class:`ray.runtime
   - Example: ``["https://bucket/my_native_libraries.zip"]``
 
   - Example: ``[{"url": "https://bucket/my_native_libraries.zip", "lib_path": ["my_lib_path"], "code_search_path": ["your_code_search_path"]}]``
-  
-  Note: If your directory structure is as follows, the native_libraries plugin form needs to be filled in as follows.
-  
-  Directory Structure
-  ===================
 
-  - my_native_libraries/
-    - ld_libraries/
-      - your_lib.so
-
-  - Example: ``[{
-         "url": "https://bucket/my_native_libraries.zip",
-         "lib_path": [{"path": "ld_libraries", "env_var_name": "LD_LIBRARY_PATH"}, {"path": "preload_libraries", "env_var_name": "LD_PRELOAD"}],
-         "code_search_path": ["your_code_search_path"]}]``
+  - Example: ``[{"url": "https://bucket/my_native_libraries.zip", "lib_path": [{"path": "ld_libraries", "env_var_name": "LD_LIBRARY_PATH"}, {"path": "preload_libraries", "env_var_name": "LD_PRELOAD"}], "code_search_path": ["your_code_search_path"]}]``
 
   Note: ``native_libraries`` plugin is not a built-in plugin of Runtime Env Agent. if users need to use this plugin, you need to specify environment variables 
-  `RAY_RUNTIME_ENV_PLUGINS='[{"class": "ray._private.runtime_env.native_libraries.NativeLibrariesPlugin"}]'`
+  ``RAY_RUNTIME_ENV_PLUGINS='[{"class": "ray._private.runtime_env.native_libraries.NativeLibrariesPlugin"}]'``
 
   Note: If you set `LD_LIBRARY_PATH` in `env_var_name` element, you just need to set dir where dynamic library is located,
   otherwise you set `LD_PRELOAD` in `env_var_name` element, you need to set the dynamic library path.

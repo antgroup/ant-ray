@@ -851,7 +851,7 @@ async def download_and_unpack_package(
                     )
                     return str(local_dir)
 
-                if pkg_file.suffix in [".zip"]:
+                if pkg_file.suffix in [".zip", "jar"]:
                     unzip_package(
                         package_path=pkg_file,
                         target_dir=local_dir,
@@ -868,8 +868,6 @@ async def download_and_unpack_package(
                     )
                 elif pkg_file.suffix == ".whl":
                     return str(pkg_file)
-                elif pkg_file.suffix == ".jar":
-                    pass
                 else:
                     raise NotImplementedError(
                         f"Package format {pkg_file.suffix} is ",

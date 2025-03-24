@@ -133,7 +133,6 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
     ):
         self._resources_dir = os.path.join(resources_dir, "working_dir_files")
         self._working_dirs = os.path.join(resources_dir, "working_dirs")
-        self._job_dirs = os.path.join(resources_dir, "job_dirs")
         self._gcs_aio_client = gcs_aio_client
         try_to_create_directory(self._resources_dir)
 

@@ -561,3 +561,9 @@ RAY_UNPACKABLE_FILE_SUFFIXS_STR = os.environ.get(
 )
 
 RAY_UNPACKABLE_FILE_SUFFIXS = RAY_UNPACKABLE_FILE_SUFFIXS_STR.split(",")
+
+# Retrieve the directory path from the environment variable "RAY_WHL_DIR".
+# If "RAY_WHL_DIR" is not set in the environment, default to "/home/admin/build/whl".
+# This directory might be used for storing or accessing wheel (.whl) files for Ray.
+# Using the environment variable allows customization based on different deployment environments or settings.
+RAY_WHL_DIR = os.environ.get("RAY_WHL_DIR", "/home/admin/build/whl")

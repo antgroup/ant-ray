@@ -601,7 +601,7 @@ RAY_CONFIG(bool, enable_worker_prestart, false)
 
 /// Whether to enable worker prestarting on first driver
 /// TODO(clarng): reconcile with enable_worker_prestart
-RAY_CONFIG(bool, prestart_worker_first_driver, true)
+RAY_CONFIG(bool, prestart_worker_first_driver, false)
 
 /// The interval of periodic idle worker killing. Value of 0 means worker capping is
 /// disabled.
@@ -951,3 +951,7 @@ RAY_CONFIG(uint64_t, pipe_logger_read_buf_size, 1024)
 // will be waiting for the required resources to become available achieved mainly by
 // updating the cluster config to add new nodes.
 RAY_CONFIG(bool, enable_infeasible_task_early_exit, false);
+
+// If enabled and worker stated in container, the container will add
+// resource limit.
+RAY_CONFIG(bool, worker_resource_limits_enabled, false)

@@ -385,14 +385,6 @@ class RuntimeEnv(dict):
             )
 
         if self.get("container"):
-            invalid_keys = set(runtime_env.keys()) - {"container", "config", "env_vars"}
-            if len(invalid_keys):
-                raise ValueError(
-                    "The 'container' field currently cannot be used "
-                    "together with other fields of runtime_env. "
-                    f"Specified fields: {invalid_keys}"
-                )
-
             logger.warning(
                 "The `container` runtime environment field is DEPRECATED and will be "
                 "removed after July 31, 2025. Use `image_uri` instead. See "
@@ -604,6 +596,24 @@ class RuntimeEnv(dict):
             return None
         return self["container"].get("image", "")
 
+    def container_install_ray(self) -> bool:
+        if not self.has_py_container():
+            return False
+        install_ray = self["container"].get("_install_ray", False)
+        if isinstance(install_ray, bool):
+            return install_ray
+        else:
+            return install_ray.get("is_install_ray_or_not", False)
+
+    def container_install_ray_extra_package(self) -> Optional[List]:
+        if not self.container_install_ray():
+            return None
+        install_ray = self["container"].get("_install_ray", False)
+        if isinstance(install_ray, bool):
+            return ["core"]
+        else:
+            return install_ray.get("extras", ["core"])
+
     def py_container_worker_path(self) -> Optional[str]:
         if not self.has_py_container():
             return None
@@ -614,8 +624,42 @@ class RuntimeEnv(dict):
             return None
         return self["container"].get("run_options", [])
 
+    def container_pip_install_without_python_path(self) -> bool:
+        if not self.has_py_container():
+            return False
+        container_field_without_python_path = self["container"].get(
+            "_pip_install_without_python_path", False
+        )
+        runtime_env_field_without_python_path = self.get(
+            "_pip_install_without_python_path", False
+        )
+        if runtime_env_field_without_python_path:
+            logger.warning(
+                "_pip_install_without_python_path in runtime_env field "
+                "will be deprecated, "
+                "please set _pip_install_without_python_path in container field."
+            )
+        return (
+            container_field_without_python_path or runtime_env_field_without_python_path
+        )
+
+    def py_container_pip_list(self) -> List:
+        if not self.has_py_container():
+            return []
+        return self["container"].get("pip", [])
+
     def image_uri(self) -> Optional[str]:
         return self.get("image_uri")
+
+    def has_image_uri(self) -> bool:
+        if self.get("image_uri"):
+            return True
+        return False
+
+    def image_uri_image(self) -> Optional[str]:
+        if not self.has_image_uri():
+            return None
+        return self["image_uri"].get("image", "")
 
     def plugins(self) -> List[Tuple[str, Any]]:
         result = list()

@@ -851,7 +851,7 @@ async def download_and_unpack_package(
                     )
                     return str(local_dir)
 
-                if pkg_file.suffix in [".zip", "jar"]:
+                if pkg_file.suffix in [".zip", ".jar"]:
                     unzip_package(
                         package_path=pkg_file,
                         target_dir=local_dir,

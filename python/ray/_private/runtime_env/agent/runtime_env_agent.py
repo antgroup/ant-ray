@@ -6,7 +6,6 @@ import traceback
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Set, Tuple, Optional
-from copy import deepcopy
 from ray._private.ray_constants import (
     DEFAULT_RUNTIME_ENV_TIMEOUT_SECONDS,
 )
@@ -459,9 +458,6 @@ class RuntimeEnvAgent:
             self._env_locks[serialized_env] = asyncio.Lock()
 
         async with self._env_locks[serialized_env]:
-            runtime_env_context = None
-            runtime_env_reply = None
-
             if serialized_env in self._env_cache:
                 result = self._env_cache[serialized_env]
                 if result.success:

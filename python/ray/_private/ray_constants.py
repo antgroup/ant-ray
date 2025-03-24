@@ -74,7 +74,8 @@ DEFAULT_OBJECT_STORE_MAX_MEMORY_BYTES = env_integer(
 )
 # The default proportion of available memory allocated to the object store
 DEFAULT_OBJECT_STORE_MEMORY_PROPORTION = env_float(
-    "RAY_DEFAULT_OBJECT_STORE_MEMORY_PROPORTION", 0.3
+    "RAY_DEFAULT_OBJECT_STORE_MEMORY_PROPORTION",
+    0.3,
 )
 # The smallest cap on the memory used by the object store that we allow.
 # This must be greater than MEMORY_RESOURCE_UNIT_BYTES
@@ -389,9 +390,9 @@ DEFAULT_RUNTIME_ENV_TIMEOUT_SECONDS = 600
 # created.
 CALL_STACK_LINE_DELIMITER = " | "
 
-# The default gRPC max message size is 4 MiB, we use a larger number of 250 MiB
+# The default gRPC max message size is 4 MiB, we use a larger number of 512 MiB
 # NOTE: This is equal to the C++ limit of (RAY_CONFIG::max_grpc_message_size)
-GRPC_CPP_MAX_MESSAGE_SIZE = 250 * 1024 * 1024
+GRPC_CPP_MAX_MESSAGE_SIZE = 512 * 1024 * 1024
 
 # The gRPC send & receive max length for "dashboard agent" server.
 # NOTE: This is equal to the C++ limit of RayConfig::max_grpc_message_size
@@ -555,4 +556,14 @@ RAY_EXPORT_EVENT_MAX_FILE_SIZE_BYTES = env_bool(
 
 RAY_EXPORT_EVENT_MAX_BACKUP_COUNT = env_bool("RAY_EXPORT_EVENT_MAX_BACKUP_COUNT", 20)
 
+RAY_UNPACKABLE_FILE_SUFFIXS_STR = os.environ.get(
+    "RAY_UNPACKABLE_FILE_SUFFIXS", ".zip,.jar,.whl,.tar,.tar.gz,.tar.bz,.tar.xz"
+)
+
+RAY_UNPACKABLE_FILE_SUFFIXS = RAY_UNPACKABLE_FILE_SUFFIXS_STR.split(",")
+
+# Retrieve the directory path from the environment variable "RAY_WHL_DIR".
+# If "RAY_WHL_DIR" is not set in the environment, default to "/home/admin/build/whl".
+# This directory might be used for storing or accessing wheel (.whl) files for Ray.
+# Using the environment variable allows customization based on different deployment environments or settings.
 RAY_WHL_DIR = os.environ.get("RAY_WHL_DIR", "/home/admin/build/whl")

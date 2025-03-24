@@ -200,9 +200,33 @@ class ActorMethod:
 
     @DeveloperAPI
     def bind(self, *args, **kwargs):
+        """
+        Bind arguments to the actor method for Ray DAG building.
+        """
         return self._bind(args, kwargs)
 
+    def _get_callee_info(self):
+        """
+        get the callee info of the actor method
+        this is needed for the insight monitor to record the call
+        """
+        callee_func = self._method_name
+        actor = self._actor_ref()
+        callee_class = None
+        if actor is not None:
+            callee_class = (
+                actor._ray_actor_creation_function_descriptor.class_name
+                + ":"
+                + actor._ray_actor_id.hex()
+            )
+        return callee_class, callee_func
+
     def remote(self, *args, **kwargs):
+        from ray.util.insight import record_control_flow
+
+        callee_class, callee_func = self._get_callee_info()
+        # report the call info to the insight monitor
+        record_control_flow(callee_class, callee_func)
         return self._remote(args, kwargs)
 
     def options(self, **options):
@@ -1028,6 +1052,11 @@ class ActorClass:
         worker = ray._private.worker.global_worker
         worker.check_connected()
 
+        if worker.mode != ray._private.worker.WORKER_MODE:
+            from ray._private.usage import usage_lib
+
+            usage_lib.record_library_usage("core")
+
         # Check whether the name is already taken.
         # TODO(edoakes): this check has a race condition because two drivers
         # could pass the check and then create the same named actor. We should
@@ -1246,7 +1275,28 @@ class ActorClass:
             original_handle=True,
         )
 
+        callee_class, callee_func = self._get_callee_info(actor_handle)
+        from ray.util.insight import record_control_flow
+
+        # report the call info to the insight monitor
+        record_control_flow(callee_class, callee_func)
+
         return actor_handle
+
+    def _get_callee_info(self, actor_handle):
+        """
+        get the callee info of the actor method
+        this is needed for the insight monitor to record the call
+        """
+        callee_func = "__init__"
+        callee_class = None
+        if actor_handle is not None:
+            callee_class = (
+                actor_handle._ray_actor_creation_function_descriptor.class_name
+                + ":"
+                + actor_handle._ray_actor_id.hex()
+            )
+        return callee_class, callee_func
 
     @DeveloperAPI
     def bind(self, *args, **kwargs):

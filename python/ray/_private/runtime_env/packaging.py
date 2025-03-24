@@ -755,9 +755,6 @@ async def download_and_unpack_package(
 
     """
     pkg_file = Path(_get_local_path(base_directory, pkg_uri))
-    # NOTE(Jacky): If pkg_uri has no suffix, local_dir and pkg_file will be the same,
-    # so it will block the subsequent `assert local_dir != pkg_file`.
-    # Thus changing the downloaded intermediate file into a temporary file.
     if pkg_file.suffix == "":
         raise ValueError(
             f"Invalid package URI: {pkg_uri}."
@@ -829,8 +826,8 @@ async def download_and_unpack_package(
 
                 if is_zip_uri(pkg_uri):
                     unzip_package(
-                        package_path=str(pkg_file),
-                        target_dir=str(local_dir),
+                        package_path=pkg_file,
+                        target_dir=local_dir,
                         remove_top_level_directory=False,
                         unlink_zip=True,
                         logger=logger,

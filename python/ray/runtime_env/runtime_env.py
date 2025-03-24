@@ -599,20 +599,7 @@ class RuntimeEnv(dict):
     def container_install_ray(self) -> bool:
         if not self.has_py_container():
             return False
-        install_ray = self["container"].get("_install_ray", False)
-        if isinstance(install_ray, bool):
-            return install_ray
-        else:
-            return install_ray.get("is_install_ray_or_not", False)
-
-    def container_install_ray_extra_package(self) -> Optional[List]:
-        if not self.container_install_ray():
-            return None
-        install_ray = self["container"].get("_install_ray", False)
-        if isinstance(install_ray, bool):
-            return ["core"]
-        else:
-            return install_ray.get("extras", ["core"])
+        return self["container"].get("_install_ray", False)
 
     def py_container_worker_path(self) -> Optional[str]:
         if not self.has_py_container():

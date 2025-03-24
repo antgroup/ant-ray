@@ -385,15 +385,24 @@ class ContainerManager:
         install_ray_or_pip_packages_command = None
         if install_ray:
             if install_ray_or_pip_packages_command is None:
-                extra_packages = runtime_env.container_install_ray_extra_package()
                 install_ray_or_pip_packages_command = [
                     "python",
                     dependencies_installer_path,
-                    "--extra-packages",
-                    ",".join(extra_packages),
-                    "--ray-version",
-                    f"{ray.__version__}",
                 ]
+                if runtime_env_constants.RAY_USE_WHL_PACKAGE:
+                    install_ray_or_pip_packages_command.extend(
+                        [
+                            "--whl-dir",
+                            get_ray_whl_dir(),
+                        ]
+                    )
+                else:
+                    install_ray_or_pip_packages_command.extend(
+                        [
+                            "--ray-version",
+                            f"{ray.__version__}",
+                        ]
+                    )
                 if pip_packages or container_pip_packages:
                     merge_pip_packages = list(
                         set(pip_packages) | set(container_pip_packages)
@@ -447,18 +456,24 @@ class ContainerManager:
         # so we create a reverse dict mapping,
         # which can modify the latest source_path.
         container_to_host_mount_dict = {}
-        if container_option.get("customize_log_dir"):
-            customize_log_path = container_option.get("customize_log_dir")
-            if not os.path.exists(customize_log_path):
-                os.makedirs(customize_log_path)
-            container_to_host_mount_dict["/home/admin/logs"] = customize_log_path
-            container_to_host_mount_dict[
-                "/home/admin/logs/ray-logs/"
-            ] = "/home/admin/logs/ray-logs/"
-            container_to_host_mount_dict["/home/admin/logs/share"] = "/home/admin/logs"
-        else:
-            container_to_host_mount_dict["/home/admin/logs"] = "/home/admin/logs"
-        container_to_host_mount_dict["/apsara"] = "/apsara"
+        if os.path.exists("/home/admin/logs"):
+            if container_option.get("customize_log_dir"):
+                customize_log_path = container_option.get("customize_log_dir")
+                if not os.path.exists(customize_log_path):
+                    os.makedirs(customize_log_path)
+                    container_to_host_mount_dict[
+                        "/home/admin/logs"
+                    ] = customize_log_path
+                    container_to_host_mount_dict[
+                        "/home/admin/logs/ray-logs/"
+                    ] = "/home/admin/logs/ray-logs/"
+                    container_to_host_mount_dict[
+                        "/home/admin/logs/share"
+                    ] = "/home/admin/logs"
+            else:
+                container_to_host_mount_dict["/home/admin/logs"] = "/home/admin/logs"
+        if os.path.exists("/apsara"):
+            container_to_host_mount_dict["/apsara"] = "/apsara"
         if install_ray or container_pip_packages:
             container_to_host_mount_dict[
                 dependencies_installer_path
@@ -480,7 +495,6 @@ class ContainerManager:
                 host_site_packages_path
             ] = host_site_packages_path
 
-        # ANT-INTERNAL for maya
         if os.path.exists(runtime_env_constants.INTERNAL_SYSTEM_CONFIG_DYNAMIC_FILE):
             system_dynamic_config_file_path = (
                 runtime_env_constants.INTERNAL_SYSTEM_CONFIG_DYNAMIC_FILE
@@ -547,11 +561,16 @@ class ContainerManager:
         # Some docker image use conda to run python, it depend on ~/.bashrc.
         # So we need to use bash as container entrypoint.
         container_command.append("bash")
-        # in ANT-INTERNAL, we use nydus image as rootfs
-        container_command.append("--rootfs")
-        container_command.append(runtime_env.py_container_image() + ":O")
+
+        # If podman integrate nydus, we use nydus image as rootfs
+        if runtime_env_constants.RAY_PODMAN_UES_NYDUS:
+            container_command.append("--rootfs")
+            container_command.append(runtime_env.py_container_image() + ":O")
+        else:
+            container_command.append(runtime_env.py_container_image())
         container_command.extend(["-l", "-c"])
         context.container["container_command"] = container_command
+
         if py_executable:
             context.py_executable = py_executable
         logger.info(

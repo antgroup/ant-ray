@@ -12,18 +12,23 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-
-def install_ray_package(extra_packages, ray_version):
-
+def install_ray_package(extra_packages, ray_version, whl_dir):
     pip_install_command = [sys.executable, "-m", "pip", "install", "-U"]
 
-    # if extra package is "core", we just install basic ray package.
-    if extra_packages == "core":
-        ray_package_name = f"ray=={ray_version}"
-    else:
-        ray_package_name = f"ray[{extra_packages}]=={ray_version}"
+    if whl_dir:
+        # generate whl file name
+        whl_file_name = (
+            f"ant_ray-*cp{sys.version_info[0]}" f"{sys.version_info[1]}*.whl"
+        )
 
-    pip_install_command.append(ray_package_name)
+        # whl file path
+
+        whl_file_path = os.path.join(whl_dir, whl_file_name)
+        pip_install_command.append(whl_file_path)
+    else:
+        # generate ray package name
+        ray_package_name = f"ant_ray=={ray_version}"
+        pip_install_command.append(ray_package_name)
 
     logger.info("Staring install ray: {}".format(pip_install_command))
 
@@ -31,7 +36,7 @@ def install_ray_package(extra_packages, ray_version):
     result = subprocess.run(" ".join(pip_install_command), shell=True)
 
     if result.returncode != 0:
-        raise RuntimeError(f"Failed to install ray whl, got ex: {result.stderr}")
+        raise RuntimeError(f"Failed to install ray, got ex: {result.stderr}")
 
 
 def install_pip_package_with_specify_path(
@@ -69,7 +74,7 @@ if __name__ == "__main__":
         description="Install Ray whl package and pip packages."
     )
     parser.add_argument(
-        "--extra-packages", required=False, help="Containing extra packages for Ray. Ex: data"
+        "--whl-dir", required=False, help="Directory containing Ray whl packages."
     )
 
     parser.add_argument(
@@ -90,7 +95,10 @@ if __name__ == "__main__":
     pip_install_without_python_path = False
     if args.without_python_path:
         pip_install_without_python_path = args.without_python_path.lower() == "true"
-    if args.extra_packages:
-        install_ray_package(args.extra_packages, args.ray_version)
+
+    if args.ray_version or args.whl_dir:
+        install_ray_package(args.extra_packages, args.ray_version, args.whl_dir)
     if args.packages:
-        install_pip_package_with_specify_path(args.packages, pip_install_without_python_path)
+        install_pip_package_with_specify_path(
+            args.packages, pip_install_without_python_path
+        )

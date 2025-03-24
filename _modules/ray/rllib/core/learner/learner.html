@@ -600,10 +600,11 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../ray-core/compiled-graph/troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
@@ -747,14 +748,14 @@ document.write(`
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -807,30 +808,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../../serve/model-multiplexing.html">Model Multiplexing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../serve/configure-serve-deployment.html">Configure Ray Serve deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../serve/http-guide.html">Set Up FastAPI and HTTP</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../../../serve/llm/overview.html">Overview</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../serve/llm/api.html">Ray Serve LLM API</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.builders.build_vllm_deployment.html">ray.serve.llm.builders.build_vllm_deployment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.builders.build_openai_app.html">ray.serve.llm.builders.build_openai_app</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.configs.LLMConfig.html">ray.serve.llm.configs.LLMConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.configs.LLMServingArgs.html">ray.serve.llm.configs.LLMServingArgs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.configs.ModelLoadingConfig.html">ray.serve.llm.configs.ModelLoadingConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.configs.CloudMirrorConfig.html">ray.serve.llm.configs.CloudMirrorConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.configs.LoraConfig.html">ray.serve.llm.configs.LoraConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.deployments.VLLMService.html">ray.serve.llm.deployments.VLLMService</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.deployments.LLMRouter.html">ray.serve.llm.deployments.LLMRouter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html">ray.serve.llm.openai_api_models.ChatCompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionRequest.html">ray.serve.llm.openai_api_models.CompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionStreamResponse.html">ray.serve.llm.openai_api_models.ChatCompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionResponse.html">ray.serve.llm.openai_api_models.ChatCompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html">ray.serve.llm.openai_api_models.CompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionResponse.html">ray.serve.llm.openai_api_models.CompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../serve/llm/doc/ray.serve.llm.openai_api_models.ErrorResponse.html">ray.serve.llm.openai_api_models.ErrorResponse</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../serve/llm/serving-llms.html">Serving LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../serve/production-guide/config.html">Serve Config Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../serve/production-guide/kubernetes.html">Deploy on Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../serve/production-guide/docker.html">Custom Docker Images</a></li>
@@ -842,7 +821,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../../serve/monitoring.html">Monitor Your Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../serve/resource-allocation.html">Resource Allocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../serve/autoscaling-guide.html">Ray Serve Autoscaling</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../serve/advanced-guides/app-builder-guide.html">Pass Arguments to Applications</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../serve/advanced-guides/advanced-autoscaling.html">Advanced Ray Serve Autoscaling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../serve/advanced-guides/performance.html">Performance Tuning</a></li>
@@ -860,10 +839,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../../serve/api/index.html">Ray Serve API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../rllib/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../rllib/key-concepts.html">Key concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../rllib/multi-agent-envs.html">Multi-Agent Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../rllib/hierarchical-envs.html">Hierarchical Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../rllib/external-envs.html">External Environments and Applications</a></li>
@@ -871,7 +850,7 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../rllib/algorithm-config.html">AlgorithmConfig API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../rllib/rllib-algorithms.html">Algorithms</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../rllib/rllib-advanced-api.html">Advanced Python APIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../rllib/checkpoints.html">Checkpointing</a></li>
@@ -898,8 +877,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../rllib/rllib-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../rllib/new-api-stack-migration-guide.html">New API stack migration guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
@@ -921,7 +900,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
@@ -940,7 +919,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html">ray.rllib.callbacks.callbacks.RLlibCallback</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end</a></li>
@@ -956,7 +935,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/env/env_runner.html">EnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/env/single_agent_env_runner.html">SingleAgentEnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/env/single_agent_episode.html">SingleAgentEpisode API</a></li>
@@ -966,7 +945,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/env/utils.html">Env Utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.build</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class</a></li>
@@ -1009,7 +988,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html">ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.html">ray.rllib.models.distributions.Distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html">ray.rllib.models.distributions.Distribution.from_logits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html">ray.rllib.models.distributions.Distribution.sample</a></li>
@@ -1018,14 +997,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html">ray.rllib.models.distributions.Distribution.kl</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html">ray.rllib.core.learner.learner_group.LearnerGroup</a></li>
 </ul>
 </li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners</a></li>
@@ -1046,7 +1025,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs.html">ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit.html">ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer.html">ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html">ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer</a></li>
@@ -1061,7 +1040,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html">ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
@@ -1107,12 +1086,12 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-more-libs/joblib.html">Distributed Scikit-learn / Joblib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-more-libs/multiprocessing.html">Distributed multiprocessing.Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-more-libs/ray-collective.html">Ray Collective Communication Lib</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.ray_active.html">ray.util.dask.RayDaskCallback.ray_active</a></li>
 </ul>
 </li>
@@ -1127,7 +1106,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../workflows/index.html">Ray Workflows (Alpha)</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../workflows/basics.html">Getting Started</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../workflows/management.html">Workflow Management</a></li>
@@ -1135,7 +1114,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../../workflows/events.html">Events</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../workflows/comparison.html">API Comparisons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../workflows/advanced.html">Advanced Topics</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../workflows/api/execution.html">Workflow Execution API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../workflows/api/management.html">Workflow Management API</a></li>
 </ul>
@@ -1144,16 +1123,16 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../cluster/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
@@ -1198,7 +1177,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/user-guides/reduce-image-pull-latency.html">Reducing image pull latency on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/examples/ml-example.html">Ray Train XGBoostTrainer on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/examples/gpu-training-example.html">Train PyTorch ResNet model with GPUs on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/examples/mnist-training-example.html">Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes</a></li>
@@ -1214,7 +1193,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/examples/vllm-rayservice.html">Serve a Large Language Model with vLLM on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/k8s-ecosystem/ingress.html">Ingress</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/k8s-ecosystem/prometheus-grafana.html">Using Prometheus and Grafana</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/k8s-ecosystem/pyspy.html">Profiling with py-spy</a></li>
@@ -1224,12 +1203,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/k8s-ecosystem/istio.html">mTLS and L7 observability with Istio</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/benchmarks/memory-scalability-benchmark.html">KubeRay memory and scalability benchmark</a></li>
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/troubleshooting/troubleshooting.html">Troubleshooting guide</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html">RayService troubleshooting</a></li>
@@ -1238,9 +1217,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../../cluster/kubernetes/references.html">API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../cluster/vms/getting-started.html">Getting Started</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/vms/user-guides/launching-clusters/index.html">Launching Ray Clusters on AWS, GCP, Azure, vSphere, On-Prem</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/vms/user-guides/large-cluster-best-practices.html">Best practices for deploying large clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/vms/user-guides/configuring-autoscaling.html">Configuring Autoscaling</a></li>
@@ -1249,11 +1228,11 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/vms/examples/ml-example.html">Ray Train XGBoostTrainer on VMs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/vms/references/ray-cluster-cli.html">Cluster Launcher Commands</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/vms/references/ray-cluster-configuration.html">Cluster YAML Configuration Options</a></li>
 </ul>
@@ -1262,8 +1241,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../cluster/metrics.html">Collecting and monitoring metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../cluster/configure-manage-dashboard.html">Configuring and Managing Ray Dashboard</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/running-applications/job-submission/quickstart.html">Quickstart using the Ray Jobs CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/running-applications/job-submission/sdk.html">Python SDK Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
@@ -1276,7 +1255,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../cluster/faq.html">FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../cluster/cli.html">Cluster Management CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../cluster/running-applications/job-submission/cli.html">Ray Jobs CLI API Reference</a></li>
@@ -1286,7 +1265,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../../cluster/usage-stats.html">Usage Stats Collection</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../virtual-cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../virtual-cluster/design-overview.html">Design Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../virtual-cluster/management.html">Virtual Cluster Management API</a></li>
@@ -1294,15 +1273,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-observability/getting-started.html">Ray Dashboard</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-observability/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
@@ -1322,7 +1301,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../../ray-observability/user-guides/ray-tracing.html">Tracing</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../ray-observability/reference/api.html">State API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../ray-observability/reference/cli.html">State CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../ray-observability/reference/system-metrics.html">System Metrics</a></li>
@@ -1330,10 +1309,10 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-contribute/stability.html">API Stability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../ray-contribute/api-policy.html">API Policy</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../ray-contribute/development.html">Building Ray from Source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../ray-contribute/ci.html">CI Testing Workflow on PRs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../ray-contribute/docs.html">Contributing to the Ray Documentation</a></li>
@@ -1429,8 +1408,6 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">tree</span>  <span class="c1"># pip install dm_tree</span>
-
 <span class="kn">import</span> <span class="nn">ray</span>
 <span class="kn">from</span> <span class="nn">ray.data.iterator</span> <span class="kn">import</span> <span class="n">DataIterator</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.connectors.learner.learner_connector_pipeline</span> <span class="kn">import</span> <span class="p">(</span>
@@ -1442,6 +1419,7 @@ document.write(`
     <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
     <span class="n">DEFAULT_MODULE_ID</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">ray.rllib.core.learner.training_data</span> <span class="kn">import</span> <span class="n">TrainingData</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.apis</span> <span class="kn">import</span> <span class="n">SelfSupervisedLossAPI</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module</span> <span class="kn">import</span> <span class="n">validate_module_id</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
@@ -1458,11 +1436,7 @@ document.write(`
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.utils.checkpoints</span> <span class="kn">import</span> <span class="n">Checkpointable</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.utils.debug</span> <span class="kn">import</span> <span class="n">update_global_seed_if_necessary</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Deprecated</span><span class="p">,</span>
-    <span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
-    <span class="n">deprecation_warning</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.utils.framework</span> <span class="kn">import</span> <span class="n">try_import_tf</span><span class="p">,</span> <span class="n">try_import_torch</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ALL_MODULES</span><span class="p">,</span>
@@ -1480,6 +1454,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">ray.rllib.utils.minibatch_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MiniBatchDummyIterator</span><span class="p">,</span>
     <span class="n">MiniBatchCyclicIterator</span><span class="p">,</span>
+    <span class="n">MiniBatchRayDataIterator</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.utils.numpy</span> <span class="kn">import</span> <span class="n">convert_to_numpy</span>
 <span class="kn">from</span> <span class="nn">ray.rllib.utils.schedules.scheduler</span> <span class="kn">import</span> <span class="n">Scheduler</span>
@@ -2433,19 +2408,25 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="Learner.update_from_batch">
-<a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.update_from_batch.html#ray.rllib.core.learner.learner.Learner.update_from_batch">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_from_batch</span><span class="p">(</span>
+<div class="viewcode-block" id="Learner.update">
+<a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.update.html#ray.rllib.core.learner.learner.Learner.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">batch</span><span class="p">:</span> <span class="n">MultiAgentBatch</span><span class="p">,</span>
+        <span class="n">batch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MultiAgentBatch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">batches</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">MultiAgentBatch</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">batch_refs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">episodes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">episodes_refs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_iterators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataIterator</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">training_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrainingData</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="c1"># TODO (sven): Make this a more formal structure with its own type.</span>
         <span class="n">timesteps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_total_minibatches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">num_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">minibatch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">shuffle_batch_per_epoch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="c1"># Deprecated args.</span>
-        <span class="n">num_iters</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
+        <span class="n">_no_metrics_reduce</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run `num_epochs` epochs over the given train batch.</span>
@@ -2479,198 +2460,138 @@ document.write(`
 <span class="sd">            Learner) to further reduce these results (for example over n parallel</span>
 <span class="sd">            Learners).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">num_iters</span> <span class="o">!=</span> <span class="n">DEPRECATED_VALUE</span><span class="p">:</span>
-            <span class="n">deprecation_warning</span><span class="p">(</span>
-                <span class="n">old</span><span class="o">=</span><span class="s2">&quot;Learner.update_from_episodes(num_iters=...)&quot;</span><span class="p">,</span>
-                <span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.update_from_episodes(num_epochs=...)&quot;</span><span class="p">,</span>
-                <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_from_batch_or_episodes</span><span class="p">(</span>
-            <span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span>
-            <span class="n">timesteps</span><span class="o">=</span><span class="n">timesteps</span><span class="p">,</span>
-            <span class="n">num_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span>
-            <span class="n">minibatch_size</span><span class="o">=</span><span class="n">minibatch_size</span><span class="p">,</span>
-            <span class="n">shuffle_batch_per_epoch</span><span class="o">=</span><span class="n">shuffle_batch_per_epoch</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="Learner.update_from_episodes">
-<a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.update_from_episodes.html#ray.rllib.core.learner.learner.Learner.update_from_episodes">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_from_episodes</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">episodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">],</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="c1"># TODO (sven): Make this a more formal structure with its own type.</span>
-        <span class="n">timesteps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">num_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">minibatch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">shuffle_batch_per_epoch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">num_total_minibatches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="c1"># Deprecated args.</span>
-        <span class="n">num_iters</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run `num_epochs` epochs over the train batch generated from `episodes`.</span>
-
-<span class="sd">        You can use this method to take more than one backward pass on the batch.</span>
-<span class="sd">        The same `minibatch_size` and `num_epochs` will be used for all module ids in</span>
-<span class="sd">        MultiRLModule.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            episodes: An list of episode objects to update from.</span>
-<span class="sd">            timesteps: Timesteps dict, which must have the key</span>
-<span class="sd">                `NUM_ENV_STEPS_SAMPLED_LIFETIME`.</span>
-<span class="sd">                # TODO (sven): Make this a more formal structure with its own type.</span>
-<span class="sd">            num_epochs: The number of complete passes over the entire train batch. Each</span>
-<span class="sd">                pass might be further split into n minibatches (if `minibatch_size`</span>
-<span class="sd">                provided). The train batch is generated from the given `episodes`</span>
-<span class="sd">                through the Learner connector pipeline.</span>
-<span class="sd">            minibatch_size: The size of minibatches to use to further split the train</span>
-<span class="sd">                `batch` into sub-batches. The `batch` is then iterated over n times</span>
-<span class="sd">                where n is `len(batch) // minibatch_size`. The train batch is generated</span>
-<span class="sd">                from the given `episodes` through the Learner connector pipeline.</span>
-<span class="sd">            shuffle_batch_per_epoch: Whether to shuffle the train batch once per epoch.</span>
-<span class="sd">                If the train batch has a time rank (axis=1), shuffling will only take</span>
-<span class="sd">                place along the batch axis to not disturb any intact (episode)</span>
-<span class="sd">                trajectories. Also, shuffling is always skipped if `minibatch_size` is</span>
-<span class="sd">                None, meaning the entire train batch is processed each epoch, making it</span>
-<span class="sd">                unnecessary to shuffle. The train batch is generated from the given</span>
-<span class="sd">                `episodes` through the Learner connector pipeline.</span>
-<span class="sd">            num_total_minibatches: The total number of minibatches to loop through</span>
-<span class="sd">                (over all `num_epochs` epochs). It&#39;s only required to set this to != 0</span>
-<span class="sd">                in multi-agent + multi-GPU situations, in which the MultiAgentEpisodes</span>
-<span class="sd">                themselves are roughly sharded equally, however, they might contain</span>
-<span class="sd">                SingleAgentEpisodes with very lopsided length distributions. Thus,</span>
-<span class="sd">                without this fixed, pre-computed value, one Learner might go through a</span>
-<span class="sd">                different number of minibatche passes than others causing a deadlock.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            A `ResultDict` object produced by a call to `self.metrics.reduce()`. The</span>
-<span class="sd">            returned dict may be arbitrarily nested and must have `Stats` objects at</span>
-<span class="sd">            all its leafs, allowing components further downstream (i.e. a user of this</span>
-<span class="sd">            Learner) to further reduce these results (for example over n parallel</span>
-<span class="sd">            Learners).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">num_iters</span> <span class="o">!=</span> <span class="n">DEPRECATED_VALUE</span><span class="p">:</span>
-            <span class="n">deprecation_warning</span><span class="p">(</span>
-                <span class="n">old</span><span class="o">=</span><span class="s2">&quot;Learner.update_from_episodes(num_iters=...)&quot;</span><span class="p">,</span>
-                <span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.update_from_episodes(num_epochs=...)&quot;</span><span class="p">,</span>
-                <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_from_batch_or_episodes</span><span class="p">(</span>
-            <span class="n">episodes</span><span class="o">=</span><span class="n">episodes</span><span class="p">,</span>
-            <span class="n">timesteps</span><span class="o">=</span><span class="n">timesteps</span><span class="p">,</span>
-            <span class="n">num_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span>
-            <span class="n">minibatch_size</span><span class="o">=</span><span class="n">minibatch_size</span><span class="p">,</span>
-            <span class="n">shuffle_batch_per_epoch</span><span class="o">=</span><span class="n">shuffle_batch_per_epoch</span><span class="p">,</span>
-            <span class="n">num_total_minibatches</span><span class="o">=</span><span class="n">num_total_minibatches</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="Learner.update_from_iterator">
-<a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.update_from_iterator.html#ray.rllib.core.learner.learner.Learner.update_from_iterator">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_from_iterator</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">iterator</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">timesteps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">minibatch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">num_iters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">if</span> <span class="s2">&quot;num_epochs&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;`num_epochs` arg NOT supported by Learner.update_from_iterator! Use &quot;</span>
-                <span class="s2">&quot;`num_iters` instead.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span> <span class="o">=</span> <span class="n">iterator</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_is_built</span><span class="p">()</span>
 
         <span class="c1"># Call `before_gradient_based_update` to allow for non-gradient based</span>
         <span class="c1"># preparations-, logging-, and update logic to happen.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">before_gradient_based_update</span><span class="p">(</span><span class="n">timesteps</span><span class="o">=</span><span class="n">timesteps</span> <span class="ow">or</span> <span class="p">{})</span>
 
-        <span class="k">def</span> <span class="nf">_finalize_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-            <span class="c1"># Note, the incoming batch is a dictionary with a numpy array</span>
-            <span class="c1"># holding the `MultiAgentBatch`.</span>
-            <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_batch_type</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;batch&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;batch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_slicing_by_batch_id</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">training_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">training_data</span> <span class="o">=</span> <span class="n">TrainingData</span><span class="p">(</span>
+                <span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span>
+                <span class="n">batches</span><span class="o">=</span><span class="n">batches</span><span class="p">,</span>
+                <span class="n">batch_refs</span><span class="o">=</span><span class="n">batch_refs</span><span class="p">,</span>
+                <span class="n">episodes</span><span class="o">=</span><span class="n">episodes</span><span class="p">,</span>
+                <span class="n">episodes_refs</span><span class="o">=</span><span class="n">episodes_refs</span><span class="p">,</span>
+                <span class="n">data_iterators</span><span class="o">=</span><span class="n">data_iterators</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">training_data</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+        <span class="n">training_data</span><span class="o">.</span><span class="n">solve_refs</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">training_data</span><span class="o">.</span><span class="n">batches</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;`training_data.batches` must be None!&quot;</span>
 
-        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;===&gt; [Learner </span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">]: Looping through batches ... &quot;</span><span class="p">)</span>
-        <span class="k">while</span> <span class="n">num_iters</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">num_iters</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span><span class="o">.</span><span class="n">iter_batches</span><span class="p">(</span>
-                <span class="c1"># Note, this needs to be one b/c data is already mapped to</span>
-                <span class="c1"># `MultiAgentBatch`es of `minibatch_size`.</span>
-                <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="n">_finalize_fn</span><span class="o">=</span><span class="n">_finalize_fn</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights_seq_no</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Data iterator provided.</span>
+        <span class="k">if</span> <span class="n">training_data</span><span class="o">.</span><span class="n">data_iterators</span><span class="p">:</span>
+            <span class="n">num_iters</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;num_iters&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">num_iters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Learner.update(data_iterators=..) requires `num_iters` kwarg!&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span> <span class="o">=</span> <span class="n">training_data</span><span class="o">.</span><span class="n">data_iterators</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">def</span> <span class="nf">_finalize_fn</span><span class="p">(</span><span class="n">_batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+                <span class="c1"># Note, the incoming batch is a dictionary with a numpy array</span>
+                <span class="c1"># holding the `MultiAgentBatch`.</span>
+                <span class="n">_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_batch_type</span><span class="p">(</span><span class="n">_batch</span><span class="p">[</span><span class="s2">&quot;batch&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;batch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_slicing_by_batch_id</span><span class="p">(</span><span class="n">_batch</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
+
+            <span class="n">batch_iter</span> <span class="o">=</span> <span class="n">MiniBatchRayDataIterator</span><span class="p">(</span>
+                <span class="n">iterator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iterator</span><span class="p">,</span>
+                <span class="n">finalize_fn</span><span class="o">=</span><span class="n">_finalize_fn</span><span class="p">,</span>
+                <span class="n">num_iters</span><span class="o">=</span><span class="n">num_iters</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">):</span>
-                <span class="c1"># TODO (simon): Add metrics for the `dataset_num_iter`.</span>
-                <span class="c1"># Update the iteration counter.</span>
-                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="c1"># Record the number of batches pulled from the dataset.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">ALL_MODULES</span><span class="p">,</span> <span class="n">DATASET_NUM_ITERS_TRAINED</span><span class="p">),</span>
+                <span class="n">num_iters</span><span class="p">,</span>
+                <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+                <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">ALL_MODULES</span><span class="p">,</span> <span class="n">DATASET_NUM_ITERS_TRAINED_LIFETIME</span><span class="p">),</span>
+                <span class="n">num_iters</span><span class="p">,</span>
+                <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_batch_if_necessary</span><span class="p">(</span><span class="n">training_data</span><span class="o">=</span><span class="n">training_data</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-                <span class="c1"># Note, `_finalize_fn`  must return a dictionary.</span>
-                <span class="n">batch</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;batch&quot;</span><span class="p">]</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;===&gt; [Learner </span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">]: batch </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">batch</span><span class="o">.</span><span class="n">env_steps</span><span class="p">()</span><span class="si">}</span><span class="s2"> rows.&quot;</span>
+            <span class="c1"># TODO: Move this into LearnerConnector pipeline?</span>
+            <span class="c1"># Filter out those RLModules from the final train batch that should not be</span>
+            <span class="c1"># updated.</span>
+            <span class="k">for</span> <span class="n">module_id</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_module_be_updated</span><span class="p">(</span><span class="n">module_id</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+                    <span class="k">del</span> <span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="p">[</span><span class="n">module_id</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{}</span>
+
+            <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_slicing_by_batch_id</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">minibatch_size</span><span class="p">:</span>
+                <span class="n">batch_iter_cls</span> <span class="o">=</span> <span class="n">MiniBatchCyclicIterator</span>
+            <span class="k">elif</span> <span class="n">num_epochs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># `minibatch_size` was not set but `num_epochs` &gt; 1.</span>
+                <span class="n">minibatch_size</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">count</span>
+                <span class="c1"># Note that there is no need to shuffle here, b/c we don&#39;t have</span>
+                <span class="c1"># minibatches.</span>
+                <span class="n">batch_iter_cls</span> <span class="o">=</span> <span class="n">MiniBatchCyclicIterator</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># `minibatch_size` and `num_epochs` are not set by the user.</span>
+                <span class="n">batch_iter_cls</span> <span class="o">=</span> <span class="n">MiniBatchDummyIterator</span>
+
+            <span class="n">batch_iter</span> <span class="o">=</span> <span class="n">batch_iter_cls</span><span class="p">(</span>
+                <span class="n">batch</span><span class="p">,</span>
+                <span class="n">num_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span>
+                <span class="n">minibatch_size</span><span class="o">=</span><span class="n">minibatch_size</span><span class="p">,</span>
+                <span class="n">shuffle_batch_per_epoch</span><span class="o">=</span><span class="n">shuffle_batch_per_epoch</span> <span class="ow">and</span> <span class="p">(</span><span class="n">num_epochs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">num_total_minibatches</span><span class="o">=</span><span class="n">num_total_minibatches</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Perform the actual looping through the minibatches or the given data iterator.</span>
+        <span class="k">for</span> <span class="n">tensor_minibatch</span> <span class="ow">in</span> <span class="n">batch_iter</span><span class="p">:</span>
+            <span class="c1"># Check the MultiAgentBatch, whether our RLModule contains all ModuleIDs</span>
+            <span class="c1"># found in this batch. If not, throw an error.</span>
+            <span class="n">unknown_module_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tensor_minibatch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">unknown_module_ids</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Batch contains one or more ModuleIDs (</span><span class="si">{</span><span class="n">unknown_module_ids</span><span class="si">}</span><span class="s2">) that &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;are not in this Learner!&quot;</span>
                 <span class="p">)</span>
-                <span class="c1"># Check the MultiAgentBatch, whether our RLModule contains all ModuleIDs</span>
-                <span class="c1"># found in this batch. If not, throw an error.</span>
-                <span class="n">unknown_module_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_module_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;Batch contains one or more ModuleIDs that are not in this &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;Learner! Found IDs: </span><span class="si">{</span><span class="n">unknown_module_ids</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="p">)</span>
 
-                <span class="c1"># Log metrics.</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_log_steps_trained_metrics</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+            <span class="c1"># Make the actual in-graph/traced `_update` call. This should return</span>
+            <span class="c1"># all tensor values (no numpy).</span>
+            <span class="n">fwd_out</span><span class="p">,</span> <span class="n">loss_per_module</span><span class="p">,</span> <span class="n">tensor_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span>
+                <span class="n">tensor_minibatch</span><span class="o">.</span><span class="n">policy_batches</span>
+            <span class="p">)</span>
 
-                <span class="c1"># Make the actual in-graph/traced `_update` call. This should return</span>
-                <span class="c1"># all tensor values (no numpy).</span>
-                <span class="n">fwd_out</span><span class="p">,</span> <span class="n">loss_per_module</span><span class="p">,</span> <span class="n">tensor_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span>
-                    <span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span>
-                <span class="p">)</span>
-                <span class="c1"># Convert logged tensor metrics (logged during tensor-mode of</span>
-                <span class="c1"># MetricsLogger) to actual (numpy) values.</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">tensors_to_numpy</span><span class="p">(</span><span class="n">tensor_metrics</span><span class="p">)</span>
+            <span class="c1"># Convert logged tensor metrics (logged during tensor-mode of MetricsLogger)</span>
+            <span class="c1"># to actual (numpy) values.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">tensors_to_numpy</span><span class="p">(</span><span class="n">tensor_metrics</span><span class="p">)</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">_set_slicing_by_batch_id</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                <span class="c1"># If `num_iters` is reached break and return.</span>
-                <span class="k">if</span> <span class="n">num_iters</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="n">num_iters</span><span class="p">:</span>
-                    <span class="k">break</span>
+            <span class="c1"># TODO (sven): Maybe move this into loop above to get metrics more accuratcely</span>
+            <span class="c1">#  cover the minibatch/epoch logic.</span>
+            <span class="c1"># Log all timesteps (env, agent, modules) based on given episodes/batch.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_steps_trained_metrics</span><span class="p">(</span><span class="n">tensor_minibatch</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;===&gt; [Learner </span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">] number of iterations run in this epoch: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_slicing_by_batch_id</span><span class="p">(</span><span class="n">tensor_minibatch</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># Log all individual RLModules&#39; loss terms and its registered optimizers&#39;</span>
         <span class="c1"># current learning rates.</span>
+        <span class="c1"># Note: We do this only once for the last of the minibatch updates, b/c the</span>
+        <span class="c1"># window is only 1 anyways.</span>
         <span class="k">for</span> <span class="n">mid</span><span class="p">,</span> <span class="n">loss</span> <span class="ow">in</span> <span class="n">convert_to_numpy</span><span class="p">(</span><span class="n">loss_per_module</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
                 <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TOTAL_LOSS_KEY</span><span class="p">),</span>
                 <span class="n">value</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
                 <span class="n">window</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="c1"># Record the number of batches pulled from the dataset in this RLlib iteration.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
-            <span class="n">DATASET_NUM_ITERS_TRAINED</span><span class="p">,</span>
-            <span class="n">i</span><span class="p">,</span>
-            <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span>
-            <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
-            <span class="n">DATASET_NUM_ITERS_TRAINED_LIFETIME</span><span class="p">,</span>
-            <span class="n">i</span><span class="p">,</span>
-            <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+
         <span class="c1"># Call `after_gradient_based_update` to allow for non-gradient based</span>
         <span class="c1"># cleanups-, logging-, and update logic to happen.</span>
         <span class="c1"># TODO (simon): Check, if this should stay here, when running multiple</span>
@@ -2679,7 +2600,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">after_gradient_based_update</span><span class="p">(</span><span class="n">timesteps</span><span class="o">=</span><span class="n">timesteps</span> <span class="ow">or</span> <span class="p">{})</span>
 
         <span class="c1"># Reduce results across all minibatch update steps.</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_no_metrics_reduce</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span></div>
 
 
     <span class="nd">@OverrideToImplementCustomLogic</span>
@@ -2793,6 +2715,67 @@ document.write(`
             <span class="p">(</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">),</span>
         <span class="p">]</span>
 
+    <span class="k">def</span> <span class="nf">_make_batch_if_necessary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_data</span><span class="p">):</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="n">training_data</span><span class="o">.</span><span class="n">batch</span>
+
+        <span class="c1"># Call the learner connector on the given `episodes` (if we have one).</span>
+        <span class="k">if</span> <span class="n">training_data</span><span class="o">.</span><span class="n">episodes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If we want to learn from Episodes, we must have a LearnerConnector</span>
+            <span class="c1"># pipeline to translate into a train batch first.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_learner_connector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;If episodes provided for training, Learner (</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">) must have a &quot;</span>
+                    <span class="s2">&quot;LearnerConnector pipeline (but pipeline is None)!&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Call the learner connector pipeline.</span>
+            <span class="n">shared_data</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_learner_connector</span><span class="p">(</span>
+                <span class="n">rl_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span>
+                <span class="n">batch</span><span class="o">=</span><span class="n">training_data</span><span class="o">.</span><span class="n">batch</span> <span class="k">if</span> <span class="n">training_data</span><span class="o">.</span><span class="n">batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{},</span>
+                <span class="n">episodes</span><span class="o">=</span><span class="n">training_data</span><span class="o">.</span><span class="n">episodes</span><span class="p">,</span>
+                <span class="n">shared_data</span><span class="o">=</span><span class="n">shared_data</span><span class="p">,</span>
+                <span class="n">metrics</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># Convert to a batch.</span>
+            <span class="c1"># TODO (sven): Try to not require MultiAgentBatch anymore.</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="n">MultiAgentBatch</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">module_id</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">SampleBatch</span><span class="p">(</span><span class="n">module_data</span><span class="p">,</span> <span class="n">_zero_padded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">shared_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_zero_padded_for_mid=</span><span class="si">{</span><span class="n">module_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="n">SampleBatch</span><span class="p">(</span><span class="n">module_data</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">module_data</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">},</span>
+                <span class="n">env_steps</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">training_data</span><span class="o">.</span><span class="n">episodes</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="c1"># Single-agent SampleBatch: Have to convert to MultiAgentBatch.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_data</span><span class="o">.</span><span class="n">batch</span><span class="p">,</span> <span class="n">SampleBatch</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;SampleBatch provided, but RLModule (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="si">}</span><span class="s2">) has more than &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;one sub-RLModule! Need to provide MultiAgentBatch instead.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">batch</span> <span class="o">=</span> <span class="n">MultiAgentBatch</span><span class="p">(</span>
+                <span class="p">{</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span> <span class="n">training_data</span><span class="o">.</span><span class="n">batch</span><span class="p">},</span>
+                <span class="n">env_steps</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">training_data</span><span class="o">.</span><span class="n">batch</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="c1"># If we already have an `MultiAgentBatch` but with `numpy` array, convert to</span>
+        <span class="c1"># tensors.</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">training_data</span><span class="o">.</span><span class="n">batch</span><span class="p">,</span> <span class="n">MultiAgentBatch</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">training_data</span><span class="o">.</span><span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">training_data</span><span class="o">.</span><span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">values</span><span class="p">()))[</span><span class="s2">&quot;obs&quot;</span><span class="p">],</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_batch_type</span><span class="p">(</span><span class="n">training_data</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">batch</span>
+
     <span class="k">def</span> <span class="nf">_get_optimizer_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the state of all optimizers currently registered in this Learner.</span>
 
@@ -2808,170 +2791,6 @@ document.write(`
 <span class="sd">            state: The state of the optimizers.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-    <span class="k">def</span> <span class="nf">_update_from_batch_or_episodes</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="c1"># TODO (sven): We should allow passing in a single agent batch here</span>
-        <span class="c1">#  as well for simplicity.</span>
-        <span class="n">batch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MultiAgentBatch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">episodes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="c1"># TODO (sven): Make this a more formal structure with its own type.</span>
-        <span class="n">timesteps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="c1"># TODO (sven): Deprecate these in favor of config attributes for only those</span>
-        <span class="c1">#  algos that actually need (and know how) to do minibatching.</span>
-        <span class="n">num_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">minibatch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">shuffle_batch_per_epoch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">num_total_minibatches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_is_built</span><span class="p">()</span>
-
-        <span class="c1"># Call `before_gradient_based_update` to allow for non-gradient based</span>
-        <span class="c1"># preparations-, logging-, and update logic to happen.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">before_gradient_based_update</span><span class="p">(</span><span class="n">timesteps</span><span class="o">=</span><span class="n">timesteps</span> <span class="ow">or</span> <span class="p">{})</span>
-
-        <span class="c1"># Resolve batch/episodes being ray object refs (instead of</span>
-        <span class="c1"># actual batch/episodes objects).</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
-            <span class="n">batch</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">episodes</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
-            <span class="n">episodes</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">episodes</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">episodes</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">episodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
-            <span class="c1"># It&#39;s possible that individual refs are invalid due to the EnvRunner</span>
-            <span class="c1"># that produced the ref has crashed or had its entire node go down.</span>
-            <span class="c1"># In this case, try each ref individually and collect only valid results.</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">episodes</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">episodes</span><span class="p">))</span>
-            <span class="k">except</span> <span class="n">ray</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">OwnerDiedError</span><span class="p">:</span>
-                <span class="n">episode_refs</span> <span class="o">=</span> <span class="n">episodes</span>
-                <span class="n">episodes</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">episode_refs</span><span class="p">:</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">episodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ref</span><span class="p">))</span>
-                    <span class="k">except</span> <span class="n">ray</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">OwnerDiedError</span><span class="p">:</span>
-                        <span class="k">pass</span>
-
-        <span class="c1"># Call the learner connector on the given `episodes` (if we have one).</span>
-        <span class="k">if</span> <span class="n">episodes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_learner_connector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># Call the learner connector pipeline.</span>
-            <span class="n">shared_data</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_learner_connector</span><span class="p">(</span>
-                <span class="n">rl_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span>
-                <span class="n">batch</span><span class="o">=</span><span class="n">batch</span> <span class="k">if</span> <span class="n">batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{},</span>
-                <span class="n">episodes</span><span class="o">=</span><span class="n">episodes</span><span class="p">,</span>
-                <span class="n">shared_data</span><span class="o">=</span><span class="n">shared_data</span><span class="p">,</span>
-                <span class="n">metrics</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="c1"># Convert to a batch.</span>
-            <span class="c1"># TODO (sven): Try to not require MultiAgentBatch anymore.</span>
-            <span class="n">batch</span> <span class="o">=</span> <span class="n">MultiAgentBatch</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="n">module_id</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">SampleBatch</span><span class="p">(</span><span class="n">module_data</span><span class="p">,</span> <span class="n">_zero_padded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">shared_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_zero_padded_for_mid=</span><span class="si">{</span><span class="n">module_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                        <span class="k">else</span> <span class="n">SampleBatch</span><span class="p">(</span><span class="n">module_data</span><span class="p">)</span>
-                    <span class="p">)</span>
-                    <span class="k">for</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">module_data</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                <span class="p">},</span>
-                <span class="n">env_steps</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">episodes</span><span class="p">),</span>
-            <span class="p">)</span>
-        <span class="c1"># Single-agent SampleBatch: Have to convert to MultiAgentBatch.</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">SampleBatch</span><span class="p">):</span>
-            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
-            <span class="n">batch</span> <span class="o">=</span> <span class="n">MultiAgentBatch</span><span class="p">(</span>
-                <span class="p">{</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span> <span class="n">batch</span><span class="p">},</span> <span class="n">env_steps</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-            <span class="p">)</span>
-        <span class="c1"># If we have already an `MultiAgentBatch` but with `numpy` array, convert to</span>
-        <span class="c1"># tensors.</span>
-        <span class="k">elif</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">MultiAgentBatch</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span>
-            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
-                <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">values</span><span class="p">()))[</span><span class="s2">&quot;obs&quot;</span><span class="p">],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>
-            <span class="p">)</span>
-        <span class="p">):</span>
-            <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_batch_type</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-
-        <span class="c1"># Check the MultiAgentBatch, whether our RLModule contains all ModuleIDs</span>
-        <span class="c1"># found in this batch. If not, throw an error.</span>
-        <span class="n">unknown_module_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_module_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Batch contains one or more ModuleIDs that are not in this Learner! &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Found IDs: </span><span class="si">{</span><span class="n">unknown_module_ids</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-
-        <span class="c1"># TODO: Move this into LearnerConnector pipeline?</span>
-        <span class="c1"># Filter out those RLModules from the final train batch that should not be</span>
-        <span class="c1"># updated.</span>
-        <span class="k">for</span> <span class="n">module_id</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_module_be_updated</span><span class="p">(</span><span class="n">module_id</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
-                <span class="k">del</span> <span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="p">[</span><span class="n">module_id</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="p">:</span>
-            <span class="k">return</span>
-
-        <span class="c1"># Log all timesteps (env, agent, modules) based on given episodes/batch.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_log_steps_trained_metrics</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">minibatch_size</span><span class="p">:</span>
-            <span class="n">batch_iter</span> <span class="o">=</span> <span class="n">MiniBatchCyclicIterator</span>
-        <span class="k">elif</span> <span class="n">num_epochs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="c1"># `minibatch_size` was not set but `num_epochs` &gt; 1.</span>
-            <span class="c1"># Under the old training stack, users could do multiple epochs</span>
-            <span class="c1"># over a batch without specifying a minibatch size. We enable</span>
-            <span class="c1"># this behavior here by setting the minibatch size to be the size</span>
-            <span class="c1"># of the batch (e.g. 1 minibatch of size batch.count)</span>
-            <span class="n">minibatch_size</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">count</span>
-            <span class="c1"># Note that there is no need to shuffle here, b/c we don&#39;t have minibatches.</span>
-            <span class="n">batch_iter</span> <span class="o">=</span> <span class="n">MiniBatchCyclicIterator</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># `minibatch_size` and `num_epochs` are not set by the user.</span>
-            <span class="n">batch_iter</span> <span class="o">=</span> <span class="n">MiniBatchDummyIterator</span>
-
-        <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_slicing_by_batch_id</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">tensor_minibatch</span> <span class="ow">in</span> <span class="n">batch_iter</span><span class="p">(</span>
-            <span class="n">batch</span><span class="p">,</span>
-            <span class="n">num_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span>
-            <span class="n">minibatch_size</span><span class="o">=</span><span class="n">minibatch_size</span><span class="p">,</span>
-            <span class="n">shuffle_batch_per_epoch</span><span class="o">=</span><span class="n">shuffle_batch_per_epoch</span> <span class="ow">and</span> <span class="p">(</span><span class="n">num_epochs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="n">num_total_minibatches</span><span class="o">=</span><span class="n">num_total_minibatches</span><span class="p">,</span>
-        <span class="p">):</span>
-            <span class="c1"># Make the actual in-graph/traced `_update` call. This should return</span>
-            <span class="c1"># all tensor values (no numpy).</span>
-            <span class="n">fwd_out</span><span class="p">,</span> <span class="n">loss_per_module</span><span class="p">,</span> <span class="n">tensor_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span>
-                <span class="n">tensor_minibatch</span><span class="o">.</span><span class="n">policy_batches</span>
-            <span class="p">)</span>
-
-            <span class="c1"># Convert logged tensor metrics (logged during tensor-mode of MetricsLogger)</span>
-            <span class="c1"># to actual (numpy) values.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">tensors_to_numpy</span><span class="p">(</span><span class="n">tensor_metrics</span><span class="p">)</span>
-
-            <span class="c1"># Log all individual RLModules&#39; loss terms and its registered optimizers&#39;</span>
-            <span class="c1"># current learning rates.</span>
-            <span class="k">for</span> <span class="n">mid</span><span class="p">,</span> <span class="n">loss</span> <span class="ow">in</span> <span class="n">convert_to_numpy</span><span class="p">(</span><span class="n">loss_per_module</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
-                    <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TOTAL_LOSS_KEY</span><span class="p">),</span>
-                    <span class="n">value</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
-                    <span class="n">window</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weights_seq_no</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="n">WEIGHTS_SEQ_NO</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights_seq_no</span>
-                <span class="k">for</span> <span class="n">mid</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-            <span class="p">},</span>
-            <span class="n">window</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_slicing_by_batch_id</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="c1"># Call `after_gradient_based_update` to allow for non-gradient based</span>
-        <span class="c1"># cleanups-, logging-, and update logic to happen.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">after_gradient_based_update</span><span class="p">(</span><span class="n">timesteps</span><span class="o">=</span><span class="n">timesteps</span> <span class="ow">or</span> <span class="p">{})</span>
 
 <div class="viewcode-block" id="Learner.before_gradient_based_update">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.before_gradient_based_update.html#ray.rllib.core.learner.learner.Learner.before_gradient_based_update">[docs]</a>
@@ -3243,6 +3062,13 @@ document.write(`
     <span class="k">def</span> <span class="nf">_log_steps_trained_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">MultiAgentBatch</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs this iteration&#39;s steps trained, based on given `batch`.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">mid</span><span class="p">,</span> <span class="n">module_batch</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Log weights seq no for this batch.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="n">WEIGHTS_SEQ_NO</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_weights_seq_no</span><span class="p">,</span>
+                <span class="n">window</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+
             <span class="n">module_batch_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">module_batch</span><span class="p">)</span>
             <span class="c1"># Log average batch size (for each module).</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
@@ -3287,49 +3113,27 @@ document.write(`
             <span class="n">with_throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="nd">@Deprecated</span><span class="p">(</span>
-        <span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.before_gradient_based_update(&quot;</span>
-        <span class="s2">&quot;timesteps={&#39;num_env_steps_sampled_lifetime&#39;: ...}) and/or &quot;</span>
-        <span class="s2">&quot;Learner.after_gradient_based_update(&quot;</span>
-        <span class="s2">&quot;timesteps={&#39;num_env_steps_sampled_lifetime&#39;: ...})&quot;</span><span class="p">,</span>
-        <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">additional_update_for_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">pass</span>
+    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.update(batch=.., ..)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">update_from_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">batches_refs</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">batches</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.save_to_path(...)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">save_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">pass</span>
+    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.update(episodes=.., ..)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">update_from_episodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">episodes</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">episodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">episodes_refs</span><span class="o">=</span><span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">episodes</span><span class="o">=</span><span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.restore_from_path(...)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">load_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.module.get_state()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_module_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.module.set_state()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_module_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner._get_optimizer_state()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_optimizer_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner._set_optimizer_state()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_optimizer_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.compute_losses(...)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.compute_losses(...)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">losses_per_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_losses</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="c1"># To continue supporting the old `compute_loss` behavior (instead of</span>
-        <span class="c1"># the new `compute_losses`, add the ALL_MODULES key here holding the sum</span>
-        <span class="c1"># of all individual loss terms.</span>
-        <span class="k">if</span> <span class="n">ALL_MODULES</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">losses_per_module</span><span class="p">:</span>
-            <span class="n">losses_per_module</span><span class="p">[</span><span class="n">ALL_MODULES</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">losses_per_module</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="k">return</span> <span class="n">losses_per_module</span></div>
+        <span class="k">pass</span></div>
 
 </pre></div>
 

@@ -607,10 +607,11 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
@@ -754,14 +755,14 @@ document.write(`
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -814,30 +815,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../serve/model-multiplexing.html">Model Multiplexing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/configure-serve-deployment.html">Configure Ray Serve deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/http-guide.html">Set Up FastAPI and HTTP</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../serve/llm/overview.html">Overview</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../serve/llm/api.html">Ray Serve LLM API</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.builders.build_vllm_deployment.html">ray.serve.llm.builders.build_vllm_deployment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.builders.build_openai_app.html">ray.serve.llm.builders.build_openai_app</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.LLMConfig.html">ray.serve.llm.configs.LLMConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.LLMServingArgs.html">ray.serve.llm.configs.LLMServingArgs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.ModelLoadingConfig.html">ray.serve.llm.configs.ModelLoadingConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.CloudMirrorConfig.html">ray.serve.llm.configs.CloudMirrorConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.LoraConfig.html">ray.serve.llm.configs.LoraConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.deployments.VLLMService.html">ray.serve.llm.deployments.VLLMService</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.deployments.LLMRouter.html">ray.serve.llm.deployments.LLMRouter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html">ray.serve.llm.openai_api_models.ChatCompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionRequest.html">ray.serve.llm.openai_api_models.CompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionStreamResponse.html">ray.serve.llm.openai_api_models.ChatCompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionResponse.html">ray.serve.llm.openai_api_models.ChatCompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html">ray.serve.llm.openai_api_models.CompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionResponse.html">ray.serve.llm.openai_api_models.CompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ErrorResponse.html">ray.serve.llm.openai_api_models.ErrorResponse</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../serve/llm/serving-llms.html">Serving LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/production-guide/config.html">Serve Config Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/production-guide/kubernetes.html">Deploy on Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/production-guide/docker.html">Custom Docker Images</a></li>
@@ -849,7 +828,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../serve/monitoring.html">Monitor Your Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/resource-allocation.html">Resource Allocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/autoscaling-guide.html">Ray Serve Autoscaling</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/advanced-guides/app-builder-guide.html">Pass Arguments to Applications</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/advanced-guides/advanced-autoscaling.html">Advanced Ray Serve Autoscaling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/advanced-guides/performance.html">Performance Tuning</a></li>
@@ -867,10 +846,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../serve/api/index.html">Ray Serve API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/key-concepts.html">Key concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/multi-agent-envs.html">Multi-Agent Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/hierarchical-envs.html">Hierarchical Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/external-envs.html">External Environments and Applications</a></li>
@@ -878,7 +857,7 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/algorithm-config.html">AlgorithmConfig API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/rllib-algorithms.html">Algorithms</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/rllib-advanced-api.html">Advanced Python APIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/checkpoints.html">Checkpointing</a></li>
@@ -905,8 +884,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/rllib-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/new-api-stack-migration-guide.html">New API stack migration guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
@@ -928,7 +907,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
@@ -947,7 +926,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html">ray.rllib.callbacks.callbacks.RLlibCallback</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end</a></li>
@@ -963,7 +942,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/env_runner.html">EnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/single_agent_env_runner.html">SingleAgentEnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/single_agent_episode.html">SingleAgentEpisode API</a></li>
@@ -973,7 +952,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/utils.html">Env Utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.build</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class</a></li>
@@ -1016,7 +995,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html">ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.html">ray.rllib.models.distributions.Distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html">ray.rllib.models.distributions.Distribution.from_logits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html">ray.rllib.models.distributions.Distribution.sample</a></li>
@@ -1025,14 +1004,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html">ray.rllib.models.distributions.Distribution.kl</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html">ray.rllib.core.learner.learner_group.LearnerGroup</a></li>
 </ul>
 </li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners</a></li>
@@ -1053,7 +1032,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs.html">ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit.html">ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer.html">ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html">ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer</a></li>
@@ -1068,7 +1047,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html">ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
@@ -1114,12 +1093,12 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/joblib.html">Distributed Scikit-learn / Joblib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/multiprocessing.html">Distributed multiprocessing.Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/ray-collective.html">Ray Collective Communication Lib</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.ray_active.html">ray.util.dask.RayDaskCallback.ray_active</a></li>
 </ul>
 </li>
@@ -1134,7 +1113,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../workflows/index.html">Ray Workflows (Alpha)</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/basics.html">Getting Started</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/management.html">Workflow Management</a></li>
@@ -1142,7 +1121,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/events.html">Events</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/comparison.html">API Comparisons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/advanced.html">Advanced Topics</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../workflows/api/execution.html">Workflow Execution API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../workflows/api/management.html">Workflow Management API</a></li>
 </ul>
@@ -1151,16 +1130,16 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
@@ -1205,7 +1184,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/reduce-image-pull-latency.html">Reducing image pull latency on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/ml-example.html">Ray Train XGBoostTrainer on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/gpu-training-example.html">Train PyTorch ResNet model with GPUs on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/mnist-training-example.html">Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes</a></li>
@@ -1221,7 +1200,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/vllm-rayservice.html">Serve a Large Language Model with vLLM on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/ingress.html">Ingress</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/prometheus-grafana.html">Using Prometheus and Grafana</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/pyspy.html">Profiling with py-spy</a></li>
@@ -1231,12 +1210,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/istio.html">mTLS and L7 observability with Istio</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/benchmarks/memory-scalability-benchmark.html">KubeRay memory and scalability benchmark</a></li>
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting/troubleshooting.html">Troubleshooting guide</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html">RayService troubleshooting</a></li>
@@ -1245,9 +1224,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/kubernetes/references.html">API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/vms/getting-started.html">Getting Started</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/user-guides/launching-clusters/index.html">Launching Ray Clusters on AWS, GCP, Azure, vSphere, On-Prem</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/user-guides/large-cluster-best-practices.html">Best practices for deploying large clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/user-guides/configuring-autoscaling.html">Configuring Autoscaling</a></li>
@@ -1256,11 +1235,11 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/examples/ml-example.html">Ray Train XGBoostTrainer on VMs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/references/ray-cluster-cli.html">Cluster Launcher Commands</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/references/ray-cluster-configuration.html">Cluster YAML Configuration Options</a></li>
 </ul>
@@ -1269,8 +1248,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/metrics.html">Collecting and monitoring metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/configure-manage-dashboard.html">Configuring and Managing Ray Dashboard</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/running-applications/job-submission/quickstart.html">Quickstart using the Ray Jobs CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/running-applications/job-submission/sdk.html">Python SDK Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
@@ -1283,7 +1262,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/faq.html">FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/cli.html">Cluster Management CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/running-applications/job-submission/cli.html">Ray Jobs CLI API Reference</a></li>
@@ -1293,7 +1272,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/usage-stats.html">Usage Stats Collection</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/design-overview.html">Design Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/management.html">Virtual Cluster Management API</a></li>
@@ -1301,15 +1280,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Monitoring and Debugging</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Monitoring and Debugging</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../getting-started.html">Ray Dashboard</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
 <li class="toctree-l2"><a class="reference internal" href="../key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">User Guides</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l3 has-children"><a class="reference internal" href="debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">User Guides</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="debug-apps/general-debugging.html">General Debugging</a></li>
 <li class="toctree-l4"><a class="reference internal" href="debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="debug-apps/debug-hangs.html">Debugging Hangs</a></li>
@@ -1329,7 +1308,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="ray-tracing.html">Tracing</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../reference/api.html">State API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../reference/cli.html">State CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../reference/system-metrics.html">System Metrics</a></li>
@@ -1337,10 +1316,10 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-contribute/stability.html">API Stability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-contribute/api-policy.html">API Policy</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-contribute/development.html">Building Ray from Source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-contribute/ci.html">CI Testing Workflow on PRs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-contribute/docs.html">Contributing to the Ray Documentation</a></li>
@@ -1423,12 +1402,12 @@ document.write(`
 <p>This guide helps you understand and modify the configuration of Ray’s logging system.</p>
 <section id="logging-directory">
 <span id="id1"></span><h2>Logging directory<a class="headerlink" href="#logging-directory" title="Link to this heading">#</a></h2>
-<p>By default, Ray log files are stored in a <code class="docutils literal notranslate"><span class="pre">/tmp/ray/session_*/logs</span></code> directory. View the <a class="reference internal" href="#logging-directory-structure"><span class="std std-ref">log files in logging directory</span></a> below to understand how they are organized within the logs folder.</p>
+<p>By default, Ray stores the log files in a <code class="docutils literal notranslate"><span class="pre">/tmp/ray/session_*/logs</span></code> directory. View the <a class="reference internal" href="#logging-directory-structure"><span class="std std-ref">log files in logging directory</span></a> below to understand how Ray organizes the log files within the logs folder.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Ray uses <code class="docutils literal notranslate"><span class="pre">/tmp/ray</span></code> (for Linux and macOS) as the default temp directory. To change the temp and the logging directory, specify it when you call <code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">start</span></code> or <code class="docutils literal notranslate"><span class="pre">ray.init()</span></code>.</p>
+<p>For Linux and macOS, Ray uses <code class="docutils literal notranslate"><span class="pre">/tmp/ray</span></code> as the default temp directory. To change the temp and the logging directory, specify it when you call <code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">start</span></code> or <code class="docutils literal notranslate"><span class="pre">ray.init()</span></code>.</p>
 </div>
-<p>A new Ray session creates a new folder to the temp directory. The latest session folder is symlinked to <code class="docutils literal notranslate"><span class="pre">/tmp/ray/session_latest</span></code>. Here is an example temp directory:</p>
+<p>A new Ray session creates a new folder to the temp directory. Ray symlinks the latest session folder to <code class="docutils literal notranslate"><span class="pre">/tmp/ray/session_latest</span></code>. Here is an example temp directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── tmp/ray
 │   ├── session_latest
 │   │   ├── logs
@@ -1440,13 +1419,13 @@ document.write(`
 │   ├── ...
 </pre></div>
 </div>
-<p>Usually, temp directories are cleared up whenever the machines reboot. As a result, log files may get lost whenever your cluster or some of the nodes are stopped or terminated.</p>
-<p>If you need to inspect logs after the clusters stop or terminate, you need to store and persist the logs. See the instructions for how to process and export logs for <a class="reference internal" href="../../cluster/vms/user-guides/logging.html#vm-logging"><span class="std std-ref">Log persistence</span></a> and <a class="reference internal" href="../../cluster/kubernetes/user-guides/persist-kuberay-custom-resource-logs.html#persist-kuberay-custom-resource-logs"><span class="std std-ref">KubeRay Clusters</span></a>.</p>
+<p>Usually, Ray clears up the temp directories whenever the machines reboot. As a result, log files may get lost whenever your cluster or some of the nodes are stopped.</p>
+<p>If you need to inspect logs after the clusters stop, you need to store and persist the logs. See the instructions for how to process and export logs for <a class="reference internal" href="../../cluster/vms/user-guides/logging.html#vm-logging"><span class="std std-ref">Log persistence</span></a> and <a class="reference internal" href="../../cluster/kubernetes/user-guides/persist-kuberay-custom-resource-logs.html#persist-kuberay-custom-resource-logs"><span class="std std-ref">KubeRay Clusters</span></a>.</p>
 </section>
 <section id="log-files-in-logging-directory">
 <span id="logging-directory-structure"></span><h2>Log files in logging directory<a class="headerlink" href="#log-files-in-logging-directory" title="Link to this heading">#</a></h2>
 <p>Below are the log files in the logging directory. Broadly speaking, two types of log files exist: system log files and application log files.
-Note that <code class="docutils literal notranslate"><span class="pre">.out</span></code> logs are from stdout/stderr and <code class="docutils literal notranslate"><span class="pre">.err</span></code> logs are from stderr. The backward compatibility of log directories is not guaranteed.</p>
+Note that <code class="docutils literal notranslate"><span class="pre">.out</span></code> logs are from stdout/stderr and <code class="docutils literal notranslate"><span class="pre">.err</span></code> logs are from stderr. Ray doesn’t guarantee the backward compatibility of log directories.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>System logs may include information about your applications. For example, <code class="docutils literal notranslate"><span class="pre">runtime_env_setup-[job_id].log</span></code> may include information about your application’s environment and dependency.</p>
@@ -1455,28 +1434,28 @@ Note that <code class="docutils literal notranslate"><span class="pre">.out</spa
 <h3>Application logs<a class="headerlink" href="#application-logs" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">job-driver-[submission_id].log</span></code>: The stdout of a job submitted with the <a class="reference internal" href="../../cluster/running-applications/job-submission/index.html#jobs-overview"><span class="std std-ref">Ray Jobs API</span></a>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">worker-[worker_id]-[job_id]-[pid].[out|err]</span></code>: Python or Java part of Ray drivers and workers. All stdout and stderr from Tasks or Actors are streamed to these files. Note that job_id is the ID of the driver.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">worker-[worker_id]-[job_id]-[pid].[out|err]</span></code>: Python or Java part of Ray drivers and workers. Ray streams all stdout and stderr from Tasks or Actors to these files. Note that job_id is the ID of the driver.</p></li>
 </ul>
 </section>
 <section id="system-component-logs">
-<h3>System (component) logs<a class="headerlink" href="#system-component-logs" title="Link to this heading">#</a></h3>
+<h3>System/component logs<a class="headerlink" href="#system-component-logs" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">dashboard.[log|err]</span></code>: A log file of a Ray Dashboard. <code class="docutils literal notranslate"><span class="pre">.log</span></code> files contain logs generated from the dashboard’s logger. <code class="docutils literal notranslate"><span class="pre">.err</span></code> files contain stdout and stderr printed from the dashboard. They are usually empty except when the dashboard crashes unexpectedly.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dashboard.[log|err]</span></code>: A log file of a Ray Dashboard. <code class="docutils literal notranslate"><span class="pre">.log</span></code> files contain logs generated from the dashboard’s logger. <code class="docutils literal notranslate"><span class="pre">.err</span></code> files contain stdout and stderr printed from the dashboard. They’re usually empty except when the dashboard crashes unexpectedly.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dashboard_agent.log</span></code>: Every Ray node has one dashboard agent. This is a log file of the agent.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">gcs_server.[out|err]</span></code>: The GCS server is a stateless server that manages Ray cluster metadata. It exists only in the head node.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">io-worker-[worker_id]-[pid].[out|err]</span></code>: Ray creates IO workers to spill/restore objects to external storage by default from Ray 1.3+. This is a log file of IO workers.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">log_monitor.[log|err]</span></code>: The log monitor is in charge of streaming logs to the driver. <code class="docutils literal notranslate"><span class="pre">.log</span></code> files contain logs generated from the log monitor’s logger. <code class="docutils literal notranslate"><span class="pre">.err</span></code> files contain the stdout and stderr printed from the log monitor. They are usually empty except when the log monitor crashes unexpectedly.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_monitor.[log|err]</span></code>: The log monitor is in charge of streaming logs to the driver. <code class="docutils literal notranslate"><span class="pre">.log</span></code> files contain logs generated from the log monitor’s logger. <code class="docutils literal notranslate"><span class="pre">.err</span></code> files contain the stdout and stderr printed from the log monitor. They’re usually empty except when the log monitor crashes unexpectedly.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">monitor.[out|err]</span></code>: Stdout and stderr of a cluster launcher.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">monitor.log</span></code>: Ray’s Cluster Launcher operates from a monitor process. It also manages the Autoscaler.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">plasma_store.[out|err]</span></code>: Deprecated.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">python-core-driver-[worker_id]_[pid].log</span></code>: Ray drivers consist of CPP core and a Python or Java frontend. CPP code generates this log file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">python-core-worker-[worker_id]_[pid].log</span></code>: Ray workers consist of CPP core and a Python or Java frontend. CPP code generates this log file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">python-core-driver-[worker_id]_[pid].log</span></code>: Ray drivers consist of C++ core and a Python or Java frontend. C++ code generates this log file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">python-core-worker-[worker_id]_[pid].log</span></code>: Ray workers consist of C++ core and a Python or Java frontend. C++ code generates this log file.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">raylet.[out|err]</span></code>: A log file of raylets.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">redis-shard_[shard_index].[out|err]</span></code>: Redis shard log files.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">redis.[out|err]</span></code>: Redis log files.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">runtime_env_agent.log</span></code>: Every Ray node has one agent that manages <a class="reference internal" href="../../ray-core/handling-dependencies.html#runtime-environments"><span class="std std-ref">Runtime Environment</span></a> creation, deletion, and caching.
 This is the log file of the agent containing logs of create or delete requests and cache hits and misses.
-For the logs of the actual installations (for example, <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> logs), see the <code class="docutils literal notranslate"><span class="pre">runtime_env_setup-[job_id].log</span></code> file (see below).</p></li>
+The logs of the actual installations for <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> logs are in the following <code class="docutils literal notranslate"><span class="pre">runtime_env_setup-[job_id].log</span></code> file.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">runtime_env_setup-ray_client_server_[port].log</span></code>: Logs from installing <a class="reference internal" href="../../ray-core/handling-dependencies.html#runtime-environments"><span class="std std-ref">Runtime Environments</span></a> for a job when connecting with <a class="reference internal" href="../../cluster/running-applications/job-submission/ray-client.html#ray-client-ref"><span class="std std-ref">Ray Client</span></a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">runtime_env_setup-[job_id].log</span></code>: Logs from installing <a class="reference internal" href="../../ray-core/handling-dependencies.html#runtime-environments"><span class="std std-ref">runtime environments</span></a> for a Task, Actor, or Job. This file is only present if you install a runtime environment.</p></li>
 </ul>
@@ -1509,14 +1488,14 @@ For the logs of the actual installations (for example, <code class="docutils lit
 <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">actor</span><span class="o">.</span><span class="n">ready</span><span class="o">.</span><span class="n">remote</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>All stdout emitted from the <code class="docutils literal notranslate"><span class="pre">print</span></code> method are printed to the driver with a <code class="docutils literal notranslate"><span class="pre">(Task</span> <span class="pre">or</span> <span class="pre">Actor</span> <span class="pre">repr,</span> <span class="pre">process</span> <span class="pre">ID,</span> <span class="pre">IP</span> <span class="pre">address)</span></code> prefix.</p>
+<p>Ray prints all stdout emitted from the <code class="docutils literal notranslate"><span class="pre">print</span></code> method to the driver with a <code class="docutils literal notranslate"><span class="pre">(Task</span> <span class="pre">or</span> <span class="pre">Actor</span> <span class="pre">repr,</span> <span class="pre">process</span> <span class="pre">ID,</span> <span class="pre">IP</span> <span class="pre">address)</span></code> prefix.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span><span class="nv">pid</span><span class="o">=</span><span class="m">45601</span><span class="o">)</span><span class="w"> </span>task
 <span class="o">(</span>Actor<span class="w"> </span><span class="nv">pid</span><span class="o">=</span><span class="m">480956</span><span class="o">)</span><span class="w"> </span>actor
 </pre></div>
 </div>
 <section id="customizing-prefixes-for-actor-logs">
 <h3>Customizing prefixes for Actor logs<a class="headerlink" href="#customizing-prefixes-for-actor-logs" title="Link to this heading">#</a></h3>
-<p>It is often useful to distinguish between log messages from different Actors. For example, if you have a large number of worker Actors, you may want to easily see the index of the Actor that logged a particular message. Define the <code class="docutils literal notranslate"><span class="pre">__repr__</span> <span class="pre">&lt;https://docs.python.org/3/library/functions.html#repr&gt;</span></code>__ method for the Actor class to replace the Actor name with the Actor repr. For example:</p>
+<p>It’s often useful to distinguish between log messages from different Actors. For example, if you have a large number of worker Actors, you may want to easily see the index of the Actor that logged a particular message. Define the <code class="docutils literal notranslate"><span class="pre">__repr__</span> <span class="pre">&lt;https://docs.python.org/3/library/functions.html#repr&gt;</span></code>__ method for the Actor class to replace the Actor name with the Actor repr. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
 
 
@@ -1547,15 +1526,17 @@ For the logs of the actual installations (for example, <code class="docutils lit
 <section id="coloring-actor-log-prefixes">
 <h3>Coloring Actor log prefixes<a class="headerlink" href="#coloring-actor-log-prefixes" title="Link to this heading">#</a></h3>
 <p>By default, Ray prints Actor log prefixes in light blue.
-Turn color logging off by setting the environment variable <code class="docutils literal notranslate"><span class="pre">RAY_COLOR_PREFIX=0</span></code>
-(for example, when outputting logs to a file or other location that does not support ANSI codes).
+Turn color logging off by setting the environment variable <code class="docutils literal notranslate"><span class="pre">RAY_COLOR_PREFIX=0</span></code></p>
+<ul class="simple">
+<li><p>for example, when outputting logs to a file or other location that doesn’t support ANSI codes.
 Or activate multi-color prefixes by setting the environment variable <code class="docutils literal notranslate"><span class="pre">RAY_COLOR_PREFIX=1</span></code>;
-this indexes into an array of colors modulo the PID of each process.</p>
+this indexes into an array of colors modulo the PID of each process.</p></li>
+</ul>
 <p><img alt="coloring-actor-log-prefixes" src="../../_images/coloring-actor-log-prefixes.png" /></p>
 </section>
 <section id="disable-logging-to-the-driver">
 <h3>Disable logging to the driver<a class="headerlink" href="#disable-logging-to-the-driver" title="Link to this heading">#</a></h3>
-<p>In large scale runs, routing all worker logs to the driver may be unwanted. Disable this feature by setting <code class="docutils literal notranslate"><span class="pre">log_to_driver=False</span></code> in <code class="docutils literal notranslate"><span class="pre">ray.init</span></code>:</p>
+<p>In large scale runs, you may not want to route all worker logs to the driver. Disable this feature by setting <code class="docutils literal notranslate"><span class="pre">log_to_driver=False</span></code> in <code class="docutils literal notranslate"><span class="pre">ray.init</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
 
 <span class="c1"># Task and Actor logs are not copied to the driver stdout.</span>
@@ -1566,7 +1547,7 @@ this indexes into an array of colors modulo the PID of each process.</p>
 </section>
 <section id="log-deduplication">
 <h2>Log deduplication<a class="headerlink" href="#log-deduplication" title="Link to this heading">#</a></h2>
-<p>By default, Ray deduplicates logs that appear redundantly across multiple processes. The first instance of each log message is always immediately printed. However, subsequent log messages of the same pattern (ignoring words with numeric components) are buffered for up to five seconds and printed in batch. For example, for the following code snippet:</p>
+<p>By default, Ray deduplicates logs that appear redundantly across multiple processes. The first instance of each log message is always immediately printed. However, Ray buffers subsequent log messages of the same pattern for up to five seconds and prints them in batch. Note that Ray also ignores words with numeric components. For example, for the following code snippet:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
 <span class="kn">import</span> <span class="nn">random</span>
 
@@ -1644,8 +1625,8 @@ this indexes into an array of colors modulo the PID of each process.</p>
 </li>
 </ul>
 </section>
-<section id="distributed-progress-bars-tqdm">
-<h2>Distributed progress bars (tqdm)<a class="headerlink" href="#distributed-progress-bars-tqdm" title="Link to this heading">#</a></h2>
+<section id="distributed-progress-bars-with-tqdm">
+<h2>Distributed progress bars with tqdm<a class="headerlink" href="#distributed-progress-bars-with-tqdm" title="Link to this heading">#</a></h2>
 <p>When using <a class="reference external" href="https://tqdm.github.io">tqdm</a> in Ray remote Tasks or Actors, you may notice that the progress bar output is corrupted. To avoid this problem, use the Ray distributed tqdm implementation at <code class="docutils literal notranslate"><span class="pre">ray.experimental.tqdm_ray</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">ray</span>
@@ -1665,21 +1646,21 @@ this indexes into an array of colors modulo the PID of each process.</p>
 </div>
 <p>This tqdm implementation works as follows:</p>
 <ol class="arabic simple">
-<li><p>The <code class="docutils literal notranslate"><span class="pre">tqdm_ray</span></code> module translates TQDM calls into special JSON log messages written to the worker stdout.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">tqdm_ray</span></code> module translates tqdm calls into special JSON log messages written to the worker stdout.</p></li>
 <li><p>The Ray log monitor routes these log messages to a tqdm singleton, instead of copying them directly to the driver stdout.</p></li>
 <li><p>The tqdm singleton determines the positions of progress bars from various Ray Tasks or Actors, ensuring they don’t collide or conflict with each other.</p></li>
 </ol>
 <p>Limitations:</p>
 <ul class="simple">
-<li><p>Only a subset of tqdm functionality is supported. Refer to the ray_tqdm <a class="reference external" href="https://github.com/ray-project/ray/blob/master/python/ray/experimental/tqdm_ray.py">implementation</a> for more details.</p></li>
-<li><p>Performance may be poor if there are more than a couple thousand updates per second (updates are not batched).</p></li>
+<li><p>Ray only supports a subset of tqdm features. Refer to the ray_tqdm <a class="reference external" href="https://github.com/ray-project/ray/blob/master/python/ray/experimental/tqdm_ray.py">implementation</a> for more details.</p></li>
+<li><p>Performance may be poor if there are more than a couple thousand updates per second because Ray doesn’t batch updates.</p></li>
 </ul>
-<p>By default, the built-in print is also be patched to use <code class="docutils literal notranslate"><span class="pre">ray.experimental.tqdm_ray.safe_print</span></code> when <code class="docutils literal notranslate"><span class="pre">tqdm_ray</span></code> is used.
-This avoids progress bar corruption on driver print statements. To disable this, set <code class="docutils literal notranslate"><span class="pre">RAY_TQDM_PATCH_PRINT=0</span></code>.</p>
+<p>By default, the built-in print is also patched to use <code class="docutils literal notranslate"><span class="pre">ray.experimental.tqdm_ray.safe_print</span></code> when you use <code class="docutils literal notranslate"><span class="pre">tqdm_ray</span></code>.
+This avoids progress bar corruption on driver print statements. To turn off this, set <code class="docutils literal notranslate"><span class="pre">RAY_TQDM_PATCH_PRINT=0</span></code>.</p>
 </section>
 <section id="using-rays-logger">
 <h2>Using Ray’s logger<a class="headerlink" href="#using-rays-logger" title="Link to this heading">#</a></h2>
-<p>When <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">ray</span></code> is executed, Ray’s logger is initialized, generating a default configuration given in <code class="docutils literal notranslate"><span class="pre">python/ray/_private/log.py</span></code>. The default logging level is <code class="docutils literal notranslate"><span class="pre">logging.INFO</span></code>.</p>
+<p>When Ray executes <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">ray</span></code>, Ray initializes Ray’s logger, generating a default configuration given in <code class="docutils literal notranslate"><span class="pre">python/ray/_private/log.py</span></code>. The default logging level is <code class="docutils literal notranslate"><span class="pre">logging.INFO</span></code>.</p>
 <p>All Ray loggers are automatically configured in <code class="docutils literal notranslate"><span class="pre">ray._private.ray_logging</span></code>. To modify the Ray logger:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
 
@@ -1701,7 +1682,7 @@ This avoids progress bar corruption on driver print statements. To disable this,
 <span class="n">ray_data_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
 
 <span class="c1"># Other loggers can be modified similarly.</span>
-<span class="c1"># Here&#39;s how to add an aditional file handler for Ray Tune:</span>
+<span class="c1"># Here&#39;s how to add an additional file handler for Ray Tune:</span>
 <span class="n">ray_tune_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s2">&quot;extra_ray_tune_log.log&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -1828,9 +1809,14 @@ Ray libraries</label><div class="sd-tab-content docutils">
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">encoding</span></code>: The encoding format for the logs. The default is <code class="docutils literal notranslate"><span class="pre">TEXT</span></code> for plain text logs.
 The other option is <code class="docutils literal notranslate"><span class="pre">JSON</span></code> for structured logs.
-In both <code class="docutils literal notranslate"><span class="pre">TEXT</span></code> and <code class="docutils literal notranslate"><span class="pre">JSON</span></code> encoding formats, the logs include Ray-specific fields such as <code class="docutils literal notranslate"><span class="pre">job_id</span></code>, <code class="docutils literal notranslate"><span class="pre">worker_id</span></code>, <code class="docutils literal notranslate"><span class="pre">node_id</span></code>, <code class="docutils literal notranslate"><span class="pre">actor_id</span></code>, and <code class="docutils literal notranslate"><span class="pre">task_id</span></code>, if available.</p></li>
+In both <code class="docutils literal notranslate"><span class="pre">TEXT</span></code> and <code class="docutils literal notranslate"><span class="pre">JSON</span></code> encoding formats, the logs include Ray-specific fields such as <code class="docutils literal notranslate"><span class="pre">job_id</span></code>, <code class="docutils literal notranslate"><span class="pre">worker_id</span></code>, <code class="docutils literal notranslate"><span class="pre">node_id</span></code>, <code class="docutils literal notranslate"><span class="pre">actor_id</span></code>, <code class="docutils literal notranslate"><span class="pre">actor_name</span></code>, <code class="docutils literal notranslate"><span class="pre">task_id</span></code>, <code class="docutils literal notranslate"><span class="pre">task_name</span></code> and <code class="docutils literal notranslate"><span class="pre">task_function_name</span></code>, if available.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">log_level</span></code>: The log level for the driver process. The default is <code class="docutils literal notranslate"><span class="pre">INFO</span></code>.
 Available log levels are defined in the <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging-levels">Python logging library</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">additional_log_standard_attrs</span></code>: Since Ray version 2.43. A list of additional
+standard Python logger attributes to include in the log record. The default is an empty
+list. The list of already included standard attributes are: <code class="docutils literal notranslate"><span class="pre">asctime</span></code>, <code class="docutils literal notranslate"><span class="pre">levelname</span></code>,
+<code class="docutils literal notranslate"><span class="pre">message</span></code>, <code class="docutils literal notranslate"><span class="pre">filename</span></code>, <code class="docutils literal notranslate"><span class="pre">lineno</span></code>, <code class="docutils literal notranslate"><span class="pre">exc_text</span></code>. The list of all valid attributes are
+specified in the <a class="reference external" href="http://docs.python.org/library/logging.html#logrecord-attributes">Python logging library</a>.</p></li>
 </ul>
 <p>When you set up <code class="docutils literal notranslate"><span class="pre">logging_config</span></code> in <code class="docutils literal notranslate"><span class="pre">ray.init</span></code>, it configures the root loggers for the driver process, Ray actors, and Ray tasks.</p>
 <div class="admonition-note admonition">
@@ -1843,7 +1829,7 @@ not JSON parsable.</p>
 <section id="method-2-configure-structured-logging-with-an-environment-variable">
 <h5>Method 2: Configure structured logging with an environment variable<a class="headerlink" href="#method-2-configure-structured-logging-with-an-environment-variable" title="Link to this heading">#</a></h5>
 <p>You can set the <code class="docutils literal notranslate"><span class="pre">RAY_LOGGING_CONFIG_ENCODING</span></code> environment variable to <code class="docutils literal notranslate"><span class="pre">TEXT</span></code> or <code class="docutils literal notranslate"><span class="pre">JSON</span></code> to set the encoding format for the logs.
-Note that the environment variable needs to be set before <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">ray</span></code>.</p>
+Note that you need to set the environment variables before <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">ray</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;RAY_LOGGING_CONFIG_ENCODING&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;JSON&quot;</span>
 
@@ -1860,7 +1846,7 @@ Note that the environment variable needs to be set before <code class="docutils 
 <h4>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h4>
 <p>The following example configures the <code class="docutils literal notranslate"><span class="pre">LoggingConfig</span></code> to output logs in a structured JSON format and sets the log level to <code class="docutils literal notranslate"><span class="pre">INFO</span></code>.
 It then logs messages with the root loggers in the driver process, Ray tasks, and Ray actors.
-The logs include Ray-specific fields such as <code class="docutils literal notranslate"><span class="pre">job_id</span></code>, <code class="docutils literal notranslate"><span class="pre">worker_id</span></code>, <code class="docutils literal notranslate"><span class="pre">node_id</span></code>, <code class="docutils literal notranslate"><span class="pre">actor_id</span></code>, and <code class="docutils literal notranslate"><span class="pre">task_id</span></code>.</p>
+The logs include Ray-specific fields such as <code class="docutils literal notranslate"><span class="pre">job_id</span></code>, <code class="docutils literal notranslate"><span class="pre">worker_id</span></code>, <code class="docutils literal notranslate"><span class="pre">node_id</span></code>, <code class="docutils literal notranslate"><span class="pre">actor_id</span></code>, <code class="docutils literal notranslate"><span class="pre">actor_name</span></code>, <code class="docutils literal notranslate"><span class="pre">task_id</span></code>, <code class="docutils literal notranslate"><span class="pre">task_name</span></code> and <code class="docutils literal notranslate"><span class="pre">task_function_name</span></code> when applicable.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
@@ -2015,8 +2001,8 @@ Node</label><div class="sd-tab-content docutils">
 </section>
 <section id="log-rotation">
 <span id="id4"></span><h2>Log rotation<a class="headerlink" href="#log-rotation" title="Link to this heading">#</a></h2>
-<p>Ray supports log rotation of log files. Note that not all components support log rotation. (Raylet, Python, and Java worker logs do not rotate).</p>
-<p>By default, logs rotate when they reach 512MB (maxBytes), and have a maximum of five backup files (backupCount). Indexes are appended to all backup files (e.g., <code class="docutils literal notranslate"><span class="pre">raylet.out.1</span></code>)
+<p>Ray supports log rotation of log files. Note that not all components support log rotation. (Raylet, Python, and Java worker logs don’t rotate).</p>
+<p>By default, logs rotate when they reach 512 MB (maxBytes), and have a maximum of five backup files (backupCount). Ray appends indexes to all backup files - for example, <code class="docutils literal notranslate"><span class="pre">raylet.out.1</span></code>.
 To change the log rotation configuration, specify environment variables. For example,</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">RAY_ROTATION_MAX_BYTES</span><span class="o">=</span><span class="m">1024</span><span class="p">;</span><span class="w"> </span>ray<span class="w"> </span>start<span class="w"> </span>--head<span class="w"> </span><span class="c1"># Start a ray instance with maxBytes 1KB.</span>
 <span class="nv">RAY_ROTATION_BACKUP_COUNT</span><span class="o">=</span><span class="m">1</span><span class="p">;</span><span class="w"> </span>ray<span class="w"> </span>start<span class="w"> </span>--head<span class="w"> </span><span class="c1"># Start a ray instance with backupCount 1.</span>
@@ -2026,7 +2012,7 @@ To change the log rotation configuration, specify environment variables. For exa
 </section>
 <section id="log-persistence">
 <h2>Log persistence<a class="headerlink" href="#log-persistence" title="Link to this heading">#</a></h2>
-<p>To process and export logs to external stroage or management systems, view <a class="reference internal" href="../../cluster/kubernetes/user-guides/persist-kuberay-custom-resource-logs.html#persist-kuberay-custom-resource-logs"><span class="std std-ref">log persistence on Kubernetes</span></a> see <a class="reference internal" href="../../cluster/vms/user-guides/logging.html#vm-logging"><span class="std std-ref">log persistence on VMs</span></a> for more details.</p>
+<p>To process and export logs to external storage or management systems, view <a class="reference internal" href="../../cluster/kubernetes/user-guides/persist-kuberay-custom-resource-logs.html#persist-kuberay-custom-resource-logs"><span class="std std-ref">log persistence on Kubernetes</span></a> see <a class="reference internal" href="../../cluster/vms/user-guides/logging.html#vm-logging"><span class="std std-ref">log persistence on VMs</span></a> for more details.</p>
 </section>
 </section>
 
@@ -2076,7 +2062,7 @@ To change the log rotation configuration, specify environment variables. For exa
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logging-directory">Logging directory</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#log-files-in-logging-directory">Log files in logging directory</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#application-logs">Application logs</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#system-component-logs">System (component) logs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#system-component-logs">System/component logs</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#redirecting-worker-logs-to-the-driver">Redirecting Worker logs to the Driver</a><ul class="nav section-nav flex-column">
@@ -2086,7 +2072,7 @@ To change the log rotation configuration, specify environment variables. For exa
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#log-deduplication">Log deduplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distributed-progress-bars-tqdm">Distributed progress bars (tqdm)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distributed-progress-bars-with-tqdm">Distributed progress bars with tqdm</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-rays-logger">Using Ray’s logger</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-ray-logger-for-application-logs">Using Ray logger for application logs</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#customizing-worker-process-loggers">Customizing worker process loggers</a></li>

@@ -68,8 +68,8 @@
     <link rel="canonical" href="https://docs.ray.io/en/latest/tune/examples/tune_mnist_keras.html" />
     <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="next" title="How to use Tune with PyTorch" href="tune-pytorch-cifar.html" />
-    <link rel="prev" title="Examples using Ray Tune with ML Frameworks" href="ml-frameworks.html" /><!-- Extra header to include at the top of each template.
+    <link rel="next" title="Using Horovod with Tune" href="horovod_simple.html" />
+    <link rel="prev" title="Using RLlib with Tune" href="pbt_ppo_example.html" /><!-- Extra header to include at the top of each template.
 Kept separately so that it can easily be included in any templates
 that need to be overridden for individual pages; e.g. included
 both in the usual template (layout.html) as well as (index.html). -->
@@ -607,10 +607,11 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
@@ -754,14 +755,14 @@ document.write(`
 </li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Ray Tune Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">Keras Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tune-pytorch-cifar.html">PyTorch Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pbt_ppo_example.html">Ray RLlib Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tune-xgboost.html">XGBoost Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="horovod_simple.html">Horovod Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">Keras Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="horovod_simple.html">Horovod Example</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -814,30 +815,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../serve/model-multiplexing.html">Model Multiplexing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/configure-serve-deployment.html">Configure Ray Serve deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/http-guide.html">Set Up FastAPI and HTTP</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../serve/llm/overview.html">Overview</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../serve/llm/api.html">Ray Serve LLM API</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.builders.build_vllm_deployment.html">ray.serve.llm.builders.build_vllm_deployment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.builders.build_openai_app.html">ray.serve.llm.builders.build_openai_app</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.LLMConfig.html">ray.serve.llm.configs.LLMConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.LLMServingArgs.html">ray.serve.llm.configs.LLMServingArgs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.ModelLoadingConfig.html">ray.serve.llm.configs.ModelLoadingConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.CloudMirrorConfig.html">ray.serve.llm.configs.CloudMirrorConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.LoraConfig.html">ray.serve.llm.configs.LoraConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.deployments.VLLMService.html">ray.serve.llm.deployments.VLLMService</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.deployments.LLMRouter.html">ray.serve.llm.deployments.LLMRouter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html">ray.serve.llm.openai_api_models.ChatCompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionRequest.html">ray.serve.llm.openai_api_models.CompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionStreamResponse.html">ray.serve.llm.openai_api_models.ChatCompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionResponse.html">ray.serve.llm.openai_api_models.ChatCompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html">ray.serve.llm.openai_api_models.CompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionResponse.html">ray.serve.llm.openai_api_models.CompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ErrorResponse.html">ray.serve.llm.openai_api_models.ErrorResponse</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../serve/llm/serving-llms.html">Serving LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/production-guide/config.html">Serve Config Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/production-guide/kubernetes.html">Deploy on Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/production-guide/docker.html">Custom Docker Images</a></li>
@@ -849,7 +828,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../serve/monitoring.html">Monitor Your Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/resource-allocation.html">Resource Allocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/autoscaling-guide.html">Ray Serve Autoscaling</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/advanced-guides/app-builder-guide.html">Pass Arguments to Applications</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/advanced-guides/advanced-autoscaling.html">Advanced Ray Serve Autoscaling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/advanced-guides/performance.html">Performance Tuning</a></li>
@@ -867,10 +846,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../serve/api/index.html">Ray Serve API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/key-concepts.html">Key concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/multi-agent-envs.html">Multi-Agent Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/hierarchical-envs.html">Hierarchical Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/external-envs.html">External Environments and Applications</a></li>
@@ -878,7 +857,7 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/algorithm-config.html">AlgorithmConfig API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/rllib-algorithms.html">Algorithms</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/rllib-advanced-api.html">Advanced Python APIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/checkpoints.html">Checkpointing</a></li>
@@ -905,8 +884,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/rllib-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/new-api-stack-migration-guide.html">New API stack migration guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
@@ -928,7 +907,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
@@ -947,7 +926,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html">ray.rllib.callbacks.callbacks.RLlibCallback</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end</a></li>
@@ -963,7 +942,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/env_runner.html">EnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/single_agent_env_runner.html">SingleAgentEnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/single_agent_episode.html">SingleAgentEpisode API</a></li>
@@ -973,7 +952,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/utils.html">Env Utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.build</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class</a></li>
@@ -1016,7 +995,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html">ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.html">ray.rllib.models.distributions.Distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html">ray.rllib.models.distributions.Distribution.from_logits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html">ray.rllib.models.distributions.Distribution.sample</a></li>
@@ -1025,14 +1004,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html">ray.rllib.models.distributions.Distribution.kl</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html">ray.rllib.core.learner.learner_group.LearnerGroup</a></li>
 </ul>
 </li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners</a></li>
@@ -1053,7 +1032,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs.html">ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit.html">ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer.html">ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html">ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer</a></li>
@@ -1068,7 +1047,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html">ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
@@ -1114,12 +1093,12 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/joblib.html">Distributed Scikit-learn / Joblib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/multiprocessing.html">Distributed multiprocessing.Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/ray-collective.html">Ray Collective Communication Lib</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.ray_active.html">ray.util.dask.RayDaskCallback.ray_active</a></li>
 </ul>
 </li>
@@ -1134,7 +1113,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../workflows/index.html">Ray Workflows (Alpha)</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/basics.html">Getting Started</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/management.html">Workflow Management</a></li>
@@ -1142,7 +1121,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/events.html">Events</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/comparison.html">API Comparisons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/advanced.html">Advanced Topics</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../workflows/api/execution.html">Workflow Execution API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../workflows/api/management.html">Workflow Management API</a></li>
 </ul>
@@ -1151,16 +1130,16 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
@@ -1205,7 +1184,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/reduce-image-pull-latency.html">Reducing image pull latency on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/ml-example.html">Ray Train XGBoostTrainer on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/gpu-training-example.html">Train PyTorch ResNet model with GPUs on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/mnist-training-example.html">Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes</a></li>
@@ -1221,7 +1200,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/vllm-rayservice.html">Serve a Large Language Model with vLLM on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/ingress.html">Ingress</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/prometheus-grafana.html">Using Prometheus and Grafana</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/pyspy.html">Profiling with py-spy</a></li>
@@ -1231,12 +1210,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/istio.html">mTLS and L7 observability with Istio</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/benchmarks/memory-scalability-benchmark.html">KubeRay memory and scalability benchmark</a></li>
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting/troubleshooting.html">Troubleshooting guide</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html">RayService troubleshooting</a></li>
@@ -1245,9 +1224,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/kubernetes/references.html">API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/vms/getting-started.html">Getting Started</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/user-guides/launching-clusters/index.html">Launching Ray Clusters on AWS, GCP, Azure, vSphere, On-Prem</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/user-guides/large-cluster-best-practices.html">Best practices for deploying large clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/user-guides/configuring-autoscaling.html">Configuring Autoscaling</a></li>
@@ -1256,11 +1235,11 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/examples/ml-example.html">Ray Train XGBoostTrainer on VMs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/references/ray-cluster-cli.html">Cluster Launcher Commands</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/references/ray-cluster-configuration.html">Cluster YAML Configuration Options</a></li>
 </ul>
@@ -1269,8 +1248,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/metrics.html">Collecting and monitoring metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/configure-manage-dashboard.html">Configuring and Managing Ray Dashboard</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/running-applications/job-submission/quickstart.html">Quickstart using the Ray Jobs CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/running-applications/job-submission/sdk.html">Python SDK Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
@@ -1283,7 +1262,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/faq.html">FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/cli.html">Cluster Management CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/running-applications/job-submission/cli.html">Ray Jobs CLI API Reference</a></li>
@@ -1293,7 +1272,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/usage-stats.html">Usage Stats Collection</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/design-overview.html">Design Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/management.html">Virtual Cluster Management API</a></li>
@@ -1301,15 +1280,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-observability/getting-started.html">Ray Dashboard</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
 <li class="toctree-l2"><a class="reference internal" href="../../ray-observability/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
@@ -1329,7 +1308,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../ray-observability/user-guides/ray-tracing.html">Tracing</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-observability/reference/api.html">State API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-observability/reference/cli.html">State CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-observability/reference/system-metrics.html">System Metrics</a></li>
@@ -1337,10 +1316,10 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-contribute/stability.html">API Stability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-contribute/api-policy.html">API Policy</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-contribute/development.html">Building Ray from Source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-contribute/ci.html">CI Testing Workflow on PRs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-contribute/docs.html">Contributing to the Ray Documentation</a></li>
@@ -1432,21 +1411,26 @@ document.write(`
 <a class="reference external image-reference" href="https://keras.io"><img alt="Keras &amp; TensorFlow Logo" class="align-center" src="../../_images/tf_keras_logo.jpeg" style="height: 120px;" /></a>
 <nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#example" id="id1">Example</a></p></li>
-<li><p><a class="reference internal" href="#more-keras-and-tensorflow-examples" id="id2">More Keras and TensorFlow Examples</a></p></li>
+<li><p><a class="reference internal" href="#prerequisites" id="id1">Prerequisites</a></p></li>
+<li><p><a class="reference internal" href="#example" id="id2">Example</a></p></li>
+<li><p><a class="reference internal" href="#more-keras-and-tensorflow-examples" id="id3">More Keras and TensorFlow Examples</a></p></li>
 </ul>
 </nav>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;ray[tune]&quot;</span> <span class="pre">tensorflow==2.18.0</span> <span class="pre">filelock</span></code></p></li>
+</ul>
+</section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<div class="cell tag_hide-output docutils container">
+<div class="cell_input above-output-prompt docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">filelock</span> <span class="kn">import</span> <span class="n">FileLock</span>
 <span class="kn">from</span> <span class="nn">tensorflow.keras.datasets</span> <span class="kn">import</span> <span class="n">mnist</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
 <span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
 <span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">AsyncHyperBandScheduler</span>
 <span class="kn">from</span> <span class="nn">ray.air.integrations.keras</span> <span class="kn">import</span> <span class="n">ReportCheckpointCallback</span>
@@ -1474,7 +1458,7 @@ document.write(`
 
     <span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
         <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;sparse_categorical_crossentropy&quot;</span><span class="p">,</span>
-        <span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;lr&quot;</span><span class="p">],</span> <span class="n">momentum</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;momentum&quot;</span><span class="p">]),</span>
+        <span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">],</span> <span class="n">momentum</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;momentum&quot;</span><span class="p">]),</span>
         <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">],</span>
     <span class="p">)</span>
 
@@ -1485,7 +1469,7 @@ document.write(`
         <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">),</span>
-        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">ReportCheckpointCallback</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mean_accuracy&quot;</span><span class="p">:</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">})],</span>
+        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">ReportCheckpointCallback</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">})],</span>
     <span class="p">)</span>
 
 
@@ -1497,1197 +1481,122 @@ document.write(`
     <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
         <span class="n">tune</span><span class="o">.</span><span class="n">with_resources</span><span class="p">(</span><span class="n">train_mnist</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}),</span>
         <span class="n">tune_config</span><span class="o">=</span><span class="n">tune</span><span class="o">.</span><span class="n">TuneConfig</span><span class="p">(</span>
-            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mean_accuracy&quot;</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span>
             <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">,</span>
             <span class="n">scheduler</span><span class="o">=</span><span class="n">sched</span><span class="p">,</span>
             <span class="n">num_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">run_config</span><span class="o">=</span><span class="n">tune</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;exp&quot;</span><span class="p">,</span>
-            <span class="n">stop</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mean_accuracy&quot;</span><span class="p">:</span> <span class="mf">0.99</span><span class="p">},</span>
+            <span class="n">stop</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="mf">0.99</span><span class="p">},</span>
         <span class="p">),</span>
         <span class="n">param_space</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span>
+            <span class="s2">&quot;learning_rate&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span>
             <span class="s2">&quot;momentum&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span>
             <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
         <span class="p">},</span>
     <span class="p">)</span>
     <span class="n">results</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">results</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best hyperparameters found were: &quot;</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">get_best_result</span><span class="p">()</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    
 
-<span class="n">tune_mnist</span><span class="p">()</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">tune_mnist</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best hyperparameters found were: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">get_best_result</span><span class="p">()</span><span class="o">.</span><span class="n">config</span><span class="si">}</span><span class="s2"> | Accuracy: </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">get_best_result</span><span class="p">()</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<details class="hide below-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell output</span>
+<span class="expanded">Hide code cell output</span>
+</summary>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2022-07-22 16:16:58,114	INFO services.py:1483 -- View the Ray dashboard at <span class=" -Color -Color-Bold -Color-Bold-Green">http://127.0.0.1:8269</span>
-2022-07-22 16:17:00,822	WARNING function_trainable.py:619 -- 
-</pre></div>
-</div>
-<div class="output text_html">== Status ==<br>Current time: 2022-07-22 16:18:36 (running for 00:01:35.04)<br>Memory usage on this node: 9.0/16.0 GiB<br>Using AsyncHyperBand: num_stopped=0
-Bracket: Iter 320.000: None | Iter 80.000: None | Iter 20.000: None<br>Resources requested: 0/16 CPUs, 0/0 GPUs, 0.0/5.47 GiB heap, 0.0/2.0 GiB objects<br>Current best trial: 55a9b_00002 with mean_accuracy=0.9904166460037231 and parameters={'threads': 2, 'lr': 0.09518133271957563, 'momentum': 0.8254987643140009, 'hidden': 258}<br>Result logdir: /Users/kai/ray_results/exp<br>Number of trials: 10/10 (10 TERMINATED)<br><table>
+<div class="output text_html"><div class="tuneStatus">
+  <div style="display: flex;flex-direction: row">
+    <div style="display: flex;flex-direction: column;">
+      <h3>Tune Status</h3>
+      <table>
+<tbody>
+<tr><td>Current time:</td><td>2025-02-13 15:22:41</td></tr>
+<tr><td>Running for: </td><td>00:00:41.76        </td></tr>
+<tr><td>Memory:      </td><td>21.4/36.0 GiB      </td></tr>
+</tbody>
+</table>
+    </div>
+    <div class="vDivider"></div>
+    <div class="systemInfo">
+      <h3>System Info</h3>
+      Using AsyncHyperBand: num_stopped=0<br>Bracket: Iter 320.000: None | Iter 80.000: None | Iter 20.000: None<br>Logical resource usage: 2.0/12 CPUs, 0/0 GPUs
+    </div>
+    
+  </div>
+  <div class="hDivider"></div>
+  <div class="trialStatus">
+    <h3>Trial Status</h3>
+    <table>
 <thead>
-<tr><th>Trial name             </th><th>status    </th><th>loc            </th><th style="text-align: right;">  hidden</th><th style="text-align: right;">        lr</th><th style="text-align: right;">  momentum</th><th style="text-align: right;">     acc</th><th style="text-align: right;">  iter</th><th style="text-align: right;">  total time (s)</th></tr>
+<tr><th>Trial name             </th><th>status    </th><th>loc            </th><th style="text-align: right;">  hidden</th><th style="text-align: right;">  learning_rate</th><th style="text-align: right;">  momentum</th><th style="text-align: right;">  iter</th><th style="text-align: right;">  total time (s)</th><th style="text-align: right;">  accuracy</th></tr>
 </thead>
 <tbody>
-<tr><td>train_mnist_55a9b_00000</td><td>TERMINATED</td><td>127.0.0.1:51968</td><td style="text-align: right;">     276</td><td style="text-align: right;">0.0406397 </td><td style="text-align: right;">  0.817788</td><td style="text-align: right;">0.98455 </td><td style="text-align: right;">    12</td><td style="text-align: right;">         78.3252</td></tr>
-<tr><td>train_mnist_55a9b_00001</td><td>TERMINATED</td><td>127.0.0.1:51977</td><td style="text-align: right;">     380</td><td style="text-align: right;">0.0873557 </td><td style="text-align: right;">  0.524634</td><td style="text-align: right;">0.983717</td><td style="text-align: right;">    12</td><td style="text-align: right;">         74.9888</td></tr>
-<tr><td>train_mnist_55a9b_00002</td><td>TERMINATED</td><td>127.0.0.1:51984</td><td style="text-align: right;">     258</td><td style="text-align: right;">0.0951813 </td><td style="text-align: right;">  0.825499</td><td style="text-align: right;">0.990417</td><td style="text-align: right;">    11</td><td style="text-align: right;">         64.1272</td></tr>
-<tr><td>train_mnist_55a9b_00003</td><td>TERMINATED</td><td>127.0.0.1:51991</td><td style="text-align: right;">     255</td><td style="text-align: right;">0.0971683 </td><td style="text-align: right;">  0.23161 </td><td style="text-align: right;">0.977633</td><td style="text-align: right;">    12</td><td style="text-align: right;">         60.8475</td></tr>
-<tr><td>train_mnist_55a9b_00004</td><td>TERMINATED</td><td>127.0.0.1:52000</td><td style="text-align: right;">     303</td><td style="text-align: right;">0.00440117</td><td style="text-align: right;">  0.325439</td><td style="text-align: right;">0.90775 </td><td style="text-align: right;">    12</td><td style="text-align: right;">         55.5722</td></tr>
-<tr><td>train_mnist_55a9b_00005</td><td>TERMINATED</td><td>127.0.0.1:52007</td><td style="text-align: right;">      92</td><td style="text-align: right;">0.0651919 </td><td style="text-align: right;">  0.710183</td><td style="text-align: right;">0.974867</td><td style="text-align: right;">    12</td><td style="text-align: right;">         44.8092</td></tr>
-<tr><td>train_mnist_55a9b_00006</td><td>TERMINATED</td><td>127.0.0.1:52016</td><td style="text-align: right;">     211</td><td style="text-align: right;">0.0731116 </td><td style="text-align: right;">  0.127751</td><td style="text-align: right;">0.97025 </td><td style="text-align: right;">    12</td><td style="text-align: right;">         42.1217</td></tr>
-<tr><td>train_mnist_55a9b_00007</td><td>TERMINATED</td><td>127.0.0.1:52021</td><td style="text-align: right;">     181</td><td style="text-align: right;">0.0362389 </td><td style="text-align: right;">  0.790345</td><td style="text-align: right;">0.979967</td><td style="text-align: right;">    12</td><td style="text-align: right;">         41.7632</td></tr>
-<tr><td>train_mnist_55a9b_00008</td><td>TERMINATED</td><td>127.0.0.1:52007</td><td style="text-align: right;">     142</td><td style="text-align: right;">0.0323741 </td><td style="text-align: right;">  0.660418</td><td style="text-align: right;">0.969367</td><td style="text-align: right;">    12</td><td style="text-align: right;">         14.1527</td></tr>
-<tr><td>train_mnist_55a9b_00009</td><td>TERMINATED</td><td>127.0.0.1:51984</td><td style="text-align: right;">      97</td><td style="text-align: right;">0.0244971 </td><td style="text-align: right;">  0.175045</td><td style="text-align: right;">0.9407  </td><td style="text-align: right;">    12</td><td style="text-align: right;">         12.6405</td></tr>
+<tr><td>train_mnist_533a2_00000</td><td>TERMINATED</td><td>127.0.0.1:36365</td><td style="text-align: right;">     371</td><td style="text-align: right;">     0.0799367 </td><td style="text-align: right;">  0.588387</td><td style="text-align: right;">    12</td><td style="text-align: right;">         20.8515</td><td style="text-align: right;">  0.984583</td></tr>
+<tr><td>train_mnist_533a2_00001</td><td>TERMINATED</td><td>127.0.0.1:36364</td><td style="text-align: right;">     266</td><td style="text-align: right;">     0.0457424 </td><td style="text-align: right;">  0.22303 </td><td style="text-align: right;">    12</td><td style="text-align: right;">         19.5277</td><td style="text-align: right;">  0.96495 </td></tr>
+<tr><td>train_mnist_533a2_00002</td><td>TERMINATED</td><td>127.0.0.1:36368</td><td style="text-align: right;">     157</td><td style="text-align: right;">     0.0190286 </td><td style="text-align: right;">  0.537132</td><td style="text-align: right;">    12</td><td style="text-align: right;">         16.6606</td><td style="text-align: right;">  0.95385 </td></tr>
+<tr><td>train_mnist_533a2_00003</td><td>TERMINATED</td><td>127.0.0.1:36363</td><td style="text-align: right;">     451</td><td style="text-align: right;">     0.0433488 </td><td style="text-align: right;">  0.18925 </td><td style="text-align: right;">    12</td><td style="text-align: right;">         22.0514</td><td style="text-align: right;">  0.966283</td></tr>
+<tr><td>train_mnist_533a2_00004</td><td>TERMINATED</td><td>127.0.0.1:36367</td><td style="text-align: right;">     276</td><td style="text-align: right;">     0.0336728 </td><td style="text-align: right;">  0.430171</td><td style="text-align: right;">    12</td><td style="text-align: right;">         20.0884</td><td style="text-align: right;">  0.964767</td></tr>
+<tr><td>train_mnist_533a2_00005</td><td>TERMINATED</td><td>127.0.0.1:36366</td><td style="text-align: right;">     208</td><td style="text-align: right;">     0.071015  </td><td style="text-align: right;">  0.419166</td><td style="text-align: right;">    12</td><td style="text-align: right;">         17.933 </td><td style="text-align: right;">  0.976083</td></tr>
+<tr><td>train_mnist_533a2_00006</td><td>TERMINATED</td><td>127.0.0.1:36475</td><td style="text-align: right;">     312</td><td style="text-align: right;">     0.00692959</td><td style="text-align: right;">  0.714595</td><td style="text-align: right;">    12</td><td style="text-align: right;">         13.058 </td><td style="text-align: right;">  0.944017</td></tr>
+<tr><td>train_mnist_533a2_00007</td><td>TERMINATED</td><td>127.0.0.1:36479</td><td style="text-align: right;">     169</td><td style="text-align: right;">     0.0694114 </td><td style="text-align: right;">  0.664904</td><td style="text-align: right;">    12</td><td style="text-align: right;">         10.7991</td><td style="text-align: right;">  0.9803  </td></tr>
+<tr><td>train_mnist_533a2_00008</td><td>TERMINATED</td><td>127.0.0.1:36486</td><td style="text-align: right;">     389</td><td style="text-align: right;">     0.0370836 </td><td style="text-align: right;">  0.665592</td><td style="text-align: right;">    12</td><td style="text-align: right;">         14.018 </td><td style="text-align: right;">  0.977833</td></tr>
+<tr><td>train_mnist_533a2_00009</td><td>TERMINATED</td><td>127.0.0.1:36487</td><td style="text-align: right;">     389</td><td style="text-align: right;">     0.0676138 </td><td style="text-align: right;">  0.52372 </td><td style="text-align: right;">    12</td><td style="text-align: right;">         14.0043</td><td style="text-align: right;">  0.981833</td></tr>
 </tbody>
-</table><br><br></div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2022-07-22 16:17:01,834	INFO plugin_schema_manager.py:52 -- Loading the default runtime env schemas: [&#39;/Users/kai/coding/ray/python/ray/_private/runtime_env/../../runtime_env/schemas/working_dir_schema.json&#39;, &#39;/Users/kai/coding/ray/python/ray/_private/runtime_env/../../runtime_env/schemas/pip_schema.json&#39;].
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51968)</span> 2022-07-22 16:17:08.627419: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51968)</span> To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51968)</span> /Users/kai/.pyenv/versions/3.7.7/lib/python3.7/site-packages/keras/optimizer_v2/optimizer_v2.py:356: UserWarning: The `lr` argument is deprecated, use `learning_rate` instead.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51968)</span>   &quot;The `lr` argument is deprecated, use `learning_rate` instead.&quot;)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51968)</span> 2022-07-22 16:17:08.947939: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:185] None of the MLIR Optimization Passes are enabled (registered 2)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51977)</span> 2022-07-22 16:17:14.473677: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51977)</span> To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51977)</span> /Users/kai/.pyenv/versions/3.7.7/lib/python3.7/site-packages/keras/optimizer_v2/optimizer_v2.py:356: UserWarning: The `lr` argument is deprecated, use `learning_rate` instead.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51977)</span>   &quot;The `lr` argument is deprecated, use `learning_rate` instead.&quot;)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51977)</span> 2022-07-22 16:17:14.635104: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:185] None of the MLIR Optimization Passes are enabled (registered 2)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51984)</span> 2022-07-22 16:17:20.406624: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51984)</span> To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51984)</span> /Users/kai/.pyenv/versions/3.7.7/lib/python3.7/site-packages/keras/optimizer_v2/optimizer_v2.py:356: UserWarning: The `lr` argument is deprecated, use `learning_rate` instead.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51984)</span>   &quot;The `lr` argument is deprecated, use `learning_rate` instead.&quot;)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51984)</span> 2022-07-22 16:17:20.681960: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:185] None of the MLIR Optimization Passes are enabled (registered 2)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51991)</span> 2022-07-22 16:17:26.109460: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51991)</span> To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51991)</span> /Users/kai/.pyenv/versions/3.7.7/lib/python3.7/site-packages/keras/optimizer_v2/optimizer_v2.py:356: UserWarning: The `lr` argument is deprecated, use `learning_rate` instead.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51991)</span>   &quot;The `lr` argument is deprecated, use `learning_rate` instead.&quot;)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=51991)</span> 2022-07-22 16:17:26.303375: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:185] None of the MLIR Optimization Passes are enabled (registered 2)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52000)</span> 2022-07-22 16:17:31.899252: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52000)</span> To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52000)</span> /Users/kai/.pyenv/versions/3.7.7/lib/python3.7/site-packages/keras/optimizer_v2/optimizer_v2.py:356: UserWarning: The `lr` argument is deprecated, use `learning_rate` instead.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52000)</span>   &quot;The `lr` argument is deprecated, use `learning_rate` instead.&quot;)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52000)</span> 2022-07-22 16:17:32.300424: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:185] None of the MLIR Optimization Passes are enabled (registered 2)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52007)</span> 2022-07-22 16:17:37.937471: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52007)</span> To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52007)</span> /Users/kai/.pyenv/versions/3.7.7/lib/python3.7/site-packages/keras/optimizer_v2/optimizer_v2.py:356: UserWarning: The `lr` argument is deprecated, use `learning_rate` instead.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52007)</span>   &quot;The `lr` argument is deprecated, use `learning_rate` instead.&quot;)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52007)</span> 2022-07-22 16:17:38.263888: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:185] None of the MLIR Optimization Passes are enabled (registered 2)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52016)</span> 2022-07-22 16:17:43.657379: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52016)</span> To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52016)</span> /Users/kai/.pyenv/versions/3.7.7/lib/python3.7/site-packages/keras/optimizer_v2/optimizer_v2.py:356: UserWarning: The `lr` argument is deprecated, use `learning_rate` instead.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52016)</span>   &quot;The `lr` argument is deprecated, use `learning_rate` instead.&quot;)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52016)</span> 2022-07-22 16:17:43.828809: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:185] None of the MLIR Optimization Passes are enabled (registered 2)
+</table>
+  </div>
+</div>
+<style>
+.tuneStatus {
+  color: var(--jp-ui-font-color1);
+}
+.tuneStatus .systemInfo {
+  display: flex;
+  flex-direction: column;
+}
+.tuneStatus td {
+  white-space: nowrap;
+}
+.tuneStatus .trialStatus {
+  display: flex;
+  flex-direction: column;
+}
+.tuneStatus h3 {
+  font-weight: bold;
+}
+.tuneStatus .hDivider {
+  border-bottom-width: var(--jp-border-width);
+  border-bottom-color: var(--jp-border-color0);
+  border-bottom-style: solid;
+}
+.tuneStatus .vDivider {
+  border-left-width: var(--jp-border-width);
+  border-left-color: var(--jp-border-color0);
+  border-left-style: solid;
+  margin: 0.5em 1em 0.5em 1em;
+}
+</style>
+</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-02-13 15:22:41,843	INFO tune.py:1009 -- Wrote the latest version of all result files and experiment state to &#39;/Users/rdecal/ray_results/exp&#39; in 0.0048s.
+2025-02-13 15:22:41,846	INFO tune.py:1041 -- Total run time: 41.77 seconds (41.75 seconds for the tuning loop).
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Result for train_mnist_55a9b_00000:
-  date: 2022-07-22_16-17-10
-  done: false
-  experiment_id: 3659349c38c746cfb71b4db5eb9302a0
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.8903833627700806
-  node_ip: 127.0.0.1
-  pid: 51968
-  time_since_restore: 2.439258098602295
-  time_this_iter_s: 2.439258098602295
-  time_total_s: 2.439258098602295
-  timestamp: 1658503030
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00000
-  warmup_time: 0.003445863723754883
-  
-Result for train_mnist_55a9b_00004:
-  date: 2022-07-22_16-17-33
-  done: false
-  experiment_id: 6eb62b7cb38f442a867a9094f0664701
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.6376166939735413
-  node_ip: 127.0.0.1
-  pid: 52000
-  time_since_restore: 2.4364511966705322
-  time_this_iter_s: 2.4364511966705322
-  time_total_s: 2.4364511966705322
-  timestamp: 1658503053
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00004
-  warmup_time: 0.0030939579010009766
-  
-Result for train_mnist_55a9b_00006:
-  date: 2022-07-22_16-17-45
-  done: false
-  experiment_id: 9594405e38084311a891b48addd13f75
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.8557000160217285
-  node_ip: 127.0.0.1
-  pid: 52016
-  time_since_restore: 1.8570480346679688
-  time_this_iter_s: 1.8570480346679688
-  time_total_s: 1.8570480346679688
-  timestamp: 1658503065
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00006
-  warmup_time: 0.003566741943359375
-  
-Result for train_mnist_55a9b_00001:
-  date: 2022-07-22_16-17-15
-  done: false
-  experiment_id: fcdeb049f9614755a9b7c9420ca2ae5e
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.8887666463851929
-  node_ip: 127.0.0.1
-  pid: 51977
-  time_since_restore: 1.9353628158569336
-  time_this_iter_s: 1.9353628158569336
-  time_total_s: 1.9353628158569336
-  timestamp: 1658503035
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00001
-  warmup_time: 0.0029449462890625
-  
-Result for train_mnist_55a9b_00005:
-  date: 2022-07-22_16-17-39
-  done: false
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.8789666891098022
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 2.3337321281433105
-  time_this_iter_s: 2.3337321281433105
-  time_total_s: 2.3337321281433105
-  timestamp: 1658503059
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00005
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00002:
-  date: 2022-07-22_16-17-21
-  done: false
-  experiment_id: c4f803baf65f4d4e9fd6abc85b2fd00c
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.9112833142280579
-  node_ip: 127.0.0.1
-  pid: 51984
-  time_since_restore: 2.3220012187957764
-  time_this_iter_s: 2.3220012187957764
-  time_total_s: 2.3220012187957764
-  timestamp: 1658503041
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00002
-  warmup_time: 0.0028328895568847656
-  
-Result for train_mnist_55a9b_00003:
-  date: 2022-07-22_16-17-27
-  done: false
-  experiment_id: 469478f02b4a43f5b44c40e59989ad39
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.8743166923522949
-  node_ip: 127.0.0.1
-  pid: 51991
-  time_since_restore: 2.0278611183166504
-  time_this_iter_s: 2.0278611183166504
-  time_total_s: 2.0278611183166504
-  timestamp: 1658503047
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00003
-  warmup_time: 0.0033779144287109375
-  
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52021)</span> 2022-07-22 16:17:51.567914: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52021)</span> To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52021)</span> /Users/kai/.pyenv/versions/3.7.7/lib/python3.7/site-packages/keras/optimizer_v2/optimizer_v2.py:356: UserWarning: The `lr` argument is deprecated, use `learning_rate` instead.
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52021)</span>   &quot;The `lr` argument is deprecated, use `learning_rate` instead.&quot;)
-<span class=" -Color -Color-Faint -Color-Faint-Cyan">(train_mnist pid=52021)</span> 2022-07-22 16:17:52.977183: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:185] None of the MLIR Optimization Passes are enabled (registered 2)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Result for train_mnist_55a9b_00005:
-  date: 2022-07-22_16-17-54
-  done: false
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 3
-  mean_accuracy: 0.9490833282470703
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 17.22033405303955
-  time_this_iter_s: 2.672102928161621
-  time_total_s: 17.22033405303955
-  timestamp: 1658503074
-  timesteps_since_restore: 0
-  training_iteration: 3
-  trial_id: 55a9b_00005
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00006:
-  date: 2022-07-22_16-17-54
-  done: false
-  experiment_id: 9594405e38084311a891b48addd13f75
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 3
-  mean_accuracy: 0.9327999949455261
-  node_ip: 127.0.0.1
-  pid: 52016
-  time_since_restore: 11.758372068405151
-  time_this_iter_s: 3.0426323413848877
-  time_total_s: 11.758372068405151
-  timestamp: 1658503074
-  timesteps_since_restore: 0
-  training_iteration: 3
-  trial_id: 55a9b_00006
-  warmup_time: 0.003566741943359375
-  
-Result for train_mnist_55a9b_00003:
-  date: 2022-07-22_16-17-55
-  done: false
-  experiment_id: 469478f02b4a43f5b44c40e59989ad39
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 3
-  mean_accuracy: 0.9454166889190674
-  node_ip: 127.0.0.1
-  pid: 51991
-  time_since_restore: 29.733185052871704
-  time_this_iter_s: 3.0363340377807617
-  time_total_s: 29.733185052871704
-  timestamp: 1658503075
-  timesteps_since_restore: 0
-  training_iteration: 3
-  trial_id: 55a9b_00003
-  warmup_time: 0.0033779144287109375
-  
-Result for train_mnist_55a9b_00000:
-  date: 2022-07-22_16-17-55
-  done: false
-  experiment_id: 3659349c38c746cfb71b4db5eb9302a0
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 3
-  mean_accuracy: 0.958216667175293
-  node_ip: 127.0.0.1
-  pid: 51968
-  time_since_restore: 47.272178173065186
-  time_this_iter_s: 3.2986061573028564
-  time_total_s: 47.272178173065186
-  timestamp: 1658503075
-  timesteps_since_restore: 0
-  training_iteration: 3
-  trial_id: 55a9b_00000
-  warmup_time: 0.003445863723754883
-  
-Result for train_mnist_55a9b_00004:
-  date: 2022-07-22_16-17-55
-  done: false
-  experiment_id: 6eb62b7cb38f442a867a9094f0664701
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 3
-  mean_accuracy: 0.8524500131607056
-  node_ip: 127.0.0.1
-  pid: 52000
-  time_since_restore: 24.11396098136902
-  time_this_iter_s: 3.2331089973449707
-  time_total_s: 24.11396098136902
-  timestamp: 1658503075
-  timesteps_since_restore: 0
-  training_iteration: 3
-  trial_id: 55a9b_00004
-  warmup_time: 0.0030939579010009766
-  
-Result for train_mnist_55a9b_00002:
-  date: 2022-07-22_16-17-55
-  done: false
-  experiment_id: c4f803baf65f4d4e9fd6abc85b2fd00c
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 3
-  mean_accuracy: 0.9695500135421753
-  node_ip: 127.0.0.1
-  pid: 51984
-  time_since_restore: 35.78592824935913
-  time_this_iter_s: 3.021165132522583
-  time_total_s: 35.78592824935913
-  timestamp: 1658503075
-  timesteps_since_restore: 0
-  training_iteration: 3
-  trial_id: 55a9b_00002
-  warmup_time: 0.0028328895568847656
-  
-Result for train_mnist_55a9b_00001:
-  date: 2022-07-22_16-17-56
-  done: false
-  experiment_id: fcdeb049f9614755a9b7c9420ca2ae5e
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 3
-  mean_accuracy: 0.9560333490371704
-  node_ip: 127.0.0.1
-  pid: 51977
-  time_since_restore: 42.38909387588501
-  time_this_iter_s: 3.753290891647339
-  time_total_s: 42.38909387588501
-  timestamp: 1658503076
-  timesteps_since_restore: 0
-  training_iteration: 3
-  trial_id: 55a9b_00001
-  warmup_time: 0.0029449462890625
-  
-Result for train_mnist_55a9b_00005:
-  date: 2022-07-22_16-18-00
-  done: false
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 5
-  mean_accuracy: 0.9611166715621948
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 23.303561210632324
-  time_this_iter_s: 2.933852195739746
-  time_total_s: 23.303561210632324
-  timestamp: 1658503080
-  timesteps_since_restore: 0
-  training_iteration: 5
-  trial_id: 55a9b_00005
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00007:
-  date: 2022-07-22_16-18-01
-  done: false
-  experiment_id: d9469b1fc58b41db88da5446dc2a3b23
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.8797500133514404
-  node_ip: 127.0.0.1
-  pid: 52021
-  time_since_restore: 12.469872951507568
-  time_this_iter_s: 12.469872951507568
-  time_total_s: 12.469872951507568
-  timestamp: 1658503081
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00007
-  warmup_time: 0.0028028488159179688
-  
-Result for train_mnist_55a9b_00006:
-  date: 2022-07-22_16-18-01
-  done: false
-  experiment_id: 9594405e38084311a891b48addd13f75
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 5
-  mean_accuracy: 0.9499499797821045
-  node_ip: 127.0.0.1
-  pid: 52016
-  time_since_restore: 18.780059814453125
-  time_this_iter_s: 3.3080599308013916
-  time_total_s: 18.780059814453125
-  timestamp: 1658503081
-  timesteps_since_restore: 0
-  training_iteration: 5
-  trial_id: 55a9b_00006
-  warmup_time: 0.003566741943359375
-  
-Result for train_mnist_55a9b_00003:
-  date: 2022-07-22_16-18-02
-  done: false
-  experiment_id: 469478f02b4a43f5b44c40e59989ad39
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 5
-  mean_accuracy: 0.9601166844367981
-  node_ip: 127.0.0.1
-  pid: 51991
-  time_since_restore: 36.93912100791931
-  time_this_iter_s: 3.4057939052581787
-  time_total_s: 36.93912100791931
-  timestamp: 1658503082
-  timesteps_since_restore: 0
-  training_iteration: 5
-  trial_id: 55a9b_00003
-  warmup_time: 0.0033779144287109375
-  
-Result for train_mnist_55a9b_00000:
-  date: 2022-07-22_16-18-02
-  done: false
-  experiment_id: 3659349c38c746cfb71b4db5eb9302a0
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 5
-  mean_accuracy: 0.970466673374176
-  node_ip: 127.0.0.1
-  pid: 51968
-  time_since_restore: 54.49850010871887
-  time_this_iter_s: 3.4417831897735596
-  time_total_s: 54.49850010871887
-  timestamp: 1658503082
-  timesteps_since_restore: 0
-  training_iteration: 5
-  trial_id: 55a9b_00000
-  warmup_time: 0.003445863723754883
-  
-Result for train_mnist_55a9b_00004:
-  date: 2022-07-22_16-18-02
-  done: false
-  experiment_id: 6eb62b7cb38f442a867a9094f0664701
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 5
-  mean_accuracy: 0.8777499794960022
-  node_ip: 127.0.0.1
-  pid: 52000
-  time_since_restore: 31.513713121414185
-  time_this_iter_s: 3.506195068359375
-  time_total_s: 31.513713121414185
-  timestamp: 1658503082
-  timesteps_since_restore: 0
-  training_iteration: 5
-  trial_id: 55a9b_00004
-  warmup_time: 0.0030939579010009766
-  
-Result for train_mnist_55a9b_00002:
-  date: 2022-07-22_16-18-02
-  done: false
-  experiment_id: c4f803baf65f4d4e9fd6abc85b2fd00c
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 5
-  mean_accuracy: 0.979283332824707
-  node_ip: 127.0.0.1
-  pid: 51984
-  time_since_restore: 43.266417026519775
-  time_this_iter_s: 3.3383469581604004
-  time_total_s: 43.266417026519775
-  timestamp: 1658503082
-  timesteps_since_restore: 0
-  training_iteration: 5
-  trial_id: 55a9b_00002
-  warmup_time: 0.0028328895568847656
-  
-Result for train_mnist_55a9b_00001:
-  date: 2022-07-22_16-18-04
-  done: false
-  experiment_id: fcdeb049f9614755a9b7c9420ca2ae5e
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 5
-  mean_accuracy: 0.9692999720573425
-  node_ip: 127.0.0.1
-  pid: 51977
-  time_since_restore: 50.620792865753174
-  time_this_iter_s: 4.001068115234375
-  time_total_s: 50.620792865753174
-  timestamp: 1658503084
-  timesteps_since_restore: 0
-  training_iteration: 5
-  trial_id: 55a9b_00001
-  warmup_time: 0.0029449462890625
-  
-Result for train_mnist_55a9b_00005:
-  date: 2022-07-22_16-18-06
-  done: false
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 7
-  mean_accuracy: 0.96711665391922
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 29.40476107597351
-  time_this_iter_s: 2.976076126098633
-  time_total_s: 29.40476107597351
-  timestamp: 1658503086
-  timesteps_since_restore: 0
-  training_iteration: 7
-  trial_id: 55a9b_00005
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00007:
-  date: 2022-07-22_16-18-07
-  done: false
-  experiment_id: d9469b1fc58b41db88da5446dc2a3b23
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 3
-  mean_accuracy: 0.951033353805542
-  node_ip: 127.0.0.1
-  pid: 52021
-  time_since_restore: 18.96213722229004
-  time_this_iter_s: 3.252371311187744
-  time_total_s: 18.96213722229004
-  timestamp: 1658503087
-  timesteps_since_restore: 0
-  training_iteration: 3
-  trial_id: 55a9b_00007
-  warmup_time: 0.0028028488159179688
-  
-Result for train_mnist_55a9b_00006:
-  date: 2022-07-22_16-18-08
-  done: false
-  experiment_id: 9594405e38084311a891b48addd13f75
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 7
-  mean_accuracy: 0.9584500193595886
-  node_ip: 127.0.0.1
-  pid: 52016
-  time_since_restore: 25.336583852767944
-  time_this_iter_s: 3.311979055404663
-  time_total_s: 25.336583852767944
-  timestamp: 1658503088
-  timesteps_since_restore: 0
-  training_iteration: 7
-  trial_id: 55a9b_00006
-  warmup_time: 0.003566741943359375
-  
-Result for train_mnist_55a9b_00003:
-  date: 2022-07-22_16-18-09
-  done: false
-  experiment_id: 469478f02b4a43f5b44c40e59989ad39
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 7
-  mean_accuracy: 0.9675499796867371
-  node_ip: 127.0.0.1
-  pid: 51991
-  time_since_restore: 43.7107310295105
-  time_this_iter_s: 3.3927559852600098
-  time_total_s: 43.7107310295105
-  timestamp: 1658503089
-  timesteps_since_restore: 0
-  training_iteration: 7
-  trial_id: 55a9b_00003
-  warmup_time: 0.0033779144287109375
-  
-Result for train_mnist_55a9b_00000:
-  date: 2022-07-22_16-18-09
-  done: false
-  experiment_id: 3659349c38c746cfb71b4db5eb9302a0
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 7
-  mean_accuracy: 0.9763000011444092
-  node_ip: 127.0.0.1
-  pid: 51968
-  time_since_restore: 61.30248522758484
-  time_this_iter_s: 3.4063682556152344
-  time_total_s: 61.30248522758484
-  timestamp: 1658503089
-  timesteps_since_restore: 0
-  training_iteration: 7
-  trial_id: 55a9b_00000
-  warmup_time: 0.003445863723754883
-  
-Result for train_mnist_55a9b_00002:
-  date: 2022-07-22_16-18-09
-  done: false
-  experiment_id: c4f803baf65f4d4e9fd6abc85b2fd00c
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 7
-  mean_accuracy: 0.9840666651725769
-  node_ip: 127.0.0.1
-  pid: 51984
-  time_since_restore: 50.212465047836304
-  time_this_iter_s: 3.43766188621521
-  time_total_s: 50.212465047836304
-  timestamp: 1658503089
-  timesteps_since_restore: 0
-  training_iteration: 7
-  trial_id: 55a9b_00002
-  warmup_time: 0.0028328895568847656
-  
-Result for train_mnist_55a9b_00004:
-  date: 2022-07-22_16-18-09
-  done: false
-  experiment_id: 6eb62b7cb38f442a867a9094f0664701
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 7
-  mean_accuracy: 0.8899999856948853
-  node_ip: 127.0.0.1
-  pid: 52000
-  time_since_restore: 38.63890194892883
-  time_this_iter_s: 3.5783908367156982
-  time_total_s: 38.63890194892883
-  timestamp: 1658503089
-  timesteps_since_restore: 0
-  training_iteration: 7
-  trial_id: 55a9b_00004
-  warmup_time: 0.0030939579010009766
-  
-Result for train_mnist_55a9b_00005:
-  date: 2022-07-22_16-18-12
-  done: false
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 9
-  mean_accuracy: 0.9712333083152771
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 35.3185760974884
-  time_this_iter_s: 3.0241990089416504
-  time_total_s: 35.3185760974884
-  timestamp: 1658503092
-  timesteps_since_restore: 0
-  training_iteration: 9
-  trial_id: 55a9b_00005
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00001:
-  date: 2022-07-22_16-18-12
-  done: false
-  experiment_id: fcdeb049f9614755a9b7c9420ca2ae5e
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 7
-  mean_accuracy: 0.9755333065986633
-  node_ip: 127.0.0.1
-  pid: 51977
-  time_since_restore: 58.57745599746704
-  time_this_iter_s: 3.936232089996338
-  time_total_s: 58.57745599746704
-  timestamp: 1658503092
-  timesteps_since_restore: 0
-  training_iteration: 7
-  trial_id: 55a9b_00001
-  warmup_time: 0.0029449462890625
-  
-Result for train_mnist_55a9b_00007:
-  date: 2022-07-22_16-18-14
-  done: false
-  experiment_id: d9469b1fc58b41db88da5446dc2a3b23
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 5
-  mean_accuracy: 0.9648333191871643
-  node_ip: 127.0.0.1
-  pid: 52021
-  time_since_restore: 25.25843620300293
-  time_this_iter_s: 3.094501256942749
-  time_total_s: 25.25843620300293
-  timestamp: 1658503094
-  timesteps_since_restore: 0
-  training_iteration: 5
-  trial_id: 55a9b_00007
-  warmup_time: 0.0028028488159179688
-  
-Result for train_mnist_55a9b_00006:
-  date: 2022-07-22_16-18-15
-  done: false
-  experiment_id: 9594405e38084311a891b48addd13f75
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 9
-  mean_accuracy: 0.9646666646003723
-  node_ip: 127.0.0.1
-  pid: 52016
-  time_since_restore: 32.048911809921265
-  time_this_iter_s: 3.315690755844116
-  time_total_s: 32.048911809921265
-  timestamp: 1658503095
-  timesteps_since_restore: 0
-  training_iteration: 9
-  trial_id: 55a9b_00006
-  warmup_time: 0.003566741943359375
-  
-Result for train_mnist_55a9b_00003:
-  date: 2022-07-22_16-18-15
-  done: false
-  experiment_id: 469478f02b4a43f5b44c40e59989ad39
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 9
-  mean_accuracy: 0.9729499816894531
-  node_ip: 127.0.0.1
-  pid: 51991
-  time_since_restore: 50.50909209251404
-  time_this_iter_s: 3.4110782146453857
-  time_total_s: 50.50909209251404
-  timestamp: 1658503095
-  timesteps_since_restore: 0
-  training_iteration: 9
-  trial_id: 55a9b_00003
-  warmup_time: 0.0033779144287109375
-  
-Result for train_mnist_55a9b_00000:
-  date: 2022-07-22_16-18-16
-  done: false
-  experiment_id: 3659349c38c746cfb71b4db5eb9302a0
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 9
-  mean_accuracy: 0.9807666540145874
-  node_ip: 127.0.0.1
-  pid: 51968
-  time_since_restore: 68.26757216453552
-  time_this_iter_s: 3.4475879669189453
-  time_total_s: 68.26757216453552
-  timestamp: 1658503096
-  timesteps_since_restore: 0
-  training_iteration: 9
-  trial_id: 55a9b_00000
-  warmup_time: 0.003445863723754883
-  
-Result for train_mnist_55a9b_00002:
-  date: 2022-07-22_16-18-16
-  done: false
-  experiment_id: c4f803baf65f4d4e9fd6abc85b2fd00c
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 9
-  mean_accuracy: 0.9872999787330627
-  node_ip: 127.0.0.1
-  pid: 51984
-  time_since_restore: 57.01431703567505
-  time_this_iter_s: 3.3804008960723877
-  time_total_s: 57.01431703567505
-  timestamp: 1658503096
-  timesteps_since_restore: 0
-  training_iteration: 9
-  trial_id: 55a9b_00002
-  warmup_time: 0.0028328895568847656
-  
-Result for train_mnist_55a9b_00004:
-  date: 2022-07-22_16-18-16
-  done: false
-  experiment_id: 6eb62b7cb38f442a867a9094f0664701
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 9
-  mean_accuracy: 0.8989166617393494
-  node_ip: 127.0.0.1
-  pid: 52000
-  time_since_restore: 45.67929005622864
-  time_this_iter_s: 3.4561610221862793
-  time_total_s: 45.67929005622864
-  timestamp: 1658503096
-  timesteps_since_restore: 0
-  training_iteration: 9
-  trial_id: 55a9b_00004
-  warmup_time: 0.0030939579010009766
-  
-Result for train_mnist_55a9b_00005:
-  date: 2022-07-22_16-18-18
-  done: false
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 11
-  mean_accuracy: 0.9744333624839783
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 41.49077916145325
-  time_this_iter_s: 3.172250270843506
-  time_total_s: 41.49077916145325
-  timestamp: 1658503098
-  timesteps_since_restore: 0
-  training_iteration: 11
-  trial_id: 55a9b_00005
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00001:
-  date: 2022-07-22_16-18-20
-  done: false
-  experiment_id: fcdeb049f9614755a9b7c9420ca2ae5e
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 9
-  mean_accuracy: 0.9806166887283325
-  node_ip: 127.0.0.1
-  pid: 51977
-  time_since_restore: 66.64132380485535
-  time_this_iter_s: 4.0674309730529785
-  time_total_s: 66.64132380485535
-  timestamp: 1658503100
-  timesteps_since_restore: 0
-  training_iteration: 9
-  trial_id: 55a9b_00001
-  warmup_time: 0.0029449462890625
-  
-Result for train_mnist_55a9b_00007:
-  date: 2022-07-22_16-18-20
-  done: false
-  experiment_id: d9469b1fc58b41db88da5446dc2a3b23
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 7
-  mean_accuracy: 0.970716655254364
-  node_ip: 127.0.0.1
-  pid: 52021
-  time_since_restore: 31.897236108779907
-  time_this_iter_s: 3.3691420555114746
-  time_total_s: 31.897236108779907
-  timestamp: 1658503100
-  timesteps_since_restore: 0
-  training_iteration: 7
-  trial_id: 55a9b_00007
-  warmup_time: 0.0028028488159179688
-  
-Result for train_mnist_55a9b_00005:
-  date: 2022-07-22_16-18-21
-  done: true
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  experiment_tag: 5_hidden=92,lr=0.0652,momentum=0.7102
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 12
-  mean_accuracy: 0.9748666882514954
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 44.80922222137451
-  time_this_iter_s: 3.3184430599212646
-  time_total_s: 44.80922222137451
-  timestamp: 1658503101
-  timesteps_since_restore: 0
-  training_iteration: 12
-  trial_id: 55a9b_00005
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00006:
-  date: 2022-07-22_16-18-22
-  done: false
-  experiment_id: 9594405e38084311a891b48addd13f75
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 11
-  mean_accuracy: 0.9679166674613953
-  node_ip: 127.0.0.1
-  pid: 52016
-  time_since_restore: 39.08963179588318
-  time_this_iter_s: 3.4860758781433105
-  time_total_s: 39.08963179588318
-  timestamp: 1658503102
-  timesteps_since_restore: 0
-  training_iteration: 11
-  trial_id: 55a9b_00006
-  warmup_time: 0.003566741943359375
-  
-Result for train_mnist_55a9b_00003:
-  date: 2022-07-22_16-18-23
-  done: false
-  experiment_id: 469478f02b4a43f5b44c40e59989ad39
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 11
-  mean_accuracy: 0.9771833419799805
-  node_ip: 127.0.0.1
-  pid: 51991
-  time_since_restore: 57.6213219165802
-  time_this_iter_s: 3.4615819454193115
-  time_total_s: 57.6213219165802
-  timestamp: 1658503103
-  timesteps_since_restore: 0
-  training_iteration: 11
-  trial_id: 55a9b_00003
-  warmup_time: 0.0033779144287109375
-  
-Result for train_mnist_55a9b_00000:
-  date: 2022-07-22_16-18-23
-  done: false
-  experiment_id: 3659349c38c746cfb71b4db5eb9302a0
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 11
-  mean_accuracy: 0.98416668176651
-  node_ip: 127.0.0.1
-  pid: 51968
-  time_since_restore: 75.32713007926941
-  time_this_iter_s: 3.443808078765869
-  time_total_s: 75.32713007926941
-  timestamp: 1658503103
-  timesteps_since_restore: 0
-  training_iteration: 11
-  trial_id: 55a9b_00000
-  warmup_time: 0.003445863723754883
-  
-Result for train_mnist_55a9b_00002:
-  date: 2022-07-22_16-18-23
-  done: true
-  experiment_id: c4f803baf65f4d4e9fd6abc85b2fd00c
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 11
-  mean_accuracy: 0.9904166460037231
-  node_ip: 127.0.0.1
-  pid: 51984
-  time_since_restore: 64.12720203399658
-  time_this_iter_s: 3.508151054382324
-  time_total_s: 64.12720203399658
-  timestamp: 1658503103
-  timesteps_since_restore: 0
-  training_iteration: 11
-  trial_id: 55a9b_00002
-  warmup_time: 0.0028328895568847656
-  
-Result for train_mnist_55a9b_00004:
-  date: 2022-07-22_16-18-23
-  done: false
-  experiment_id: 6eb62b7cb38f442a867a9094f0664701
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 11
-  mean_accuracy: 0.9052166938781738
-  node_ip: 127.0.0.1
-  pid: 52000
-  time_since_restore: 52.687995195388794
-  time_this_iter_s: 3.420351982116699
-  time_total_s: 52.687995195388794
-  timestamp: 1658503103
-  timesteps_since_restore: 0
-  training_iteration: 11
-  trial_id: 55a9b_00004
-  warmup_time: 0.0030939579010009766
-  
-Result for train_mnist_55a9b_00006:
-  date: 2022-07-22_16-18-25
-  done: true
-  experiment_id: 9594405e38084311a891b48addd13f75
-  experiment_tag: 6_hidden=211,lr=0.0731,momentum=0.1278
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 12
-  mean_accuracy: 0.9702500104904175
-  node_ip: 127.0.0.1
-  pid: 52016
-  time_since_restore: 42.1216938495636
-  time_this_iter_s: 3.03206205368042
-  time_total_s: 42.1216938495636
-  timestamp: 1658503105
-  timesteps_since_restore: 0
-  training_iteration: 12
-  trial_id: 55a9b_00006
-  warmup_time: 0.003566741943359375
-  
-Result for train_mnist_55a9b_00003:
-  date: 2022-07-22_16-18-26
-  done: true
-  experiment_id: 469478f02b4a43f5b44c40e59989ad39
-  experiment_tag: 3_hidden=255,lr=0.0972,momentum=0.2316
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 12
-  mean_accuracy: 0.9776333570480347
-  node_ip: 127.0.0.1
-  pid: 51991
-  time_since_restore: 60.8474760055542
-  time_this_iter_s: 3.226154088973999
-  time_total_s: 60.8474760055542
-  timestamp: 1658503106
-  timesteps_since_restore: 0
-  training_iteration: 12
-  trial_id: 55a9b_00003
-  warmup_time: 0.0033779144287109375
-  
-Result for train_mnist_55a9b_00000:
-  date: 2022-07-22_16-18-26
-  done: true
-  experiment_id: 3659349c38c746cfb71b4db5eb9302a0
-  experiment_tag: 0_hidden=276,lr=0.0406,momentum=0.8178
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 12
-  mean_accuracy: 0.9845499992370605
-  node_ip: 127.0.0.1
-  pid: 51968
-  time_since_restore: 78.32520508766174
-  time_this_iter_s: 2.998075008392334
-  time_total_s: 78.32520508766174
-  timestamp: 1658503106
-  timesteps_since_restore: 0
-  training_iteration: 12
-  trial_id: 55a9b_00000
-  warmup_time: 0.003445863723754883
-  
-Result for train_mnist_55a9b_00007:
-  date: 2022-07-22_16-18-26
-  done: false
-  experiment_id: d9469b1fc58b41db88da5446dc2a3b23
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 9
-  mean_accuracy: 0.9751333594322205
-  node_ip: 127.0.0.1
-  pid: 52021
-  time_since_restore: 37.76195311546326
-  time_this_iter_s: 2.7159180641174316
-  time_total_s: 37.76195311546326
-  timestamp: 1658503106
-  timesteps_since_restore: 0
-  training_iteration: 9
-  trial_id: 55a9b_00007
-  warmup_time: 0.0028028488159179688
-  
-Result for train_mnist_55a9b_00004:
-  date: 2022-07-22_16-18-26
-  done: true
-  experiment_id: 6eb62b7cb38f442a867a9094f0664701
-  experiment_tag: 4_hidden=303,lr=0.0044,momentum=0.3254
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 12
-  mean_accuracy: 0.9077500104904175
-  node_ip: 127.0.0.1
-  pid: 52000
-  time_since_restore: 55.57219409942627
-  time_this_iter_s: 2.8841989040374756
-  time_total_s: 55.57219409942627
-  timestamp: 1658503106
-  timesteps_since_restore: 0
-  training_iteration: 12
-  trial_id: 55a9b_00004
-  warmup_time: 0.0030939579010009766
-  
-Result for train_mnist_55a9b_00001:
-  date: 2022-07-22_16-18-27
-  done: false
-  experiment_id: fcdeb049f9614755a9b7c9420ca2ae5e
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 11
-  mean_accuracy: 0.9830166697502136
-  node_ip: 127.0.0.1
-  pid: 51977
-  time_since_restore: 73.19760584831238
-  time_this_iter_s: 2.7281620502471924
-  time_total_s: 73.19760584831238
-  timestamp: 1658503107
-  timesteps_since_restore: 0
-  training_iteration: 11
-  trial_id: 55a9b_00001
-  warmup_time: 0.0029449462890625
-  
-Result for train_mnist_55a9b_00008:
-  date: 2022-07-22_16-18-28
-  done: false
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.8477166891098022
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 6.2436230182647705
-  time_this_iter_s: 6.2436230182647705
-  time_total_s: 6.2436230182647705
-  timestamp: 1658503108
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00008
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00001:
-  date: 2022-07-22_16-18-28
-  done: true
-  experiment_id: fcdeb049f9614755a9b7c9420ca2ae5e
-  experiment_tag: 1_hidden=380,lr=0.0874,momentum=0.5246
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 12
-  mean_accuracy: 0.9837166666984558
-  node_ip: 127.0.0.1
-  pid: 51977
-  time_since_restore: 74.98881888389587
-  time_this_iter_s: 1.791213035583496
-  time_total_s: 74.98881888389587
-  timestamp: 1658503108
-  timesteps_since_restore: 0
-  training_iteration: 12
-  trial_id: 55a9b_00001
-  warmup_time: 0.0029449462890625
-  
-Result for train_mnist_55a9b_00009:
-  date: 2022-07-22_16-18-29
-  done: false
-  experiment_id: c4f803baf65f4d4e9fd6abc85b2fd00c
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 1
-  mean_accuracy: 0.7675999999046326
-  node_ip: 127.0.0.1
-  pid: 51984
-  time_since_restore: 5.303471088409424
-  time_this_iter_s: 5.303471088409424
-  time_total_s: 5.303471088409424
-  timestamp: 1658503109
-  timesteps_since_restore: 0
-  training_iteration: 1
-  trial_id: 55a9b_00009
-  warmup_time: 0.0028328895568847656
-  
-Result for train_mnist_55a9b_00007:
-  date: 2022-07-22_16-18-30
-  done: true
-  experiment_id: d9469b1fc58b41db88da5446dc2a3b23
-  experiment_tag: 7_hidden=181,lr=0.0362,momentum=0.7903
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 12
-  mean_accuracy: 0.9799666404724121
-  node_ip: 127.0.0.1
-  pid: 52021
-  time_since_restore: 41.763158082962036
-  time_this_iter_s: 1.0622038841247559
-  time_total_s: 41.763158082962036
-  timestamp: 1658503110
-  timesteps_since_restore: 0
-  training_iteration: 12
-  trial_id: 55a9b_00007
-  warmup_time: 0.0028028488159179688
-  
-Result for train_mnist_55a9b_00008:
-  date: 2022-07-22_16-18-33
-  done: false
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 8
-  mean_accuracy: 0.9599000215530396
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 11.612935304641724
-  time_this_iter_s: 0.6818761825561523
-  time_total_s: 11.612935304641724
-  timestamp: 1658503113
-  timesteps_since_restore: 0
-  training_iteration: 8
-  trial_id: 55a9b_00008
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00009:
-  date: 2022-07-22_16-18-34
-  done: false
-  experiment_id: c4f803baf65f4d4e9fd6abc85b2fd00c
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 9
-  mean_accuracy: 0.9319833517074585
-  node_ip: 127.0.0.1
-  pid: 51984
-  time_since_restore: 10.803268194198608
-  time_this_iter_s: 0.606992244720459
-  time_total_s: 10.803268194198608
-  timestamp: 1658503114
-  timesteps_since_restore: 0
-  training_iteration: 9
-  trial_id: 55a9b_00009
-  warmup_time: 0.0028328895568847656
-  
-Result for train_mnist_55a9b_00008:
-  date: 2022-07-22_16-18-36
-  done: true
-  experiment_id: 8dbd22e6caed4fe39351dffa3ef14eac
-  experiment_tag: 8_hidden=142,lr=0.0324,momentum=0.6604
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 12
-  mean_accuracy: 0.9693666696548462
-  node_ip: 127.0.0.1
-  pid: 52007
-  time_since_restore: 14.152745008468628
-  time_this_iter_s: 0.5980076789855957
-  time_total_s: 14.152745008468628
-  timestamp: 1658503116
-  timesteps_since_restore: 0
-  training_iteration: 12
-  trial_id: 55a9b_00008
-  warmup_time: 0.005449056625366211
-  
-Result for train_mnist_55a9b_00009:
-  date: 2022-07-22_16-18-36
-  done: true
-  experiment_id: c4f803baf65f4d4e9fd6abc85b2fd00c
-  experiment_tag: 9_hidden=97,lr=0.0245,momentum=0.1750
-  hostname: Kais-MacBook-Pro.local
-  iterations_since_restore: 12
-  mean_accuracy: 0.9406999945640564
-  node_ip: 127.0.0.1
-  pid: 51984
-  time_since_restore: 12.640528202056885
-  time_this_iter_s: 0.5808131694793701
-  time_total_s: 12.640528202056885
-  timestamp: 1658503116
-  timesteps_since_restore: 0
-  training_iteration: 12
-  trial_id: 55a9b_00009
-  warmup_time: 0.0028328895568847656
-  
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2022-07-22 16:18:36,803	INFO tune.py:738 -- Total run time: 95.98 seconds (95.03 seconds for the tuning loop).
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Best hyperparameters found were:  {&#39;threads&#39;: 2, &#39;lr&#39;: 0.09518133271957563, &#39;momentum&#39;: 0.8254987643140009, &#39;hidden&#39;: 258}
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Best hyperparameters found were: {&#39;threads&#39;: 2, &#39;learning_rate&#39;: 0.07993666231835218, &#39;momentum&#39;: 0.5883866709655042, &#39;hidden&#39;: 371} | Accuracy: 0.98458331823349
 </pre></div>
 </div>
 </div>
+</details>
+</div>
+<p>This should output something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Best</span> <span class="n">hyperparameters</span> <span class="n">found</span> <span class="n">were</span><span class="p">:</span>  <span class="p">{</span><span class="s1">&#39;threads&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="mf">0.07607440973606909</span><span class="p">,</span> <span class="s1">&#39;momentum&#39;</span><span class="p">:</span> <span class="mf">0.7715363277240616</span><span class="p">,</span> <span class="s1">&#39;hidden&#39;</span><span class="p">:</span> <span class="mi">452</span><span class="p">}</span> <span class="o">|</span> <span class="n">Accuracy</span><span class="p">:</span> <span class="mf">0.98458331823349</span>
+</pre></div>
 </div>
 </section>
 <section id="more-keras-and-tensorflow-examples">
@@ -2714,20 +1623,20 @@ A contributed example of tuning a Keras model on CIFAR10 with the PopulationBase
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="ml-frameworks.html"
+       href="pbt_ppo_example.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Examples using Ray Tune with ML Frameworks</p>
+        <p class="prev-next-title">Using RLlib with Tune</p>
       </div>
     </a>
     <a class="right-next"
-       href="tune-pytorch-cifar.html"
+       href="horovod_simple.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">How to use Tune with PyTorch</p>
+        <p class="prev-next-title">Using Horovod with Tune</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -2746,6 +1655,7 @@ A contributed example of tuning a Keras model on CIFAR10 with the PopulationBase
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#more-keras-and-tensorflow-examples">More Keras and TensorFlow Examples</a></li>
 </ul>

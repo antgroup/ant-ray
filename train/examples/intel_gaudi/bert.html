@@ -605,10 +605,11 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
@@ -752,14 +753,14 @@ document.write(`
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -812,30 +813,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/model-multiplexing.html">Model Multiplexing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/configure-serve-deployment.html">Configure Ray Serve deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/http-guide.html">Set Up FastAPI and HTTP</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../serve/llm/overview.html">Overview</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../serve/llm/api.html">Ray Serve LLM API</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.builders.build_vllm_deployment.html">ray.serve.llm.builders.build_vllm_deployment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.builders.build_openai_app.html">ray.serve.llm.builders.build_openai_app</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.LLMConfig.html">ray.serve.llm.configs.LLMConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.LLMServingArgs.html">ray.serve.llm.configs.LLMServingArgs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.ModelLoadingConfig.html">ray.serve.llm.configs.ModelLoadingConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.CloudMirrorConfig.html">ray.serve.llm.configs.CloudMirrorConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.LoraConfig.html">ray.serve.llm.configs.LoraConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.deployments.VLLMService.html">ray.serve.llm.deployments.VLLMService</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.deployments.LLMRouter.html">ray.serve.llm.deployments.LLMRouter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html">ray.serve.llm.openai_api_models.ChatCompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionRequest.html">ray.serve.llm.openai_api_models.CompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionStreamResponse.html">ray.serve.llm.openai_api_models.ChatCompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionResponse.html">ray.serve.llm.openai_api_models.ChatCompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html">ray.serve.llm.openai_api_models.CompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionResponse.html">ray.serve.llm.openai_api_models.CompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ErrorResponse.html">ray.serve.llm.openai_api_models.ErrorResponse</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../serve/llm/serving-llms.html">Serving LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/production-guide/config.html">Serve Config Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/production-guide/kubernetes.html">Deploy on Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/production-guide/docker.html">Custom Docker Images</a></li>
@@ -847,7 +826,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/monitoring.html">Monitor Your Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/resource-allocation.html">Resource Allocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/autoscaling-guide.html">Ray Serve Autoscaling</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/advanced-guides/app-builder-guide.html">Pass Arguments to Applications</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/advanced-guides/advanced-autoscaling.html">Advanced Ray Serve Autoscaling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/advanced-guides/performance.html">Performance Tuning</a></li>
@@ -865,10 +844,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/api/index.html">Ray Serve API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/key-concepts.html">Key concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/multi-agent-envs.html">Multi-Agent Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/hierarchical-envs.html">Hierarchical Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/external-envs.html">External Environments and Applications</a></li>
@@ -876,7 +855,7 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/algorithm-config.html">AlgorithmConfig API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/rllib-algorithms.html">Algorithms</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-advanced-api.html">Advanced Python APIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/checkpoints.html">Checkpointing</a></li>
@@ -903,8 +882,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/rllib-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/new-api-stack-migration-guide.html">New API stack migration guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
@@ -926,7 +905,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
@@ -945,7 +924,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html">ray.rllib.callbacks.callbacks.RLlibCallback</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end</a></li>
@@ -961,7 +940,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/env_runner.html">EnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/single_agent_env_runner.html">SingleAgentEnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/single_agent_episode.html">SingleAgentEpisode API</a></li>
@@ -971,7 +950,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/utils.html">Env Utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.build</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class</a></li>
@@ -1014,7 +993,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html">ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.html">ray.rllib.models.distributions.Distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html">ray.rllib.models.distributions.Distribution.from_logits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html">ray.rllib.models.distributions.Distribution.sample</a></li>
@@ -1023,14 +1002,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html">ray.rllib.models.distributions.Distribution.kl</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html">ray.rllib.core.learner.learner_group.LearnerGroup</a></li>
 </ul>
 </li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners</a></li>
@@ -1051,7 +1030,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs.html">ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit.html">ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer.html">ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html">ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer</a></li>
@@ -1066,7 +1045,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html">ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
@@ -1112,12 +1091,12 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/joblib.html">Distributed Scikit-learn / Joblib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/multiprocessing.html">Distributed multiprocessing.Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/ray-collective.html">Ray Collective Communication Lib</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.ray_active.html">ray.util.dask.RayDaskCallback.ray_active</a></li>
 </ul>
 </li>
@@ -1132,7 +1111,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../workflows/index.html">Ray Workflows (Alpha)</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/basics.html">Getting Started</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/management.html">Workflow Management</a></li>
@@ -1140,7 +1119,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/events.html">Events</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/comparison.html">API Comparisons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/advanced.html">Advanced Topics</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../workflows/api/execution.html">Workflow Execution API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../workflows/api/management.html">Workflow Management API</a></li>
 </ul>
@@ -1149,16 +1128,16 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
@@ -1203,7 +1182,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/reduce-image-pull-latency.html">Reducing image pull latency on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/ml-example.html">Ray Train XGBoostTrainer on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/gpu-training-example.html">Train PyTorch ResNet model with GPUs on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/mnist-training-example.html">Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes</a></li>
@@ -1219,7 +1198,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/vllm-rayservice.html">Serve a Large Language Model with vLLM on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/ingress.html">Ingress</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/prometheus-grafana.html">Using Prometheus and Grafana</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/pyspy.html">Profiling with py-spy</a></li>
@@ -1229,12 +1208,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/istio.html">mTLS and L7 observability with Istio</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/benchmarks/memory-scalability-benchmark.html">KubeRay memory and scalability benchmark</a></li>
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting/troubleshooting.html">Troubleshooting guide</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html">RayService troubleshooting</a></li>
@@ -1243,9 +1222,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/kubernetes/references.html">API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/vms/getting-started.html">Getting Started</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/user-guides/launching-clusters/index.html">Launching Ray Clusters on AWS, GCP, Azure, vSphere, On-Prem</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/user-guides/large-cluster-best-practices.html">Best practices for deploying large clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/user-guides/configuring-autoscaling.html">Configuring Autoscaling</a></li>
@@ -1254,11 +1233,11 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/examples/ml-example.html">Ray Train XGBoostTrainer on VMs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/references/ray-cluster-cli.html">Cluster Launcher Commands</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/references/ray-cluster-configuration.html">Cluster YAML Configuration Options</a></li>
 </ul>
@@ -1267,8 +1246,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/metrics.html">Collecting and monitoring metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/configure-manage-dashboard.html">Configuring and Managing Ray Dashboard</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/running-applications/job-submission/quickstart.html">Quickstart using the Ray Jobs CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/running-applications/job-submission/sdk.html">Python SDK Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
@@ -1281,7 +1260,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/faq.html">FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/cli.html">Cluster Management CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/running-applications/job-submission/cli.html">Ray Jobs CLI API Reference</a></li>
@@ -1291,7 +1270,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/usage-stats.html">Usage Stats Collection</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/design-overview.html">Design Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/management.html">Virtual Cluster Management API</a></li>
@@ -1299,15 +1278,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/getting-started.html">Ray Dashboard</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
@@ -1327,7 +1306,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/user-guides/ray-tracing.html">Tracing</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/api.html">State API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/cli.html">State CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/system-metrics.html">System Metrics</a></li>
@@ -1335,10 +1314,10 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-contribute/stability.html">API Stability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-contribute/api-policy.html">API Policy</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/development.html">Building Ray from Source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/ci.html">CI Testing Workflow on PRs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/docs.html">Contributing to the Ray Documentation</a></li>
@@ -1424,8 +1403,8 @@ document.write(`
 <p>We recommend using a prebuilt container to run these examples. To run a container, you need Docker. See <a class="reference external" href="https://docs.docker.com/engine/install/">Install Docker Engine</a> for installation instructions.</p>
 <p>Next, follow <a class="reference external" href="https://docs.habana.ai/en/latest/Installation_Guide/Bare_Metal_Fresh_OS.html?highlight=installer#run-using-containers">Run Using Containers</a> to install the Gaudi drivers and container runtime.</p>
 <p>Next, start the Gaudi container:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>vault.habana.ai/gaudi-docker/1.14.0/ubuntu22.04/habanalabs/pytorch-installer-2.1.1:latest
-docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--runtime<span class="o">=</span>habana<span class="w"> </span>-e<span class="w"> </span><span class="nv">HABANA_VISIBLE_DEVICES</span><span class="o">=</span>all<span class="w"> </span>-e<span class="w"> </span><span class="nv">OMPI_MCA_btl_vader_single_copy_mechanism</span><span class="o">=</span>none<span class="w"> </span>--cap-add<span class="o">=</span>sys_nice<span class="w"> </span>--net<span class="o">=</span>host<span class="w"> </span>--ipc<span class="o">=</span>host<span class="w"> </span>vault.habana.ai/gaudi-docker/1.14.0/ubuntu22.04/habanalabs/pytorch-installer-2.1.1:latest
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>vault.habana.ai/gaudi-docker/1.20.0/ubuntu22.04/habanalabs/pytorch-installer-2.6.0:latest
+docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--runtime<span class="o">=</span>habana<span class="w"> </span>-e<span class="w"> </span><span class="nv">HABANA_VISIBLE_DEVICES</span><span class="o">=</span>all<span class="w"> </span>-e<span class="w"> </span><span class="nv">OMPI_MCA_btl_vader_single_copy_mechanism</span><span class="o">=</span>none<span class="w"> </span>--cap-add<span class="o">=</span>sys_nice<span class="w"> </span>--net<span class="o">=</span>host<span class="w"> </span>--ipc<span class="o">=</span>host<span class="w"> </span>vault.habana.ai/gaudi-docker/1.20.0/ubuntu22.04/habanalabs/pytorch-installer-2.6.0:latest
 </pre></div>
 </div>
 <p>Inside the container, install the following dependecies to run this notebook.</p>
@@ -1630,226 +1609,118 @@ docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </s
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div class="tuneStatus">
-  <div style="display: flex;flex-direction: row">
-    <div style="display: flex;flex-direction: column;">
-      <h3>Tune Status</h3>
-      <table>
-<tbody>
-<tr><td>Current time:</td><td>2024-02-28 07:05:06</td></tr>
-<tr><td>Running for: </td><td>00:05:09.32        </td></tr>
-<tr><td>Memory:      </td><td>389.1/1007.5 GiB   </td></tr>
-</tbody>
-</table>
-    </div>
-    <div class="vDivider"></div>
-    <div class="systemInfo">
-      <h3>System Info</h3>
-      Using FIFO scheduling algorithm.<br>Logical resource usage: 3.0/160 CPUs, 0/0 GPUs (0.0/1.0 TPU, 2.0/8.0 HPU)
-    </div>
-    
-  </div>
-  <div class="hDivider"></div>
-  <div class="trialStatus">
-    <h3>Trial Status</h3>
-    <table>
-<thead>
-<tr><th>Trial name              </th><th>status    </th><th>loc             </th></tr>
-</thead>
-<tbody>
-<tr><td>TorchTrainer_fb74f_00000</td><td>TERMINATED</td><td>172.17.0.3:59382</td></tr>
-</tbody>
-</table>
-  </div>
 </div>
-<style>
-.tuneStatus {
-  color: var(--jp-ui-font-color1);
-}
-.tuneStatus .systemInfo {
-  display: flex;
-  flex-direction: column;
-}
-.tuneStatus td {
-  white-space: nowrap;
-}
-.tuneStatus .trialStatus {
-  display: flex;
-  flex-direction: column;
-}
-.tuneStatus h3 {
-  font-weight: bold;
-}
-.tuneStatus .hDivider {
-  border-bottom-width: var(--jp-border-width);
-  border-bottom-color: var(--jp-border-color0);
-  border-bottom-style: solid;
-}
-.tuneStatus .vDivider {
-  border-left-width: var(--jp-border-width);
-  border-left-color: var(--jp-border-color0);
-  border-left-style: solid;
-  margin: 0.5em 1em 0.5em 1em;
-}
-</style>
-</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Cyan">(pid=59382)</span> /usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py:252: UserWarning: Device capability of hccl unspecified, assuming `cpu` and `cuda`. Please specify it via the `devices` argument of `register_backend`.
-<span class=" -Color -Color-Cyan">(pid=59382)</span>   warnings.warn(
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> Setting up process group for: env:// [rank=0, world_size=2]
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> /usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py:252: UserWarning: Device capability of hccl unspecified, assuming `cpu` and `cuda`. Please specify it via the `devices` argument of `register_backend`.<span class=" -Color -Color-Green"> [repeated 2x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/ray-logging.html#log-deduplication for more options.)</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span>   warnings.warn(<span class=" -Color -Color-Green"> [repeated 2x across cluster]</span>
-<span class=" -Color -Color-Cyan">(TorchTrainer pid=59382)</span> Started distributed worker processes: 
-<span class=" -Color -Color-Cyan">(TorchTrainer pid=59382)</span> - (ip=172.17.0.3, pid=66009) world_rank=0, local_rank=0, node_rank=0
-<span class=" -Color -Color-Cyan">(TorchTrainer pid=59382)</span> - (ip=172.17.0.3, pid=66010) world_rank=1, local_rank=1, node_rank=0
-Downloading readme: 100%|██████████| 6.72k/6.72k [00:00&lt;00:00, 21.0MB/s]
-Downloading data:   0%|          | 0.00/299M [00:00&lt;?, ?B/s]
-Downloading data:   1%|▏         | 4.19M/299M [00:00&lt;00:26, 11.2MB/s]
-Downloading data:   4%|▍         | 12.6M/299M [00:00&lt;00:10, 27.3MB/s]
-Downloading data:   7%|▋         | 21.0M/299M [00:00&lt;00:07, 35.6MB/s]
-Downloading data:  10%|▉         | 29.4M/299M [00:00&lt;00:06, 41.6MB/s]
-Downloading data:  13%|█▎        | 37.7M/299M [00:01&lt;00:05, 44.7MB/s]
-Downloading data:  15%|█▌        | 46.1M/299M [00:01&lt;00:05, 46.2MB/s]
-Downloading data:  18%|█▊        | 54.5M/299M [00:01&lt;00:05, 45.3MB/s]
-Downloading data:  21%|██        | 62.9M/299M [00:01&lt;00:05, 47.0MB/s]
-Downloading data:  24%|██▍       | 71.3M/299M [00:01&lt;00:06, 34.1MB/s]
-Downloading data:  27%|██▋       | 79.7M/299M [00:02&lt;00:05, 37.7MB/s]
-Downloading data:  29%|██▉       | 88.1M/299M [00:02&lt;00:05, 39.1MB/s]
-Downloading data:  32%|███▏      | 96.5M/299M [00:02&lt;00:04, 41.6MB/s]
-Downloading data:  35%|███▌      | 105M/299M [00:02&lt;00:05, 33.2MB/s] 
-Downloading data:  38%|███▊      | 113M/299M [00:03&lt;00:05, 36.7MB/s]
-Downloading data:  41%|████      | 122M/299M [00:03&lt;00:04, 40.5MB/s]
-Downloading data:  43%|████▎     | 130M/299M [00:03&lt;00:04, 41.8MB/s]
-Downloading data:  46%|████▌     | 138M/299M [00:03&lt;00:03, 42.1MB/s]
-Downloading data:  49%|████▉     | 147M/299M [00:03&lt;00:03, 43.7MB/s]
-Downloading data:  52%|█████▏    | 155M/299M [00:03&lt;00:03, 44.2MB/s]
-Downloading data:  55%|█████▍    | 164M/299M [00:04&lt;00:02, 45.9MB/s]
-Downloading data:  57%|█████▋    | 172M/299M [00:04&lt;00:02, 47.0MB/s]
-Downloading data:  60%|██████    | 180M/299M [00:04&lt;00:02, 46.5MB/s]
-Downloading data:  63%|██████▎   | 189M/299M [00:04&lt;00:02, 48.0MB/s]
-Downloading data:  66%|██████▌   | 197M/299M [00:04&lt;00:02, 47.5MB/s]
-Downloading data:  69%|██████▊   | 206M/299M [00:04&lt;00:01, 49.7MB/s]
-Downloading data:  71%|███████▏  | 214M/299M [00:05&lt;00:01, 45.0MB/s]
-Downloading data:  74%|███████▍  | 222M/299M [00:05&lt;00:01, 46.8MB/s]
-Downloading data:  77%|███████▋  | 231M/299M [00:05&lt;00:01, 47.8MB/s]
-Downloading data:  80%|███████▉  | 239M/299M [00:05&lt;00:01, 48.1MB/s]
-Downloading data:  83%|████████▎ | 247M/299M [00:05&lt;00:01, 43.1MB/s]
-Downloading data:  85%|████████▌ | 256M/299M [00:06&lt;00:00, 45.6MB/s]
-Downloading data:  88%|████████▊ | 264M/299M [00:06&lt;00:00, 48.1MB/s]
-Downloading data:  91%|█████████ | 273M/299M [00:06&lt;00:00, 48.3MB/s]
-Downloading data:  94%|█████████▍| 281M/299M [00:06&lt;00:00, 47.7MB/s]
-Downloading data:  97%|█████████▋| 289M/299M [00:06&lt;00:00, 48.0MB/s]
-Downloading data:  99%|█████████▉| 298M/299M [00:06&lt;00:00, 50.0MB/s]
-Downloading data: 100%|██████████| 299M/299M [00:06&lt;00:00, 43.0MB/s]
-Downloading data:   0%|          | 0.00/23.5M [00:00&lt;?, ?B/s]
-Downloading data:  18%|█▊        | 4.19M/23.5M [00:00&lt;00:01, 18.0MB/s]
-Downloading data:  54%|█████▎    | 12.6M/23.5M [00:00&lt;00:00, 33.7MB/s]
-Downloading data: 100%|██████████| 23.5M/23.5M [00:00&lt;00:00, 38.5MB/s]
+</section>
+<section id="possible-outputs">
+<h2>Possible outputs<a class="headerlink" href="#possible-outputs" title="Link to this heading">#</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Downloading builder script: 100%|██████████| 4.20k/4.20k [00:00&lt;00:00, 27.0MB/s]
+2025-03-03 03:37:08,776 INFO worker.py:1841 -- Started a local Ray instance.
+/usr/local/lib/python3.10/dist-packages/ray/tune/impl/tuner_internal.py:125: RayDeprecationWarning: The `RunConfig` class should be imported from `ray.tune` when passing it to the Tuner. Please update your imports. See this issue for more context and migration options: https://github.com/ray-project/ray/issues/49454. Disable these warnings by setting the environment variable: RAY_TRAIN_ENABLE_V2_MIGRATION_WARNINGS=0
+  _log_deprecation_warning(
+(RayTrainWorker pid=75123) Setting up process group for: env:// [rank=0, world_size=2]
+(TorchTrainer pid=74734) Started distributed worker processes: 
+(TorchTrainer pid=74734) - (node_id=eef984cd0cd96cce50bad1b1dab12e19c809047f10be3c829524a3d1, ip=100.83.111.228, pid=75123) world_rank=0, local_rank=0, node_rank=0
+(TorchTrainer pid=74734) - (node_id=eef984cd0cd96cce50bad1b1dab12e19c809047f10be3c829524a3d1, ip=100.83.111.228, pid=75122) world_rank=1, local_rank=1, node_rank=0
 Generating train split:   0%|          | 0/650000 [00:00&lt;?, ? examples/s]
-Generating train split:   2%|▏         | 10000/650000 [00:00&lt;00:12, 53061.09 examples/s]
-Generating train split:   8%|▊         | 50000/650000 [00:00&lt;00:03, 177970.09 examples/s]
-Generating train split:  14%|█▍        | 90000/650000 [00:00&lt;00:02, 241849.95 examples/s]
-Generating train split:  20%|██        | 130000/650000 [00:00&lt;00:01, 268863.13 examples/s]
-Generating train split:  26%|██▌       | 170000/650000 [00:00&lt;00:01, 253807.33 examples/s]
-Generating train split:  32%|███▏      | 210000/650000 [00:00&lt;00:01, 257649.77 examples/s]
-Generating train split:  38%|███▊      | 250000/650000 [00:01&lt;00:01, 253667.16 examples/s]
-Generating train split:  45%|████▍     | 290000/650000 [00:01&lt;00:01, 271412.63 examples/s]
-Generating train split:  51%|█████     | 330000/650000 [00:01&lt;00:01, 265042.75 examples/s]
-Generating train split:  57%|█████▋    | 370000/650000 [00:01&lt;00:01, 260300.41 examples/s]
-Generating train split:  63%|██████▎   | 410000/650000 [00:01&lt;00:00, 247497.01 examples/s]
-Generating train split:  69%|██████▉   | 450000/650000 [00:01&lt;00:00, 239998.89 examples/s]
-Generating train split:  75%|███████▌  | 490000/650000 [00:02&lt;00:00, 235786.32 examples/s]
-Generating train split:  80%|████████  | 520000/650000 [00:02&lt;00:00, 231040.12 examples/s]
-Generating train split:  86%|████████▌ | 560000/650000 [00:02&lt;00:00, 234604.52 examples/s]
-Generating train split:  92%|█████████▏| 600000/650000 [00:02&lt;00:00, 234508.34 examples/s]
-Generating train split: 100%|██████████| 650000/650000 [00:02&lt;00:00, 237989.20 examples/s]
+Generating train split:   7%|▋         | 45000/650000 [00:00&lt;00:01, 435976.18 examples/s]
+Generating train split:  15%|█▍        | 95000/650000 [00:00&lt;00:01, 469481.51 examples/s]
+Generating train split:  23%|██▎       | 150000/650000 [00:00&lt;00:01, 477676.99 examples/s]
+Generating train split:  31%|███       | 203000/650000 [00:00&lt;00:00, 493746.70 examples/s]
+Generating train split:  43%|████▎     | 279000/650000 [00:00&lt;00:00, 499340.09 examples/s]
+Generating train split:  55%|█████▍    | 355000/650000 [00:00&lt;00:00, 498613.65 examples/s]
+Generating train split:  66%|██████▋   | 431000/650000 [00:00&lt;00:00, 497799.19 examples/s]
+Generating train split:  78%|███████▊  | 506000/650000 [00:01&lt;00:00, 495696.93 examples/s]
+Generating train split:  86%|████████▌ | 556000/650000 [00:01&lt;00:00, 494508.05 examples/s]
+Generating train split:  94%|█████████▎| 609000/650000 [00:01&lt;00:00, 490725.53 examples/s]
+Generating train split: 100%|██████████| 650000/650000 [00:01&lt;00:00, 494916.42 examples/s]
 Generating test split:   0%|          | 0/50000 [00:00&lt;?, ? examples/s]
-Generating test split:  80%|████████  | 40000/50000 [00:00&lt;00:00, 248449.76 examples/s]
-Generating test split: 100%|██████████| 50000/50000 [00:00&lt;00:00, 247162.55 examples/s]
+Generating test split: 100%|██████████| 50000/50000 [00:00&lt;00:00, 509619.87 examples/s]
 Map:   0%|          | 0/1000 [00:00&lt;?, ? examples/s]
-Map: 100%|██████████| 1000/1000 [00:00&lt;00:00, 2898.10 examples/s]
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-cased and are newly initialized: [&#39;classifier.bias&#39;, &#39;classifier.weight&#39;]
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> ============================= HABANA PT BRIDGE CONFIGURATION =========================== 
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span>  PT_HPU_LAZY_MODE = 1
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span>  PT_RECIPE_CACHE_PATH = 
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span>  PT_CACHE_FOLDER_DELETE = 0
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span>  PT_HPU_RECIPE_CACHE_CONFIG = 
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span>  PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span>  PT_HPU_LAZY_ACC_PAR_MODE = 1
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span>  PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> ---------------------------: System Configuration :---------------------------
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> Num CPU Cores : 160
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> CPU RAM       : 1056389756 KB
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> ------------------------------------------------------------------------------
-Map:   0%|          | 0/1000 [00:00&lt;?, ? examples/s]<span class=" -Color -Color-Green"> [repeated 3x across cluster]</span>
-Map: 100%|██████████| 1000/1000 [00:00&lt;00:00, 3179.11 examples/s]<span class=" -Color -Color-Green"> [repeated 3x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-cased and are newly initialized: [&#39;classifier.bias&#39;, &#39;classifier.weight&#39;]
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[0]	loss:1.782888
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[0]	loss:2.250521<span class=" -Color -Color-Green"> [repeated 2x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[0]	loss:2.005397<span class=" -Color -Color-Green"> [repeated 114x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[0]	loss:1.583421<span class=" -Color -Color-Green"> [repeated 122x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[0]	loss:1.873015<span class=" -Color -Color-Green"> [repeated 117x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[0]	loss:1.287454<span class=" -Color -Color-Green"> [repeated 111x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[1]	loss:1.256705<span class=" -Color -Color-Green"> [repeated 35x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[1]	loss:1.783350<span class=" -Color -Color-Green"> [repeated 112x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> train epoch:[1]	loss:1.161693<span class=" -Color -Color-Green"> [repeated 117x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[1]	loss:1.083962<span class=" -Color -Color-Green"> [repeated 121x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[1]	loss:1.452244<span class=" -Color -Color-Green"> [repeated 126x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[2]	loss:0.848569<span class=" -Color -Color-Green"> [repeated 23x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[2]	loss:0.935847<span class=" -Color -Color-Green"> [repeated 104x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[2]	loss:2.003910<span class=" -Color -Color-Green"> [repeated 133x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[2]	loss:0.719678<span class=" -Color -Color-Green"> [repeated 119x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> train epoch:[2]	loss:1.115227<span class=" -Color -Color-Green"> [repeated 128x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[3]	loss:1.476088<span class=" -Color -Color-Green"> [repeated 16x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[3]	loss:0.938356<span class=" -Color -Color-Green"> [repeated 95x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[3]	loss:0.880045<span class=" -Color -Color-Green"> [repeated 124x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[3]	loss:0.906078<span class=" -Color -Color-Green"> [repeated 126x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> 
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[3]	loss:0.977447<span class=" -Color -Color-Green"> [repeated 121x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[4]	loss:0.545720<span class=" -Color -Color-Green"> [repeated 34x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[4]	loss:0.733710<span class=" -Color -Color-Green"> [repeated 114x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[4]	loss:0.894966<span class=" -Color -Color-Green"> [repeated 121x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[4]	loss:1.428036<span class=" -Color -Color-Green"> [repeated 122x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[4]	loss:1.482066<span class=" -Color -Color-Green"> [repeated 122x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[5]	loss:1.564706<span class=" -Color -Color-Green"> [repeated 22x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[5]	loss:1.853072<span class=" -Color -Color-Green"> [repeated 121x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[5]	loss:2.260058<span class=" -Color -Color-Green"> [repeated 129x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[5]	loss:1.414144<span class=" -Color -Color-Green"> [repeated 128x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> train epoch:[5]	loss:0.980207<span class=" -Color -Color-Green"> [repeated 118x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[6]	loss:1.559380<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[6]	loss:1.634878<span class=" -Color -Color-Green"> [repeated 123x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[6]	loss:1.564483<span class=" -Color -Color-Green"> [repeated 132x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[6]	loss:1.733673<span class=" -Color -Color-Green"> [repeated 136x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[7]	loss:1.582968<span class=" -Color -Color-Green"> [repeated 105x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[7]	loss:1.486512<span class=" -Color -Color-Green"> [repeated 133x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[7]	loss:1.723742<span class=" -Color -Color-Green"> [repeated 134x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[7]	loss:1.556943<span class=" -Color -Color-Green"> [repeated 137x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[8]	loss:1.613637<span class=" -Color -Color-Green"> [repeated 96x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[8]	loss:1.744777<span class=" -Color -Color-Green"> [repeated 132x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[8]	loss:1.816669<span class=" -Color -Color-Green"> [repeated 131x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[8]	loss:1.313460<span class=" -Color -Color-Green"> [repeated 128x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66009)</span> train epoch:[9]	loss:1.920412<span class=" -Color -Color-Green"> [repeated 109x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[9]	loss:1.687392<span class=" -Color -Color-Green"> [repeated 131x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[9]	loss:1.714871<span class=" -Color -Color-Green"> [repeated 126x across cluster]</span>
-<span class=" -Color -Color-Cyan">(RayTrainWorker pid=66010)</span> train epoch:[9]	loss:1.679613<span class=" -Color -Color-Green"> [repeated 139x across cluster]</span>
-Trial TorchTrainer_fb74f_00000 completed. Last result: 
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-02-28 07:05:06,559	INFO tune.py:1042 -- Total run time: 309.37 seconds (309.32 seconds for the tuning loop).
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training result: Result(
+Map: 100%|██████████| 1000/1000 [00:00&lt;00:00, 3998.33 examples/s]
+Map: 100%|██████████| 1000/1000 [00:00&lt;00:00, 4051.80 examples/s]
+Map: 100%|██████████| 1000/1000 [00:00&lt;00:00, 3869.20 examples/s]
+(RayTrainWorker pid=75123) Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-cased and are newly initialized: [&#39;classifier.bias&#39;, &#39;classifier.weight&#39;]
+(RayTrainWorker pid=75123) You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Map:   0%|          | 0/1000 [00:00&lt;?, ? examples/s] [repeated 3x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)
+Map: 100%|██████████| 1000/1000 [00:00&lt;00:00, 3782.66 examples/s] [repeated 2x across cluster]
+(RayTrainWorker pid=75123) ============================= HABANA PT BRIDGE CONFIGURATION =========================== 
+(RayTrainWorker pid=75123)  PT_HPU_LAZY_MODE = 1
+(RayTrainWorker pid=75123)  PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024
+(RayTrainWorker pid=75123)  PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+(RayTrainWorker pid=75123)  PT_HPU_LAZY_ACC_PAR_MODE = 1
+(RayTrainWorker pid=75123)  PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+(RayTrainWorker pid=75123)  PT_HPU_EAGER_PIPELINE_ENABLE = 1
+(RayTrainWorker pid=75123)  PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+(RayTrainWorker pid=75123)  PT_HPU_ENABLE_LAZY_COLLECTIVES = 0
+(RayTrainWorker pid=75123) ---------------------------: System Configuration :---------------------------
+(RayTrainWorker pid=75123) Num CPU Cores : 160
+(RayTrainWorker pid=75123) CPU RAM       : 1056374420 KB
+(RayTrainWorker pid=75123) ------------------------------------------------------------------------------
+2025-03-03 03:41:04,658 INFO tune.py:1009 -- Wrote the latest version of all result files and experiment state to &#39;/root/ray_results/TorchTrainer_2025-03-03_03-37-11&#39; in 0.0020s.
+
+View detailed results here: /root/ray_results/TorchTrainer_2025-03-03_03-37-11
+To visualize your results with TensorBoard, run: `tensorboard --logdir /tmp/ray/session_2025-03-03_03-37-06_983992_65223/artifacts/2025-03-03_03-37-11/TorchTrainer_2025-03-03_03-37-11/driver_artifacts`
+
+Training started with configuration:
+╭─────────────────────────────────────────────────╮
+│ Training config                                 │
+├─────────────────────────────────────────────────┤
+│ train_loop_config/batch_size_per_worker       4 │
+│ train_loop_config/epochs                     10 │
+│ train_loop_config/lr                      0.001 │
+╰─────────────────────────────────────────────────╯
+(RayTrainWorker pid=75123) train epoch:[0]      loss:1.979938
+(RayTrainWorker pid=75123) train epoch:[0]      loss:1.756611 [repeated 36x across cluster]
+(RayTrainWorker pid=75123) train epoch:[0]      loss:1.643875 [repeated 180x across cluster]
+(RayTrainWorker pid=75123) train epoch:[0]      loss:1.416416 [repeated 177x across cluster]
+(RayTrainWorker pid=75123) train epoch:[1]      loss:1.272513 [repeated 107x across cluster]
+(RayTrainWorker pid=75123) 
+(RayTrainWorker pid=75123) train epoch:[1]      loss:2.086884 [repeated 155x across cluster]
+(RayTrainWorker pid=75123) train epoch:[1]      loss:1.426217 [repeated 178x across cluster]
+(RayTrainWorker pid=75122) train epoch:[1]      loss:0.991381 [repeated 160x across cluster]
+(RayTrainWorker pid=75123) train epoch:[2]      loss:1.294097 [repeated 28x across cluster]
+(RayTrainWorker pid=75123) train epoch:[2]      loss:1.386306 [repeated 169x across cluster]
+(RayTrainWorker pid=75123) train epoch:[2]      loss:1.190416 [repeated 181x across cluster]
+(RayTrainWorker pid=75123) train epoch:[3]      loss:1.171733 [repeated 130x across cluster]
+(RayTrainWorker pid=75123) train epoch:[3]      loss:1.287821 [repeated 152x across cluster]
+(RayTrainWorker pid=75123) train epoch:[3]      loss:1.055692 [repeated 179x across cluster]
+(RayTrainWorker pid=75122) train epoch:[3]      loss:1.677789 [repeated 162x across cluster]
+(RayTrainWorker pid=75123) train epoch:[4]      loss:0.942071 [repeated 19x across cluster]
+(RayTrainWorker pid=75123) train epoch:[4]      loss:1.592500 [repeated 167x across cluster]
+(RayTrainWorker pid=75123) train epoch:[4]      loss:0.936934 [repeated 180x across cluster]
+(RayTrainWorker pid=75123) 
+(RayTrainWorker pid=75123) train epoch:[5]      loss:2.465384 [repeated 141x across cluster]
+(RayTrainWorker pid=75123) train epoch:[5]      loss:1.659170 [repeated 156x across cluster]
+(RayTrainWorker pid=75123) train epoch:[5]      loss:1.850438 [repeated 180x across cluster]
+(RayTrainWorker pid=75122) train epoch:[5]      loss:1.101623 [repeated 160x across cluster]
+(RayTrainWorker pid=75123) train epoch:[6]      loss:2.125591 [repeated 18x across cluster]
+(RayTrainWorker pid=75123) train epoch:[6]      loss:1.612838 [repeated 170x across cluster]
+(RayTrainWorker pid=75123) train epoch:[6]      loss:1.759160 [repeated 177x across cluster]
+(RayTrainWorker pid=75123) train epoch:[7]      loss:1.338552 [repeated 139x across cluster]
+(RayTrainWorker pid=75123) train epoch:[7]      loss:1.467959 [repeated 157x across cluster]
+(RayTrainWorker pid=75123) train epoch:[7]      loss:1.682137 [repeated 181x across cluster]
+(RayTrainWorker pid=75123) 
+(RayTrainWorker pid=75123) train epoch:[8]      loss:1.395805 [repeated 162x across cluster]
+(RayTrainWorker pid=75123) train epoch:[8]      loss:1.527835 [repeated 153x across cluster]
+(RayTrainWorker pid=75123) train epoch:[8]      loss:1.672311 [repeated 177x across cluster]
+(RayTrainWorker pid=75123) 
+(RayTrainWorker pid=75122) train epoch:[8]      loss:1.093186 [repeated 166x across cluster]
+(RayTrainWorker pid=75123) train epoch:[9]      loss:1.457587 [repeated 13x across cluster]
+(RayTrainWorker pid=75123) train epoch:[9]      loss:1.727377 [repeated 171x across cluster]
+(RayTrainWorker pid=75123) train epoch:[9]      loss:1.694001 [repeated 182x across cluster]
+
+Training completed after 0 iterations at 2025-03-03 03:41:04. Total running time: 3min 53s
+
+Training result: Result(
   metrics={},
-  path=&#39;/root/ray_results/TorchTrainer_2024-02-28_06-59-57/TorchTrainer_fb74f_00000_0_2024-02-28_06-59-57&#39;,
+  path=&#39;/root/ray_results/TorchTrainer_2025-03-03_03-37-11/TorchTrainer_ca6cf_00000_0_2025-03-03_03-37-11&#39;,
   filesystem=&#39;local&#39;,
   checkpoint=None
 )
+(RayTrainWorker pid=75122) Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-cased and are newly initialized: [&#39;classifier.bias&#39;, &#39;classifier.weight&#39;]
+(RayTrainWorker pid=75122) You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+(RayTrainWorker pid=75122) train epoch:[9]      loss:0.417845 [repeated 136x across cluster]
 </pre></div>
-</div>
-</div>
 </div>
 </section>
 </section>
@@ -1884,6 +1755,7 @@ Trial TorchTrainer_fb74f_00000 completed. Last result:
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-function">Training Function</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main-training-function">Main Training Function</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#start-training">Start Training</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#possible-outputs">Possible outputs</a></li>
 </ul>
   </nav></div>
 

@@ -96,6 +96,34 @@ def test_runtime_env_cache_with_pip_check(start_cluster):
         ray.get(f.options(runtime_env=runtime_env).remote())
 
 
+def test_runtime_env_with_pip_cmd(start_cluster):
+    class Actor:
+        def test_dep(self):
+            import pip_install_test  # noqa: F401
+
+            return True
+
+        def get_executable(self):
+            import sys
+
+            return sys.executable
+
+    runtime_env = {
+        "pip": {
+            "packages": ["pip install pip-install-test"],
+            "pip_version": "==20.2.3",
+            "pip_check": False,
+        }
+    }
+    actor_1 = ray.remote(runtime_env=runtime_env)(Actor).remote()
+    actor_2 = ray.remote(runtime_env=runtime_env)(Actor).remote()
+    executable_1 = ray.get(actor_1.get_executable.remote())
+    executable_2 = ray.get(actor_2.get_executable.remote())
+    assert executable_1 == executable_2
+    assert ray.get(actor_1.test_dep.remote())
+    assert ray.get(actor_2.test_dep.remote())
+
+
 if __name__ == "__main__":
     import os
 

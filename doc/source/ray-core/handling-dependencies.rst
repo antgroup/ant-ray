@@ -302,6 +302,100 @@ For details, head to the :ref:`API Reference <runtime-environments-api-ref>`.
 
   ``conda`` environments must have the same Python version as the Ray cluster.  Do not list ``ray`` in the ``conda`` dependencies, as it will be automatically installed.
 
+.. _use-uv-for-package-management:
+
+Using ``uv`` for package management
+"""""""""""""""""""""""""""""""""""
+
+The recommended approach for package management with `uv` in runtime environments is through `uv run`.
+
+This method offers several key advantages:
+First, it keeps dependencies synchronized between your driver and Ray workers.
+Additionally, it provides full support for `pyproject.toml` including editable
+packages. It also allows you to lock package versions using `uv lock`.
+For more details, see the `UV scripts documentation <https://docs.astral.sh/uv/guides/scripts/>`_.
+
+Create a file `pyproject.toml` in your working directory like the following:
+
+.. code-block:: toml
+
+  [project]
+
+  name = "test"
+
+  version = "0.1"
+
+  dependencies = [
+    "emoji",
+    "ray",
+  ]
+
+
+And then a `test.py` like the following:
+
+.. testcode::
+  :skipif: True
+
+  import ray
+
+  # Add `--isolated` to avoid uv problems with concurrent environment setup
+  # (see https://github.com/astral-sh/uv/issues/11219).
+  ray.init(runtime_env={"working_dir": ".", "py_executable": "uv run --isolated"})
+
+  @ray.remote
+  def message(entity):
+      import emoji
+      return emoji.emojize(entity + " rocks :thumbs_up:")
+
+  entities = [
+    "Ray",
+    "Ray Serve",
+    "Ray Data",
+    "Ray Train",
+    "Ray RLlib",
+    "Ray Tune",
+  ]
+  results = [message.remote(entity) for entity in entities]
+  for result in results:
+      print(ray.get(result))
+
+
+and run the driver script with `uv run test.py`. For reproducibility it's
+recommended to freeze the package versions by running `uv lock`.
+
+This workflow also supports editable packages, for example, you can use
+`uv add --editable ./path/to/package` where `./path/to/package`
+must be inside your `working_dir` so it's available to all
+workers.
+
+Instead of the `pyproject.toml` file, you can also use a `requirements.txt`
+file and use `uv run --with-requirements requirements.txt` for your `py_executable`
+or use the `--with` flag to specify individual requirements.
+
+
+.. tip::
+
+  In order to make this functionality available in a convenient way without having
+  to specify `py_executable` in the runtime environment, you can use the following
+  runtime environment hook:
+
+  .. code-block:: sh
+
+    export RAY_RUNTIME_ENV_HOOK=ray._private.runtime_env.uv_runtime_env_hook.hook
+
+  Run your driver with the following command:
+
+  .. code-block:: sh
+
+    uv run <args> my_script.py
+
+  This command sets the `py_executable` to `uv run <args>` and also sets the
+  `working_dir` to the same working directory that the driver is using, either
+  the current working directory or the `--directory` in `uv run`.
+  Note that this hook is experimental, in the future the Ray team might make
+  this behavior the default.
+
+
 Library Development
 """""""""""""""""""
 
@@ -379,6 +473,12 @@ The ``runtime_env`` is a Python dictionary or a Python class :class:`ray.runtime
   Note: Setting options (1), (3) and (4) per-task or per-actor is currently unsupported, it can only be set per-job (i.e., in ``ray.init()``).
 
   Note: For option (1), if the local directory contains a ``.gitignore`` file, the files and paths specified there are not uploaded to the cluster.  You can disable this by setting the environment variable `RAY_RUNTIME_ENV_IGNORE_GITIGNORE=1` on the machine doing the uploading.
+
+- ``py_executable`` (str): Specifies the executable used for running the Ray workers. It can include arguments as well. The executable can be
+  located in the `working_dir`. This runtime environment is useful to run workers in a custom debugger or profiler as well as to run workers
+  in an environment set up by a package manager like `UV` (see :ref:`here <use-uv-for-package-management>`).
+
+  Note: ``py_executable`` is new functionality and currently experimental. If you have some requirements or run into any problems, raise issues in `github <https://github.com/ray-project/ray/issues>`__.
 
 - ``excludes`` (List[str]): When used with ``working_dir`` or ``py_modules``, specifies a list of files or paths to exclude from being uploaded to the cluster.
   This field uses the pattern-matching syntax used by ``.gitignore`` files: see `<https://git-scm.com/docs/gitignore>`_ for details.
@@ -461,6 +561,36 @@ The ``runtime_env`` is a Python dictionary or a Python class :class:`ray.runtime
   - Example: ``"default"``
 
   - Example: ``{"stop-on-exit": "true", "t": "cuda,cublas,cudnn", "ftrace": ""}``
+
+- ``archives`` (Dict[str, str] | str): Specifies the packages or files for the Ray workers. This must either be (1) a URI to a remotely-stored zip or tar file (no file size limit if enforced by Ray).
+  See :ref:`remote-uris` for details, (2) a Dict which containing a user-defined key and a remote-stored zip or tar file.
+
+  - Example: ``"https://bucket/my_project.zip"``
+
+  - Example: ``{"url1": "https://bucket/my_project.zip", "url2": "https://bucket/my_project_2.zip"}``
+
+  Note: ``archives`` plugin is not a built-in plugin of Runtime Env Agent. if users need to use this plugin, you need to specify environment variables 
+  `RAY_RUNTIME_ENV_PLUGINS='[{"class": "ray._private.runtime_env.archive.DownloadAndUnpackArchivePlugin"}]'`
+
+  Note: ``archives`` plugin provides a user interface that can get the path of the file downloaded by the corresponding archives plugin.
+  user can use `get_context` interface to get archives path, the test code is like the following.
+
+  .. testcode::
+    import ray
+    from ray._private.runtime_env.archive import get_context
+
+    # This example runs on a local machine, but you can also do
+    # ray.init(address=..., runtime_env=...) to connect to a cluster.
+    ray.init()
+
+    @ray.remote
+    def get_archives_context():
+        archive_path = get_context()
+        return archive_path
+    
+    # This exmaple just show the archives plugin is instance of dict, but you can also set
+    # archives plugin a instance of str, like runtime_env = {"archives": "https://bucket/my_project.zip"}
+    ray.get(get_archives_context.options(runtime_env={"archives": {"url1": "https://bucket/my_project.zip", "url2": "https://bucket/my_project.zip"}))
 
 - ``image_uri`` (dict): Require a given Docker image. The worker process runs in a container with this image.
   - Example: ``{"image_uri": "anyscale/ray:2.31.0-py39-cpu"}``

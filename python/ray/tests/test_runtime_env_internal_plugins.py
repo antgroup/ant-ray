@@ -111,6 +111,12 @@ def test_archive_plugin_with_mutiple_packages(set_runtime_env_plugins, start_clu
             message = f.read()
             assert message == "test_2\n", message
 
+        # check archive symbol link
+        assert os.path.exists("test_1.txt")
+        assert os.path.exists("test_1/test_1.txt")
+        assert os.path.exists("test_2.txt")
+        assert os.path.exists("test_2/test_2.txt")
+
         return True
 
     _, address = start_cluster

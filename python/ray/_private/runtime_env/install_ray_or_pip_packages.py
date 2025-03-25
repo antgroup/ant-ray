@@ -7,12 +7,12 @@ import base64
 import logging
 
 logging.basicConfig(
-    stream=sys.stdout, format="%(asctime)s %(message)s", level=logging.DEBUG
+    stream=sys.stdout, format="%(asctime)s %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
 
-def install_ray_package(extra_packages, ray_version, whl_dir):
+def install_ray_package(ray_version, whl_dir):
     pip_install_command = [sys.executable, "-m", "pip", "install", "-U"]
 
     if whl_dir:
@@ -97,7 +97,7 @@ if __name__ == "__main__":
         pip_install_without_python_path = args.without_python_path.lower() == "true"
 
     if args.ray_version or args.whl_dir:
-        install_ray_package(args.extra_packages, args.ray_version, args.whl_dir)
+        install_ray_package(args.ray_version, args.whl_dir)
     if args.packages:
         install_pip_package_with_specify_path(
             args.packages, pip_install_without_python_path

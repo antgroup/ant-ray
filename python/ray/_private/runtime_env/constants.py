@@ -43,7 +43,7 @@ RAY_JAVA_JARS_DIRS = "RAY_JAVA_JARS_DIRS"
 RAY_USE_WHL_PACKAGE = env_bool("RAY_USE_WHL_PACKAGE", False)
 
 # Whether podman integrate nydus
-RAY_PODMAN_UES_NYDUS = env_bool("RAY_PODMAN_UES_NYDUS", False)
+RAY_PODMAN_UES_NYDUS = env_bool("RAY_PODMAN_UES_NYDUS", True)
 
 # The system log dir
 RAY_PODMAN_SYSTEM_LOG_DIR = os.environ.get("RAY_PODMAN_SYSTEM_LOG_DIR", "")

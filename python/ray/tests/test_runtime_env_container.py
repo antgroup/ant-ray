@@ -239,10 +239,22 @@ class TestContainerRuntimeEnvWithOtherRuntimeEnv:
                 return ray.put((1, 10))
 
 
+@ray.remote
+class Counter(object):
+    def __init__(self):
+        self.value = 0
+        ray.put(self.value)
+
+    def increment(self):
+        self.value += 1
+        return self.value
+
+
+@pytest.mark.parametrize("api_version", ["container", "image_uri"])
 class TestContainerRuntimeEnvCommandLine:
-    def test_container_mount_path_deduplication(ray_start_regular):
+    def test_container_mount_path_deduplication(self, api_version, ray_start_regular):
         runtime_env = {
-            "container": {
+            api_version: {
                 "image": "unknown_image",
                 "run_options": [
                     "-v",
@@ -253,16 +265,6 @@ class TestContainerRuntimeEnvCommandLine:
                 ],
             },
         }
-
-        @ray.remote
-        class Counter(object):
-            def __init__(self):
-                self.value = 0
-                ray.put(self.value)
-
-            def increment(self):
-                self.value += 1
-                return self.value
 
         a = Counter.options(
             runtime_env=runtime_env,
@@ -295,9 +297,9 @@ class TestContainerRuntimeEnvCommandLine:
             lambda: check_logs_by_keyword(keyword4, log_file_pattern), timeout=10
         )
 
-    def test_check_install_ray_with_pip_packages(ray_start_regular):
+    def test_check_install_ray_with_pip_packages(self, api_version, ray_start_regular):
         runtime_env = {
-            "container": {
+            api_version: {
                 "image": "unknown_image",
                 "_install_ray": True,
             },
@@ -309,15 +311,33 @@ class TestContainerRuntimeEnvCommandLine:
             },
         }
 
-        @ray.remote
-        class Counter(object):
-            def __init__(self):
-                self.value = 0
-                ray.put(self.value)
+        a = Counter.options(
+            runtime_env=runtime_env,
+        ).remote()
+        try:
+            ray.get(a.increment.remote(), timeout=1)
+        except (ray.exceptions.RuntimeEnvSetupError, ray.exceptions.GetTimeoutError):
+            # ignore the exception because container mode don't work in common
+            # test environments.
+            time.sleep(2)
+        # Checkout the worker logs to ensure if the cgroup params is set correctly
+        # in the podman command.
+        base64string = base64.b64encode(
+            json.dumps(runtime_env["pip"]["packages"]).encode("utf-8")
+        ).decode("utf-8")
+        keyword = f"\--packages {base64string}"
+        log_file_pattern = "raylet.err"
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword, log_file_pattern), timeout=20
+        )
 
-            def increment(self):
-                self.value += 1
-                return self.value
+    def test_container_command_with_py_executable(self, api_version, ray_start_regular):
+        runtime_env = {
+            api_version: {
+                "image": "unknown_image",
+                "py_executable": "/fake/python/bin",
+            },
+        }
 
         a = Counter.options(
             runtime_env=runtime_env,
@@ -330,10 +350,7 @@ class TestContainerRuntimeEnvCommandLine:
             pass
         # Checkout the worker logs to ensure if the cgroup params is set correctly
         # in the podman command.
-        base64string = base64.b64encode(
-            json.dumps(runtime_env["pip"]["packages"]).encode("utf-8")
-        ).decode("utf-8")
-        keyword = f"\--packages {base64string}"
+        keyword = "/fake/python/bin -m ray._private.workers.default_worker"
         log_file_pattern = "raylet.err"
         wait_for_condition(
             lambda: check_logs_by_keyword(keyword, log_file_pattern), timeout=20
@@ -366,16 +383,6 @@ class TestContainerRuntimeEnvCommandLine:
     ],
 )
 def test_container_with_pip_packages(runtime_env, ray_start_regular):
-    @ray.remote
-    class Counter(object):
-        def __init__(self):
-            self.value = 0
-            ray.put(self.value)
-
-        def increment(self):
-            self.value += 1
-            return self.value
-
     a = Counter.options(runtime_env=runtime_env).remote()
 
     try:
@@ -389,7 +396,7 @@ def test_container_with_pip_packages(runtime_env, ray_start_regular):
     log_file_pattern_2 = "runtime_env_setup-01000000.log"
     pip_packages = runtime_env.get("pip")
     container_pip_packages = runtime_env.get("container").get("pip")
-    merge_pip_packages = list(set(pip_packages) | set(container_pip_packages))
+    merge_pip_packages = list(dict.fromkeys(pip_packages + container_pip_packages))
     json_dumps_container_pip_packages = base64.b64encode(
         json.dumps(container_pip_packages).encode("utf-8")
     ).decode("utf-8")
@@ -425,16 +432,6 @@ def test_container_with_pip_packages(runtime_env, ray_start_regular):
     indirect=True,
 )
 def test_container_with_resources_limit(ray_start_regular):
-    @ray.remote
-    class Counter(object):
-        def __init__(self):
-            self.value = 0
-            ray.put(self.value)
-
-        def increment(self):
-            self.value += 1
-            return self.value
-
     a = Counter.options(
         runtime_env={
             "container": {

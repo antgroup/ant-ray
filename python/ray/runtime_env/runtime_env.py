@@ -391,17 +391,24 @@ class RuntimeEnv(dict):
                 "https://docs.ray.io/en/latest/serve/advanced-guides/multi-app-container.html."  # noqa
             )
 
-        if self.get("image_uri"):
-            image_uri_plugin_cls = get_image_uri_plugin_cls()
-            invalid_keys = (
-                set(runtime_env.keys()) - image_uri_plugin_cls.get_compatible_keys()
+        if self.get("container") and self.get("image_uri"):
+            raise ValueError(
+                "'container' field and 'image_uri' field cannot be set at the same time."
             )
-            if len(invalid_keys):
-                raise ValueError(
-                    "The 'image_uri' field currently cannot be used "
-                    "together with other fields of runtime_env. "
-                    f"Specified fields: {invalid_keys}"
-                )
+
+        # NOTE(Jacky): We allow 'image_uri' field can be used together with other fields of runtime_env.
+        # So, We block the following logic code.
+        # if self.get("image_uri"):
+        #     image_uri_plugin_cls = get_image_uri_plugin_cls()
+        #     invalid_keys = (
+        #         set(runtime_env.keys()) - image_uri_plugin_cls.get_compatible_keys()
+        #     )
+        #     if len(invalid_keys):
+        #         raise ValueError(
+        #             "The 'image_uri' field currently cannot be used "
+        #             "together with other fields of runtime_env. "
+        #             f"Specified fields: {invalid_keys}"
+        #         )
 
         if self.get("archives") and self.env_vars().get("RAY_ARCHIVE_PATH"):
             raise ValueError(
@@ -586,35 +593,42 @@ class RuntimeEnv(dict):
             )
         return self.get(key)
 
-    def has_py_container(self) -> bool:
+    def get_containaer_key_name(self) -> Optional[str]:
         if self.get("container"):
+            return "container"
+        if self.get("image_uri"):
+            return "image_uri"
+        return None
+
+    def has_py_container(self, container_key_name) -> bool:
+        if self.get(container_key_name):
             return True
         return False
 
-    def py_container_image(self) -> Optional[str]:
-        if not self.has_py_container():
+    def py_container_image(self, container_key_name) -> Optional[str]:
+        if not self.has_py_container(container_key_name):
             return None
-        return self["container"].get("image", "")
+        return self[container_key_name].get("image", "")
 
-    def container_install_ray(self) -> bool:
-        if not self.has_py_container():
+    def container_install_ray(self, container_key_name) -> bool:
+        if not self.has_py_container(container_key_name):
             return False
-        return self["container"].get("_install_ray", False)
+        return self[container_key_name].get("_install_ray", False)
 
-    def py_container_worker_path(self) -> Optional[str]:
-        if not self.has_py_container():
+    def py_container_worker_path(self, container_key_name) -> Optional[str]:
+        if not self.has_py_container(container_key_name):
             return None
-        return self["container"].get("worker_path", "")
+        return self[container_key_name].get("worker_path", "")
 
-    def py_container_run_options(self) -> List:
-        if not self.has_py_container():
+    def py_container_run_options(self, container_key_name) -> List:
+        if not self.has_py_container(container_key_name):
             return None
-        return self["container"].get("run_options", [])
+        return self[container_key_name].get("run_options", [])
 
-    def container_pip_install_without_python_path(self) -> bool:
-        if not self.has_py_container():
+    def container_pip_install_without_python_path(self, container_key_name) -> bool:
+        if not self.has_py_container(container_key_name):
             return False
-        container_field_without_python_path = self["container"].get(
+        container_field_without_python_path = self[container_key_name].get(
             "_pip_install_without_python_path", False
         )
         runtime_env_field_without_python_path = self.get(
@@ -630,23 +644,13 @@ class RuntimeEnv(dict):
             container_field_without_python_path or runtime_env_field_without_python_path
         )
 
-    def py_container_pip_list(self) -> List:
-        if not self.has_py_container():
+    def py_container_pip_list(self, container_key_name) -> List:
+        if not self.has_py_container(container_key_name):
             return []
-        return self["container"].get("pip", [])
+        return self[container_key_name].get("pip", [])
 
     def image_uri(self) -> Optional[str]:
         return self.get("image_uri")
-
-    def has_image_uri(self) -> bool:
-        if self.get("image_uri"):
-            return True
-        return False
-
-    def image_uri_image(self) -> Optional[str]:
-        if not self.has_image_uri():
-            return None
-        return self["image_uri"].get("image", "")
 
     def plugins(self) -> List[Tuple[str, Any]]:
         result = list()

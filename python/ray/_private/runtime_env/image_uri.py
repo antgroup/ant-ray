@@ -334,20 +334,21 @@ class ContainerManager:
         context: RuntimeEnvContext,
         logger: Optional[logging.Logger] = default_logger,
     ):
-        if not runtime_env.has_py_container() or not runtime_env.py_container_image():
+        container_key_name = runtime_env.get_containaer_key_name()
+        if not container_key_name:
+            return
+        if not runtime_env.py_container_image(container_key_name):
             return
 
         logger.info(f"container setup for {runtime_env}")
-        container_option = runtime_env.get("container")
-        if not container_option or not container_option.get("image"):
-            return
+        container_option = runtime_env.get(container_key_name)
 
         # Use the user's python executable if py_executable is not None.
         py_executable = container_option.get("py_executable")
 
-        install_ray = runtime_env.container_install_ray()
+        install_ray = runtime_env.container_install_ray(container_key_name)
         pip_install_without_python_path = (
-            runtime_env.container_pip_install_without_python_path()
+            runtime_env.container_pip_install_without_python_path(container_key_name)
         )
 
         container_driver = "podman"
@@ -379,7 +380,7 @@ class ContainerManager:
                 "_install_ray and _pip_install_without_python_path can't both be True, "
                 "please check your runtime_env field."
             )
-        container_pip_packages = runtime_env.py_container_pip_list()
+        container_pip_packages = runtime_env.py_container_pip_list(container_key_name)
         pip_packages = runtime_env.pip_config().get("packages", [])
 
         install_ray_or_pip_packages_command = None
@@ -405,7 +406,7 @@ class ContainerManager:
                     )
                 if pip_packages or container_pip_packages:
                     merge_pip_packages = list(
-                        set(pip_packages) | set(container_pip_packages)
+                        dict.fromkeys(pip_packages + container_pip_packages)
                     )
                     install_ray_or_pip_packages_command.extend(
                         [
@@ -502,8 +503,8 @@ class ContainerManager:
             container_to_host_mount_dict[
                 system_dynamic_config_file_path
             ] = system_dynamic_config_file_path
-        if runtime_env.py_container_run_options():
-            run_options_list = runtime_env.py_container_run_options()
+        if runtime_env.py_container_run_options(container_key_name):
+            run_options_list = runtime_env.py_container_run_options(container_key_name)
             index = 0
             while index < len(run_options_list):
                 run_option = run_options_list[index]
@@ -565,9 +566,11 @@ class ContainerManager:
         # If podman integrate nydus, we use nydus image as rootfs
         if runtime_env_constants.RAY_PODMAN_UES_NYDUS:
             container_command.append("--rootfs")
-            container_command.append(runtime_env.py_container_image() + ":O")
+            container_command.append(
+                runtime_env.py_container_image(container_key_name) + ":O"
+            )
         else:
-            container_command.append(runtime_env.py_container_image())
+            container_command.append(runtime_env.py_container_image(container_key_name))
         container_command.extend(["-l", "-c"])
         context.container["container_command"] = container_command
 

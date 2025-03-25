@@ -2139,3 +2139,46 @@ def get_dependencies_installer_path():
 def get_pyenv_path():
     # Get the pyenv path automatically instead of hard code.
     return "/home/admin/.pyenv"
+
+
+def get_current_python():
+    """
+    Get current python executable and site package directory.
+    """
+    version_dir = os.path.dirname(os.path.dirname(sys.executable))
+    # The python version format must be `{major}.{minor}`.
+    splited_version = os.path.basename(version_dir).split(".")
+    python_version = ".".join(splited_version[0:2])
+    site_packages_path = os.path.join(
+        version_dir,
+        "lib",
+        "python" + python_version,
+        "site-packages",
+    )
+    return sys.executable, site_packages_path, python_version
+
+
+def get_specify_python(python_version):
+    """
+    Get specified python executable and site package directory.
+
+    In ANT-INTERNAL, we install multiple python in
+    /home/admin/.pyenv/versions/.
+    There will be 3.6.13, 3.7.10 and so on.
+    """
+    base_path = os.path.join(get_pyenv_path(), "versions")
+    for version_dir_name in os.listdir(base_path):
+        if version_dir_name.startswith(python_version):
+            return os.path.join(
+                base_path,
+                version_dir_name,
+                "bin",
+                "python",
+            ), os.path.join(
+                base_path,
+                version_dir_name,
+                "lib",
+                "python" + python_version,
+                "site-packages",
+            )
+    return None, None

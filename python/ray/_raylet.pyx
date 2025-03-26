@@ -72,6 +72,7 @@ from cython.operator import dereference, postincrement
 from cpython.pystate cimport (
     PyGILState_Ensure,
     PyGILState_Release,
+    PyGILState_STATE,
 )
 
 from ray.includes.common cimport (
@@ -1836,7 +1837,7 @@ cdef void execute_task(
 
             return function(actor, *arguments, **kwarguments)
 
-    from ray.util.insight import record_object_arg_get, timeit
+    from ray.util.insight import record_object_arg_get
 
     with core_worker.profile_event(b"task::" + name, extra_data=extra_data), \
          ray._private.worker._changeproctitle(title, next_title):
@@ -1895,13 +1896,13 @@ cdef void execute_task(
             # Execute the task.
             with core_worker.profile_event(b"task:execute"):
                 task_exception = True
+                task_exception_instance = None
                 try:
                     if debugger_breakpoint != b"":
                         ray.util.pdb.set_trace(
                             breakpoint_uuid=debugger_breakpoint)
 
-                    with timeit():
-                        outputs = function_executor(*args, **kwargs)
+                    outputs = function_executor(*args, **kwargs)
                     
                     if is_streaming_generator:
                         # Streaming generator always has a single return value
@@ -1997,10 +1998,14 @@ cdef void execute_task(
                                      " {}.".format(
                                         core_worker.get_current_task_id()),
                                      exc_info=True)
-                    raise e
+                    task_exception_instance = e
                 finally:
                     # Record the end of the task log.
                     worker.record_task_log_end(task_id, attempt_number)
+                    if task_exception_instance is not None:
+                        raise task_exception_instance
+                    if core_worker.get_current_actor_should_exit():
+                        raise_sys_exit_with_custom_error_message("exit_actor() is called.")
 
                 if (returns[0].size() == 1
                         and not inspect.isgenerator(outputs)
@@ -2262,6 +2267,10 @@ cdef shared_ptr[LocalMemoryBuffer] ray_error_to_memory_buf(ray_error):
     return make_shared[LocalMemoryBuffer](
         <uint8_t*>py_bytes, len(py_bytes), True)
 
+cdef void pygilstate_release(PyGILState_STATE gstate) nogil:
+    with gil:
+        PyGILState_Release(gstate)
+
 cdef function[void()] initialize_pygilstate_for_thread() nogil:
     """
     This function initializes a C++ thread to make it be considered as a
@@ -2278,7 +2287,7 @@ cdef function[void()] initialize_pygilstate_for_thread() nogil:
     cdef function[void()] callback
     with gil:
         gstate = PyGILState_Ensure()
-        callback = bind(PyGILState_Release, ref(gstate))
+        callback = bind(pygilstate_release, ref(gstate))
     return callback
 
 cdef CRayStatus task_execution_handler(
@@ -2307,8 +2316,15 @@ cdef CRayStatus task_execution_handler(
         # Initialize job_config if it hasn't already.
         # Setup system paths configured in job_config.
         maybe_initialize_job_config()
+        
+        from ray.util.insight import record_task_enter, record_task_duration
 
+        # directly use record_task_enter and record_task_duration here
+        # rather than timeit to prevent indent change
+        # to avoid diff conflict when merge new features
+        start_time = None
         try:
+            start_time = record_task_enter()
             try:
                 # Exceptions, including task cancellation, should be handled
                 # internal to this call. If it does raise an exception, that
@@ -2384,6 +2400,9 @@ cdef CRayStatus task_execution_handler(
                 if hasattr(e, "unexpected_error_traceback"):
                     msg += (f" {e.unexpected_error_traceback}")
                 return CRayStatus.UnexpectedSystemExit(msg)
+        finally:
+            if start_time is not None:
+                record_task_duration(time.time() - start_time)
 
     return CRayStatus.OK()
 
@@ -2721,42 +2740,6 @@ cdef class EmptyProfileEvent:
         pass
 
 
-def _auto_reconnect(f):
-    @wraps(f)
-    def wrapper(self, *args, **kwargs):
-        if "TEST_RAY_COLLECT_KV_FREQUENCY" in os.environ:
-            with ray._private.utils._CALLED_FREQ_LOCK:
-                ray._private.utils._CALLED_FREQ[f.__name__] += 1
-        remaining_retry = self._nums_reconnect_retry
-        while True:
-            try:
-                return f(self, *args, **kwargs)
-            except RpcError as e:
-                if e.rpc_code in [
-                    GRPC_STATUS_CODE_UNAVAILABLE,
-                    GRPC_STATUS_CODE_UNKNOWN,
-                ]:
-                    if remaining_retry <= 0:
-                        logger.error(
-                            "Failed to connect to GCS. Please check"
-                            " `gcs_server.out` for more details."
-                        )
-                        raise
-                    logger.debug(
-                        f"Failed to send request to gcs, reconnecting. Error {e}"
-                    )
-                    try:
-                        self._connect()
-                    except Exception:
-                        logger.error(f"Connecting to gcs failed. Error {e}")
-                    time.sleep(1)
-                    remaining_retry -= 1
-                    continue
-                raise
-
-    return wrapper
-
-
 cdef class GcsClient:
     """
     Client to the GCS server. Only contains synchronous methods. For async methods,
@@ -2767,10 +2750,8 @@ cdef class GcsClient:
 
     cdef InnerGcsClient inner
 
-    def __cinit__(self, address,
-                  nums_reconnect_retry=RayConfig.instance().nums_py_gcs_reconnect_retry(
-                  ),
-                  cluster_id: str = None):
+    def __cinit__(self, address: str,
+                  cluster_id: Optional[str] = None):
         # For timeout (DEADLINE_EXCEEDED): retries once with timeout_ms.
         #
         # For other RpcError (UNAVAILABLE, UNKNOWN): retries indefinitely until it
@@ -4686,6 +4667,14 @@ cdef class CoreWorker:
     def current_actor_is_asyncio(self):
         return (CCoreWorkerProcess.GetCoreWorker().GetWorkerContext()
                 .CurrentActorIsAsync())
+
+    def set_current_actor_should_exit(self):
+        return (CCoreWorkerProcess.GetCoreWorker().GetWorkerContext()
+                .SetCurrentActorShouldExit())
+
+    def get_current_actor_should_exit(self):
+        return (CCoreWorkerProcess.GetCoreWorker().GetWorkerContext()
+                .GetCurrentActorShouldExit())
 
     def current_actor_max_concurrency(self):
         return (CCoreWorkerProcess.GetCoreWorker().GetWorkerContext()

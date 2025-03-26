@@ -447,7 +447,6 @@ type PhysicalVisualizationProps = {
   onElementClick: (data: any, skip_zoom: boolean) => void;
   selectedElementId: string | null;
   jobId?: string;
-  updateKey?: number;
   onUpdate?: () => void;
   updating?: boolean;
   searchTerm?: string;
@@ -706,7 +705,6 @@ const PhysicalVisualization = forwardRef<
       onElementClick,
       selectedElementId,
       jobId,
-      updateKey,
       onUpdate,
       updating = false,
       searchTerm = "",
@@ -1450,7 +1448,7 @@ const PhysicalVisualization = forwardRef<
     // Initial render and on data change
     useEffect(() => {
       renderPhysicalView();
-    }, [renderPhysicalView, physicalViewData, updateKey, contextValueFilter]);
+    }, [renderPhysicalView, physicalViewData, contextValueFilter]);
 
     return (
       <div
@@ -1486,6 +1484,31 @@ const PhysicalVisualization = forwardRef<
                 value={selectedResource}
                 onChange={(e) => setSelectedResource(e.target.value)}
                 label="Resource Type"
+                sx={{
+                  "& .MuiSelect-select": {
+                    paddingRight: "32px !important",
+                  },
+                }}
+                IconComponent={() => (
+                  <div
+                    style={{
+                      position: "absolute",
+                      right: "7px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M7 10l5 5 5-5z" />
+                    </svg>
+                  </div>
+                )}
               >
                 {getAvailableResources(
                   physicalViewData.physicalView?.[
@@ -1508,6 +1531,31 @@ const PhysicalVisualization = forwardRef<
                   setContextValueFilter(""); // Reset filter when context changes
                 }}
                 label="Context"
+                sx={{
+                  "& .MuiSelect-select": {
+                    paddingRight: "32px !important",
+                  },
+                }}
+                IconComponent={() => (
+                  <div
+                    style={{
+                      position: "absolute",
+                      right: "7px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M7 10l5 5 5-5z" />
+                    </svg>
+                  </div>
+                )}
               >
                 {getAvailableContextKeys(physicalViewData).map(
                   ({ key, label }) => (

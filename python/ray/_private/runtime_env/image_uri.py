@@ -365,6 +365,16 @@ class ContainerManager:
             "--ipc=host",
             "--env-host",
             "--cgroups=no-conmon",  # ANT-INTERNAL
+            # NOTE(zcin): Mounted volumes in rootless containers are
+            # owned by the user `root`. The user on host (which will
+            # usually be `ray` if this is being run in a ray docker
+            # image) who started the container is mapped using user
+            # namespaces to the user `root` in a rootless container. In
+            # order for the Ray Python worker to access the mounted ray
+            # tmp dir, we need to use keep-id mode which maps the user
+            # as itself (instead of as `root`) into the container.
+            # https://www.redhat.com/sysadmin/rootless-podman-user-namespace-modes
+            "--userns=keep-id",
         ]
 
         # in ANT-INTERNAL, we need mount /home/admin/ray-pack,
@@ -576,6 +586,11 @@ class ContainerManager:
 
         if py_executable:
             context.py_executable = py_executable
+        # Example:
+        # sudo -E podman run -v /tmp/ray:/tmp/ray
+        # --cgroup-manager=cgroupfs --network=host --pid=host --ipc=host --env-host --cgroups=no-conmon
+        # --userns=keep-id -v /home/admin/ray-pack:/home/admin/ray-pack --env RAY_RAYLET_PID=23478 --env RAY_JOB_ID=$RAY_JOB_ID
+        # --entrypoint python rayproject/ray:nightly-py39
         logger.info(
             "start worker in container with prefix: {}".format(
                 " ".join(container_command)

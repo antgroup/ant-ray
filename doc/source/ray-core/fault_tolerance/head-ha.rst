@@ -18,16 +18,24 @@ Head HA is a simple and effective way to make the head node highly available.
 
 How it works
 ----------------
-Head High-Availability Feature is implemented by the following steps:
+The Head High-Availability Feature is implemented through the following steps:
 
-1. Start two or more head nodes at the same time.
-2. The startup process is before initializing the node and starting the head node process. It connects to redis and compete for the leadership through redis's distributed lock.
-3. Only the node that successfully competes for the leadership will execute the subsequent gcs_server/dashboard process startup normally.
-4. The standby node will be stuck in the competition process until the original leader node fails.
-5. After normal startup, the startup process of the leader node will periodically renew the distributed lock of redis to maintain the leader status. Then the startup process will run as a daemon process to check the leadership of this head node.
-6. If the entire pod of the leader node fails or the lease renewal fails, it considers itself as a standby node and kills all processes and itself and then exit the startup process. Exit of the startup process will cause the pod to restart, which is done by kuberay.
-7. The standby node will terminate the competition process when it finds itself as the leader, starting the gcs and dashboard processes, etc.
-8. Then the newly started process in step 6 will be stuck in the competition process as a standby node until the current leader node in step 7 fails.
+1. **Simultaneous Initialization:** Two or more head nodes are launched simultaneously.
+
+2. **Leadership Election:** During the startup process—before initializing the node or starting the head node process—each node connects to Redis and competes for leadership using Redis’s distributed lock mechanism.
+
+3. **Leader Node Activation:** Only the node that successfully acquires leadership proceeds with starting critical processes such as the `gcs_server` and `dashboard`. 
+
+4. **Standby Node Behavior:** Nodes that fail to gain leadership remain in the competition loop as standby nodes until the leader node encounters a failure.
+
+5. **Periodic Lease Renewal:** After a successful startup, the leader node periodically renews the distributed lock in Redis to maintain its leadership status. Meanwhile, a daemon process monitors the node's leadership status.
+
+6. **Leader Node Failure Handling:** If the leader node's pod fails entirely or lease renewal fails, the node considers itself as a standby node. It terminates all processes, exits the startup process, and triggers a pod restart via KubeRay.
+
+7. **Leadership Transition:** When a standby node detects that it has become the new leader, it terminates the competition process and initiates the necessary services (e.g., `gcs_server`, `dashboard`).
+
+8. **Standby Node Re-entry:** Upon restarting, the previously failed leader node enters the competition loop as a standby node, waiting for the current leader node to fail before taking over.
+
 
 
 How to use it

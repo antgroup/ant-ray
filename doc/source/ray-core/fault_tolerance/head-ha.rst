@@ -40,7 +40,7 @@ The Head High-Availability Feature is implemented through the following steps:
 
 How to use it
 ----------------
-To enable it, set the OS environment variable ``RAY_ENABLE_HEAD_NODE_HA`` to ``True``.
+To enable it, set the OS environment variable ``RAY_ENABLE_HEAD_HA`` to ``True``.
 
 
 Dependency

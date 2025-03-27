@@ -1455,13 +1455,13 @@ document.write(`
 <span class="c1"># TODO (sven): As soon as RolloutWorker is no longer supported, make `EnvRunner` itself</span>
 <span class="c1">#  a Checkpointable. Currently, only some of its subclasses are Checkpointables.</span>
 <div class="viewcode-block" id="SingleAgentEnvRunner">
-<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.env.single_agent_env_runner.SingleAgentEnvRunner">[docs]</a>
+<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.offline.offline_env_runner.SingleAgentEnvRunner">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">SingleAgentEnvRunner</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">,</span> <span class="n">Checkpointable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The generic environment runner for the single agent case.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SingleAgentEnvRunner.__init__">
-<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.env.single_agent_env_runner.SingleAgentEnvRunner.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.offline.offline_env_runner.SingleAgentEnvRunner.__init__">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes a SingleAgentEnvRunner instance.</span>
@@ -1532,7 +1532,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="SingleAgentEnvRunner.sample">
-<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.env.single_agent_env_runner.SingleAgentEnvRunner.sample">[docs]</a>
+<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.offline.offline_env_runner.SingleAgentEnvRunner.sample">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1852,7 +1852,7 @@ document.write(`
         <span class="k">return</span> <span class="n">done_episodes_to_return</span> <span class="o">+</span> <span class="n">ongoing_episodes_to_return</span>
 
 <div class="viewcode-block" id="SingleAgentEnvRunner.get_spaces">
-<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.env.single_agent_env_runner.SingleAgentEnvRunner.get_spaces">[docs]</a>
+<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.offline.offline_env_runner.SingleAgentEnvRunner.get_spaces">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_spaces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -1865,7 +1865,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="SingleAgentEnvRunner.get_metrics">
-<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.env.single_agent_env_runner.SingleAgentEnvRunner.get_metrics">[docs]</a>
+<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.offline.offline_env_runner.SingleAgentEnvRunner.get_metrics">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
         <span class="c1"># Compute per-episode metrics (only on already completed episodes).</span>
@@ -2005,7 +2005,7 @@ document.write(`
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;module&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SingleAgentEnvRunner.make_env">
-<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.env.single_agent_env_runner.SingleAgentEnvRunner.make_env">[docs]</a>
+<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.offline.offline_env_runner.SingleAgentEnvRunner.make_env">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">make_env</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a vectorized gymnasium env and stores it in `self.env`.</span>
@@ -2092,7 +2092,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="SingleAgentEnvRunner.make_module">
-<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.env.single_agent_env_runner.SingleAgentEnvRunner.make_module">[docs]</a>
+<a class="viewcode-back" href="../../../../rllib/package_ref/env/single_agent_env_runner.html#ray.rllib.offline.offline_env_runner.SingleAgentEnvRunner.make_module">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">make_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>

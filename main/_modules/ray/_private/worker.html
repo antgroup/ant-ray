@@ -2961,6 +2961,10 @@ document.write(`
             <span class="n">usage_lib</span><span class="o">.</span><span class="n">put_pre_init_usage_stats</span><span class="p">()</span>
 
         <span class="n">usage_lib</span><span class="o">.</span><span class="n">record_library_usage</span><span class="p">(</span><span class="s2">&quot;client&quot;</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">create_insight_monitor_actor</span>
+
+        <span class="n">create_insight_monitor_actor</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">ctx</span>
 
     <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allow_multiple&quot;</span><span class="p">):</span>
@@ -3092,6 +3096,10 @@ document.write(`
         <span class="k">if</span> <span class="n">ignore_reinit_error</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calling ray.init() again after it has already been called.&quot;</span><span class="p">)</span>
             <span class="n">node_id</span> <span class="o">=</span> <span class="n">global_worker</span><span class="o">.</span><span class="n">core_worker</span><span class="o">.</span><span class="n">get_current_node_id</span><span class="p">()</span>
+
+            <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">create_insight_monitor_actor</span>
+
+            <span class="n">create_insight_monitor_actor</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">RayContext</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">_global_node</span><span class="o">.</span><span class="n">address_info</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="n">node_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -3292,6 +3300,10 @@ document.write(`
     <span class="n">node_id</span> <span class="o">=</span> <span class="n">global_worker</span><span class="o">.</span><span class="n">core_worker</span><span class="o">.</span><span class="n">get_current_node_id</span><span class="p">()</span>
     <span class="n">global_node_address_info</span> <span class="o">=</span> <span class="n">_global_node</span><span class="o">.</span><span class="n">address_info</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">global_node_address_info</span><span class="p">[</span><span class="s2">&quot;webui_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_remove_protocol_from_url</span><span class="p">(</span><span class="n">dashboard_url</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">create_insight_monitor_actor</span>
+
+    <span class="n">create_insight_monitor_actor</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">RayContext</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">global_node_address_info</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="n">node_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()))</span></div>
 
 

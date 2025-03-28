@@ -1,4 +1,4 @@
-.. _fault-tolerance-nodes:
+.. _fault-tolerance-head-ha:
 
 Head High-Availability Feature
 ==============================

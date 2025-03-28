@@ -234,7 +234,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             context.command_prefix[i] = prefix.replace(
                 WorkingDirPlugin.working_dir_placeholder, working_dir
             )
-        for k, v in context.env_vars.copy().items():
+        for k, v in context.env_vars.items():
             context.env_vars[k] = v.replace(
                 WorkingDirPlugin.working_dir_placeholder, working_dir
             )

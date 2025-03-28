@@ -110,8 +110,6 @@ class DownloadAndUnpackArchivePlugin(RuntimeEnvPlugin):
                     "downloading or unpacking the archive package."
                 )
             local_archive_uris = str(local_archive_uris)
-            # TODO(Jacky): The Working Dir plugin has not been revamped, so this interface is blocked for now
-            # context.symlink_dirs_to_cwd.append(local_archive_uris)
             context.symlink_dirs_to_cwd.append(local_archive_uris)
         elif isinstance(archive_uris, dict):
             local_archive_uris = dict()
@@ -124,7 +122,6 @@ class DownloadAndUnpackArchivePlugin(RuntimeEnvPlugin):
                         "downloading or unpacking the archive package."
                     )
                 local_archive_uris[key] = str(local_dir)
-                # TODO(Jacky): The Working Dir plugin has not been revamped, so this interface is blocked for now
                 context.symlink_dirs_to_cwd.append(str(local_dir))
         else:
             # NOTE(Jacky): archive_uris can not be instance of list, cause users need to find

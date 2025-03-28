@@ -582,6 +582,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/fault_tolerance/nodes.html">Node Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/fault_tolerance/gcs.html">GCS Fault Tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -607,10 +608,11 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
@@ -754,14 +756,14 @@ document.write(`
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -814,30 +816,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../serve/model-multiplexing.html">Model Multiplexing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/configure-serve-deployment.html">Configure Ray Serve deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/http-guide.html">Set Up FastAPI and HTTP</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../serve/llm/overview.html">Overview</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../serve/llm/api.html">Ray Serve LLM API</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.builders.build_vllm_deployment.html">ray.serve.llm.builders.build_vllm_deployment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.builders.build_openai_app.html">ray.serve.llm.builders.build_openai_app</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.LLMConfig.html">ray.serve.llm.configs.LLMConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.LLMServingArgs.html">ray.serve.llm.configs.LLMServingArgs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.ModelLoadingConfig.html">ray.serve.llm.configs.ModelLoadingConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.CloudMirrorConfig.html">ray.serve.llm.configs.CloudMirrorConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.configs.LoraConfig.html">ray.serve.llm.configs.LoraConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.deployments.VLLMService.html">ray.serve.llm.deployments.VLLMService</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.deployments.LLMRouter.html">ray.serve.llm.deployments.LLMRouter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html">ray.serve.llm.openai_api_models.ChatCompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionRequest.html">ray.serve.llm.openai_api_models.CompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionStreamResponse.html">ray.serve.llm.openai_api_models.ChatCompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionResponse.html">ray.serve.llm.openai_api_models.ChatCompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html">ray.serve.llm.openai_api_models.CompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionResponse.html">ray.serve.llm.openai_api_models.CompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../serve/llm/doc/ray.serve.llm.openai_api_models.ErrorResponse.html">ray.serve.llm.openai_api_models.ErrorResponse</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../serve/llm/serving-llms.html">Serving LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/production-guide/config.html">Serve Config Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/production-guide/kubernetes.html">Deploy on Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/production-guide/docker.html">Custom Docker Images</a></li>
@@ -849,7 +829,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../serve/monitoring.html">Monitor Your Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/resource-allocation.html">Resource Allocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../serve/autoscaling-guide.html">Ray Serve Autoscaling</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/advanced-guides/app-builder-guide.html">Pass Arguments to Applications</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/advanced-guides/advanced-autoscaling.html">Advanced Ray Serve Autoscaling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../serve/advanced-guides/performance.html">Performance Tuning</a></li>
@@ -867,10 +847,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../serve/api/index.html">Ray Serve API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/key-concepts.html">Key concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/multi-agent-envs.html">Multi-Agent Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/hierarchical-envs.html">Hierarchical Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/external-envs.html">External Environments and Applications</a></li>
@@ -878,7 +858,7 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/algorithm-config.html">AlgorithmConfig API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/rllib-algorithms.html">Algorithms</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/rllib-advanced-api.html">Advanced Python APIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../rllib/checkpoints.html">Checkpointing</a></li>
@@ -905,8 +885,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/rllib-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../rllib/new-api-stack-migration-guide.html">New API stack migration guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
@@ -928,7 +908,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
@@ -947,7 +927,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html">ray.rllib.callbacks.callbacks.RLlibCallback</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end</a></li>
@@ -963,7 +943,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/env_runner.html">EnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/single_agent_env_runner.html">SingleAgentEnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/single_agent_episode.html">SingleAgentEpisode API</a></li>
@@ -973,7 +953,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/env/utils.html">Env Utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.build</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class</a></li>
@@ -1016,7 +996,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html">ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.html">ray.rllib.models.distributions.Distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html">ray.rllib.models.distributions.Distribution.from_logits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html">ray.rllib.models.distributions.Distribution.sample</a></li>
@@ -1025,14 +1005,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html">ray.rllib.models.distributions.Distribution.kl</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html">ray.rllib.core.learner.learner_group.LearnerGroup</a></li>
 </ul>
 </li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners</a></li>
@@ -1053,7 +1033,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs.html">ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit.html">ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer.html">ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html">ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer</a></li>
@@ -1068,7 +1048,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html">ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
@@ -1114,12 +1094,12 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/joblib.html">Distributed Scikit-learn / Joblib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/multiprocessing.html">Distributed multiprocessing.Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/ray-collective.html">Ray Collective Communication Lib</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.ray_active.html">ray.util.dask.RayDaskCallback.ray_active</a></li>
 </ul>
 </li>
@@ -1134,7 +1114,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../workflows/index.html">Ray Workflows (Alpha)</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/basics.html">Getting Started</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/management.html">Workflow Management</a></li>
@@ -1142,7 +1122,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/events.html">Events</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/comparison.html">API Comparisons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../workflows/advanced.html">Advanced Topics</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../workflows/api/execution.html">Workflow Execution API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../workflows/api/management.html">Workflow Management API</a></li>
 </ul>
@@ -1151,16 +1131,16 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
@@ -1205,7 +1185,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/user-guides/reduce-image-pull-latency.html">Reducing image pull latency on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/ml-example.html">Ray Train XGBoostTrainer on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/gpu-training-example.html">Train PyTorch ResNet model with GPUs on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/mnist-training-example.html">Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes</a></li>
@@ -1221,7 +1201,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/examples/vllm-rayservice.html">Serve a Large Language Model with vLLM on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/ingress.html">Ingress</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/prometheus-grafana.html">Using Prometheus and Grafana</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/pyspy.html">Profiling with py-spy</a></li>
@@ -1231,12 +1211,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/k8s-ecosystem/istio.html">mTLS and L7 observability with Istio</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/benchmarks/memory-scalability-benchmark.html">KubeRay memory and scalability benchmark</a></li>
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting/troubleshooting.html">Troubleshooting guide</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html">RayService troubleshooting</a></li>
@@ -1245,9 +1225,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/kubernetes/references.html">API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/vms/getting-started.html">Getting Started</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/user-guides/launching-clusters/index.html">Launching Ray Clusters on AWS, GCP, Azure, vSphere, On-Prem</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/user-guides/large-cluster-best-practices.html">Best practices for deploying large clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/user-guides/configuring-autoscaling.html">Configuring Autoscaling</a></li>
@@ -1256,11 +1236,11 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/examples/ml-example.html">Ray Train XGBoostTrainer on VMs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/references/ray-cluster-cli.html">Cluster Launcher Commands</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/vms/references/ray-cluster-configuration.html">Cluster YAML Configuration Options</a></li>
 </ul>
@@ -1269,8 +1249,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/metrics.html">Collecting and monitoring metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/configure-manage-dashboard.html">Configuring and Managing Ray Dashboard</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/running-applications/job-submission/quickstart.html">Quickstart using the Ray Jobs CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/running-applications/job-submission/sdk.html">Python SDK Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
@@ -1283,7 +1263,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/faq.html">FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/cli.html">Cluster Management CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../cluster/running-applications/job-submission/cli.html">Ray Jobs CLI API Reference</a></li>
@@ -1293,7 +1273,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../cluster/usage-stats.html">Usage Stats Collection</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/design-overview.html">Design Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/management.html">Virtual Cluster Management API</a></li>
@@ -1301,15 +1281,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-observability/getting-started.html">Ray Dashboard</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
 <li class="toctree-l2"><a class="reference internal" href="../../ray-observability/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
@@ -1329,7 +1309,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../ray-observability/user-guides/ray-tracing.html">Tracing</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-observability/reference/api.html">State API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-observability/reference/cli.html">State CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-observability/reference/system-metrics.html">System Metrics</a></li>
@@ -1337,10 +1317,10 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-contribute/stability.html">API Stability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ray-contribute/api-policy.html">API Policy</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-contribute/development.html">Building Ray from Source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-contribute/ci.html">CI Testing Workflow on PRs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../ray-contribute/docs.html">Contributing to the Ray Documentation</a></li>
@@ -1420,177 +1400,347 @@ document.write(`
                   
   <section id="hyperparameter-tuning-with-ray-tune">
 <span id="train-tune"></span><h1>Hyperparameter Tuning with Ray Tune<a class="headerlink" href="#hyperparameter-tuning-with-ray-tune" title="Link to this heading">#</a></h1>
-<p>Hyperparameter tuning with <a class="reference internal" href="../../tune/index.html#tune-main"><span class="std std-ref">Ray Tune</span></a> is natively supported with Ray Train.</p>
-<figure class="align-center" id="id1">
-<img alt="../../_images/train-tuner.svg" src="../../_images/train-tuner.svg" /><figcaption>
-<p><span class="caption-text">The <code class="code docutils literal notranslate"><span class="pre">Tuner</span></code> will take in a <code class="code docutils literal notranslate"><span class="pre">Trainer</span></code> and execute multiple training runs, each with different hyperparameter configurations.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
-</figcaption>
-</figure>
-<section id="key-concepts">
-<h2>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">#</a></h2>
-<p>There are a number of key concepts when doing hyperparameter optimization with a <a class="reference internal" href="../../tune/api/doc/ray.tune.Tuner.html#ray.tune.Tuner" title="ray.tune.Tuner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuner</span></code></a>:</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This user guide shows how to integrate Ray Train and Ray Tune to tune over distributed hyperparameter runs
+for the revamped Ray Train V2 available starting from Ray 2.43 by enabling the environment variable <code class="docutils literal notranslate"><span class="pre">RAY_TRAIN_V2_ENABLED=1</span></code>.
+<strong>This user guide assumes that the environment variable has been enabled.</strong></p>
+<p>Please see <a class="reference internal" href="#train-tune-deprecation"><span class="std std-ref">here</span></a> for information about the deprecation and migration.</p>
+</div>
+<p>Ray Train can be used together with Ray Tune to do hyperparameter sweeps of distributed training runs.
+This is often useful when you want to do a small sweep over critical hyperparameters,
+before launching a run with the best performing hyperparameters on all available cluster resources for a long duration.</p>
+<section id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h2>
+<p>In the example below:</p>
 <ul class="simple">
-<li><p>A set of hyperparameters you want to tune in a <em>search space</em>.</p></li>
-<li><p>A <em>search algorithm</em> to effectively optimize your parameters and optionally use a
-<em>scheduler</em> to stop searches early and speed up your experiments.</p></li>
-<li><p>The <em>search space</em>, <em>search algorithm</em>, <em>scheduler</em>, and <em>Trainer</em> are passed to a Tuner,
-which runs the hyperparameter tuning workload by evaluating multiple hyperparameters in parallel.</p></li>
-<li><p>Each individual hyperparameter evaluation run is called a <em>trial</em>.</p></li>
-<li><p>The Tuner returns its results as a <a class="reference internal" href="../../tune/api/doc/ray.tune.ResultGrid.html#ray.tune.ResultGrid" title="ray.tune.ResultGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultGrid</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="../../tune/api/doc/ray.tune.Tuner.html#ray.tune.Tuner" title="ray.tune.Tuner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuner</span></code></a> launches the tuning job, which runs trials of <code class="docutils literal notranslate"><span class="pre">train_driver_fn</span></code> with different hyperparameter configurations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">train_driver_fn</span></code>, which (1) takes in a hyperparameter configuration, (2) instantiates a <code class="docutils literal notranslate"><span class="pre">TorchTrainer</span></code> (or some other framework trainer), and (3) launches the distributed training job.</p></li>
+<li><p><a class="reference internal" href="../api/doc/ray.train.ScalingConfig.html#ray.train.ScalingConfig" title="ray.train.ScalingConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalingConfig</span></code></a> defines the number of training workers and resources per worker for a single Ray Train run.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">train_fn_per_worker</span></code> is the Python code that executes on each distributed training worker for a trial.</p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Tuners can also be used to launch hyperparameter tuning without using Ray Train. See
-<a class="reference internal" href="../../tune/index.html#tune-main"><span class="std std-ref">the Ray Tune documentation</span></a> for more guides and examples.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+
+<span class="kn">import</span> <span class="nn">ray.train</span>
+<span class="kn">import</span> <span class="nn">ray.train.torch</span>
+<span class="kn">import</span> <span class="nn">ray.tune</span>
+<span class="kn">from</span> <span class="nn">ray.tune.integration.ray_train</span> <span class="kn">import</span> <span class="n">TuneReportCallback</span>
+
+
+<span class="c1"># [1] Define your Ray Train worker code.</span>
+<span class="k">def</span> <span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="c1"># Unpack train worker hyperparameters.</span>
+    <span class="c1"># Train feeds in the `train_loop_config` defined below.</span>
+    <span class="n">lr</span> <span class="o">=</span> <span class="n">train_loop_config</span><span class="p">[</span><span class="s2">&quot;lr&quot;</span><span class="p">]</span>
+
+    <span class="c1"># training code here...</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">(),</span>
+        <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_world_rank</span><span class="p">(),</span>
+        <span class="n">train_loop_config</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># model = ray.train.torch.prepare_model(...)  # Wrap model in DDP.</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_checkpoint_dir</span><span class="p">:</span>
+        <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">report</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()},</span>
+            <span class="n">checkpoint</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Checkpoint</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span><span class="n">temp_checkpoint_dir</span><span class="p">),</span>
+        <span class="p">)</span>
+
+
+<span class="c1"># [2] Define a function that launches the Ray Train run.</span>
+<span class="k">def</span> <span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="c1"># Unpack run-level hyperparameters.</span>
+    <span class="c1"># Tune feeds in hyperparameters defined in the `param_space` below.</span>
+    <span class="n">num_workers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">]</span>
+
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">TorchTrainer</span><span class="p">(</span>
+        <span class="n">train_fn_per_worker</span><span class="p">,</span>
+        <span class="n">train_loop_config</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;train_loop_config&quot;</span><span class="p">],</span>
+        <span class="n">scaling_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">ScalingConfig</span><span class="p">(</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="c1"># Uncomment to use GPUs.</span>
+            <span class="c1"># use_gpu=True,</span>
+        <span class="p">),</span>
+        <span class="n">run_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span>
+            <span class="c1"># [3] Assign unique names to each run.</span>
+            <span class="c1"># Recommendation: use the trial id as part of the run name.</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;train-trial_id=</span><span class="si">{</span><span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_trial_id</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="c1"># [4] (Optional) Pass in a `TuneReportCallback` to propagate</span>
+            <span class="c1"># reported results to the Tuner.</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">TuneReportCallback</span><span class="p">()],</span>
+            <span class="c1"># (If multi-node, configure S3 / NFS as the storage path.)</span>
+            <span class="c1"># storage_path=&quot;s3://...&quot;,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+
+<span class="c1"># Launch a single Train run.</span>
+<span class="n">train_driver_fn</span><span class="p">({</span><span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;train_loop_config&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="mf">1e-3</span><span class="p">}})</span>
+
+
+<span class="c1"># Launch a sweep of hyperparameters with Ray Tune.</span>
+<span class="n">tuner</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
+    <span class="n">train_driver_fn</span><span class="p">,</span>
+    <span class="n">param_space</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]),</span>
+        <span class="s2">&quot;train_loop_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">grid_search</span><span class="p">([</span><span class="mf">1e-3</span><span class="p">,</span> <span class="mf">3e-4</span><span class="p">]),</span>
+            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">grid_search</span><span class="p">([</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">]),</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">run_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;tune_train_example-</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="c1"># (If multi-node, configure S3 / NFS as the storage path.)</span>
+        <span class="c1"># storage_path=&quot;s3://...&quot;,</span>
+    <span class="p">),</span>
+    <span class="c1"># [5] (Optional) Set the maximum number of concurrent trials</span>
+    <span class="c1"># in order to prevent too many Train driver processes from</span>
+    <span class="c1"># being launched at once.</span>
+    <span class="n">tune_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">TuneConfig</span><span class="p">(</span><span class="n">max_concurrent_trials</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">get_best_result</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">))</span>
+</pre></div>
 </div>
 </section>
-<section id="basic-usage">
-<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading">#</a></h2>
-<p>You can take an existing <a class="reference internal" href="../api/doc/ray.train.trainer.BaseTrainer.html#ray.train.trainer.BaseTrainer" title="ray.train.base_trainer.BaseTrainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code></a> and simply
-pass it into a <a class="reference internal" href="../../tune/api/doc/ray.tune.Tuner.html#ray.tune.Tuner" title="ray.tune.Tuner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuner</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span><span class="p">,</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Tuner</span>
-<span class="kn">from</span> <span class="nn">ray.train.xgboost</span> <span class="kn">import</span> <span class="n">XGBoostTrainer</span>
+<section id="what-does-ray-tune-provide">
+<h2>What does Ray Tune provide?<a class="headerlink" href="#what-does-ray-tune-provide" title="Link to this heading">#</a></h2>
+<p>Ray Tune provides utilities for:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../tune/tutorials/tune-search-spaces.html#tune-search-space-tutorial"><span class="std std-ref">Defining hyperparameter search spaces</span></a> and <a class="reference internal" href="../../tune/tutorials/tune-run.html#tune-parallel-experiments-guide"><span class="std std-ref">launching multiple trials concurrently</span></a> on a Ray cluster</p></li>
+<li><p><a class="reference internal" href="../../tune/api/suggestion.html#tune-search-alg"><span class="std std-ref">Using search algorithms</span></a></p></li>
+<li><p><a class="reference internal" href="../../tune/tutorials/tune-stopping.html#tune-stopping-guide"><span class="std std-ref">Early stopping runs based on metrics</span></a></p></li>
+</ul>
+<p>This user guide only focuses on the integration layer between Ray Train and Ray Tune. For more details on how to use Ray Tune, refer to the <a class="reference internal" href="../../tune/index.html#tune-main"><span class="std std-ref">Ray Tune documentation</span></a>.</p>
+</section>
+<section id="configuring-resources-for-multiple-trials">
+<h2>Configuring resources for multiple trials<a class="headerlink" href="#configuring-resources-for-multiple-trials" title="Link to this heading">#</a></h2>
+<p>Ray Tune launches multiple trials which <a class="reference internal" href="../../tune/api/trainable.html#tune-function-api"><span class="std std-ref">run a user-defined function in a remote Ray actor</span></a>, where each trial gets a different sampled hyperparameter configuration.</p>
+<p>When using Ray Tune by itself, trials do computation directly inside the Ray actor. For example, each trial could request 1 GPU and do some single-process model
+training within the remote actor itself. When using Ray Train inside Ray Tune functions, the Tune trial is actually not doing extensive computation inside this actor
+– instead it just acts as a driver process to launch and monitor the Ray Train workers running elsewhere.</p>
+<p>Ray Train requests its own resources via the <a class="reference internal" href="../api/doc/ray.train.ScalingConfig.html#ray.train.ScalingConfig" title="ray.train.ScalingConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalingConfig</span></code></a>.
+See <a class="reference internal" href="using-gpus.html#train-scaling-config"><span class="std std-ref">Configuring Scale and GPUs</span></a> for more details.</p>
+<figure class="align-center" id="id1">
+<img alt="../../_images/train_without_tune.png" src="../../_images/train_without_tune.png" />
+<figcaption>
+<p><span class="caption-text">A single Ray Train run to showcase how using Ray Tune in the next figure just adds a layer of hierarchy to this tree of processes.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id2">
+<img alt="../../_images/train_tune_interop.png" src="../../_images/train_tune_interop.png" />
+<figcaption>
+<p><span class="caption-text">Example of Ray Train runs being launched from within Ray Tune trials.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<section id="limit-the-number-of-concurrent-ray-train-runs">
+<h3>Limit the number of concurrent Ray Train runs<a class="headerlink" href="#limit-the-number-of-concurrent-ray-train-runs" title="Link to this heading">#</a></h3>
+<p>Ray Train runs can only start when resources for all workers can be acquired at once.
+This means that multiple Tune trials spawning Train runs will be competing for the logical resources available in the Ray cluster.</p>
+<p>If there is a limiting cluster resource such as GPUs, then it won’t be possible to run training for all hyperparameter configurations concurrently.
+Since the cluster only has enough resources for a handful of trials to run concurrently,
+set <a class="reference internal" href="../../tune/api/doc/ray.tune.TuneConfig.html#ray.tune.TuneConfig" title="ray.tune.TuneConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">tune.TuneConfig(max_concurrent_trials)</span></code></a> on the Tuner to limit the number of “in-flight” Train runs so that no trial is being starved of resources.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># For a fixed size cluster, calculate this based on the limiting resource (ex: GPUs).</span>
+<span class="n">total_cluster_gpus</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">num_gpu_workers_per_trial</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">max_concurrent_trials</span> <span class="o">=</span> <span class="n">total_cluster_gpus</span> <span class="o">//</span> <span class="n">num_gpu_workers_per_trial</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/breast_cancer.csv&quot;</span><span class="p">)</span>
 
-<span class="n">trainer</span> <span class="o">=</span> <span class="n">XGBoostTrainer</span><span class="p">(</span>
-    <span class="n">label_column</span><span class="o">=</span><span class="s2">&quot;target&quot;</span><span class="p">,</span>
-    <span class="n">params</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;objective&quot;</span><span class="p">:</span> <span class="s2">&quot;binary:logistic&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;eval_metric&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;logloss&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-    <span class="p">},</span>
-    <span class="n">datasets</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">dataset</span><span class="p">},</span>
-    <span class="n">scaling_config</span><span class="o">=</span><span class="n">train</span><span class="o">.</span><span class="n">ScalingConfig</span><span class="p">(</span><span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+<span class="k">def</span> <span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">TorchTrainer</span><span class="p">(</span>
+        <span class="n">train_fn_per_worker</span><span class="p">,</span>
+        <span class="n">scaling_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">ScalingConfig</span><span class="p">(</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_gpu_workers_per_trial</span><span class="p">,</span> <span class="n">use_gpu</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+
+<span class="n">tuner</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
+    <span class="n">train_driver_fn</span><span class="p">,</span>
+    <span class="n">tune_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">TuneConfig</span><span class="p">(</span><span class="n">max_concurrent_trials</span><span class="o">=</span><span class="n">max_concurrent_trials</span><span class="p">),</span>
 <span class="p">)</span>
+</pre></div>
+</div>
+<p>As a concrete example, consider a fixed sized cluster with 128 CPUs and 8 GPUs.</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Tuner(param_space)</span></code> sweeps over 4 hyperparameter configurations with a grid search: <code class="docutils literal notranslate"><span class="pre">param_space={“train_loop_config”:</span> <span class="pre">{“batch_size”:</span> <span class="pre">tune.grid_search([8,</span> <span class="pre">16,</span> <span class="pre">32,</span> <span class="pre">64])}}</span></code></p></li>
+<li><p>Each Ray Train run is configured to train with 4 GPU workers: <code class="docutils literal notranslate"><span class="pre">ScalingConfig(num_workers=4,</span> <span class="pre">use_gpu=True)</span></code>. Since there are only 8 GPUs, only 2 Train runs can acquire their full set of resources at a time.</p></li>
+<li><p>However, since there are many CPUs available in the cluster, the 4 total Ray Tune trials (which default to requesting 1 CPU) can be launched immediately.
+This results in 2 extra Ray Tune trial processes being launched, even though their inner Ray Train run just waits for resources until one of the other trials finishes.
+This introduces some spammy log messages when Train waits for resources. There may also be an excessive number of Ray Tune trial processes if the total number of hyperparameter configurations is large.</p></li>
+<li><p>To fix this issue, set <code class="docutils literal notranslate"><span class="pre">Tuner(tune_config=tune.TuneConfig(max_concurrent_trials=2))</span></code>. Now, only two Ray Tune trial processes will be running at a time.
+This number can be calculated based on the limiting cluster resource and the amount of that resources required by each trial.</p></li>
+</ul>
+</section>
+<section id="advanced-set-train-driver-resources">
+<h3>Advanced: Set Train driver resources<a class="headerlink" href="#advanced-set-train-driver-resources" title="Link to this heading">#</a></h3>
+<p>The default Train driver runs as a Ray Tune function with 1 CPU. Ray Tune will schedule these functions to run anywhere on the cluster that has free logical CPU resources.</p>
+<p><strong>Recommendation:</strong> If you are launching longer-running training jobs or using spot instances, these Tune functions which act as the Ray Train driver process should be run on “safe nodes” that are at lower risk of going down. For example, they should not be scheduled to run on preemptible spot instances and should not be colocated with training workers. This could be the head node or a dedicated CPU node in your cluster.</p>
+<p>This is because the Ray Train driver process is responsible for handling fault tolerance of the worker processes, which are more likely to error. Nodes that are running Train workers can crash due to spot preemption or other errors that come up due to the user-defined model training code.</p>
+<ul class="simple">
+<li><p>If a Train worker node dies, the Ray Train driver process that is still alive on a different node can gracefully handle the error.</p></li>
+<li><p>On the other hand, if the driver process dies, then all Ray Train workers will ungracefully exit and some of the run state may not be committed fully.</p></li>
+</ul>
+<p>One way to achieve this behavior is to set custom resources on certain node types and configure the Tune functions to request those resources.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Cluster setup:</span>
+<span class="c1"># head_node:</span>
+<span class="c1">#     resources:</span>
+<span class="c1">#         CPU: 16.0</span>
+<span class="c1"># worker_node_cpu:</span>
+<span class="c1">#     resources:</span>
+<span class="c1">#         CPU: 32.0</span>
+<span class="c1">#         TRAIN_DRIVER_RESOURCE: 1.0</span>
+<span class="c1"># worker_node_gpu:</span>
+<span class="c1">#     resources:</span>
+<span class="c1">#         GPU: 4.0</span>
 
-<span class="c1"># Create Tuner</span>
-<span class="n">tuner</span> <span class="o">=</span> <span class="n">Tuner</span><span class="p">(</span>
-    <span class="n">trainer</span><span class="p">,</span>
-    <span class="c1"># Add some parameters to tune</span>
-    <span class="n">param_space</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">])}},</span>
-    <span class="c1"># Specify tuning behavior</span>
-    <span class="n">tune_config</span><span class="o">=</span><span class="n">tune</span><span class="o">.</span><span class="n">TuneConfig</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s2">&quot;train-logloss&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+<span class="kn">import</span> <span class="nn">ray.tune</span>
+
+
+<span class="k">def</span> <span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="c1"># trainer = TorchTrainer(...)</span>
+    <span class="o">...</span>
+
+
+<span class="n">tuner</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
+    <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">with_resources</span><span class="p">(</span>
+        <span class="n">train_driver_fn</span><span class="p">,</span>
+        <span class="c1"># Note: 0.01 is an arbitrary value to schedule the actor</span>
+        <span class="c1"># onto the `worker_node_cpu` node type.</span>
+        <span class="p">{</span><span class="s2">&quot;TRAIN_DRIVER_RESOURCE&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">},</span>
+    <span class="p">),</span>
 <span class="p">)</span>
-<span class="c1"># Run tuning job</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="reporting-metrics-and-checkpoints">
+<h2>Reporting metrics and checkpoints<a class="headerlink" href="#reporting-metrics-and-checkpoints" title="Link to this heading">#</a></h2>
+<p>Both Ray Train and Ray Tune provide utilities to help upload and track checkpoints via the <a class="reference internal" href="../api/doc/ray.train.report.html#ray.train.report" title="ray.train.report"><code class="xref py py-func docutils literal notranslate"><span class="pre">ray.train.report</span></code></a> and <a class="reference internal" href="../../tune/api/doc/ray.tune.report.html#ray.tune.report" title="ray.tune.report"><code class="xref py py-func docutils literal notranslate"><span class="pre">ray.tune.report</span></code></a> APIs.
+See the <a class="reference internal" href="checkpoints.html#train-checkpointing"><span class="std std-ref">Saving and Loading Checkpoints</span></a> user guide for more details.</p>
+<p>If the Ray Train workers report checkpoints, saving another Ray Tune checkpoint at the Train driver level is not needed because it does not hold any extra training state. The Ray Train driver process will already periodically snapshot its status to the configured storage_path, which is further described in the next section on fault tolerance.</p>
+<p>In order to access the checkpoints from the Tuner output, you can append the checkpoint path as a metric. The provided <a class="reference internal" href="../api/doc/ray.tune.integration.ray_train.TuneReportCallback.html#ray.tune.integration.ray_train.TuneReportCallback" title="ray.tune.integration.ray_train.TuneReportCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">TuneReportCallback</span></code></a>
+does this by propagating reported Ray Train results over to Ray Tune, where the checkpoint path is attached as a separate metric.</p>
+<section id="advanced-fault-tolerance">
+<h3>Advanced: Fault Tolerance<a class="headerlink" href="#advanced-fault-tolerance" title="Link to this heading">#</a></h3>
+<p>In the event that the Ray Tune trials running the Ray Train driver process crash, you can enable trial fault tolerance on the Ray Tune side via:
+<a class="reference internal" href="../../tune/api/doc/ray.tune.FailureConfig.html#ray.tune.FailureConfig" title="ray.tune.FailureConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ray.tune.Tuner(run_config=ray.tune.RunConfig(failure_config))</span></code></a>.</p>
+<p>Fault tolerance on the Ray Train side is configured and handled separately. See the <a class="reference internal" href="fault-tolerance.html#train-fault-tolerance"><span class="std std-ref">Handling Failures and Node Preemption</span></a> user guide for more details.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="kn">import</span> <span class="nn">ray.tune</span>
+<span class="kn">import</span> <span class="nn">ray.train</span>
+<span class="kn">import</span> <span class="nn">ray.train.torch</span>
+
+
+<span class="k">def</span> <span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="c1"># [1] Train worker restoration logic.</span>
+    <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_checkpoint</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">checkpoint</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">checkpoint</span><span class="o">.</span><span class="n">as_directory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_checkpoint_dir</span><span class="p">:</span>
+            <span class="c1"># model.load_state_dict(torch.load(...))</span>
+            <span class="o">...</span>
+
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_checkpoint_dir</span><span class="p">:</span>
+        <span class="c1"># torch.save(...)</span>
+        <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">report</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">},</span>
+            <span class="n">checkpoint</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Checkpoint</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span><span class="n">temp_checkpoint_dir</span><span class="p">),</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">train_fn_driver</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">TorchTrainer</span><span class="p">(</span>
+        <span class="n">train_fn_per_worker</span><span class="p">,</span>
+        <span class="n">run_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span>
+            <span class="c1"># [2] Train driver restoration is automatic, as long as</span>
+            <span class="c1"># the (storage_path, name) remains the same across trial restarts.</span>
+            <span class="c1"># The easiest way to do this is to attach the trial ID in the name.</span>
+            <span class="c1"># **Do not include any timestamps or random values in the name.**</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;train-trial_id=</span><span class="si">{</span><span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_trial_id</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="c1"># [3] Enable worker-level fault tolerance to gracefully handle</span>
+            <span class="c1"># Train worker failures.</span>
+            <span class="n">failure_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">FailureConfig</span><span class="p">(</span><span class="n">max_failures</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="c1"># (If multi-node, configure S3 / NFS as the storage path.)</span>
+            <span class="c1"># storage_path=&quot;s3://...&quot;,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+
+<span class="n">tuner</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
+    <span class="n">train_fn_driver</span><span class="p">,</span>
+    <span class="n">run_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span>
+        <span class="c1"># [4] Enable trial-level fault tolerance to gracefully handle</span>
+        <span class="c1"># Train driver process failures.</span>
+        <span class="n">failure_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">FailureConfig</span><span class="p">(</span><span class="n">max_failures</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="p">),</span>
+<span class="p">)</span>
 <span class="n">tuner</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
-<section id="how-to-configure-a-tuner">
-<h2>How to configure a Tuner?<a class="headerlink" href="#how-to-configure-a-tuner" title="Link to this heading">#</a></h2>
-<p>There are two main configuration objects that can be passed into a Tuner: the <a class="reference internal" href="../../tune/api/doc/ray.tune.TuneConfig.html#ray.tune.TuneConfig" title="ray.tune.tune_config.TuneConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">TuneConfig</span></code></a> and the <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span></code></a>.</p>
-<p>The <a class="reference internal" href="../../tune/api/doc/ray.tune.TuneConfig.html#ray.tune.TuneConfig" title="ray.tune.TuneConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">TuneConfig</span></code></a> contains tuning specific settings, including:</p>
-<ul class="simple">
-<li><p>the tuning algorithm to use</p></li>
-<li><p>the metric and mode to rank results</p></li>
-<li><p>the amount of parallelism to use</p></li>
-</ul>
-<p>Here are some common configurations for <code class="code docutils literal notranslate"><span class="pre">TuneConfig</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">TuneConfig</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.bayesopt</span> <span class="kn">import</span> <span class="n">BayesOptSearch</span>
-
-<span class="n">tune_config</span> <span class="o">=</span> <span class="n">TuneConfig</span><span class="p">(</span>
-    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span>
-    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
-    <span class="n">max_concurrent_trials</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">num_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-    <span class="n">search_alg</span><span class="o">=</span><span class="n">BayesOptSearch</span><span class="p">(),</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>See the <a class="reference internal" href="../../tune/api/doc/ray.tune.TuneConfig.html#ray.tune.TuneConfig" title="ray.tune.tune_config.TuneConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">TuneConfig</span> <span class="pre">API</span> <span class="pre">reference</span></code></a> for more details.</p>
-<p>The <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span></code></a> contains configurations that are more generic than tuning specific settings.
-This includes:</p>
-<ul class="simple">
-<li><p>failure/retry configurations</p></li>
-<li><p>verbosity levels</p></li>
-<li><p>the name of the experiment</p></li>
-<li><p>the logging directory</p></li>
-<li><p>checkpoint configurations</p></li>
-<li><p>custom callbacks</p></li>
-<li><p>integration with cloud storage</p></li>
-</ul>
-<p>Below we showcase some common configurations of <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">RunConfig</span>
-
-<span class="n">run_config</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;MyExperiment&quot;</span><span class="p">,</span>
-    <span class="n">storage_path</span><span class="o">=</span><span class="s2">&quot;s3://...&quot;</span><span class="p">,</span>
-    <span class="n">checkpoint_config</span><span class="o">=</span><span class="n">CheckpointConfig</span><span class="p">(</span><span class="n">checkpoint_frequency</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>See the <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span> <span class="pre">API</span> <span class="pre">reference</span></code></a> for more details.</p>
-</section>
-<section id="search-space-configuration">
-<h2>Search Space configuration<a class="headerlink" href="#search-space-configuration" title="Link to this heading">#</a></h2>
-<p>A <code class="code docutils literal notranslate"><span class="pre">Tuner</span></code> takes in a <code class="code docutils literal notranslate"><span class="pre">param_space</span></code> argument where you can define the search space
-from which hyperparameter configurations will be sampled.</p>
-<p>Depending on the model and dataset, you may want to tune:</p>
-<ul class="simple">
-<li><p>The training batch size</p></li>
-<li><p>The learning rate for deep learning training (e.g., image classification)</p></li>
-<li><p>The maximum depth for tree-based models (e.g., XGBoost)</p></li>
-</ul>
-<p>You can use a Tuner to tune most arguments and configurations for Ray Train, including but
-not limited to:</p>
-<ul class="simple">
-<li><p>Ray <a class="reference internal" href="../../data/api/dataset.html#ray.data.Dataset" title="ray.data.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Datasets</span></code></a></p></li>
-<li><p><a class="reference internal" href="../api/doc/ray.train.ScalingConfig.html#ray.train.ScalingConfig" title="ray.train.ScalingConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalingConfig</span></code></a></p></li>
-<li><p>and other hyperparameters.</p></li>
-</ul>
-<p>Read more about <a class="reference internal" href="../../tune/tutorials/tune-search-spaces.html#tune-search-space-tutorial"><span class="std std-ref">Tune search spaces here</span></a>.</p>
-</section>
-<section id="train-tune-gotchas">
-<h2>Train - Tune gotchas<a class="headerlink" href="#train-tune-gotchas" title="Link to this heading">#</a></h2>
-<p>There are a couple gotchas about parameter specification when using Tuners with Trainers:</p>
-<ul class="simple">
-<li><p>By default, configuration dictionaries and config objects will be deep-merged.</p></li>
-<li><p>Parameters that are duplicated in the Trainer and Tuner will be overwritten by the Tuner <code class="docutils literal notranslate"><span class="pre">param_space</span></code>.</p></li>
-<li><p><strong>Exception:</strong> all arguments of the <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span></code></a> and <a class="reference internal" href="../../tune/api/doc/ray.tune.TuneConfig.html#ray.tune.TuneConfig" title="ray.tune.tune_config.TuneConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">TuneConfig</span></code></a> are inherently un-tunable.</p></li>
-</ul>
-<p>See <a class="reference internal" href="../../tune/tutorials/tune_get_data_in_and_out.html"><span class="doc">Getting Data in and out of Tune</span></a> for an example.</p>
-</section>
-<section id="advanced-tuning">
-<h2>Advanced Tuning<a class="headerlink" href="#advanced-tuning" title="Link to this heading">#</a></h2>
-<p>Tuners also offer the ability to tune over different data preprocessing steps and
-different training/validation datasets, as shown in the following snippet.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.data.preprocessors</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<section id="advanced-using-ray-tune-callbacks">
+<span id="train-with-tune-callbacks"></span><h3>Advanced: Using Ray Tune callbacks<a class="headerlink" href="#advanced-using-ray-tune-callbacks" title="Link to this heading">#</a></h3>
+<p>Ray Tune callbacks should be passed into the <a class="reference internal" href="../../tune/api/doc/ray.tune.RunConfig.html#ray.tune.RunConfig" title="ray.tune.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ray.tune.RunConfig(callbacks)</span></code></a> at the Tuner level.</p>
+<p>For Ray Train users that depend on behavior of built-in or custom Ray Tune callbacks, it’s possible to use them by running Ray Train as a single trial Tune run
+and passing in the callbacks to the Tuner.</p>
+<p>If any callback functionality depends on reported metrics, make sure to pass the <a class="reference internal" href="../api/doc/ray.tune.integration.ray_train.TuneReportCallback.html#ray.tune.integration.ray_train.TuneReportCallback" title="ray.tune.integration.ray_train.TuneReportCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">ray.tune.integration.ray_train.TuneReportCallback</span></code></a> to the trainer callbacks,
+which propagates results to the Tuner.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.tune</span>
+<span class="kn">from</span> <span class="nn">ray.tune.integration.ray_train</span> <span class="kn">import</span> <span class="n">TuneReportCallback</span>
+<span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">TBXLoggerCallback</span>
 
 
-<span class="k">def</span> <span class="nf">get_dataset</span><span class="p">():</span>
-    <span class="n">ds1</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/breast_cancer.csv&quot;</span><span class="p">)</span>
-    <span class="n">prep_v1</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">([</span><span class="s2">&quot;worst radius&quot;</span><span class="p">,</span> <span class="s2">&quot;worst area&quot;</span><span class="p">])</span>
-    <span class="n">ds1</span> <span class="o">=</span> <span class="n">prep_v1</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ds1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ds1</span>
-
-
-<span class="k">def</span> <span class="nf">get_another_dataset</span><span class="p">():</span>
-    <span class="n">ds2</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-        <span class="s2">&quot;s3://anonymous@air-example-data/breast_cancer_with_categorical.csv&quot;</span>
+<span class="k">def</span> <span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span>
+        <span class="n">run_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">TuneReportCallback</span><span class="p">()])</span>
     <span class="p">)</span>
-    <span class="n">prep_v2</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">([</span><span class="s2">&quot;worst concavity&quot;</span><span class="p">,</span> <span class="s2">&quot;worst smoothness&quot;</span><span class="p">])</span>
-    <span class="n">ds2</span> <span class="o">=</span> <span class="n">prep_v2</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ds2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ds2</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 
 
-<span class="n">dataset_1</span> <span class="o">=</span> <span class="n">get_dataset</span><span class="p">()</span>
-<span class="n">dataset_2</span> <span class="o">=</span> <span class="n">get_another_dataset</span><span class="p">()</span>
-
-<span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
-    <span class="n">trainer</span><span class="p">,</span>
-    <span class="n">param_space</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">grid_search</span><span class="p">([</span><span class="n">dataset_1</span><span class="p">,</span> <span class="n">dataset_2</span><span class="p">]),</span>
-        <span class="p">}</span>
-        <span class="c1"># Your other parameters go here</span>
-    <span class="p">},</span>
+<span class="n">tuner</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
+    <span class="n">train_driver_fn</span><span class="p">,</span>
+    <span class="n">run_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span><span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">TBXLoggerCallback</span><span class="p">()])</span>
 <span class="p">)</span>
 </pre></div>
 </div>
+</section>
+</section>
+<section id="tuner-trainer-api-deprecation">
+<span id="train-tune-deprecation"></span><h2><code class="docutils literal notranslate"><span class="pre">Tuner(trainer)</span></code> API Deprecation<a class="headerlink" href="#tuner-trainer-api-deprecation" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Tuner(trainer)</span></code> API which directly takes in a Ray Train trainer instance is deprecated as of Ray 2.43 and will be removed in a future release.</p>
+<section id="motivation">
+<h3>Motivation<a class="headerlink" href="#motivation" title="Link to this heading">#</a></h3>
+<p>This API change provides several benefits:</p>
+<ol class="arabic simple">
+<li><p><strong>Better separation of concerns</strong>: Decouples Ray Train and Ray Tune responsibilities</p></li>
+<li><p><strong>Improved configuration experience</strong>: Makes hyperparameter and run configuration more explicit and flexible</p></li>
+</ol>
+</section>
+<section id="migration-steps">
+<h3>Migration Steps<a class="headerlink" href="#migration-steps" title="Link to this heading">#</a></h3>
+<p>To migrate from the old <code class="docutils literal notranslate"><span class="pre">Tuner(trainer)</span></code> API to the new pattern:</p>
+<ol class="arabic simple">
+<li><p>Enable the environment variable <code class="docutils literal notranslate"><span class="pre">RAY_TRAIN_V2_ENABLED=1</span></code>.</p></li>
+<li><p>Replace <code class="docutils literal notranslate"><span class="pre">Tuner(trainer)</span></code> with a function-based approach where Ray Train is launched inside a Tune trial.</p></li>
+<li><p>Move your training logic into a driver function that Tune will call with different hyperparameters.</p></li>
+</ol>
+</section>
+<section id="additional-resources">
+<h3>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/ray-project/enhancements/blob/main/reps/2024-10-18-train-tune-api-revamp/2024-10-18-train-tune-api-revamp.md">Train V2 REP</a>: Technical details about the API change</p></li>
+<li><p><a class="reference external" href="https://github.com/ray-project/ray/issues/49454">Train V2 Migration Guide</a>: Full migration guide for Train V2</p></li>
+<li><p><a class="reference internal" href="../deprecated-user-guides/hyperparameter-optimization-deprecated.html#train-tune-deprecated-api"><span class="std std-ref">Hyperparameter Tuning with Ray Tune (Deprecated API)</span></a>: Documentation for the old API</p></li>
+</ul>
+</section>
 </section>
 </section>
 
@@ -1637,12 +1787,24 @@ different training/validation datasets, as shown in the following snippet.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-concepts">Key Concepts</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-usage">Basic usage</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-configure-a-tuner">How to configure a Tuner?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#search-space-configuration">Search Space configuration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#train-tune-gotchas">Train - Tune gotchas</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-tuning">Advanced Tuning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quickstart">Quickstart</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-does-ray-tune-provide">What does Ray Tune provide?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuring-resources-for-multiple-trials">Configuring resources for multiple trials</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#limit-the-number-of-concurrent-ray-train-runs">Limit the number of concurrent Ray Train runs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-set-train-driver-resources">Advanced: Set Train driver resources</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reporting-metrics-and-checkpoints">Reporting metrics and checkpoints</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-fault-tolerance">Advanced: Fault Tolerance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-using-ray-tune-callbacks">Advanced: Using Ray Tune callbacks</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tuner-trainer-api-deprecation"><code class="docutils literal notranslate"><span class="pre">Tuner(trainer)</span></code> API Deprecation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation">Motivation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#migration-steps">Migration Steps</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

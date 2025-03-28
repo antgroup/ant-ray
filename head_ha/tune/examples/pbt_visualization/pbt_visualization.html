@@ -582,6 +582,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/nodes.html">Node Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/gcs.html">GCS Fault Tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -607,10 +608,11 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
@@ -754,14 +756,14 @@ document.write(`
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../tune_mnist_keras.html">Keras Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tune-pytorch-cifar.html">PyTorch Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pbt_ppo_example.html">Ray RLlib Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tune-xgboost.html">XGBoost Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../horovod_simple.html">Horovod Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../horovod_simple.html">Horovod Example</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -814,30 +816,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/model-multiplexing.html">Model Multiplexing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/configure-serve-deployment.html">Configure Ray Serve deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/http-guide.html">Set Up FastAPI and HTTP</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../serve/llm/overview.html">Overview</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../serve/llm/api.html">Ray Serve LLM API</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.builders.build_vllm_deployment.html">ray.serve.llm.builders.build_vllm_deployment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.builders.build_openai_app.html">ray.serve.llm.builders.build_openai_app</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.LLMConfig.html">ray.serve.llm.configs.LLMConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.LLMServingArgs.html">ray.serve.llm.configs.LLMServingArgs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.ModelLoadingConfig.html">ray.serve.llm.configs.ModelLoadingConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.CloudMirrorConfig.html">ray.serve.llm.configs.CloudMirrorConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.LoraConfig.html">ray.serve.llm.configs.LoraConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.deployments.VLLMService.html">ray.serve.llm.deployments.VLLMService</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.deployments.LLMRouter.html">ray.serve.llm.deployments.LLMRouter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html">ray.serve.llm.openai_api_models.ChatCompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionRequest.html">ray.serve.llm.openai_api_models.CompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionStreamResponse.html">ray.serve.llm.openai_api_models.ChatCompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionResponse.html">ray.serve.llm.openai_api_models.ChatCompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html">ray.serve.llm.openai_api_models.CompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionResponse.html">ray.serve.llm.openai_api_models.CompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ErrorResponse.html">ray.serve.llm.openai_api_models.ErrorResponse</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../serve/llm/serving-llms.html">Serving LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/production-guide/config.html">Serve Config Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/production-guide/kubernetes.html">Deploy on Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/production-guide/docker.html">Custom Docker Images</a></li>
@@ -849,7 +829,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/monitoring.html">Monitor Your Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/resource-allocation.html">Resource Allocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/autoscaling-guide.html">Ray Serve Autoscaling</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/advanced-guides/app-builder-guide.html">Pass Arguments to Applications</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/advanced-guides/advanced-autoscaling.html">Advanced Ray Serve Autoscaling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/advanced-guides/performance.html">Performance Tuning</a></li>
@@ -867,10 +847,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/api/index.html">Ray Serve API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/key-concepts.html">Key concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/multi-agent-envs.html">Multi-Agent Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/hierarchical-envs.html">Hierarchical Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/external-envs.html">External Environments and Applications</a></li>
@@ -878,7 +858,7 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/algorithm-config.html">AlgorithmConfig API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/rllib-algorithms.html">Algorithms</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-advanced-api.html">Advanced Python APIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/checkpoints.html">Checkpointing</a></li>
@@ -905,8 +885,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/rllib-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/new-api-stack-migration-guide.html">New API stack migration guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
@@ -928,7 +908,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
@@ -947,7 +927,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html">ray.rllib.callbacks.callbacks.RLlibCallback</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end</a></li>
@@ -963,7 +943,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/env_runner.html">EnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/single_agent_env_runner.html">SingleAgentEnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/single_agent_episode.html">SingleAgentEpisode API</a></li>
@@ -973,7 +953,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/utils.html">Env Utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.build</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class</a></li>
@@ -1016,7 +996,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html">ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.html">ray.rllib.models.distributions.Distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html">ray.rllib.models.distributions.Distribution.from_logits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html">ray.rllib.models.distributions.Distribution.sample</a></li>
@@ -1025,14 +1005,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html">ray.rllib.models.distributions.Distribution.kl</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html">ray.rllib.core.learner.learner_group.LearnerGroup</a></li>
 </ul>
 </li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners</a></li>
@@ -1053,7 +1033,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs.html">ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit.html">ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer.html">ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html">ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer</a></li>
@@ -1068,7 +1048,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html">ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
@@ -1114,12 +1094,12 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/joblib.html">Distributed Scikit-learn / Joblib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/multiprocessing.html">Distributed multiprocessing.Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/ray-collective.html">Ray Collective Communication Lib</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.ray_active.html">ray.util.dask.RayDaskCallback.ray_active</a></li>
 </ul>
 </li>
@@ -1134,7 +1114,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../workflows/index.html">Ray Workflows (Alpha)</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/basics.html">Getting Started</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/management.html">Workflow Management</a></li>
@@ -1142,7 +1122,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/events.html">Events</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/comparison.html">API Comparisons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/advanced.html">Advanced Topics</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../workflows/api/execution.html">Workflow Execution API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../workflows/api/management.html">Workflow Management API</a></li>
 </ul>
@@ -1151,16 +1131,16 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
@@ -1205,7 +1185,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/reduce-image-pull-latency.html">Reducing image pull latency on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/ml-example.html">Ray Train XGBoostTrainer on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/gpu-training-example.html">Train PyTorch ResNet model with GPUs on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/mnist-training-example.html">Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes</a></li>
@@ -1221,7 +1201,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/vllm-rayservice.html">Serve a Large Language Model with vLLM on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/ingress.html">Ingress</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/prometheus-grafana.html">Using Prometheus and Grafana</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/pyspy.html">Profiling with py-spy</a></li>
@@ -1231,12 +1211,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/istio.html">mTLS and L7 observability with Istio</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/benchmarks/memory-scalability-benchmark.html">KubeRay memory and scalability benchmark</a></li>
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting/troubleshooting.html">Troubleshooting guide</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html">RayService troubleshooting</a></li>
@@ -1245,9 +1225,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/kubernetes/references.html">API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/vms/getting-started.html">Getting Started</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/user-guides/launching-clusters/index.html">Launching Ray Clusters on AWS, GCP, Azure, vSphere, On-Prem</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/user-guides/large-cluster-best-practices.html">Best practices for deploying large clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/user-guides/configuring-autoscaling.html">Configuring Autoscaling</a></li>
@@ -1256,11 +1236,11 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/examples/ml-example.html">Ray Train XGBoostTrainer on VMs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/references/ray-cluster-cli.html">Cluster Launcher Commands</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/references/ray-cluster-configuration.html">Cluster YAML Configuration Options</a></li>
 </ul>
@@ -1269,8 +1249,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/metrics.html">Collecting and monitoring metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/configure-manage-dashboard.html">Configuring and Managing Ray Dashboard</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/running-applications/job-submission/quickstart.html">Quickstart using the Ray Jobs CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/running-applications/job-submission/sdk.html">Python SDK Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
@@ -1283,7 +1263,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/faq.html">FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/cli.html">Cluster Management CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/running-applications/job-submission/cli.html">Ray Jobs CLI API Reference</a></li>
@@ -1293,7 +1273,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/usage-stats.html">Usage Stats Collection</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/design-overview.html">Design Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/management.html">Virtual Cluster Management API</a></li>
@@ -1301,15 +1281,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/getting-started.html">Ray Dashboard</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
@@ -1329,7 +1309,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/user-guides/ray-tracing.html">Tracing</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/api.html">State API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/cli.html">State CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/system-metrics.html">System Metrics</a></li>
@@ -1337,10 +1317,10 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-contribute/stability.html">API Stability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-contribute/api-policy.html">API Policy</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/development.html">Building Ray from Source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/ci.html">CI Testing Workflow on PRs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/docs.html">Contributing to the Ray Documentation</a></li>
@@ -1426,7 +1406,8 @@ document.write(`
   <section class="tex2jax_ignore mathjax_ignore" id="visualizing-population-based-training-pbt-hyperparameter-optimization">
 <h1>Visualizing Population Based Training (PBT) Hyperparameter Optimization<a class="headerlink" href="#visualizing-population-based-training-pbt-hyperparameter-optimization" title="Link to this heading">#</a></h1>
 <p><strong>Assumptions:</strong> The reader has a basic understanding of the <a class="reference external" href="https://www.deepmind.com/blog/population-based-training-of-neural-networks">PBT algorithm</a> and wants to dive deeper and verify the underlying algorithm behavior with <a class="reference internal" href="../../api/schedulers.html#tune-scheduler-pbt"><span class="std std-ref">Ray’s PBT implementation</span></a>. <a class="reference internal" href="../pbt_guide.html#pbt-guide-ref"><span class="std std-ref">This guide</span></a> provides resources for gaining some context.</p>
-<p>This tutorial will go through a simple example that will help you develop a better understanding of what PBT is doing under the hood when using it to tune your algorithms. Follow along by launching the notebook with the rocket 🚀 icon above.</p>
+<p>Population Based Training (PBT) is a powerful technique that combines parallel search with sequential optimization to efficiently find optimal hyperparameters. Unlike traditional hyperparameter tuning methods, PBT dynamically adjusts hyperparameters during training by having multiple training runs (“trials”) that evolve together, periodically replacing poorly performing configurations with perturbations of better ones.</p>
+<p>This tutorial will go through a simple example that will help you develop a better understanding of what PBT is doing under the hood when using it to tune your algorithms.</p>
 <p>We will learn how to:</p>
 <ol class="arabic simple">
 <li><p><strong>Set up checkpointing and loading for PBT</strong> with the function trainable interface</p></li>
@@ -1439,20 +1420,19 @@ document.write(`
 <p>We’ll start with some imports.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span><span class="s2">&quot;ray[tune]&quot;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>-q<span class="w"> </span>-U<span class="w"> </span><span class="s2">&quot;ray[tune]&quot;</span><span class="w"> </span>matplotlib
 </pre></div>
 </div>
 </div>
 </div>
-<p>Note: If you’re running on Colab, please copy <a class="reference internal" href="pbt_visualization_utils.html"><span class="doc">this helper file</span></a> into your Colab mount as <code class="docutils literal notranslate"><span class="pre">pbt_visualization_utils.py</span></code> using the file explorer on the left.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
+<p>Note: this tutorial imports functions from <a class="reference internal" href="pbt_visualization_utils.html"><span class="doc">this helper file</span></a> named <code class="docutils literal notranslate"><span class="pre">pbt_visualization_utils.py</span></code>. These define plotting functions for the PBT training progress.</p>
+<div class="cell tag_hide-output docutils container">
+<div class="cell_input above-output-prompt docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">import</span> <span class="nn">ray</span>
 <span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
@@ -1469,32 +1449,49 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<details class="hide below-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell output</span>
+<span class="expanded">Hide code cell output</span>
+</summary>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-02-24 16:21:26,622	INFO util.py:154 -- Missing packages: [&#39;ipywidgets&#39;]. Run `pip install -U ipywidgets`, then restart the notebook server for rich notebook output.
+2025-02-24 16:21:26,890	INFO util.py:154 -- Missing packages: [&#39;ipywidgets&#39;]. Run `pip install -U ipywidgets`, then restart the notebook server for rich notebook output.
+</pre></div>
+</div>
+</div>
+</details>
 </div>
 <p>Concretely, we will use the definitions (with very minor modifications) provided in the <a class="reference external" href="https://arxiv.org/pdf/1711.09846.pdf">paper</a> for the function we are trying to optimize, and the estimator we are given.</p>
+<p>Our goal is to maximize a quadratic function <code class="docutils literal notranslate"><span class="pre">Q</span></code>, but we only have access to a biased estimator <code class="docutils literal notranslate"><span class="pre">Qhat</span></code> that depends on hyperparameters. This simulates real-world scenarios where we want to optimize for true generalization performance but can only measure training performance, which is influenced by hyperparameters.</p>
 <p>Here is a list of the concepts we will use for the example, and what they might be analagous to in practice:</p>
 <table class="table">
 <thead>
-<tr class="row-odd"><th class="head"><p>Concept within this example</p></th>
-<th class="head"><p>Description</p></th>
-<th class="head"><p>Practical analogy</p></th>
+<tr class="row-odd"><th class="head"><p>Symbol</p></th>
+<th class="head"><p>In This Example</p></th>
+<th class="head"><p>Real-World Analogy</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">theta</span> <span class="pre">=</span> <span class="pre">[theta0,</span> <span class="pre">theta1]</span></code></p></td>
-<td><p>The model parameters that we will update in our training loop.</p></td>
+<td><p>Model parameters, updated in each training step.</p></td>
 <td><p>Neural network parameters</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">h</span> <span class="pre">=</span> <span class="pre">[h0,</span> <span class="pre">h1]</span></code></p></td>
-<td><p>The hyperparameters that PBT will optimize.</p></td>
+<td><p>The hyperparameters optimized by PBT.</p></td>
 <td><p>Learning rate, batch size, etc.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Q(theta)</span></code></p></td>
-<td><p>The quadratic function we are trying to maximize.</p></td>
-<td><p>Generalization capability over all inputs</p></td>
+<td><p><strong>True reward function</strong> we <em>want</em> to optimize, but is not directly use for training.</p></td>
+<td><p><strong>True generalization</strong>– an theoretical and unobersvable in practice.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Qhat(theta</span> <span class="pre">|</span> <span class="pre">h)</span></code></p></td>
-<td><p>The estimator we are given as our training objective, depends (<code class="docutils literal notranslate"><span class="pre">|</span></code>) on <code class="docutils literal notranslate"><span class="pre">h</span></code>.</p></td>
-<td><p>Empirical loss/reward</p></td>
+<td><p><strong>Estimated reward function</strong> we actually optimize against; depends on the hyperparameters as well as the model parameters.</p></td>
+<td><p><strong>Empirical reward</strong> in training.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">grad_Qhat(theta</span> <span class="pre">|</span> <span class="pre">h)</span></code></p></td>
+<td><p>Gradient of the estimated reward function, used to update model parameters</p></td>
+<td><p>Gradient descent step in training</p></td>
 </tr>
 </tbody>
 </table>
@@ -1502,6 +1499,7 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Q</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+    <span class="c1"># equation for an elliptic paraboloid with a center at (0, 0, 1.2)</span>
     <span class="k">return</span> <span class="mf">1.2</span> <span class="o">-</span> <span class="p">(</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">theta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
 
@@ -1518,12 +1516,12 @@ document.write(`
 
 
 <span class="n">theta_0</span> <span class="o">=</span> <span class="n">get_init_theta</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial parameter values: theta = &quot;</span><span class="p">,</span> <span class="n">theta_0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initial parameter values: theta = </span><span class="si">{</span><span class="n">theta_0</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial parameter values: theta =  [0.9 0.9]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial parameter values: theta = [0.9 0.9]
 </pre></div>
 </div>
 </div>
@@ -1610,7 +1608,7 @@ document.write(`
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Since PBT will keep restoring from latest checkpoints, it’s important to save and load <code class="docutils literal notranslate"><span class="pre">train_step</span></code> correctly in a function trainable. <strong>Make sure you increment the loaded <code class="docutils literal notranslate"><span class="pre">train_step</span></code> by one as shown above.</strong> This avoids repeating an iteration and causing the checkpoint and perturbation intervals to be out of sync.</p>
+<p>Since PBT will keep restoring from latest checkpoints, it’s important to save and load <code class="docutils literal notranslate"><span class="pre">train_step</span></code> correctly in a function trainable. <strong>Make sure you increment the loaded <code class="docutils literal notranslate"><span class="pre">train_step</span></code> by one as shown above in <code class="docutils literal notranslate"><span class="pre">checkpoint_dict</span></code>.</strong> This avoids repeating an iteration and causing the checkpoint and perturbation intervals to be out of sync.</p>
 </div>
 </section>
 <section id="configure-pbt-and-tuner">
@@ -1625,44 +1623,37 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2022-09-14 11:43:32,337	INFO worker.py:1517 -- Started a local Ray instance.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-02-24 16:21:27,556	INFO worker.py:1841 -- Started a local Ray instance.
 </pre></div>
 </div>
-<div class="output text_html"><div>
+<div class="output text_html"><div class="lm-Widget p-Widget lm-Panel p-Panel jp-Cell-outputWrapper">
     <div style="margin-left: 50px;display: flex;flex-direction: row;align-items: center">
-        <h3 style="color: var(--jp-ui-font-color0)">Ray</h3>
-        <svg version="1.1" id="ray" width="3em" viewBox="0 0 144.5 144.6" style="margin-left: 3em;margin-right: 3em">
-            <g id="layer-1">
-                <path fill="#00a2e9" class="st0" d="M97.3,77.2c-3.8-1.1-6.2,0.9-8.3,5.1c-3.5,6.8-9.9,9.9-17.4,9.6S58,88.1,54.8,81.2c-1.4-3-3-4-6.3-4.1
-                    c-5.6-0.1-9.9,0.1-13.1,6.4c-3.8,7.6-13.6,10.2-21.8,7.6C5.2,88.4-0.4,80.5,0,71.7c0.1-8.4,5.7-15.8,13.8-18.2
-                    c8.4-2.6,17.5,0.7,22.3,8c1.3,1.9,1.3,5.2,3.6,5.6c3.9,0.6,8,0.2,12,0.2c1.8,0,1.9-1.6,2.4-2.8c3.5-7.8,9.7-11.8,18-11.9
-                    c8.2-0.1,14.4,3.9,17.8,11.4c1.3,2.8,2.9,3.6,5.7,3.3c1-0.1,2,0.1,3,0c2.8-0.5,6.4,1.7,8.1-2.7s-2.3-5.5-4.1-7.5
-                    c-5.1-5.7-10.9-10.8-16.1-16.3C84,38,81.9,37.1,78,38.3C66.7,42,56.2,35.7,53,24.1C50.3,14,57.3,2.8,67.7,0.5
-                    C78.4-2,89,4.7,91.5,15.3c0.1,0.3,0.1,0.5,0.2,0.8c0.7,3.4,0.7,6.9-0.8,9.8c-1.7,3.2-0.8,5,1.5,7.2c6.7,6.5,13.3,13,19.8,19.7
-                    c1.8,1.8,3,2.1,5.5,1.2c9.1-3.4,17.9-0.6,23.4,7c4.8,6.9,4.6,16.1-0.4,22.9c-5.4,7.2-14.2,9.9-23.1,6.5c-2.3-0.9-3.5-0.6-5.1,1.1
-                    c-6.7,6.9-13.6,13.7-20.5,20.4c-1.8,1.8-2.5,3.2-1.4,5.9c3.5,8.7,0.3,18.6-7.7,23.6c-7.9,5-18.2,3.8-24.8-2.9
-                    c-6.4-6.4-7.4-16.2-2.5-24.3c4.9-7.8,14.5-11,23.1-7.8c3,1.1,4.7,0.5,6.9-1.7C91.7,98.4,98,92.3,104.2,86c1.6-1.6,4.1-2.7,2.6-6.2
-                    c-1.4-3.3-3.8-2.5-6.2-2.6C99.8,77.2,98.9,77.2,97.3,77.2z M72.1,29.7c5.5,0.1,9.9-4.3,10-9.8c0-0.1,0-0.2,0-0.3
-                    C81.8,14,77,9.8,71.5,10.2c-5,0.3-9,4.2-9.3,9.2c-0.2,5.5,4,10.1,9.5,10.3C71.8,29.7,72,29.7,72.1,29.7z M72.3,62.3
-                    c-5.4-0.1-9.9,4.2-10.1,9.7c0,0.2,0,0.3,0,0.5c0.2,5.4,4.5,9.7,9.9,10c5.1,0.1,9.9-4.7,10.1-9.8c0.2-5.5-4-10-9.5-10.3
-                    C72.6,62.3,72.4,62.3,72.3,62.3z M115,72.5c0.1,5.4,4.5,9.7,9.8,9.9c5.6-0.2,10-4.8,10-10.4c-0.2-5.4-4.6-9.7-10-9.7
-                    c-5.3-0.1-9.8,4.2-9.9,9.5C115,72.1,115,72.3,115,72.5z M19.5,62.3c-5.4,0.1-9.8,4.4-10,9.8c-0.1,5.1,5.2,10.4,10.2,10.3
-                    c5.6-0.2,10-4.9,9.8-10.5c-0.1-5.4-4.5-9.7-9.9-9.6C19.6,62.3,19.5,62.3,19.5,62.3z M71.8,134.6c5.9,0.2,10.3-3.9,10.4-9.6
-                    c0.5-5.5-3.6-10.4-9.1-10.8c-5.5-0.5-10.4,3.6-10.8,9.1c0,0.5,0,0.9,0,1.4c-0.2,5.3,4,9.8,9.3,10
-                    C71.6,134.6,71.7,134.6,71.8,134.6z"/>
-            </g>
-        </svg>
-        <table>
-            <tr>
-                <td style="text-align: left"><b>Python version:</b></td>
-                <td style="text-align: left"><b>3.8.13</b></td>
-            </tr>
-            <tr>
-                <td style="text-align: left"><b>Ray version:</b></td>
-                <td style="text-align: left"><b> 3.0.0.dev0</b></td>
-            </tr>
-            
-        </table>
+        <div class="jp-RenderedHTMLCommon" style="display: flex; flex-direction: row;">
+  <svg viewBox="0 0 567 224" fill="none" xmlns="http://www.w3.org/2000/svg" style="height: 3em;">
+    <g clip-path="url(#clip0_4338_178347)">
+        <path d="M341.29 165.561H355.29L330.13 129.051C345.63 123.991 354.21 112.051 354.21 94.2307C354.21 71.3707 338.72 58.1807 311.88 58.1807H271V165.561H283.27V131.661H311.8C314.25 131.661 316.71 131.501 319.01 131.351L341.25 165.561H341.29ZM283.29 119.851V70.0007H311.82C331.3 70.0007 342.34 78.2907 342.34 94.5507C342.34 111.271 331.34 119.861 311.82 119.861L283.29 119.851ZM451.4 138.411L463.4 165.561H476.74L428.74 58.1807H416L367.83 165.561H380.83L392.83 138.411H451.4ZM446.19 126.601H398L422 72.1407L446.24 126.601H446.19ZM526.11 128.741L566.91 58.1807H554.35L519.99 114.181L485.17 58.1807H472.44L514.01 129.181V165.541H526.13V128.741H526.11Z" fill="var(--jp-ui-font-color0)"/>
+        <path d="M82.35 104.44C84.0187 97.8827 87.8248 92.0678 93.1671 87.9146C98.5094 83.7614 105.083 81.5067 111.85 81.5067C118.617 81.5067 125.191 83.7614 130.533 87.9146C135.875 92.0678 139.681 97.8827 141.35 104.44H163.75C164.476 101.562 165.622 98.8057 167.15 96.2605L127.45 56.5605C121.071 60.3522 113.526 61.6823 106.235 60.3005C98.9443 58.9187 92.4094 54.9203 87.8602 49.0574C83.3109 43.1946 81.0609 35.8714 81.5332 28.4656C82.0056 21.0599 85.1679 14.0819 90.4252 8.8446C95.6824 3.60726 102.672 0.471508 110.08 0.0272655C117.487 -0.416977 124.802 1.86091 130.647 6.4324C136.493 11.0039 140.467 17.5539 141.821 24.8501C143.175 32.1463 141.816 39.6859 138 46.0505L177.69 85.7505C182.31 82.9877 187.58 81.4995 192.962 81.4375C198.345 81.3755 203.648 82.742 208.33 85.3976C213.012 88.0532 216.907 91.9029 219.616 96.5544C222.326 101.206 223.753 106.492 223.753 111.875C223.753 117.258 222.326 122.545 219.616 127.197C216.907 131.848 213.012 135.698 208.33 138.353C203.648 141.009 198.345 142.375 192.962 142.313C187.58 142.251 182.31 140.763 177.69 138L138 177.7C141.808 184.071 143.155 191.614 141.79 198.91C140.424 206.205 136.44 212.75 130.585 217.313C124.731 221.875 117.412 224.141 110.004 223.683C102.596 223.226 95.6103 220.077 90.3621 214.828C85.1139 209.58 81.9647 202.595 81.5072 195.187C81.0497 187.779 83.3154 180.459 87.878 174.605C92.4405 168.751 98.9853 164.766 106.281 163.401C113.576 162.035 121.119 163.383 127.49 167.19L167.19 127.49C165.664 124.941 164.518 122.182 163.79 119.3H141.39C139.721 125.858 135.915 131.673 130.573 135.826C125.231 139.98 118.657 142.234 111.89 142.234C105.123 142.234 98.5494 139.98 93.2071 135.826C87.8648 131.673 84.0587 125.858 82.39 119.3H60C58.1878 126.495 53.8086 132.78 47.6863 136.971C41.5641 141.163 34.1211 142.972 26.7579 142.059C19.3947 141.146 12.6191 137.574 7.70605 132.014C2.79302 126.454 0.0813599 119.29 0.0813599 111.87C0.0813599 104.451 2.79302 97.2871 7.70605 91.7272C12.6191 86.1673 19.3947 82.5947 26.7579 81.6817C34.1211 80.7686 41.5641 82.5781 47.6863 86.7696C53.8086 90.9611 58.1878 97.2456 60 104.44H82.35ZM100.86 204.32C103.407 206.868 106.759 208.453 110.345 208.806C113.93 209.159 117.527 208.258 120.522 206.256C123.517 204.254 125.725 201.276 126.771 197.828C127.816 194.38 127.633 190.677 126.253 187.349C124.874 184.021 122.383 181.274 119.205 179.577C116.027 177.88 112.359 177.337 108.826 178.042C105.293 178.746 102.113 180.654 99.8291 183.44C97.5451 186.226 96.2979 189.718 96.3 193.32C96.2985 195.364 96.7006 197.388 97.4831 199.275C98.2656 201.163 99.4132 202.877 100.86 204.32ZM204.32 122.88C206.868 120.333 208.453 116.981 208.806 113.396C209.159 109.811 208.258 106.214 206.256 103.219C204.254 100.223 201.275 98.0151 197.827 96.97C194.38 95.9249 190.676 96.1077 187.348 97.4873C184.02 98.8669 181.274 101.358 179.577 104.536C177.879 107.714 177.337 111.382 178.041 114.915C178.746 118.448 180.653 121.627 183.439 123.911C186.226 126.195 189.717 127.443 193.32 127.44C195.364 127.443 197.388 127.042 199.275 126.259C201.163 125.476 202.878 124.328 204.32 122.88ZM122.88 19.4205C120.333 16.8729 116.981 15.2876 113.395 14.9347C109.81 14.5817 106.213 15.483 103.218 17.4849C100.223 19.4868 98.0146 22.4654 96.9696 25.9131C95.9245 29.3608 96.1073 33.0642 97.4869 36.3922C98.8665 39.7202 101.358 42.4668 104.535 44.1639C107.713 45.861 111.381 46.4036 114.914 45.6992C118.447 44.9949 121.627 43.0871 123.911 40.301C126.195 37.515 127.442 34.0231 127.44 30.4205C127.44 28.3772 127.038 26.3539 126.255 24.4664C125.473 22.5788 124.326 20.8642 122.88 19.4205ZM19.42 100.86C16.8725 103.408 15.2872 106.76 14.9342 110.345C14.5813 113.93 15.4826 117.527 17.4844 120.522C19.4863 123.518 22.4649 125.726 25.9127 126.771C29.3604 127.816 33.0638 127.633 36.3918 126.254C39.7198 124.874 42.4664 122.383 44.1635 119.205C45.8606 116.027 46.4032 112.359 45.6988 108.826C44.9944 105.293 43.0866 102.114 40.3006 99.8296C37.5145 97.5455 34.0227 96.2983 30.42 96.3005C26.2938 96.3018 22.337 97.9421 19.42 100.86ZM100.86 100.86C98.3125 103.408 96.7272 106.76 96.3742 110.345C96.0213 113.93 96.9226 117.527 98.9244 120.522C100.926 123.518 103.905 125.726 107.353 126.771C110.8 127.816 114.504 127.633 117.832 126.254C121.16 124.874 123.906 122.383 125.604 119.205C127.301 116.027 127.843 112.359 127.139 108.826C126.434 105.293 124.527 102.114 121.741 99.8296C118.955 97.5455 115.463 96.2983 111.86 96.3005C109.817 96.299 107.793 96.701 105.905 97.4835C104.018 98.2661 102.303 99.4136 100.86 100.86Z" fill="#00AEEF"/>
+    </g>
+    <defs>
+        <clipPath id="clip0_4338_178347">
+            <rect width="566.93" height="223.75" fill="white"/>
+        </clipPath>
+    </defs>
+  </svg>
+</div>
+
+        <table class="jp-RenderedHTMLCommon" style="border-collapse: collapse;color: var(--jp-ui-font-color1);font-size: var(--jp-ui-font-size1);">
+    <tr>
+        <td style="text-align: left"><b>Python version:</b></td>
+        <td style="text-align: left"><b>3.11.11</b></td>
+    </tr>
+    <tr>
+        <td style="text-align: left"><b>Ray version:</b></td>
+        <td style="text-align: left"><b>2.42.1</b></td>
+    </tr>
+    
+</table>
+
     </div>
 </div>
 </div></div>
@@ -1748,12 +1739,382 @@ This ensures that the PBT algorithm actually exploits the trials in the most rec
 <section id="run-the-experiment">
 <h2>Run the experiment<a class="headerlink" href="#run-the-experiment" title="Link to this heading">#</a></h2>
 <p>We launch the trials by calling <code class="docutils literal notranslate"><span class="pre">Tuner.fit</span></code>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
+<div class="cell tag_hide-output docutils container">
+<div class="cell_input above-output-prompt docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pbt_results</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<details class="hide below-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell output</span>
+<span class="expanded">Hide code cell output</span>
+</summary>
+<div class="cell_output docutils container">
+<div class="output text_html"><div class="tuneStatus">
+  <div style="display: flex;flex-direction: row">
+    <div style="display: flex;flex-direction: column;">
+      <h3>Tune Status</h3>
+      <table>
+<tbody>
+<tr><td>Current time:</td><td>2025-02-24 16:22:07</td></tr>
+<tr><td>Running for: </td><td>00:00:39.86        </td></tr>
+<tr><td>Memory:      </td><td>21.5/36.0 GiB      </td></tr>
+</tbody>
+</table>
+    </div>
+    <div class="vDivider"></div>
+    <div class="systemInfo">
+      <h3>System Info</h3>
+      PopulationBasedTraining: 24 checkpoints, 24 perturbs<br>Logical resource usage: 1.0/12 CPUs, 0/0 GPUs
+    </div>
+    
+  </div>
+  <div class="hDivider"></div>
+  <div class="trialStatus">
+    <h3>Trial Status</h3>
+    <table>
+<thead>
+<tr><th>Trial name            </th><th>status    </th><th>loc            </th><th style="text-align: right;">     h0</th><th style="text-align: right;">  iter</th><th style="text-align: right;">  total time (s)</th><th style="text-align: right;">      Q</th><th style="text-align: right;">    theta0</th><th style="text-align: right;">    theta1</th></tr>
+</thead>
+<tbody>
+<tr><td>train_func_74757_00000</td><td>TERMINATED</td><td>127.0.0.1:23555</td><td style="text-align: right;">0.89156</td><td style="text-align: right;">   100</td><td style="text-align: right;">       0.0432718</td><td style="text-align: right;">1.19993</td><td style="text-align: right;">0.00573655</td><td style="text-align: right;">0.00685687</td></tr>
+<tr><td>train_func_74757_00001</td><td>TERMINATED</td><td>127.0.0.1:23556</td><td style="text-align: right;">1.11445</td><td style="text-align: right;">   100</td><td style="text-align: right;">       0.0430496</td><td style="text-align: right;">1.19995</td><td style="text-align: right;">0.0038124 </td><td style="text-align: right;">0.00615009</td></tr>
+</tbody>
+</table>
+  </div>
+</div>
+<style>
+.tuneStatus {
+  color: var(--jp-ui-font-color1);
+}
+.tuneStatus .systemInfo {
+  display: flex;
+  flex-direction: column;
+}
+.tuneStatus td {
+  white-space: nowrap;
+}
+.tuneStatus .trialStatus {
+  display: flex;
+  flex-direction: column;
+}
+.tuneStatus h3 {
+  font-weight: bold;
+}
+.tuneStatus .hDivider {
+  border-bottom-width: var(--jp-border-width);
+  border-bottom-color: var(--jp-border-color0);
+  border-bottom-style: solid;
+}
+.tuneStatus .vDivider {
+  border-left-width: var(--jp-border-width);
+  border-left-color: var(--jp-border-color0);
+  border-left-style: solid;
+  margin: 0.5em 1em 0.5em 1em;
+}
+</style>
+</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-02-24 16:21:28,081	WARNING sample.py:469 -- sample_from functions that take a spec dict are deprecated. Please update your function to work with the config dict directly.
+2025-02-24 16:21:28,082	WARNING sample.py:469 -- sample_from functions that take a spec dict are deprecated. Please update your function to work with the config dict directly.
+2025-02-24 16:21:29,018	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 0.243822) into trial 74757_00001 (score = 0.064403)
+
+2025-02-24 16:21:29,018	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.05 --- (resample) --&gt; 0.017
+h0 : 0.0 --- (* 1.2) --&gt; 0.0
+h1 : 1.0 --- (resample) --&gt; 0.2659170728716209
+
+2025-02-24 16:21:29,795	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:30,572	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:30,579	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 0.442405) into trial 74757_00001 (score = 0.268257)
+
+2025-02-24 16:21:30,579	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.05 --- (resample) --&gt; 0.0345
+h0 : 0.0 --- (resample) --&gt; 0.9170235381005166
+h1 : 1.0 --- (resample) --&gt; 0.6256279739131234
+
+2025-02-24 16:21:31,351	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:32,127	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:32,134	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 0.682806) into trial 74757_00000 (score = 0.527889)
+
+2025-02-24 16:21:32,134	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (resample) --&gt; 0.0305
+h0 : 0.9170235381005166 --- (* 1.2) --&gt; 1.1004282457206198
+h1 : 0.6256279739131234 --- (resample) --&gt; 0.027475735413096558
+
+2025-02-24 16:21:32,921	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:33,706	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:33,713	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 0.846848) into trial 74757_00000 (score = 0.823588)
+
+2025-02-24 16:21:33,713	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (* 0.8) --&gt; 0.027600000000000003
+h0 : 0.9170235381005166 --- (* 1.2) --&gt; 1.1004282457206198
+h1 : 0.6256279739131234 --- (resample) --&gt; 0.7558831532799641
+
+2025-02-24 16:21:34,498	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:35,346	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:35,353	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 0.958808) into trial 74757_00000 (score = 0.955140)
+
+2025-02-24 16:21:35,353	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (* 0.8) --&gt; 0.027600000000000003
+h0 : 0.9170235381005166 --- (* 1.2) --&gt; 1.1004282457206198
+h1 : 0.6256279739131234 --- (* 1.2) --&gt; 0.750753568695748
+
+2025-02-24 16:21:36,193	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:36,979	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:36,986	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.035238) into trial 74757_00000 (score = 1.032648)
+
+2025-02-24 16:21:36,986	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (* 1.2) --&gt; 0.0414
+h0 : 0.9170235381005166 --- (resample) --&gt; 0.42270740484472435
+h1 : 0.6256279739131234 --- (* 0.8) --&gt; 0.5005023791304988
+
+2025-02-24 16:21:37,808	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/result.json
+2025-02-24 16:21:38,675	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.087423) into trial 74757_00000 (score = 1.070314)
+
+2025-02-24 16:21:38,675	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (resample) --&gt; 0.013000000000000001
+h0 : 0.9170235381005166 --- (resample) --&gt; 0.2667247790077112
+h1 : 0.6256279739131234 --- (resample) --&gt; 0.7464010779997918
+
+2025-02-24 16:21:40,273	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.123062) into trial 74757_00000 (score = 1.094701)
+
+2025-02-24 16:21:40,274	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (resample) --&gt; 0.035
+h0 : 0.9170235381005166 --- (resample) --&gt; 0.6700641473724329
+h1 : 0.6256279739131234 --- (resample) --&gt; 0.09369892963876703
+
+2025-02-24 16:21:42,000	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.147406) into trial 74757_00000 (score = 1.138657)
+
+2025-02-24 16:21:42,000	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (* 0.8) --&gt; 0.027600000000000003
+h0 : 0.9170235381005166 --- (* 1.2) --&gt; 1.1004282457206198
+h1 : 0.6256279739131234 --- (resample) --&gt; 0.4113637620174102
+
+2025-02-24 16:21:43,617	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.164039) into trial 74757_00000 (score = 1.161962)
+
+2025-02-24 16:21:43,618	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (* 0.8) --&gt; 0.027600000000000003
+h0 : 0.9170235381005166 --- (resample) --&gt; 0.22455715637303986
+h1 : 0.6256279739131234 --- (* 1.2) --&gt; 0.750753568695748
+
+2025-02-24 16:21:45,229	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.175406) into trial 74757_00000 (score = 1.168546)
+
+2025-02-24 16:21:45,229	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (resample) --&gt; 0.0075
+h0 : 0.9170235381005166 --- (* 0.8) --&gt; 0.7336188304804133
+h1 : 0.6256279739131234 --- (* 1.2) --&gt; 0.750753568695748
+
+2025-02-24 16:21:46,822	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.183176) into trial 74757_00000 (score = 1.177124)
+
+2025-02-24 16:21:46,823	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (resample) --&gt; 0.016
+h0 : 0.9170235381005166 --- (resample) --&gt; 0.9850746699152328
+h1 : 0.6256279739131234 --- (resample) --&gt; 0.6345079222898454
+
+2025-02-24 16:21:48,411	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.188488) into trial 74757_00000 (score = 1.186006)
+
+2025-02-24 16:21:48,411	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0345 --- (resample) --&gt; 0.0545
+h0 : 0.9170235381005166 --- (resample) --&gt; 0.644936448785508
+h1 : 0.6256279739131234 --- (resample) --&gt; 0.47452815582611396
+
+2025-02-24 16:21:49,978	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 1.192519) into trial 74757_00001 (score = 1.192121)
+
+2025-02-24 16:21:49,978	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.0545 --- (resample) --&gt; 0.006500000000000001
+h0 : 0.644936448785508 --- (* 0.8) --&gt; 0.5159491590284064
+h1 : 0.47452815582611396 --- (resample) --&gt; 0.20892073190112748
+
+2025-02-24 16:21:51,547	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 1.195139) into trial 74757_00001 (score = 1.192779)
+
+2025-02-24 16:21:51,548	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.0545 --- (resample) --&gt; 0.0405
+h0 : 0.644936448785508 --- (* 0.8) --&gt; 0.5159491590284064
+h1 : 0.47452815582611396 --- (* 0.8) --&gt; 0.3796225246608912
+
+2025-02-24 16:21:53,193	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 1.196841) into trial 74757_00001 (score = 1.196227)
+
+2025-02-24 16:21:53,194	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.0545 --- (resample) --&gt; 0.043000000000000003
+h0 : 0.644936448785508 --- (resample) --&gt; 0.8612751379606769
+h1 : 0.47452815582611396 --- (resample) --&gt; 0.008234170890763504
+
+2025-02-24 16:21:54,799	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 1.197947) into trial 74757_00001 (score = 1.197688)
+
+2025-02-24 16:21:54,799	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.0545 --- (* 1.2) --&gt; 0.0654
+h0 : 0.644936448785508 --- (resample) --&gt; 0.2636264337170955
+h1 : 0.47452815582611396 --- (* 0.8) --&gt; 0.3796225246608912
+
+2025-02-24 16:21:56,428	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 1.198666) into trial 74757_00001 (score = 1.198417)
+
+2025-02-24 16:21:56,429	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.0545 --- (resample) --&gt; 0.0445
+h0 : 0.644936448785508 --- (* 0.8) --&gt; 0.5159491590284064
+h1 : 0.47452815582611396 --- (resample) --&gt; 0.4078642041684053
+
+2025-02-24 16:21:58,033	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 1.199133) into trial 74757_00001 (score = 1.198996)
+
+2025-02-24 16:21:58,033	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.0545 --- (resample) --&gt; 0.0085
+h0 : 0.644936448785508 --- (resample) --&gt; 0.21841880940819025
+h1 : 0.47452815582611396 --- (* 0.8) --&gt; 0.3796225246608912
+
+2025-02-24 16:21:59,690	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 1.199437) into trial 74757_00001 (score = 1.199159)
+
+2025-02-24 16:21:59,690	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.0545 --- (* 1.2) --&gt; 0.0654
+h0 : 0.644936448785508 --- (* 1.2) --&gt; 0.7739237385426097
+h1 : 0.47452815582611396 --- (resample) --&gt; 0.15770319740458727
+
+2025-02-24 16:22:01,361	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.199651) into trial 74757_00000 (score = 1.199634)
+
+2025-02-24 16:22:01,362	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.0654 --- (* 0.8) --&gt; 0.052320000000000005
+h0 : 0.7739237385426097 --- (* 1.2) --&gt; 0.9287084862511316
+h1 : 0.15770319740458727 --- (resample) --&gt; 0.4279796053289977
+
+2025-02-24 16:22:03,081	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 1.199790) into trial 74757_00001 (score = 1.199772)
+
+2025-02-24 16:22:03,082	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.052320000000000005 --- (* 0.8) --&gt; 0.041856000000000004
+h0 : 0.9287084862511316 --- (resample) --&gt; 0.579167003721271
+h1 : 0.4279796053289977 --- (* 1.2) --&gt; 0.5135755263947972
+
+2025-02-24 16:22:04,698	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00000 (score = 1.199872) into trial 74757_00001 (score = 1.199847)
+
+2025-02-24 16:22:04,699	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00001:
+lr : 0.052320000000000005 --- (* 1.2) --&gt; 0.062784
+h0 : 0.9287084862511316 --- (* 1.2) --&gt; 1.1144501835013578
+h1 : 0.4279796053289977 --- (resample) --&gt; 0.25894972559062557
+
+2025-02-24 16:22:06,309	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 74757_00001 (score = 1.199924) into trial 74757_00000 (score = 1.199920)
+
+2025-02-24 16:22:06,310	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial74757_00000:
+lr : 0.062784 --- (resample) --&gt; 0.006500000000000001
+h0 : 1.1144501835013578 --- (* 0.8) --&gt; 0.8915601468010863
+h1 : 0.25894972559062557 --- (resample) --&gt; 0.4494584110928429
+
+2025-02-24 16:22:07,944	INFO tune.py:1009 -- Wrote the latest version of all result files and experiment state to &#39;/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28&#39; in 0.0049s.
+2025-02-24 16:22:07,946	INFO tune.py:1041 -- Total run time: 39.88 seconds (39.86 seconds for the tuning loop).
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Cyan">(train_func pid=23370)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/checkpoint_000000)
+<span class=" -Color -Color-Cyan">(train_func pid=23377)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/checkpoint_000000)
+<span class=" -Color -Color-Cyan">(train_func pid=23397)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/checkpoint_000004)<span class=" -Color -Color-Green"> [repeated 8x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23398)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/checkpoint_000001)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23428)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/checkpoint_000005)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23428)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/checkpoint_000004)<span class=" -Color -Color-Green"> [repeated 6x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23453)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/checkpoint_000011)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23453)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/checkpoint_000008)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23478)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/checkpoint_000014)<span class=" -Color -Color-Green"> [repeated 6x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23479)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/checkpoint_000013)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23509)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/checkpoint_000018)<span class=" -Color -Color-Green"> [repeated 8x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23509)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/checkpoint_000017)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23530)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00000_0_h0=0.0000_2025-02-24_16-21-28/checkpoint_000021)<span class=" -Color -Color-Green"> [repeated 6x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23530)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/checkpoint_000011)<span class=" -Color -Color-Green"> [repeated 6x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23556)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/checkpoint_000012)
+<span class=" -Color -Color-Cyan">(train_func pid=23556)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-21-28/train_func_74757_00001_1_h0=1.0000_2025-02-24_16-21-28/checkpoint_000013)
+</pre></div>
+</div>
+</div>
+</details>
 </div>
 </section>
 <section id="visualize-results">
@@ -1763,7 +2124,7 @@ This ensures that the PBT algorithm actually exploits the trials in the most rec
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">gridspec_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
 
-<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">]</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h = [1, 0]&quot;</span><span class="p">,</span> <span class="s2">&quot;h = [0, 1]&quot;</span><span class="p">]</span>
 
 <span class="n">plot_parameter_history</span><span class="p">(</span>
@@ -1779,17 +2140,17 @@ This ensures that the PBT algorithm actually exploits the trials in the most rec
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/abfe55e4ed3702b63205d71227ac55bbf9b8e2f8a6736e61155876affd62e994.png" src="../../../_images/abfe55e4ed3702b63205d71227ac55bbf9b8e2f8a6736e61155876affd62e994.png" />
+<img alt="../../../_images/c59f1361baaaeb15a318864bea3939459e61fb1f46e6bc9f08f247f6ed156189.png" src="../../../_images/c59f1361baaaeb15a318864bea3939459e61fb1f46e6bc9f08f247f6ed156189.png" />
 </div>
 </div>
-<p>The plot on the right shows the true function value <code class="docutils literal notranslate"><span class="pre">Q(theta)</span></code> as training progresses for both trials. Both trials reach the maximum value of <code class="docutils literal notranslate"><span class="pre">1.2</span></code>.</p>
+<p>The plot on the right shows the true function value <code class="docutils literal notranslate"><span class="pre">Q(theta)</span></code> as training progresses for both trials. Both trials reach the maximum value of <code class="docutils literal notranslate"><span class="pre">1.2</span></code>. This demonstrates PBT’s ability to find optimal solutions regardless of the initial hyperparameter configuration.</p>
 <p>Here’s how to understand the plot on the left:</p>
 <ul class="simple">
 <li><p>The plot on the left shows the parameter values <code class="docutils literal notranslate"><span class="pre">(theta0,</span> <span class="pre">theta1)</span></code> on every training iteration, for both trials. As the training iteration increases, the size of the point gets smaller.</p></li>
 <li><p>We see the iteration shown as a label next to points at every <code class="docutils literal notranslate"><span class="pre">perturbation_interval</span></code> training iterations. Let’s zoom into the transition from iteration 4 to 5 for both the trials.</p>
 <ul>
-<li><p>We see that a trial either <strong>continues</strong> (see how iteration 4 to 5 for the black trial just continues training) or <strong>exploits and perturbs the other trial and then performs a train step</strong> (see how iteration 4 to 5 for the red trial jumps to the parameter value of the black trial).</p></li>
-<li><p>The gradient direction also changes at this step for the black trial due to the hyperparameters changing from the exploit and explore steps of PBT. Remember that the gradient of the estimator <code class="docutils literal notranslate"><span class="pre">Qhat</span></code> depends on the hyperparameters <code class="docutils literal notranslate"><span class="pre">(h0,</span> <span class="pre">h1)</span></code>.</p></li>
+<li><p>We see that a trial either <strong>continues</strong> (see how iteration 4 to 5 for the red trial just continues training) or <strong>exploits and perturbs the other trial and then performs a train step</strong> (see how iteration 4 to 5 for the black trial jumps to the parameter value of the red trial).</p></li>
+<li><p>The gradient direction also changes at this step for the red trial due to the hyperparameters changing from the exploit and explore steps of PBT. Remember that the gradient of the estimator <code class="docutils literal notranslate"><span class="pre">Qhat</span></code> depends on the hyperparameters <code class="docutils literal notranslate"><span class="pre">(h0,</span> <span class="pre">h1)</span></code>.</p></li>
 <li><p>The varying size of jumps between training iterations shows that the learning rate is also changing, since we included <code class="docutils literal notranslate"><span class="pre">lr</span></code> in the set of hyperparameters to mutate.</p></li>
 </ul>
 </li>
@@ -1809,15 +2170,21 @@ This ensures that the PBT algorithm actually exploits the trials in the most rec
 </div>
 </div>
 </div>
-<p>We can also animate the training progress to see what’s happening to the model parameters at each step.</p>
+<p>We can also animate the training progress to see what’s happening to the model parameters at each step. The animation shows:</p>
+<ol class="arabic simple">
+<li><p>How parameters move through space during training</p></li>
+<li><p>When exploitation occurs (jumps in parameter space)</p></li>
+<li><p>How gradient directions change after hyperparameter perturbation</p></li>
+<li><p>Both trials eventually converging to the optimal parameter region</p></li>
+</ol>
 <p><img alt="PBT Visualization GIF" src="../../../_images/pbt.gif" /></p>
 </section>
 </section>
 <section id="grid-search-comparison">
 <h2>Grid Search Comparison<a class="headerlink" href="#grid-search-comparison" title="Link to this heading">#</a></h2>
 <p>The paper includes a comparison to a grid search of 2 trials, using the same initial hyperparameter configurations (<code class="docutils literal notranslate"><span class="pre">h</span> <span class="pre">=</span> <span class="pre">[1,</span> <span class="pre">0],</span> <span class="pre">h</span> <span class="pre">=</span> <span class="pre">[0,</span> <span class="pre">1]</span></code>) as the PBT experiment. The only difference in the code below is removing the PBT scheduler from the <code class="docutils literal notranslate"><span class="pre">TuneConfig</span></code>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
+<div class="cell tag_hide-output docutils container">
+<div class="cell_input above-output-prompt docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
     <span class="n">ray</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
@@ -1846,13 +2213,111 @@ This ensures that the PBT algorithm actually exploits the trials in the most rec
 </pre></div>
 </div>
 </div>
+<details class="hide below-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell output</span>
+<span class="expanded">Hide code cell output</span>
+</summary>
+<div class="cell_output docutils container">
+<div class="output text_html"><div class="tuneStatus">
+  <div style="display: flex;flex-direction: row">
+    <div style="display: flex;flex-direction: column;">
+      <h3>Tune Status</h3>
+      <table>
+<tbody>
+<tr><td>Current time:</td><td>2025-02-24 16:22:18</td></tr>
+<tr><td>Running for: </td><td>00:00:01.24        </td></tr>
+<tr><td>Memory:      </td><td>21.5/36.0 GiB      </td></tr>
+</tbody>
+</table>
+    </div>
+    <div class="vDivider"></div>
+    <div class="systemInfo">
+      <h3>System Info</h3>
+      Using FIFO scheduling algorithm.<br>Logical resource usage: 1.0/12 CPUs, 0/0 GPUs
+    </div>
+    
+  </div>
+  <div class="hDivider"></div>
+  <div class="trialStatus">
+    <h3>Trial Status</h3>
+    <table>
+<thead>
+<tr><th>Trial name            </th><th>status    </th><th>loc            </th><th style="text-align: right;">  h0</th><th style="text-align: right;">   lr</th><th style="text-align: right;">  iter</th><th style="text-align: right;">  total time (s)</th><th style="text-align: right;">       Q</th><th style="text-align: right;">     theta0</th><th style="text-align: right;">   theta1</th></tr>
+</thead>
+<tbody>
+<tr><td>train_func_91d06_00000</td><td>TERMINATED</td><td>127.0.0.1:23610</td><td style="text-align: right;">   0</td><td style="text-align: right;">0.015</td><td style="text-align: right;">   100</td><td style="text-align: right;">       0.068691 </td><td style="text-align: right;">0.590668</td><td style="text-align: right;">0.9        </td><td style="text-align: right;">0.0427973</td></tr>
+<tr><td>train_func_91d06_00001</td><td>TERMINATED</td><td>127.0.0.1:23609</td><td style="text-align: right;">   1</td><td style="text-align: right;">0.045</td><td style="text-align: right;">   100</td><td style="text-align: right;">       0.0659969</td><td style="text-align: right;">0.389999</td><td style="text-align: right;">0.000830093</td><td style="text-align: right;">0.9      </td></tr>
+</tbody>
+</table>
+  </div>
 </div>
-<p>As we can see, neither trial makes it to the optimum, since the hyperparameter configs are stuck with their original values.</p>
+<style>
+.tuneStatus {
+  color: var(--jp-ui-font-color1);
+}
+.tuneStatus .systemInfo {
+  display: flex;
+  flex-direction: column;
+}
+.tuneStatus td {
+  white-space: nowrap;
+}
+.tuneStatus .trialStatus {
+  display: flex;
+  flex-direction: column;
+}
+.tuneStatus h3 {
+  font-weight: bold;
+}
+.tuneStatus .hDivider {
+  border-bottom-width: var(--jp-border-width);
+  border-bottom-color: var(--jp-border-color0);
+  border-bottom-style: solid;
+}
+.tuneStatus .vDivider {
+  border-left-width: var(--jp-border-width);
+  border-left-color: var(--jp-border-color0);
+  border-left-style: solid;
+  margin: 0.5em 1em 0.5em 1em;
+}
+</style>
+</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-02-24 16:22:17,325	WARNING sample.py:469 -- sample_from functions that take a spec dict are deprecated. Please update your function to work with the config dict directly.
+2025-02-24 16:22:17,326	WARNING sample.py:469 -- sample_from functions that take a spec dict are deprecated. Please update your function to work with the config dict directly.
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000000)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000001)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000002)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000003)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000004)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000005)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000006)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000007)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000008)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000009)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000010)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000011)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000012)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000013)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000014)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000015)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000016)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000017)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000018)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000019)
+<span class=" -Color -Color-Cyan">(train_func pid=23609)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17/train_func_91d06_00001_1_h0=1.0000,lr=0.0450_2025-02-24_16-22-17/checkpoint_000020)
+2025-02-24 16:22:18,562	INFO tune.py:1009 -- Wrote the latest version of all result files and experiment state to &#39;/Users/rdecal/ray_results/train_func_2025-02-24_16-22-17&#39; in 0.0061s.
+2025-02-24 16:22:18,565	INFO tune.py:1041 -- Total run time: 1.25 seconds (1.23 seconds for the tuning loop).
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<p>As we can see, neither trial makes it to the optimum, since the search configs are stuck with their original values. This illustrates a key advantage of PBT: while traditional hyperparameter search methods (like grid search) keep fixed search values throughout training, PBT can adapt the search dynamically, allowing it to find better solutions with the same computational budget.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">gridspec_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
 
-<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">]</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h = [1, 0]&quot;</span><span class="p">,</span> <span class="s2">&quot;h = [0, 1]&quot;</span><span class="p">]</span>
 
 <span class="n">plot_parameter_history</span><span class="p">(</span>
@@ -1868,7 +2333,7 @@ This ensures that the PBT algorithm actually exploits the trials in the most rec
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/27e2bde8b6fafc0fd81ada9b3d7247536385326abf40395312b7cde33ad194dc.png" src="../../../_images/27e2bde8b6fafc0fd81ada9b3d7247536385326abf40395312b7cde33ad194dc.png" />
+<img alt="../../../_images/45a657ab26016ddca7a6ed8618b3d7238913bccbf302166816c2b35c94c66d70.png" src="../../../_images/45a657ab26016ddca7a6ed8618b3d7238913bccbf302166816c2b35c94c66d70.png" />
 </div>
 </div>
 <p>Compare the two plots we generated with Figure 2 from the <a class="reference external" href="https://arxiv.org/pdf/1711.09846.pdf">PBT paper</a> (in particular, we produced the top-left and bottom-right plots).</p>
@@ -1877,8 +2342,15 @@ This ensures that the PBT algorithm actually exploits the trials in the most rec
 <section id="increase-pbt-population-size">
 <h2>Increase PBT population size<a class="headerlink" href="#increase-pbt-population-size" title="Link to this heading">#</a></h2>
 <p>One last experiment: what does it look like if we increase the PBT population size? Now, low-performing trials will sample one of the multiple high-performing trials to exploit, and it should result in some more interesting behavior.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
+<p>With a larger population:</p>
+<ol class="arabic simple">
+<li><p>There’s more diversity in the exploration space</p></li>
+<li><p>Multiple “good” solutions can be discovered simultaneously</p></li>
+<li><p>Different exploitation patterns emerge as trials may choose from multiple well-performing configurations</p></li>
+<li><p>The population as a whole can develop more robust strategies for optimization</p></li>
+</ol>
+<div class="cell tag_hide-output docutils container">
+<div class="cell_input above-output-prompt docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
     <span class="n">ray</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
@@ -1920,12 +2392,660 @@ This ensures that the PBT algorithm actually exploits the trials in the most rec
 </pre></div>
 </div>
 </div>
+<details class="hide below-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell output</span>
+<span class="expanded">Hide code cell output</span>
+</summary>
+<div class="cell_output docutils container">
+<div class="output text_html"><div class="tuneStatus">
+  <div style="display: flex;flex-direction: row">
+    <div style="display: flex;flex-direction: column;">
+      <h3>Tune Status</h3>
+      <table>
+<tbody>
+<tr><td>Current time:</td><td>2025-02-24 16:23:40</td></tr>
+<tr><td>Running for: </td><td>00:01:18.96        </td></tr>
+<tr><td>Memory:      </td><td>21.3/36.0 GiB      </td></tr>
+</tbody>
+</table>
+    </div>
+    <div class="vDivider"></div>
+    <div class="systemInfo">
+      <h3>System Info</h3>
+      PopulationBasedTraining: 48 checkpoints, 48 perturbs<br>Logical resource usage: 1.0/12 CPUs, 0/0 GPUs
+    </div>
+    
+  </div>
+  <div class="hDivider"></div>
+  <div class="trialStatus">
+    <h3>Trial Status</h3>
+    <table>
+<thead>
+<tr><th>Trial name            </th><th>status    </th><th>loc            </th><th style="text-align: right;">      h0</th><th style="text-align: right;">    lr</th><th style="text-align: right;">  iter</th><th style="text-align: right;">  total time (s)</th><th style="text-align: right;">  Q</th><th style="text-align: right;">     theta0</th><th style="text-align: right;">     theta1</th></tr>
+</thead>
+<tbody>
+<tr><td>train_func_942f2_00000</td><td>TERMINATED</td><td>127.0.0.1:23974</td><td style="text-align: right;">0.937925</td><td style="text-align: right;">0.1008</td><td style="text-align: right;">   100</td><td style="text-align: right;">       0.0464976</td><td style="text-align: right;">1.2</td><td style="text-align: right;">2.01666e-06</td><td style="text-align: right;">3.7014e-06 </td></tr>
+<tr><td>train_func_942f2_00001</td><td>TERMINATED</td><td>127.0.0.1:23979</td><td style="text-align: right;">1.18802 </td><td style="text-align: right;">0.0995</td><td style="text-align: right;">   100</td><td style="text-align: right;">       0.0468764</td><td style="text-align: right;">1.2</td><td style="text-align: right;">1.74199e-06</td><td style="text-align: right;">2.48858e-06</td></tr>
+<tr><td>train_func_942f2_00002</td><td>TERMINATED</td><td>127.0.0.1:23981</td><td style="text-align: right;">1.71075 </td><td style="text-align: right;">0.0395</td><td style="text-align: right;">   100</td><td style="text-align: right;">       0.0464926</td><td style="text-align: right;">1.2</td><td style="text-align: right;">2.42464e-06</td><td style="text-align: right;">4.55143e-06</td></tr>
+<tr><td>train_func_942f2_00003</td><td>TERMINATED</td><td>127.0.0.1:23982</td><td style="text-align: right;">1.42562 </td><td style="text-align: right;">0.084 </td><td style="text-align: right;">   100</td><td style="text-align: right;">       0.0461869</td><td style="text-align: right;">1.2</td><td style="text-align: right;">1.68403e-06</td><td style="text-align: right;">3.62265e-06</td></tr>
+</tbody>
+</table>
+  </div>
+</div>
+<style>
+.tuneStatus {
+  color: var(--jp-ui-font-color1);
+}
+.tuneStatus .systemInfo {
+  display: flex;
+  flex-direction: column;
+}
+.tuneStatus td {
+  white-space: nowrap;
+}
+.tuneStatus .trialStatus {
+  display: flex;
+  flex-direction: column;
+}
+.tuneStatus h3 {
+  font-weight: bold;
+}
+.tuneStatus .hDivider {
+  border-bottom-width: var(--jp-border-width);
+  border-bottom-color: var(--jp-border-color0);
+  border-bottom-style: solid;
+}
+.tuneStatus .vDivider {
+  border-left-width: var(--jp-border-width);
+  border-left-color: var(--jp-border-color0);
+  border-left-style: solid;
+  margin: 0.5em 1em 0.5em 1em;
+}
+</style>
+</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-02-24 16:22:21,301	WARNING sample.py:469 -- sample_from functions that take a spec dict are deprecated. Please update your function to work with the config dict directly.
+2025-02-24 16:22:21,302	WARNING sample.py:469 -- sample_from functions that take a spec dict are deprecated. Please update your function to work with the config dict directly.
+2025-02-24 16:22:21,303	WARNING sample.py:469 -- sample_from functions that take a spec dict are deprecated. Please update your function to work with the config dict directly.
+2025-02-24 16:22:21,304	WARNING sample.py:469 -- sample_from functions that take a spec dict are deprecated. Please update your function to work with the config dict directly.
+<span class=" -Color -Color-Cyan">(train_func pid=23644)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/checkpoint_000000)
+2025-02-24 16:22:22,342	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 0.090282) into trial 942f2_00001 (score = -0.168306)
+
+2025-02-24 16:22:22,343	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.029 --- (resample) --&gt; 0.092
+h0 : 0.0 --- (resample) --&gt; 0.21859874791501244
+h1 : 1.0 --- (resample) --&gt; 0.14995290392498006
+
+2025-02-24 16:22:22,343	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 0.090282) into trial 942f2_00002 (score = -0.022182)
+
+2025-02-24 16:22:22,344	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.029 --- (* 0.8) --&gt; 0.023200000000000002
+h0 : 0.0 --- (* 0.8) --&gt; 0.0
+h1 : 1.0 --- (* 0.8) --&gt; 0.8
+
+2025-02-24 16:22:23,155	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/result.json
+<span class=" -Color -Color-Cyan">(train_func pid=23649)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/checkpoint_000000)
+2025-02-24 16:22:23,942	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/result.json
+2025-02-24 16:22:24,739	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00002_2_h0=0.0100,lr=0.0170_2025-02-24_16-22-21/result.json
+2025-02-24 16:22:25,531	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00003_3_h0=0.9900,lr=0.0530_2025-02-24_16-22-21/result.json
+2025-02-24 16:22:25,539	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 0.323032) into trial 942f2_00002 (score = 0.221418)
+
+2025-02-24 16:22:25,540	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.092 --- (resample) --&gt; 0.0385
+h0 : 0.21859874791501244 --- (* 1.2) --&gt; 0.2623184974980149
+h1 : 0.14995290392498006 --- (* 0.8) --&gt; 0.11996232313998406
+
+2025-02-24 16:22:25,540	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 0.323032) into trial 942f2_00003 (score = 0.239975)
+
+2025-02-24 16:22:25,541	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.092 --- (* 1.2) --&gt; 0.1104
+h0 : 0.21859874791501244 --- (resample) --&gt; 0.12144956368659676
+h1 : 0.14995290392498006 --- (* 1.2) --&gt; 0.17994348470997606
+
+2025-02-24 16:22:26,332	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/result.json
+2025-02-24 16:22:27,106	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/result.json
+2025-02-24 16:22:27,882	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00002_2_h0=0.0100,lr=0.0170_2025-02-24_16-22-21/result.json
+<span class=" -Color -Color-Cyan">(train_func pid=23670)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00002_2_h0=0.0100,lr=0.0170_2025-02-24_16-22-21/checkpoint_000001)<span class=" -Color -Color-Green"> [repeated 10x across cluster]</span>
+2025-02-24 16:22:28,670	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00003_3_h0=0.9900,lr=0.0530_2025-02-24_16-22-21/result.json
+2025-02-24 16:22:28,678	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 0.506889) into trial 942f2_00000 (score = 0.399434)
+
+2025-02-24 16:22:28,678	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.092 --- (* 0.8) --&gt; 0.0736
+h0 : 0.21859874791501244 --- (resample) --&gt; 0.8250136748029772
+h1 : 0.14995290392498006 --- (resample) --&gt; 0.5594708426615145
+
+2025-02-24 16:22:28,679	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00003 (score = 0.505573) into trial 942f2_00002 (score = 0.406418)
+
+2025-02-24 16:22:28,679	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.1104 --- (resample) --&gt; 0.025500000000000002
+h0 : 0.12144956368659676 --- (* 1.2) --&gt; 0.1457394764239161
+h1 : 0.17994348470997606 --- (resample) --&gt; 0.8083066244826129
+
+<span class=" -Color -Color-Cyan">(train_func pid=23671)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/checkpoint_000001)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:22:29,460	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/result.json
+2025-02-24 16:22:30,255	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/result.json
+2025-02-24 16:22:31,035	WARNING logger.py:186 -- Remote file not found: /Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00002_2_h0=0.0100,lr=0.0170_2025-02-24_16-22-21/result.json
+2025-02-24 16:22:31,847	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 0.652138) into trial 942f2_00002 (score = 0.606250)
+
+2025-02-24 16:22:31,848	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.092 --- (resample) --&gt; 0.007
+h0 : 0.21859874791501244 --- (* 0.8) --&gt; 0.17487899833200996
+h1 : 0.14995290392498006 --- (resample) --&gt; 0.5452206891524898
+
+2025-02-24 16:22:31,848	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 0.652138) into trial 942f2_00003 (score = 0.646607)
+
+2025-02-24 16:22:31,849	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.092 --- (* 0.8) --&gt; 0.0736
+h0 : 0.21859874791501244 --- (resample) --&gt; 0.007051230918609708
+h1 : 0.14995290392498006 --- (* 0.8) --&gt; 0.11996232313998406
+
+<span class=" -Color -Color-Cyan">(train_func pid=23690)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/checkpoint_000004)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23696)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/checkpoint_000003)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:22:35,034	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.038110) into trial 942f2_00002 (score = 0.671646)
+
+2025-02-24 16:22:35,034	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.0736 --- (resample) --&gt; 0.018000000000000002
+h0 : 0.8250136748029772 --- (resample) --&gt; 0.002064710166551409
+h1 : 0.5594708426615145 --- (resample) --&gt; 0.5725196002079377
+
+2025-02-24 16:22:35,035	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 0.766900) into trial 942f2_00003 (score = 0.688034)
+
+2025-02-24 16:22:35,035	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.092 --- (* 1.2) --&gt; 0.1104
+h0 : 0.21859874791501244 --- (resample) --&gt; 0.6821981346240038
+h1 : 0.14995290392498006 --- (* 0.8) --&gt; 0.11996232313998406
+
+2025-02-24 16:22:38,261	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.121589) into trial 942f2_00001 (score = 0.857585)
+
+2025-02-24 16:22:38,262	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.0736 --- (* 0.8) --&gt; 0.05888
+h0 : 0.8250136748029772 --- (resample) --&gt; 0.4514076493559237
+h1 : 0.5594708426615145 --- (* 0.8) --&gt; 0.4475766741292116
+
+2025-02-24 16:22:38,262	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.050600) into trial 942f2_00003 (score = 0.947136)
+
+2025-02-24 16:22:38,263	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.018000000000000002 --- (resample) --&gt; 0.039
+h0 : 0.002064710166551409 --- (* 0.8) --&gt; 0.0016517681332411272
+h1 : 0.5725196002079377 --- (* 1.2) --&gt; 0.6870235202495252
+
+<span class=" -Color -Color-Cyan">(train_func pid=23715)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/checkpoint_000006)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23719)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/checkpoint_000005)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:22:41,544	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.161966) into trial 942f2_00002 (score = 1.061179)
+
+2025-02-24 16:22:41,544	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.0736 --- (* 0.8) --&gt; 0.05888
+h0 : 0.8250136748029772 --- (* 0.8) --&gt; 0.6600109398423818
+h1 : 0.5594708426615145 --- (resample) --&gt; 0.7597397486004039
+
+2025-02-24 16:22:41,545	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.146381) into trial 942f2_00003 (score = 1.075142)
+
+2025-02-24 16:22:41,545	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.05888 --- (resample) --&gt; 0.022
+h0 : 0.4514076493559237 --- (* 1.2) --&gt; 0.5416891792271085
+h1 : 0.4475766741292116 --- (* 0.8) --&gt; 0.3580613393033693
+
+2025-02-24 16:22:44,761	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.179472) into trial 942f2_00003 (score = 1.153187)
+
+2025-02-24 16:22:44,762	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.05888 --- (resample) --&gt; 0.077
+h0 : 0.6600109398423818 --- (* 1.2) --&gt; 0.7920131278108581
+h1 : 0.7597397486004039 --- (* 0.8) --&gt; 0.6077917988803232
+
+2025-02-24 16:22:44,762	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.179472) into trial 942f2_00001 (score = 1.163228)
+
+2025-02-24 16:22:44,763	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.05888 --- (* 0.8) --&gt; 0.04710400000000001
+h0 : 0.6600109398423818 --- (resample) --&gt; 0.9912816837768351
+h1 : 0.7597397486004039 --- (resample) --&gt; 0.14906117271353014
+
+<span class=" -Color -Color-Cyan">(train_func pid=23743)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00003_3_h0=0.9900,lr=0.0530_2025-02-24_16-22-21/checkpoint_000002)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23748)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/checkpoint_000007)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:22:47,992	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.191012) into trial 942f2_00001 (score = 1.185283)
+
+2025-02-24 16:22:47,993	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.0736 --- (resample) --&gt; 0.017
+h0 : 0.8250136748029772 --- (* 1.2) --&gt; 0.9900164097635725
+h1 : 0.5594708426615145 --- (resample) --&gt; 0.8982838603244675
+
+2025-02-24 16:22:47,994	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00003 (score = 1.190555) into trial 942f2_00002 (score = 1.188719)
+
+2025-02-24 16:22:47,994	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.077 --- (resample) --&gt; 0.008
+h0 : 0.7920131278108581 --- (resample) --&gt; 0.6807322169820972
+h1 : 0.6077917988803232 --- (* 0.8) --&gt; 0.4862334391042586
+
+<span class=" -Color -Color-Cyan">(train_func pid=23768)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00002_2_h0=0.0100,lr=0.0170_2025-02-24_16-22-21/checkpoint_000008)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:22:51,175	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.195622) into trial 942f2_00002 (score = 1.191142)
+
+2025-02-24 16:22:51,175	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.0736 --- (resample) --&gt; 0.0205
+h0 : 0.8250136748029772 --- (* 1.2) --&gt; 0.9900164097635725
+h1 : 0.5594708426615145 --- (resample) --&gt; 0.6233012271154452
+
+2025-02-24 16:22:51,176	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.195622) into trial 942f2_00001 (score = 1.192855)
+
+2025-02-24 16:22:51,177	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.0736 --- (* 0.8) --&gt; 0.05888
+h0 : 0.8250136748029772 --- (resample) --&gt; 0.6776393680340219
+h1 : 0.5594708426615145 --- (resample) --&gt; 0.5972686909595455
+
+<span class=" -Color -Color-Cyan">(train_func pid=23773)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00003_3_h0=0.9900,lr=0.0530_2025-02-24_16-22-21/checkpoint_000002)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:22:54,409	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.197864) into trial 942f2_00002 (score = 1.196497)
+
+2025-02-24 16:22:54,410	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.0736 --- (resample) --&gt; 0.094
+h0 : 0.8250136748029772 --- (* 1.2) --&gt; 0.9900164097635725
+h1 : 0.5594708426615145 --- (resample) --&gt; 0.916496614878753
+
+2025-02-24 16:22:54,411	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00003 (score = 1.198000) into trial 942f2_00001 (score = 1.197464)
+
+2025-02-24 16:22:54,411	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.077 --- (resample) --&gt; 0.009000000000000001
+h0 : 0.7920131278108581 --- (resample) --&gt; 0.09724457530695019
+h1 : 0.6077917988803232 --- (* 0.8) --&gt; 0.4862334391042586
+
+<span class=" -Color -Color-Cyan">(train_func pid=23796)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/checkpoint_000011)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23801)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/checkpoint_000010)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:22:57,678	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.199463) into trial 942f2_00001 (score = 1.198073)
+
+2025-02-24 16:22:57,678	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.094 --- (resample) --&gt; 0.011
+h0 : 0.9900164097635725 --- (* 1.2) --&gt; 1.188019691716287
+h1 : 0.916496614878753 --- (resample) --&gt; 0.854735155913485
+
+2025-02-24 16:22:57,679	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00003 (score = 1.199079) into trial 942f2_00000 (score = 1.198957)
+
+2025-02-24 16:22:57,679	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.077 --- (* 1.2) --&gt; 0.0924
+h0 : 0.7920131278108581 --- (resample) --&gt; 0.8783500284482123
+h1 : 0.6077917988803232 --- (* 1.2) --&gt; 0.7293501586563879
+
+2025-02-24 16:23:00,836	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.199862) into trial 942f2_00001 (score = 1.199540)
+
+2025-02-24 16:23:00,836	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.094 --- (* 0.8) --&gt; 0.0752
+h0 : 0.9900164097635725 --- (resample) --&gt; 0.06185563216172696
+h1 : 0.916496614878753 --- (resample) --&gt; 0.06868522206070948
+
+2025-02-24 16:23:00,837	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.199862) into trial 942f2_00003 (score = 1.199576)
+
+2025-02-24 16:23:00,837	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.094 --- (* 1.2) --&gt; 0.1128
+h0 : 0.9900164097635725 --- (resample) --&gt; 0.3672068732350573
+h1 : 0.916496614878753 --- (resample) --&gt; 0.3263725487154706
+
+<span class=" -Color -Color-Cyan">(train_func pid=23821)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/checkpoint_000013)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23822)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00002_2_h0=0.0100,lr=0.0170_2025-02-24_16-22-21/checkpoint_000011)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:23:04,072	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.199964) into trial 942f2_00001 (score = 1.199871)
+
+2025-02-24 16:23:04,073	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.094 --- (* 0.8) --&gt; 0.0752
+h0 : 0.9900164097635725 --- (resample) --&gt; 0.8143417145384867
+h1 : 0.916496614878753 --- (* 1.2) --&gt; 1.0997959378545035
+
+2025-02-24 16:23:04,073	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.199964) into trial 942f2_00000 (score = 1.199896)
+
+2025-02-24 16:23:04,074	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.094 --- (* 0.8) --&gt; 0.0752
+h0 : 0.9900164097635725 --- (resample) --&gt; 0.28845453300169044
+h1 : 0.916496614878753 --- (resample) --&gt; 0.02235127072371279
+
+2025-02-24 16:23:07,516	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.199986) into trial 942f2_00003 (score = 1.199955)
+
+2025-02-24 16:23:07,516	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.0752 --- (* 0.8) --&gt; 0.060160000000000005
+h0 : 0.8143417145384867 --- (* 1.2) --&gt; 0.9772100574461839
+h1 : 1.0997959378545035 --- (* 0.8) --&gt; 0.8798367502836029
+
+2025-02-24 16:23:07,517	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.199986) into trial 942f2_00000 (score = 1.199969)
+
+2025-02-24 16:23:07,517	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.0752 --- (resample) --&gt; 0.0155
+h0 : 0.8143417145384867 --- (* 1.2) --&gt; 0.9772100574461839
+h1 : 1.0997959378545035 --- (* 0.8) --&gt; 0.8798367502836029
+
+<span class=" -Color -Color-Cyan">(train_func pid=23846)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00003_3_h0=0.9900,lr=0.0530_2025-02-24_16-22-21/checkpoint_000007)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23846)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00003_3_h0=0.9900,lr=0.0530_2025-02-24_16-22-21/checkpoint_000006)<span class=" -Color -Color-Green"> [repeated 6x across cluster]</span>
+2025-02-24 16:23:10,721	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.199994) into trial 942f2_00000 (score = 1.199989)
+
+2025-02-24 16:23:10,722	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.0752 --- (resample) --&gt; 0.005
+h0 : 0.8143417145384867 --- (resample) --&gt; 0.14093804696635504
+h1 : 1.0997959378545035 --- (resample) --&gt; 0.04714342092680601
+
+2025-02-24 16:23:10,723	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.199997) into trial 942f2_00003 (score = 1.199994)
+
+2025-02-24 16:23:10,723	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.094 --- (* 0.8) --&gt; 0.0752
+h0 : 0.9900164097635725 --- (resample) --&gt; 0.4368194817950344
+h1 : 0.916496614878753 --- (resample) --&gt; 0.7095403843032826
+
+<span class=" -Color -Color-Cyan">(train_func pid=23867)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00002_2_h0=0.0100,lr=0.0170_2025-02-24_16-22-21/checkpoint_000015)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23867)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00002_2_h0=0.0100,lr=0.0170_2025-02-24_16-22-21/checkpoint_000014)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:23:13,989	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.199999) into trial 942f2_00000 (score = 1.199994)
+
+2025-02-24 16:23:13,989	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.094 --- (resample) --&gt; 0.0925
+h0 : 0.9900164097635725 --- (resample) --&gt; 0.998683166515384
+h1 : 0.916496614878753 --- (* 1.2) --&gt; 1.0997959378545035
+
+2025-02-24 16:23:13,990	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.199999) into trial 942f2_00001 (score = 1.199998)
+
+2025-02-24 16:23:13,990	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00001:
+lr : 0.094 --- (resample) --&gt; 0.0995
+h0 : 0.9900164097635725 --- (* 1.2) --&gt; 1.188019691716287
+h1 : 0.916496614878753 --- (* 0.8) --&gt; 0.7331972919030024
+
+2025-02-24 16:23:17,224	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.200000) into trial 942f2_00003 (score = 1.199999)
+
+2025-02-24 16:23:17,224	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.0925 --- (resample) --&gt; 0.006500000000000001
+h0 : 0.998683166515384 --- (* 0.8) --&gt; 0.7989465332123072
+h1 : 1.0997959378545035 --- (* 0.8) --&gt; 0.8798367502836029
+
+2025-02-24 16:23:17,225	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.200000) into trial 942f2_00002 (score = 1.200000)
+
+2025-02-24 16:23:17,225	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.0995 --- (* 0.8) --&gt; 0.0796
+h0 : 1.188019691716287 --- (* 0.8) --&gt; 0.9504157533730297
+h1 : 0.7331972919030024 --- (* 0.8) --&gt; 0.586557833522402
+
+<span class=" -Color -Color-Cyan">(train_func pid=23892)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/checkpoint_000018)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23892)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/checkpoint_000017)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:23:20,513	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.200000) into trial 942f2_00003 (score = 1.200000)
+
+2025-02-24 16:23:20,514	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.0995 --- (resample) --&gt; 0.0325
+h0 : 1.188019691716287 --- (* 0.8) --&gt; 0.9504157533730297
+h1 : 0.7331972919030024 --- (resample) --&gt; 0.19444236619090172
+
+2025-02-24 16:23:20,515	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.200000) into trial 942f2_00002 (score = 1.200000)
+
+2025-02-24 16:23:20,515	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.0925 --- (* 0.8) --&gt; 0.074
+h0 : 0.998683166515384 --- (* 1.2) --&gt; 1.1984197998184607
+h1 : 1.0997959378545035 --- (resample) --&gt; 0.6632564869583678
+
+2025-02-24 16:23:23,779	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00000 (score = 1.200000) into trial 942f2_00003 (score = 1.200000)
+
+2025-02-24 16:23:23,779	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.0925 --- (resample) --&gt; 0.0205
+h0 : 0.998683166515384 --- (* 0.8) --&gt; 0.7989465332123072
+h1 : 1.0997959378545035 --- (* 1.2) --&gt; 1.319755125425404
+
+2025-02-24 16:23:23,780	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.200000) into trial 942f2_00002 (score = 1.200000)
+
+2025-02-24 16:23:23,780	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.0995 --- (resample) --&gt; 0.059500000000000004
+h0 : 1.188019691716287 --- (* 1.2) --&gt; 1.4256236300595444
+h1 : 0.7331972919030024 --- (resample) --&gt; 0.19309431415014977
+
+<span class=" -Color -Color-Cyan">(train_func pid=23917)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/checkpoint_000020)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23917)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00000_0_h0=0.0000,lr=0.0290_2025-02-24_16-22-21/checkpoint_000019)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:23:27,089	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.200000) into trial 942f2_00003 (score = 1.200000)
+
+2025-02-24 16:23:27,090	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.059500000000000004 --- (* 0.8) --&gt; 0.0476
+h0 : 1.4256236300595444 --- (* 0.8) --&gt; 1.1404989040476357
+h1 : 0.19309431415014977 --- (* 0.8) --&gt; 0.15447545132011983
+
+2025-02-24 16:23:27,090	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.200000) into trial 942f2_00000 (score = 1.200000)
+
+2025-02-24 16:23:27,091	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.059500000000000004 --- (resample) --&gt; 0.051000000000000004
+h0 : 1.4256236300595444 --- (resample) --&gt; 0.5322491694545954
+h1 : 0.19309431415014977 --- (resample) --&gt; 0.4907896898235511
+
+2025-02-24 16:23:30,403	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.200000) into trial 942f2_00003 (score = 1.200000)
+
+2025-02-24 16:23:30,403	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00003:
+lr : 0.0995 --- (resample) --&gt; 0.084
+h0 : 1.188019691716287 --- (* 1.2) --&gt; 1.4256236300595444
+h1 : 0.7331972919030024 --- (resample) --&gt; 0.7068936194953941
+
+2025-02-24 16:23:30,404	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00002 (score = 1.200000) into trial 942f2_00000 (score = 1.200000)
+
+2025-02-24 16:23:30,404	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.059500000000000004 --- (resample) --&gt; 0.041
+h0 : 1.4256236300595444 --- (* 1.2) --&gt; 1.7107483560714531
+h1 : 0.19309431415014977 --- (resample) --&gt; 0.6301738678453057
+
+<span class=" -Color -Color-Cyan">(train_func pid=23942)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00003_3_h0=0.9900,lr=0.0530_2025-02-24_16-22-21/checkpoint_000008)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23942)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00002_2_h0=0.0100,lr=0.0170_2025-02-24_16-22-21/checkpoint_000019)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:23:33,643	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.200000) into trial 942f2_00002 (score = 1.200000)
+
+2025-02-24 16:23:33,643	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.0995 --- (resample) --&gt; 0.08
+h0 : 1.188019691716287 --- (* 1.2) --&gt; 1.4256236300595444
+h1 : 0.7331972919030024 --- (resample) --&gt; 0.12615387675586676
+
+2025-02-24 16:23:33,644	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00001 (score = 1.200000) into trial 942f2_00000 (score = 1.200000)
+
+2025-02-24 16:23:33,644	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.0995 --- (resample) --&gt; 0.0185
+h0 : 1.188019691716287 --- (* 1.2) --&gt; 1.4256236300595444
+h1 : 0.7331972919030024 --- (* 0.8) --&gt; 0.586557833522402
+
+<span class=" -Color -Color-Cyan">(train_func pid=23962)</span> Checkpoint successfully created at: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/checkpoint_000023)<span class=" -Color -Color-Green"> [repeated 6x across cluster]</span>
+<span class=" -Color -Color-Cyan">(train_func pid=23967)</span> Restored on 127.0.0.1 from checkpoint: Checkpoint(filesystem=local, path=/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21/train_func_942f2_00001_1_h0=1.0000,lr=0.0070_2025-02-24_16-22-21/checkpoint_000022)<span class=" -Color -Color-Green"> [repeated 7x across cluster]</span>
+2025-02-24 16:23:36,961	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00003 (score = 1.200000) into trial 942f2_00000 (score = 1.200000)
+
+2025-02-24 16:23:36,961	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00000:
+lr : 0.084 --- (* 1.2) --&gt; 0.1008
+h0 : 1.4256236300595444 --- (resample) --&gt; 0.9379248877817841
+h1 : 0.7068936194953941 --- (* 0.8) --&gt; 0.5655148955963153
+
+2025-02-24 16:23:36,962	INFO pbt.py:878 -- 
+
+[PopulationBasedTraining] [Exploit] Cloning trial 942f2_00003 (score = 1.200000) into trial 942f2_00002 (score = 1.200000)
+
+2025-02-24 16:23:36,962	INFO pbt.py:905 -- 
+
+[PopulationBasedTraining] [Explore] Perturbed the hyperparameter config of trial942f2_00002:
+lr : 0.084 --- (resample) --&gt; 0.0395
+h0 : 1.4256236300595444 --- (* 1.2) --&gt; 1.7107483560714531
+h1 : 0.7068936194953941 --- (* 1.2) --&gt; 0.8482723433944729
+
+2025-02-24 16:23:40,264	INFO tune.py:1009 -- Wrote the latest version of all result files and experiment state to &#39;/Users/rdecal/ray_results/train_func_2025-02-24_16-22-21&#39; in 0.0086s.
+2025-02-24 16:23:40,265	INFO tune.py:1041 -- Total run time: 78.97 seconds (78.95 seconds for the tuning loop).
+</pre></div>
+</div>
+</div>
+</details>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">gridspec_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
 
-<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">]</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h = [1, 0]&quot;</span><span class="p">,</span> <span class="s2">&quot;h = [0, 1]&quot;</span><span class="p">,</span> <span class="s2">&quot;h = [0.01, 0.99]&quot;</span><span class="p">,</span> <span class="s2">&quot;h = [0.99, 0.01]&quot;</span><span class="p">]</span>
 
 <span class="n">plot_parameter_history</span><span class="p">(</span>
@@ -1941,7 +3061,7 @@ This ensures that the PBT algorithm actually exploits the trials in the most rec
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/53c6040ce843397a1cbd78696edc36cfb2ea7d4c44b5a0ebbd3503d89699ae9a.png" src="../../../_images/53c6040ce843397a1cbd78696edc36cfb2ea7d4c44b5a0ebbd3503d89699ae9a.png" />
+<img alt="../../../_images/d3b32145dc5ba2b87e9f1cc1ec6b6cd4abd1b6346be7ee27320d37db30c2a192.png" src="../../../_images/d3b32145dc5ba2b87e9f1cc1ec6b6cd4abd1b6346be7ee27320d37db30c2a192.png" />
 </div>
 </div>
 <div class="cell docutils container">

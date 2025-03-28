@@ -580,6 +580,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/nodes.html">Node Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/gcs.html">GCS Fault Tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -605,10 +606,11 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
@@ -752,14 +754,14 @@ document.write(`
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -812,30 +814,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/model-multiplexing.html">Model Multiplexing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/configure-serve-deployment.html">Configure Ray Serve deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/http-guide.html">Set Up FastAPI and HTTP</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../serve/llm/overview.html">Overview</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../serve/llm/api.html">Ray Serve LLM API</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.builders.build_vllm_deployment.html">ray.serve.llm.builders.build_vllm_deployment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.builders.build_openai_app.html">ray.serve.llm.builders.build_openai_app</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.LLMConfig.html">ray.serve.llm.configs.LLMConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.LLMServingArgs.html">ray.serve.llm.configs.LLMServingArgs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.ModelLoadingConfig.html">ray.serve.llm.configs.ModelLoadingConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.CloudMirrorConfig.html">ray.serve.llm.configs.CloudMirrorConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.configs.LoraConfig.html">ray.serve.llm.configs.LoraConfig</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.deployments.VLLMService.html">ray.serve.llm.deployments.VLLMService</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.deployments.LLMRouter.html">ray.serve.llm.deployments.LLMRouter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html">ray.serve.llm.openai_api_models.ChatCompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionRequest.html">ray.serve.llm.openai_api_models.CompletionRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionStreamResponse.html">ray.serve.llm.openai_api_models.ChatCompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ChatCompletionResponse.html">ray.serve.llm.openai_api_models.ChatCompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html">ray.serve.llm.openai_api_models.CompletionStreamResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.CompletionResponse.html">ray.serve.llm.openai_api_models.CompletionResponse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serve/llm/doc/ray.serve.llm.openai_api_models.ErrorResponse.html">ray.serve.llm.openai_api_models.ErrorResponse</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../serve/llm/serving-llms.html">Serving LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/production-guide/config.html">Serve Config Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/production-guide/kubernetes.html">Deploy on Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/production-guide/docker.html">Custom Docker Images</a></li>
@@ -847,7 +827,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/monitoring.html">Monitor Your Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/resource-allocation.html">Resource Allocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/autoscaling-guide.html">Ray Serve Autoscaling</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/advanced-guides/app-builder-guide.html">Pass Arguments to Applications</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/advanced-guides/advanced-autoscaling.html">Advanced Ray Serve Autoscaling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../serve/advanced-guides/performance.html">Performance Tuning</a></li>
@@ -865,10 +845,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../serve/api/index.html">Ray Serve API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/key-concepts.html">Key concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/multi-agent-envs.html">Multi-Agent Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/hierarchical-envs.html">Hierarchical Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/external-envs.html">External Environments and Applications</a></li>
@@ -876,7 +856,7 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/algorithm-config.html">AlgorithmConfig API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/rllib-algorithms.html">Algorithms</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-advanced-api.html">Advanced Python APIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rllib/checkpoints.html">Checkpointing</a></li>
@@ -903,8 +883,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/rllib-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../rllib/new-api-stack-migration-guide.html">New API stack migration guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
@@ -926,7 +906,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
@@ -945,7 +925,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html">ray.rllib.callbacks.callbacks.RLlibCallback</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end</a></li>
@@ -961,7 +941,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/env_runner.html">EnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/single_agent_env_runner.html">SingleAgentEnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/single_agent_episode.html">SingleAgentEpisode API</a></li>
@@ -971,7 +951,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/env/utils.html">Env Utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.build</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class</a></li>
@@ -1014,7 +994,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html">ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.html">ray.rllib.models.distributions.Distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html">ray.rllib.models.distributions.Distribution.from_logits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html">ray.rllib.models.distributions.Distribution.sample</a></li>
@@ -1023,14 +1003,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html">ray.rllib.models.distributions.Distribution.kl</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html">ray.rllib.core.learner.learner_group.LearnerGroup</a></li>
 </ul>
 </li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners</a></li>
@@ -1051,7 +1031,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs.html">ray.rllib.offline.offline_prelearner.OfflinePreLearner.default_prelearner_buffer_kwargs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit.html">ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer.html">ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html">ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer</a></li>
@@ -1066,7 +1046,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html">ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
@@ -1112,12 +1092,12 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/joblib.html">Distributed Scikit-learn / Joblib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/multiprocessing.html">Distributed multiprocessing.Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/ray-collective.html">Ray Collective Communication Lib</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.ray_active.html">ray.util.dask.RayDaskCallback.ray_active</a></li>
 </ul>
 </li>
@@ -1132,7 +1112,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../workflows/index.html">Ray Workflows (Alpha)</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/basics.html">Getting Started</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/management.html">Workflow Management</a></li>
@@ -1140,7 +1120,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/events.html">Events</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/comparison.html">API Comparisons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/advanced.html">Advanced Topics</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../workflows/api/api.html">Ray Workflows API</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../workflows/api/execution.html">Workflow Execution API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../workflows/api/management.html">Workflow Management API</a></li>
 </ul>
@@ -1149,16 +1129,16 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
@@ -1203,7 +1183,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/user-guides/reduce-image-pull-latency.html">Reducing image pull latency on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/ml-example.html">Ray Train XGBoostTrainer on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/gpu-training-example.html">Train PyTorch ResNet model with GPUs on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/mnist-training-example.html">Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes</a></li>
@@ -1219,7 +1199,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/examples/vllm-rayservice.html">Serve a Large Language Model with vLLM on Kubernetes</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/ingress.html">Ingress</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/prometheus-grafana.html">Using Prometheus and Grafana</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/pyspy.html">Profiling with py-spy</a></li>
@@ -1229,12 +1209,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/k8s-ecosystem/istio.html">mTLS and L7 observability with Istio</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/benchmarks/memory-scalability-benchmark.html">KubeRay memory and scalability benchmark</a></li>
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting/troubleshooting.html">Troubleshooting guide</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html">RayService troubleshooting</a></li>
@@ -1243,9 +1223,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/kubernetes/references.html">API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/vms/getting-started.html">Getting Started</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/user-guides/launching-clusters/index.html">Launching Ray Clusters on AWS, GCP, Azure, vSphere, On-Prem</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/user-guides/large-cluster-best-practices.html">Best practices for deploying large clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/user-guides/configuring-autoscaling.html">Configuring Autoscaling</a></li>
@@ -1254,11 +1234,11 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/examples/ml-example.html">Ray Train XGBoostTrainer on VMs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/references/ray-cluster-cli.html">Cluster Launcher Commands</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/vms/references/ray-cluster-configuration.html">Cluster YAML Configuration Options</a></li>
 </ul>
@@ -1267,8 +1247,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/metrics.html">Collecting and monitoring metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/configure-manage-dashboard.html">Configuring and Managing Ray Dashboard</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/running-applications/job-submission/quickstart.html">Quickstart using the Ray Jobs CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/running-applications/job-submission/sdk.html">Python SDK Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
@@ -1281,7 +1261,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/faq.html">FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/cli.html">Cluster Management CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cluster/running-applications/job-submission/cli.html">Ray Jobs CLI API Reference</a></li>
@@ -1291,7 +1271,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../cluster/usage-stats.html">Usage Stats Collection</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/design-overview.html">Design Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/management.html">Virtual Cluster Management API</a></li>
@@ -1299,15 +1279,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/getting-started.html">Ray Dashboard</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
@@ -1327,7 +1307,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/user-guides/ray-tracing.html">Tracing</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/api.html">State API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/cli.html">State CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/system-metrics.html">System Metrics</a></li>
@@ -1335,10 +1315,10 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-contribute/stability.html">API Stability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-contribute/api-policy.html">API Policy</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/development.html">Building Ray from Source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/ci.html">CI Testing Workflow on PRs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/docs.html">Contributing to the Ray Documentation</a></li>
@@ -1477,8 +1457,8 @@ tutorial.</p>
     └──  ...
 </pre></div>
 </div>
-<section id="define-a-custom-datasource">
-<h3>Define a custom datasource<a class="headerlink" href="#define-a-custom-datasource" title="Link to this heading">#</a></h3>
+<section id="parse-annotations">
+<h3>Parse annotations<a class="headerlink" href="#parse-annotations" title="Link to this heading">#</a></h3>
 <p>Each annotation describes the objects in an image.</p>
 <p>For example, view this image of a dog:</p>
 <div class="cell docutils container">
@@ -1495,7 +1475,7 @@ tutorial.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/1cba3d88b9c3288ca360a7d839074355008f6c58477fe9636d56fcbce9a88222.png" src="../../../_images/1cba3d88b9c3288ca360a7d839074355008f6c58477fe9636d56fcbce9a88222.png" />
+<img alt="../../../_images/ace6066cf2c3c344a5997b5cb8ff8951e133f98ac8446eb939244992aa663135.png" src="../../../_images/ace6066cf2c3c344a5997b5cb8ff8951e133f98ac8446eb939244992aa663135.png" />
 </div>
 </div>
 <p>Then, print the image’s annotation:</p>
@@ -1552,95 +1532,68 @@ tutorial.</p>
 </pre></div>
 </div>
 <p><a class="reference internal" href="../../../data/data.html#data"><span class="std std-ref">Ray Data</span></a> lets you read and preprocess data in parallel. Ray Data doesn’t
-have built-in support for VOC-style annotations, so you’ll need to define a custom
-datasource.</p>
-<p>A Datasource is an object that reads data of a particular type. For example, Ray Data
-implements a Datasource that reads CSV files. Your datasource will parse labels and
-bounding boxes from XML files. Later, you’ll read the corresponding images.</p>
-<p>To implement the datasource, extend the built-in <code class="docutils literal notranslate"><span class="pre">FileBasedDatasource</span></code> class
-and override the <code class="docutils literal notranslate"><span class="pre">_read_stream_</span></code> method.</p>
+have built-in support for VOC-style annotations, so you’ll need to define logic to parse the annotations.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">xmltodict</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
-
-<span class="kn">from</span> <span class="nn">ray.data._internal.delegating_block_builder</span> <span class="kn">import</span> <span class="n">DelegatingBlockBuilder</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">Block</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource</span> <span class="kn">import</span> <span class="n">FileBasedDatasource</span>
 
 
-<span class="k">class</span> <span class="nc">VOCAnnotationDatasource</span><span class="p">(</span><span class="n">FileBasedDatasource</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">_read_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">NativeFile</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-        <span class="n">annotation</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">)[</span><span class="s2">&quot;annotation&quot;</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">decode_annotation</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;bytes&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">annotation</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">)[</span><span class="s2">&quot;annotation&quot;</span><span class="p">]</span>
 
-        <span class="n">objects</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">]</span>
-        <span class="c1"># If there&#39;s one object, `objects` is a `dict`; otherwise, it&#39;s a `list[dict]`.</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">objects</span><span class="p">]</span>
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">]</span>
+    <span class="c1"># If there&#39;s one object, `objects` is a `dict`; otherwise, it&#39;s a `list[dict]`.</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">objects</span><span class="p">]</span>
 
-        <span class="n">boxes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
-            <span class="n">x1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;bndbox&quot;</span><span class="p">][</span><span class="s2">&quot;xmin&quot;</span><span class="p">])</span>
-            <span class="n">y1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;bndbox&quot;</span><span class="p">][</span><span class="s2">&quot;ymin&quot;</span><span class="p">])</span>
-            <span class="n">x2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;bndbox&quot;</span><span class="p">][</span><span class="s2">&quot;xmax&quot;</span><span class="p">])</span>
-            <span class="n">y2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;bndbox&quot;</span><span class="p">][</span><span class="s2">&quot;ymax&quot;</span><span class="p">])</span>
-            <span class="n">boxes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">))</span>
+    <span class="n">boxes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;bndbox&quot;</span><span class="p">][</span><span class="s2">&quot;xmin&quot;</span><span class="p">])</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;bndbox&quot;</span><span class="p">][</span><span class="s2">&quot;ymin&quot;</span><span class="p">])</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;bndbox&quot;</span><span class="p">][</span><span class="s2">&quot;xmax&quot;</span><span class="p">])</span>
+        <span class="n">y2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;bndbox&quot;</span><span class="p">][</span><span class="s2">&quot;ymax&quot;</span><span class="p">])</span>
+        <span class="n">boxes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">))</span>
 
-        <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">CLASS_TO_LABEL</span><span class="p">[</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">]</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">CLASS_TO_LABEL</span><span class="p">[</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">]</span>
 
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
 
-        <span class="n">builder</span> <span class="o">=</span> <span class="n">DelegatingBlockBuilder</span><span class="p">()</span>
-        <span class="n">builder</span><span class="o">.</span><span class="n">add_batch</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;boxes&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">boxes</span><span class="p">]),</span>
-                <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">labels</span><span class="p">]),</span>
-                <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">filename</span><span class="p">],</span>
-            <span class="p">}</span>
-        <span class="p">)</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-
-        <span class="k">yield</span> <span class="n">block</span>
-
-    <span class="k">def</span> <span class="nf">_rows_per_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;boxes&quot;</span><span class="p">:</span> <span class="n">boxes</span><span class="p">,</span>
+        <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span>
+        <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span>
+    <span class="p">}</span>
 </pre></div>
 </div>
 </div>
 </div>
-</section>
-<section id="read-annotations">
-<h3>Read annotations<a class="headerlink" href="#read-annotations" title="Link to this heading">#</a></h3>
-<p>To load the annotations into a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code>, call <code class="docutils literal notranslate"><span class="pre">ray.data.read_datasource</span></code> and pass
-the custom datasource to the constructor. Ray will read the annotations in parallel.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">ray</span>
 
 
-<span class="n">annotations</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_datasource</span><span class="p">(</span>
-    <span class="n">VOCAnnotationDatasource</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/AnimalDetection/Annotations&quot;</span><span class="p">)</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;s3://anonymous@air-example-data/AnimalDetection/Annotations&quot;</span>
+<span class="n">annotations</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_binary_files</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">decode_annotation</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>find: ‘.git’: No such file or directory
-2023-03-01 13:05:51,314	INFO worker.py:1360 -- Connecting to existing Ray cluster at address: 10.0.26.109:6379...
-2023-03-01 13:05:51,327	INFO worker.py:1548 -- Connected to Ray cluster. View the dashboard at <span class=" -Color -Color-Bold -Color-Bold-Green">https://console.anyscale-staging.com/api/v2/sessions/ses_mf1limh36cs2yrh9wkf6h2a75k/services?redirect_to=dashboard </span>
-2023-03-01 13:05:52,269	INFO packaging.py:330 -- Pushing file package &#39;gcs://_ray_pkg_00aff5a3a84ab6438be1961b97a5beaa.zip&#39; (266.32MiB) to Ray cluster...
-2023-03-01 13:05:58,529	INFO packaging.py:343 -- Successfully pushed file package &#39;gcs://_ray_pkg_00aff5a3a84ab6438be1961b97a5beaa.zip&#39;.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-10 21:44:27,975	INFO worker.py:1654 -- Connecting to existing Ray cluster at address: 10.0.49.230:6379...
+2025-03-10 21:44:27,985	INFO worker.py:1832 -- Connected to Ray cluster. View the dashboard at <span class=" -Color -Color-Bold -Color-Bold-Green">https://session-l9djtlqx7qqeui6ppmc55icd5n.i.anyscaleuserdata.com </span>
+2025-03-10 21:44:27,989	INFO packaging.py:367 -- Pushing file package &#39;gcs://_ray_pkg_5faf6ec023d53f8af2bda5976e1d23b9edab9b2d.zip&#39; (0.61MiB) to Ray cluster...
+2025-03-10 21:44:27,992	INFO packaging.py:380 -- Successfully pushed file package &#39;gcs://_ray_pkg_5faf6ec023d53f8af2bda5976e1d23b9edab9b2d.zip&#39;.
 </pre></div>
 </div>
 </div>
 </div>
-<p>Look at the first two samples. <code class="docutils literal notranslate"><span class="pre">VOCAnnotationDatasource</span></code> should’ve correctly parsed
-labels and bounding boxes.</p>
+<p>Look at the first two samples. Ray Data should’ve correctly parsed labels and bounding boxes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">annotations</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -1648,19 +1601,27 @@ labels and bounding boxes.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;boxes&#39;: array([[123., 115., 379., 275.]]),
-  &#39;labels&#39;: 2,
-  &#39;filename&#39;: &#39;2007_000063.jpg&#39;},
- {&#39;boxes&#39;: array([[124.,  68., 319., 310.]]),
-  &#39;labels&#39;: 1,
-  &#39;filename&#39;: &#39;2007_000528.jpg&#39;}]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-10 21:44:29,880	INFO dataset.py:2799 -- Tip: Use `take_batch()` instead of `take() / show()` to return records in pandas or numpy batch format.
+2025-03-10 21:44:29,890	INFO streaming_executor.py:108 -- Starting execution of Dataset. Full logs are in /tmp/ray/session_2025-03-10_20-48-49_801322_2254/logs/ray-data
+2025-03-10 21:44:29,890	INFO streaming_executor.py:109 -- Execution plan of Dataset: InputDataBuffer[Input] -&gt; TaskPoolMapOperator[ListFiles] -&gt; TaskPoolMapOperator[PartitionFiles] -&gt; TaskPoolMapOperator[ReadFiles] -&gt; TaskPoolMapOperator[Map(decode_annotation)] -&gt; LimitOperator[limit=2]
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "6c435e4354f244cbb77b418d27d7a507", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "1c803d1537374ea0af0c9feeeb2e4f5f", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "c90acf3c08a8476ba235ea4b2fb79114", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "24408762e6994f09a76fea97e67e0024", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e1b4d67282864b2a98bf3cae4a8a85b0", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b4178a6c7edf41ebb8c871656db34e6d", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Cyan">(autoscaler +24s)</span> Tip: use `ray status` to view detailed cluster status. To disable these messages, set RAY_SCHEDULER_EVENTS=0.
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;boxes&#39;: [[31.0, 166.0, 275.0, 415.0]],
+  &#39;labels&#39;: [1],
+  &#39;filename&#39;: &#39;2010_002026.jpg&#39;},
+ {&#39;boxes&#39;: [[109.0, 29.0, 428.0, 394.0]],
+  &#39;labels&#39;: [2],
+  &#39;filename&#39;: &#39;2010_002029.jpg&#39;}]
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-<section id="load-images-into-memory">
-<h3>Load images into memory<a class="headerlink" href="#load-images-into-memory" title="Link to this heading">#</a></h3>
+<section id="load-images">
+<h3>Load images<a class="headerlink" href="#load-images" title="Link to this heading">#</a></h3>
 <p>Each row of <code class="docutils literal notranslate"><span class="pre">annotations</span></code> contains the filename of an image.</p>
 <p>Write a user-defined function that loads these images. For each annotation, your function will:</p>
 <ol class="arabic simple">
@@ -1675,28 +1636,25 @@ labels and bounding boxes.</p>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
 
-<span class="k">def</span> <span class="nf">read_images</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]:</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;https://s3-us-west-2.amazonaws.com/air-example-data/AnimalDetection/JPEGImages&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
-        <span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
-    <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">batch</span>
+<span class="k">def</span> <span class="nf">read_images</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;https://s3-us-west-2.amazonaws.com/air-example-data/AnimalDetection/JPEGImages&quot;</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+    <span class="n">row</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">row</span>
 
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">annotations</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span><span class="n">read_images</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">annotations</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">read_images</span><span class="p">)</span>
 <span class="n">dataset</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2023-03-01 13:06:08,005	INFO bulk_executor.py:41 -- Executing DAG InputDataBuffer[Input] -&gt; TaskPoolMapOperator[read-&gt;MapBatches(read_images)]
-read-&gt;MapBatches(read_images): 100%|██████████| 128/128 [00:24&lt;00:00,  5.25it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-10 21:45:01,288	INFO streaming_executor.py:108 -- Starting execution of Dataset. Full logs are in /tmp/ray/session_2025-03-10_20-48-49_801322_2254/logs/ray-data
+2025-03-10 21:45:01,289	INFO streaming_executor.py:109 -- Execution plan of Dataset: InputDataBuffer[Input] -&gt; TaskPoolMapOperator[ListFiles] -&gt; TaskPoolMapOperator[PartitionFiles] -&gt; TaskPoolMapOperator[ReadFiles]
 </pre></div>
 </div>
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "016ad4fe729a4949bf6f59153b039ec7", "version_major": 2, "version_minor": 0}</script></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "30e30c077e724067b1d1ed24a4a8e01d", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8fdd001b5d204c2d950dacde5ddda666", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8a67223b96bf41bfb7e04f47b27cb626", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b9a28fe77fda4611872715acc4c24d2f", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "ef17acfa51a146b58d2772451de7c286", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 </section>
 <section id="split-the-dataset-into-train-and-test-sets">
@@ -1708,6 +1666,16 @@ read-&gt;MapBatches(read_images): 100%|██████████| 128/128 [
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-10 21:46:46,178	INFO streaming_executor.py:108 -- Starting execution of Dataset. Full logs are in /tmp/ray/session_2025-03-10_20-48-49_801322_2254/logs/ray-data
+2025-03-10 21:46:46,178	INFO streaming_executor.py:109 -- Execution plan of Dataset: InputDataBuffer[Input] -&gt; TaskPoolMapOperator[ListFiles] -&gt; TaskPoolMapOperator[PartitionFiles] -&gt; TaskPoolMapOperator[ReadFiles] -&gt; TaskPoolMapOperator[Map(decode_annotation)-&gt;Map(read_images)] -&gt; AggregateNumRows[AggregateNumRows]
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d881605e6b7b4ab1ad2cff1dd1d8aff6", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "236d0973306242c8a0a183bda7fab4f7", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "284c5d0cba2a443ab68c1a34e9bce004", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "d24ac75de63e4b40b61fd74a13a1e0fc", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "6c27033fdc764dae8d215cd3c563b98c", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "cc569555cb1a49dab52544df9d4ba4c5", "version_major": 2, "version_minor": 0}</script><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-10 21:49:52,272	INFO streaming_executor.py:108 -- Starting execution of Dataset. Full logs are in /tmp/ray/session_2025-03-10_20-48-49_801322_2254/logs/ray-data
+2025-03-10 21:49:52,272	INFO streaming_executor.py:109 -- Execution plan of Dataset: InputDataBuffer[Input] -&gt; TaskPoolMapOperator[ListFiles] -&gt; TaskPoolMapOperator[PartitionFiles] -&gt; TaskPoolMapOperator[ReadFiles] -&gt; TaskPoolMapOperator[Map(decode_annotation)-&gt;Map(read_images)]
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "46d70f44dfa84e6384ef35cf41634fb5", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "01feff887400476fbc568004b58d76e7", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "832664ebe4b0452c8026bdd298b3f6f5", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "39d107e8972a42be89dde0177ed94e64", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "bebb5d64a8c647699d967992dafc91b9", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 </section>
 </section>
@@ -1729,6 +1697,73 @@ randomly augment images every epoch (<code class="docutils literal notranslate">
 <span class="c1"># The following transform operation is lazy.</span>
 <span class="c1"># It will be re-run every epoch.</span>
 <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">preprocess_image</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_dataset</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-10 21:55:10,274	INFO streaming_executor.py:108 -- Starting execution of Dataset. Full logs are in /tmp/ray/session_2025-03-10_20-48-49_801322_2254/logs/ray-data
+2025-03-10 21:55:10,275	INFO streaming_executor.py:109 -- Execution plan of Dataset: InputDataBuffer[Input] -&gt; LimitOperator[limit=1]
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "7338a88ca27b4e4d83e580f17753e61c", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "a874a6ff91d54bf98446b29768b9d6be", "version_major": 2, "version_minor": 0}</script><div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;boxes&#39;: [[188.0, 72.0, 319.0, 341.0]],
+  &#39;labels&#39;: [1],
+  &#39;filename&#39;: &#39;2009_002936.jpg&#39;,
+  &#39;image&#39;: array([[[  0,   4,   0],
+          [  0,   4,   0],
+          [  1,   6,   2],
+          ...,
+          [  2,   6,   0],
+          [ 60,  79,  96],
+          [134, 186, 233]],
+  
+         [[  6,   5,   0],
+          [ 13,  12,   8],
+          [  0,   1,   0],
+          ...,
+          [  0,  11,   0],
+          [125, 162, 178],
+          [132, 176, 221]],
+  
+         [[ 10,   3,   0],
+          [ 44,  39,  35],
+          [ 14,  10,   7],
+          ...,
+          [ 54,  81,  92],
+          [144, 190, 223],
+          [124, 160, 212]],
+  
+         ...,
+  
+         [[  9,  18,   1],
+          [ 12,  21,   2],
+          [ 10,  17,  10],
+          ...,
+          [182, 176, 180],
+          [ 92,  78,  49],
+          [166, 167, 123]],
+  
+         [[ 74,  83,  40],
+          [  9,  16,   0],
+          [  4,   9,   2],
+          ...,
+          [255, 250, 255],
+          [134, 122, 122],
+          [148, 142, 116]],
+  
+         [[164, 166, 155],
+          [ 64,  72,  35],
+          [ 33,  41,  17],
+          ...,
+          [107,  95, 107],
+          [184, 180, 179],
+          [119, 115,  68]]], dtype=uint8)}]
 </pre></div>
 </div>
 </div>
@@ -1756,7 +1791,6 @@ standard Torch code with a few changes.</p>
 <span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
 
 <span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
 
 
 <span class="k">def</span> <span class="nf">train_one_epoch</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
@@ -1775,13 +1809,15 @@ standard Torch code with a few changes.</p>
     <span class="n">batches</span> <span class="o">=</span> <span class="n">train_dataset_shard</span><span class="o">.</span><span class="n">iter_batches</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
         <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]]</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;boxes&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span>
-                <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span>
-            <span class="p">}</span>
-            <span class="k">for</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;boxes&quot;</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">])</span>
-        <span class="p">]</span>
+
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;boxes&quot;</span><span class="p">])):</span>
+            <span class="c1"># `boxes` is a (B, 4) tensor, where B is the number of boxes in the image.</span>
+            <span class="n">boxes</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">([</span><span class="n">box</span> <span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;boxes&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="c1"># `labels` is a (B,) tensor, where B is the number of boxes in the image.</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">targets</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;boxes&quot;</span><span class="p">:</span> <span class="n">boxes</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">labels</span><span class="p">})</span>
+
         <span class="n">loss_dict</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
         <span class="n">losses</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">loss</span> <span class="k">for</span> <span class="n">loss</span> <span class="ow">in</span> <span class="n">loss_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
@@ -1825,19 +1861,6 @@ standard Torch code with a few changes.</p>
             <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-
-        <span class="n">state_dict</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
-            <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
-            <span class="s2">&quot;lr_scheduler&quot;</span><span class="p">:</span> <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
-            <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">,</span>
-            <span class="s2">&quot;epoch&quot;</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s2">&quot;checkpoint.pt&quot;</span><span class="p">))</span>
-            <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">Checkpoint</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span>
-            <span class="n">train</span><span class="o">.</span><span class="n">report</span><span class="p">({},</span> <span class="n">checkpoint</span><span class="o">=</span><span class="n">checkpoint</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1872,128 +1895,192 @@ loop to the constructor. Then, call <code class="docutils literal notranslate"><
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2023-03-01 13:06:39,486	INFO instantiator.py:21 -- Created a temporary directory at /tmp/tmp1stz0z_r
-2023-03-01 13:06:39,488	INFO instantiator.py:76 -- Writing /tmp/tmp1stz0z_r/_remote_module_non_scriptable.py
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/ray/anaconda3/lib/python3.12/site-packages/ray/tune/impl/tuner_internal.py:125: RayDeprecationWarning: The `RunConfig` class should be imported from `ray.tune` when passing it to the Tuner. Please update your imports. See this issue for more context and migration options: https://github.com/ray-project/ray/issues/49454. Disable these warnings by setting the environment variable: RAY_TRAIN_ENABLE_V2_MIGRATION_WARNINGS=0
+  _log_deprecation_warning(
+2025-03-10 21:55:21,525	INFO tune.py:616 -- [output] This uses the legacy output and progress reporter, as Jupyter notebooks are not supported by the new engine, yet. For more information, please see https://github.com/ray-project/ray/issues/36949
 </pre></div>
 </div>
-<div class="output text_html"><div class="tuneStatus">
-  <div style="display: flex;flex-direction: row">
-    <div style="display: flex;flex-direction: column;">
-      <h3>Tune Status</h3>
-      <table>
-<tbody>
-<tr><td>Current time:</td><td>2023-03-01 13:08:45</td></tr>
-<tr><td>Running for: </td><td>00:02:05.37        </td></tr>
-<tr><td>Memory:      </td><td>50.5/480.2 GiB     </td></tr>
-</tbody>
-</table>
-    </div>
-    <div class="vDivider"></div>
-    <div class="systemInfo">
-      <h3>System Info</h3>
-      Using FIFO scheduling algorithm.<br>Resources requested: 0/64 CPUs, 0/8 GPUs, 0.0/324.83 GiB heap, 0.0/143.21 GiB objects (0.0/1.0 accelerator_type:V100)
-    </div>
-    
-  </div>
-  <div class="hDivider"></div>
-  <div class="trialStatus">
-    <h3>Trial Status</h3>
-    <table>
-<thead>
-<tr><th>Trial name              </th><th>status    </th><th>loc               </th><th style="text-align: right;">  iter</th><th style="text-align: right;">  total time (s)</th></tr>
-</thead>
-<tbody>
-<tr><td>TorchTrainer_f5aa9_00000</td><td>TERMINATED</td><td>10.0.26.109:175347</td><td style="text-align: right;">   244</td><td style="text-align: right;">         108.703</td></tr>
-</tbody>
-</table>
-  </div>
-</div>
-<style>
-.tuneStatus {
-  color: var(--jp-ui-font-color1);
-}
-.tuneStatus .systemInfo {
-  display: flex;
-  flex-direction: column;
-}
-.tuneStatus td {
-  white-space: nowrap;
-}
-.tuneStatus .trialStatus {
-  display: flex;
-  flex-direction: column;
-}
-.tuneStatus h3 {
-  font-weight: bold;
-}
-.tuneStatus .hDivider {
-  border-bottom-width: var(--jp-border-width);
-  border-bottom-color: var(--jp-border-color0);
-  border-bottom-style: solid;
-}
-.tuneStatus .vDivider {
-  border-left-width: var(--jp-border-width);
-  border-left-color: var(--jp-border-color0);
-  border-left-style: solid;
-  margin: 0.5em 1em 0.5em 1em;
-}
-</style>
-</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(RayTrainWorker pid=175611) 2023-03-01 13:06:56,331	INFO config.py:86 -- Setting up process group for: env:// [rank=0, world_size=4]
-(TorchTrainer pid=175347) 2023-03-01 13:07:00,615	INFO bulk_executor.py:41 -- Executing DAG InputDataBuffer[Input] -&gt; TaskPoolMapOperator[TorchVisionPreprocessor] -&gt; AllToAllOperator[randomize_block_order]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>== Status ==
+Current time: 2025-03-10 21:55:21 (running for 00:00:00.11)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/1.0 anyscale/node-group:head, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 accelerator_type:L4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 PENDING)
+
+
+== Status ==
+Current time: 2025-03-10 21:55:26 (running for 00:00:05.13)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/1.0 anyscale/node-group:head, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 accelerator_type:L4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(autoscaler +1m25s) Tip: use `ray status` to view detailed cluster status. To disable these messages, set RAY_SCHEDULER_EVENTS=0.
-(autoscaler +1m25s) Warning: The following resource request cannot be scheduled right now: {&#39;CPU&#39;: 1.0}. This is likely due to all cluster resources being claimed by actors. Consider creating fewer actors or adding more nodes to this Ray cluster.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Cyan">(RayTrainWorker pid=25530, ip=10.0.211.239)</span> Setting up process group for: env:// [rank=0, world_size=4]
+<span class=" -Color -Color-Cyan">(TorchTrainer pid=25443, ip=10.0.211.239)</span> Started distributed worker processes: 
+<span class=" -Color -Color-Cyan">(TorchTrainer pid=25443, ip=10.0.211.239)</span> - (node_id=35eba17ece4a52de5138ed69f190e701d93372fa47b22ac14d9e0523, ip=10.0.211.239, pid=25530) world_rank=0, local_rank=0, node_rank=0
+<span class=" -Color -Color-Cyan">(TorchTrainer pid=25443, ip=10.0.211.239)</span> - (node_id=35eba17ece4a52de5138ed69f190e701d93372fa47b22ac14d9e0523, ip=10.0.211.239, pid=25529) world_rank=1, local_rank=1, node_rank=0
+<span class=" -Color -Color-Cyan">(TorchTrainer pid=25443, ip=10.0.211.239)</span> - (node_id=35eba17ece4a52de5138ed69f190e701d93372fa47b22ac14d9e0523, ip=10.0.211.239, pid=25532) world_rank=2, local_rank=2, node_rank=0
+<span class=" -Color -Color-Cyan">(TorchTrainer pid=25443, ip=10.0.211.239)</span> - (node_id=35eba17ece4a52de5138ed69f190e701d93372fa47b22ac14d9e0523, ip=10.0.211.239, pid=25531) world_rank=3, local_rank=3, node_rank=0
+<span class=" -Color -Color-Cyan">(RayTrainWorker pid=25530, ip=10.0.211.239)</span> Moving model to device: cuda:0
+<span class=" -Color -Color-Cyan">(RayTrainWorker pid=25530, ip=10.0.211.239)</span> Wrapping provided model in DistributedDataParallel.
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(TorchTrainer pid=175347) /home/ray/anaconda3/lib/python3.9/site-packages/ray/train/_internal/dataset_iterator.py:64: UserWarning: session.get_dataset_shard returns a ray.data.DataIterator instead of a Dataset/DatasetPipeline as of Ray v2.3. Use iter_torch_batches(), to_tf(), or iter_batches() to iterate over one epoch. See https://docs.ray.io/en/latest/data/api/dataset_iterator.html for full DataIterator docs.
-(TorchTrainer pid=175347)   warnings.warn(
-Stage 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]
-  0%|          | 0/1 [00:00&lt;?, ?it/s]=191352) 
-Stage 1:   0%|          | 0/1 [00:00&lt;?, ?it/s]
-(RayTrainWorker pid=175611) 2023-03-01 13:07:26,094	INFO train_loop_utils.py:307 -- Moving model to device: cuda:3
-(RayTrainWorker pid=175611) 2023-03-01 13:07:29,092	INFO train_loop_utils.py:367 -- Wrapping provided model in DistributedDataParallel.
-Stage 0: 100%|██████████| 1/1 [00:03&lt;00:00,  3.96s/it]2023-03-01 13:07:29,436	INFO bulk_executor.py:41 -- Executing DAG InputDataBuffer[Input] -&gt; TaskPoolMapOperator[TorchVisionPreprocessor]
-(PipelineSplitExecutorCoordinator pid=191352) 
-Stage 0: : 2it [00:08,  4.31s/it]                     2023-03-01 13:07:33,990	INFO bulk_executor.py:41 -- Executing DAG InputDataBuffer[Input] -&gt; TaskPoolMapOperator[TorchVisionPreprocessor]
-(RayTrainWorker pid=175612) 2023-03-01 13:07:34,394	WARNING plan.py:527 -- Warning: The Ray cluster currently does not have any available CPUs. The Dataset job will hang unless more CPUs are freed up. A common reason is that cluster resources are used by Actors or Tune trials; see the following link for more details: https://docs.ray.io/en/master/data/dataset-internals.html#data-and-tune
-(PipelineSplitExecutorCoordinator pid=191352) 
-Stage 0: : 3it [00:13,  4.48s/it]2023-03-01 13:07:38,660	INFO bulk_executor.py:41 -- Executing DAG InputDataBuffer[Input] -&gt; TaskPoolMapOperator[TorchVisionPreprocessor]
-(RayTrainWorker pid=175612) /tmp/ipykernel_160001/3839218723.py:23: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_numpy.cpp:199.)
-(RayTrainWorker pid=175614) /tmp/ipykernel_160001/3839218723.py:26: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_numpy.cpp:199.)
-(RayTrainWorker pid=175611) /tmp/ipykernel_160001/3839218723.py:26: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_numpy.cpp:199.)
-(RayTrainWorker pid=175613) /tmp/ipykernel_160001/3839218723.py:23: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at ../torch/csrc/utils/tensor_numpy.cpp:199.)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>== Status ==
+Current time: 2025-03-10 21:55:31 (running for 00:00:10.15)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 anyscale/node-group:head, 0.0/2.0 anyscale/region:us-west-2, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
 </pre></div>
 </div>
-<div class="output text_html"><div class="trialProgress">
-  <h3>Trial Progress</h3>
-  <table>
-<thead>
-<tr><th>Trial name              </th><th>date               </th><th>done  </th><th style="text-align: right;">  experiment_tag</th><th>hostname      </th><th style="text-align: right;">  iterations_since_restore</th><th>node_ip    </th><th style="text-align: right;">   pid</th><th>should_checkpoint  </th><th style="text-align: right;">  time_since_restore</th><th style="text-align: right;">  time_this_iter_s</th><th style="text-align: right;">  time_total_s</th><th style="text-align: right;">  timestamp</th><th style="text-align: right;">  training_iteration</th><th>trial_id   </th></tr>
-</thead>
-<tbody>
-<tr><td>TorchTrainer_f5aa9_00000</td><td>2023-03-01_13-08-41</td><td>True  </td><td style="text-align: right;">               0</td><td>ip-10-0-26-109</td><td style="text-align: right;">                       244</td><td>10.0.26.109</td><td style="text-align: right;">175347</td><td>True               </td><td style="text-align: right;">             108.703</td><td style="text-align: right;">            4.2088</td><td style="text-align: right;">       108.703</td><td style="text-align: right;"> 1677704918</td><td style="text-align: right;">                 244</td><td>f5aa9_00000</td></tr>
-</tbody>
-</table>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Cyan">(SplitCoordinator pid=25864, ip=10.0.211.239)</span> Starting execution of Dataset. Full logs are in /tmp/ray/session_2025-03-10_20-48-49_801322_2254/logs/ray-data
+<span class=" -Color -Color-Cyan">(SplitCoordinator pid=25864, ip=10.0.211.239)</span> Execution plan of Dataset: InputDataBuffer[Input] -&gt; TaskPoolMapOperator[Map(preprocess_image)] -&gt; OutputSplitter[split(4, equal=True)]
+</pre></div>
 </div>
-<style>
-.trialProgress {
-  display: flex;
-  flex-direction: column;
-  color: var(--jp-ui-font-color1);
-}
-.trialProgress h3 {
-  font-weight: bold;
-}
-.trialProgress td {
-  white-space: nowrap;
-}
-</style>
-</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(RayTrainWorker pid=175612) 2023-03-01 13:07:41,980	INFO distributed.py:1027 -- Reducer buckets have been rebuilt in this iteration.
-(PipelineSplitExecutorCoordinator pid=191352) 
-Stage 0: : 4it [01:11, 25.77s/it]2023-03-01 13:08:37,068	INFO bulk_executor.py:41 -- Executing DAG InputDataBuffer[Input] -&gt; TaskPoolMapOperator[TorchVisionPreprocessor]
-(RayTrainWorker pid=175614) 2023-03-01 13:08:37,464	WARNING plan.py:527 -- Warning: The Ray cluster currently does not have any available CPUs. The Dataset job will hang unless more CPUs are freed up. A common reason is that cluster resources are used by Actors or Tune trials; see the following link for more details: https://docs.ray.io/en/master/data/dataset-internals.html#data-and-tune
-2023-03-01 13:08:45,074	INFO tune.py:825 -- Total run time: 125.51 seconds (125.36 seconds for the tuning loop).
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "92c3c9efe2a147aebd95e1db90d51f16", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "9ad82fd47ca947c9a45e6ac10a035fdc", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b587040bcfb64889b3b26f0c288e870c", "version_major": 2, "version_minor": 0}</script><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Cyan">(Map(preprocess_image) pid=25996, ip=10.0.211.239)</span> /tmp/ray/session_2025-03-10_20-48-49_801322_2254/runtime_resources/pip/eeb9e5d99a956859fc3b865940547678c4d9c242/virtualenv/lib/python3.12/site-packages/torchvision/transforms/functional.py:154: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+<span class=" -Color -Color-Cyan">(Map(preprocess_image) pid=25996, ip=10.0.211.239)</span>   img = torch.from_numpy(pic.transpose((2, 0, 1))).contiguous()
+<span class=" -Color -Color-Cyan">(RayTrainWorker pid=25529, ip=10.0.211.239)</span> /tmp/ipykernel_20675/2152789653.py:29: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:254.)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>== Status ==
+Current time: 2025-03-10 21:55:36 (running for 00:00:15.17)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 anyscale/node-group:head, 0.0/2.0 anyscale/region:us-west-2, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:55:41 (running for 00:00:20.18)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:55:46 (running for 00:00:25.20)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:55:51 (running for 00:00:30.27)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/node-group:head, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 accelerator_type:L4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:55:56 (running for 00:00:35.30)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/node-group:head, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 accelerator_type:L4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:01 (running for 00:00:40.33)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:07 (running for 00:00:45.37)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:12 (running for 00:00:50.44)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:17 (running for 00:00:55.53)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:22 (running for 00:01:00.59)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:27 (running for 00:01:05.63)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/accelerator_shape:4xL4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:32 (running for 00:01:10.69)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/node-group:head, 0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:37 (running for 00:01:15.70)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/node-group:head, 0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/cpu_only:true, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:42 (running for 00:01:20.77)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/region:us-west-2, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:47 (running for 00:01:25.86)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/region:us-west-2, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-03-10 21:56:52,736	INFO tune.py:1009 -- Wrote the latest version of all result files and experiment state to &#39;/home/ray/ray_results/TorchTrainer_2025-03-10_21-55-21&#39; in 0.0025s.
+2025-03-10 21:56:52,738	INFO tune.py:1041 -- Total run time: 91.21 seconds (91.10 seconds for the tuning loop).
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>== Status ==
+Current time: 2025-03-10 21:56:52 (running for 00:01:30.91)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 RUNNING)
+
+
+== Status ==
+Current time: 2025-03-10 21:56:52 (running for 00:01:31.10)
+Using FIFO scheduling algorithm.
+Logical resource usage: 1.0/48 CPUs, 4.0/4 GPUs (0.0/2.0 anyscale/region:us-west-2, 0.0/1.0 anyscale/cpu_only:true, 0.0/2.0 anyscale/provider:aws, 0.0/1.0 anyscale/node-group:head, 0.0/1.0 accelerator_type:L4, 0.0/1.0 anyscale/node-group:4xL4:48CPU-192GB, 0.0/1.0 anyscale/accelerator_shape:4xL4)
+Result logdir: /tmp/ray/session_2025-03-10_20-48-49_801322_2254/artifacts/2025-03-10_21-55-21/TorchTrainer_2025-03-10_21-55-21/driver_artifacts
+Number of trials: 1/1 (1 TERMINATED)
 </pre></div>
 </div>
 </div>
@@ -2035,9 +2122,8 @@ Stage 0: : 4it [01:11, 25.77s/it]2023-03-01 13:08:37,068	INFO bulk_executor.py:4
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#before-you-begin">Before you begin</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-dataset">Create a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-a-custom-datasource">Define a custom datasource</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#read-annotations">Read annotations</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-images-into-memory">Load images into memory</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parse-annotations">Parse annotations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-images">Load images</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#split-the-dataset-into-train-and-test-sets">Split the dataset into train and test sets</a></li>
 </ul>
 </li>

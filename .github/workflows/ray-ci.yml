@@ -241,24 +241,6 @@ jobs:
           DOCKER_IMAGE_BASE_BUILD=ghcr.io/${{ github.repository }}/oss-ci-base_build-py${{ matrix.python }}
         push: true
 
-    - name: Push core build image to local registry
-      if: '!cancelled()'
-      run: |
-        max_attempts=3
-        for i in $(seq 1 $max_attempts); do
-          if docker push localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild; then
-            echo "Docker push succeeded on attempt $i"
-            break
-          else
-            echo "Docker push failed on attempt $i"
-            if [ $i -eq $max_attempts ]; then
-              echo "All docker push attempts failed - exiting"
-              exit 1
-            fi
-            sleep 10
-          fi
-        done
-    
     - name: Install bazel
       if: '!cancelled()'
       run: |

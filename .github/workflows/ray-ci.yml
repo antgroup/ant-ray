@@ -246,6 +246,16 @@ jobs:
       run: |
         bash ci/env/install-bazel.sh
 
+    - name: Start local registry
+      if: '!cancelled()'
+      run: |
+        # Check if registry container exists and handle accordingly
+        if ! docker ps -a --format '{{.Names}}' | grep -q '^local-registry$'; then
+          docker run -d -p 5000:5000 --name local-registry registry:2
+        elif ! docker ps --format '{{.Names}}' | grep -q '^local-registry$'; then
+          docker start local-registry
+        fi
+
     - name: Run Core Python Tests (1)
       if: '!cancelled()'
       env:

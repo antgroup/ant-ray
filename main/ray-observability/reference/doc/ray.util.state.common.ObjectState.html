@@ -582,6 +582,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/nodes.html">Node Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/gcs.html">GCS Fault Tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -1411,28 +1412,28 @@ document.write(`
 <p>Object State</p>
 <p>Below columns can be used for the <code class="code docutils literal notranslate"><span class="pre">--filter</span></code> option.</p>
 <blockquote>
-<div><p>reference_type</p>
-<p>pid</p>
-<p>type</p>
+<div><p>type</p>
+<p>call_site</p>
+<p>task_status</p>
 <p>object_size</p>
 <p>attempt_number</p>
-<p>ip</p>
-<p>task_status</p>
 <p>object_id</p>
-<p>call_site</p>
+<p>pid</p>
+<p>reference_type</p>
+<p>ip</p>
 </div></blockquote>
 <p>Below columns are available only when <code class="code docutils literal notranslate"><span class="pre">get</span></code> API is used,</p>
 <p><code class="code docutils literal notranslate"><span class="pre">--detail</span></code> is specified through CLI, or <code class="code docutils literal notranslate"><span class="pre">detail=True</span></code> is given to Python APIs.</p>
 <blockquote>
-<div><p>reference_type</p>
-<p>pid</p>
-<p>type</p>
+<div><p>type</p>
+<p>call_site</p>
+<p>task_status</p>
 <p>object_size</p>
 <p>attempt_number</p>
-<p>ip</p>
-<p>task_status</p>
 <p>object_id</p>
-<p>call_site</p>
+<p>pid</p>
+<p>reference_type</p>
+<p>ip</p>
 </div></blockquote>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ray.util.state.common.ObjectState.object_id">

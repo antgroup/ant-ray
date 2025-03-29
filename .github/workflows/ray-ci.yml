@@ -256,6 +256,24 @@ jobs:
           docker start local-registry
         fi
 
+    - name: Push core build image to local registry
+      if: '!cancelled()'
+      run: |
+        max_attempts=3
+        for i in $(seq 1 $max_attempts); do
+          if docker push localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild; then
+            echo "Docker push succeeded on attempt $i"
+            break
+          else
+            echo "Docker push failed on attempt $i"
+            if [ $i -eq $max_attempts ]; then
+              echo "All docker push attempts failed - exiting"
+              exit 1
+            fi
+            sleep 10
+          fi
+        done
+    
     - name: Run Core Python Tests (1)
       if: '!cancelled()'
       env:

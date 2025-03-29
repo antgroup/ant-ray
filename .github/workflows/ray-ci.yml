@@ -246,28 +246,6 @@ jobs:
       run: |
         bash ci/env/install-bazel.sh
 
-    - name: Check Manylinux Image Existence
-      id: check_manylinux_image
-      run: |
-        if docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -q "localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-manylinux"; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Build Manylinux Image
-      if: steps.check_manylinux_image.outputs.exists != 'true'
-      uses: docker/build-push-action@v3
-      with:
-        context: .
-        file: ci/docker/manylinux.Dockerfile
-        tags: |
-          localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-manylinux
-        push: true
-        build-args: |
-          BUILDKITE_BAZEL_CACHE_URL
-          HOSTTYPE=x86_64
-
     - name: Run Core Python Tests (1)
       if: '!cancelled()'
       env:

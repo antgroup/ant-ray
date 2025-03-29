@@ -198,7 +198,8 @@ jobs:
       matrix:
         python: ['3.11']
     services:
-      - image: registry:2
+      registry:
+        image: registry:2
         name: local-registry2
         ports:
           - 5000:5000

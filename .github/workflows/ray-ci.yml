@@ -134,11 +134,6 @@ jobs:
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-      with:
-        buildkitd-config-inline: |
-          [registry."0.0.0.0:5000"]
-            http = true
-            insecure = true
 
     - name: Check Test Image Existence
       id: check_test_image
@@ -202,6 +197,11 @@ jobs:
     strategy:
       matrix:
         python: ['3.11']
+    services:
+      - image: registry:2
+        name: local-registry2
+        ports:
+          - 5000:5000
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -213,30 +213,15 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
       with:
-        buildkitd-config-inline: |
-          [registry."0.0.0.0:5000"]
-            http = true
-            insecure = true
-
-
-    - name: Start local registry
-      if: '!cancelled()'
-      run: |
-        # Check if registry container exists and handle accordingly
-        if ! docker ps -a --format '{{.Names}}' | grep -q '^local-registry$'; then
-          docker run -d -p 5000:5000 --name local-registry registry:2
-        elif ! docker ps --format '{{.Names}}' | grep -q '^local-registry$'; then
-          docker start local-registry
-        fi
+        driver-opts: network=host
 
     - name: Check Core Image Existence
       id: check_core_image
       run: |
-        if docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -q "0.0.0.0:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild"; then
+        if docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -q "localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild"; then
           echo "exists=true" >> $GITHUB_OUTPUT
         else
           echo "exists=false" >> $GITHUB_OUTPUT
@@ -249,7 +234,7 @@ jobs:
         context: .
         file: ci/docker/core.build.Dockerfile
         tags: |
-          0.0.0.0:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild
+          localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild
         build-args: |
           RAYCI_IS_GPU_BUILD=false
           BUILDKITE=true
@@ -261,7 +246,7 @@ jobs:
       run: |
         max_attempts=3
         for i in $(seq 1 $max_attempts); do
-          if docker push 0.0.0.0:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild; then
+          if docker push localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild; then
             echo "Docker push succeeded on attempt $i"
             break
           else
@@ -282,7 +267,7 @@ jobs:
     - name: Check Manylinux Image Existence
       id: check_manylinux_image
       run: |
-        if docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -q "0.0.0.0:5000/citemp:${{ env.RAYCI_BUILD_ID }}-manylinux"; then
+        if docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -q "localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-manylinux"; then
           echo "exists=true" >> $GITHUB_OUTPUT
         else
           echo "exists=false" >> $GITHUB_OUTPUT
@@ -295,7 +280,7 @@ jobs:
         context: .
         file: ci/docker/manylinux.Dockerfile
         tags: |
-          0.0.0.0:5000/citemp:${{ env.RAYCI_BUILD_ID }}-manylinux
+          localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-manylinux
         push: true
         build-args: |
           BUILDKITE_BAZEL_CACHE_URL
@@ -304,7 +289,7 @@ jobs:
     - name: Run Core Python Tests (1)
       if: '!cancelled()'
       env:
-        RAYCI_WORK_REPO: 0.0.0.0:5000/citemp
+        RAYCI_WORK_REPO: localhost:5000/citemp
       run: |
         echo "Running core: python tests..."
         bazel run //ci/ray_ci:test_in_docker -- //python/ray/tests/... core \
@@ -327,7 +312,7 @@ jobs:
     - name: Run Core Python Tests (2)
       if: '!cancelled()'
       env:
-        RAYCI_WORK_REPO: 0.0.0.0:5000/citemp
+        RAYCI_WORK_REPO: localhost:5000/citemp
 
       run: |
         echo "Running core: python tests..."
@@ -352,7 +337,7 @@ jobs:
     - name: Run Core Python Tests (3)
       if: '!cancelled()'
       env:
-        RAYCI_WORK_REPO: 0.0.0.0:5000/citemp
+        RAYCI_WORK_REPO: localhost:5000/citemp
 
       run: |
         #echo "Running core: python tests..."
@@ -376,13 +361,13 @@ jobs:
     - name: Update Test Image
       if: '!cancelled()'
       run: |
-        docker build -t 0.0.0.0:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild -f ci/docker/core.build.ant.Dockerfile \
-          --build-arg DOCKER_IMAGE_BASE=0.0.0.0:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild \
+        docker build -t localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild -f ci/docker/core.build.ant.Dockerfile \
+          --build-arg DOCKER_IMAGE_BASE=localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild \
           .
     - name: Run Core Cpp Tests
       if: '!cancelled()'
       env:
-        RAYCI_WORK_REPO: 0.0.0.0:5000/citemp
+        RAYCI_WORK_REPO: localhost:5000/citemp
 
       run: |
         echo "Running core: cpp tests..."
@@ -404,7 +389,7 @@ jobs:
     - name: Run Dashboard Tests
       if: '!cancelled()'
       env:
-        RAYCI_WORK_REPO: 0.0.0.0:5000/citemp
+        RAYCI_WORK_REPO: localhost:5000/citemp
 
       run: |
         echo "Running dashboard tests..."
@@ -427,7 +412,7 @@ jobs:
     - name: Run Workflow Tests
       if: '!cancelled()'
       env:
-        RAYCI_WORK_REPO: 0.0.0.0:5000/citemp
+        RAYCI_WORK_REPO: localhost:5000/citemp
 
       run: |
         echo "Running workflow tests..."
@@ -458,7 +443,7 @@ jobs:
     - name: Run Debug Tests
       if: '!cancelled()'
       env:
-        RAYCI_WORK_REPO: 0.0.0.0:5000/citemp
+        RAYCI_WORK_REPO: localhost:5000/citemp
 
       run: |
         echo "Running debug tests..."
@@ -485,7 +470,7 @@ jobs:
     - name: Run ASAN Tests
       if: '!cancelled()'
       env:
-        RAYCI_WORK_REPO: 0.0.0.0:5000/citemp
+        RAYCI_WORK_REPO: localhost:5000/citemp
 
       run: |
         echo "Running ASAN tests..."
@@ -520,7 +505,7 @@ jobs:
       if: always()
       continue-on-error: true
       run: |
-        docker ps -a --filter ancestor=0.0.0.0:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild -q | xargs -r docker rm --force || true
+        docker ps -a --filter ancestor=localhost:5000/citemp:${{ env.RAYCI_BUILD_ID }}-corebuild -q | xargs -r docker rm --force || true
         # Clean up any dangling containers
         docker ps -a --filter status=exited -q | xargs -r docker rm || true
 

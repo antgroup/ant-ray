@@ -99,6 +99,8 @@ using CreateOrUpdateVirtualClusterCallback = std::function<void(
 
 using RemoveVirtualClusterCallback = CreateOrUpdateVirtualClusterCallback;
 
+using RemoveNodesFromVirtualClusterCallback = CreateOrUpdateVirtualClusterCallback;
+
 using VirtualClustersDataVisitCallback =
     std::function<void(std::shared_ptr<rpc::VirtualClusterTableData>)>;
 
@@ -256,6 +258,9 @@ class VirtualCluster {
   std::shared_ptr<NodeInstance> ReplenishUndividedNodeInstance(
       std::shared_ptr<NodeInstance> node_instance_to_replenish);
 
+  void RemoveNodeInstances(const std::vector<std::string> &nodes_to_shrink,
+                           std::vector<std::string> *nodes_with_failure);
+
  protected:
   /// Insert the node instances to the cluster.
   ///
@@ -266,6 +271,8 @@ class VirtualCluster {
   ///
   /// \param replica_instances The node instances to be removed.
   void RemoveNodeInstances(ReplicaInstances replica_instances);
+
+  bool IsNodeInstanceIdle(const std::string &node_instance_id);
 
   /// The id of the virtual cluster.
   std::string id_;
@@ -476,6 +483,11 @@ class PrimaryCluster : public DivisibleCluster,
   Status CreateOrUpdateVirtualCluster(rpc::CreateOrUpdateVirtualClusterRequest request,
                                       CreateOrUpdateVirtualClusterCallback callback,
                                       ReplicaSets *replica_sets_to_recommend = nullptr);
+
+  Status RemoveNodesFromVirtualCluster(
+      const rpc::RemoveNodesFromVirtualClusterRequest &request,
+      RemoveNodesFromVirtualClusterCallback callback,
+      std::vector<std::string> *nodes_with_failure);
 
   /// Get the virtual cluster by the logical cluster id.
   ///

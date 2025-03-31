@@ -193,14 +193,15 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "downloading or unpacking the working_dir."
             )
         # Use placeholder here and will replace it by `pre_worker_startup`.
-        context.cwd = WorkingDirPlugin.working_dir_placeholder
-        context.symlink_dirs_to_cwd.append(str(local_dir))
-        context.env_vars["RAY_JOB_DIR"] = WorkingDirPlugin.working_dir_placeholder
+        context.working_dir = WorkingDirPlugin.working_dir_placeholder
+        working_dir = context.working_dir
+        context.symlink_paths_to_working_dir.append(str(local_dir))
+        context.env_vars[runtime_env_consts.RAY_WORKING_DIR] = working_dir
 
         if not _WIN32:
             context.command_prefix += [
                 "cd",
-                f"{WorkingDirPlugin.working_dir_placeholder}",
+                str(working_dir),
                 "&&",
             ]
         else:
@@ -208,12 +209,10 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             context.command_prefix += [
                 "cd",
                 "/d",
-                f"{WorkingDirPlugin.working_dir_placeholder}",
+                str(working_dir),
                 "&&",
             ]
-        set_pythonpath_in_context(
-            python_path=WorkingDirPlugin.working_dir_placeholder, context=context
-        )
+        set_pythonpath_in_context(python_path=str(working_dir), context=context)
 
     async def pre_worker_startup(
         self,
@@ -228,7 +227,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         logger.info(f"Creating working dir for worker {worker_id}, job id {job_id}")
         working_dir = os.path.join(self._working_dirs, worker_id)
         os.makedirs(working_dir, exist_ok=True)
-        context.cwd = working_dir
+        context.working_dir = working_dir
         # Replace the placeholder with the real working dir.
         for i, prefix in enumerate(context.command_prefix):
             context.command_prefix[i] = prefix.replace(
@@ -239,13 +238,25 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 WorkingDirPlugin.working_dir_placeholder, working_dir
             )
         # Add symbol links to the working dir.
-        for symlink_dir in context.symlink_dirs_to_cwd:
+        # Deduplicate, as linking duplicate file will raise FileExistsError
+        linked_dir = set()
+        for symlink_dir in context.symlink_paths_to_working_dir:
             for name in os.listdir(symlink_dir):
+                logger.info(f"show the src path: {symlink_dir}")
+                logger.info(f"show the linked dir: {linked_dir}")
                 src_path = os.path.join(symlink_dir, name)
                 link_path = os.path.join(working_dir, name)
-                logger.info(f"Creating symlink from {src_path} to {link_path}.")
-                os.symlink(src_path, link_path)
-        return
+                if src_path not in linked_dir:
+                    if os.path.isfile(src_path) and src_path.endswith("jar"):
+                        # Hard link jar files only
+                        logger.info(
+                            f"Creating hardlink from {src_path} to {link_path}."
+                        )
+                        os.link(src_path, link_path)
+                    else:
+                        logger.info(f"Creating symlink from {src_path} to {link_path}.")
+                        os.symlink(src_path, link_path)
+                    linked_dir.add(src_path)
 
     async def post_worker_exit(
         self,
@@ -266,7 +277,6 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         working_dir = os.path.join(self._working_dirs, worker_id)
         # TODO(Jacky): Use async method to remove, such as aiofiles.os.removedirs
         shutil.rmtree(working_dir)
-        return
 
     @contextmanager
     def with_working_dir_env(self, uri):

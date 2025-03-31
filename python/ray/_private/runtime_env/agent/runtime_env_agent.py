@@ -5,7 +5,7 @@ import time
 import traceback
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Set, Tuple, Optional
+from typing import Callable, Dict, List, Set, Tuple, Optional, Union
 from copy import deepcopy
 from ray._private.ray_constants import (
     DEFAULT_RUNTIME_ENV_TIMEOUT_SECONDS,
@@ -54,10 +54,7 @@ class CreatedEnvResult:
     success: bool
     # If success is True, will be a RuntimeEnvContext
     # If success is False, will be None
-    context: Optional[RuntimeEnvContext]
-    # If success is True, will be None
-    # If success is False, error message will be filled in
-    error_message: Optional[str]
+    result: Union[RuntimeEnvContext, str]
     # The time to create a runtime env in ms.
     creation_time_ms: int
 
@@ -462,7 +459,7 @@ class RuntimeEnvAgent:
             if serialized_env in self._env_cache:
                 result = self._env_cache[serialized_env]
                 if result.success:
-                    runtime_env_context = result.context
+                    runtime_env_context = result.result
                     self._logger.info(
                         "Runtime env already created "
                         f"successfully. Env: {serialized_env}, "
@@ -482,7 +479,7 @@ class RuntimeEnvAgent:
                         error_message="",
                     )
                 else:
-                    error_message = result.error_message
+                    error_message = result.result
                     self._logger.info(
                         "Runtime env already failed. "
                         f"Env: {serialized_env}, "
@@ -530,7 +527,9 @@ class RuntimeEnvAgent:
                 )
             # Add the result to env cache.
             self._env_cache[serialized_env] = CreatedEnvResult(
-                successful, runtime_env_context, error_message, creation_time_ms
+                successful,
+                runtime_env_context if successful else error_message,
+                creation_time_ms,
             )
             serialized_runtime_env_context = await self.trigger_pre_worker_startup(
                 runtime_env,

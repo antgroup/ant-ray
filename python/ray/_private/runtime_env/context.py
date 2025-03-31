@@ -30,8 +30,8 @@ class RuntimeEnvContext:
         py_executable: Optional[str] = None,
         override_worker_entrypoint: Optional[str] = None,
         java_jars: List[str] = None,
-        cwd: Optional[str] = None,
-        symlink_dirs_to_cwd: List[str] = None,
+        working_dir: Optional[str] = None,
+        symlink_paths_to_working_dir: List[str] = None,
         native_libraries: List[Dict[str, str]] = None,
         preload_libraries: List[str] = None,
     ):
@@ -40,8 +40,8 @@ class RuntimeEnvContext:
         self.py_executable = py_executable or sys.executable
         self.override_worker_entrypoint: Optional[str] = override_worker_entrypoint
         self.java_jars = java_jars or []
-        self.cwd = cwd
-        # `symlink_dirs_to_cwd` provides a way that we can link any content to
+        self.working_dir = working_dir
+        # `symlink_paths_to_working_dir` provides a way that we can link any content to
         # the working directory of the workers. Note that the dirs in this list
         # will not be linked directly. Instead, we will walk through each dir
         # and link each content to the working directory.
@@ -53,9 +53,9 @@ class RuntimeEnvContext:
         # And the tree of another dir named "resource_dir2" is:
         # resource_dir2
         # └── file3.txt
-        # If you append these two dirs into `symlink_dirs_to_cwd`:
-        # self.symlink_dirs_to_cwd.append("/xxx/xxx/resource_dir1")
-        # self.symlink_dirs_to_cwd.append("/xxx/xxx/resource_dir2")
+        # If you append these two dirs into `symlink_paths_to_working_dir`:
+        # self.symlink_paths_to_working_dir.append("/xxx/xxx/resource_dir1")
+        # self.symlink_paths_to_working_dir.append("/xxx/xxx/resource_dir2")
         # The final working directory of the worker process will be:
         # /xxx/xxx/working_dirs/{worker_id}
         # ├── file1.txt
@@ -64,7 +64,7 @@ class RuntimeEnvContext:
         # └── file3.txt
         # Note that if there are conflict file or sub dir names in different
         # resource dirs, some contents will be covered and we don't guarantee it.
-        self.symlink_dirs_to_cwd = symlink_dirs_to_cwd or []
+        self.symlink_paths_to_working_dir = symlink_paths_to_working_dir or []
         self.native_libraries = native_libraries or {
             "lib_path": [],
             "code_search_path": [],

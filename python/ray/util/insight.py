@@ -1,4 +1,5 @@
 import ray
+import requests
 import time
 import os
 from collections import defaultdict
@@ -8,44 +9,70 @@ import socket
 from contextlib import contextmanager
 from ray.experimental import internal_kv
 import ray.dashboard.consts as dashboard_consts
-import queue
-import threading
+from collections import deque
+import json
 
-# Global queue and thread for processing async coroutines
-_async_queue_map = defaultdict(lambda: queue.Queue())
-_async_thread_map = defaultdict(lambda: None)
+insight_monitor_address = None
 
 
-def _process_async_queue(_async_queue):
-    """Worker function that processes coroutines from the queue."""
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
+def _get_insight_monitor_address():
+    """Get the insight monitor address from internal_kv."""
+    if not is_flow_insight_enabled():
+        return None
+    global insight_monitor_address
+    if insight_monitor_address is not None:
+        return insight_monitor_address
     while True:
         try:
-            coro = _async_queue.get()
-            if coro is None:  # Sentinel to stop the thread
-                break
-            loop.run_until_complete(coro)
-        except Exception as e:
-            print(f"Error processing coroutine: {e}")
-        finally:
-            _async_queue.task_done()
+            insight_monitor_address = internal_kv._internal_kv_get(
+                "insight_monitor_address",
+                namespace="flowinsight",
+            ).decode()
+            return insight_monitor_address
+        except Exception:
+            time.sleep(1)
 
 
-def run_async(job_id, coro):
+def get_current_worker_id():
     """
-    Run a coroutine asynchronously using a shared worker thread and queue.
-    This avoids creating a new thread for each coroutine.
+    Get the current worker ID.
     """
-    global _async_thread_map
-    if _async_thread_map[job_id] is None or not _async_thread_map[job_id].is_alive():
-        _async_thread_map[job_id] = threading.Thread(
-            target=_process_async_queue, daemon=True, args=(_async_queue_map[job_id],)
-        )
-        _async_thread_map[job_id].start()
+    return ray._private.worker.global_worker.worker_id
 
-    _async_queue_map[job_id].put(coro)
+
+def get_current_job_id():
+    """
+    Get the current job ID.
+    """
+    return ray._private.worker.global_worker.current_job_id.hex()
+
+
+def create_insight_monitor_actor():
+    if not is_flow_insight_enabled():
+        return
+    try:
+        ray.get_actor("_ray_internal_insight_monitor", namespace="flowinsight")
+    except ValueError:
+        _ray_internal_insight_monitor.options(
+            name="_ray_internal_insight_monitor",
+            namespace="flowinsight",
+            lifetime="detached",
+        ).remote()
+
+
+def emit_request(endpoint, payload):
+    url = f"http://{_get_insight_monitor_address()}/{endpoint}"
+    data = json.dumps(payload).encode()
+    headers = {"Content-Type": "application/json"}
+
+    try:
+        response = requests.post(url, data=data, headers=headers, timeout=300)
+        if response.status_code != 200:
+            print(
+                f"Error sending HTTP request: {response.status_code} {response.reason}"
+            )
+    except Exception as e:
+        print(f"Error sending HTTP request: {e}")
 
 
 @ray.remote
@@ -66,6 +93,7 @@ class _ray_internal_insight_monitor:
         self.actor_counter = defaultdict(int)
         self.method_counter = defaultdict(int)
         self.function_counter = defaultdict(int)
+        self.flow_record = defaultdict(list)
 
         # Data flow tracking
         self.data_flows = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
@@ -99,6 +127,22 @@ class _ray_internal_insight_monitor:
         self.app.router.add_get(
             "/get_flame_graph_data", self.handle_get_flame_graph_data
         )
+
+        # Add new HTTP handlers for the data collection endpoints
+        self.app.router.add_post("/emit-call-record", self.handle_emit_call_record)
+        self.app.router.add_post(
+            "/emit-object-record-get", self.handle_emit_object_record_get
+        )
+        self.app.router.add_post(
+            "/emit-object-record-put", self.handle_emit_object_record_put
+        )
+        self.app.router.add_post("/emit-context", self.handle_emit_context)
+        self.app.router.add_post(
+            "/emit-resource-usage", self.handle_emit_resource_usage
+        )
+        self.app.router.add_post("/emit-task-end", self.handle_emit_task_end)
+        self.app.router.add_post("/emit-caller-info", self.handle_emit_caller_info)
+
         self.runner = None
         self.site = None
         self.node_ip_address = ray._private.services.get_node_ip_address()
@@ -133,7 +177,8 @@ class _ray_internal_insight_monitor:
     async def handle_get_call_graph_data(self, request):
         """Handle HTTP request for call graph data."""
         job_id = request.query.get("job_id", "default_job")
-        data = self.get_call_graph_data(job_id)
+        stack_mode = request.query.get("stack_mode", "0")
+        data = self.get_call_graph_data(job_id, stack_mode)
         return aiohttp.web.json_response(data)
 
     async def handle_get_context_info(self, request):
@@ -154,9 +199,6 @@ class _ray_internal_insight_monitor:
         data = self.get_flame_graph_data(job_id)
         return aiohttp.web.json_response(data)
 
-    async def async_emit_call_record(self, call_record):
-        self.emit_call_record(call_record)
-
     def emit_call_record(self, call_record):
         job_id = call_record["job_id"]
         caller_class = call_record["caller_class"]
@@ -167,6 +209,16 @@ class _ray_internal_insight_monitor:
         # Create caller and callee identifiers for parent-child relationship
         caller_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
         callee_id = f"{callee_class}.{callee_func}" if callee_class else callee_func
+        current_task_id = call_record["current_task_id"]
+
+        self.flow_record[job_id].append(
+            {
+                "type": "enter",
+                "caller_id": caller_id,
+                "callee_id": callee_id,
+                "caller_task_id": current_task_id,
+            }
+        )
 
         # Update call graph
         self.call_graph[job_id][f"{caller_id}->{callee_id}"] += call_times
@@ -220,7 +272,7 @@ class _ray_internal_insight_monitor:
                         callee_func
                     ] = f"function{self.function_counter[job_id]}"
 
-    def get_call_graph_data(self, job_id):
+    def get_call_graph_data(self, job_id, stack_mode="0"):
         """Return the call graph data for a specific job."""
         graph_data = {
             "actors": [],
@@ -230,8 +282,18 @@ class _ray_internal_insight_monitor:
             "dataFlows": [],
         }
 
+        call_graph = self.call_graph[job_id]
+        if stack_mode == "1":
+            (
+                call_graph,
+                reachable_methods,
+                reachable_actors,
+                reachable_funcs,
+            ) = self.filter_call_graph_data(job_id, self.call_graph[job_id])
         # Add actors
         for actor_class, actor_id in self.actor_id_map.get(job_id, {}).items():
+            if stack_mode == "1" and actor_class not in reachable_actors:
+                continue
             graph_data["actors"].append(
                 {
                     "id": actor_id,
@@ -242,6 +304,12 @@ class _ray_internal_insight_monitor:
 
         # Add methods
         for method_info in self.methods.get(job_id, {}).values():
+            if stack_mode == "1":
+                if (
+                    method_info["actorId"] + "." + method_info["name"]
+                    not in reachable_methods
+                ):
+                    continue
             graph_data["methods"].append(
                 {
                     "id": method_info["id"],
@@ -254,14 +322,15 @@ class _ray_internal_insight_monitor:
         # Add functions
         for func_name, function_id in self.function_id_map.get(job_id, {}).items():
             if "." not in func_name:  # Ensure it's not a method
+                if stack_mode == "1" and func_name not in reachable_funcs:
+                    continue
                 graph_data["functions"].append(
                     {"id": function_id, "name": func_name, "language": "python"}
                 )
 
         # Add call flows
-        for call_edge, count in self.call_graph.get(job_id, {}).items():
+        for call_edge, count in call_graph.items():
             caller, callee = call_edge.split("->")
-
             # Get source ID
             source_id = None
             if caller in self.methods.get(job_id, {}):
@@ -285,6 +354,25 @@ class _ray_internal_insight_monitor:
         for flow_key, entry in self.data_flows.get(job_id, {}).items():
             for argpos, flow_stats in entry.items():
                 source, target = flow_key.split("->")
+                if stack_mode == "1":
+                    if "." in source:
+                        actor_class = source.split(".")[0]
+                        if source.split(":")[1] not in reachable_methods:
+                            continue
+                        if actor_class not in reachable_actors:
+                            continue
+                    else:
+                        if source not in reachable_funcs:
+                            continue
+                    if "." in target:
+                        actor_class = target.split(".")[0]
+                        if target.split(":")[1] not in reachable_methods:
+                            continue
+                        if actor_class not in reachable_actors:
+                            continue
+                    else:
+                        if target not in reachable_funcs:
+                            continue
 
                 # Get source ID
                 source_id = None
@@ -312,11 +400,98 @@ class _ray_internal_insight_monitor:
                             "timestamp": flow_stats["timestamp"],
                         }
                     )
+        if len(graph_data["functions"]) == 0:
+            graph_data["functions"].append(
+                {
+                    "id": "_main",
+                    "name": "_main",
+                    "language": "python",
+                }
+            )
 
         return graph_data
 
-    async def async_emit_object_record_get(self, recv_record):
-        self.emit_object_record_get(recv_record)
+    def filter_call_graph_data(self, job_id, call_graph):
+        """Filter the call graph data to keep only edges that are part of paths leading to target edges.
+
+        A target edge is defined as caller_id->callee_id where caller_id and callee_id come from
+        the flow_record and caller_info mappings. The algorithm uses reverse graph traversal
+        to efficiently identify all edges that can reach these target edges.
+        """
+        # First identify all target edges we want to reach
+        target_edges = {}
+        reachable_nodes = set()
+        reachable_methods = set()
+        reachable_actors = set()
+        reachable_funcs = set()
+
+        # Build target edges from flow records
+        for flow_record in self.flow_record[job_id]:
+            if flow_record["type"] == "enter":
+                target_edges[flow_record["caller_task_id"]] = (
+                    flow_record["caller_id"],
+                    flow_record["callee_id"],
+                )
+                reachable_nodes.add(flow_record["caller_id"])
+                reachable_nodes.add(flow_record["callee_id"])
+            if flow_record["type"] == "exit":
+                caller_infos = self.caller_info[job_id][flow_record["callee_task_id"]]
+                for caller_info in caller_infos:
+                    caller_task_id = caller_info["task_id"]
+                    caller_id = (
+                        f"{caller_info['class']}.{caller_info['func']}"
+                        if caller_info["class"]
+                        else caller_info["func"]
+                    )
+                    callee_id = flow_record["callee_id"]
+                    if caller_task_id in target_edges:
+                        del target_edges[caller_task_id]
+                    if caller_id in reachable_nodes:
+                        reachable_nodes.remove(caller_id)
+                    if callee_id in reachable_nodes:
+                        reachable_nodes.remove(callee_id)
+
+        target_edges = set(target_edges.values())
+
+        # Build reverse adjacency list for efficient backwards traversal
+        reverse_adj = defaultdict(set)
+        for edge, _ in call_graph.items():
+            src, dst = edge.split("->")
+            reverse_adj[dst].add(src)
+
+        # Do reverse BFS from all nodes in target edges to find reachable edges
+        queue = deque(reachable_nodes)
+        visited = reachable_nodes.copy()
+
+        while queue:
+            node = queue.popleft()
+            # Add all incoming nodes to queue if not visited
+            for prev_node in reverse_adj[node]:
+                if prev_node not in visited:
+                    visited.add(prev_node)
+                    queue.append(prev_node)
+                    reachable_nodes.add(prev_node)
+
+        # Filter call_graph to only keep edges between reachable nodes that lead to target edges
+        filtered_graph = {}
+        for edge, count in call_graph.items():
+            src, dst = edge.split("->")
+            if src in reachable_nodes and dst in reachable_nodes:
+                if "." in src:
+                    info = src.split(".")
+                    reachable_methods.add(src.split(":")[1])
+                    reachable_actors.add(info[0])
+                if "." not in src:
+                    reachable_funcs.add(src)
+                if "." in dst:
+                    info = dst.split(".")
+                    reachable_methods.add(dst.split(":")[1])
+                    reachable_actors.add(info[0])
+                if "." not in dst:
+                    reachable_funcs.add(dst)
+                filtered_graph[edge] = count
+
+        return filtered_graph, reachable_methods, reachable_actors, reachable_funcs
 
     def emit_object_record_get(self, recv_record):
         """Record object transfer between methods/functions."""
@@ -346,9 +521,6 @@ class _ray_internal_insight_monitor:
         self.data_flows[job_id][flow_key][argpos]["size"] = size
         self.data_flows[job_id][flow_key][argpos]["duration"] = duration
         self.data_flows[job_id][flow_key][argpos]["timestamp"] = timestamp
-
-    async def async_emit_object_record_put(self, object_record):
-        self.emit_object_record_put(object_record)
 
     def emit_object_record_put(self, object_record):
         """Record object transfer between methods/functions."""
@@ -418,9 +590,6 @@ class _ray_internal_insight_monitor:
 
         return flame_data
 
-    async def async_emit_task_end(self, task_record):
-        self.emit_task_end(task_record)
-
     def emit_task_end(self, task_record):
         """Record the end of a task execution and calculate duration."""
         job_id = task_record["job_id"]
@@ -429,6 +598,14 @@ class _ray_internal_insight_monitor:
         current_task_id = task_record["current_task_id"]
         # Create node_id from caller class and function for parent tracking
         node_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
+
+        self.flow_record[job_id].append(
+            {
+                "type": "exit",
+                "callee_id": node_id,
+                "callee_task_id": current_task_id,
+            }
+        )
 
         duration = task_record["duration"]
 
@@ -447,41 +624,125 @@ class _ray_internal_insight_monitor:
     async def emit_caller_info(self, caller_info):
         """Record caller info."""
         job_id = caller_info["job_id"]
-        caller_task_id = caller_info["caller_task_id"]
-        self.caller_info[job_id][caller_task_id].append(
+        current_task_id = caller_info["current_task_id"]
+        self.caller_info[job_id][current_task_id].append(
             {
                 "class": caller_info["caller_class"],
                 "func": caller_info["caller_func"],
+                "task_id": caller_info["caller_task_id"],
             }
         )
+
+    # Add the new HTTP handler methods
+    async def handle_emit_call_record(self, request):
+        """Handle HTTP request for emitting call records."""
+        try:
+            data = await request.json()
+            self.emit_call_record(data)
+            return aiohttp.web.json_response({"status": "success"})
+        except Exception as e:
+            return aiohttp.web.json_response(
+                {"status": "error", "error": str(e)}, status=500
+            )
+
+    async def handle_emit_object_record_get(self, request):
+        """Handle HTTP request for emitting object get records."""
+        try:
+            data = await request.json()
+            self.emit_object_record_get(data)
+            return aiohttp.web.json_response({"status": "success"})
+        except Exception as e:
+            return aiohttp.web.json_response(
+                {"status": "error", "error": str(e)}, status=500
+            )
+
+    async def handle_emit_object_record_put(self, request):
+        """Handle HTTP request for emitting object put records."""
+        try:
+            data = await request.json()
+            self.emit_object_record_put(data)
+            return aiohttp.web.json_response({"status": "success"})
+        except Exception as e:
+            return aiohttp.web.json_response(
+                {"status": "error", "error": str(e)}, status=500
+            )
+
+    async def handle_emit_context(self, request):
+        """Handle HTTP request for emitting context info."""
+        try:
+            data = await request.json()
+            self.emit_context(data)
+            return aiohttp.web.json_response({"status": "success"})
+        except Exception as e:
+            return aiohttp.web.json_response(
+                {"status": "error", "error": str(e)}, status=500
+            )
+
+    async def handle_emit_resource_usage(self, request):
+        """Handle HTTP request for emitting resource usage."""
+        try:
+            data = await request.json()
+            await self.emit_resource_usage(data)
+            return aiohttp.web.json_response({"status": "success"})
+        except Exception as e:
+            return aiohttp.web.json_response(
+                {"status": "error", "error": str(e)}, status=500
+            )
+
+    async def handle_emit_task_end(self, request):
+        """Handle HTTP request for emitting task end records."""
+        try:
+            data = await request.json()
+            self.emit_task_end(data)
+            return aiohttp.web.json_response({"status": "success"})
+        except Exception as e:
+            return aiohttp.web.json_response(
+                {"status": "error", "error": str(e)}, status=500
+            )
+
+    async def handle_emit_caller_info(self, request):
+        """Handle HTTP request for emitting caller info."""
+        try:
+            data = await request.json()
+            await self.emit_caller_info(data)
+            return aiohttp.web.json_response({"status": "success"})
+        except Exception as e:
+            return aiohttp.web.json_response(
+                {"status": "error", "error": str(e)}, status=500
+            )
 
 
 _inner_class_name = "_ray_internal_insight_monitor"
 _null_object_id = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-monitor_actor = None
-
-
-def get_monitor_actor():
-    global monitor_actor
-    if monitor_actor is not None:
-        return monitor_actor
-    try:
-        monitor_actor = ray.get_actor(_inner_class_name, namespace="flowinsight")
-    except ValueError:
-        monitor_actor = _ray_internal_insight_monitor.options(
-            name=_inner_class_name,
-            namespace="flowinsight",
-            lifetime="detached",
-        ).remote()
-    return monitor_actor
 
 
 def _get_current_task_name():
-    if ray.get_runtime_context().worker.mode == ray._private.worker.WORKER_MODE:
-        current_task_name = ray.get_runtime_context().get_task_name()
+    if ray._private.worker.global_worker.mode == ray._private.worker.WORKER_MODE:
+        current_task_name = ray._private.worker.global_worker.current_task_name
         if current_task_name is not None:
             return current_task_name.split(".")[-1]
     return "_main"
+
+
+def get_current_task_id():
+    try:
+        current_task_id = ray._private.worker.global_worker.current_task_id
+        if current_task_id.is_nil():
+            current_task_id = "_main"
+        else:
+            current_task_id = current_task_id.hex()
+    except:
+        current_task_id = "_main"
+    return current_task_id
+
+
+def _get_actor_name():
+    if ray._private.worker.global_worker.mode == ray._private.worker.WORKER_MODE:
+        actor_id = ray._private.worker.global_worker.actor_id
+        if actor_id.is_nil():
+            return None
+        return ray._private.worker.global_worker.actor_name
+    return None
 
 
 def _get_caller_class():
@@ -489,10 +750,17 @@ def _get_caller_class():
     try:
         # caller actor can be fetched from the runtime context
         # but it may raise Exception if called in the driver or in a task
-        caller_actor = ray.get_runtime_context().current_actor
+        actor_id = ray._private.worker.global_worker.actor_id
+        if actor_id.is_nil():
+            return None
+        caller_actor = ray._private.worker.global_worker.core_worker.get_actor_handle(
+            actor_id
+        )
         if caller_actor is not None:
             caller_class = (
-                caller_actor._ray_actor_creation_function_descriptor.class_name
+                caller_actor._ray_actor_creation_function_descriptor.class_name.split(
+                    "."
+                )[-1]
                 + ":"
                 + caller_actor._ray_actor_id.hex()
             )
@@ -509,6 +777,16 @@ def is_flow_insight_enabled():
     return os.getenv(dashboard_consts.FLOW_INSIGHT_ENABLED_ENV_VAR, "0") == "1"
 
 
+def need_record(caller_class):
+    return not (
+        caller_class is not None
+        and (
+            caller_class.startswith(_inner_class_name)
+            or caller_class.startswith("JobSupervisor")
+        )
+    )
+
+
 def record_control_flow(callee_class, callee_func):
     """
     record the control flow between the caller and the callee
@@ -521,27 +799,29 @@ def record_control_flow(callee_class, callee_func):
     if not is_flow_insight_enabled():
         return
 
-    if callee_class is not None and callee_class.startswith(_inner_class_name):
+    if not need_record(callee_class):
         return
 
-    caller_class = _get_caller_class()
-    caller_func = _get_current_task_name()
+    try:
+        caller_class = _get_caller_class()
+        caller_func = _get_current_task_name()
+        current_task_id = get_current_task_id()
 
-    # Create a record for this call
-    job_id = ray.get_runtime_context().get_job_id()
-    call_record = {
-        "caller_class": caller_class,
-        "caller_func": caller_func,
-        "callee_class": callee_class,
-        "callee_func": callee_func,
-        "call_times": 1,
-        "job_id": job_id,
-    }
+        # Create a record for this call
+        job_id = get_current_job_id()
+        call_record = {
+            "caller_class": caller_class,
+            "caller_func": caller_func,
+            "callee_class": callee_class,
+            "callee_func": callee_func,
+            "call_times": 1,
+            "job_id": job_id,
+            "current_task_id": current_task_id,
+        }
 
-    async def _emit():
-        await get_monitor_actor().async_emit_call_record.remote(call_record)
-
-    run_async(job_id, _emit())
+        emit_request("emit-call-record", call_record)
+    except Exception as e:
+        print(f"Error recording control flow: {e}")
 
 
 def record_object_arg_get(object_id):
@@ -557,30 +837,27 @@ def record_object_arg_get(object_id):
 
     if object_id is None or object_id == _null_object_id:
         return
-    caller_class = _get_caller_class()
 
-    if caller_class is not None and caller_class.startswith(
-        "_ray_internal_insight_monitor"
-    ):
-        return
+    try:
+        caller_class = _get_caller_class()
 
-    recv_func = _get_current_task_name()
+        if not need_record(caller_class):
+            return
 
-    job_id = ray.get_runtime_context().get_job_id()
-    object_recv_record = {
-        "object_id": object_id,
-        "recv_class": caller_class,
-        "recv_func": recv_func,
-        "timestamp": time.time(),
-        "job_id": job_id,
-    }
+        recv_func = _get_current_task_name()
 
-    async def _emit():
-        await get_monitor_actor().async_emit_object_record_get.remote(
-            object_recv_record
-        )
+        job_id = get_current_job_id()
+        object_recv_record = {
+            "object_id": object_id,
+            "recv_class": caller_class,
+            "recv_func": recv_func,
+            "timestamp": time.time(),
+            "job_id": job_id,
+        }
 
-    run_async(job_id, _emit())
+        emit_request("emit-object-record-get", object_recv_record)
+    except Exception as e:
+        print(f"Error recording object arg get: {e}")
 
 
 def record_object_put(object_id, size):
@@ -598,24 +875,28 @@ def record_object_put(object_id, size):
     if object_id == _null_object_id:
         return
 
-    caller_class = _get_caller_class()
-    caller_func = _get_current_task_name()
-    # Create a record for this call
-    job_id = ray.get_runtime_context().get_job_id()
-    object_record = {
-        "object_id": object_id,
-        "size": size,
-        "argpos": -2,
-        "timestamp": time.time(),
-        "caller_class": caller_class,
-        "caller_func": caller_func,
-        "job_id": job_id,
-    }
+    try:
+        caller_class = _get_caller_class()
+        caller_func = _get_current_task_name()
 
-    async def _emit():
-        await get_monitor_actor().async_emit_object_record_put.remote(object_record)
+        if not need_record(caller_class):
+            return
 
-    run_async(job_id, _emit())
+        # Create a record for this call
+        job_id = get_current_job_id()
+        object_record = {
+            "object_id": object_id,
+            "size": size,
+            "argpos": -2,
+            "timestamp": time.time(),
+            "caller_class": caller_class,
+            "caller_func": caller_func,
+            "job_id": job_id,
+        }
+
+        emit_request("emit-object-record-put", object_record)
+    except Exception as e:
+        print(f"Error recording object put: {e}")
 
 
 def record_object_arg_put(object_id, argpos, size, callee):
@@ -634,34 +915,35 @@ def record_object_arg_put(object_id, argpos, size, callee):
 
     if object_id == _null_object_id:
         return
-    callee_class = None
-    callee_info = callee.split(".")
-    if len(callee_info) == 2:
+
+    try:
         callee_class = None
-    elif len(callee_info) == 3:
-        callee_class = callee_info[-2]
+        callee_info = callee.split(".")
+        if len(callee_info) == 2:
+            callee_class = None
+        elif len(callee_info) == 3:
+            callee_class = callee_info[-2]
 
-    if callee_class is not None and callee_class.startswith(_inner_class_name):
-        return
+        if not need_record(callee_class):
+            return
 
-    caller_class = _get_caller_class()
-    caller_func = _get_current_task_name()
-    # Create a record for this call
-    job_id = ray.get_runtime_context().get_job_id()
-    object_record = {
-        "object_id": object_id,
-        "argpos": argpos,
-        "size": size,
-        "timestamp": time.time(),
-        "caller_class": caller_class,
-        "caller_func": caller_func,
-        "job_id": job_id,
-    }
+        caller_class = _get_caller_class()
+        caller_func = _get_current_task_name()
+        # Create a record for this call
+        job_id = get_current_job_id()
+        object_record = {
+            "object_id": object_id,
+            "argpos": argpos,
+            "size": size,
+            "timestamp": time.time(),
+            "caller_class": caller_class,
+            "caller_func": caller_func,
+            "job_id": job_id,
+        }
 
-    async def _emit():
-        await get_monitor_actor().async_emit_object_record_put.remote(object_record)
-
-    run_async(job_id, _emit())
+        emit_request("emit-object-record-put", object_record)
+    except Exception as e:
+        print(f"Error recording object arg put: {e}")
 
 
 def record_object_return_put(object_id, size):
@@ -682,30 +964,30 @@ def record_object_return_put(object_id, size):
     if size == 0:
         return
 
-    caller_class = _get_caller_class()
+    try:
+        caller_class = _get_caller_class()
 
-    if caller_class is not None and caller_class.startswith(_inner_class_name):
-        return
+        if not need_record(caller_class):
+            return
 
-    # Get the task name from the runtime context
-    # if there is no task name, it should be the driver
-    caller_func = _get_current_task_name()
-    # Create a record for this call
-    job_id = ray.get_runtime_context().get_job_id()
-    object_record = {
-        "object_id": object_id,
-        "size": size,
-        "argpos": -1,
-        "timestamp": time.time(),
-        "caller_class": caller_class,
-        "caller_func": caller_func,
-        "job_id": job_id,
-    }
+        # Get the task name from the runtime context
+        # if there is no task name, it should be the driver
+        caller_func = _get_current_task_name()
+        # Create a record for this call
+        job_id = get_current_job_id()
+        object_record = {
+            "object_id": object_id,
+            "size": size,
+            "argpos": -1,
+            "timestamp": time.time(),
+            "caller_class": caller_class,
+            "caller_func": caller_func,
+            "job_id": job_id,
+        }
 
-    async def _emit():
-        await get_monitor_actor().async_emit_object_record_put.remote(object_record)
-
-    run_async(job_id, _emit())
+        emit_request("emit-object-record-put", object_record)
+    except Exception as e:
+        print(f"Error recording object return put: {e}")
 
 
 def record_object_get(object_id, task_id):
@@ -725,32 +1007,27 @@ def record_object_get(object_id, task_id):
     if object_id is None or object_id == _null_object_id:
         return
 
-    # Get the task name from the runtime context
-    # if there is no task name, it should be the driver
-    recv_func = _get_current_task_name()
-    caller_class = _get_caller_class()
+    try:
+        # Get the task name from the runtime context
+        # if there is no task name, it should be the driver
+        recv_func = _get_current_task_name()
+        caller_class = _get_caller_class()
 
-    job_id = ray.get_runtime_context().get_job_id()
-    object_recv_record = {
-        "object_id": object_id,
-        "recv_class": caller_class,
-        "recv_func": recv_func,
-        "timestamp": time.time(),
-        "job_id": job_id,
-    }
+        job_id = get_current_job_id()
+        object_recv_record = {
+            "object_id": object_id,
+            "recv_class": caller_class,
+            "recv_func": recv_func,
+            "timestamp": time.time(),
+            "job_id": job_id,
+        }
 
-    if task_id.actor_id() == get_monitor_actor()._ray_actor_id:
-        return
+        if not need_record(caller_class):
+            return
 
-    if caller_class is not None and caller_class.startswith(_inner_class_name):
-        return
-
-    async def _emit():
-        await get_monitor_actor().async_emit_object_record_get.remote(
-            object_recv_record
-        )
-
-    run_async(job_id, _emit())
+        emit_request("emit-object-record-get", object_recv_record)
+    except Exception as e:
+        print(f"Error recording object get: {e}")
 
 
 def report_resource_usage(usage: dict):
@@ -762,43 +1039,25 @@ def report_resource_usage(usage: dict):
     if not is_flow_insight_enabled():
         return
 
-    current_class = _get_caller_class()
-    if current_class is None:
-        return
-    actor_info = current_class.split(":")
-    job_id = ray.get_runtime_context().get_job_id()
+    try:
+        current_class = _get_caller_class()
+        if current_class is None:
+            return
+        actor_info = current_class.split(":")
+        job_id = get_current_job_id()
 
-    async def _emit():
-        await get_monitor_actor().emit_resource_usage.remote(
-            {
-                "actor_id": actor_info[1],
-                "job_id": job_id,
-                "usage": usage,
-            }
-        )
+        if not need_record(current_class):
+            return
 
-    run_async(job_id, _emit())
-
-
-async def async_register_current_context(context: dict):
-    """
-    register the current context info of the current node
-    """
-    if not is_flow_insight_enabled():
-        return
-
-    current_class = _get_caller_class()
-    if current_class is None:
-        return
-    actor_info = current_class.split(":")
-    job_id = ray.get_runtime_context().get_job_id()
-    await get_monitor_actor().emit_context.remote(
-        {
+        resource_usage_data = {
             "actor_id": actor_info[1],
             "job_id": job_id,
-            "context": context,
+            "usage": usage,
         }
-    )
+
+        emit_request("emit-resource-usage", resource_usage_data)
+    except Exception as e:
+        print(f"Error reporting resource usage: {e}")
 
 
 def register_current_context(context: dict):
@@ -808,23 +1067,26 @@ def register_current_context(context: dict):
     if not is_flow_insight_enabled():
         return
 
-    current_class = _get_caller_class()
-    if current_class is None:
-        return
-    actor_info = current_class.split(":")
+    try:
+        current_class = _get_caller_class()
+        if current_class is None:
+            return
+        actor_info = current_class.split(":")
 
-    job_id = ray.get_runtime_context().get_job_id()
+        job_id = get_current_job_id()
 
-    async def _emit():
-        await get_monitor_actor().emit_context.remote(
-            {
-                "actor_id": actor_info[1],
-                "job_id": job_id,
-                "context": context,
-            }
-        )
+        if not need_record(current_class):
+            return
 
-    run_async(job_id, _emit())
+        context_data = {
+            "actor_id": actor_info[1],
+            "job_id": job_id,
+            "context": context,
+        }
+
+        emit_request("emit-context", context_data)
+    except Exception as e:
+        print(f"Error registering current context: {e}")
 
 
 def report_torch_gram():
@@ -839,67 +1101,21 @@ def report_torch_gram():
     except ImportError:
         return
 
-    report_resource_usage(
-        {
-            "torch_gram_allocated": {
-                "used": torch.cuda.memory_allocated() / 1024 / 1024,
-                "base": "gpu",
-            },
-            "torch_gram_max_allocated": {
-                "used": torch.cuda.max_memory_allocated() / 1024 / 1024,
-                "base": "gpu",
-            },
-        }
-    )
-
-
-async def async_report_resource_usage(usage: dict):
-    """
-    report the resource usage of the current task
-    usage is a dict of the resource usage
-    e.g. {"torch_gram": {"used": 1024, "base": "gpu"}}
-    """
-    if not is_flow_insight_enabled():
-        return
-
-    current_class = _get_caller_class()
-    if current_class is None:
-        return
-    actor_info = current_class.split(":")
-    job_id = ray.get_runtime_context().get_job_id()
-    await get_monitor_actor().emit_resource_usage.remote(
-        {
-            "actor_id": actor_info[1],
-            "job_id": job_id,
-            "usage": usage,
-        }
-    )
-
-
-async def async_report_torch_gram():
-    """
-    report the torch gram usage of the current task
-    """
-    if not is_flow_insight_enabled():
-        return
-
     try:
-        import torch
-    except ImportError:
-        return
-
-    await async_report_resource_usage(
-        {
-            "torch_gram_allocated": {
-                "used": torch.cuda.memory_allocated() / 1024 / 1024,
-                "base": "gpu",
-            },
-            "torch_gram_max_allocated": {
-                "used": torch.cuda.max_memory_allocated() / 1024 / 1024,
-                "base": "gpu",
-            },
-        }
-    )
+        report_resource_usage(
+            {
+                "torch_gram_allocated": {
+                    "used": torch.cuda.memory_allocated() / 1024 / 1024,
+                    "base": "gpu",
+                },
+                "torch_gram_max_allocated": {
+                    "used": torch.cuda.max_memory_allocated() / 1024 / 1024,
+                    "base": "gpu",
+                },
+            }
+        )
+    except Exception as e:
+        print(f"Error reporting torch gram: {e}")
 
 
 def record_task_duration(duration):
@@ -910,43 +1126,35 @@ def record_task_duration(duration):
     if not is_flow_insight_enabled():
         return
 
-    caller_class = _get_caller_class()
-    caller_func = _get_current_task_name()
-
-    if caller_class is not None and (
-        caller_class.startswith(_inner_class_name)
-        or caller_class.startswith("JobSupervisor")
-    ):
+    if duration is None:
         return
 
-    actor_name = None
-    if ray.get_runtime_context().worker.mode == ray._private.worker.WORKER_MODE:
-        actor_name = ray.get_runtime_context().get_actor_name()
-
     try:
-        current_task_id = ray._private.worker.global_worker.current_task_id
-        if current_task_id.is_nil():
-            current_task_id = "_main"
-        else:
-            current_task_id = current_task_id.hex()
-    except:
-        current_task_id = "_main"
+        caller_class = _get_caller_class()
+        caller_func = _get_current_task_name()
 
-    # Create a record for this task end
-    job_id = ray.get_runtime_context().get_job_id()
-    task_record = {
-        "caller_class": caller_class,
-        "caller_func": caller_func,
-        "actor_name": actor_name,
-        "duration": duration,
-        "job_id": job_id,
-        "current_task_id": current_task_id,
-    }
+        if not need_record(caller_class):
+            return
 
-    async def _emit():
-        await get_monitor_actor().async_emit_task_end.remote(task_record)
+        actor_name = _get_actor_name()
 
-    run_async(job_id, _emit())
+        current_task_id = get_current_task_id()
+
+        # Create a record for this task end
+        job_id = get_current_job_id()
+        task_record = {
+            "caller_class": caller_class,
+            "caller_func": caller_func,
+            "actor_name": actor_name,
+            "duration": duration,
+            "job_id": job_id,
+            "current_task_id": current_task_id,
+        }
+
+        emit_request("emit-task-end", task_record)
+    except Exception as e:
+        print(f"Error recording task duration: {e}")
+        return
 
 
 @contextmanager
@@ -986,31 +1194,23 @@ def report_trace_info(caller_info):
     if not is_flow_insight_enabled():
         return
 
-    try:
-        current_task_id = ray._private.worker.global_worker.current_task_id
-        if current_task_id.is_nil():
-            current_task_id = "_main"
-        else:
-            current_task_id = current_task_id.hex()
-    except:
-        current_task_id = "_main"
+    current_task_id = get_current_task_id()
 
     current_class = _get_caller_class()
-    if current_class is not None and current_class.startswith(_inner_class_name):
+
+    if not need_record(current_class):
         return
 
-    job_id = ray.get_runtime_context().get_job_id()
+    job_id = get_current_job_id()
     trace_info = {
         "job_id": job_id,
         "caller_class": caller_info.get("caller_class"),
         "caller_func": caller_info.get("caller_func"),
-        "caller_task_id": current_task_id,
+        "caller_task_id": caller_info.get("caller_task_id"),
+        "current_task_id": current_task_id,
     }
 
-    async def _emit():
-        await get_monitor_actor().emit_caller_info.remote(trace_info)
-
-    run_async(job_id, _emit())
+    emit_request("emit-caller-info", trace_info)
 
 
 def get_caller_info():
@@ -1021,7 +1221,9 @@ def get_caller_info():
         return
     caller_class = _get_caller_class()
     caller_func = _get_current_task_name()
+    caller_task_id = get_current_task_id()
     return {
         "caller_class": caller_class,
         "caller_func": caller_func,
+        "caller_task_id": caller_task_id,
     }

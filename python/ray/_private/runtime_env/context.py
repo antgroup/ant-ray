@@ -9,7 +9,12 @@ from typing import Dict, List, Optional
 from ray.util.annotations import DeveloperAPI
 from ray.core.generated.common_pb2 import Language
 from ray._private.services import get_ray_jars_dir
-from ray._private.utils import update_envs
+from ray._private.utils import (
+    update_envs,
+    try_update_code_search_path,
+    try_update_ld_preload,
+    try_update_ld_library_path,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +32,8 @@ class RuntimeEnvContext:
         java_jars: List[str] = None,
         cwd: Optional[str] = None,
         symlink_dirs_to_cwd: List[str] = None,
+        native_libraries: List[Dict[str, str]] = None,
+        preload_libraries: List[str] = None,
     ):
         self.command_prefix = command_prefix or []
         self.env_vars = env_vars or {}
@@ -58,6 +65,11 @@ class RuntimeEnvContext:
         # Note that if there are conflict file or sub dir names in different
         # resource dirs, some contents will be covered and we don't guarantee it.
         self.symlink_dirs_to_cwd = symlink_dirs_to_cwd or []
+        self.native_libraries = native_libraries or {
+            "lib_path": [],
+            "code_search_path": [],
+        }
+        self.preload_libraries = preload_libraries or []
 
     def serialize(self) -> str:
         return json.dumps(self.__dict__)
@@ -83,11 +95,28 @@ class RuntimeEnvContext:
                 local_java_jars.append(java_jar)
 
             class_path_args = ["-cp", ray_jars + ":" + str(":".join(local_java_jars))]
+            # try update code search path
+            passthrough_args = try_update_code_search_path(
+                passthrough_args, language, self.java_jars, self.native_libraries
+            )
             passthrough_args = class_path_args + passthrough_args
+        elif language == Language.CPP:
+            executable = ["exec"]
+            # try update code search path
+            passthrough_args = try_update_code_search_path(
+                passthrough_args, language, self.java_jars, self.native_libraries
+            )
+
         elif sys.platform == "win32":
             executable = []
         else:
             executable = ["exec"]
+
+        # try update ld_library path
+        try_update_ld_library_path(language, self.native_libraries)
+
+        # try update ld_preload
+        try_update_ld_preload(self.preload_libraries)
 
         # By default, raylet uses the path to default_worker.py on host.
         # However, the path to default_worker.py inside the container

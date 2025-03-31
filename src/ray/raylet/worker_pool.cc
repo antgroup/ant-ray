@@ -534,8 +534,7 @@ std::tuple<Process, StartupToken> WorkerPool::StartWorkerProcess(
   if (!IsIOWorkerType(worker_type)) {
     AdjustWorkerOomScore(proc.GetId());
   }
-  MonitorStartingWorkerProcess(
-      worker_startup_token_counter_, language, worker_type, job_id);
+  MonitorStartingWorkerProcess(worker_startup_token_counter_, language, worker_type, job_id);
   AddWorkerProcess(state,
                    worker_type,
                    proc,
@@ -1856,7 +1855,7 @@ void WorkerPool::DeleteRuntimeEnvIfPossible(
     runtime_env_agent_client_->DeleteRuntimeEnvIfPossible(
         serialized_runtime_env,
         runtime_env_config,
-        [serialized_runtime_env, worker_id](bool successful) {
+        [serialized_runtime_env](bool successful) {
           if (!successful) {
             RAY_LOG(ERROR) << "Delete runtime env failed";
             RAY_LOG(DEBUG) << "Runtime env: " << serialized_runtime_env;

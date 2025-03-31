@@ -1,3 +1,4 @@
+import os
 import ray._private.ray_constants as ray_constants
 
 RUNTIME_ENV_RETRY_TIMES = ray_constants.env_integer("RUNTIME_ENV_RETRY_TIMES", 3)
@@ -26,3 +27,4 @@ RUNTIME_ENV_AGENT_LOG_FILENAME = "runtime_env_agent.log"
 RUNTIME_ENV_AGENT_CHECK_PARENT_INTERVAL_S_ENV_NAME = (
     "RAY_RUNTIME_ENV_AGENT_CHECK_PARENT_INTERVAL_S"  # noqa
 )
+RAY_WORKING_DIR = os.environ.get("RAY_WORKING_DIR", "RAY_WORKING_DIR")

@@ -648,7 +648,6 @@ def test_id_named_working_dir(tmp_working_dir, disable_working_dir_gc, shutdown_
     if not disable_working_dir_gc:
         wait_for_condition(_check_path_does_not_exist, path=actor_cwd, timeout=3)
     else:
-        time.sleep(5)
         assert os.path.exists(actor_cwd)
 
     b = A.remote()
@@ -656,7 +655,6 @@ def test_id_named_working_dir(tmp_working_dir, disable_working_dir_gc, shutdown_
     test_file_name = "working_dir_test.txt"
     assert ray.get(b.write_file.remote(test_file_name))
     assert ray.get(b.check_file.remote(test_file_name))
-    print()
     assert not ray.get(c.check_file.remote(test_file_name))
 
 

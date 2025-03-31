@@ -116,7 +116,9 @@ def test_archive_plugin_with_mutiple_packages(set_runtime_env_plugins, start_clu
             message = f.read()
             assert message == "test_2\n", message
 
-        # check archive symbol link
+        # NOTE(Jacky): After refactoring working_dir, the files downloaded from archives
+        # will be soft linked to the current worker's working directory.
+        # So we check if the files exist in the current directory.
         assert os.path.exists("test_1.txt")
         assert os.path.exists("test_1/test_1.txt")
         assert os.path.exists("test_2.txt")

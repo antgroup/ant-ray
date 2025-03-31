@@ -1815,6 +1815,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
       startTime: number,
       duration: number,
       count: number,
+      isRunning: boolean,
     ) => {
       addedAsChild.add(nodeData.name);
       const parentNode = nodeMap.get(callerNodeId);
@@ -1834,7 +1835,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
         value: nodeData.value,
         delta: nodeData.delta,
         totalInParent: nodeData.totalInParent,
-        isRunning: false,
+        isRunning: isRunning,
         extras: nodeData.extras ? { ...nodeData.extras } : undefined,
       };
       if (parentNode) {
@@ -1880,6 +1881,7 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
                 startTime,
                 originalValue,
                 1,
+                true,
               );
             }
           }
@@ -1901,7 +1903,39 @@ export const FlameVisualization: React.FC<FlameVisualizationProps> = ({
           startTime,
           duration,
           count,
+          false,
         );
+      });
+    });
+
+    data.parentStartTimes.forEach(({ calleeId, startTimes }) => {
+      startTimes.forEach(({ callerId, startTime }) => {
+        let originalValue = 0;
+        if (startTime > 0) {
+          originalValue = Date.now() / 1000 - startTime; // Convert to seconds since startTime is in seconds
+        }
+        const nodeDataCopy: FlameNode = {
+          name: calleeId,
+          customValue: originalValue,
+          originalValue: originalValue,
+          startTime: startTime,
+          children: [],
+          totalInParent: [],
+          isRunning: true,
+        };
+        if (!nodeMap.has(calleeId)) {
+          nodeMap.set(calleeId, nodeDataCopy);
+          fillParent(
+            nodeMap,
+            data,
+            nodeDataCopy,
+            callerId,
+            startTime,
+            originalValue,
+            1,
+            true,
+          );
+        }
       });
     });
 

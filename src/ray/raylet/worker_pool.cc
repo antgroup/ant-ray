@@ -534,8 +534,7 @@ std::tuple<Process, StartupToken> WorkerPool::StartWorkerProcess(
   if (!IsIOWorkerType(worker_type)) {
     AdjustWorkerOomScore(proc.GetId());
   }
-  MonitorStartingWorkerProcess(
-      worker_startup_token_counter_, language, worker_type, job_id);
+  MonitorStartingWorkerProcess(worker_startup_token_counter_, language, worker_type);
   AddWorkerProcess(state,
                    worker_type,
                    proc,
@@ -576,14 +575,13 @@ void WorkerPool::AdjustWorkerOomScore(pid_t pid) const {
 
 void WorkerPool::MonitorStartingWorkerProcess(StartupToken proc_startup_token,
                                               const Language &language,
-                                              const rpc::WorkerType worker_type,
-                                              const JobID &job_id) {
+                                              const rpc::WorkerType worker_type) {
   auto timer = std::make_shared<boost::asio::deadline_timer>(
       *io_service_,
       boost::posix_time::seconds(
           RayConfig::instance().worker_register_timeout_seconds()));
   // Capture timer in lambda to copy it once, so that it can avoid destructing timer.
-  timer->async_wait([timer, language, proc_startup_token, worker_type, job_id, this](
+  timer->async_wait([timer, language, proc_startup_token, worker_type, this](
                         const boost::system::error_code e) mutable {
     // check the error code.
     auto &state = this->GetStateForLanguage(language);
@@ -1838,7 +1836,7 @@ void WorkerPool::DeleteRuntimeEnvIfPossible(const std::string &serialized_runtim
   if (!IsRuntimeEnvEmpty(serialized_runtime_env)) {
     runtime_env_agent_client_->DeleteRuntimeEnvIfPossible(
         serialized_runtime_env,
-        [serialized_runtime_env, worker_id](bool successful) {
+        [serialized_runtime_env](bool successful) {
           if (!successful) {
             RAY_LOG(ERROR) << "Delete runtime env failed";
             RAY_LOG(DEBUG) << "Runtime env: " << serialized_runtime_env;

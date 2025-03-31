@@ -53,7 +53,7 @@ class CreatedEnvResult:
     # Whether or not the env was installed correctly.
     success: bool
     # If success is True, will be a RuntimeEnvContext
-    # If success is False, will be None
+    # If success is False, will be an error message
     result: Union[RuntimeEnvContext, str]
     # The time to create a runtime env in ms.
     creation_time_ms: int
@@ -615,7 +615,7 @@ class RuntimeEnvAgent:
             runtime_env_states[runtime_env].runtime_env = runtime_env
             runtime_env_states[runtime_env].success = result.success
             if not result.success:
-                runtime_env_states[runtime_env].error = result.error_message
+                runtime_env_states[runtime_env].error = result.result
             runtime_env_states[runtime_env].creation_time_ms = result.creation_time_ms
 
         reply = runtime_env_agent_pb2.GetRuntimeEnvsInfoReply()

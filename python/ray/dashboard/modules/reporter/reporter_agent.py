@@ -16,7 +16,6 @@ from prometheus_client.core import REGISTRY
 import ray
 import ray._private.prometheus_exporter as prometheus_exporter
 import ray._private.services
-import ray._private.utils
 import ray.dashboard.modules.reporter.reporter_consts as reporter_consts
 import ray.dashboard.utils as dashboard_utils
 from ray._private import utils
@@ -350,9 +349,7 @@ class ReporterAgent(
             # psutil does not give a meaningful logical cpu count when in a K8s pod, or
             # in a container in general.
             # Use ray._private.utils for this instead.
-            logical_cpu_count = ray._private.utils.get_num_cpus(
-                override_docker_cpu_warning=True
-            )
+            logical_cpu_count = utils.get_num_cpus(override_docker_cpu_warning=True)
             # (Override the docker warning to avoid dashboard log spam.)
 
             # The dashboard expects a physical CPU count as well.
@@ -546,6 +543,12 @@ class ReporterAgent(
             except pynvml.NVMLError as e:
                 logger.debug(f"pynvml failed to retrieve GPU processes: {e}")
 
+            # If we're in a container, transform host PIDs to container PIDs
+            if processes_pids and IN_CONTAINER:
+                processes_pids = ReporterAgent._transform_host_pids_to_container_pids(
+                    processes_pids
+                )
+
             info = GpuUtilizationInfo(
                 index=i,
                 name=decode(pynvml.nvmlDeviceGetName(gpu_handle)),
@@ -559,6 +562,84 @@ class ReporterAgent(
         pynvml.nvmlShutdown()
 
         return gpu_utilizations
+
+    @staticmethod
+    def _transform_host_pids_to_container_pids(
+        processes_pids: List[ProcessGPUInfo],
+    ) -> List[ProcessGPUInfo]:
+        """Transform host PIDs to container PIDs when running in a container.
+
+        In containerized environments, the PIDs reported by NVML are host PIDs,
+        not the PIDs visible inside the container. This function maps those
+        host PIDs to their corresponding container PIDs.
+        this utilize a linux kernel bug to find the container PIDs.
+
+        Args:
+            processes_pids: List of ProcessGPUInfo objects with host PIDs
+
+        Returns:
+            List of ProcessGPUInfo objects with container PIDs
+        """
+        # Extract the host PIDs we need to find
+        host_pids_to_find = {process["pid"] for process in processes_pids}
+        if not host_pids_to_find:
+            return processes_pids
+
+        host_to_container_pid_map = {}
+
+        try:
+            import os
+            import re
+
+            # Find all process directories in /proc
+            proc_dirs = [d for d in os.listdir("/proc") if d.isdigit()]
+
+            pattern = re.compile(r"\(([0-9]+),")
+
+            for container_pid in proc_dirs:
+                sched_path = f"/proc/{container_pid}/sched"
+                if os.path.exists(sched_path):
+                    try:
+                        with open(sched_path, "r") as f:
+                            first_line = f.readline()
+                            # Extract host PID using regex
+                            match = pattern.search(first_line)
+                            if match:
+                                host_pid = int(match.group(1))
+                                # Only store if it's one of the PIDs we're looking for
+                                if host_pid in host_pids_to_find:
+                                    host_to_container_pid_map[host_pid] = int(
+                                        container_pid
+                                    )
+                                    # If we've found all the PIDs we need, we can stop searching
+                                    if len(host_to_container_pid_map) == len(
+                                        host_pids_to_find
+                                    ):
+                                        break
+                    except (IOError, ValueError):
+                        # Skip files we can't read or parse
+                        continue
+        except Exception as e:
+            logger.debug(f"Failed to map host PIDs to container PIDs: {e}")
+            return processes_pids
+
+        # Transform the PIDs in the ProcessGPUInfo objects
+        transformed_processes = []
+        for process in processes_pids:
+            host_pid = process["pid"]
+            if host_pid in host_to_container_pid_map:
+                # Create a new ProcessGPUInfo with the container PID
+                transformed_processes.append(
+                    ProcessGPUInfo(
+                        pid=host_to_container_pid_map[host_pid],
+                        gpu_memory_usage=process["gpu_memory_usage"],
+                    )
+                )
+            else:
+                # Keep the original if no mapping is found
+                transformed_processes.append(process)
+
+        return transformed_processes
 
     @staticmethod
     def _get_boot_time():
@@ -580,8 +661,8 @@ class ReporterAgent(
 
     @staticmethod
     def _get_mem_usage():
-        total = ray._private.utils.get_system_memory()
-        used = ray._private.utils.get_used_memory()
+        total = utils.get_system_memory()
+        used = utils.get_used_memory()
         available = total - used
         percent = round(used / total, 3) * 100
         return total, available, percent, used
@@ -597,7 +678,7 @@ class ReporterAgent(
             root = psutil.disk_partitions()[0].mountpoint
         else:
             root = os.sep
-        tmp = ray._private.utils.get_user_temp_dir()
+        tmp = utils.get_user_temp_dir()
         return {
             "/": psutil.disk_usage(root),
             tmp: psutil.disk_usage(tmp),

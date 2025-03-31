@@ -33,11 +33,11 @@ import ray._private.ray_constants as ray_constants
 import ray._private.services as services
 from ray._private.utils import (
     check_ray_client_dependencies_installed,
+    load_class,
     parse_resources_json,
     parse_node_labels_json,
 )
 from ray._private.internal_api import memory_summary
-from ray._private.storage import _load_class
 from ray._private.usage import usage_lib
 from ray._private.gcs_aio_client import GcsAioClient
 from ray._private.gcs_utils import GcsChannel
@@ -86,6 +86,34 @@ def _check_ray_version(gcs_client):
             f'{cluster_metadata["ray_version"]} '
             f"but local Ray version is {ray.__version__}"
         )
+
+
+def handle_process_fo(node, process_name):
+    logger.info("process {} failover".format(process_name))
+    if process_name == ray.ray_constants.PROCESS_TYPE_GCS_SERVER:
+        node.kill_gcs_server(check_alive=False)
+        node.start_gcs_server()
+    elif process_name == ray.ray_constants.PROCESS_TYPE_DASHBOARD:
+        node.kill_dashboard(check_alive=False)
+        node.start_dashboard(require_dashboard=True)
+    elif process_name == ray.ray_constants.PROCESS_TYPE_MONITOR:
+        node.kill_monitor(check_alive=False)
+        node.start_monitor()
+    else:
+        logger.error("No FO policy defined for {}".format(process_name))
+
+
+def check_ray_processes(node):
+    for name, infos in node.all_processes.items():
+        for info in infos:
+            # find exit process
+            if info.process.poll() is not None:
+                logger.error(
+                    "Process {} (pid={}) is dead, try to restart.".format(
+                        name, info.process.pid
+                    )
+                )
+                handle_process_fo(node, name)
 
 
 @click.group()
@@ -465,16 +493,6 @@ def debug(address: str, verbose: bool):
     "but can be set higher.",
 )
 @click.option(
-    "--redis-max-memory",
-    required=False,
-    hidden=True,
-    type=int,
-    help="The max amount of memory (in bytes) to allow redis to use. Once the "
-    "limit is exceeded, redis will start LRU eviction of entries. This only "
-    "applies to the sharded redis tables (task, object, and profile tables). "
-    "By default this is capped at 10GB but can be set higher.",
-)
-@click.option(
     "--num-cpus", required=False, type=int, help="the number of CPUs on this node"
 )
 @click.option(
@@ -599,7 +617,10 @@ Windows powershell users need additional escaping:
 @click.option(
     "--storage",
     default=None,
-    help="the persistent storage URI for the cluster. Experimental.",
+    help=(
+        "[DEPRECATED] Cluster-wide storage is deprecated and will be removed in a "
+        "future version of Ray."
+    ),
 )
 @click.option(
     "--system-config",
@@ -686,7 +707,6 @@ def start(
     ray_client_server_port,
     memory,
     object_store_memory,
-    redis_max_memory,
     num_cpus,
     num_gpus,
     resources,
@@ -769,6 +789,10 @@ def start(
     if has_ray_client and ray_client_server_port is None:
         ray_client_server_port = 10001
 
+    if storage is not None:
+        warnings.warn(
+            "--storage is deprecated and will be removed in a future version of Ray.",
+        )
     ray_params = ray._private.parameter.RayParams(
         node_ip_address=node_ip_address,
         node_name=node_name if node_name else node_ip_address,
@@ -811,8 +835,10 @@ def start(
         include_log_monitor=include_log_monitor,
     )
 
+    clean_processes_at_exit = block or (ray_params.enable_head_ha and head)
+
     if ray_constants.RAY_START_HOOK in os.environ:
-        _load_class(os.environ[ray_constants.RAY_START_HOOK])(ray_params, head)
+        load_class(os.environ[ray_constants.RAY_START_HOOK])(ray_params, head)
 
     if head:
         # Start head node.
@@ -885,7 +911,6 @@ def start(
         # Initialize Redis settings.
         ray_params.update_if_absent(
             redis_shard_ports=redis_shard_ports,
-            redis_max_memory=redis_max_memory,
             num_redis_shards=num_redis_shards,
             redis_max_clients=None,
         )
@@ -908,7 +933,10 @@ def start(
                 )
 
         node = ray._private.node.Node(
-            ray_params, head=True, shutdown_at_exit=block, spawn_reaper=block
+            ray_params,
+            head=True,
+            shutdown_at_exit=clean_processes_at_exit,
+            spawn_reaper=clean_processes_at_exit,
         )
 
         bootstrap_address = node.address
@@ -1089,9 +1117,11 @@ def start(
     assert ray_params.gcs_address is not None
     ray._private.utils.write_ray_address(ray_params.gcs_address, temp_dir)
 
-    if block:
+    if clean_processes_at_exit:
         cli_logger.newline()
-        with cli_logger.group(cf.bold("--block")):
+        msg = "--block" if block else ""
+        msg = msg + "\nenable_head_ha" if head and ray_params.enable_head_ha else msg
+        with cli_logger.group(cf.bold(msg)):
             cli_logger.print(
                 "This command will now block forever until terminated by a signal."
             )
@@ -1104,44 +1134,55 @@ def start(
 
         while True:
             time.sleep(1)
-            deceased = node.dead_processes()
 
-            # Report unexpected exits of subprocesses with unexpected return codes.
-            # We are explicitly expecting SIGTERM because this is how `ray stop` sends
-            # shutdown signal to subprocesses, i.e. log_monitor, raylet...
-            # NOTE(rickyyx): We are treating 128+15 as an expected return code since
-            # this is what autoscaler/_private/monitor.py does upon SIGTERM
-            # handling.
-            expected_return_codes = [
-                0,
-                signal.SIGTERM,
-                -1 * signal.SIGTERM,
-                128 + signal.SIGTERM,
-            ]
-            unexpected_deceased = [
-                (process_type, process)
-                for process_type, process in deceased
-                if process.returncode not in expected_return_codes
-            ]
-            if len(unexpected_deceased) > 0:
-                cli_logger.newline()
-                cli_logger.error("Some Ray subprocesses exited unexpectedly:")
+            # Head HA
+            if head and ray_params.enable_head_ha:
+                if node.check_leadership_downgrade():
+                    raise RuntimeError("leadership downgrade")
+                else:
+                    check_ray_processes(node)
 
-                with cli_logger.indented():
-                    for process_type, process in unexpected_deceased:
-                        cli_logger.error(
-                            "{}",
-                            cf.bold(str(process_type)),
-                            _tags={"exit code": str(process.returncode)},
-                        )
+            if block:
+                deceased = node.dead_processes()
 
-                cli_logger.newline()
-                cli_logger.error("Remaining processes will be killed.")
-                # explicitly kill all processes since atexit handlers
-                # will not exit with errors.
-                node.kill_all_processes(check_alive=False, allow_graceful=False)
-                os._exit(1)
-        # not-reachable
+                # Report unexpected exits of subprocesses with unexpected return codes.
+                # We are explicitly expecting SIGTERM because this is how `ray stop` sends
+                # shutdown signal to subprocesses, i.e. log_monitor, raylet...
+                # NOTE(rickyyx): We are treating 128+15 as an expected return code since
+                # this is what autoscaler/_private/monitor.py does upon SIGTERM
+                # handling.
+                expected_return_codes = [
+                    0,
+                    signal.SIGTERM,
+                    -1 * signal.SIGTERM,
+                    128 + signal.SIGTERM,
+                ]
+                unexpected_deceased = [
+                    (process_type, process)
+                    for process_type, process in deceased
+                    if process.returncode not in expected_return_codes
+                ]
+                if len(unexpected_deceased) > 0:
+                    cli_logger.newline()
+                    cli_logger.error("Some Ray subprocesses exited unexpectedly:")
+
+                    with cli_logger.indented():
+                        for process_type, process in unexpected_deceased:
+                            cli_logger.error(
+                                "{}",
+                                cf.bold(str(process_type)),
+                                _tags={"exit code": str(process.returncode)},
+                            )
+
+                    cli_logger.newline()
+                    cli_logger.error("Remaining processes will be killed.")
+                    # explicitly kill all processes since atexit handlers
+                    # will not exit with errors.
+                    node.kill_all_processes(check_alive=False, allow_graceful=False)
+                    os._exit(1)
+
+
+# not-reachable
 
 
 @cli.command()
@@ -2330,9 +2371,9 @@ def global_gc(address):
 )
 @click.option(
     "--node-id",
-    required=True,
+    required=False,
     type=str,
-    help="Hex ID of the worker node to be drained.",
+    help="Hex ID of the worker node to be drained. Will default to current node if not provided.",
 )
 @click.option(
     "--reason",
@@ -2375,6 +2416,12 @@ def drain_node(
 
     Manually drain a worker node.
     """
+    # This should be before get_runtime_context() so get_runtime_context()
+    # doesn't start a new worker here.
+    address = services.canonicalize_bootstrap_address_or_die(address)
+
+    if node_id is None:
+        node_id = ray.get_runtime_context().get_node_id()
     deadline_timestamp_ms = 0
     if deadline_remaining_seconds is not None:
         if deadline_remaining_seconds < 0:
@@ -2388,8 +2435,6 @@ def drain_node(
 
     if ray.NodeID.from_hex(node_id) == ray.NodeID.nil():
         raise click.BadParameter(f"Invalid hex ID of a Ray node, got {node_id}")
-
-    address = services.canonicalize_bootstrap_address_or_die(address)
 
     gcs_client = ray._raylet.GcsClient(address=address)
     _check_ray_version(gcs_client)

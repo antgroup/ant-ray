@@ -138,7 +138,6 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
     ):
         self._resources_dir = os.path.join(resources_dir, "working_dir_files")
         self._working_dirs = os.path.join(resources_dir, "working_dirs")
-        self._job_dirs = os.path.join(resources_dir, "job_dirs")
         self._gcs_aio_client = gcs_aio_client
         try_to_create_directory(self._resources_dir)
 
@@ -240,7 +239,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             context.command_prefix[i] = prefix.replace(
                 WorkingDirPlugin.working_dir_placeholder, working_dir
             )
-        for k, v in context.env_vars.copy().items():
+        for k, v in context.env_vars.items():
             context.env_vars[k] = v.replace(
                 WorkingDirPlugin.working_dir_placeholder, working_dir
             )
@@ -271,7 +270,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         self,
         runtime_env: "RuntimeEnv",  # noqa: F821
         worker_id: str,
-        job_id: str,
+        job_id : str,        
         logger: logging.Logger = default_logger,
     ) -> None:
         if not runtime_env.working_dir():

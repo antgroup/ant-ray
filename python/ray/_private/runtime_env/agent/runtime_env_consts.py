@@ -13,7 +13,9 @@ BAD_RUNTIME_ENV_CACHE_TTL_SECONDS = ray_constants.env_integer(
 )
 
 # Disable working dir GC or not
-DISABLE_WORKING_DIR_GC = ray_constants.env_bool("RAY_DISABLE_WORKING_DIR_GC", False)
+DISABLE_WORKING_DIR_GC = ray_constants.env_bool(
+    "RAY_RUNTIME_ENV_DISABLE_WORKING_DIR_GC", False
+)
 
 # Disable job dir GC or not
 DISABLE_JOB_DIR_GC = ray_constants.env_bool("RAY_DISABLE_JOB_DIR_GC", False)

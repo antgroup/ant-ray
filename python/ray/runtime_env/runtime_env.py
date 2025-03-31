@@ -279,6 +279,7 @@ class RuntimeEnv(dict):
 
     known_fields: Set[str] = {
         "py_modules",
+        "py_executable",
         "java_jars",
         "working_dir",
         "job_dir",
@@ -313,6 +314,7 @@ class RuntimeEnv(dict):
         self,
         *,
         py_modules: Optional[List[str]] = None,
+        py_executable: Optional[str] = None,
         working_dir: Optional[str] = None,
         job_dir: Optional[str] = None,
         pip: Optional[List[str]] = None,
@@ -333,6 +335,8 @@ class RuntimeEnv(dict):
         runtime_env = kwargs
         if py_modules is not None:
             runtime_env["py_modules"] = py_modules
+        if py_executable is not None:
+            runtime_env["py_executable"] = py_executable
         if working_dir is not None:
             runtime_env["working_dir"] = working_dir
         if job_dir is not None:
@@ -410,6 +414,12 @@ class RuntimeEnv(dict):
                     "together with other fields of runtime_env. "
                     f"Specified fields: {invalid_keys}"
                 )
+
+        if self.get("archives") and self.env_vars().get("RAY_ARCHIVE_PATH"):
+            raise ValueError(
+                f"'RAY_ARCHIVE_PATH' can not be set in env_vars {self.env_vars()}, "
+                "this is not allowed, please check your env_vars in runtime_env."
+            )
 
         for option, validate_fn in OPTION_TO_VALIDATION_FN.items():
             option_val = self.get(option)
@@ -521,6 +531,9 @@ class RuntimeEnv(dict):
         if "py_modules" in self:
             return list(self["py_modules"])
         return []
+
+    def py_executable(self) -> Optional[str]:
+        return self.get("py_executable", None)
 
     def java_jars(self) -> List[str]:
         if "java_jars" in self:

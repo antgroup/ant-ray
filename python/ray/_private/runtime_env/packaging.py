@@ -4,6 +4,7 @@ import hashlib
 import logging
 import os
 import shutil
+import tarfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Callable, List, Optional, Tuple
@@ -17,6 +18,8 @@ from ray._private.ray_constants import (
     RAY_RUNTIME_ENV_URI_PIN_EXPIRATION_S_DEFAULT,
     RAY_RUNTIME_ENV_URI_PIN_EXPIRATION_S_ENV_VAR,
     RAY_RUNTIME_ENV_IGNORE_GITIGNORE,
+    GRPC_CPP_MAX_MESSAGE_SIZE,
+    RAY_UNPACKABLE_FILE_SUFFIXS,
 )
 from ray._private.runtime_env.conda_utils import exec_cmd_stream_to_logger
 from ray._private.runtime_env.protocol import Protocol
@@ -34,7 +37,7 @@ FILE_SIZE_WARNING = 10 * 1024 * 1024  # 10MiB
 # The size is bounded by the max gRPC message size.
 # Keep in sync with max_grpc_message_size in ray_config_def.h.
 GCS_STORAGE_MAX_SIZE = int(
-    os.environ.get("RAY_max_grpc_message_size", 500 * 1024 * 1024)
+    os.environ.get("RAY_max_grpc_message_size", GRPC_CPP_MAX_MESSAGE_SIZE)
 )
 RAY_PKG_PREFIX = "_ray_pkg_"
 
@@ -221,7 +224,16 @@ def parse_uri(pkg_uri: str) -> Tuple[Protocol, str]:
 
             # Remove all periods except the last, which is part of the
             # file extension
-            package_name = package_name.replace(".", "_", package_name.count(".") - 1)
+            if is_tar_file(package_name):
+                suffix_index = package_name.rfind(".tar")
+                package_name = (
+                    package_name[:suffix_index].replace(".", "_")
+                    + package_name[suffix_index:]
+                )
+            else:
+                package_name = package_name.replace(
+                    ".", "_", package_name.count(".") - 1
+                )
     else:
         package_name = uri.netloc
 
@@ -260,7 +272,22 @@ def is_tar_uri(uri: str) -> bool:
         _, path = parse_uri(uri)
     except ValueError:
         return False
+    return is_tar_file(path)
 
+
+def is_tar_file(path: str) -> bool:
+    """Determine if the given local file path represents a compressed tar archive.
+
+    This function checks if the provided path string ends with any of the
+    common tar file extensions including .tar, .tar.gz, .tar.bz, or .tar.xz.
+
+    Args:
+        path: A string representing the local file path to be checked.
+
+    Returns:
+        bool: Returns True if the path ends with a recognized tar file extension,
+              otherwise returns False.
+    """
     return (
         path.endswith(".tar")
         or path.endswith(".tar.gz")
@@ -662,7 +689,36 @@ def get_local_dir_from_uri(uri: str, base_directory: str) -> Path:
     """Return the local directory corresponding to this URI."""
     pkg_file = Path(_get_local_path(base_directory, uri))
     local_dir = pkg_file.with_suffix("")
+    # NOTE(Jacky): If the URls have.tar.gz, .tar.bz, or.tar.xz suffixes,
+    # then the URIs have double suffixes,
+    # which needs to be removed twice to get local_dir
+    if local_dir.suffix == ".tar":
+        local_dir = local_dir.with_suffix("")
     return local_dir
+
+
+def is_file_unpackable(pkg_file: str) -> bool:
+    """Determines whether the given pkg_file should be unpacked based on its suffix.
+
+    This function checks the suffix of the pkg_file to see if it matches one of
+    the specified compression or packaging formats. If the suffix matches, the
+    function returns True, indicating that the file should be unpacked.
+    Otherwise, it returns False.
+
+    Args:
+        pkg_file: The file name or path to check.
+
+    Returns:
+        bool: True if the file should be unpacked, False otherwise.
+    """
+    unpack_suffixs = RAY_UNPACKABLE_FILE_SUFFIXS
+
+    # Loop through the list of unpack suffixes and check against the pkg_file
+    for suffix in unpack_suffixs:
+        if pkg_file.endswith(suffix):
+            return True
+
+    return False
 
 
 @DeveloperAPI
@@ -684,6 +740,7 @@ async def download_and_unpack_package(
             directory for the unpacked files.
         gcs_aio_client: Client to use for downloading from the GCS.
         logger: The logger to use.
+        unpack: Whether to decompress the file into target_dir.
         overwrite: If True, overwrite the existing package.
 
     Returns:
@@ -703,6 +760,17 @@ async def download_and_unpack_package(
             f"Invalid package URI: {pkg_uri}."
             "URI must have a file extension and the URI must be valid."
         )
+
+    # NOTE(Jacky): If the suffix of pkg_file is not ".zip", ".whl", ".jar"
+    # or pkg_file is not a tar file, we set unpack to False.
+    # This is necessary because we only want to attempt to unpack files with
+    # recognized compression formats. Trying to unpack files with unrecognized
+    # or unsupported formats can lead to errors or undefined behavior.
+    # Therefore, setting unpack to False explicitly prevents such issues
+    # and ensures that only files with supported formats are processed
+    # for unpacking. This check helps in maintaining robustness and stability
+    # in handling various files.
+    unpack = is_file_unpackable(str(pkg_file))
 
     async with _AsyncFileLock(str(pkg_file) + ".lock"):
         if logger is None:
@@ -768,8 +836,22 @@ async def download_and_unpack_package(
                     return str(pkg_file)
             elif protocol in Protocol.remote_protocols():
                 protocol.download_remote_uri(source_uri=pkg_uri, dest_file=pkg_file)
+                # NOTE(Jacky): Assuming `base_directory` is "/tmp", `pkg_uri` is https://xxx.zip,
+                # then the generated `local_dir` is /tmp/https_xxx.
+                # If `unpack` is False, we just put file into `local_dir`, the absolute path is
+                # /tmp/https_xxx/https_xxx.zip.
+                if not unpack:
+                    try:
+                        os.mkdir(local_dir)
+                    except FileExistsError:
+                        logger.info(f"Directory at {local_dir} already exists")
+                    os.rename(
+                        pkg_file,
+                        os.path.join(local_dir, os.path.basename(pkg_file)),
+                    )
+                    return str(local_dir)
 
-                if pkg_file.suffix in [".zip"]:
+                if pkg_file.suffix in [".zip", ".jar"]:
                     unzip_package(
                         package_path=pkg_file,
                         target_dir=local_dir,
@@ -777,10 +859,15 @@ async def download_and_unpack_package(
                         unlink_zip=True,
                         logger=logger,
                     )
+                elif is_tar_uri(pkg_uri):
+                    untar_package(
+                        file_path=str(pkg_file),
+                        target_dir=str(local_dir),
+                        unlink_tar=True,
+                        logger=logger,
+                    )
                 elif pkg_file.suffix == ".whl":
                     return str(pkg_file)
-                elif pkg_file.suffix == ".jar":
-                    pass
                 else:
                     raise NotImplementedError(
                         f"Package format {pkg_file.suffix} is ",
@@ -895,7 +982,7 @@ def unzip_package(
     except FileExistsError:
         logger.info(f"Directory at {target_dir} already exists")
 
-    logger.debug(f"Unpacking {package_path} to {target_dir}")
+    logger.info(f"Unpacking {package_path} to {target_dir}")
 
     with ZipFile(str(package_path), "r") as zip_ref:
         zip_ref.extractall(target_dir)
@@ -911,6 +998,42 @@ def unzip_package(
 
     if unlink_zip:
         Path(package_path).unlink()
+
+
+def untar_package(
+    file_path: str,
+    target_dir: str,
+    unlink_tar: bool,
+    logger: Optional[logging.Logger] = default_logger,
+):
+    """Unpacks a tar package into a specified directory and optionally removes the tar file after extraction.
+
+    This function takes a file path to a tar archive and unpacks its contents into the specified target
+    directory. If the directory does not exist, it will be created. It also supports logging of the process
+    and optionally deletes the tar file upon successful extraction.
+
+    Args:
+        file_path: The path to the tar file that is to be extracted.
+        target_dir: The directory where the contents of the tar file will be extracted.
+        unlink_tar: A flag indicating whether the tar file should be deleted after extraction.
+        logger: Logger instance used to log information and debug messages. Defaults to 'default_logger'.
+
+    Raises:
+        FileNotFoundError: If the tar file does not exist.
+
+        FileExistsError: If the target directory cannot be created and does not already exist.
+    """
+    try:
+        os.mkdir(target_dir)
+    except FileExistsError:
+        logger.info(f"Directory at {target_dir} already exists")
+
+    logger.info(f"Unpacking {file_path} to {target_dir}")
+    with tarfile.open(file_path, "r") as tar:
+        tar.extractall(path=target_dir)
+
+    if unlink_tar:
+        Path(file_path).unlink()
 
 
 def delete_package(pkg_uri: str, base_directory: str) -> Tuple[bool, int]:

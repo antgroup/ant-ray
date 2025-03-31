@@ -17,7 +17,6 @@ from collections.abc import Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import (
-    IO,
     Any,
     AnyStr,
     Callable,
@@ -78,8 +77,7 @@ from ray._private.runtime_env.working_dir import upload_working_dir_if_needed
 from ray._private.runtime_env.setup_hook import (
     upload_worker_process_setup_hook_if_needed,
 )
-from ray._private.storage import _load_class
-from ray._private.utils import get_ray_doc_version
+from ray._private.utils import get_ray_doc_version, load_class
 from ray.exceptions import ObjectStoreFullError, RayError, RaySystemError, RayTaskError
 from ray.experimental.internal_kv import (
     _initialize_internal_kv,
@@ -470,8 +468,10 @@ class Worker:
         self._enable_record_actor_task_log = (
             ray_constants.RAY_ENABLE_RECORD_ACTOR_TASK_LOGGING
         )
-        self._out_file = None
-        self._err_file = None
+        # Whether rotation is enabled for out file and err file, task log position report will be skipped if rotation enabled, since the position cannot be accurate.
+        self._file_rotation_enabled = False
+        self._out_filepath = None
+        self._err_filepath = None
         # Create the lock here because the serializer will use it before
         # initializing Ray.
         self.lock = threading.RLock()
@@ -629,13 +629,17 @@ class Worker:
         finally:
             ray._private.state.update_worker_num_paused_threads(worker_id, -1)
 
-    def set_err_file(self, err_file=Optional[IO[AnyStr]]) -> None:
-        """Set the worker's err file where stderr is redirected to"""
-        self._err_file = err_file
+    def set_file_rotation_enabled(self, rotation_enabled: bool) -> None:
+        """Set whether rotation is enabled for outfile and errfile."""
+        self._file_rotation_enabled = rotation_enabled
 
-    def set_out_file(self, out_file=Optional[IO[AnyStr]]) -> None:
+    def set_err_file(self, err_filepath=Optional[AnyStr]) -> None:
+        """Set the worker's err file where stderr is redirected to"""
+        self._err_filepath = err_filepath
+
+    def set_out_file(self, out_filepath=Optional[AnyStr]) -> None:
         """Set the worker's out file where stdout is redirected to"""
-        self._out_file = out_file
+        self._out_filepath = out_filepath
 
     def record_task_log_start(self, task_id: TaskID, attempt_number: int):
         """Record the task log info when task starts executing for
@@ -648,6 +652,8 @@ class Worker:
             return
 
         if not hasattr(self, "core_worker"):
+            return
+        if self._file_rotation_enabled:
             return
 
         self.core_worker.record_task_log_start(
@@ -672,6 +678,10 @@ class Worker:
         if not hasattr(self, "core_worker"):
             return
 
+        # Disable file offset fetch if rotation enabled (since file offset doesn't make sense for rotated files).
+        if self._file_rotation_enabled:
+            return
+
         self.core_worker.record_task_log_end(
             task_id,
             attempt_number,
@@ -679,24 +689,24 @@ class Worker:
             self.get_current_err_offset(),
         )
 
-    def get_err_file_path(self) -> str:
-        """Get the err log file path"""
-        return self._err_file.name if self._err_file is not None else ""
-
     def get_out_file_path(self) -> str:
         """Get the out log file path"""
-        return self._out_file.name if self._out_file is not None else ""
+        return self._out_filepath if self._out_filepath is not None else ""
+
+    def get_err_file_path(self) -> str:
+        """Get the err log file path"""
+        return self._err_filepath if self._err_filepath is not None else ""
 
     def get_current_out_offset(self) -> int:
         """Get the current offset of the out file if seekable, else 0"""
-        if self._out_file is not None and self._out_file.seekable():
-            return self._out_file.tell()
+        if self._out_filepath is not None:
+            return os.path.getsize(self._out_filepath)
         return 0
 
     def get_current_err_offset(self) -> int:
         """Get the current offset of the err file if seekable, else 0"""
-        if self._err_file is not None and self._err_file.seekable():
-            return self._err_file.tell()
+        if self._err_filepath is not None:
+            return os.path.getsize(self._err_filepath)
         return 0
 
     def get_serialization_context(self):
@@ -824,7 +834,7 @@ class Worker:
         # reference will be created. If another reference is created and
         # removed before this one, it will corrupt the state in the
         # reference counter.
-        return ray.ObjectRef(
+        ref = ray.ObjectRef(
             self.core_worker.put_serialized_object_and_increment_local_ref(
                 serialized_value,
                 object_ref=object_ref,
@@ -835,6 +845,10 @@ class Worker:
             # The initial local reference is already acquired internally.
             skip_adding_local_ref=True,
         )
+        from ray.util.insight import record_object_put
+
+        record_object_put(ref.hex(), serialized_value.total_bytes)
+        return ref
 
     def raise_errors(self, data_metadata_pairs, object_refs):
         out = self.deserialize_objects(data_metadata_pairs, object_refs)
@@ -875,7 +889,7 @@ class Worker:
                 returned list. If False, then the first found exception will be
                 raised.
             skip_deserialization: If true, only the buffer will be released and
-                the object associated with the buffer will not be deserailized.
+                the object associated with the buffer will not be deserialized.
         Returns:
             list: List of deserialized objects or None if skip_deserialization is True.
             bytes: UUID of the debugger breakpoint we should drop
@@ -923,6 +937,12 @@ class Worker:
                         raise value.as_instanceof_cause()
                     else:
                         raise value
+
+        from ray.util.insight import record_object_get
+
+        for value, object_ref in zip(values, object_refs):
+            if value is not None:
+                record_object_get(object_ref.hex(), object_ref.task_id())
 
         return values, debugger_breakpoint
 
@@ -1406,17 +1426,14 @@ def init(
         namespace: A namespace is a logical grouping of jobs and named actors.
         runtime_env: The runtime environment to use
             for this job (see :ref:`runtime-environments` for details).
-        storage: [Experimental] Specify a URI for persistent cluster-wide storage.
-            This storage path must be accessible by all nodes of the cluster, otherwise
-            an error will be raised. This option can also be specified as the
-            RAY_STORAGE env var.
+        storage: [DEPRECATED] Cluster-wide storage configuration is deprecated and will
+            be removed in a future version of Ray.
         _enable_object_reconstruction: If True, when an object stored in
             the distributed plasma store is lost due to node failure, Ray will
             attempt to reconstruct the object by re-executing the task that
             created the object. Arguments to the task will be recursively
             reconstructed. If False, then ray.ObjectLostError will be
             thrown.
-        _redis_max_memory: Redis max memory.
         _plasma_directory: Override the plasma mmap file directory.
         _node_ip_address: The IP address of the node that we are on.
         _driver_object_store_memory: Deprecated.
@@ -1475,7 +1492,6 @@ def init(
     _enable_object_reconstruction: bool = kwargs.pop(
         "_enable_object_reconstruction", False
     )
-    _redis_max_memory: Optional[int] = kwargs.pop("_redis_max_memory", None)
     _plasma_directory: Optional[str] = kwargs.pop("_plasma_directory", None)
     _node_ip_address: str = kwargs.pop("_node_ip_address", None)
     _driver_object_store_memory: Optional[int] = kwargs.pop(
@@ -1550,6 +1566,10 @@ def init(
             usage_lib.put_pre_init_usage_stats()
 
         usage_lib.record_library_usage("client")
+
+        from ray.util.insight import create_insight_monitor_actor
+
+        create_insight_monitor_actor()
         return ctx
 
     if kwargs.get("allow_multiple"):
@@ -1626,7 +1646,7 @@ def init(
             )
 
         if ray_constants.RAY_RUNTIME_ENV_HOOK in os.environ and not _skip_env_hook:
-            runtime_env = _load_class(os.environ[ray_constants.RAY_RUNTIME_ENV_HOOK])(
+            runtime_env = load_class(os.environ[ray_constants.RAY_RUNTIME_ENV_HOOK])(
                 runtime_env
             )
         job_config.set_runtime_env(runtime_env)
@@ -1638,7 +1658,7 @@ def init(
     # higher priority in case user also provided runtime_env for ray.init()
     else:
         if ray_constants.RAY_RUNTIME_ENV_HOOK in os.environ and not _skip_env_hook:
-            runtime_env = _load_class(os.environ[ray_constants.RAY_RUNTIME_ENV_HOOK])(
+            runtime_env = load_class(os.environ[ray_constants.RAY_RUNTIME_ENV_HOOK])(
                 runtime_env
             )
 
@@ -1669,12 +1689,22 @@ def init(
     else:
         driver_mode = SCRIPT_MODE
 
+    if storage is not None:
+        warnings.warn(
+            "Cluster-wide storage configuration is deprecated and will be removed in a "
+            "future version of Ray."
+        )
+
     global _global_node
 
     if global_worker.connected:
         if ignore_reinit_error:
             logger.info("Calling ray.init() again after it has already been called.")
             node_id = global_worker.core_worker.get_current_node_id()
+
+            from ray.util.insight import create_insight_monitor_actor
+
+            create_insight_monitor_actor()
             return RayContext(dict(_global_node.address_info, node_id=node_id.hex()))
         else:
             raise RuntimeError(
@@ -1720,7 +1750,6 @@ def init(
             dashboard_port=dashboard_port,
             memory=_memory,
             object_store_memory=object_store_memory,
-            redis_max_memory=_redis_max_memory,
             plasma_store_socket_name=None,
             temp_dir=_temp_dir,
             storage=storage,
@@ -1876,6 +1905,10 @@ def init(
     node_id = global_worker.core_worker.get_current_node_id()
     global_node_address_info = _global_node.address_info.copy()
     global_node_address_info["webui_url"] = _remove_protocol_from_url(dashboard_url)
+
+    from ray.util.insight import create_insight_monitor_actor
+
+    create_insight_monitor_actor()
     return RayContext(dict(global_node_address_info, node_id=node_id.hex()))
 
 
@@ -2278,6 +2311,7 @@ def connect(
     entrypoint: str = "",
     worker_launch_time_ms: int = -1,
     worker_launched_time_ms: int = -1,
+    debug_source: str = "",
 ):
     """Connect this worker to the raylet, to Plasma, and to GCS.
 
@@ -2305,6 +2339,7 @@ def connect(
         worker_launched_time_ms: The time when the worker process for this worker
             finshes launching. If the worker is not launched by raylet (e.g.,
             driver), this must be -1 (default value).
+        debug_source: Source information for `CoreWorker`, used for debugging and informational purpose, rather than functional purpose.
     """
     # Do some basic checking to make sure we didn't call ray.init twice.
     error_message = "Perhaps you called ray.init twice by accident?"
@@ -2372,8 +2407,6 @@ def connect(
             )
 
     driver_name = ""
-    log_stdout_file_path = ""
-    log_stderr_file_path = ""
     interactive_mode = False
     if mode == SCRIPT_MODE:
         import __main__ as main
@@ -2478,8 +2511,6 @@ def connect(
         node.raylet_ip_address,
         (mode == LOCAL_MODE),
         driver_name,
-        log_stdout_file_path,
-        log_stderr_file_path,
         serialized_job_config,
         node.metrics_agent_port,
         runtime_env_hash,
@@ -2489,6 +2520,7 @@ def connect(
         "" if mode != SCRIPT_MODE else entrypoint,
         worker_launch_time_ms,
         worker_launched_time_ms,
+        debug_source,
     )
 
     if mode == SCRIPT_MODE:

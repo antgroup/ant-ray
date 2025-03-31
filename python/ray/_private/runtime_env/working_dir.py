@@ -242,8 +242,6 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         linked_dir = set()
         for symlink_dir in context.symlink_paths_to_working_dir:
             for name in os.listdir(symlink_dir):
-                logger.info(f"show the src path: {symlink_dir}")
-                logger.info(f"show the linked dir: {linked_dir}")
                 src_path = os.path.join(symlink_dir, name)
                 link_path = os.path.join(working_dir, name)
                 if src_path not in linked_dir:

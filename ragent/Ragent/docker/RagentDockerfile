@@ -1,0 +1,13 @@
+FROM reg.docker.alibaba-inc.com/antfin_datatech_share/new_ray_image_prod_pythons:20240326105858-1.12.7-6db9c670
+WORKDIR /home/admin/
+
+USER admin
+
+RUN source ~/.bashrc && pyenv global 3.10.13 && pyenv shell 3.10.13
+
+RUN pip install https://artifacts.antgroup-inc.cn/artifact/repositories/simple-dev/ragent/ragent-0.1.2.dev0-py3-none-any.whl
+RUN pip install https://artifacts.antgroup-inc.cn/artifact/repositories/simple-dev/antflow/antflow-0.8.5.dev0-py3-none-any.whl
+
+# Yuque loader deps ntlk which need download nltk data.
+RUN wget http://alipay-cognition.cn-hangzhou.alipay.aliyun-inc.com/antflow/deps/nltk_data.zip
+RUN unzip nltk_data.zip -d ~/

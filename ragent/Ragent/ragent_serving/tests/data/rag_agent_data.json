@@ -1,0 +1,625 @@
+{
+ "nodes": [
+  {
+   "width": 384,
+   "height": 482,
+   "id": "ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91",
+   "type": "genericNode",
+   "position": {
+    "x": 949.7310404840778,
+    "y": 143.62864943490075
+   },
+   "data": {
+    "type": "ZeroShotAgent",
+    "node": {
+     "template": {
+      "llm": {
+       "required": true,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "password": false,
+       "name": "llm",
+       "advanced": false,
+       "type": "BaseLanguageModel",
+       "list": false
+      },
+      "tools": {
+       "required": true,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "password": false,
+       "name": "tools",
+       "advanced": false,
+       "type": "Tool",
+       "list": true
+      },
+      "callback_manager": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "password": false,
+       "name": "callback_manager",
+       "advanced": false,
+       "type": "BaseCallbackManager",
+       "list": false
+      },
+      "output_parser": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "password": false,
+       "name": "output_parser",
+       "advanced": false,
+       "type": "AgentOutputParser",
+       "list": false
+      },
+      "prefix": {
+       "required": false,
+       "placeholder": "",
+       "show": true,
+       "multiline": true,
+       "value": "Answer the following questions as best you can. You have access to the following tools:",
+       "password": false,
+       "name": "prefix",
+       "advanced": false,
+       "type": "str",
+       "list": false
+      },
+      "suffix": {
+       "required": false,
+       "placeholder": "",
+       "show": true,
+       "multiline": true,
+       "value": "Begin!\n\nQuestion: {input}\nThought:{agent_scratchpad}",
+       "password": false,
+       "name": "suffix",
+       "advanced": false,
+       "type": "str",
+       "list": false
+      },
+      "format_instructions": {
+       "required": false,
+       "placeholder": "",
+       "show": true,
+       "multiline": true,
+       "value": "Use the following format:\n\nQuestion: the input question you must answer\nThought: you should always think about what to do\nAction: the action to take, should be one of [{tool_names}]\nAction Input: the input to the action\nObservation: the result of the action\n... (this Thought/Action/Action Input/Observation can repeat N times)\nThought: I now know the final answer\nFinal Answer: the final answer to the original input question",
+       "password": false,
+       "name": "format_instructions",
+       "advanced": false,
+       "type": "str",
+       "list": false
+      },
+      "input_variables": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "password": false,
+       "name": "input_variables",
+       "advanced": false,
+       "type": "str",
+       "list": true
+      },
+      "kwargs": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "password": false,
+       "name": "kwargs",
+       "advanced": true,
+       "type": "Any",
+       "list": false
+      },
+      "_type": "ZeroShotAgent"
+     },
+     "description": "Construct an agent from an LLM and tools.",
+     "base_classes": [
+      "Agent",
+      "BaseSingleActionAgent",
+      "ZeroShotAgent",
+      "function"
+     ],
+     "display_name": "ZeroShotAgent"
+    },
+    "id": "ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91",
+    "value": null
+   },
+   "selected": true,
+   "positionAbsolute": {
+    "x": 949.7310404840778,
+    "y": 143.62864943490075
+   },
+   "dragging": false
+  },
+  {
+   "width": 384,
+   "height": 246,
+   "id": "Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5",
+   "type": "genericNode",
+   "position": {
+    "x": 13.901743853759513,
+    "y": 123.94041362655153
+   },
+   "data": {
+    "type": "Calculator",
+    "node": {
+     "template": {
+      "llm": {
+       "required": true,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "password": false,
+       "name": "llm",
+       "advanced": false,
+       "type": "BaseLanguageModel",
+       "list": false
+      },
+      "_type": "Calculator"
+     },
+     "description": "Useful for when you need to answer questions about math.",
+     "base_classes": [
+      "Tool"
+     ],
+     "display_name": "Calculator"
+    },
+    "id": "Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5",
+    "value": null
+   },
+   "selected": false,
+   "positionAbsolute": {
+    "x": 13.901743853759513,
+    "y": 123.94041362655153
+   },
+   "dragging": false
+  },
+  {
+   "width": 384,
+   "height": 298,
+   "id": "Search-8ae84b5e-add0-450a-a8db-0568de45e38a",
+   "type": "genericNode",
+   "position": {
+    "x": -156.8538422241291,
+    "y": 417.00881028153356
+   },
+   "data": {
+    "type": "Search",
+    "node": {
+     "template": {
+      "serpapi_api_key": {
+       "required": false,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "value": "67db87fed32e69cc259a050ff2cd69e08864a78a581d53fecbb4b62baeb1e710",
+       "password": true,
+       "name": "serpapi_api_key",
+       "display_name": "Serpapi API Key",
+       "advanced": false,
+       "type": "str",
+       "list": false
+      },
+      "aiosession": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "value": "",
+       "password": false,
+       "name": "aiosession",
+       "advanced": false,
+       "type": "str",
+       "list": false
+      },
+      "_type": "Search"
+     },
+     "description": "A search engine. Useful for when you need to answer questions about current events. Input should be a search query.",
+     "base_classes": [
+      "Tool"
+     ],
+     "display_name": "Search"
+    },
+    "id": "Search-8ae84b5e-add0-450a-a8db-0568de45e38a",
+    "value": null
+   },
+   "selected": false,
+   "positionAbsolute": {
+    "x": -156.8538422241291,
+    "y": 417.00881028153356
+   },
+   "dragging": false
+  },
+  {
+   "width": 384,
+   "height": 406,
+   "id": "PythonFunctionTool-0d90c90c-d01a-4e72-8d67-f02be3c2a9c6",
+   "type": "genericNode",
+   "position": {
+    "x": -195.51657488813328,
+    "y": 732.1537375557499
+   },
+   "data": {
+    "type": "PythonFunctionTool",
+    "node": {
+     "template": {
+      "name": {
+       "required": true,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "value": "\u81ea\u5b9a\u4e49\u5916\u90e8\u63a5\u53e3",
+       "password": false,
+       "name": "name",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "str",
+       "list": false
+      },
+      "description": {
+       "required": true,
+       "placeholder": "",
+       "show": true,
+       "multiline": true,
+       "value": "\u81ea\u5b9a\u4e49\u5916\u90e8\u63a5\u53e3",
+       "password": false,
+       "name": "description",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "str",
+       "list": false
+      },
+      "code": {
+       "required": true,
+       "placeholder": "",
+       "show": true,
+       "multiline": true,
+       "value": "\ndef python_function(text: str) -> str:\n    \"\"\"This is a default python function that returns the input text\"\"\"\n    return text\n",
+       "password": false,
+       "name": "code",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "code",
+       "list": false
+      },
+      "_type": "PythonFunctionTool"
+     },
+     "description": "Python function to be executed.",
+     "base_classes": [
+      "Tool"
+     ],
+     "custom_fields": {},
+     "documentation": "",
+     "display_name": "PythonFunctionTool"
+    },
+    "id": "PythonFunctionTool-0d90c90c-d01a-4e72-8d67-f02be3c2a9c6",
+    "value": null
+   },
+   "positionAbsolute": {
+    "x": -195.51657488813328,
+    "y": 732.1537375557499
+   },
+   "selected": false,
+   "dragging": false
+  },
+  {
+   "width": 384,
+   "height": 474,
+   "id": "ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4",
+   "type": "genericNode",
+   "position": {
+    "x": -462.32242798728055,
+    "y": -660.5136534899293
+   },
+   "data": {
+    "type": "ChatGPT",
+    "node": {
+     "template": {
+      "lc_kwargs": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "password": false,
+       "name": "lc_kwargs",
+       "advanced": true,
+       "dynamic": false,
+       "info": "",
+       "type": "code",
+       "list": false
+      },
+      "cache": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "password": false,
+       "name": "cache",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "bool",
+       "list": false
+      },
+      "verbose": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "value": false,
+       "password": false,
+       "name": "verbose",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "bool",
+       "list": false
+      },
+      "callbacks": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "password": false,
+       "name": "callbacks",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "langchain.callbacks.base.BaseCallbackHandler",
+       "list": true
+      },
+      "tags": {
+       "required": false,
+       "placeholder": "",
+       "show": false,
+       "multiline": false,
+       "password": false,
+       "name": "tags",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "str",
+       "list": true
+      },
+      "temperature": {
+       "required": false,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "value": 0.1,
+       "password": false,
+       "name": "temperature",
+       "display_name": "temperature(\u751f\u6210\u7b54\u6848\u968f\u673a\u6027)",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "float",
+       "list": false
+      },
+      "top_p": {
+       "required": false,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "value": 0.1,
+       "password": false,
+       "name": "top_p",
+       "display_name": "top_p(\u5019\u9009\u7b54\u6848\u91c7\u6837\u8303\u56f4)",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "float",
+       "list": false
+      },
+      "frequency_penalty": {
+       "required": false,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "value": 0.1,
+       "password": false,
+       "name": "frequency_penalty",
+       "display_name": "frequency_penalty(\u4e0d\u5e38\u89c1\u5355\u8bcd\u4f7f\u7528\u5ea6)",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "float",
+       "list": false
+      },
+      "presence_penalty": {
+       "required": false,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "value": 0.1,
+       "password": false,
+       "name": "presence_penalty",
+       "display_name": "presence_penalty(\u751f\u6210\u7684\u6587\u672c\u4e0e\u8f93\u5165\u6587\u672c\u7684\u5dee\u5f02\u5ea6)",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "float",
+       "list": false
+      },
+      "_type": "ChatGPT"
+     },
+     "description": "\u670d\u52a1\u8c03\u7528\u5916\u90e8\uff0c\u6ce8\u610f\u6570\u636e\u5b89\u5168",
+     "base_classes": [
+      "LLM",
+      "BaseLLM",
+      "ChatGPT",
+      "Serializable",
+      "BaseLanguageModel"
+     ],
+     "custom_fields": {},
+     "output_types": [],
+     "documentation": "",
+     "display_name": "ChatGPT(\u5916\u90e8\u670d\u52a1)"
+    },
+    "id": "ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4",
+    "value": null
+   },
+   "positionAbsolute": {
+    "x": -462.32242798728055,
+    "y": -660.5136534899293
+   },
+   "selected": false,
+   "dragging": false
+  },
+  {
+   "id": "FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d",
+   "type": "genericNode",
+   "position": {
+    "x": 568.3216130588519,
+    "y": -623.9285140394084
+   },
+   "data": {
+    "type": "FunctionCallLLM",
+    "node": {
+     "template": {
+      "code": {
+       "dynamic": true,
+       "required": true,
+       "placeholder": "",
+       "show": false,
+       "multiline": true,
+       "value": "from langflow.custom.llm.CodeFuse import CodeFuse\nfrom langflow.custom.llm.FunctionCllLLM import FunctionCllLLM\nfrom langflow import CustomComponent\nfrom langchain.llms.base import BaseLLM\n\n\nclass FunctionCallComponent(CustomComponent):\n    display_name: str = \"functionCall \u9002\u914d\u6a21\u578b\"\n    description: str = \"\u9002\u914d\u6a21\u578b\u7684 function call \u548c stopwords \u7684\u80fd\u529b\"\n\n    def build_config(self):\n        return {\n            \"code\": {\"show\": False},\n        }\n\n    def build(\n            self,\n            llm: BaseLLM\n    ) -> BaseLLM:\n\n        return FunctionCllLLM(llm=llm)\n",
+       "password": false,
+       "name": "code",
+       "advanced": false,
+       "type": "code",
+       "list": false
+      },
+      "_type": "CustomComponent",
+      "llm": {
+       "required": true,
+       "placeholder": "",
+       "show": true,
+       "multiline": false,
+       "password": false,
+       "name": "llm",
+       "display_name": "llm",
+       "advanced": false,
+       "dynamic": false,
+       "info": "",
+       "type": "BaseLLM",
+       "list": false
+      }
+     },
+     "description": "\u9002\u914d\u6a21\u578b\u7684 function call \u548c stopwords \u7684\u80fd\u529b",
+     "base_classes": [
+      "BaseLLM",
+      "BaseLanguageModel"
+     ],
+     "custom_fields": {
+      "llm": null
+     },
+     "output_types": [
+      "FunctionCallLLM"
+     ],
+     "documentation": "",
+     "display_name": "functionCall \u9002\u914d\u6a21\u578b"
+    },
+    "id": "FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d",
+    "value": null
+   },
+   "width": 384,
+   "height": 226,
+   "positionAbsolute": {
+    "x": 568.3216130588519,
+    "y": -623.9285140394084
+   },
+   "selected": false,
+   "dragging": false
+  }
+ ],
+ "edges": [
+  {
+   "source": "Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5",
+   "sourceHandle": "{\u0153baseClasses\u0153:[\u0153Tool\u0153],\u0153dataType\u0153:\u0153Calculator\u0153,\u0153id\u0153:\u0153Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5\u0153}",
+   "target": "ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91",
+   "targetHandle": "{\u0153fieldName\u0153:\u0153tools\u0153,\u0153id\u0153:\u0153ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91\u0153,\u0153type\u0153:\u0153Tool\u0153}",
+   "style": {
+    "stroke": "inherit"
+   },
+   "className": "stroke-gray-900",
+   "animated": false,
+   "id": "reactflow__edge-Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5{\u0153baseClasses\u0153:[\u0153Tool\u0153],\u0153dataType\u0153:\u0153Calculator\u0153,\u0153id\u0153:\u0153Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5\u0153}-ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91{\u0153fieldName\u0153:\u0153tools\u0153,\u0153id\u0153:\u0153ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91\u0153,\u0153type\u0153:\u0153Tool\u0153}",
+   "selected": false
+  },
+  {
+   "source": "Search-8ae84b5e-add0-450a-a8db-0568de45e38a",
+   "sourceHandle": "{\u0153baseClasses\u0153:[\u0153Tool\u0153],\u0153dataType\u0153:\u0153Search\u0153,\u0153id\u0153:\u0153Search-8ae84b5e-add0-450a-a8db-0568de45e38a\u0153}",
+   "target": "ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91",
+   "targetHandle": "{\u0153fieldName\u0153:\u0153tools\u0153,\u0153id\u0153:\u0153ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91\u0153,\u0153type\u0153:\u0153Tool\u0153}",
+   "style": {
+    "stroke": "inherit"
+   },
+   "className": "stroke-gray-900",
+   "animated": false,
+   "id": "reactflow__edge-Search-8ae84b5e-add0-450a-a8db-0568de45e38a{\u0153baseClasses\u0153:[\u0153Tool\u0153],\u0153dataType\u0153:\u0153Search\u0153,\u0153id\u0153:\u0153Search-8ae84b5e-add0-450a-a8db-0568de45e38a\u0153}-ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91{\u0153fieldName\u0153:\u0153tools\u0153,\u0153id\u0153:\u0153ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91\u0153,\u0153type\u0153:\u0153Tool\u0153}",
+   "selected": false
+  },
+  {
+   "source": "PythonFunctionTool-0d90c90c-d01a-4e72-8d67-f02be3c2a9c6",
+   "sourceHandle": "{\u0153baseClasses\u0153:[\u0153Tool\u0153],\u0153dataType\u0153:\u0153PythonFunctionTool\u0153,\u0153id\u0153:\u0153PythonFunctionTool-0d90c90c-d01a-4e72-8d67-f02be3c2a9c6\u0153}",
+   "target": "ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91",
+   "targetHandle": "{\u0153fieldName\u0153:\u0153tools\u0153,\u0153id\u0153:\u0153ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91\u0153,\u0153type\u0153:\u0153Tool\u0153}",
+   "style": {
+    "stroke": "inherit"
+   },
+   "className": "stroke-gray-900",
+   "animated": false,
+   "id": "reactflow__edge-PythonFunctionTool-0d90c90c-d01a-4e72-8d67-f02be3c2a9c6{\u0153baseClasses\u0153:[\u0153Tool\u0153],\u0153dataType\u0153:\u0153PythonFunctionTool\u0153,\u0153id\u0153:\u0153PythonFunctionTool-0d90c90c-d01a-4e72-8d67-f02be3c2a9c6\u0153}-ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91{\u0153fieldName\u0153:\u0153tools\u0153,\u0153id\u0153:\u0153ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91\u0153,\u0153type\u0153:\u0153Tool\u0153}",
+   "selected": false
+  },
+  {
+   "source": "FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d",
+   "sourceHandle": "{\u0153baseClasses\u0153:[\u0153BaseLLM\u0153,\u0153BaseLanguageModel\u0153],\u0153dataType\u0153:\u0153FunctionCallLLM\u0153,\u0153id\u0153:\u0153FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d\u0153}",
+   "target": "ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91",
+   "targetHandle": "{\u0153fieldName\u0153:\u0153llm\u0153,\u0153id\u0153:\u0153ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91\u0153,\u0153type\u0153:\u0153BaseLanguageModel\u0153}",
+   "style": {
+    "stroke": "#555"
+   },
+   "className": "stroke-gray-900",
+   "animated": false,
+   "id": "reactflow__edge-FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d{\u0153baseClasses\u0153:[\u0153BaseLLM\u0153,\u0153BaseLanguageModel\u0153],\u0153dataType\u0153:\u0153FunctionCallLLM\u0153,\u0153id\u0153:\u0153FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d\u0153}-ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91{\u0153fieldName\u0153:\u0153llm\u0153,\u0153id\u0153:\u0153ZeroShotAgent-655188e6-c874-43e6-bc36-d75922906f91\u0153,\u0153type\u0153:\u0153BaseLanguageModel\u0153}"
+  },
+  {
+   "source": "ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4",
+   "sourceHandle": "{\u0153baseClasses\u0153:[\u0153LLM\u0153,\u0153BaseLLM\u0153,\u0153ChatGPT\u0153,\u0153Serializable\u0153,\u0153BaseLanguageModel\u0153],\u0153dataType\u0153:\u0153ChatGPT\u0153,\u0153id\u0153:\u0153ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4\u0153}",
+   "target": "Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5",
+   "targetHandle": "{\u0153fieldName\u0153:\u0153llm\u0153,\u0153id\u0153:\u0153Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5\u0153,\u0153type\u0153:\u0153BaseLanguageModel\u0153}",
+   "style": {
+    "stroke": "#555"
+   },
+   "className": "stroke-gray-900",
+   "animated": false,
+   "id": "reactflow__edge-ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4{\u0153baseClasses\u0153:[\u0153LLM\u0153,\u0153BaseLLM\u0153,\u0153ChatGPT\u0153,\u0153Serializable\u0153,\u0153BaseLanguageModel\u0153],\u0153dataType\u0153:\u0153ChatGPT\u0153,\u0153id\u0153:\u0153ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4\u0153}-Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5{\u0153fieldName\u0153:\u0153llm\u0153,\u0153id\u0153:\u0153Calculator-7d90e7c8-efab-4e10-bd2d-470a3e0018f5\u0153,\u0153type\u0153:\u0153BaseLanguageModel\u0153}"
+  },
+  {
+   "source": "ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4",
+   "sourceHandle": "{\u0153baseClasses\u0153:[\u0153LLM\u0153,\u0153BaseLLM\u0153,\u0153ChatGPT\u0153,\u0153Serializable\u0153,\u0153BaseLanguageModel\u0153],\u0153dataType\u0153:\u0153ChatGPT\u0153,\u0153id\u0153:\u0153ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4\u0153}",
+   "target": "FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d",
+   "targetHandle": "{\u0153fieldName\u0153:\u0153llm\u0153,\u0153id\u0153:\u0153FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d\u0153,\u0153type\u0153:\u0153BaseLLM\u0153}",
+   "style": {
+    "stroke": "#555"
+   },
+   "className": "stroke-gray-900",
+   "animated": false,
+   "id": "reactflow__edge-ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4{\u0153baseClasses\u0153:[\u0153LLM\u0153,\u0153BaseLLM\u0153,\u0153ChatGPT\u0153,\u0153Serializable\u0153,\u0153BaseLanguageModel\u0153],\u0153dataType\u0153:\u0153ChatGPT\u0153,\u0153id\u0153:\u0153ChatGPT-8ca2af5f-a21f-4bc7-947d-c450c88f59a4\u0153}-FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d{\u0153fieldName\u0153:\u0153llm\u0153,\u0153id\u0153:\u0153FunctionCallLLM-481b4635-6622-40ea-8ff8-1343a8c6031d\u0153,\u0153type\u0153:\u0153BaseLLM\u0153}"
+  }
+ ],
+ "viewport": {
+  "x": 354.46137119728564,
+  "y": 297.63687441372895,
+  "zoom": 0.5300220793919275
+ }
+}

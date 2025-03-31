@@ -1,0 +1,41 @@
+version: "2.0"
+
+stages:
+- 前置检查
+- 构建&发布到测试库
+- 验包&确认
+- 发布正式库前检查
+- 发布正式库
+
+jobs:
+  构建并发布到测试库:
+    stage: 构建&发布到测试库
+    id: build
+    component: pypi-artifact-uploader
+    inputs:
+      registry: "https://artifacts.antgroup-inc.cn/artifact/repositories/simple-dev/" # 测试库地址
+      workdir: ./ray_common_libs/Ragent # pypi 工程目录，默认在此目录下进行 python -m build 并输出到 dist 目录, 详细可参考组件首页说明
+
+  选择迁移制品:
+    id: check
+    stage: 发布正式库前检查
+    component: artifact-transfer-check
+    inputs:
+      artifactsConfigs:
+        - artifacts: ${{jobs.build.outputs.artifacts}}
+          antArtifactRepo: simple
+
+  同步至正式库:
+    stage: 发布正式库
+    component: ant-artifact-transfer
+    inputs:
+      transferArtifacts: ${{jobs.check.outputs.transferArtifacts}}
+    config:
+      beforeExecute:
+        isAutoSkip: ${{jobs.check.outputs.selectedCount}} = 0
+        confirm:
+          buttonName: 确认发布正式库
+          approvers:
+          - lianjunwen.ljw
+          - chenqixiang.cqx
+          - guyang.sgy

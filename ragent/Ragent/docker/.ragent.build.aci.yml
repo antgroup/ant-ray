@@ -1,0 +1,40 @@
+stages:
+  - 镜像构建
+
+build_customized_ray_image:
+  stage: 镜像构建
+  plugin: ANT-BUILD
+  passEnv: true
+  pluginConfig:
+    environments:
+      # add nydus image
+      ironmanNydusImageConvert: "true"
+      disableNydusV1Convert: "true"
+    image: ${ACI_VAR_RAY_RAY_IMAGE_112_LATEST}
+    inputs:
+      params:
+        - name: DOCKERFILE
+          value: ray_common_libs/Ragent/docker/RagentDockerfile
+    outputs:
+      ### TODO(user): modify to your image repo addr
+      ### TODO(user): 镜像推送时，如遇到授权问题，请将账号admin.for.antb 添加授权并设置为读写权限之上；
+      ### more info: https://yuque.antfin-inc.com/docs/share/786cf0fb-e070-4484-b7a8-979991f23af9#bc90917b
+      - name: new_ray_image_prod
+        namespace: antfin_datatech_share
+        repository: reg.docker.alibaba-inc.com
+        tag: ${ACI_COMMIT_SHA}-ragent-${ACI_JOB_FUNC_CURRENT_TIMESTAMP}
+        type: image
+        desc: "ray_package image for ci on k8s"
+    type: COMPILE
+  only:
+    triggerType:
+      - pullRequest # 创建PR
+      - push       # 普通push触发，去掉节省机器资源
+    triggerBranch:
+      prTargetBranch:
+        - ^master$
+      pushOriginalBranch:
+        - ^master$
+  timeout: 60
+  git:
+    depth: 10

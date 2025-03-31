@@ -1,0 +1,55 @@
+2024-05-08 14:27:31,061 - INFO - Logger set up with log level: 10(debug)
+2024-05-08 14:27:31,067 - INFO - Log file: logs/langflow.log
+2024-05-08 14:27:31,119 - INFO - {'bind': '127.0.0.1:7861', 'workers': 5, 'worker_class': 'uvicorn.workers.UvicornWorker', 'timeout': 10000, 'threads': 15}
+2024-05-08 14:27:33,157 - INFO - Building custom components from ['/Users/paer/Documents/work/codes/antflow/backend/langflow/components']
+2024-05-08 14:27:33,806 - ERROR - Error while getting custom function: Module zhconv not found. Please install it and try again.
+2024-05-08 14:27:33,816 - ERROR - Error loading Component: ['yuqueCleanSegmentation']
+2024-05-08 14:27:33,819 - ERROR - Error while building custom component ['yuqueCleanSegmentation']: 
+Traceback (most recent call last):
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/utils/validate.py", line 180, in create_class
+    exec_globals[alias.asname or alias.name] = importlib.import_module(
+  File "/Users/paer/opt/anaconda3/envs/antflow/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1004, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'zhconv'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/utils/validate.py", line 254, in auto_install_import_package
+    raise ModuleNotFoundError(
+ModuleNotFoundError: Module zhconv not found. Please install it and try again.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/interface/types.py", line 259, in build_field_config
+    custom_class = get_function_custom(custom_component.code,template_config)
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/interface/importing/utils.py", line 355, in get_function_custom
+    return validate.create_class(code, class_name, template_config)
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/utils/validate.py", line 184, in create_class
+    auto_install_import_package(alias, exec_globals, template_config.get('auto_install_package'))
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/utils/validate.py", line 263, in auto_install_import_package
+    raise ModuleNotFoundError(
+ModuleNotFoundError: Module zhconv not found. Please install it and try again.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/interface/types.py", line 355, in build_langchain_template_custom_component
+    field_config = build_field_config(custom_component,template_config)
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/interface/types.py", line 262, in build_field_config
+    raise HTTPException(
+fastapi.exceptions.HTTPException
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/interface/types.py", line 419, in build_valid_menu
+    component_template = build_langchain_template_custom_component(
+  File "/Users/paer/Documents/work/codes/antflow/backend/langflow/interface/types.py", line 371, in build_langchain_template_custom_component
+    raise HTTPException(
+fastapi.exceptions.HTTPException
+2024-05-08 14:27:34,461 - INFO - Loading 1 category(ies)

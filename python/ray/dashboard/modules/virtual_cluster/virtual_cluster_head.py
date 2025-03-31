@@ -104,7 +104,7 @@ class VirtualClusterHead(dashboard_utils.DashboardHeadModule):
             )
 
     @routes.post("/virtual_clusters/remove_nodes")
-    async def shrink_virtual_cluster(self, req) -> aiohttp.web.Response:
+    async def remove_nodes_from_virtual_cluster(self, req) -> aiohttp.web.Response:
         virtual_cluster_info_json = await req.json()
         logger.info("POST /virtual_clusters/remove_nodes %s", virtual_cluster_info_json)
 

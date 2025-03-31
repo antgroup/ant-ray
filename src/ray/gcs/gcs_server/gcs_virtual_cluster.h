@@ -258,7 +258,7 @@ class VirtualCluster {
   std::shared_ptr<NodeInstance> ReplenishUndividedNodeInstance(
       std::shared_ptr<NodeInstance> node_instance_to_replenish);
 
-  void RemoveNodeInstances(const std::vector<std::string> &nodes_to_shrink,
+  void RemoveNodeInstances(const std::vector<std::string> &nodes_to_remove,
                            std::vector<std::string> *nodes_with_failure);
 
  protected:

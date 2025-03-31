@@ -79,7 +79,9 @@ def emit_request(endpoint, payload):
 class _ray_internal_insight_monitor:
     def __init__(self):
         # {job_id: {caller_class.caller_func -> callee_class.callee_func: count}}
-        self.call_graph = defaultdict(lambda: defaultdict(int))
+        self.call_graph = defaultdict(
+            lambda: defaultdict(lambda: {"count": 0, "start_time": 0})
+        )
         # Maps to track unique actors and methods per job
         self.actors = defaultdict(set)
         self.actor_id_map = defaultdict(dict)  # {job_id: {actor_class: actor_id}}
@@ -225,7 +227,8 @@ class _ray_internal_insight_monitor:
         )
 
         # Update call graph
-        self.call_graph[job_id][f"{caller_id}->{callee_id}"] += call_times
+        self.call_graph[job_id][f"{caller_id}->{callee_id}"]["count"] += call_times
+        self.call_graph[job_id][f"{caller_id}->{callee_id}"]["start_time"] = start_time
 
         # Track actors and methods
         if caller_class:
@@ -333,7 +336,7 @@ class _ray_internal_insight_monitor:
                 )
 
         # Add call flows
-        for call_edge, count in call_graph.items():
+        for call_edge, info in call_graph.items():
             caller, callee = call_edge.split("->")
             # Get source ID
             source_id = None
@@ -351,7 +354,12 @@ class _ray_internal_insight_monitor:
 
             if source_id and target_id:
                 graph_data["callFlows"].append(
-                    {"source": source_id, "target": target_id, "count": count}
+                    {
+                        "source": source_id,
+                        "target": target_id,
+                        "count": info["count"],
+                        "start_time": info["start_time"],
+                    }
                 )
 
         # Add data flows with merged statistics
@@ -478,7 +486,7 @@ class _ray_internal_insight_monitor:
 
         # Filter call_graph to only keep edges between reachable nodes that lead to target edges
         filtered_graph = {}
-        for edge, count in call_graph.items():
+        for edge, info_dict in call_graph.items():
             src, dst = edge.split("->")
             if src in reachable_nodes and dst in reachable_nodes:
                 if "." in src:
@@ -493,7 +501,7 @@ class _ray_internal_insight_monitor:
                     reachable_actors.add(info[0])
                 if "." not in dst:
                     reachable_funcs.add(dst)
-                filtered_graph[edge] = count
+                filtered_graph[edge] = info_dict
 
         return filtered_graph, reachable_methods, reachable_actors, reachable_funcs
 

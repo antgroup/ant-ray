@@ -41,6 +41,7 @@ type GraphData = {
     source: string;
     target: string;
     count: number;
+    startTime: number;
   }>;
   dataFlows: Array<{
     source: string;

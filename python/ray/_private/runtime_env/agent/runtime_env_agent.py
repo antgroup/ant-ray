@@ -6,6 +6,7 @@ import traceback
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Set, Tuple, Optional
+from copy import deepcopy
 from ray._private.ray_constants import (
     DEFAULT_RUNTIME_ENV_TIMEOUT_SECONDS,
 )
@@ -588,7 +589,6 @@ class RuntimeEnvAgent:
                 await plugin_setup_context.class_instance.post_worker_exit(
                     runtime_env,
                     request.worker_id.decode(),
-                    request.job_id.decode(),
                     self._logger,
                 )
 
@@ -639,13 +639,16 @@ class RuntimeEnvAgent:
     ):
         # Trigger `pre_worker_startup` of plugins to prepare something for each
         # worker process, such as making a unique working directory.
-        if runtime_env_context and worker_id:
+        # NOTE(Jacky): Deep copy here because `pre_worker_startup` will rewrite it for a
+        # specific worker.
+        runtime_env_context_copy = deepcopy(runtime_env_context)
+        if runtime_env_context_copy and worker_id:
             for (
                 plugin_setup_context
             ) in self._plugin_manager.sorted_plugin_setup_contexts():
                 await plugin_setup_context.class_instance.pre_worker_startup(
                     runtime_env,
-                    runtime_env_context,
+                    runtime_env_context_copy,
                     worker_id,
                     job_id,
                     self._logger,
@@ -654,8 +657,8 @@ class RuntimeEnvAgent:
         # Need to write runtime env context here because `pre_worker_startup`
         # could rewrite the context.
         serialized_runtime_env_context = ""
-        if runtime_env_context:
-            serialized_runtime_env_context = runtime_env_context.serialize()
+        if runtime_env_context_copy:
+            serialized_runtime_env_context = runtime_env_context_copy.serialize()
             self._logger.info(
                 "The serialized runtime env context for reply is "
                 f"{serialized_runtime_env_context}."

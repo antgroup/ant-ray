@@ -656,6 +656,7 @@ def test_id_named_working_dir(tmp_working_dir, disable_working_dir_gc, shutdown_
     test_file_name = "working_dir_test.txt"
     assert ray.get(b.write_file.remote(test_file_name))
     assert ray.get(b.check_file.remote(test_file_name))
+    print()
     assert not ray.get(c.check_file.remote(test_file_name))
 
 

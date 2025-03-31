@@ -251,7 +251,6 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         self,
         runtime_env: "RuntimeEnv",  # noqa: F821
         worker_id: str,
-        job_id: str,
         logger: logging.Logger = default_logger,
     ) -> None:
         if not runtime_env.working_dir():
@@ -263,7 +262,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "won't be deleted."
             )
             return
-        logger.info(f"Deleting working dir for worker {worker_id}, job id {job_id}")
+        logger.info(f"Deleting working dir for worker {worker_id}")
         working_dir = os.path.join(self._working_dirs, worker_id)
         # TODO(Jacky): Use async method to remove, such as aiofiles.os.removedirs
         shutil.rmtree(working_dir)

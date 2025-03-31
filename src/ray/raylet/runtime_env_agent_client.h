@@ -80,11 +80,9 @@ class RuntimeEnvAgentClient {
   /// `RuntimeEnv::Serialize` method.
   /// \param[in] callback The callback function.
   /// \param[in] worker_id The worker id which the runtime env is created for.
-  /// \param[in] job_id The job id which the runtime env belongs to.
   virtual void DeleteRuntimeEnvIfPossible(const std::string &serialized_runtime_env,
                                           DeleteRuntimeEnvIfPossibleCallback callback,
-                                          const WorkerID &worker_id,
-                                          const JobID &job_id) = 0;
+                                          const WorkerID &worker_id) = 0;
 
   // NOTE: The service has another method `GetRuntimeEnvsInfo` but nobody in raylet uses
   // it.

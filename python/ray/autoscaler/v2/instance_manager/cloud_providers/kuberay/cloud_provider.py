@@ -65,8 +65,9 @@ class KubeRayProvider(ICloudInstanceProvider):
         self._namespace = provider_config["namespace"]
 
         if k8s_api_client is None:
+            kuberay_http_api_enabled = os.getenv("KUBERAY_HTTP_API_ENABLED", "0") == "1"
             kuberay_operator_address = os.getenv("KUBERAY_OPERATOR_ADDRESS")
-            if kuberay_operator_address is not None:
+            if kuberay_http_api_enabled and kuberay_operator_address is not None:
                 self._k8s_api_client = KubeRayHttpApiClient(
                     namespace=self._namespace,
                     kuberay_operator_address=kuberay_operator_address,

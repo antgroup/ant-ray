@@ -467,14 +467,12 @@ class RuntimeEnvAgent:
                         "Runtime env already created "
                         f"successfully. Env: {serialized_env}, "
                     )
-                    serialized_runtime_env_context = (
-                        await self.trigger_pre_worker_startup(
-                            runtime_env,
-                            runtime_env_context,
-                            request.worker_id.decode(),
-                            request.job_id.decode(),
-                            self._logger,
-                        )
+                    context = await self.trigger_pre_worker_startup(
+                        runtime_env,
+                        runtime_env_context,
+                        request.worker_id.decode(),
+                        request.job_id.decode(),
+                        self._logger,
                     )
                     return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
                         status=agent_manager_pb2.AGENT_RPC_STATUS_OK,
@@ -534,7 +532,7 @@ class RuntimeEnvAgent:
                 runtime_env_context if successful else error_message,
                 creation_time_ms,
             )
-            serialized_runtime_env_context = await self.trigger_pre_worker_startup(
+            serialized_context = await self.trigger_pre_worker_startup(
                 runtime_env,
                 runtime_env_context,
                 request.worker_id.decode(),
@@ -644,8 +642,11 @@ class RuntimeEnvAgent:
         # worker process, such as making a unique working directory.
         # NOTE(Jacky): Deep copy here because `pre_worker_startup` will rewrite it for a
         # specific worker.
+        if runtime_env_context is None:
+            return
+
         runtime_env_context_copy = deepcopy(runtime_env_context)
-        if runtime_env_context_copy and worker_id:
+        if worker_id:
             for (
                 plugin_setup_context
             ) in self._plugin_manager.sorted_plugin_setup_contexts():
@@ -659,12 +660,10 @@ class RuntimeEnvAgent:
 
         # Need to write runtime env context here because `pre_worker_startup`
         # could rewrite the context.
-        serialized_runtime_env_context = ""
-        if runtime_env_context_copy:
-            serialized_runtime_env_context = runtime_env_context_copy.serialize()
-            self._logger.info(
-                "The serialized runtime env context for reply is "
-                f"{serialized_runtime_env_context}."
-            )
+        serialized_runtime_env_context = runtime_env_context_copy.serialize()
+        logger.info(
+            "The serialized runtime env context for reply is "
+            f"{serialized_runtime_env_context}."
+        )
 
         return serialized_runtime_env_context

@@ -59,6 +59,23 @@ def create_insight_monitor_actor():
             lifetime="detached",
         ).remote()
 
+def fetch_request(endpoint, payload):
+    url = f"http://{_get_insight_monitor_address()}/{endpoint}"
+    data = json.dumps(payload).encode()
+    headers = {"Content-Type": "application/json"}
+
+    try:
+        response = requests.post(url, data=data, headers=headers, timeout=300)
+        if response.status_code != 200:
+            print(
+                f"Error sending HTTP request: {response.status_code} {response.reason}"
+            )
+            return None
+        return response.json()
+    except Exception as e:
+        print(f"Error sending HTTP request: {e}")
+        return None
+
 
 def emit_request(endpoint, payload):
     url = f"http://{_get_insight_monitor_address()}/{endpoint}"
@@ -97,6 +114,7 @@ class _ray_internal_insight_monitor:
         self.function_counter = defaultdict(int)
         self.flow_record = defaultdict(list)
         self.start_time_record = defaultdict(lambda: defaultdict(dict))
+        self.breakpoints = defaultdict(lambda: defaultdict(lambda: {"enable": False, "task_ids": set()}))
 
         # Data flow tracking
         self.data_flows = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
@@ -146,6 +164,11 @@ class _ray_internal_insight_monitor:
         self.app.router.add_post("/emit-task-end", self.handle_emit_task_end)
         self.app.router.add_post("/emit-caller-info", self.handle_emit_caller_info)
 
+        self.app.router.add_get("/get_breakpoints", self.handle_get_breakpoints)
+        self.app.router.add_post("/set_breakpoint", self.handle_set_breakpoint)
+        self.app.router.add_post("/deactivate_breakpoint", self.handle_deactivate_breakpoint)
+        self.app.router.add_post("/activate-breakpoint", self.handle_activate_breakpoint)
+
         self.runner = None
         self.site = None
         self.node_ip_address = ray._private.services.get_node_ip_address()
@@ -176,6 +199,61 @@ class _ray_internal_insight_monitor:
         print(
             f"Insight monitor HTTP server started at http://{self.node_ip_address}:{self.port}"
         )
+
+    async def handle_get_breakpoints(self, request):
+        """Handle HTTP request for getting breakpoints."""
+        job_id = request.query.get("job_id", "default_job")
+        breakpoints = []
+        for key, info in self.breakpoints[job_id].items():
+            if not info["enable"]:
+                continue
+            for task_id in info["task_ids"]:
+                breakpoints.append({"actor_cls": key[0], "actor_name": key[1], "method_name": key[2], "func_name": key[3], "enable": info["enable"], "task_id": task_id})
+            if len(info["task_ids"]) == 0:
+                breakpoints.append({"actor_cls": key[0], "actor_name": key[1], "method_name": key[2], "func_name": key[3], "enable": info["enable"], "task_id": None})
+        return aiohttp.web.json_response(breakpoints)
+
+    async def handle_deactivate_breakpoint(self, request):
+        """Handle HTTP request for deactivating breakpoint."""
+        body = await request.json()
+        job_id = body.get("job_id", "default_job")
+        actor_name = body.get("actor_name", None)
+        actor_cls = body.get("actor_cls", None)
+        method_name = body.get("method_name", None)
+        func_name = body.get("func_name", None)
+        key = (actor_cls, actor_name, method_name, func_name)
+        if key in self.breakpoints[job_id]:
+            self.breakpoints[job_id][key]["task_ids"].remove(body.get("task_id", None))
+        return aiohttp.web.json_response({"message": "Breakpoint deactivated"})
+    
+
+    async def handle_activate_breakpoint(self, request):
+        """Handle HTTP request for getting breakpoints."""
+        body = await request.json()
+        job_id = body.get("job_id", "default_job")
+        actor_name = body.get("actor_name", None)
+        actor_cls = body.get("actor_cls", None)
+        method_name = body.get("method_name", None)
+        func_name = body.get("func_name", None)
+        task_id = body.get("task_id", None)
+        key = (actor_cls, actor_name, method_name, func_name)
+        info = self.breakpoints[job_id][key]
+        if info["enable"]:
+            self.breakpoints[job_id][key]["task_ids"].add(task_id)
+        return aiohttp.web.json_response({"enable": info["enable"]})
+
+    async def handle_set_breakpoint(self, request):
+        """Handle HTTP request for setting breakpoint."""
+        body = await request.json()
+        job_id = body.get("job_id", "default_job")
+        actor_name = body.get("actor_name", None)
+        actor_cls = body.get("actor_cls", None)
+        method_name = body.get("method_name", None)
+        func_name = body.get("func_name", None)
+        flag = body.get("flag", True)
+        key = (actor_cls, actor_name, method_name, func_name)
+        self.breakpoints[job_id][key]["enable"] = flag
+        return aiohttp.web.json_response({"message": "Breakpoint set"})
 
     async def handle_get_call_graph_data(self, request):
         """Handle HTTP request for call graph data."""
@@ -1189,7 +1267,50 @@ def record_task_duration(duration):
         print(f"Error recording task duration: {e}")
         return
 
+def insight_breakpoint():
+    if not is_flow_insight_enabled():
+        return
+    if not need_record(_get_caller_class()):
+        return
 
+    actor_cls = None
+    actor_name = None
+    actor_id = ray._private.worker.global_worker.actor_id
+    if not actor_id.is_nil():
+        caller_actor = ray._private.worker.global_worker.core_worker.get_actor_handle(
+            actor_id
+        )
+        if caller_actor is not None:
+            actor_cls = caller_actor._ray_actor_creation_function_descriptor.class_name.split(".")[-1]
+            actor_name = _get_actor_name()
+    func_name = _get_current_task_name()
+    task_id = get_current_task_id()
+    job_id = get_current_job_id()
+
+    if actor_cls is None:
+        record = {
+            "actor_cls": None,
+            "actor_name": None,
+            "method_name": None,
+            "func_name": func_name,
+            "task_id": task_id,
+            "job_id": job_id,
+        }
+    else:
+        record = {
+            "actor_cls": actor_cls,
+            "actor_name": None if actor_name == "" else actor_name,
+            "method_name": func_name,
+            "func_name": None,
+            "task_id": task_id,
+            "job_id": job_id,
+        }
+    info = fetch_request("activate-breakpoint", record)
+    if info.get("enable", False):
+        ray.util.pdb.set_trace()
+
+    
+ 
 @contextmanager
 def timeit():
     """A context manager for recording task execution timing in Ray.

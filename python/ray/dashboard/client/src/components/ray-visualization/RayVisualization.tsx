@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useImperativeHandle,
   useRef,
+  useState,
 } from "react";
 import { FlameGraphData } from "../../service/flame-graph";
 import { PhysicalViewData } from "../../service/physical-view";
@@ -168,6 +169,7 @@ const RayVisualization = forwardRef<
     ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [showDebugPanel, setShowDebugPanel] = useState(false);
 
     // Add refs for tracking the position of the main node
     const previousCenterXRef = useRef<number | null>(null);

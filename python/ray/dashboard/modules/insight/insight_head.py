@@ -1,4 +1,7 @@
 import logging
+import json
+import asyncio
+from ray._private import ray_constants
 import aiohttp.web
 import ray.dashboard.utils as dashboard_utils
 import ray.dashboard.optional_utils as dashboard_optional_utils
@@ -9,9 +12,430 @@ logger = logging.getLogger(__name__)
 routes = dashboard_optional_utils.DashboardHeadRouteTable
 
 
+class AsyncTelnetClient:
+    """A simple asynchronous telnet client implementation using asyncio."""
+    
+    def __init__(self, host, port):
+        self.host = host
+        self.port = int(port)
+        self.reader = None
+        self.writer = None
+        
+    async def connect(self):
+        """Connect to the telnet server."""
+        self.reader, self.writer = await asyncio.open_connection(
+            self.host, self.port)
+        logger.info(f"Connected to telnet server at {self.host}:{self.port}")
+        return self
+    
+    def check_connection(self):
+        """Check if the connection is still active."""
+        if self.reader is None or self.writer is None:
+            raise ConnectionError("Not connected to telnet server")
+        if self.writer.is_closing():
+            raise ConnectionError("Connection is closing or closed")
+        return True
+        
+    async def read_very_eager(self):
+        """Read all available data without blocking."""
+        try:
+            # Check connection status before attempting to read
+            self.check_connection()
+            
+            # Set a very short timeout to avoid blocking
+            data = await asyncio.wait_for(
+                self.reader.read(4096), timeout=0.1)
+            
+            # If we got EOF (empty bytes), the connection is closed
+            if not data:
+                raise ConnectionError("Connection lost - received EOF")
+                
+            return data
+        except asyncio.TimeoutError:
+            # No data available
+            return b''
+        
+    async def write(self, data):
+        """Write data to the telnet connection."""
+        self.check_connection()
+        self.writer.write(data)
+        await self.writer.drain()
+        
+    async def close(self):
+        """Close the telnet connection."""
+        if self.writer:
+            self.writer.close()
+            try:
+                await self.writer.wait_closed()
+            except Exception as e:
+                logger.warning(f"Error waiting for writer to close: {str(e)}")
+            self.writer = None
+            self.reader = None
+
+
 class InsightHead(dashboard_utils.DashboardHeadModule):
     def __init__(self, config: dashboard_utils.DashboardHeadModuleConfig):
         super().__init__(config)
+        self.debug_sessions = {}
+        self.debug_output_buffer = {}
+        self._telnet_tasks = {}
+        self.breakpoints = {}
+
+    async def fetch_breakpoint(self, job_id, task_id):
+        """Fetch the breakpoint from the InsightMonitor."""
+        active_sessions = await self.gcs_aio_client.internal_kv_keys(
+                b"RAY_PDB_", namespace=ray_constants.KV_NAMESPACE_PDB
+        )
+        for session in active_sessions:
+            data = json.loads(await self.gcs_aio_client.internal_kv_get(session, namespace=ray_constants.KV_NAMESPACE_PDB))
+            if data.get("job_id") == job_id and data.get("task_id") == task_id:
+                return data
+        return None
+        
+    async def _telnet_reader(self, task_id, tn):
+        """Continuously read from telnet and populate the output buffer."""
+        try:
+            logger.info(f"Starting telnet reader for task {task_id}")
+
+            while task_id in self.debug_sessions:
+                try:
+                    # Try to read any available data without blocking
+                    data = await tn.read_very_eager()
+                    if data:
+                        # Reset empty read counter when we get data
+                        # Append to output buffer string
+                        if task_id not in self.debug_output_buffer:
+                            self.debug_output_buffer[task_id] = ""
+                        self.debug_output_buffer[task_id] += data.decode("utf-8")
+                except Exception as e:
+                    logger.warning(f"Error reading from debugger for task {task_id}: {str(e)}")
+                    if "Connection lost" in str(e) or "Connection reset" in str(e) or "EOF" in str(e):
+                        # Connection lost, clean up this session
+                        logger.info(f"Debug connection lost for task {task_id}, cleaning up")
+                        await self._cleanup_debug_session(task_id)
+                        break
+                
+                # Short sleep to avoid CPU spinning
+                await asyncio.sleep(0.1)
+                
+        except Exception as e:
+            logger.error(f"Telnet reader coroutine crashed for task {task_id}: {str(e)}")
+            # Ensure resources are cleaned up even if the coroutine crashes
+            await self._cleanup_debug_session(task_id)
+        finally:
+            logger.info(f"Telnet reader for task {task_id} has stopped")
+
+    async def _deactivate_breakpoint(self, task_id):
+        """Deactivate the breakpoint for a given task."""
+        if task_id in self.breakpoints:
+            breakpoint = self.breakpoints[task_id]
+            address = await self.gcs_aio_client.internal_kv_get(
+                "insight_monitor_address",
+                namespace="flowinsight",
+                timeout=5,
+            )
+            if address:
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(
+                        f"http://{address.decode()}/deactivate_breakpoint",
+                        json={"task_id": task_id, "job_id": breakpoint.get("job_id"), "actor_cls": breakpoint.get("actor_cls"), "actor_name": breakpoint.get("actor_name"), "method_name": breakpoint.get("method_name"), "func_name": breakpoint.get("func_name")},
+                    ) as response:
+                        if response.status != 200:
+                            logger.warning(f"Error deactivating breakpoint: {await response.text()}")
+                        elif response.status == 200:
+                            del self.breakpoints[task_id]
+                            return True
+                return False
+
+    async def _cleanup_debug_session(self, task_id):
+        """Helper method to clean up a debug session."""
+        try:
+            # Only proceed if the session still exists
+            if task_id in self.debug_sessions:
+                tn = self.debug_sessions[task_id]
+                await tn.write("c\n".encode("utf-8"))
+                await asyncio.sleep(1)
+                # Close the telnet connection
+                try:
+                    await self.debug_sessions[task_id].close()
+                except Exception as e:
+                    logger.warning(f"Error closing telnet connection for task {task_id}: {str(e)}")
+                
+                # Remove from sessions dict
+                del self.debug_sessions[task_id]
+                
+                # Cancel and remove the telnet task if it exists
+                if task_id in self._telnet_tasks:
+                    # We don't cancel the current task if we're being called from within it
+                    # to avoid cancellation errors
+                    current_task = asyncio.current_task()
+                    if self._telnet_tasks[task_id] != current_task:
+                        self._telnet_tasks[task_id].cancel()
+                    del self._telnet_tasks[task_id]
+                
+                # Clear the output buffer
+                if task_id in self.debug_output_buffer:
+                    del self.debug_output_buffer[task_id]
+
+                await self._deactivate_breakpoint(task_id)
+                    
+                logger.info(f"Debug session for task {task_id} cleaned up successfully")
+        except Exception as e:
+            logger.error(f"Error cleaning up debug session for task {task_id}: {str(e)}")
+
+    @routes.get("/insight_debug")
+    async def insight_debug(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
+        """Send a command to a debug session and retrieve output from buffer."""
+        try:
+            job_id = req.query.get("job_id", None)   
+            task_id = req.query.get("task_id", None)
+            cmd = req.query.get("cmd", None)
+            
+            if job_id is None:
+                return dashboard_optional_utils.rest_response(
+                    success=False,
+                    message="Job ID is required",
+                )
+                
+            # Initialize debug session if it doesn't exist
+            if task_id not in self.debug_sessions:
+                breakpoint = await self.fetch_breakpoint(job_id, task_id)
+                if breakpoint is None:
+                    return dashboard_optional_utils.rest_response(
+                        success=False,
+                        message="Breakpoint not found",
+                    )
+                    
+                pdb_address = breakpoint.get("pdb_address")
+                host, port = pdb_address.split(":")
+                
+                # Create and connect the async telnet client
+                tn = AsyncTelnetClient(host, port)
+                await tn.connect()
+                self.debug_sessions[task_id] = tn
+                
+                # Initialize output buffer for this task
+                self.debug_output_buffer[task_id] = ""
+                
+                # Start background coroutine to continuously read from telnet
+                task = asyncio.create_task(self._telnet_reader(task_id, tn))
+                self._telnet_tasks[task_id] = task
+                
+                # Wait a moment for initial connection data to be read
+                await asyncio.sleep(0.5)
+
+            # Send command if provided
+            if cmd:
+                tn = self.debug_sessions[task_id]
+                try:
+                    await tn.write((cmd).encode("utf-8"))
+                except Exception as e:
+                    logger.error(f"Error sending command to debugger: {str(e)}")
+                    return dashboard_optional_utils.rest_response(
+                        success=False, 
+                        message=f"Error sending command: {str(e)}"
+                    )
+
+            output = self.debug_output_buffer[task_id]
+            self.debug_output_buffer[task_id] = ""
+            return dashboard_optional_utils.rest_response(
+                success=True,
+                message="Command sent successfully.",
+                output=output,
+            )
+            
+        except Exception as e:
+            logger.error(f"Error in debug session: {str(e)}")
+            return dashboard_optional_utils.rest_response(
+                success=False, message=f"Error in debug session: {str(e)}"
+            )
+
+    @routes.get("/get_debug_output")
+    async def get_debug_output(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
+        """Get debug output for a specific task."""
+        try:
+            task_id = req.query.get("task_id", None)
+            if task_id is None:
+                return dashboard_optional_utils.rest_response(
+                    success=False,
+                    message="Task ID is required",
+                )
+            
+            output = ""
+            if task_id in self.debug_output_buffer:
+                output = self.debug_output_buffer[task_id]
+                # Clear the output buffer after reading
+                self.debug_output_buffer[task_id] = ""
+            return dashboard_optional_utils.rest_response(
+                success=True,
+                message="Debug output retrieved successfully.",
+                output=output,
+            )
+        except Exception as e:
+            logger.error(f"Error retrieving debug output: {str(e)}")
+            return dashboard_optional_utils.rest_response(
+                success=False, 
+                message=f"Error retrieving debug output: {str(e)}",
+                output="",
+            )
+            
+    @routes.get("/close_debug_session")
+    async def close_debug_session(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
+        """Close a specific debug session and clean up resources."""
+        try:
+            task_id = req.query.get("task_id", None)
+            job_id = req.query.get("job_id", None)
+            if task_id is None:
+                return dashboard_optional_utils.rest_response(
+                    success=False,
+                    message="Task ID is required",
+                )
+                
+            if task_id in self.debug_sessions:
+                # Use the helper method to clean up the debug session
+                await self._cleanup_debug_session(task_id)
+            else:
+                breakpoint = await self.fetch_breakpoint(job_id, task_id)
+                if breakpoint is None:
+                    return dashboard_optional_utils.rest_response(
+                        success=False,
+                        message="Breakpoint not found",
+                    )
+                    
+                pdb_address = breakpoint.get("pdb_address")
+                host, port = pdb_address.split(":")
+                
+                # Create and connect the async telnet client
+                tn = AsyncTelnetClient(host, port)
+                try:
+                    await tn.connect()
+                    # Send continue command with a newline character
+                    await tn.write("c\n".encode("utf-8"))
+                    # Small delay to allow pdb to process the command
+                    await asyncio.sleep(1)
+                    await tn.close()
+                except ConnectionError as e:
+                    logger.warning(f"Connection error with debugger: {str(e)}")
+                    # Debugger connection may already be closed, which is fine
+                except Exception as e:
+                    logger.warning(f"Error when continuing debugger: {str(e)}")
+                    await tn.close()
+                
+                # Consider the session closed regardless of outcome
+                # Deactivate breakpoint if it exists for this task
+                await self._deactivate_breakpoint(task_id)
+                
+            return dashboard_optional_utils.rest_response(
+                success=True,
+                message=f"Debug session for task {task_id} closed successfully.",
+            )
+        except Exception as e:
+            logger.error(f"Error closing debug session: {str(e)}")
+            return dashboard_optional_utils.rest_response(
+                success=False, message=f"Error closing debug session: {str(e)}"
+            )
+
+    async def run(self, server):
+        pass
+        
+    @routes.get("/set_breakpoint")
+    async def set_breakpoint(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
+        """Set a breakpoint for a given function or actor method."""
+        try:
+            job_id = req.query.get("job_id", None)
+            actor_cls = req.query.get("actor_cls", None)
+            actor_name = req.query.get("actor_name", None)
+            method_name = req.query.get("method_name", None)
+            func_name = req.query.get("func_name", None)
+            flag = req.query.get("flag", "true")
+            flag = True if flag == "true" else False
+            # Get insight monitor address from KV store
+            address = await self.gcs_aio_client.internal_kv_get(
+                "insight_monitor_address",
+                namespace="flowinsight",
+                timeout=5,
+            )
+            if not address:
+                return dashboard_optional_utils.rest_response(
+                    success=False,
+                    message="InsightMonitor address not found in KV store",
+                )
+            host, port = address.decode().split(":")
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    f"http://{host}:{port}/set_breakpoint", 
+                    json={
+                        "job_id": job_id,
+                        "actor_cls": actor_cls,
+                        "actor_name": actor_name,
+                        "method_name": method_name,
+                        "func_name": func_name,
+                        "flag": flag,
+                    },
+                ) as response:
+                    if response.status != 200:
+                        logger.warning(
+                            f"Error setting breakpoint: {await response.text()}"
+                        )
+                        return dashboard_optional_utils.rest_response(
+                            success=False,
+                            message=f"Error setting breakpoint: {await response.text()}",
+                        )
+            return dashboard_optional_utils.rest_response(
+                success=True, message="Breakpoint set successfully."
+            )
+        except Exception as e:
+            logger.error(f"Error setting breakpoint: {str(e)}")
+            return dashboard_optional_utils.rest_response(
+                success=False, message=f"Error setting breakpoint: {str(e)}"
+            )
+
+    @routes.get("/get_breakpoints")
+    async def get_breakpoints(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
+        """Get all breakpoints for a given job."""
+        try:
+            job_id = req.query.get("job_id", "default_job")
+            # Get insight monitor address from KV store
+            address = await self.gcs_aio_client.internal_kv_get(
+                "insight_monitor_address",
+                namespace="flowinsight",
+                timeout=5,
+            )
+            if not address:
+                return dashboard_optional_utils.rest_response(
+                    success=False,
+                    message="InsightMonitor address not found in KV store",
+                )
+            host, port = address.decode().split(":")
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    f"http://{host}:{port}/get_breakpoints?job_id={job_id}"
+                ) as response:
+                    if response.status != 200:
+                        logger.warning(
+                            f"Error fetching breakpoints: {await response.text()}"
+                        )
+                        breakpoints = {}
+                    else:
+                        breakpoints = await response.json()
+
+            for breakpoint in breakpoints:
+                if breakpoint.get("task_id", None) is not None:
+                    self.breakpoints[breakpoint.get("task_id")] = {**breakpoint, "job_id": job_id}
+
+            return dashboard_optional_utils.rest_response(
+                success=True,
+                message="Breakpoints retrieved successfully.",
+                breakpoints=breakpoints,
+            )
+
+        except Exception as e:
+            logger.error(f"Error retrieving breakpoints: {str(e)}")
+            return dashboard_optional_utils.rest_response(
+                success=False, message=f"Error retrieving breakpoints: {str(e)}"
+            )
+
+    
 
     @routes.get("/physical_view")
     async def get_physical_view(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -365,9 +789,6 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
             return dashboard_optional_utils.rest_response(
                 success=False, message=f"Error retrieving flame graph data: {str(e)}"
             )
-
-    async def run(self, server):
-        pass
 
     @staticmethod
     def is_minimal_module():

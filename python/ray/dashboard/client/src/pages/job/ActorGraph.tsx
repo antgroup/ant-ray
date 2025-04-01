@@ -478,6 +478,7 @@ const ActorGraph = () => {
             visualizationRef.current?.navigateToView("logical");
             setSelectedElementId(nodeId);
           }}
+          jobId={currentJobId}
         />
       </Box>
     </Box>

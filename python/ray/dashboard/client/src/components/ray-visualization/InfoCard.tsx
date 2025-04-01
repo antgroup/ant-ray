@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import DebugPanel from "./DebugPanel";
 import "./InfoCard.css";
 
 // Define types for the graph data structures
@@ -93,9 +94,13 @@ type InfoCardProps = {
   graphData: GraphData;
   currentView?: "logical" | "physical" | "flame" | "call_stack";
   onNavigateToLogicalView?: (nodeId: string) => void;
+  jobId?: string;
 };
 
 type Node = Actor | Method | FunctionNode;
+
+// Tab type for the InfoCard
+type TabType = "info" | "debug";
 
 // Helper functions to find connected nodes
 const findCallInputs = (
@@ -243,7 +248,11 @@ const InfoCard = ({
   graphData,
   currentView = "logical",
   onNavigateToLogicalView,
+  jobId,
 }: InfoCardProps) => {
+  // Add state for active tab
+  const [activeTab, setActiveTab] = useState<TabType>("info");
+
   // Add debugging
   useEffect(() => {
     console.log("InfoCard rendering with data:", data);
@@ -739,11 +748,53 @@ const InfoCard = ({
     zIndex: 9999,
     overflowY: "auto" as const,
     borderLeft: "1px solid #e1e4e8",
+    display: "flex",
+    flexDirection: "column" as const,
   };
+
+  // Tab header style
+  const tabHeaderStyle = {
+    display: "flex",
+    width: "100%",
+    borderBottom: "1px solid #e1e4e8",
+    backgroundColor: "#f7f7f7",
+  };
+
+  // Tab style
+  const tabStyle = (isActive: boolean) => ({
+    padding: "10px 15px",
+    cursor: "pointer",
+    borderBottom: isActive ? "2px solid #1890ff" : "none",
+    fontWeight: isActive ? "bold" : "normal",
+    color: isActive ? "#1890ff" : "#333",
+  });
 
   return (
     <div className="sidebar-panel" style={panelStyle}>
-      <div className="info-panel-content">{renderContent()}</div>
+      <div className="info-panel-tabs" style={tabHeaderStyle}>
+        <div 
+          className="info-panel-tab" 
+          style={tabStyle(activeTab === "info")}
+          onClick={() => setActiveTab("info")}
+        >
+          Info
+        </div>
+        <div 
+          className="info-panel-tab" 
+          style={tabStyle(activeTab === "debug")}
+          onClick={() => setActiveTab("debug")}
+        >
+          Debug
+        </div>
+      </div>
+      
+      {activeTab === "info" ? (
+        <div className="info-panel-content">{renderContent()}</div>
+      ) : (
+        <div className="debug-panel-content">
+          <DebugPanel open={true} jobId={jobId} isTab={true} />
+        </div>
+      )}
     </div>
   );
 };

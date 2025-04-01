@@ -42,12 +42,17 @@ class _LF2CRLF_FileWrapper(object):
         self.close = fh.close
         self.flush = fh.flush
         self.fileno = fh.fileno
-        if hasattr(fh, "encoding"):
-            self._send = lambda data: connection.sendall(
-                data.encode(fh.encoding, errors="replace")
-            )
-        else:
-            self._send = connection.sendall
+
+        def send_data(data):
+            try:
+                if hasattr(fh, "encoding"):
+                    connection.sendall(data.encode(fh.encoding, errors="replace"))
+                else:
+                    connection.sendall
+            except:
+                log.warning("Failed to send data to remote debugger")
+
+        self._send = send_data
 
     @property
     def encoding(self):
@@ -157,8 +162,11 @@ class _RemotePdb(Pdb):
     do_q = do_exit = do_quit
 
     def do_continue(self, arg):
-        self.__restore()
-        self.handle.connection.close()
+        from ray.util.insight import is_flow_insight_enabled
+
+        if not is_flow_insight_enabled():
+            self.__restore()
+            self.handle.connection.close()
         return Pdb.do_continue(self, arg)
 
     do_c = do_cont = do_continue
@@ -286,9 +294,11 @@ def set_trace(breakpoint_uuid=None):
 
     Can be used within a Ray task or actor.
     """
+    from ray.util.insight import is_flow_insight_enabled
+
     if os.environ.get("RAY_DEBUG", "1") == "1":
         return ray.util.ray_debugpy.set_trace(breakpoint_uuid)
-    if os.environ.get("RAY_DEBUG", "1") == "legacy":
+    if os.environ.get("RAY_DEBUG", "1") == "legacy" or is_flow_insight_enabled():
         # If there is an active debugger already, we do not want to
         # start another one, so "set_trace" is just a no-op in that case.
         if ray._private.worker.global_worker.debugger_breakpoint == b"":
@@ -310,9 +320,11 @@ def _driver_set_trace():
     This disables Ray driver logs temporarily so that the PDB console is not
     spammed: https://github.com/ray-project/ray/issues/18172
     """
+    from ray.util.insight import is_flow_insight_enabled
+
     if os.environ.get("RAY_DEBUG", "1") == "1":
         return ray.util.ray_debugpy.set_trace()
-    if os.environ.get("RAY_DEBUG", "1") == "legacy":
+    if os.environ.get("RAY_DEBUG", "1") == "legacy" or is_flow_insight_enabled():
         print("*** Temporarily disabling Ray worker logs ***")
         ray._private.worker._worker_logs_enabled = False
 

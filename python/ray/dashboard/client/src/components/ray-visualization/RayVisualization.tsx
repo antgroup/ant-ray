@@ -9,6 +9,7 @@ import React, {
   useImperativeHandle,
   useRef,
 } from "react";
+import { Breakpoint } from "../../service/debug-insight";
 import { FlameGraphData } from "../../service/flame-graph";
 import { PhysicalViewData } from "../../service/physical-view";
 import { colorScheme } from "./graphData";
@@ -30,6 +31,7 @@ type RayVisualizationProps = {
   setViewType: (
     viewType: "logical" | "physical" | "flame" | "call_stack",
   ) => void;
+  activeDebugSession: Breakpoint | null;
 };
 
 type NodeData = {
@@ -63,6 +65,7 @@ type Actor = {
   id: string;
   name: string;
   language: string;
+  isActorNameSet: boolean;
   gpuDevices?: Array<{
     index: number;
     name: string;
@@ -164,6 +167,7 @@ const RayVisualization = forwardRef<
       onAutoRefreshChange,
       autoRefresh = false,
       setViewType,
+      activeDebugSession,
     },
     ref,
   ) => {
@@ -265,6 +269,29 @@ const RayVisualization = forwardRef<
       },
       [dagreGraphRef],
     );
+
+    useEffect(() => {
+      if (activeDebugSession) {
+        if (activeDebugSession.bpActorId) {
+          const selectedElementId = graphData.methods.find(
+            (method) =>
+              method.actorId === activeDebugSession.bpActorId &&
+              method.name === activeDebugSession.methodName,
+          )?.id;
+          if (selectedElementId) {
+            focusOnNode(selectedElementId);
+          }
+        } else {
+          const selectedElementId = graphData.functions.find(
+            (func) => func.name === activeDebugSession.funcName,
+          )?.id;
+          if (selectedElementId) {
+            focusOnNode(selectedElementId);
+          }
+        }
+      }
+      // eslint-disable-next-line
+    }, [activeDebugSession]);
 
     // Watch for changes to selectedElementId and focus on the node
     useEffect(() => {

@@ -18,6 +18,7 @@ import PhysicalVisualization from "../../components/ray-visualization/PhysicalVi
 import RayVisualization, {
   RayVisualizationHandle,
 } from "../../components/ray-visualization/RayVisualization";
+import { Breakpoint, setBreakpoint } from "../../service/debug-insight";
 import { FlameGraphData, getFlameGraphData } from "../../service/flame-graph";
 import {
   getPhysicalViewData,
@@ -29,6 +30,7 @@ type BaseNode = {
   id: string;
   name: string;
   language: string;
+  isActorNameSet: boolean;
 };
 
 type Actor = BaseNode & {
@@ -94,6 +96,8 @@ const ActorGraph = () => {
   const visualizationRef = useRef<RayVisualizationHandle>(null);
   const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [activeDebugSession, setActiveDebugSession] =
+    useState<Breakpoint | null>(null);
 
   // State management similar to App.tsx
   const [infoCardData, setInfoCardData] = useState<ElementData>({
@@ -101,10 +105,16 @@ const ActorGraph = () => {
     type: "function",
     name: "Component Details",
     language: "unknown",
+    isActorNameSet: false,
   });
 
   const [selectedElementId, setSelectedElementId] =
     useState<string | null>(null);
+
+  // Track nodes with active breakpoints
+  const [nodesWithBreakpoints, setNodesWithBreakpoints] = useState<Set<string>>(
+    new Set(),
+  );
 
   const fetchGraphData = useCallback(
     async (id?: string, stackMode?: boolean) => {
@@ -234,6 +244,60 @@ const ActorGraph = () => {
   const handleAutoRefreshChange = useCallback((enabled: boolean) => {
     setAutoRefresh(enabled);
   }, []);
+
+  const handleSetBreakpoint = async (data: ElementData) => {
+    if (data.type === "function" || data.type === "method") {
+      try {
+        const targetName = data.name;
+        let actorClass = null;
+        let actorName = null;
+
+        if (data.type === "method") {
+          // Find the actor this method belongs to
+          const actor = graphData?.actors.find((a) => a.id === data.actorId);
+          if (actor) {
+            if (actor.isActorNameSet) {
+              actorName = actor.name;
+            } else {
+              actorClass = actor.name;
+            }
+          }
+        }
+
+        // Check if we're setting or deactivating
+        const isDeactivating = nodesWithBreakpoints.has(data.id);
+
+        // Set the breakpoint
+        await setBreakpoint({
+          job_id: jobId || "",
+          actor_id: data.actorId || undefined,
+          actor_cls: actorClass || undefined,
+          actor_name: actorName || undefined,
+          method_name: data.type === "method" ? targetName : undefined,
+          func_name: data.type === "function" ? targetName : undefined,
+          flag: !isDeactivating, // true to set, false to deactivate
+        });
+
+        if (isDeactivating) {
+          // Remove this node from the set of nodes with breakpoints
+          setNodesWithBreakpoints((prev) => {
+            const updated = new Set(prev);
+            updated.delete(data.id);
+            return updated;
+          });
+        } else {
+          // Record that this node has a breakpoint set
+          setNodesWithBreakpoints((prev) => {
+            const updated = new Set(prev);
+            updated.add(data.id);
+            return updated;
+          });
+        }
+      } catch (error) {
+        console.error("Failed to set breakpoint:", error);
+      }
+    }
+  };
 
   if (error) {
     return <Box color="error.main">Error: {error}</Box>;
@@ -401,6 +465,7 @@ const ActorGraph = () => {
             searchTerm={searchTerm}
             autoRefresh={autoRefresh}
             setViewType={setCurrentViewType}
+            activeDebugSession={activeDebugSession}
           />
         )}
         {currentViewType === "call_stack" && (
@@ -418,6 +483,7 @@ const ActorGraph = () => {
             searchTerm={searchTerm}
             autoRefresh={autoRefresh}
             setViewType={setCurrentViewType}
+            activeDebugSession={activeDebugSession}
           />
         )}
         {graphData && currentViewType === "physical" && (
@@ -473,11 +539,15 @@ const ActorGraph = () => {
               dataFlows: [],
             }
           }
+          setActiveDebugSession={setActiveDebugSession}
           currentView={currentViewType}
           onNavigateToLogicalView={(nodeId) => {
             visualizationRef.current?.navigateToView("logical");
             setSelectedElementId(nodeId);
           }}
+          jobId={currentJobId}
+          onSetBreakpoint={handleSetBreakpoint}
+          nodesWithBreakpoints={nodesWithBreakpoints}
         />
       </Box>
     </Box>

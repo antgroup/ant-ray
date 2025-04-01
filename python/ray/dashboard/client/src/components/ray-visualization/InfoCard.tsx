@@ -1,4 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Breakpoint } from "../../service/debug-insight";
+import DebugPanel from "./DebugPanel";
 import "./InfoCard.css";
 
 // Define types for the graph data structures
@@ -7,6 +9,7 @@ type BaseNode = {
   name: string;
   language: string;
   type: string;
+  isActorNameSet: boolean;
 };
 
 type Actor = BaseNode & {
@@ -93,9 +96,16 @@ type InfoCardProps = {
   graphData: GraphData;
   currentView?: "logical" | "physical" | "flame" | "call_stack";
   onNavigateToLogicalView?: (nodeId: string) => void;
+  jobId?: string;
+  onSetBreakpoint?: (data: Node) => void;
+  nodesWithBreakpoints?: Set<string>;
+  setActiveDebugSession?: (data: Breakpoint) => void;
 };
 
-type Node = Actor | Method | FunctionNode;
+export type Node = Actor | Method | FunctionNode;
+
+// Tab type for the InfoCard
+type TabType = "info" | "debug";
 
 // Helper functions to find connected nodes
 const findCallInputs = (
@@ -186,7 +196,13 @@ const findNodeById = (id: string, graphData: GraphData): Node => {
     return { ...func, type: "function" };
   }
 
-  return { id, name: id, type: "function", language: "unknown" };
+  return {
+    id,
+    name: id,
+    type: "function",
+    language: "unknown",
+    isActorNameSet: false,
+  };
 };
 
 // Get all methods for an actor
@@ -243,7 +259,14 @@ const InfoCard = ({
   graphData,
   currentView = "logical",
   onNavigateToLogicalView,
+  jobId,
+  onSetBreakpoint,
+  nodesWithBreakpoints,
+  setActiveDebugSession,
 }: InfoCardProps) => {
+  // Add state for active tab
+  const [activeTab, setActiveTab] = useState<TabType>("info");
+
   // Add debugging
   useEffect(() => {
     console.log("InfoCard rendering with data:", data);
@@ -614,6 +637,66 @@ const InfoCard = ({
       );
     }
 
+    const renderSetBreakpointButton = () => {
+      // Only show for functions and methods
+      if (data.type !== "function" && data.type !== "method") {
+        return null;
+      }
+
+      const hasBreakpoint = nodesWithBreakpoints?.has(data.id);
+
+      return (
+        <div style={{ marginTop: "16px" }}>
+          {!hasBreakpoint ? (
+            <button
+              onClick={() => onSetBreakpoint?.(data)}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#1976d2",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              Set Breakpoint
+            </button>
+          ) : (
+            <React.Fragment>
+              <div
+                style={{
+                  marginBottom: "8px",
+                  fontSize: "12px",
+                  color: "#555",
+                  backgroundColor: "#f1f1f1",
+                  padding: "6px",
+                  borderRadius: "4px",
+                  textAlign: "center",
+                }}
+              >
+                Breakpoint is active for this {data.type}
+              </div>
+              <button
+                onClick={() => onSetBreakpoint?.(data)}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#d32f2f",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  width: "100%",
+                }}
+              >
+                Deactivate Breakpoint
+              </button>
+            </React.Fragment>
+          )}
+        </div>
+      );
+    };
+
     switch (data.type) {
       case "actor": {
         // Get all information for this actor including its methods
@@ -690,6 +773,7 @@ const InfoCard = ({
               {renderConnectedNodes(callOutputs, "Callees")}
               {renderConnectedNodes(dataInputs, "Data Dependencies")}
             </div>
+            {renderSetBreakpointButton()}
           </React.Fragment>
         );
       }
@@ -697,7 +781,13 @@ const InfoCard = ({
         const callInputs = findCallInputs(data.id, graphData);
         const dataInputs = findDataInputs(data.id, graphData);
         const callOutputs = findCallOutputs(data.id, graphData);
-
+        if (data.language !== "python") {
+          return (
+            <React.Fragment>
+              <h3>{data.name}</h3>
+            </React.Fragment>
+          );
+        }
         return (
           <React.Fragment>
             <h3>{data.name}</h3>
@@ -715,6 +805,7 @@ const InfoCard = ({
               {renderConnectedNodes(callOutputs, "Callees")}
               {renderConnectedNodes(dataInputs, "Data Dependencies")}
             </div>
+            {renderSetBreakpointButton()}
           </React.Fragment>
         );
       }
@@ -739,11 +830,59 @@ const InfoCard = ({
     zIndex: 9999,
     overflowY: "auto" as const,
     borderLeft: "1px solid #e1e4e8",
+    display: "flex",
+    flexDirection: "column" as const,
   };
+
+  // Tab header style
+  const tabHeaderStyle = {
+    display: "flex",
+    width: "100%",
+    borderBottom: "1px solid #e1e4e8",
+    backgroundColor: "#f7f7f7",
+  };
+
+  // Tab style
+  const tabStyle = (isActive: boolean) => ({
+    padding: "10px 15px",
+    cursor: "pointer",
+    borderBottom: isActive ? "2px solid #1890ff" : "none",
+    fontWeight: isActive ? "bold" : "normal",
+    color: isActive ? "#1890ff" : "#333",
+  });
 
   return (
     <div className="sidebar-panel" style={panelStyle}>
-      <div className="info-panel-content">{renderContent()}</div>
+      <div className="info-panel-tabs" style={tabHeaderStyle}>
+        <div
+          className="info-panel-tab"
+          style={tabStyle(activeTab === "info")}
+          onClick={() => setActiveTab("info")}
+        >
+          Info
+        </div>
+        <div
+          className="info-panel-tab"
+          style={tabStyle(activeTab === "debug")}
+          onClick={() => setActiveTab("debug")}
+        >
+          Debug
+        </div>
+      </div>
+
+      {activeTab === "info" ? (
+        <div className="info-panel-content">{renderContent()}</div>
+      ) : (
+        <div className="debug-panel-content">
+          <DebugPanel
+            open={true}
+            data={data}
+            jobId={jobId}
+            isTab={true}
+            setActiveDebugSession={setActiveDebugSession}
+          />
+        </div>
+      )}
     </div>
   );
 };

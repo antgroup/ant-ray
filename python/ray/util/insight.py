@@ -9,8 +9,8 @@ import socket
 from contextlib import contextmanager
 from ray.experimental import internal_kv
 import ray.dashboard.consts as dashboard_consts
-from collections import deque
 import json
+import heapq
 
 insight_monitor_address = None
 
@@ -60,6 +60,24 @@ def create_insight_monitor_actor():
         ).remote()
 
 
+def fetch_request(endpoint, payload):
+    url = f"http://{_get_insight_monitor_address()}/{endpoint}"
+    data = json.dumps(payload).encode()
+    headers = {"Content-Type": "application/json"}
+
+    try:
+        response = requests.post(url, data=data, headers=headers, timeout=300)
+        if response.status_code != 200:
+            print(
+                f"Error sending HTTP request: {response.status_code} {response.reason}"
+            )
+            return None
+        return response.json()
+    except Exception as e:
+        print(f"Error sending HTTP request: {e}")
+        return None
+
+
 def emit_request(endpoint, payload):
     url = f"http://{_get_insight_monitor_address()}/{endpoint}"
     data = json.dumps(payload).encode()
@@ -82,6 +100,7 @@ class _ray_internal_insight_monitor:
         self.call_graph = defaultdict(
             lambda: defaultdict(lambda: {"count": 0, "start_time": 0})
         )
+        self.debug_open = defaultdict(lambda: False)
         # Maps to track unique actors and methods per job
         self.actors = defaultdict(set)
         self.actor_id_map = defaultdict(dict)  # {job_id: {actor_class: actor_id}}
@@ -95,8 +114,11 @@ class _ray_internal_insight_monitor:
         self.actor_counter = defaultdict(int)
         self.method_counter = defaultdict(int)
         self.function_counter = defaultdict(int)
-        self.flow_record = defaultdict(list)
+        self.flow_record = defaultdict(lambda: defaultdict(set))
         self.start_time_record = defaultdict(lambda: defaultdict(dict))
+        self.breakpoints = defaultdict(
+            lambda: defaultdict(lambda: {"enable": False, "task_ids": {}})
+        )
 
         # Data flow tracking
         self.data_flows = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
@@ -146,6 +168,17 @@ class _ray_internal_insight_monitor:
         self.app.router.add_post("/emit-task-end", self.handle_emit_task_end)
         self.app.router.add_post("/emit-caller-info", self.handle_emit_caller_info)
 
+        self.app.router.add_get("/get_breakpoints", self.handle_get_breakpoints)
+        self.app.router.add_post("/set_breakpoint", self.handle_set_breakpoint)
+        self.app.router.add_post(
+            "/deactivate_breakpoint", self.handle_deactivate_breakpoint
+        )
+        self.app.router.add_post(
+            "/activate-breakpoint", self.handle_activate_breakpoint
+        )
+        self.app.router.add_post("/switch_debug_mode", self.handle_switch_debug_mode)
+        self.app.router.add_get("/get_debug_state", self.handle_get_debug_state)
+
         self.runner = None
         self.site = None
         self.node_ip_address = ray._private.services.get_node_ip_address()
@@ -176,6 +209,135 @@ class _ray_internal_insight_monitor:
         print(
             f"Insight monitor HTTP server started at http://{self.node_ip_address}:{self.port}"
         )
+
+    async def handle_get_breakpoints(self, request):
+        """Handle HTTP request for getting breakpoints."""
+        job_id = request.query.get("job_id", "default_job")
+        breakpoints = []
+        for key, info in self.breakpoints[job_id].items():
+            if not info["enable"]:
+                continue
+            for task_id, actor_id in info["task_ids"].items():
+                breakpoints.append(
+                    {
+                        "actor_cls": key[1],
+                        "actor_name": key[2],
+                        "method_name": key[3],
+                        "func_name": key[4],
+                        "enable": info["enable"],
+                        "task_id": task_id,
+                        "actor_id": key[0],
+                        "bp_actor_id": actor_id,
+                    }
+                )
+            if len(info["task_ids"]) == 0:
+                breakpoints.append(
+                    {
+                        "actor_cls": key[1],
+                        "actor_name": key[2],
+                        "method_name": key[3],
+                        "func_name": key[4],
+                        "enable": info["enable"],
+                        "task_id": None,
+                        "actor_id": key[0],
+                        "bp_actor_id": None,
+                    }
+                )
+        return aiohttp.web.json_response(breakpoints)
+
+    async def handle_get_debug_state(self, request):
+        """Handle HTTP request for getting debug state."""
+        job_id = request.query.get("job_id", "default_job")
+        return aiohttp.web.json_response({"debug_state": self.debug_open[job_id]})
+
+    async def handle_deactivate_breakpoint(self, request):
+        """Handle HTTP request for deactivating breakpoint."""
+        body = await request.json()
+        job_id = body.get("job_id", "default_job")
+        actor_id = body.get("actor_id", None)
+        actor_name = body.get("actor_name", None)
+        actor_cls = body.get("actor_cls", None)
+        method_name = body.get("method_name", None)
+        func_name = body.get("func_name", None)
+        key = (actor_id, actor_cls, actor_name, method_name, func_name)
+        if key in self.breakpoints[job_id]:
+            self.breakpoints[job_id][key]["task_ids"].pop(
+                body.get("task_id", None), None
+            )
+        return aiohttp.web.json_response({"message": "Breakpoint deactivated"})
+
+    def _get_breakpoint(
+        self, job_id, actor_id, actor_cls, actor_name, method_name, func_name
+    ):
+        # If we have a function name, check for function breakpoint first
+        if func_name is not None:
+            key = (None, None, None, None, func_name)
+            if key in self.breakpoints[job_id]:
+                return key, self.breakpoints[job_id][key]
+
+        # For actor methods, create all possible match patterns
+        if actor_id or actor_cls or actor_name:
+            # Method name must match if we're dealing with an actor
+            if not method_name:
+                return None, {"enable": False}
+
+            # Create all possible combinations for actor-related fields
+            patterns = [
+                (a_id, a_cls, a_name, method_name, None)
+                for a_id in [actor_id, None]
+                for a_cls in [actor_cls, None]
+                for a_name in [actor_name, None]
+            ]
+
+            # Find the first matching pattern
+            for pattern in patterns:
+                if pattern in self.breakpoints[job_id]:
+                    return pattern, self.breakpoints[job_id][pattern]
+
+        return None, {"enable": False}
+
+    async def handle_switch_debug_mode(self, request):
+        """Handle HTTP request for switching debug mode."""
+        body = await request.json()
+        job_id = body.get("job_id", "default_job")
+        mode = body.get("mode", None)
+        self.debug_open[job_id] = mode
+        return aiohttp.web.json_response({"message": "Debug mode switched"})
+
+    async def handle_activate_breakpoint(self, request):
+        """Handle HTTP request for getting breakpoints."""
+        body = await request.json()
+        job_id = body.get("job_id", "default_job")
+        if not self.debug_open[job_id]:
+            return aiohttp.web.json_response({"enable": False})
+        actor_name = body.get("actor_name", None)
+        actor_cls = body.get("actor_cls", None)
+        actor_id = body.get("actor_id", None)
+        method_name = body.get("method_name", None)
+        func_name = body.get("func_name", None)
+        task_id = body.get("task_id", None)
+        key, info = self._get_breakpoint(
+            job_id, actor_id, actor_cls, actor_name, method_name, func_name
+        )
+        if info is not None and info["enable"]:
+            self.breakpoints[job_id][key]["task_ids"][task_id] = actor_id
+        return aiohttp.web.json_response(
+            {"enable": info["enable"] if info is not None else False}
+        )
+
+    async def handle_set_breakpoint(self, request):
+        """Handle HTTP request for setting breakpoint."""
+        body = await request.json()
+        job_id = body.get("job_id", "default_job")
+        actor_name = body.get("actor_name", None)
+        actor_id = body.get("actor_id", None)
+        actor_cls = body.get("actor_cls", None)
+        method_name = body.get("method_name", None)
+        func_name = body.get("func_name", None)
+        flag = body.get("flag", True)
+        key = (actor_id, actor_cls, actor_name, method_name, func_name)
+        self.breakpoints[job_id][key]["enable"] = flag
+        return aiohttp.web.json_response({"message": "Breakpoint set"})
 
     async def handle_get_call_graph_data(self, request):
         """Handle HTTP request for call graph data."""
@@ -210,25 +372,16 @@ class _ray_internal_insight_monitor:
         callee_func = call_record["callee_func"]
         call_times = call_record.get("call_times", 1)
         # Create caller and callee identifiers for parent-child relationship
-        caller_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
-        callee_id = f"{callee_class}.{callee_func}" if callee_class else callee_func
-        current_task_id = call_record["current_task_id"]
+        caller_id = (caller_class, caller_func)
+        callee_id = (callee_class, callee_func)
         start_time = call_record["start_time"]
         if caller_id not in self.start_time_record[job_id][callee_id]:
             self.start_time_record[job_id][callee_id][caller_id] = start_time
 
-        self.flow_record[job_id].append(
-            {
-                "type": "enter",
-                "caller_id": caller_id,
-                "callee_id": callee_id,
-                "caller_task_id": current_task_id,
-            }
-        )
-
+        self.flow_record[job_id][callee_id].add(caller_id)
         # Update call graph
-        self.call_graph[job_id][f"{caller_id}->{callee_id}"]["count"] += call_times
-        self.call_graph[job_id][f"{caller_id}->{callee_id}"]["start_time"] = start_time
+        self.call_graph[job_id][(caller_id, callee_id)]["count"] += call_times
+        self.call_graph[job_id][(caller_id, callee_id)]["start_time"] = start_time
 
         # Track actors and methods
         if caller_class:
@@ -299,7 +452,7 @@ class _ray_internal_insight_monitor:
             ) = self.filter_call_graph_data(job_id, self.call_graph[job_id])
         # Add actors
         for actor_class, actor_id in self.actor_id_map.get(job_id, {}).items():
-            if stack_mode == "1" and actor_class not in reachable_actors:
+            if stack_mode == "1" and actor_id not in reachable_actors:
                 continue
             graph_data["actors"].append(
                 {
@@ -313,8 +466,8 @@ class _ray_internal_insight_monitor:
         for method_info in self.methods.get(job_id, {}).values():
             if stack_mode == "1":
                 if (
-                    method_info["actorId"] + "." + method_info["name"]
-                    not in reachable_methods
+                    method_info["actorId"] not in reachable_actors
+                    or method_info["name"] not in reachable_methods
                 ):
                     continue
             graph_data["methods"].append(
@@ -337,20 +490,19 @@ class _ray_internal_insight_monitor:
 
         # Add call flows
         for call_edge, info in call_graph.items():
-            caller, callee = call_edge.split("->")
-            # Get source ID
+            caller, callee = call_edge
+
             source_id = None
             if caller in self.methods.get(job_id, {}):
                 source_id = self.methods[job_id][caller]["id"]
-            elif caller in self.function_id_map.get(job_id, {}):
-                source_id = self.function_id_map[job_id][caller]
+            elif caller[1] in self.function_id_map.get(job_id, {}):
+                source_id = self.function_id_map[job_id][caller[1]]
 
-            # Get target ID
             target_id = None
             if callee in self.methods.get(job_id, {}):
                 target_id = self.methods[job_id][callee]["id"]
-            elif callee in self.function_id_map.get(job_id, {}):
-                target_id = self.function_id_map[job_id][callee]
+            elif callee[1] in self.function_id_map.get(job_id, {}):
+                target_id = self.function_id_map[job_id][callee[1]]
 
             if source_id and target_id:
                 graph_data["callFlows"].append(
@@ -365,40 +517,38 @@ class _ray_internal_insight_monitor:
         # Add data flows with merged statistics
         for flow_key, entry in self.data_flows.get(job_id, {}).items():
             for argpos, flow_stats in entry.items():
-                source, target = flow_key.split("->")
+                source, target = flow_key
                 if stack_mode == "1":
-                    if "." in source:
-                        actor_class = source.split(".")[0]
-                        if source.split(":")[1] not in reachable_methods:
+                    if source[0] is not None:
+                        if source[1] not in reachable_methods:
                             continue
-                        if actor_class not in reachable_actors:
-                            continue
-                    else:
-                        if source not in reachable_funcs:
-                            continue
-                    if "." in target:
-                        actor_class = target.split(".")[0]
-                        if target.split(":")[1] not in reachable_methods:
-                            continue
-                        if actor_class not in reachable_actors:
+                        if source[0].split(":")[-1] not in reachable_actors:
                             continue
                     else:
-                        if target not in reachable_funcs:
+                        if source[1] not in reachable_funcs:
+                            continue
+                    if target[0] is not None:
+                        if target[1] not in reachable_methods:
+                            continue
+                        if target[0].split(":")[-1] not in reachable_actors:
+                            continue
+                    else:
+                        if target[1] not in reachable_funcs:
                             continue
 
                 # Get source ID
                 source_id = None
                 if source in self.methods.get(job_id, {}):
                     source_id = self.methods[job_id][source]["id"]
-                elif source in self.function_id_map.get(job_id, {}):
-                    source_id = self.function_id_map[job_id][source]
+                elif source[1] in self.function_id_map.get(job_id, {}):
+                    source_id = self.function_id_map[job_id][source[1]]
 
                 # Get target ID
                 target_id = None
                 if target in self.methods.get(job_id, {}):
                     target_id = self.methods[job_id][target]["id"]
-                elif target in self.function_id_map.get(job_id, {}):
-                    target_id = self.function_id_map[job_id][target]
+                elif target[1] in self.function_id_map.get(job_id, {}):
+                    target_id = self.function_id_map[job_id][target[1]]
 
                 if source_id and target_id:
                     total_size_mb = flow_stats["size"] / (1024 * 1024)
@@ -424,84 +574,100 @@ class _ray_internal_insight_monitor:
         return graph_data
 
     def filter_call_graph_data(self, job_id, call_graph):
-        """Filter the call graph data to keep only edges that are part of paths leading to target edges.
+        """Filter the call graph data to keep only edges that are part of paths leading to target edges
+        and are reachable from '_main'.
 
         A target edge is defined as caller_id->callee_id where caller_id and callee_id come from
-        the flow_record and caller_info mappings. The algorithm uses reverse graph traversal
-        to efficiently identify all edges that can reach these target edges.
+        the flow_record and caller_info mappings. The algorithm uses Dijkstra's algorithm to ensure
+        all kept nodes are reachable from '_main'.
         """
+
+        class NodeKey:
+            """Helper class to make node tuples comparable in priority queue."""
+
+            def __init__(self, node_tuple):
+                self.node = node_tuple
+                # Convert None to empty string for comparison
+                self.class_name = "" if node_tuple[0] is None else str(node_tuple[0])
+                self.func_name = str(node_tuple[1])
+
+            def __lt__(self, other):
+                # Compare by class name first, then function name
+                return (self.class_name, self.func_name) < (
+                    other.class_name,
+                    other.func_name,
+                )
+
+            def __eq__(self, other):
+                return (self.class_name, self.func_name) == (
+                    other.class_name,
+                    other.func_name,
+                )
+
         # First identify all target edges we want to reach
-        target_edges = {}
-        reachable_nodes = set()
+        target_edges = defaultdict(set)
         reachable_methods = set()
         reachable_actors = set()
         reachable_funcs = set()
 
         # Build target edges from flow records
-        for flow_record in self.flow_record[job_id]:
-            if flow_record["type"] == "enter":
-                target_edges[flow_record["caller_task_id"]] = (
-                    flow_record["caller_id"],
-                    flow_record["callee_id"],
-                )
-                reachable_nodes.add(flow_record["caller_id"])
-                reachable_nodes.add(flow_record["callee_id"])
-            if flow_record["type"] == "exit":
-                caller_infos = self.caller_info[job_id][flow_record["callee_task_id"]]
-                for caller_info in caller_infos:
-                    caller_task_id = caller_info["task_id"]
-                    caller_id = (
-                        f"{caller_info['class']}.{caller_info['func']}"
-                        if caller_info["class"]
-                        else caller_info["func"]
-                    )
-                    callee_id = flow_record["callee_id"]
-                    if caller_task_id in target_edges:
-                        del target_edges[caller_task_id]
-                    if caller_id in reachable_nodes:
-                        reachable_nodes.remove(caller_id)
-                    if callee_id in reachable_nodes:
-                        reachable_nodes.remove(callee_id)
+        for callee_id, caller_ids in self.flow_record[job_id].items():
+            for caller_id in caller_ids:
+                target_edges[callee_id].add((caller_id, callee_id))
 
-        target_edges = set(target_edges.values())
+        # Build graph representation for Dijkstra's algorithm
+        # Graph maps node tuples (class, func) to list of neighbor tuples
+        graph = defaultdict(list)
+        for edge in call_graph:
+            src, dst = edge
+            graph[src].append(dst)
 
-        # Build reverse adjacency list for efficient backwards traversal
-        reverse_adj = defaultdict(set)
-        for edge, _ in call_graph.items():
-            src, dst = edge.split("->")
-            reverse_adj[dst].add(src)
+        # Run Dijkstra's algorithm from '_main' node
+        main_node = (None, "_main")  # Root node representing program entry
+        distances = {}
+        distances[main_node] = 0
+        # Priority queue entries are (distance, NodeKey)
+        pq = [(0, NodeKey(main_node))]
+        visited = set()
 
-        # Do reverse BFS from all nodes in target edges to find reachable edges
-        queue = deque(reachable_nodes)
-        visited = reachable_nodes.copy()
+        while pq:
+            dist, node_key = heapq.heappop(pq)
+            current = node_key.node
+            if current in visited:
+                continue
+            visited.add(current)
 
-        while queue:
-            node = queue.popleft()
-            # Add all incoming nodes to queue if not visited
-            for prev_node in reverse_adj[node]:
-                if prev_node not in visited:
-                    visited.add(prev_node)
-                    queue.append(prev_node)
-                    reachable_nodes.add(prev_node)
+            for neighbor in graph[current]:
+                if neighbor not in visited:
+                    new_dist = dist + 1
+                    if neighbor not in distances or new_dist < distances[neighbor]:
+                        distances[neighbor] = new_dist
+                        heapq.heappush(pq, (new_dist, NodeKey(neighbor)))
 
-        # Filter call_graph to only keep edges between reachable nodes that lead to target edges
+        # Filter target edges and reachable nodes based on Dijkstra results
+        filtered_target_edges = defaultdict(set)
+        for callee_id, edges in target_edges.items():
+            if callee_id in distances:  # Node is reachable from '_main'
+                for edge in edges:
+                    src, _ = edge
+                    if src in distances:  # Source is also reachable from '_main'
+                        filtered_target_edges[callee_id].add(edge)
+                        if src[0] is not None:
+                            reachable_methods.add(src[1])
+                            reachable_actors.add(src[0].split(":")[-1])
+                        else:
+                            reachable_funcs.add(src[1])
+                        if callee_id[0] is not None:
+                            reachable_methods.add(callee_id[1])
+                            reachable_actors.add(callee_id[0].split(":")[-1])
+                        else:
+                            reachable_funcs.add(callee_id[1])
+
+        # Filter call_graph to only keep edges between reachable nodes
         filtered_graph = {}
-        for edge, info_dict in call_graph.items():
-            src, dst = edge.split("->")
-            if src in reachable_nodes and dst in reachable_nodes:
-                if "." in src:
-                    info = src.split(".")
-                    reachable_methods.add(src.split(":")[1])
-                    reachable_actors.add(info[0])
-                if "." not in src:
-                    reachable_funcs.add(src)
-                if "." in dst:
-                    info = dst.split(".")
-                    reachable_methods.add(dst.split(":")[1])
-                    reachable_actors.add(info[0])
-                if "." not in dst:
-                    reachable_funcs.add(dst)
-                filtered_graph[edge] = info_dict
+        for edges in filtered_target_edges.values():
+            for edge in edges:
+                filtered_graph[edge] = call_graph[edge]
 
         return filtered_graph, reachable_methods, reachable_actors, reachable_funcs
 
@@ -524,11 +690,11 @@ class _ray_internal_insight_monitor:
             del self.object_events[job_id][object_id]
 
         # Create source and target identifiers
-        source = f"{caller_class}.{caller_func}" if caller_class else caller_func
-        target = f"{callee_class}.{callee_func}" if callee_class else callee_func
+        source = (caller_class, caller_func)
+        target = (callee_class, callee_func)
 
         # Update data flow tracking with accumulated values
-        flow_key = f"{source}->{target}"
+        flow_key = (source, target)
         duration = timestamp - object_event["timestamp"]
         self.data_flows[job_id][flow_key][argpos]["size"] = size
         self.data_flows[job_id][flow_key][argpos]["duration"] = duration
@@ -614,6 +780,9 @@ class _ray_internal_insight_monitor:
                     for k, v in start_times.items()
                     if v > 0
                 ]
+                callee_id = (
+                    f"{callee_id[0]}.{callee_id[1]}" if callee_id[0] else callee_id[1]
+                )
                 parent_start_times.append(
                     {"callee_id": callee_id, "start_times": start_times}
                 )
@@ -629,17 +798,17 @@ class _ray_internal_insight_monitor:
         caller_func = task_record["caller_func"]
         current_task_id = task_record["current_task_id"]
         # Create node_id from caller class and function for parent tracking
-        node_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
+        node_id = (caller_class, caller_func)
 
-        self.flow_record[job_id].append(
-            {
-                "type": "exit",
-                "callee_id": node_id,
-                "callee_task_id": current_task_id,
-            }
-        )
+        caller_infos = self.caller_info[job_id][current_task_id]
+        for caller_info in caller_infos:
+            self.flow_record[job_id][node_id].remove(
+                (caller_info["class"], caller_info["func"])
+            )
 
         duration = task_record["duration"]
+
+        node_id = f"{caller_class}.{caller_func}" if caller_class else caller_func
 
         # Update aggregated data using node_id
         self.flame_graph_aggregated[job_id][node_id]["total_time"] += duration
@@ -1188,6 +1357,55 @@ def record_task_duration(duration):
     except Exception as e:
         print(f"Error recording task duration: {e}")
         return
+
+
+def insight_breakpoint():
+    if not is_flow_insight_enabled():
+        return
+    if not need_record(_get_caller_class()):
+        return
+
+    actor_cls = None
+    actor_name = None
+    actor_id = ray._private.worker.global_worker.actor_id
+    if not actor_id.is_nil():
+        caller_actor = ray._private.worker.global_worker.core_worker.get_actor_handle(
+            actor_id
+        )
+        if caller_actor is not None:
+            actor_cls = (
+                caller_actor._ray_actor_creation_function_descriptor.class_name.split(
+                    "."
+                )[-1]
+            )
+            actor_name = _get_actor_name()
+    func_name = _get_current_task_name()
+    task_id = get_current_task_id()
+    job_id = get_current_job_id()
+
+    if actor_cls is None:
+        record = {
+            "actor_cls": None,
+            "actor_name": None,
+            "method_name": None,
+            "func_name": func_name,
+            "task_id": task_id,
+            "job_id": job_id,
+            "actor_id": None,
+        }
+    else:
+        record = {
+            "actor_cls": actor_cls,
+            "actor_name": None if actor_name == "" else actor_name,
+            "method_name": func_name,
+            "func_name": None,
+            "task_id": task_id,
+            "job_id": job_id,
+            "actor_id": actor_id.hex(),
+        }
+    info = fetch_request("activate-breakpoint", record)
+    if info is not None and info.get("enable", False):
+        ray.util.pdb.set_trace()
 
 
 @contextmanager

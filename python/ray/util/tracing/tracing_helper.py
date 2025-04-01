@@ -516,6 +516,9 @@ def _inject_tracing_into_function(function):
             kind=_opentelemetry.trace.SpanKind.CONSUMER,
             attributes=_function_hydrate_span_args(function_name),
         ):
+            from ray.util.insight import insight_breakpoint
+
+            insight_breakpoint()
             return function(*args, **kwargs)
 
     return _function_with_tracing
@@ -655,6 +658,9 @@ def _inject_tracing_into_class(_cls):
                 kind=_opentelemetry.trace.SpanKind.CONSUMER,
                 attributes=_actor_hydrate_span_args(self.__class__.__name__, method),
             ):
+                from ray.util.insight import insight_breakpoint
+
+                insight_breakpoint()
                 return method(self, *_args, **_kwargs)
 
         return _resume_span
@@ -690,6 +696,9 @@ def _inject_tracing_into_class(_cls):
                     self.__class__.__name__, method.__name__
                 ),
             ):
+                from ray.util.insight import insight_breakpoint
+
+                insight_breakpoint()
                 return await method(self, *_args, **_kwargs)
 
         return _resume_span

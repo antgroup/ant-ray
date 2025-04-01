@@ -99,8 +99,11 @@ class SetupSpec:
         elif build_type == BuildType.TSAN:
             self.version: str = f"{version}+tsan"
         elif build_type == BuildType.NIGHTLY:
-            version_postfix = datetime.today().strftime("%Y%m%d")
+            version_postfix = os.getenv(
+                "RAY_VERSION_POSTFIX", datetime.today().strftime("%Y%m%d")
+            )
             version = re.sub(r"dev\d*", f"dev{version_postfix}", version)
+
             self.version: str = version
             self.name = f"{self.name}-nightly"
         else:

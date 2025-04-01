@@ -152,8 +152,8 @@ void VirtualCluster::RemoveNodeInstances(ReplicaInstances replica_instances) {
   }
 }
 
-void VirtualCluster::RemoveNodeInstances(const std::vector<std::string> &nodes_to_remove,
-                                         std::vector<std::string> *nodes_with_failure) {
+Status VirtualCluster::RemoveNodeInstances(
+    const std::vector<std::string> &nodes_to_remove) {
   absl::flat_hash_set<std::string> node_set_to_remove(nodes_to_remove.begin(),
                                                       nodes_to_remove.end());
   ReplicaInstances replica_instances_to_remove;
@@ -171,12 +171,16 @@ void VirtualCluster::RemoveNodeInstances(const std::vector<std::string> &nodes_t
     }
   }
   if (!node_set_to_remove.empty()) {
-    nodes_with_failure->insert(
-        nodes_with_failure->end(), node_set_to_remove.begin(), node_set_to_remove.end());
-    return;
+    std::vector<std::string> nodes_with_failure(node_set_to_remove.begin(),
+                                                node_set_to_remove.end());
+    return Status::UnsafeToRemove(
+        "Failed to remove some of the nodes because they are not idle nor found in the "
+        "virtual cluster. These nodes with failure are shown below.",
+        std::any(nodes_with_failure));
   }
 
   RemoveNodeInstances(replica_instances_to_remove);
+  return Status::OK();
 }
 
 bool VirtualCluster::IsNodeInstanceIdle(const std::string &node_instance_id) {
@@ -896,7 +900,8 @@ Status PrimaryCluster::DetermineNodeInstanceAdditionsAndRemovals(
           "No enough nodes to remove from the virtual cluster. The replica sets that gcs "
           "can remove "
           "at most are shown below. Use it as a suggestion to "
-          "adjust your request or cluster.");
+          "adjust your request or cluster.",
+          std::any());
     }
   }
 
@@ -953,17 +958,12 @@ void PrimaryCluster::OnNodeInstanceDead(const std::string &node_instance_id,
 
 Status PrimaryCluster::RemoveNodesFromVirtualCluster(
     const rpc::RemoveNodesFromVirtualClusterRequest &request,
-    RemoveNodesFromVirtualClusterCallback callback,
-    std::vector<std::string> *nodes_with_failure) {
+    RemoveNodesFromVirtualClusterCallback callback) {
   auto logical_cluster = GetLogicalCluster(request.virtual_cluster_id());
-  logical_cluster->RemoveNodeInstances(
-      std::vector<std::string>(request.nodes_to_remove().begin(),
-                               request.nodes_to_remove().end()),
-      nodes_with_failure);
-  if (!nodes_with_failure->empty()) {
-    return Status::UnsafeToRemove(
-        "Failed to remove some of the nodes because they are not idle nor found in the "
-        "virtual cluster. These nodes with failure are shown below.");
+  auto status = logical_cluster->RemoveNodeInstances(std::vector<std::string>(
+      request.nodes_to_remove().begin(), request.nodes_to_remove().end()));
+  if (!status.ok()) {
+    return status;
   }
   return async_data_flusher_(logical_cluster->ToProto(), std::move(callback));
 }
@@ -1026,7 +1026,7 @@ Status PrimaryCluster::RemoveLogicalCluster(const std::string &logical_cluster_i
     auto message = ostr.str();
     RAY_LOG(ERROR) << message;
 
-    return Status::UnsafeToRemove(message);
+    return Status::UnsafeToRemove(message, std::any());
   }
 
   const auto &replica_instances_to_remove = logical_cluster->GetVisibleNodeInstances();

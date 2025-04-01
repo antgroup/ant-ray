@@ -258,8 +258,7 @@ class VirtualCluster {
   std::shared_ptr<NodeInstance> ReplenishUndividedNodeInstance(
       std::shared_ptr<NodeInstance> node_instance_to_replenish);
 
-  void RemoveNodeInstances(const std::vector<std::string> &nodes_to_remove,
-                           std::vector<std::string> *nodes_with_failure);
+  Status RemoveNodeInstances(const std::vector<std::string> &nodes_to_remove);
 
  protected:
   /// Insert the node instances to the cluster.
@@ -486,8 +485,7 @@ class PrimaryCluster : public DivisibleCluster,
 
   Status RemoveNodesFromVirtualCluster(
       const rpc::RemoveNodesFromVirtualClusterRequest &request,
-      RemoveNodesFromVirtualClusterCallback callback,
-      std::vector<std::string> *nodes_with_failure);
+      RemoveNodesFromVirtualClusterCallback callback);
 
   /// Get the virtual cluster by the logical cluster id.
   ///

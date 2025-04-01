@@ -214,11 +214,7 @@ void GcsVirtualClusterManager::HandleRemoveNodesFromVirtualCluster(
     rpc::SendReplyCallback send_reply_callback) {
   const auto &virtual_cluster_id = request.virtual_cluster_id();
   RAY_LOG(INFO) << "Start removing nodes from virtual cluster " << virtual_cluster_id;
-  std::vector<std::string> nodes_with_failure;
-  auto on_done = [reply,
-                  virtual_cluster_id,
-                  &nodes_with_failure,
-                  callback = std::move(send_reply_callback)](
+  auto on_done = [reply, virtual_cluster_id, callback = std::move(send_reply_callback)](
                      const Status &status,
                      std::shared_ptr<rpc::VirtualClusterTableData> data,
                      const ReplicaSets *replica_sets_to_recommend) {
@@ -228,7 +224,8 @@ void GcsVirtualClusterManager::HandleRemoveNodesFromVirtualCluster(
     } else {
       RAY_LOG(WARNING) << "Failed to remove nodes from virtual cluster "
                        << virtual_cluster_id << ", status = " << status.ToString();
-      if (!nodes_with_failure.empty()) {
+      if (status.data().has_value()) {
+        auto nodes_with_failure = std::any_cast<std::vector<std::string>>(status.data());
         reply->mutable_nodes_with_failure()->Assign(nodes_with_failure.begin(),
                                                     nodes_with_failure.end());
       }
@@ -243,8 +240,7 @@ void GcsVirtualClusterManager::HandleRemoveNodesFromVirtualCluster(
     return;
   }
 
-  status = primary_cluster_->RemoveNodesFromVirtualCluster(
-      std::move(request), on_done, &nodes_with_failure);
+  status = primary_cluster_->RemoveNodesFromVirtualCluster(std::move(request), on_done);
   if (!status.ok()) {
     on_done(status, nullptr, nullptr);
   }

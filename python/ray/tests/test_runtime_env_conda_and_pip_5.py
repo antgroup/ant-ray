@@ -1,3 +1,5 @@
+import os
+import tempfile
 import sys
 import pytest
 from packaging.version import parse
@@ -108,20 +110,27 @@ def test_runtime_env_with_pip_cmd(start_cluster):
 
             return sys.executable
 
-    runtime_env = {
-        "pip": {
-            "packages": ["pip install pip-install-test"],
-            "pip_version": "==20.2.3",
-            "pip_check": False,
+    with tempfile.TemporaryDirectory() as temp_dir:
+        runtime_env = {
+            "pip": {
+                "packages": [
+                    f"pip install requests --target {temp_dir}",
+                    "pip-install-test",
+                ],
+                "pip_version": "==20.2.3",
+                "pip_check": False,
+            }
         }
-    }
-    actor_1 = ray.remote(runtime_env=runtime_env)(Actor).remote()
-    actor_2 = ray.remote(runtime_env=runtime_env)(Actor).remote()
-    executable_1 = ray.get(actor_1.get_executable.remote())
-    executable_2 = ray.get(actor_2.get_executable.remote())
-    assert executable_1 == executable_2
-    assert ray.get(actor_1.test_dep.remote())
-    assert ray.get(actor_2.test_dep.remote())
+        actor_1 = ray.remote(runtime_env=runtime_env)(Actor).remote()
+        actor_2 = ray.remote(runtime_env=runtime_env)(Actor).remote()
+        executable_1 = ray.get(actor_1.get_executable.remote())
+        executable_2 = ray.get(actor_2.get_executable.remote())
+        assert executable_1 == executable_2
+        assert ray.get(actor_1.test_dep.remote())
+        assert ray.get(actor_2.test_dep.remote())
+
+        # Check if requests is installed in the target directory
+        assert os.path.exists(os.path.join(temp_dir, "requests"))
 
 
 if __name__ == "__main__":

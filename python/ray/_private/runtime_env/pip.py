@@ -229,7 +229,14 @@ class PipProcessor:
                         self._pip_env,
                         logger,
                     )
-
+                # NOTE(Jacky): If there are both pip packages and pip commands in the `pip packages` field,
+                # we will first write all pip packages into `requirements.txt` for installation.
+                # Then pip commands will be executed in the order of pip commands.
+                # Therefore, previously installed packages may be overwritten
+                # so that we do not guarantee that the packages installed by pip_packages or pip_command
+                # will exist in the ray virtual environment.
+                # Users need to determine whether there are pip package dependency conflicts
+                # or pip package dependencies are overwritten.
                 if len(pip_commands) > 0:
                     await self._run_pip_cmd_requirements(
                         path,

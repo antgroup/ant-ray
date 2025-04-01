@@ -1663,15 +1663,17 @@ and configured node type.</p></li>
 <h2>Flow Insight View<a class="headerlink" href="#flow-insight-view" title="Link to this heading">#</a></h2>
 <p>The Flow Insight view provides a powerful visualization of your Ray application’s
 execution flow, helping you understand the relationships between actors, tasks, and
-data transfers in your distributed application. This view offers both logical and
-physical perspectives of your application’s execution, making it easier to analyze
-performance, identify bottlenecks, and optimize your Ray workloads.</p>
+data transfers in your distributed application. This view offers logical view,
+physical view, distributed stack and flame graph of your application’s execution,
+making it easier to analyze performance, identify bottlenecks, and optimize your Ray workloads.</p>
 <section id="id2">
 <h3>Key Features<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
-<p><strong>Dual Visualization Modes:</strong></p>
+<p><strong>Four Visualization Modes:</strong></p>
 <ul class="simple">
 <li><p><strong>Logical View:</strong> Displays the call graph between functions and actors, showing the control flow and data dependencies in your application.</p></li>
 <li><p><strong>Physical View:</strong> Shows the physical distribution of actors across nodes with their resource usage and placement groups.</p></li>
+<li><p><strong>Distrubuted Stack View</strong>: Offers a unified call stack visualization across your distributed system, similar to how developers use pstack for single-process applications.</p></li>
+<li><p><strong>Flame Graph View:</strong> Provides a hierarchical visualization of execution time across your distributed application.</p></li>
 </ul>
 <p><strong>Interactive Exploration:</strong></p>
 <ul class="simple">
@@ -1698,14 +1700,14 @@ performance, identify bottlenecks, and optimize your Ray workloads.</p>
 </section>
 <section id="accessing-flow-insight">
 <h3>Accessing Flow Insight<a class="headerlink" href="#accessing-flow-insight" title="Link to this heading">#</a></h3>
-<img alt="Flow Insight View screenshot" class="align-center" src="../_images/flow-insight-entry.jpg" />
+<img alt="Flow Insight View screenshot" class="align-center" src="../_images/flow-insight-view-entry.gif" />
 <p>To access the Flow Insight view, click on the “Insight” link in the Jobs view for a specific job.
 This will open the Flow Insight visualization for that job, showing the execution graph and
 relationships between components.</p>
 </section>
 <section id="logical-view">
 <h3>Logical View<a class="headerlink" href="#logical-view" title="Link to this heading">#</a></h3>
-<img alt="Flow Insight View screenshot" class="align-center" src="../_images/flow-insight-logical-view.jpg" />
+<img alt="Flow Insight View screenshot" class="align-center" src="../_images/flow-insight-view-logical.gif" />
 <p>The logical view displays the call graph of your Ray application, showing the relationships
 between functions, actors, and methods. This view helps you understand the control flow
 and data dependencies in your application.</p>
@@ -1719,7 +1721,7 @@ application and identifying communication patterns between components.</p>
 </section>
 <section id="physical-view">
 <h3>Physical View<a class="headerlink" href="#physical-view" title="Link to this heading">#</a></h3>
-<img alt="Flow Insight View screenshot" class="align-center" src="../_images/flow-insight-physical-view.jpg" />
+<img alt="Flow Insight View screenshot" class="align-center" src="../_images/flow-insight-view-physical.gif" />
 <p>The physical view shows how actors are distributed across nodes in your Ray cluster,
 organized by placement groups. This view helps you understand the physical deployment
 of your application and resource utilization.</p>
@@ -1774,10 +1776,63 @@ categorizing actors by their role, status, or other application-specific attribu
 to color-code actors based on their context values, making it easy to identify actors with
 specific roles or states.</p>
 </section>
+<section id="distributed-flame-graph">
+<h3>Distributed Flame Graph<a class="headerlink" href="#distributed-flame-graph" title="Link to this heading">#</a></h3>
+<img alt="Distributed Flame Graph screenshot" class="align-center" src="../_images/flow-insight-view-flame.gif" />
+<p>The Distributed Flame Graph is an advanced visualization tool that automatically collects and aggregates
+execution time data from all components across your entire Ray job lifecycle. While traditional flame
+graphs are limited to profiling performance on a single machine, Ray’s Distributed Flame Graph provides
+a unified view of performance across your entire distributed system.</p>
+<p>Key features of the Distributed Flame Graph:</p>
+<ul class="simple">
+<li><p><strong>System-wide Performance View:</strong> Visualizes execution time across all distributed components</p></li>
+<li><p><strong>Call Hierarchy:</strong> Shows parent-child relationships between function calls</p></li>
+<li><p><strong>Time Distribution:</strong> Block width represents the proportion of time spent in each function</p></li>
+<li><p><strong>Performance Hotspots:</strong> Easily identify which components consume the most execution time</p></li>
+</ul>
+<p>The flame graph is particularly valuable for performance optimization as it allows you to:</p>
+<ul class="simple">
+<li><p>Identify which distributed components are consuming the most time</p></li>
+<li><p>Understand call relationships between components</p></li>
+<li><p>Detect unexpected performance bottlenecks</p></li>
+<li><p>Compare expected vs. actual execution time distribution</p></li>
+</ul>
+<p>For example, the flame graph might reveal that a particular process is consuming a long
+execution time, representing the majority of your application’s runtime, helping you focus your
+optimization efforts on the most impactful components.</p>
+<p>To access the Distributed Flame Graph, select “Flame” in the view type selector in the Flow Insight
+visualization after clicking on the “Insight” link for a specific job in the Jobs view.</p>
+</section>
+<section id="distributed-stack-dstack">
+<h3>Distributed Stack (DStack)<a class="headerlink" href="#distributed-stack-dstack" title="Link to this heading">#</a></h3>
+<img alt="Distributed Stack screenshot" class="align-center" src="../_images/flow-insight-view-dstack.gif" />
+<p>The Distributed Stack (DStack) view provides a unified call stack visualization across your entire
+Ray cluster. Similar to how developers use <code class="code docutils literal notranslate"><span class="pre">pstack</span></code> to diagnose issues in single-process applications,
+DStack extends this capability to distributed systems, automatically collecting and visualizing call
+relationships across all actors and tasks in your Ray cluster.</p>
+<p>Key features of DStack:</p>
+<ul class="simple">
+<li><p><strong>Zero-Code Integration:</strong> Works automatically with native Ray API code without any modifications</p></li>
+<li><p><strong>Global System View:</strong> See the entire distributed system’s call stack in a single interface</p></li>
+<li><p><strong>Dependency Tracking:</strong> Identify call dependencies between components across nodes</p></li>
+<li><p><strong>Blockage Detection:</strong> Quickly locate blocked components and understand why they’re stuck</p></li>
+</ul>
+<p>DStack is particularly valuable for debugging complex distributed applications by helping you:</p>
+<ul class="simple">
+<li><p>Understand the current state of all distributed components at a glance</p></li>
+<li><p>Trace execution paths across multiple nodes</p></li>
+<li><p>Detect deadlocks and performance bottlenecks in distributed interactions</p></li>
+<li><p>Identify which specific components are blocking progress and why</p></li>
+</ul>
+<p>This capability is especially powerful for troubleshooting complex distributed applications like
+reinforcement learning systems, where traditional debugging approaches would require manually
+logging into individual nodes and examining processes one by one.</p>
+<p>To access the DStack view, select “Call Stack” in the view type selector in the Flow Insight
+visualization after clicking on the “Insight” link for a specific job in the Jobs view.</p>
+</section>
 <section id="info-card">
 <h3>Info Card<a class="headerlink" href="#info-card" title="Link to this heading">#</a></h3>
-<p>When you click on an element in either the logical or physical view, the info card displays
-detailed information about that element:</p>
+<p>When you click on an element in each view, the info card displays detailed information about that element:</p>
 <ul class="simple">
 <li><p><strong>For Actors:</strong>
 - Basic information (name, ID, language)
@@ -1931,6 +1986,8 @@ providing insights into both the logical structure and physical deployment of yo
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#physical-view">Physical View</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resource-visualization">Resource Visualization</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context-based-filtering">Context-Based Filtering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distributed-flame-graph">Distributed Flame Graph</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distributed-stack-dstack">Distributed Stack (DStack)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#info-card">Info Card</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#search-functionality">Search Functionality</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices">Best Practices</a></li>

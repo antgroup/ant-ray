@@ -33,7 +33,6 @@ class RuntimeEnvContext:
         working_dir: Optional[str] = None,
         symlink_paths_to_working_dir: List[str] = None,
         job_dir: Optional[str] = None,
-        symlink_paths_to_job_dir: List[str] = None,
         native_libraries: List[Dict[str, str]] = None,
         preload_libraries: List[str] = None,
     ):
@@ -68,7 +67,6 @@ class RuntimeEnvContext:
         # resource dirs, some contents will be covered and we don't guarantee it.
         self.symlink_paths_to_working_dir = symlink_paths_to_working_dir or []
         self.job_dir = job_dir
-        self.symlink_paths_to_job_dir = symlink_paths_to_job_dir
         self.native_libraries = native_libraries or {
             "lib_path": [],
             "code_search_path": [],

@@ -81,7 +81,6 @@ class RuntimeEnvAgentClient {
   /// \param[in] callback The callback function.
   /// \param[in] worker_id The worker id which the runtime env is created for.
   virtual void DeleteRuntimeEnvIfPossible(const std::string &serialized_runtime_env,
-                                          const rpc::RuntimeEnvConfig &runtime_env_config,
                                           DeleteRuntimeEnvIfPossibleCallback callback,
                                           const WorkerID &worker_id,
                                           const JobID &job_id) = 0;

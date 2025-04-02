@@ -29,8 +29,6 @@ from ray._private.utils import get_or_create_event_loop
 from ray._private.runtime_env.plugin import RuntimeEnvPluginManager
 from ray._private.runtime_env.py_modules import PyModulesPlugin
 from ray._private.runtime_env.working_dir import WorkingDirPlugin
-
-# from ray._private.runtime_env.job_dir import JobDirPlugin
 from ray._private.runtime_env.nsight import NsightPlugin
 from ray._private.runtime_env.py_executable import PyExecutablePlugin
 from ray._private.runtime_env.mpi import MPIPlugin
@@ -227,7 +225,6 @@ class RuntimeEnvAgent:
         self._working_dir_plugin = WorkingDirPlugin(
             self._runtime_env_dir, self._gcs_aio_client
         )
-        # self._job_dir_plugin = JobDirPlugin(self._runtime_env_dir, self._gcs_aio_client)
         self._container_plugin = ContainerPlugin(temp_dir)
         # TODO(jonathan-anyscale): change the plugin to ProfilerPlugin
         # and unify with nsight and other profilers.
@@ -240,7 +237,6 @@ class RuntimeEnvAgent:
         # self._xxx_plugin, we should just iterate through self._plugins.
         self._base_plugins: List[RuntimeEnvPlugin] = [
             self._working_dir_plugin,
-            # self._job_dir_plugin,
             self._uv_plugin,
             self._pip_plugin,
             self._conda_plugin,
@@ -539,12 +535,6 @@ class RuntimeEnvAgent:
                 request.job_id.decode(),
                 self._logger,
             )
-
-            # runtime_env_context = await self.trigger_pre_job_startup(
-
-            # )
-
-            # serialized_context = await self.trigger_pre
             # Reply the RPC
             return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
                 status=agent_manager_pb2.AGENT_RPC_STATUS_OK
@@ -564,7 +554,6 @@ class RuntimeEnvAgent:
 
         try:
             runtime_env = RuntimeEnv.deserialize(request.serialized_runtime_env)
-            runtime_env_config = RuntimeEnvConfig.from_proto(request.runtime_env_config)
         except Exception as e:
             self._logger.exception(
                 "[Decrease] Failed to parse runtime env: "

@@ -604,7 +604,6 @@ void WorkerPool::MonitorStartingWorkerProcess(StartupToken proc_startup_token,
 
       process_failed_pending_registration_++;
       DeleteRuntimeEnvIfPossible(it->second.runtime_env_info.serialized_runtime_env(),
-                                 it->second.runtime_env_info.runtime_env_config(),
                                  job_id,
                                  it->second.worker_id);
       RemoveWorkerProcess(state, proc_startup_token);
@@ -773,7 +772,6 @@ void WorkerPool::HandleJobFinished(const JobID &job_id) {
   // env install really happens.
   if (NeedToEagerInstallRuntimeEnv(*job_config)) {
     DeleteRuntimeEnvIfPossible(job_config->runtime_env_info().serialized_runtime_env(),
-                               job_config->runtime_env_info().runtime_env_config(),
                                job_id);
   }
   finished_jobs_.insert(job_id);
@@ -1335,8 +1333,7 @@ void WorkerPool::StartNewWorker(
     auto &state = GetStateForLanguage(pop_worker_request->language);
     const std::string &serialized_runtime_env =
         pop_worker_request->runtime_env_info.serialized_runtime_env();
-    const rpc::RuntimeEnvConfig &runtime_env_config =
-        pop_worker_request->runtime_env_info.runtime_env_config();
+
     PopWorkerStatus status = PopWorkerStatus::OK;
     auto [proc, startup_token] =
         StartWorkerProcess(pop_worker_request->language,
@@ -1357,16 +1354,12 @@ void WorkerPool::StartNewWorker(
     } else if (status == PopWorkerStatus::TooManyStartingWorkerProcesses) {
       // TODO(jjyao) As an optimization, we don't need to delete the runtime env
       // but reuse it the next time we retry the request.
-      DeleteRuntimeEnvIfPossible(serialized_runtime_env,
-                                 runtime_env_config,
-                                 pop_worker_request->job_id,
-                                 worker_id);
+      DeleteRuntimeEnvIfPossible(
+          serialized_runtime_env, pop_worker_request->job_id, worker_id);
       state.pending_start_requests.emplace_back(std::move(pop_worker_request));
     } else {
-      DeleteRuntimeEnvIfPossible(serialized_runtime_env,
-                                 runtime_env_config,
-                                 pop_worker_request->job_id,
-                                 worker_id);
+      DeleteRuntimeEnvIfPossible(
+          serialized_runtime_env, pop_worker_request->job_id, worker_id);
       PopWorkerCallbackAsync(std::move(pop_worker_request->callback), nullptr, status);
     }
   };
@@ -1590,10 +1583,8 @@ void WorkerPool::DisconnectWorker(const std::shared_ptr<WorkerInterface> &worker
       }
     }
 
-    DeleteRuntimeEnvIfPossible(serialized_runtime_env,
-                               it->second.runtime_env_info.runtime_env_config(),
-                               worker->GetAssignedJobId(),
-                               it->second.worker_id);
+    DeleteRuntimeEnvIfPossible(
+        serialized_runtime_env, worker->GetAssignedJobId(), it->second.worker_id);
     RemoveWorkerProcess(state, worker->GetStartupToken());
   }
   RAY_CHECK(RemoveWorker(state.registered_workers, worker));
@@ -1845,17 +1836,14 @@ void WorkerPool::GetOrCreateRuntimeEnv(const std::string &serialized_runtime_env
       worker_id);
 }
 
-void WorkerPool::DeleteRuntimeEnvIfPossible(
-    const std::string &serialized_runtime_env,
-    const rpc::RuntimeEnvConfig &runtime_env_config,
-    const JobID &job_id,
-    const WorkerID &worker_id) {
+void WorkerPool::DeleteRuntimeEnvIfPossible(const std::string &serialized_runtime_env,
+                                            const JobID &job_id,
+                                            const WorkerID &worker_id) {
   RAY_LOG(DEBUG) << "DeleteRuntimeEnvIfPossible " << serialized_runtime_env
                  << " for job id " << job_id << " worker id " << worker_id;
   if (!IsRuntimeEnvEmpty(serialized_runtime_env)) {
     runtime_env_agent_client_->DeleteRuntimeEnvIfPossible(
         serialized_runtime_env,
-        runtime_env_config,
         [serialized_runtime_env](bool successful) {
           if (!successful) {
             RAY_LOG(ERROR) << "Delete runtime env failed";

@@ -281,7 +281,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         for k, v in context.env_vars.items():
             context.env_vars[k] = v.replace(
                 WorkingDirPlugin.job_dir_placeholder, job_dir
-            ).replace("${RAY_RUNTIME_ENV_JOB_DIR}", job_dir)
+            )
 
     async def post_worker_exit(
         self,

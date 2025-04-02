@@ -488,7 +488,6 @@ class RuntimeEnvAgent:
                     )
                     return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
                         status=agent_manager_pb2.AGENT_RPC_STATUS_FAILED,
-                        serialized_runtime_env_context="",
                         error_message=error_message,
                     )
 

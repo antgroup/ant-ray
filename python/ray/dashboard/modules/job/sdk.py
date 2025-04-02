@@ -212,7 +212,6 @@ class JobSubmissionClient(SubmissionClient):
 
         self._upload_working_dir_if_needed(runtime_env)
         self._upload_py_modules_if_needed(runtime_env)
-        self._upload_job_dir_if_needed(runtime_env)
 
         # Verify worker_process_setup_hook type.
         setup_hook = runtime_env.get("worker_process_setup_hook")

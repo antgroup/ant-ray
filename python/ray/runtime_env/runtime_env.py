@@ -282,7 +282,6 @@ class RuntimeEnv(dict):
         "py_executable",
         "java_jars",
         "working_dir",
-        "job_dir",
         "conda",
         "pip",
         "uv",
@@ -316,7 +315,6 @@ class RuntimeEnv(dict):
         py_modules: Optional[List[str]] = None,
         py_executable: Optional[str] = None,
         working_dir: Optional[str] = None,
-        job_dir: Optional[str] = None,
         pip: Optional[List[str]] = None,
         conda: Optional[Union[Dict[str, str], str]] = None,
         container: Optional[Dict[str, str]] = None,
@@ -339,8 +337,6 @@ class RuntimeEnv(dict):
             runtime_env["py_executable"] = py_executable
         if working_dir is not None:
             runtime_env["working_dir"] = working_dir
-        if job_dir is not None:
-            runtime_env["job_dir"] = job_dir
         if pip is not None:
             runtime_env["pip"] = pip
         if uv is not None:
@@ -523,9 +519,6 @@ class RuntimeEnv(dict):
 
     def working_dir(self) -> str:
         return self.get("working_dir", "")
-
-    def job_dir(self) -> str:
-        return self.get("job_dir", "")
 
     def py_modules(self) -> List[str]:
         if "py_modules" in self:

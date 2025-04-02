@@ -144,23 +144,6 @@ class RuntimeEnvPlugin(ABC):
         """
         return
 
-    async def pre_job_startup(
-        self,
-        runtime_env: "RuntimeEnv",  # noqa: F821
-        context: RuntimeEnvContext,
-        job_id: str,
-        logger: logging.Logger,
-    ) -> None:
-        return
-
-    async def post_job_exit(
-        self,
-        runtime_env: "RuntimeEnv",  # noqa: F821
-        job_id: str,
-        logger: logging.Logger,
-    ) -> None:
-        return
-
 
 class PluginSetupContext:
     def __init__(

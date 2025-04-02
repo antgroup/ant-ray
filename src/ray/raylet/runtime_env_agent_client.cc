@@ -455,6 +455,7 @@ class HttpRuntimeEnvAgentClient : public RuntimeEnvAgentClient {
         [=](SuccCallback<rpc::DeleteRuntimeEnvIfPossibleReply> succ_callback,
             FailCallback fail_callback) {
           return TryDeleteRuntimeEnvIfPossible(serialized_runtime_env,
+                                               runtime_env_config,
                                                std::move(succ_callback),
                                                std::move(fail_callback),
                                                worker_id,

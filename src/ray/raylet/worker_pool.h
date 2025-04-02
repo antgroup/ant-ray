@@ -657,7 +657,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// think there are unregistered workers, and won't start new workers.
   void MonitorStartingWorkerProcess(StartupToken proc_startup_token,
                                     const Language &language,
-                                    rpc::WorkerType worker_type);
+                                    rpc::WorkerType worker_type,
+                                    const JobID &job_id);
 
   /// Start a timer to monitor the starting worker process.
   /// Called when a worker process is started and waiting for registration for the

@@ -138,6 +138,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
     ):
         self._resources_dir = os.path.join(resources_dir, "working_dir_files")
         self._working_dirs = os.path.join(resources_dir, "working_dirs")
+        self._job_dirs = os.path.join(resources_dir, "job_dirs")
         self._gcs_aio_client = gcs_aio_client
         try_to_create_directory(self._resources_dir)
 
@@ -219,6 +220,11 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             ]
         set_pythonpath_in_context(python_path=str(working_dir), context=context)
 
+        # Use placeholder here and will replace it by `pre_worker_startup`.
+        context.job_dir = WorkingDirPlugin.job_dir_placeholder
+        job_dir = context.job_dir
+        context.env_vars[runtime_env_consts.RAY_JOB_DIR] = job_dir
+
     async def pre_worker_startup(
         self,
         runtime_env: "RuntimeEnv",  # noqa: F821
@@ -266,22 +272,22 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         if not os.path.exists(job_dir):
             logger.info(f"Creating job dir for job {job_id}")
             os.makedirs(job_dir, exist_ok=True)
+        context.job_dir = job_dir
         symlink_working_dir = os.path.join(job_dir, worker_id)
         logger.info(f"Creating symlink from {working_dir} to {symlink_working_dir}")
         try_to_symlink(symlink_working_dir, working_dir)
-        
+
         # Replace the placeholder with the real job dir.
-        for k, v in context.env_vars.copy().items():
+        for k, v in context.env_vars.items():
             context.env_vars[k] = v.replace(
                 WorkingDirPlugin.job_dir_placeholder, job_dir
             ).replace("${RAY_RUNTIME_ENV_JOB_DIR}", job_dir)
-                
 
     async def post_worker_exit(
         self,
         runtime_env: "RuntimeEnv",  # noqa: F821
         worker_id: str,
-        job_id : str,        
+        job_id: str,
         logger: logging.Logger = default_logger,
     ) -> None:
         if not runtime_env.working_dir():
@@ -307,6 +313,24 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         working_dir = os.path.join(self._working_dirs, worker_id)
         # TODO(Jacky): Use async method to remove, such as aiofiles.os.removedirs
         shutil.rmtree(working_dir)
+
+        # Check if job_dir contains any symlinked directories for active workers.
+        if any(entry.is_symlink() for entry in os.scandir(job_dir)):
+            logger.info(
+                f"Job dir {job_dir} contains symlinked directories for active workers. "
+                f"Skipping deletion for job {job_id}."
+            )
+            return
+
+        if runtime_env_consts.DISABLE_JOB_DIR_GC:
+            logger.info(
+                f"Job directory GC has been disabled. The dir {job_id} "
+                "won't be deleted."
+            )
+            return
+
+        logger.info(f"Deleting job dir for job {job_id}.")
+        shutil.rmtree(job_dir, ignore_errors=True)
 
     @contextmanager
     def with_working_dir_env(self, uri):

@@ -534,7 +534,8 @@ std::tuple<Process, StartupToken> WorkerPool::StartWorkerProcess(
   if (!IsIOWorkerType(worker_type)) {
     AdjustWorkerOomScore(proc.GetId());
   }
-  MonitorStartingWorkerProcess(worker_startup_token_counter_, language, worker_type, job_id);
+  MonitorStartingWorkerProcess(
+      worker_startup_token_counter_, language, worker_type, job_id);
   AddWorkerProcess(state,
                    worker_type,
                    proc,

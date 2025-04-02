@@ -19,7 +19,6 @@ from ray._private.runtime_env.packaging import (
 )
 from ray._private.runtime_env.py_modules import upload_py_modules_if_needed
 from ray._private.runtime_env.working_dir import upload_working_dir_if_needed
-from ray._private.runtime_env.job_dir import upload_job_dir_if_needed
 from ray._private.utils import split_address
 from ray.autoscaler._private.cli_logger import cli_logger
 from ray.dashboard.modules.job.common import uri_to_http_components
@@ -405,14 +404,6 @@ class SubmissionClient:
             )
 
         upload_py_modules_if_needed(runtime_env, upload_fn=_upload_fn)
-
-    def _upload_job_dir_if_needed(self, runtime_env: Dict[str, Any]):
-        def _upload_fn(job_dir, excludes, is_file=False):
-            self._upload_package_if_needed(
-                job_dir, include_parent_dir=True, excludes=excludes, is_file=is_file
-            )
-
-        upload_job_dir_if_needed(runtime_env, upload_fn=_upload_fn)
 
     @PublicAPI(stability="beta")
     def get_version(self) -> str:

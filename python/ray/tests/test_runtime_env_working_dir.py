@@ -660,7 +660,7 @@ def test_id_named_working_dir(tmp_working_dir, disable_working_dir_gc, shutdown_
 
 def test_add_working_dir_to_ld_library_path(tmp_working_dir, shutdown_only):
     ray.init(runtime_env={"working_dir": tmp_working_dir})
-    
+
     @ray.remote
     class A:
         def get_ld_library_path(self):
@@ -668,7 +668,7 @@ def test_add_working_dir_to_ld_library_path(tmp_working_dir, shutdown_only):
 
         def get_cwd(self):
             return os.getcwd()
-        
+
     a = A.remote()
     working_dir = ray.get(a.get_cwd.remote())
     ld_library_path = ray.get(a.get_ld_library_path.remote())

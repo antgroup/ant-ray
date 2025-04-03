@@ -21,6 +21,7 @@ import tempfile
 import threading
 import time
 import warnings
+import base64
 from inspect import signature
 from pathlib import Path
 from subprocess import list2cmdline
@@ -2080,6 +2081,58 @@ def try_update_ld_library_path(
         all_library_paths += ":"
         all_library_paths += working_dir
     os.environ[runtime_env_constants.LIBRARY_PATH_ENV_NAME] = all_library_paths
+
+
+def try_update_container_command(
+    language: Language,
+    container_command: List[str],
+    updated_envs: Dict[str, str],
+    passthrough_args: List[str],
+    entrypoint_prefix: Optional[List[str]],
+    py_executable: str,
+    pyenv_folder: str,
+    logger: logging.Logger,
+):
+    updated_envs_list = []
+    for k, v in updated_envs.items():
+        updated_envs_list.append("--env")
+        updated_envs_list.append(k + "=" + v)
+    if runtime_env_constants.CONTAINER_ENV_PLACEHOLDER in container_command:
+        container_placeholder = runtime_env_constants.CONTAINER_ENV_PLACEHOLDER
+        index_to_replace = container_command.index(container_placeholder)
+        container_command = (
+            container_command[:index_to_replace]
+            + updated_envs_list
+            + container_command[index_to_replace + 1 :]
+        )
+
+    if language == Language.PYTHON:
+        passthrough_args.insert(0, py_executable)
+        passthrough_args[1] = "-m ray._private.workers.default_worker"
+    elif language == Language.JAVA:
+        cp_param_index = 0
+        passthrough_args.insert(0, "java")
+        for idx, remaining_arg in enumerate(passthrough_args):
+            if remaining_arg == "-cp":
+                cp_param_index = idx
+                passthrough_args[idx + 1] = passthrough_args[idx + 1].replace(
+                    ".pyenv", pyenv_folder
+                )
+        passthrough_args.insert(
+            cp_param_index, "-DWORKER_SHIM_PID={}".format(os.getpid())
+        )
+    if entrypoint_prefix:
+        # update install_ray pip packages to base64
+        if "--packages" in entrypoint_prefix:
+            index = entrypoint_prefix.index("--packages")
+            pip_packages_str = entrypoint_prefix[index + 1]
+            logger.info(f"Install ray pip packages {pip_packages_str}")
+            entrypoint_prefix[index + 1] = base64.b64encode(
+                pip_packages_str.encode("utf-8")
+            ).decode("utf-8")
+        passthrough_args = entrypoint_prefix + passthrough_args
+    container_command.append(" ".join(passthrough_args))
+    return container_command
 
 
 def get_ray_whl_dir():

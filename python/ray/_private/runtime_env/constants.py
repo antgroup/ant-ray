@@ -60,7 +60,11 @@ RAY_USE_WHL_PACKAGE = env_bool("RAY_USE_WHL_PACKAGE", False)
 RAY_PODMAN_UES_NYDUS = env_bool("RAY_PODMAN_UES_NYDUS", True)
 
 # The system log dir
-RAY_PODMAN_SYSTEM_LOG_DIR = os.environ.get("RAY_PODMAN_SYSTEM_LOG_DIR", "")
+RAY_PODMAN_SYSTEM_LOG_DIR = os.environ.get(
+    "RAY_PODMAN_SYSTEM_LOG_DIR", "/home/admin/logs"
+)
 
-# ray podman log dir
-RAY_PODMAN_LOG_DIR = os.environ.get("RAY_PODMAN_LOG_DIR", "")
+# Apsara Cloud system config dir
+RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR = os.environ.get(
+    "RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR", "/apsara"
+)

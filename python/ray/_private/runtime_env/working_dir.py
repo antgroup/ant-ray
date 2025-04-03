@@ -248,6 +248,11 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             context.env_vars[k] = v.replace(
                 WorkingDirPlugin.working_dir_placeholder, working_dir
             )
+        if "container_command" in context.container:
+            for i, command_str in enumerate(context.container["container_command"]):
+                context.container["container_command"][i] = command_str.replace(
+                    WorkingDirPlugin.working_dir_placeholder, working_dir
+                )
         # Add symbol links to the working dir.
         # Deduplicate, as linking duplicate file will raise FileExistsError
         linked_dir = set()

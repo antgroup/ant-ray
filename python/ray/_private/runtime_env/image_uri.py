@@ -457,8 +457,8 @@ class ContainerManager:
         else:
             container_command.append("admin")
         container_command.append("-w")
-        if context.cwd:
-            container_command.append(context.cwd)
+        if context.working_dir:
+            container_command.append(context.working_dir)
         else:
             container_command.append(os.getcwd())
         container_command.append("--cap-add=AUDIT_WRITE")
@@ -467,29 +467,35 @@ class ContainerManager:
         # so we create a reverse dict mapping,
         # which can modify the latest source_path.
         container_to_host_mount_dict = {}
-        if os.path.exists("/home/admin/logs"):
+        if os.path.exists(runtime_env_constants.RAY_PODMAN_SYSTEM_LOG_DIR):
+            log_dir = runtime_env_constants.RAY_PODMAN_SYSTEM_LOG_DIR
             if container_option.get("customize_log_dir"):
                 customize_log_path = container_option.get("customize_log_dir")
                 if not os.path.exists(customize_log_path):
                     os.makedirs(customize_log_path)
+                    container_to_host_mount_dict[log_dir] = customize_log_path
+                    ray_log_dir = os.path.join(log_dir, "ray_logs")
+                    container_to_host_mount_dict[ray_log_dir] = ray_log_dir
                     container_to_host_mount_dict[
-                        "/home/admin/logs"
-                    ] = customize_log_path
-                    container_to_host_mount_dict[
-                        "/home/admin/logs/ray-logs/"
-                    ] = "/home/admin/logs/ray-logs/"
-                    container_to_host_mount_dict[
-                        "/home/admin/logs/share"
-                    ] = "/home/admin/logs"
+                        os.path.join(log_dir, "share")
+                    ] = log_dir
             else:
-                container_to_host_mount_dict["/home/admin/logs"] = "/home/admin/logs"
-        if os.path.exists("/apsara"):
-            container_to_host_mount_dict["/apsara"] = "/apsara"
+                container_to_host_mount_dict[log_dir] = log_dir
+        if os.path.exists(runtime_env_constants.RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR):
+            aspara_system_config_dir = (
+                runtime_env_constants.RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR
+            )
+            container_to_host_mount_dict[
+                aspara_system_config_dir
+            ] = aspara_system_config_dir
         if install_ray or container_pip_packages:
             container_to_host_mount_dict[
                 dependencies_installer_path
             ] = get_dependencies_installer_path()
             container_to_host_mount_dict[get_ray_whl_dir()] = get_ray_whl_dir()
+
+        # If install_ray is not selected, we will mount the pyenv virtual environment
+        # and the directory where `ant-ray` is located into the image.
         if not install_ray:
             host_site_packages_path = get_ray_site_packages_path()
             if py_executable:
@@ -513,6 +519,8 @@ class ContainerManager:
             container_to_host_mount_dict[
                 system_dynamic_config_file_path
             ] = system_dynamic_config_file_path
+
+        # For loop `run options` and append each item to the command line of podman
         if runtime_env.py_container_run_options(container_key_name):
             run_options_list = runtime_env.py_container_run_options(container_key_name)
             index = 0

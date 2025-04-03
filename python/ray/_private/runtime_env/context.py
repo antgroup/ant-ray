@@ -16,6 +16,7 @@ from ray._private.utils import (
     try_update_code_search_path,
     try_update_ld_preload,
     try_update_ld_library_path,
+    try_update_container_command,
 )
 
 logger = logging.getLogger(__name__)
@@ -156,47 +157,20 @@ class RuntimeEnvContext:
 
         updated_envs = update_envs(self.env_vars)
 
+        # excute worker process in container
         if "container_command" in self.container:
             container_command = self.container["container_command"]
-            updated_envs_list = []
-            for k, v in updated_envs.items():
-                updated_envs_list.append("--env")
-                updated_envs_list.append(k + "=" + v)
-            if runtime_env_constants.CONTAINER_ENV_PLACEHOLDER in container_command:
-                container_placeholder = runtime_env_constants.CONTAINER_ENV_PLACEHOLDER
-                index_to_replace = container_command.index(container_placeholder)
-                container_command = (
-                    container_command[:index_to_replace]
-                    + updated_envs_list
-                    + container_command[index_to_replace + 1 :]
-                )
-
-            if language == Language.PYTHON:
-                passthrough_args.insert(0, self.py_executable)
-                passthrough_args[1] = "-m ray._private.workers.default_worker"
-            elif language == Language.JAVA:
-                cp_param_index = 0
-                passthrough_args.insert(0, "java")
-                for idx, remaining_arg in enumerate(passthrough_args):
-                    if remaining_arg == "-cp":
-                        cp_param_index = idx
-                        passthrough_args[idx + 1] = passthrough_args[idx + 1].replace(
-                            ".pyenv", self.pyenv_folder
-                        )
-                passthrough_args.insert(
-                    cp_param_index, "-DWORKER_SHIM_PID={}".format(os.getpid())
-                )
-            if self.entrypoint_prefix:
-                # update install_ray pip packages to base64
-                if "--packages" in self.entrypoint_prefix:
-                    index = self.entrypoint_prefix.index("--packages")
-                    pip_packages_str = self.entrypoint_prefix[index + 1]
-                    logger.info(f"Install ray pip packages {pip_packages_str}")
-                    self.entrypoint_prefix[index + 1] = base64.b64encode(
-                        pip_packages_str.encode("utf-8")
-                    ).decode("utf-8")
-                passthrough_args = self.entrypoint_prefix + passthrough_args
-            container_command.append(" ".join(passthrough_args))
+            # try update container command
+            container_command = try_update_container_command(
+                language,
+                container_command,
+                updated_envs,
+                passthrough_args,
+                self.entrypoint_prefix,
+                self.py_executable,
+                self.pyenv_folder,
+                logger=logger,
+            )
             logger.info(
                 "Exec'ing worker with command: {}".format(" ".join(container_command))
             )

@@ -2140,6 +2140,3 @@ def check_logs_by_keyword(keyword, log_file_pattern):
         return result.returncode == 0
     except Exception:
         return False
-
-
-

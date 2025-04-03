@@ -658,6 +658,23 @@ def test_id_named_working_dir(tmp_working_dir, disable_working_dir_gc, shutdown_
     assert not ray.get(c.check_file.remote(test_file_name))
 
 
+def test_add_working_dir_to_ld_library_path(tmp_working_dir, shutdown_only):
+    ray.init(runtime_env={"working_dir": tmp_working_dir})
+    
+    @ray.remote
+    class A:
+        def get_ld_library_path(self):
+            return os.environ.get("LD_LIBRARY_PATH", "")
+
+        def get_cwd(self):
+            return os.getcwd()
+        
+    a = A.remote()
+    working_dir = ray.get(a.get_cwd.remote())
+    ld_library_path = ray.get(a.get_ld_library_path.remote())
+    assert working_dir in ld_library_path
+
+
 @pytest.mark.skipif(sys.platform == "win32", reason="Fail to create temp dir.")
 @pytest.mark.parametrize("disable_job_dir_gc", [True, False])
 def test_id_named_job_dir(tmp_working_dir, disable_job_dir_gc, shutdown_only):

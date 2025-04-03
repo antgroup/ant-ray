@@ -25,20 +25,6 @@ export type DebugCommandResponse = {
   };
 };
 
-export type DebugOutputEntry = {
-  cmd: string;
-  response: string;
-  timestamp: number;
-};
-
-export type DebugOutputResponse = {
-  result: boolean;
-  msg: string;
-  data: {
-    output: string;
-  };
-};
-
 export const getBreakpoints = async (jobId?: string): Promise<Breakpoint[]> => {
   const path = jobId ? `get_breakpoints?job_id=${jobId}` : "get_breakpoints";
   console.log(`Fetching breakpoints from: ${path}`);
@@ -55,37 +41,6 @@ export const getBreakpoints = async (jobId?: string): Promise<Breakpoint[]> => {
   // If neither format matches, return an empty array
   console.error("Unexpected breakpoints response format:", result.data);
   return [];
-};
-
-export const getDebugOutput = async (taskId: string): Promise<string> => {
-  if (!taskId) {
-    console.error("Missing task ID for getDebugOutput");
-    return "";
-  }
-  
-  const path = `get_debug_output?task_id=${taskId}`;
-  console.log(`Fetching debug output from: ${path}`);
-  
-  try {
-    const result = await get<DebugOutputResponse>(path);
-    console.log(`Debug output response:`, result.data);
-    
-    if (result.data && result.data.data && result.data.data.output) {
-      return result.data.data.output;
-    }
-    
-    // If output is directly on the result.data object
-    if (result.data && result.data.data.output) {
-      return result.data.data.output;
-    }
-    
-    // If neither format matches, return an empty array
-    console.error("Unexpected debug output response format:", result.data);
-    return "";
-  } catch (error) {
-    console.error("Error fetching debug output:", error);
-    return "";
-  }
 };
 
 export const setBreakpoint = async (

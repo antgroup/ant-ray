@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Breakpoint, getBreakpoints, setBreakpoint, sendDebugCommand, getDebugOutput, DebugOutputEntry, closeDebugSession } from "../../service/debug-insight";
-import { Terminal } from "@xterm/xterm";
-import "@xterm/xterm/css/xterm.css";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { Breakpoint, getBreakpoints, setBreakpoint, sendDebugCommand, closeDebugSession } from "../../service/debug-insight";
 import "./RayVisualization.css";
 
 type DebugPanelProps = {
@@ -11,36 +9,55 @@ type DebugPanelProps = {
   isTab?: boolean;
 }
 
+type SourceCodeLine = {
+  lineNumber: number;
+  content: string;
+  isCurrent?: boolean;
+  isBreakpoint?: boolean;
+}
+
+type StackFrame = {
+  filename: string;
+  lineNumber: number;
+  functionName: string;
+}
+
 const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = false }) => {
   const [breakpoints, setBreakpoints] = useState<Breakpoint[]>([]);
   const [actorClass, setActorClass] = useState("");
   const [actorName, setActorName] = useState("");
   const [methodName, setMethodName] = useState("");
   const [functionName, setFunctionName] = useState("");
-  const [commandHistory, setCommandHistory] = useState<Array<{cmd: string, response: string}>>([]);
-  const [command, setCommand] = useState("");
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
-  const [outputRefreshInterval, setOutputRefreshInterval] = useState<NodeJS.Timeout | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const [autoRefreshOutput, setAutoRefreshOutput] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const commandHistoryRef = useRef<HTMLDivElement>(null);
-  const terminalRef = useRef<HTMLDivElement>(null);
-  const xtermRef = useRef<Terminal | null>(null);
-  const commandInputRef = useRef<HTMLInputElement>(null);
   const [selectedBreakpoint, setSelectedBreakpoint] = useState<Breakpoint | null>(null);
-  const [commandHistoryIndex, setCommandHistoryIndex] = useState(-1);
-  const [commandBuffer, setCommandBuffer] = useState("");
-  const [commandsForNav, setCommandsForNav] = useState<string[]>([]);
   const [isDisablingBreakpoint, setIsDisablingBreakpoint] = useState(false);
+
+  // New state for IDE-like debug interface
+  const [sourceCode, setSourceCode] = useState<SourceCodeLine[]>([]);
+  const [currentLine, setCurrentLine] = useState<number | null>(null);
+  const [stackFrames, setStackFrames] = useState<StackFrame[]>([]);
+  const [currentFile, setCurrentFile] = useState<string | null>(null);
+  const [executing, setExecuting] = useState(false);
+  const [executionMessage, setExecutionMessage] = useState<string | null>(null);
+  const [output, setOutput] = useState<string>('');
 
   // Add state for foldable sections
   const [breakpointSectionOpen, setBreakpointSectionOpen] = useState(true);
   const [breakpointListOpen, setBreakpointListOpen] = useState(true);
-  const [consoleSectionOpen, setConsoleSectionOpen] = useState(true);
+  const [sourceCodeSectionOpen, setSourceCodeSectionOpen] = useState(true);
+  const [stackSectionOpen, setStackSectionOpen] = useState(true);
+  const [outputSectionOpen, setOutputSectionOpen] = useState(true);
   
   const [isClosingSession, setIsClosingSession] = useState(false);
+  
+  // State to store mapping from 'filename:lineNumber' to breakpoint index
+  const [lineBreakpoints, setLineBreakpoints] = useState<Map<string, number>>(new Map());
+  
+  const sourceCodeRef = useRef<HTMLDivElement>(null);
+  const outputRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     if (open) {
@@ -50,9 +67,6 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = f
     return () => {
       if (refreshInterval) {
         clearInterval(refreshInterval);
-      }
-      if (outputRefreshInterval) {
-        clearInterval(outputRefreshInterval);
       }
     };
   }, [open, jobId]);
@@ -75,399 +89,355 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = f
     };
   }, [autoRefresh]);
   
-  // Only auto-refresh output for the currently selected breakpoint/task
-  useEffect(() => {
-    if (autoRefreshOutput && selectedBreakpoint && selectedBreakpoint.taskId === currentTaskId) {
-      const interval = setInterval(() => {
-        fetchDebugOutput();
-      }, 2000);
-      setOutputRefreshInterval(interval);
-    } else if (outputRefreshInterval) {
-      clearInterval(outputRefreshInterval);
-      setOutputRefreshInterval(null);
-    }
-    
-    return () => {
-      if (outputRefreshInterval) {
-        clearInterval(outputRefreshInterval);
-      }
-    };
-  }, [autoRefreshOutput, currentTaskId, selectedBreakpoint]);
   
-  // When selected breakpoint changes, fetch the debug output
+  // Auto scroll output to bottom when updated
+  useEffect(() => {
+    if (outputRef.current) {
+      outputRef.current.scrollTop = outputRef.current.scrollHeight;
+    }
+  }, [output]);
+
+  // When a breakpoint is selected, fetch source code
   useEffect(() => {
     if (selectedBreakpoint && selectedBreakpoint.taskId) {
-      fetchDebugOutput();
-    }
-  }, [selectedBreakpoint]);
-  
-  // Auto scroll to bottom when command history updates
-  useEffect(() => {
-    if (commandHistoryRef.current) {
-      commandHistoryRef.current.scrollTop = commandHistoryRef.current.scrollHeight;
-    }
-  }, [commandHistory]);
-
-  // Focus on input when shell is active
-  useEffect(() => {
-    if (selectedBreakpoint && commandInputRef.current) {
-      commandInputRef.current.focus();
+      fetchSourceCode();
+      // Clear the output when switching breakpoints
+      setOutput('');
     }
   }, [selectedBreakpoint]);
 
-  // Store commands for navigation history
+  // Add an effect to update breakpoints in UI when sourceCode changes
   useEffect(() => {
-    // Extract commands from the full history for navigation
-    const cmdHistory = commandHistory
-      .filter(entry => entry.cmd)
-      .map(entry => entry.cmd);
-    
-    // Ensure no duplicates and maintain order
-    const uniqueCmds: string[] = [];
-    for (let i = cmdHistory.length - 1; i >= 0; i--) {
-      if (!uniqueCmds.includes(cmdHistory[i])) {
-        uniqueCmds.unshift(cmdHistory[i]);
+    if (selectedBreakpoint && selectedBreakpoint.taskId && sourceCode.length > 0 && currentFile) {
+      // If we have source code loaded but no breakpoints marked, fetch breakpoints
+      const hasBreakpointsMarked = sourceCode.some(line => line.isBreakpoint);
+      if (!hasBreakpointsMarked) {
+        console.log("Source code loaded but no breakpoints marked, fetching breakpoints...");
+        fetchAndRecordAllBreakpoints();
       }
     }
-    
-    // Limit to 50 commands max
-    setCommandsForNav(uniqueCmds.slice(-50));
-  }, [commandHistory]);
+  }, [sourceCode, currentFile]);
 
-  // Initialize xterm when terminal container is mounted or a breakpoint is selected
+  // Add effect to handle initial load
   useEffect(() => {
-    if (consoleSectionOpen && terminalRef.current && selectedBreakpoint) {
-      // Clean up any existing terminal
-      if (xtermRef.current) {
-        xtermRef.current.dispose();
-      }
-      
-      // Create new terminal
-      const term = new Terminal({
-        fontFamily: 'monospace',
-        fontSize: 14,
-        theme: {
-          background: '#1e1e1e',
-          foreground: '#f0f0f0',
-          cursor: '#f0f0f0',
-        },
-        cursorBlink: true,
-        scrollback: 1000,
-        disableStdin: false,
-        convertEol: true,
-      });
-      
-      // Apply full container size to terminal
-      term.onResize(() => {
-        // Terminal resized
-        console.log('Terminal resized');
-      });
-      
-      term.open(terminalRef.current);
-      
-      // Apply custom CSS to hide scrollbars
-      if (terminalRef.current) {
-        // Find and modify xterm-viewport
-        const viewports = terminalRef.current.querySelectorAll('.xterm-viewport');
-        viewports.forEach(viewport => {
-          if (viewport instanceof HTMLElement) {
-            viewport.style.overflowY = 'auto'; // Allow vertical scrolling
-            viewport.style.overflowX = 'auto'; // Allow horizontal scrolling
-            viewport.style['scrollbarWidth' as any] = 'thin'; // Show thin scrollbar for Firefox
-            viewport.style['msOverflowStyle' as any] = '-ms-autohiding-scrollbar'; // Show scrollbar for IE/Edge
-          }
-        });
-      }
-      
-      // Set up terminal
-      term.writeln('Debug shell connected. Type PDB commands below.');
-      term.writeln('Common PDB commands: n (next), s (step), c (continue), q (quit)');
-      term.writeln('Use the up/down arrow keys to navigate command history.');
-      term.writeln('');
-      term.write('(Pdb) ');
-      
-      // Scroll to bottom after initial text is written
-      scrollToBottom(term);
-      
-      // Auto scroll to bottom when terminal content changes
-      term.onData(() => {
-        scrollToBottom(term);
-      });
-      
-      // Current command text buffer
-      let currentCommand = '';
-      let historyPosition = -1;
-      
-      // Set up input handling
-      term.onKey(({ key, domEvent }) => {
-        const printable = !domEvent.altKey && !domEvent.ctrlKey && !domEvent.metaKey;
-        
-        if (domEvent.key === 'Enter') {
-          // Get current line
-          const line = term.buffer.active.getLine(term.buffer.active.cursorY)?.translateToString() || '';
-          const promptIndex = line.lastIndexOf('(Pdb) ');
-          const cmd = promptIndex >= 0 ? line.substring(promptIndex + 6).trim() : currentCommand.trim();
-          
-          // Reset current command
-          currentCommand = '';
-          historyPosition = -1;
-          
-          // Handle command
-          if (cmd) {
-            // Write a new line
-            term.writeln('');
-            
-            // Handle quit command separately
-            if (cmd === 'q' || cmd === 'quit') {
-              term.writeln("Error: 'q' and 'quit' commands are disabled. Please use the 'Close Session' button instead.");
-              term.write('(Pdb) ');
-              
-              // Scroll to bottom
-              scrollToBottom(term);
-              return;
-            }
-            
-            // Execute the command
-            executePdbCommand(cmd, term);
-          } else {
-            // Empty command, just add a new prompt
-            term.writeln('');
-            term.write('(Pdb) ');
-            
-            // Scroll to bottom
-            scrollToBottom(term);
-          }
-        } else if (domEvent.key === 'ArrowUp') {
-          // Navigate up in history
-          if (historyPosition === -1 && commandsForNav.length > 0) {
-            // Save current input if we're just starting to navigate
-            currentCommand = getPromptInput(term);
-          }
-          
-          if (commandsForNav.length > 0) {
-            const nextPosition = historyPosition === -1 ? 
-              commandsForNav.length - 1 : 
-              Math.max(0, historyPosition - 1);
-              
-            // Only update if position changed
-            if (nextPosition !== historyPosition) {
-              historyPosition = nextPosition;
-              const historyCommand = commandsForNav[historyPosition];
-              clearCurrentPrompt(term);
-              term.write('(Pdb) ' + historyCommand);
-            }
-          }
-        } else if (domEvent.key === 'ArrowDown') {
-          // Navigate down in history
-          if (historyPosition >= 0) {
-            if (historyPosition < commandsForNav.length - 1) {
-              // Move to next command in history
-              historyPosition++;
-              const historyCommand = commandsForNav[historyPosition];
-              clearCurrentPrompt(term);
-              term.write('(Pdb) ' + historyCommand);
-            } else if (historyPosition === commandsForNav.length - 1) {
-              // Return to original input
-              historyPosition = -1;
-              clearCurrentPrompt(term);
-              term.write('(Pdb) ' + currentCommand);
-            }
-          }
-        } else if (domEvent.key === 'Backspace') {
-          // Handle backspace - only delete if there's text after prompt
-          const input = getPromptInput(term);
-          if (input.length > 0) {
-            // Move cursor back, write a space to erase the character, then move back again
-            term.write('\b \b');
-            // Update current command
-            currentCommand = input.slice(0, -1);
-          }
-        } else if (printable) {
-          // Print the character
-          term.write(key);
-          // Update current command
-          currentCommand += key;
-        }
-      });
-      
-      // Store the terminal instance
-      xtermRef.current = term;
-      
-      // Fetch initial output
-      fetchDebugOutput().then(output => {
-        if (output) {
-          term.writeln(output);
-          term.write('(Pdb) ');
-          
-          // Scroll to bottom after output is loaded
-          scrollToBottom(term);
-        }
-      });
+    if (open && selectedBreakpoint && selectedBreakpoint.taskId) {
+      console.log("Debug panel opened with active breakpoint, ensuring breakpoints are loaded");
+      fetchAndRecordAllBreakpoints();
     }
-    
-    return () => {
-      // Clean up terminal on unmount
-      if (xtermRef.current) {
-        xtermRef.current.dispose();
-        xtermRef.current = null;
-      }
-    };
-  }, [consoleSectionOpen, selectedBreakpoint]);
-  
-  // Helper to get input text after the prompt
-  const getPromptInput = (term: Terminal): string => {
-    const line = term.buffer.active.getLine(term.buffer.active.cursorY)?.translateToString() || '';
-    const promptIndex = line.lastIndexOf('(Pdb) ');
-    return promptIndex >= 0 ? line.substring(promptIndex + 6) : '';
-  };
-  
-  // Helper to clear the current prompt and input
-  const clearCurrentPrompt = (term: Terminal) => {
-    const input = getPromptInput(term);
-    
-    // Move cursor to the beginning of input
-    for (let i = 0; i < input.length; i++) {
-      term.write('\b \b');
-    }
-  };
+  }, [open]);
 
-  // Execute PDB command and handle the response
-  const executePdbCommand = async (cmd: string, term: Terminal) => {
-    if (!cmd.trim() || !jobId || !currentTaskId || !selectedBreakpoint) return;
+  // Scroll to current line in source code view
+  useEffect(() => {
+    if (sourceCodeRef.current && currentLine !== null) {
+      const lineElement = sourceCodeRef.current.querySelector(`[data-line="${currentLine}"]`);
+      if (lineElement) {
+        lineElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [currentLine, sourceCode]);
+
+  // Execute debug command and handle the response
+  const executeDebugCommand = async (cmd: string): Promise<string | null> => {
+    if (!cmd.trim() || !jobId || !currentTaskId || !selectedBreakpoint) return null;
     
     try {
-      setIsLoading(true);
+      setExecuting(true);
+      setExecutionMessage(`Executing: ${cmd}...`);
       
       const response = await sendDebugCommand({
         job_id: jobId,
         task_id: currentTaskId,
-        cmd: cmd + '\n'  // Add newline for PDB
+        cmd: cmd + '\n'  // Add newline for command termination
       });
       
       console.log("Debug command response:", response);
       
-      // Add command to history for navigation
-      setCommandsForNav(prev => {
-        const newCommands = [...prev];
-        if (!newCommands.includes(cmd)) {
-          newCommands.push(cmd);
-          // Limit history size
-          if (newCommands.length > 50) {
-            newCommands.shift();
-          }
-        }
-        return newCommands;
-      });
+      parseDebugOutput(response);
       
-      // Write response to terminal
-      if (response && term) {
-        term.writeln(response);
-        term.write('(Pdb) ');
-        
-        // Scroll to bottom
-        scrollToBottom(term);
+      // If this is a command that changes execution state, refetch source code
+      if (['n', 'next', 's', 'step', 'c', 'continue', 'r', 'return'].includes(cmd)) {
+        await fetchSourceCode();
       }
       
+      setExecutionMessage(null);
+      return response;
     } catch (error) {
       console.error("Failed to send debug command:", error);
-      if (term) {
-        term.writeln("Error: Failed to execute command");
-        term.write('(Pdb) ');
-        
-        // Scroll to bottom
-        scrollToBottom(term);
-      }
+      setExecutionMessage("Error executing command");
+      return null;
     } finally {
-      setIsLoading(false);
+      setExecuting(false);
     }
   };
 
-  // Helper function to scroll terminal to bottom
-  const scrollToBottom = (term: Terminal) => {
-    try {
-      // Use setTimeout to ensure scroll happens after render
-      setTimeout(() => {
-        if (term && terminalRef.current) {
-          const viewport = terminalRef.current.querySelector('.xterm-viewport');
-          if (viewport instanceof HTMLElement) {
-            viewport.scrollTop = viewport.scrollHeight;
+  // Parse debug output to extract source code, variables, and stack
+  const parseDebugOutput = (output: string) => {
+    if (!output) return;
+
+    // Track if we found any source code lines
+    let foundSourceCode = false;
+    const parsedLines: SourceCodeLine[] = [];
+    
+    // Direct string parsing without regex
+    const lines = output.split('\n');
+    let currentLine = null;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Look for lines with format like "24  ->" or "24    " that indicate source code
+      if (line.length > 0 && !isNaN(parseInt(line.charAt(0), 10))) {
+        const firstSpaceIndex = line.indexOf(' ');
+        if (firstSpaceIndex > 0) {
+          const lineNumber = parseInt(line.substring(0, firstSpaceIndex), 10);
+          if (!isNaN(lineNumber)) {
+            const remainingText = line.substring(firstSpaceIndex).trim();
+            const isArrowLine = remainingText.startsWith("->");
+            
+            // If it's a line with an arrow, it's the current line
+            if (isArrowLine) {
+              currentLine = lineNumber;
+              // Content starts after the arrow
+              const content = remainingText.substring(2).trim();
+              parsedLines.push({
+                lineNumber,
+                content,
+                isCurrent: true,
+                isBreakpoint: false
+              });
+              setCurrentLine(lineNumber);
+              foundSourceCode = true;
+            } 
+            // Otherwise it's a regular source code line
+            else {
+              parsedLines.push({
+                lineNumber,
+                content: remainingText,
+                isCurrent: lineNumber === currentLine,
+                isBreakpoint: false
+              });
+              foundSourceCode = true;
+            }
           }
         }
-      }, 0);
-    } catch (error) {
-      console.error("Failed to scroll to bottom:", error);
+      }
+      
+      // Look for file location information
+      if (line.startsWith('>') && line.includes('(') && line.includes(')')) {
+        // Format is like: "> /path/to/file.py(42)(some_function)"
+        const arrowRemoved = line.substring(1).trim();
+        const openParenIndex = arrowRemoved.indexOf('(');
+        
+        if (openParenIndex > 0) {
+          const filename = arrowRemoved.substring(0, openParenIndex).trim();
+          const closeParenIndex = arrowRemoved.indexOf(')', openParenIndex);
+          
+          if (closeParenIndex > openParenIndex) {
+            const lineNumberStr = arrowRemoved.substring(openParenIndex + 1, closeParenIndex);
+            const lineNumber = parseInt(lineNumberStr, 10);
+            
+            if (!isNaN(lineNumber)) {
+              setCurrentFile(filename);
+              setCurrentLine(lineNumber);
+              
+              // Try to extract function name
+              const remainingText = arrowRemoved.substring(closeParenIndex + 1).trim();
+              const funcOpenParenIndex = remainingText.indexOf('(');
+              const funcCloseParenIndex = remainingText.indexOf(')');
+              
+              if (funcOpenParenIndex >= 0 && funcCloseParenIndex > funcOpenParenIndex) {
+                const functionName = remainingText.substring(funcOpenParenIndex + 1, funcCloseParenIndex);
+                
+                // Update stack frames if this is a new function
+                setStackFrames(prev => {
+                  const newFrame = { 
+                    filename, 
+                    lineNumber, 
+                    functionName 
+                  };
+                  
+                  // Check if this frame is already in the stack
+                  if (!prev.some(frame => 
+                    frame.filename === newFrame.filename && 
+                    frame.lineNumber === newFrame.lineNumber && 
+                    frame.functionName === newFrame.functionName
+                  )) {
+                    return [...prev, newFrame];
+                  }
+                  return prev;
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Only update source code if we found some lines
+    if (foundSourceCode && parsedLines.length > 0) {
+      // Preserve breakpoint status when updating source code
+      if (sourceCode.length > 0) {
+        const breakpointLines = new Set(
+          sourceCode
+            .filter(line => line.isBreakpoint)
+            .map(line => line.lineNumber)
+        );
+        
+        // Update parsedLines to maintain breakpoint status
+        parsedLines = parsedLines.map(line => ({
+          ...line,
+          isBreakpoint: breakpointLines.has(line.lineNumber) || line.isBreakpoint
+        }));
+      }
+      
+      setSourceCode(parsedLines);
     }
   };
 
-  const fetchDebugOutput = async () => {
-    if (!selectedBreakpoint || !selectedBreakpoint.taskId) return null;
+  // New function to fetch and record all breakpoints from PDB
+  const fetchAndRecordAllBreakpoints = async () => {
+    if (!selectedBreakpoint || !selectedBreakpoint.taskId) return;
     
     try {
-      const output = await getDebugOutput(selectedBreakpoint.taskId);
-      if (output && typeof output === 'string' && output.trim()) {
-        // If we have an xterm instance, write the output there
-        if (xtermRef.current) {
-          xtermRef.current.writeln(output);
-          xtermRef.current.write('(Pdb) ');
+      setExecuting(true);
+      setExecutionMessage("Fetching breakpoints...");
+      
+      const response = await sendDebugCommand({
+        job_id: jobId,
+        task_id: selectedBreakpoint.taskId,
+        cmd: "b\n"  // List all breakpoints in pdb
+      });
+      
+      if (response) {
+        // Create a new map to store breakpoint information
+        const newBreakpointMap = new Map<string, number>();
+        
+        // Parse the response to extract breakpoint information
+        const lines = response.split('\n');
+        
+        // Skip the header line
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line || line === "(Pdb) ") continue;
           
-          // Scroll to bottom after new output is displayed
-          scrollToBottom(xtermRef.current);
-        }
-        return output;
-      }
-    } catch (error) {
-      console.error("Failed to fetch debug output:", error);
-    }
-    return null;
-  };
-
-  const fetchBreakpoints = async () => {
-    try {
-      setIsLoading(true);
-      const breakpointsData = await getBreakpoints(jobId);
-      console.log("Fetched breakpoints:", breakpointsData);
-      
-      // Use breakpoints directly since getBreakpoints now handles the response format
-      setBreakpoints(breakpointsData);
-      
-      // Find active breakpoints with task_id set and not 'unknown'
-      const activeBreakpoints = breakpointsData.filter(bp => bp && bp.enable && bp.taskId && bp.taskId !== 'unknown');
-      
-      if (activeBreakpoints.length > 0) {
-        // Set current task ID to the first active breakpoint task ID
-        const firstActive = activeBreakpoints[0];
-        if (firstActive.taskId) {
-          setCurrentTaskId(firstActive.taskId);
+          try {
+            // First, extract the breakpoint number from the beginning of the line
+            const firstSpaceIndex = line.indexOf(' ');
+            if (firstSpaceIndex < 1) continue;
+            
+            const bpIndexStr = line.substring(0, firstSpaceIndex).trim();
+            const bpIndex = parseInt(bpIndexStr, 10);
+            if (isNaN(bpIndex)) continue;
+            
+            // Find 'at' in the line followed by the file path and line number
+            const atIndex = line.indexOf(' at ');
+            if (atIndex < 0) continue;
+            
+            // Extract everything after 'at ' which is the file path and line number
+            const locationPart = line.substring(atIndex + 4).trim();
+            const lastColonIndex = locationPart.lastIndexOf(':');
+            
+            if (lastColonIndex > 0) {
+              const filename = locationPart.substring(0, lastColonIndex);
+              const lineNumber = parseInt(locationPart.substring(lastColonIndex + 1), 10);
+              
+              if (!isNaN(lineNumber)) {
+                const key = `${filename}:${lineNumber}`;
+                console.log(`Storing breakpoint index ${bpIndex} for ${key}`);
+                newBreakpointMap.set(key, bpIndex);
+                
+                // If we don't have a current file yet but we have breakpoints, set it
+                if (!currentFile && filename) {
+                  console.log("Setting current file to first breakpoint file:", filename);
+                  setCurrentFile(filename);
+                }
+                
+                // Update source code to show this breakpoint if it's in the current file
+                // Note: currentFile might be null initially, so we need to handle that
+                if (currentFile && (currentFile === filename || filename.endsWith(currentFile) || currentFile.endsWith(filename))) {
+                  console.log("Updating source code for breakpoint at line", lineNumber);
+                  setSourceCode(prev => prev.map(srcLine => 
+                    srcLine.lineNumber === lineNumber 
+                      ? { ...srcLine, isBreakpoint: true } 
+                      : srcLine
+                  ));
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Error parsing breakpoint line:", line, error);
+          }
         }
         
-        // If there's no selected breakpoint yet or the current selected breakpoint is no longer active,
-        // select the first active one
-        if (!selectedBreakpoint || !activeBreakpoints.some(bp => bp.taskId === selectedBreakpoint.taskId)) {
-          console.log("Setting selected breakpoint to:", firstActive);
-          setSelectedBreakpoint(firstActive);
-          // Reset command history when selecting a new breakpoint
-          setCommandHistory([]);
-          // Reset command history navigation
-          setCommandHistoryIndex(-1);
-          // Reset command buffer
-          setCommandBuffer("");
-        }
-      } else {
-        // No active breakpoints, clear current task ID
-        setCurrentTaskId(null);
-        // If there was a selected breakpoint but it's no longer active, clear it
-        if (selectedBreakpoint && selectedBreakpoint.taskId) {
-          setSelectedBreakpoint(null);
-          // Clear command history when deselecting a breakpoint
-          setCommandHistory([]);
-        }
+        // Update the lineBreakpoints state with the new map
+        setLineBreakpoints(newBreakpointMap);
       }
+      
+      setExecutionMessage(null);
     } catch (error) {
       console.error("Failed to fetch breakpoints:", error);
-      // If there's an error, set an empty array to avoid "map" errors
-      setBreakpoints([]);
+      setExecutionMessage("Error fetching breakpoints");
     } finally {
-      setIsLoading(false);
+      setExecuting(false);
+    }
+    
+    return true; // Return success for callers to know it completed
+  };
+
+  // Update fetchSourceCode to set currentFile before fetching breakpoints
+  const fetchSourceCode = async () => {
+    if (!selectedBreakpoint || !selectedBreakpoint.taskId) return;
+    
+    try {
+      setExecuting(true);
+      setExecutionMessage("Fetching source code...");
+      
+      // First, get the current execution point
+      const whereResponse = await sendDebugCommand({
+        job_id: jobId,
+        task_id: selectedBreakpoint.taskId,
+        cmd: "where\n"
+      });
+      
+      if (whereResponse) {
+        parseDebugOutput(whereResponse);
+      }
+      
+      // Get source code listing
+      const listResponse = await sendDebugCommand({
+        job_id: jobId,
+        task_id: selectedBreakpoint.taskId,
+        cmd: "ll\n"
+      });
+      
+      if (listResponse) {
+        parseDebugOutput(listResponse);
+      }
+      
+      // Ensure we have a currentFile before fetching breakpoints
+      if (!currentFile) {
+        // Try to get current file from where command response
+        const whereLines = whereResponse ? whereResponse.split('\n') : [];
+        for (const line of whereLines) {
+          if (line.trimStart().startsWith('>') && line.includes('(')) {
+            const pathMatch = line.match(/>\s+([^(]+)\(/);
+            if (pathMatch && pathMatch[1]) {
+              setCurrentFile(pathMatch[1].trim());
+              break;
+            }
+          }
+        }
+      }
+      
+      // Get all current breakpoints to update the source code view
+      await fetchAndRecordAllBreakpoints();
+      
+      setExecutionMessage(null);
+    } catch (error) {
+      console.error("Failed to fetch source code:", error);
+      setExecutionMessage("Error fetching source code");
+    } finally {
+      setExecuting(false);
     }
   };
 
@@ -521,24 +491,16 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = f
       });
       
       if (result) {
-        // For active breakpoints, we only want to clear the selection if it was successfully disabled
-        // For non-active breakpoints, just refresh the list
         if (bp.taskId && bp.taskId !== 'unknown' && selectedBreakpoint && selectedBreakpoint.taskId === bp.taskId) {
-          // Add message to command history that breakpoint was disabled
-          setCommandHistory(prev => [...prev, { 
-            cmd: "", 
-            response: "Breakpoint disabled successfully." 
-          }]);
-          
-          // Close the debug session for active breakpoints
           await closeDebugSession(jobId!, bp.taskId);
-          
-          // Clear the selection after session is closed
           setSelectedBreakpoint(null);
           setCurrentTaskId(null);
+          
+          // Clear IDE-related state
+          setSourceCode([]);
+          setCurrentFile(null);
+          setCurrentLine(null);
         }
-        
-        // Refresh breakpoints list
         fetchBreakpoints();
       } else {
         alert("Failed to disable breakpoint. Please check the console for details.");
@@ -577,11 +539,10 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = f
           setSelectedBreakpoint(null);
           setCurrentTaskId(null);
           
-          // Add message to command history that session was closed
-          setCommandHistory(prev => [...prev, { 
-            cmd: "", 
-            response: "Debug session closed successfully." 
-          }]);
+          // Clear IDE-related state
+          setSourceCode([]);
+          setCurrentFile(null);
+          setCurrentLine(null);
         }
         
         // Refresh breakpoints list
@@ -599,136 +560,232 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = f
 
   const handleSelectBreakpoint = (bp: Breakpoint) => {
     if (bp.taskId && bp.taskId !== 'unknown') {
-      // Only clear history if selecting a different breakpoint
       if (!selectedBreakpoint || selectedBreakpoint.taskId !== bp.taskId) {
         setSelectedBreakpoint(bp);
         setCurrentTaskId(bp.taskId);
         
-        // Clear command history when switching to a different breakpoint
-        setCommandHistory([]);
+        // Clear previous debugging state
+        setSourceCode([]);
+        setCurrentFile(null);
+        setCurrentLine(null);
         
-        // Reset command history navigation
-        setCommandHistoryIndex(-1);
-        
-        // Reset command buffer
-        setCommandBuffer("");
+        // Force breakpoint refresh after a short delay to allow state to update
+        setTimeout(() => {
+          fetchSourceCode().then(() => {
+            fetchAndRecordAllBreakpoints();
+          });
+        }, 100);
       }
     }
   };
 
-  const handleSendCommand = async () => {
-    if (!command.trim() || !jobId || !currentTaskId || !selectedBreakpoint) return;
-    
-    const cmd = command.trim();
-    
-    // Prevent dangerous PDB commands like 'q' that can crash the debug session
-    if (cmd === 'q' || cmd === 'quit') {
-      if (xtermRef.current) {
-        xtermRef.current.writeln("Error: 'q' and 'quit' commands are disabled. Please use the 'Close Session' button instead.");
-        xtermRef.current.write('(Pdb) ');
-      }
-      setCommand("");
-      return;
+  // Debug command functions
+  const handleStepOver = async () => {
+    const response = await executeDebugCommand('n');
+    if (response) {
+      // Output already updated in executeDebugCommand
     }
-    
-    setCommand("");
-    
-    // Get the current terminal
-    const term = xtermRef.current;
-    if (!term) return;
+  };
+
+  const handleStepInto = async () => {
+    const response = await executeDebugCommand('s');
+    if (response) {
+      // Output already updated in executeDebugCommand
+    }
+  };
+
+  const handleStepOut = async () => {
+    const response = await executeDebugCommand('r');
+    if (response) {
+      // Output already updated in executeDebugCommand
+    }
+  };
+
+  const handleContinue = async () => {
+    const response = await executeDebugCommand('c');
+    if (response) {
+      // Output already updated in executeDebugCommand
+    }
+  };
+
+  const handleEvaluate = async (expr: string) => {
+    if (!expr.trim() || !selectedBreakpoint || !selectedBreakpoint.taskId) return;
     
     try {
-      setIsLoading(true);
+      setExecuting(true);
+      setExecutionMessage(`Evaluating expression...`);
       
       const response = await sendDebugCommand({
         job_id: jobId,
-        task_id: currentTaskId,
-        cmd: cmd + '\n'  // Add newline for PDB
+        task_id: selectedBreakpoint.taskId,
+        cmd: `p ${expr}\n`
       });
       
-      console.log("Debug command response:", response);
-      
-      // Add command to history for navigation
-      setCommandsForNav(prev => {
-        const newCommands = [...prev];
-        if (!newCommands.includes(cmd)) {
-          newCommands.push(cmd);
-          // Limit history size
-          if (newCommands.length > 50) {
-            newCommands.shift();
-          }
-        }
-        return newCommands;
-      });
-      
-      // Write response to terminal
-      if (response && term) {
-        term.writeln(response);
-        term.write('(Pdb) ');
+      if (response) {
+        // Only show the latest evaluation result
+        setOutput(response.trim());
       }
       
+      setExecutionMessage(null);
     } catch (error) {
-      console.error("Failed to send debug command:", error);
-      if (term) {
-        term.writeln("Error: Failed to execute command");
-        term.write('(Pdb) ');
+      console.error("Failed to evaluate expression:", error);
+      setExecutionMessage("Error evaluating expression");
+    } finally {
+      setExecuting(false);
+    }
+  };
+
+  const fetchBreakpoints = async () => {
+    try {
+      setIsLoading(true);
+      const breakpointsData = await getBreakpoints(jobId);
+      console.log("Fetched breakpoints:", breakpointsData);
+      
+      // Use breakpoints directly since getBreakpoints now handles the response format
+      setBreakpoints(breakpointsData);
+      
+      // Find active breakpoints with task_id set and not 'unknown'
+      const activeBreakpoints = breakpointsData.filter(bp => bp && bp.enable && bp.taskId && bp.taskId !== 'unknown');
+      
+      if (activeBreakpoints.length > 0) {
+        // Set current task ID to the first active breakpoint task ID
+        const firstActive = activeBreakpoints[0];
+        if (firstActive.taskId) {
+          setCurrentTaskId(firstActive.taskId);
+        }
+        
+        // If there's no selected breakpoint yet or the current selected breakpoint is no longer active,
+        // select the first active one
+        if (!selectedBreakpoint || !activeBreakpoints.some(bp => bp.taskId === selectedBreakpoint.taskId)) {
+          console.log("Setting selected breakpoint to:", firstActive);
+          setSelectedBreakpoint(firstActive);
+        }
+      } else {
+        // No active breakpoints, clear current task ID
+        setCurrentTaskId(null);
+        // If there was a selected breakpoint but it's no longer active, clear it
+        if (selectedBreakpoint && selectedBreakpoint.taskId) {
+          setSelectedBreakpoint(null);
+        }
       }
+    } catch (error) {
+      console.error("Failed to fetch breakpoints:", error);
+      // If there's an error, set an empty array to avoid "map" errors
+      setBreakpoints([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSendCommand();
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
+  // New function to get breakpoint index
+  // Update handleSetLineBreakpoint to record the breakpoint in our map
+  const handleSetLineBreakpoint = async (filename: string, lineNumber: number) => {
+    if (!currentFile || !selectedBreakpoint || !selectedBreakpoint.taskId) return;
+    
+    try {
+      setExecuting(true);
+      setExecutionMessage(`Setting breakpoint at line ${lineNumber}...`);
       
-      // Navigate command history upward
-      if (commandsForNav.length > 0) {
-        // If we're starting navigation, save current input
-        if (commandHistoryIndex === -1) {
-          setCommandBuffer(command);
-        }
-        
-        const newIndex = commandHistoryIndex === -1 ? 
-          commandsForNav.length - 1 : Math.max(0, commandHistoryIndex - 1);
-          
-        setCommandHistoryIndex(newIndex);
-        setCommand(commandsForNav[newIndex]);
-      }
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
+      // Use the Pdb 'b' command to set a breakpoint at the specified line
+      const response = await sendDebugCommand({
+        job_id: jobId,
+        task_id: selectedBreakpoint.taskId,
+        cmd: `b ${lineNumber}\n`
+      });
       
-      // Navigate command history downward
-      if (commandHistoryIndex >= 0) {
-        const newIndex = commandHistoryIndex + 1;
-        
-        if (newIndex >= commandsForNav.length) {
-          // Return to buffer at the end of history
-          setCommandHistoryIndex(-1);
-          setCommand(commandBuffer);
-        } else {
-          setCommandHistoryIndex(newIndex);
-          setCommand(commandsForNav[newIndex]);
-        }
-      }
-    } else if (e.key === 'Tab') {
-      e.preventDefault();
-      // Future: Could implement tab completion here
+      console.log("Set line breakpoint response:", response);
+      
+      // After setting a breakpoint, update our map with all breakpoints
+      await fetchAndRecordAllBreakpoints();
+      
+      setExecutionMessage(null);
+    } catch (error) {
+      console.error("Failed to set line breakpoint:", error);
+      setExecutionMessage("Error setting breakpoint");
+    } finally {
+      setExecuting(false);
     }
   };
 
-  // Add validation for command input to prevent 'q'/'quit'
-  const handleCommandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // If user tries to type just 'q' or 'quit', show a warning and don't update the input
-    if (value === 'q' || value === 'quit') {
-      // We could show a tooltip or warning here
-      return; // Don't update the command value
+  // Update handleClearLineBreakpoint to use the breakpoint index from our map
+  const handleClearLineBreakpoint = async (filename: string, lineNumber: number) => {
+    if (!currentFile || !selectedBreakpoint || !selectedBreakpoint.taskId) return;
+    
+    const key = `${filename}:${lineNumber}`;
+    const bpIndex = lineBreakpoints.get(key);
+
+    if (bpIndex === undefined) {
+      console.error("Could not find stored breakpoint index for line", lineNumber);
+      // Fetch all breakpoints as a fallback in case our map is out of sync
+      await fetchAndRecordAllBreakpoints();
+      // Try again with the updated map
+      const updatedBpIndex = lineBreakpoints.get(key);
+      if (updatedBpIndex === undefined) {
+        setExecutionMessage("Could not find breakpoint to clear");
+        setTimeout(() => setExecutionMessage(null), 2000);
+        return;
+      }
     }
-    setCommand(value);
+    
+    try {
+      setExecuting(true);
+      setExecutionMessage(`Clearing breakpoint at line ${lineNumber}...`);
+      
+      // Use the Pdb 'clear' command with the stored breakpoint index
+      const response = await sendDebugCommand({
+        job_id: jobId,
+        task_id: selectedBreakpoint.taskId,
+        cmd: `clear ${bpIndex || lineNumber}\n`
+      });
+      
+      console.log("Clear breakpoint response:", response);
+      
+      // Immediately update the UI to remove the breakpoint indicator
+      setSourceCode(prev => prev.map(line => 
+        line.lineNumber === lineNumber 
+          ? { ...line, isBreakpoint: false } 
+          : line
+      ));
+      
+      // Remove the breakpoint from the stored map
+      setLineBreakpoints(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(key);
+        return newMap;
+      });
+      
+      // After clearing, update our map with all current breakpoints
+      await fetchAndRecordAllBreakpoints();
+      
+      setExecutionMessage(null);
+    } catch (error) {
+      console.error("Failed to clear breakpoint:", error);
+      setExecutionMessage("Error clearing breakpoint");
+    } finally {
+      setExecuting(false);
+    }
+  };
+
+  // Toggle a breakpoint at a specific line
+  const toggleLineBreakpoint = async (lineNumber: number) => {
+    if (!currentFile || !selectedBreakpoint || !selectedBreakpoint.taskId) return;
+    
+    // Find the line in source code
+    const lineData = sourceCode.find(line => line.lineNumber === lineNumber);
+    if (!lineData) return;
+    
+    try {
+      if (lineData.isBreakpoint) {
+        await handleClearLineBreakpoint(currentFile, lineNumber);
+      } else {
+        await handleSetLineBreakpoint(currentFile, lineNumber);
+      }
+      
+      // Always fetch breakpoints after toggling to ensure UI is in sync
+      await fetchAndRecordAllBreakpoints();
+    } catch (error) {
+      console.error("Error toggling breakpoint:", error);
+    }
   };
 
   if (!open) return null;
@@ -751,52 +808,6 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = f
           </div>
         )}
         
-        <div className="debug-panel-section">
-          <div className="section-header">
-            <h4>
-              <button 
-                className="toggle-button" 
-                onClick={() => setConsoleSectionOpen(!consoleSectionOpen)}
-                aria-label={consoleSectionOpen ? "Collapse section" : "Expand section"}
-              >
-                {consoleSectionOpen ? "▼" : "►"}
-              </button>
-              Debug Shell
-            </h4>
-            <div className="auto-refresh">
-              <button 
-                className="refresh-button"
-                onClick={fetchDebugOutput}
-                disabled={isLoading || !selectedBreakpoint}
-                title="Refresh Output"
-              >
-                🔄
-              </button>
-              <label htmlFor="auto-refresh-output">Auto</label>
-              <input
-                id="auto-refresh-output"
-                type="checkbox"
-                checked={autoRefreshOutput}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAutoRefreshOutput(e.target.checked)}
-                disabled={isLoading || !selectedBreakpoint}
-              />
-            </div>
-          </div>
-
-        </div>
-          {consoleSectionOpen && (
-            <div className="terminal-container">
-              {selectedBreakpoint ? (
-                <div ref={terminalRef} className="xterm-container"></div>
-              ) : (
-                  <div className="empty-message">
-                    <div className="terminal-welcome">
-                    No active breakpoint selected. Set a breakpoint first.
-                      </div>
-                      </div>
-                    )}
-            </div>
-          )}         
         <div className="debug-panel-section">
           <div className="section-header">
             <h4>
@@ -987,25 +998,247 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = f
             </div>
           )}
         </div>
-        
-        {currentTaskId && (
-          <div className="active-session">
-            <div className="active-session-info">
-              <div>
-                <strong>Active Session:</strong> {currentTaskId}
-              </div>
-              {selectedBreakpoint && (
+
+        {/* Debug controls */}
+        {selectedBreakpoint && selectedBreakpoint.taskId && (
+          <>
+            <div className="active-session">
+              <div className="active-session-info">
                 <div>
-                  <strong>Selected Breakpoint:</strong> {selectedBreakpoint.funcName ? 
-                    `Function: ${selectedBreakpoint.funcName || 'unknown'}` : 
-                    `${selectedBreakpoint.actorCls || 'unknown'}${selectedBreakpoint.actorName ? '.' + selectedBreakpoint.actorName : ''}.${selectedBreakpoint.methodName || 'unknown'}`
-                  }
+                  <strong>Active Session:</strong> {currentTaskId}
+                </div>
+                {selectedBreakpoint && (
+                  <div>
+                    <strong>Selected Breakpoint:</strong> {selectedBreakpoint.funcName ? 
+                      `Function: ${selectedBreakpoint.funcName || 'unknown'}` : 
+                      `${selectedBreakpoint.actorCls || 'unknown'}${selectedBreakpoint.actorName ? '.' + selectedBreakpoint.actorName : ''}.${selectedBreakpoint.methodName || 'unknown'}`
+                    }
+                  </div>
+                )}
+                {currentFile && (
+                  <div>
+                    <strong>File:</strong> {currentFile}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Debug Control Buttons */}
+            <div className="debug-controls">
+              <button 
+                className="debug-button"
+                onClick={handleStepOver}
+                disabled={executing}
+                title="Step Over (n)"
+              >
+                Step Over (n)
+              </button>
+              <button 
+                className="debug-button"
+                onClick={handleStepInto}
+                disabled={executing}
+                title="Step Into (s)"
+              >
+                Step Into (s)
+              </button>
+              <button 
+                className="debug-button"
+                onClick={handleStepOut}
+                disabled={executing}
+                title="Step Out (r)"
+              >
+                Step Out (r)
+              </button>
+              <button 
+                className="debug-button"
+                onClick={handleContinue}
+                disabled={executing}
+                title="Continue (c)"
+              >
+                Continue (c)
+              </button>
+            </div>
+
+            {/* Expression Evaluation */}
+            <div className="evaluate-section">
+              <div className="evaluate-input">
+                <input
+                  type="text"
+                  placeholder="Enter expression to evaluate..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.currentTarget.value) {
+                      handleEvaluate(e.currentTarget.value);
+                      e.currentTarget.value = '';
+                    }
+                  }}
+                  disabled={executing}
+                />
+                <button
+                  className="evaluate-button"
+                  onClick={() => {
+                    const input = document.querySelector('.evaluate-input input') as HTMLInputElement;
+                    if (input && input.value) {
+                      handleEvaluate(input.value);
+                      input.value = '';
+                    }
+                  }}
+                  disabled={executing}
+                >
+                  Evaluate
+                </button>
+              </div>
+            </div>
+
+            {/* Execution status */}
+            {executionMessage && (
+              <div className="execution-status">
+                <div className="status-message">{executionMessage}</div>
+              </div>
+            )}
+
+            {/* Source code view */}
+            <div className="debug-panel-section">
+              <div className="section-header">
+                <h4>
+                  <button 
+                    className="toggle-button" 
+                    onClick={() => setSourceCodeSectionOpen(!sourceCodeSectionOpen)}
+                    aria-label={sourceCodeSectionOpen ? "Collapse section" : "Expand section"}
+                  >
+                    {sourceCodeSectionOpen ? "▼" : "►"}
+                  </button>
+                  Source Code
+                </h4>
+                <div className="section-actions">
+                  <span className="source-code-help">Click on line numbers to set/clear breakpoints</span>
+                  <button 
+                    className="refresh-button"
+                    onClick={fetchSourceCode}
+                    disabled={executing}
+                    title="Refresh Source Code"
+                  >
+                    🔄
+                  </button>
+                </div>
+              </div>
+              
+              {sourceCodeSectionOpen && (
+                <div className="source-code-view" ref={sourceCodeRef}>
+                  {sourceCode.length === 0 ? (
+                    <div className="empty-message">No source code available</div>
+                  ) : (
+                    <pre className="code-container">
+                      {sourceCode.map((line) => (
+                        <div 
+                          key={line.lineNumber} 
+                          className={`code-line ${line.lineNumber === currentLine ? 'current-line' : ''} ${line.isBreakpoint ? 'breakpoint-line' : ''}`}
+                          data-line={line.lineNumber}
+                        >
+                          <span 
+                            className="line-number" 
+                            onClick={() => {
+                              if (selectedBreakpoint && selectedBreakpoint.taskId) {
+                                toggleLineBreakpoint(line.lineNumber);
+                              }
+                            }}
+                            title={line.isBreakpoint ? "Click to remove breakpoint" : "Click to set breakpoint"}
+                          >
+                            {line.isBreakpoint && <span className="breakpoint-indicator">●</span>}
+                            {line.lineNumber}
+                          </span>
+                          <span className="line-content">
+                            {line.content}
+                          </span>
+                        </div>
+                      ))}
+                    </pre>
+                  )}
                 </div>
               )}
             </div>
-          </div>
+
+            {/* Debug Output Panel (replaces terminal) */}
+            <div className="debug-panel-section">
+              <div className="section-header">
+                <h4>
+                  <button 
+                    className="toggle-button" 
+                    onClick={() => setOutputSectionOpen(!outputSectionOpen)}
+                    aria-label={outputSectionOpen ? "Collapse section" : "Expand section"}
+                  >
+                    {outputSectionOpen ? "▼" : "►"}
+                  </button>
+                  Eval Results
+                </h4>
+                <button 
+                  className="clear-button"
+                  onClick={() => setOutput('')}
+                  disabled={executing}
+                  title="Clear Results"
+                >
+                  Clear
+                </button>
+              </div>
+              
+              {outputSectionOpen && (
+                <div className="debug-output-view" ref={outputRef}>
+                  <pre className="output-container">
+                    {output}
+                  </pre>
+                </div>
+              )}
+            </div>
+
+            {/* Stack frames */}
+            <div className="debug-panel-section">
+              <div className="section-header">
+                <h4>
+                  <button 
+                    className="toggle-button" 
+                    onClick={() => setStackSectionOpen(!stackSectionOpen)}
+                    aria-label={stackSectionOpen ? "Collapse section" : "Expand section"}
+                  >
+                    {stackSectionOpen ? "▼" : "►"}
+                  </button>
+                  Call Stack
+                </h4>
+              </div>
+              
+              {stackSectionOpen && (
+                <div className="stack-view">
+                  {stackFrames.length === 0 ? (
+                    <div className="empty-message">No call stack available</div>
+                  ) : (
+                    <ul className="stack-list">
+                      {stackFrames.map((frame, index) => (
+                        <li 
+                          key={index} 
+                          className={`stack-frame ${currentFile === frame.filename && currentLine === frame.lineNumber ? 'current-frame' : ''}`}
+                          onClick={() => executeDebugCommand(`frame ${index}`)}
+                        >
+                          <span className="frame-function">{frame.functionName}</span>
+                          <span className="frame-location">
+                            {frame.filename}:{frame.lineNumber}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
+          </>
         )}
         
+        {/* No active breakpoint message */}
+        {(!selectedBreakpoint || !selectedBreakpoint.taskId) && (
+          <div className="no-debug-session">
+            <div className="empty-message">
+              <p>No active debug session. Set a breakpoint first.</p>
+              <p>Debugging will start when a Ray task hits your breakpoint.</p>
+            </div>
+          </div>
+        )}
 
       </>
     );
@@ -1014,6 +1247,235 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = f
   return (
     <div className={isTab ? "debug-panel-as-tab" : "debug-panel"}>
       {renderContent()}
+      <style>{`
+        .source-code-view {
+          max-height: 300px;
+          overflow: auto;
+          background-color: #1e1e1e;
+          border-radius: 4px;
+          color: #f0f0f0;
+          tab-size: 4;
+          -moz-tab-size: 4;
+          -o-tab-size: 4;
+          font-variant-ligatures: none;
+        }
+        
+        .debug-output-view {
+          max-height: 200px;
+          overflow: auto;
+          background-color: #1e1e1e;
+          border-radius: 4px;
+          color: #f0f0f0;
+          margin-top: 5px;
+          padding: 8px;
+        }
+
+        .output-container {
+          font-family: monospace;
+          margin: 0;
+          padding: 0;
+          white-space: pre-wrap;
+          font-size: 13px;
+          line-height: 1.4;
+        }
+        
+        .evaluate-section {
+          margin: 12px 0;
+        }
+        
+        .evaluate-input {
+          display: flex;
+          gap: 8px;
+        }
+        
+        .evaluate-input input {
+          flex: 1;
+          padding: 6px 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-family: monospace;
+        }
+        
+        .evaluate-button {
+          padding: 6px 12px;
+          background-color: #f0f0f0;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+
+        .clear-button {
+          padding: 2px 6px;
+          background-color: #f0f0f0;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+        }
+        
+        .evaluate-button:hover, .clear-button:hover {
+          background-color: #e0e0e0;
+        }
+        
+        .code-container {
+          font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+          margin: 0;
+          padding: 0;
+          white-space: pre;
+          tab-size: 4;
+          -moz-tab-size: 4;
+          -o-tab-size: 4;
+          font-variant-ligatures: none;
+        }
+        
+        .code-line {
+          display: flex;
+          padding: 0 8px;
+          white-space: pre;
+          line-height: 1.5;
+          font-variant-ligatures: none;
+        }
+        
+        .current-line {
+          background-color: #2d4151;
+        }
+        
+        .breakpoint-line {
+          background-color: rgba(255, 0, 0, 0.2);
+        }
+
+        .breakpoint-line.current-line {
+          background-color: rgba(255, 0, 0, 0.3);
+        }
+        
+        .line-number {
+          opacity: 0.6;
+          text-align: right;
+          padding-right: 12px;
+          user-select: none;
+          width: 40px;
+          cursor: pointer;
+          position: relative;
+        }
+        
+        .line-number:hover {
+          opacity: 1;
+          color: #ffffff;
+        }
+        
+        .breakpoint-indicator {
+          color: #ff5555;
+          position: absolute;
+          left: -8px;
+          top: 1px;
+        }
+        
+        .line-content {
+          flex: 1;
+          white-space: pre;
+          tab-size: 4;
+          -moz-tab-size: 4;
+          -o-tab-size: 4;
+          font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+          font-variant-ligatures: none;
+          unicode-bidi: embed;
+        }
+        
+        .current-marker {
+          color: #00ffff;
+          font-weight: bold;
+        }
+                
+        .stack-view {
+          max-height: 150px;
+          overflow: auto;
+        }
+        
+        .stack-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        
+        .stack-frame {
+          padding: 8px;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 1px solid #ddd;
+        }
+        
+        .stack-frame:hover {
+          background-color: #f5f5f5;
+        }
+        
+        .current-frame {
+          background-color: #e6f7ff;
+          font-weight: bold;
+        }
+        
+        .frame-function {
+          font-weight: bold;
+        }
+        
+        .frame-location {
+          color: #666;
+          font-size: 0.9em;
+        }
+        
+        .debug-controls {
+          display: flex;
+          gap: 8px;
+          margin: 12px 0;
+          flex-wrap: wrap;
+        }
+        
+        .debug-button {
+          padding: 6px 12px;
+          background-color: #f0f0f0;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 13px;
+        }
+        
+        .debug-button:hover {
+          background-color: #e0e0e0;
+        }
+        
+        .debug-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        
+        .execution-status {
+          padding: 8px;
+          margin: 8px 0;
+          background-color: #f0f7ff;
+          border-radius: 4px;
+          border-left: 4px solid #1890ff;
+        }
+        
+        .no-debug-session {
+          margin: 20px 0;
+          padding: 20px;
+          background-color: #f9f9f9;
+          border-radius: 4px;
+          text-align: center;
+        }
+
+        .section-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .source-code-help {
+          font-size: 12px;
+          color: #777;
+          font-style: italic;
+        }
+      `}</style>
     </div>
   );
 };

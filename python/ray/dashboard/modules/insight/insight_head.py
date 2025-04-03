@@ -78,7 +78,6 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
         super().__init__(config)
         self.debug_sessions = {}
         self.debug_output_buffer = {}
-        self._telnet_tasks = {}
         self.breakpoints = {}
 
     async def fetch_breakpoint(self, job_id, task_id):
@@ -92,39 +91,6 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                 return data
         return None
         
-    async def _telnet_reader(self, task_id, tn):
-        """Continuously read from telnet and populate the output buffer."""
-        try:
-            logger.info(f"Starting telnet reader for task {task_id}")
-
-            while task_id in self.debug_sessions:
-                try:
-                    # Try to read any available data without blocking
-                    data = await tn.read_very_eager()
-                    if data:
-                        # Reset empty read counter when we get data
-                        # Append to output buffer string
-                        if task_id not in self.debug_output_buffer:
-                            self.debug_output_buffer[task_id] = ""
-                        self.debug_output_buffer[task_id] += data.decode("utf-8")
-                except Exception as e:
-                    logger.warning(f"Error reading from debugger for task {task_id}: {str(e)}")
-                    if "Connection lost" in str(e) or "Connection reset" in str(e) or "EOF" in str(e):
-                        # Connection lost, clean up this session
-                        logger.info(f"Debug connection lost for task {task_id}, cleaning up")
-                        await self._cleanup_debug_session(task_id)
-                        break
-                
-                # Short sleep to avoid CPU spinning
-                await asyncio.sleep(0.1)
-                
-        except Exception as e:
-            logger.error(f"Telnet reader coroutine crashed for task {task_id}: {str(e)}")
-            # Ensure resources are cleaned up even if the coroutine crashes
-            await self._cleanup_debug_session(task_id)
-        finally:
-            logger.info(f"Telnet reader for task {task_id} has stopped")
-
     async def _deactivate_breakpoint(self, task_id):
         """Deactivate the breakpoint for a given task."""
         if task_id in self.breakpoints:
@@ -164,14 +130,7 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                 # Remove from sessions dict
                 del self.debug_sessions[task_id]
                 
-                # Cancel and remove the telnet task if it exists
-                if task_id in self._telnet_tasks:
-                    # We don't cancel the current task if we're being called from within it
-                    # to avoid cancellation errors
-                    current_task = asyncio.current_task()
-                    if self._telnet_tasks[task_id] != current_task:
-                        self._telnet_tasks[task_id].cancel()
-                    del self._telnet_tasks[task_id]
+                # No more telnet tasks to clean up
                 
                 # Clear the output buffer
                 if task_id in self.debug_output_buffer:
@@ -185,7 +144,7 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
 
     @routes.get("/insight_debug")
     async def insight_debug(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
-        """Send a command to a debug session and retrieve output from buffer."""
+        """Send a command to a debug session and retrieve output"""
         try:
             job_id = req.query.get("job_id", None)   
             task_id = req.query.get("task_id", None)
@@ -217,27 +176,66 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                 # Initialize output buffer for this task
                 self.debug_output_buffer[task_id] = ""
                 
-                # Start background coroutine to continuously read from telnet
-                task = asyncio.create_task(self._telnet_reader(task_id, tn))
-                self._telnet_tasks[task_id] = task
+                # No longer start a background coroutine for continuous reading
+                # Instead, read until we get a prompt
                 
-                # Wait a moment for initial connection data to be read
-                await asyncio.sleep(0.5)
+                # Read initial data
+                initial_data = b""
+                while not initial_data or b"(Pdb)" not in initial_data:
+                    try:
+                        data = await tn.read_very_eager()
+                        if data:
+                            initial_data += data
+                        else:
+                            await asyncio.sleep(0.1)  # Short sleep to avoid CPU spinning
+                    except asyncio.TimeoutError:
+                        # No data available, keep trying
+                        await asyncio.sleep(0.1)
+                
+                if initial_data:
+                    self.debug_output_buffer[task_id] = initial_data.decode("utf-8")
 
             # Send command if provided
+            output = ""
             if cmd:
                 tn = self.debug_sessions[task_id]
                 try:
                     await tn.write((cmd).encode("utf-8"))
+                    
+                    # Wait for response until we get a Pdb prompt
+                    full_response = b""
+                    while not full_response or b"(Pdb)" not in full_response:
+                        try:
+                            data = await tn.read_very_eager()
+                            if data:
+                                full_response += data
+                            else:
+                                await asyncio.sleep(0.1)  # Short sleep to avoid CPU spinning
+                        except asyncio.TimeoutError:
+                            # No data available yet, keep waiting
+                            await asyncio.sleep(0.1)
+                        
+                        # Emergency break after 10 seconds to avoid hanging
+                        if len(full_response) > 0 and b"(Pdb)" not in full_response:
+                            await asyncio.sleep(0.1)
+                    
+                    if full_response:
+                        output = full_response.decode("utf-8")
                 except Exception as e:
                     logger.error(f"Error sending command to debugger: {str(e)}")
                     return dashboard_optional_utils.rest_response(
                         success=False, 
                         message=f"Error sending command: {str(e)}"
                     )
-
-            output = self.debug_output_buffer[task_id]
-            self.debug_output_buffer[task_id] = ""
+            else:
+                # If no command provided, just read any pending output
+                try:
+                    data = await self.debug_sessions[task_id].read_very_eager()
+                    if data:
+                        output = data.decode("utf-8")
+                except Exception as e:
+                    logger.error(f"Error reading from debugger: {str(e)}")
+            
             return dashboard_optional_utils.rest_response(
                 success=True,
                 message="Command sent successfully.",
@@ -250,35 +248,6 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                 success=False, message=f"Error in debug session: {str(e)}"
             )
 
-    @routes.get("/get_debug_output")
-    async def get_debug_output(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
-        """Get debug output for a specific task."""
-        try:
-            task_id = req.query.get("task_id", None)
-            if task_id is None:
-                return dashboard_optional_utils.rest_response(
-                    success=False,
-                    message="Task ID is required",
-                )
-            
-            output = ""
-            if task_id in self.debug_output_buffer:
-                output = self.debug_output_buffer[task_id]
-                # Clear the output buffer after reading
-                self.debug_output_buffer[task_id] = ""
-            return dashboard_optional_utils.rest_response(
-                success=True,
-                message="Debug output retrieved successfully.",
-                output=output,
-            )
-        except Exception as e:
-            logger.error(f"Error retrieving debug output: {str(e)}")
-            return dashboard_optional_utils.rest_response(
-                success=False, 
-                message=f"Error retrieving debug output: {str(e)}",
-                output="",
-            )
-            
     @routes.get("/close_debug_session")
     async def close_debug_session(self, req: aiohttp.web.Request) -> aiohttp.web.Response:
         """Close a specific debug session and clean up resources."""

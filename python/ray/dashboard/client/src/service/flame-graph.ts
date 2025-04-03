@@ -8,6 +8,7 @@ export type FlameGraphNode = {
     callerNodeId: string;
     duration: number;
     count: number;
+    startTime: number;
   }>;
   actorName?: string;
 };
@@ -26,6 +27,13 @@ export type FlameGraphData = {
     parentId?: string;
   }>;
   aggregated: FlameGraphNode[];
+  parentStartTimes: Array<{
+    calleeId: string;
+    startTimes: Array<{
+      callerId: string;
+      startTime: number;
+    }>;
+  }>;
 };
 
 export type FlameGraphResponse = {
@@ -39,14 +47,12 @@ export type FlameGraphResponse = {
 
 export const getFlameGraphData = async (
   jobId?: string,
-): Promise<FlameGraphResponse> => {
+): Promise<FlameGraphData> => {
   try {
-    console.log("Fetching flame graph data for jobId:", jobId);
     const response = await get<FlameGraphResponse>(
       `flame_graph${jobId ? `?job_id=${jobId}` : ""}`,
     );
-    console.log("Flame graph API response:", response.data);
-    return response.data;
+    return response.data.data.flameData;
   } catch (error) {
     console.error("Error in getFlameGraphData:", error);
     throw error;

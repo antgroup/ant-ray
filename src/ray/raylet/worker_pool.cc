@@ -517,7 +517,6 @@ std::tuple<Process, StartupToken> WorkerPool::StartWorkerProcess(
                  << rpc::WorkerType_Name(worker_type) << ", current pool has "
                  << state.idle.size() << " workers";
 
-  RAY_LOG(INFO) << "start worker process worker id " << worker_id;
   auto [worker_command_args, env] =
       BuildProcessCommandArgs(language,
                               job_config,
@@ -1382,7 +1381,6 @@ void WorkerPool::StartNewWorker(
   if (!IsRuntimeEnvEmpty(serialized_runtime_env)) {
     // create runtime env.
     auto worker_id = WorkerID::FromRandom();
-    RAY_LOG(INFO) << "show the runtime_env worker_id " << worker_id;
     GetOrCreateRuntimeEnv(
         serialized_runtime_env,
         pop_worker_request->runtime_env_info.runtime_env_config(),
@@ -1867,7 +1865,7 @@ void WorkerPool::DeleteRuntimeEnvIfPossible(
   if (!IsRuntimeEnvEmpty(serialized_runtime_env)) {
     runtime_env_agent_client_->DeleteRuntimeEnvIfPossible(
         serialized_runtime_env,
-        [serialized_runtime_env, worker_id](bool successful) {
+        [serialized_runtime_env](bool successful) {
           if (!successful) {
             RAY_LOG(ERROR) << "Delete runtime env failed";
             RAY_LOG(DEBUG) << "Runtime env: " << serialized_runtime_env;

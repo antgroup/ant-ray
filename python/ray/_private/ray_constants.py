@@ -87,11 +87,6 @@ CALLER_MEMORY_USAGE_PER_OBJECT_REF = 3000
 # TODO(swang): Ideally this should be pulled directly from the
 # config in case the user overrides it.
 DEFAULT_MAX_DIRECT_CALL_OBJECT_SIZE = 100 * 1024
-# The default maximum number of bytes that the non-primary Redis shards are
-# allowed to use unless overridden by the user.
-DEFAULT_REDIS_MAX_MEMORY_BYTES = 10**10
-# The smallest cap on the memory used by Redis that we allow.
-REDIS_MINIMUM_MEMORY_BYTES = 10**7
 # Above this number of bytes, raise an error by default unless the user sets
 # RAY_ALLOW_SLOW_STORAGE=1. This avoids swapping with large object stores.
 REQUIRE_SHM_SIZE_THRESHOLD = 10**10
@@ -429,15 +424,6 @@ KV_NAMESPACE_FUNCTION_TABLE = b"fun"
 
 LANGUAGE_WORKER_TYPES = ["python", "java", "cpp"]
 
-# Accelerator constants
-NOSET_CUDA_VISIBLE_DEVICES_ENV_VAR = "RAY_EXPERIMENTAL_NOSET_CUDA_VISIBLE_DEVICES"
-
-CUDA_VISIBLE_DEVICES_ENV_VAR = "CUDA_VISIBLE_DEVICES"
-ROCR_VISIBLE_DEVICES_ENV_VAR = "ROCR_VISIBLE_DEVICES"
-NEURON_RT_VISIBLE_CORES_ENV_VAR = "NEURON_RT_VISIBLE_CORES"
-TPU_VISIBLE_CHIPS_ENV_VAR = "TPU_VISIBLE_CHIPS"
-NPU_RT_VISIBLE_DEVICES_ENV_VAR = "ASCEND_RT_VISIBLE_DEVICES"
-
 NEURON_CORES = "neuron_cores"
 GPU = "GPU"
 TPU = "TPU"
@@ -561,6 +547,20 @@ RAY_UNPACKABLE_FILE_SUFFIXS_STR = os.environ.get(
 )
 
 RAY_UNPACKABLE_FILE_SUFFIXS = RAY_UNPACKABLE_FILE_SUFFIXS_STR.split(",")
+
+# head high-availability feature
+STORAGE_NAMESPACE = (
+    "RAY" + os.environ.get("RAY_external_storage_namespace", "default") + "@"
+)
+HEAD_NODE_LEADER_ELECTION_KEY = STORAGE_NAMESPACE + "head_node_leader_election_key"
+HEAD_ROLE_ACTIVE = "active_head"
+HEAD_ROLE_STANDBY = "standby_head"
+GCS_ADDRESS_KEY = STORAGE_NAMESPACE + "GcsServerAddress"
+
+# Number of attempts to ping the Redis server. See
+# `services.py::wait_for_redis_to_start()` and
+# `services.py::create_redis_client()`
+START_REDIS_WAIT_RETRIES = env_integer("RAY_START_REDIS_WAIT_RETRIES", 60)
 
 # Retrieve the directory path from the environment variable "RAY_WHL_DIR".
 # If "RAY_WHL_DIR" is not set in the environment, default to "/home/admin/build/whl".

@@ -20,7 +20,6 @@ import sys
 import tempfile
 import threading
 import time
-from urllib.parse import urlencode, unquote, urlparse, parse_qsl, urlunparse
 import warnings
 from inspect import signature
 from pathlib import Path
@@ -44,12 +43,19 @@ from google.protobuf import json_format
 
 import ray
 import ray._private.ray_constants as ray_constants
+import ray._private.runtime_env.constants as runtime_env_constants
 from ray.core.generated.runtime_env_common_pb2 import (
     RuntimeEnvInfo as ProtoRuntimeEnvInfo,
 )
+from ray.core.generated.common_pb2 import Language
+from ray._private.services import get_ray_native_library_dir
 
 if TYPE_CHECKING:
     from ray.runtime_env import RuntimeEnv
+
+
+INT32_MAX = (2**31) - 1
+
 
 pwd = None
 if sys.platform != "win32":
@@ -67,7 +73,6 @@ win32_job = None
 win32_AssignProcessToJobObject = None
 
 ENV_DISABLE_DOCKER_CPU_WARNING = "RAY_DISABLE_DOCKER_CPU_WARNING" in os.environ
-_PYARROW_VERSION = None
 
 # This global variable is used for testing only
 _CALLED_FREQ = defaultdict(lambda: 0)
@@ -1174,40 +1179,6 @@ def deprecated(
     return deprecated_wrapper
 
 
-def import_attr(full_path: str, *, reload_module: bool = False):
-    """Given a full import path to a module attr, return the imported attr.
-
-    If `reload_module` is set, the module will be reloaded using `importlib.reload`.
-
-    For example, the following are equivalent:
-        MyClass = import_attr("module.submodule:MyClass")
-        MyClass = import_attr("module.submodule.MyClass")
-        from module.submodule import MyClass
-
-    Returns:
-        Imported attr
-    """
-    if full_path is None:
-        raise TypeError("import path cannot be None")
-
-    if ":" in full_path:
-        if full_path.count(":") > 1:
-            raise ValueError(
-                f'Got invalid import path "{full_path}". An '
-                "import path may have at most one colon."
-            )
-        module_name, attr_name = full_path.split(":")
-    else:
-        last_period_idx = full_path.rfind(".")
-        module_name = full_path[:last_period_idx]
-        attr_name = full_path[last_period_idx + 1 :]
-
-    module = importlib.import_module(module_name)
-    if reload_module:
-        importlib.reload(module)
-    return getattr(module, attr_name)
-
-
 def get_wheel_filename(
     sys_platform: str = sys.platform,
     ray_version: str = ray.__version__,
@@ -1765,90 +1736,6 @@ def get_entrypoint_name():
         return "unknown"
 
 
-def _add_url_query_params(url: str, params: Dict[str, str]) -> str:
-    """Add params to the provided url as query parameters.
-
-    If url already contains query parameters, they will be merged with params, with the
-    existing query parameters overriding any in params with the same parameter name.
-
-    Args:
-        url: The URL to add query parameters to.
-        params: The query parameters to add.
-
-    Returns:
-        URL with params added as query parameters.
-    """
-    # Unquote URL first so we don't lose existing args.
-    url = unquote(url)
-    # Parse URL.
-    parsed_url = urlparse(url)
-    # Merge URL query string arguments dict with new params.
-    base_params = params
-    params = dict(parse_qsl(parsed_url.query))
-    base_params.update(params)
-    # bool and dict values should be converted to json-friendly values.
-    base_params.update(
-        {
-            k: json.dumps(v)
-            for k, v in base_params.items()
-            if isinstance(v, (bool, dict))
-        }
-    )
-
-    # Convert URL arguments to proper query string.
-    encoded_params = urlencode(base_params, doseq=True)
-    # Replace query string in parsed URL with updated query string.
-    parsed_url = parsed_url._replace(query=encoded_params)
-    # Convert back to URL.
-    return urlunparse(parsed_url)
-
-
-def _add_creatable_buckets_param_if_s3_uri(uri: str) -> str:
-    """If the provided URI is an S3 URL, add allow_bucket_creation=true as a query
-    parameter. For pyarrow >= 9.0.0, this is required in order to allow
-    ``S3FileSystem.create_dir()`` to create S3 buckets.
-
-    If the provided URI is not an S3 URL or if pyarrow < 9.0.0 is installed, we return
-    the URI unchanged.
-
-    Args:
-        uri: The URI that we'll add the query parameter to, if it's an S3 URL.
-
-    Returns:
-        A URI with the added allow_bucket_creation=true query parameter, if the provided
-        URI is an S3 URL; uri will be returned unchanged otherwise.
-    """
-    from packaging.version import parse as parse_version
-
-    pyarrow_version = _get_pyarrow_version()
-    if pyarrow_version is not None:
-        pyarrow_version = parse_version(pyarrow_version)
-    if pyarrow_version is not None and pyarrow_version < parse_version("9.0.0"):
-        # This bucket creation query parameter is not required for pyarrow < 9.0.0.
-        return uri
-    parsed_uri = urlparse(uri)
-    if parsed_uri.scheme == "s3":
-        uri = _add_url_query_params(uri, {"allow_bucket_creation": True})
-    return uri
-
-
-def _get_pyarrow_version() -> Optional[str]:
-    """Get the version of the installed pyarrow package, returned as a tuple of ints.
-    Returns None if the package is not found.
-    """
-    global _PYARROW_VERSION
-    if _PYARROW_VERSION is None:
-        try:
-            import pyarrow
-        except ModuleNotFoundError:
-            # pyarrow not installed, short-circuit.
-            pass
-        else:
-            if hasattr(pyarrow, "__version__"):
-                _PYARROW_VERSION = pyarrow.__version__
-    return _PYARROW_VERSION
-
-
 class DeferSigint(contextlib.AbstractContextManager):
     """Context manager that defers SIGINT signals until the context is left."""
 
@@ -2112,6 +1999,87 @@ def get_current_node_cpu_model_name() -> Optional[str]:
     except Exception:
         logger.debug("Failed to get CPU model name", exc_info=True)
         return None
+
+
+def try_update_code_search_path(
+    passthrough_args: List[str],
+    language: Language,
+    java_jars: Optional[List[str]],
+    native_libraries: Dict,
+):
+    local_code_search_path = []
+    if language == Language.JAVA:
+        if java_jars:
+            for java_jar in java_jars:
+                local_code_search_path.append(java_jar)
+
+        if native_libraries["code_search_path"]:
+            local_code_search_path += native_libraries["code_search_path"]
+
+        if local_code_search_path:
+            old_path = None
+            index = 0
+            for args in passthrough_args:
+                if args.startswith("-Dray.job.code-search-path="):
+                    old_path = args.split("-Dray.job.code-search-path=", 1)[-1]
+                    break
+                index += 1
+            new_path = ":".join(local_code_search_path)
+            if old_path:
+                passthrough_args[
+                    index
+                ] = f"-Dray.job.code-search-path={new_path}:{old_path}"
+            else:
+                passthrough_args += [f"-Dray.job.code-search-path={new_path}"]
+    elif language == Language.CPP:
+        if native_libraries.get("code_search_path", []):
+            old_path = None
+            index = 0
+            for args in passthrough_args:
+                if args.startswith("--ray_code_search_path="):
+                    old_path = args.split("--ray_code_search_path=", 1)[-1]
+                    break
+                index += 1
+            new_path = ":".join(native_libraries["code_search_path"])
+            if old_path:
+                passthrough_args[
+                    index
+                ] = f"--ray_code_search_path={new_path}:{old_path}"
+            else:
+                passthrough_args += [f"--ray_code_search_path={new_path}"]
+
+    return passthrough_args
+
+
+def try_update_ld_preload(preload_libraries: List[str]):
+    ld_preload_env = os.environ.get(runtime_env_constants.PRELOAD_ENV_NAME, "")
+    if preload_libraries:
+        if ld_preload_env:
+            ld_preload_env += ":"
+        ld_preload_env += ":".join(preload_libraries)
+    os.environ[runtime_env_constants.PRELOAD_ENV_NAME] = ld_preload_env
+
+
+def try_update_ld_library_path(
+    language: Language, native_libraries: dict, working_dir: Optional[str]
+):
+    all_library_paths = ""
+    if language == Language.CPP:
+        all_library_paths += get_ray_native_library_dir()
+    if native_libraries.get("lib_path", []):
+        all_library_paths += ":"
+        all_library_paths += ":".join(native_libraries["lib_path"])
+    os_ld_library_paths = os.environ.get(
+        runtime_env_constants.LIBRARY_PATH_ENV_NAME, None
+    )
+    if os_ld_library_paths:
+        all_library_paths += ":"
+        all_library_paths += os_ld_library_paths
+    # Add working dir to library path of workers.
+    if working_dir:
+        all_library_paths += ":"
+        all_library_paths += working_dir
+    os.environ[runtime_env_constants.LIBRARY_PATH_ENV_NAME] = all_library_paths
 
 
 def get_ray_whl_dir():

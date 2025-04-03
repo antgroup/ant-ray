@@ -4,6 +4,7 @@ import json
 from abc import ABC
 from typing import List, Dict, Optional, Any, Type
 
+from ray._common.utils import import_attr
 from ray._private.runtime_env.context import RuntimeEnvContext
 from ray._private.runtime_env.uri_cache import URICache
 from ray._private.runtime_env.constants import (
@@ -15,7 +16,6 @@ from ray._private.runtime_env.constants import (
     RAY_RUNTIME_ENV_PLUGIN_MAX_PRIORITY,
 )
 from ray.util.annotations import DeveloperAPI
-from ray._private.utils import import_attr
 
 default_logger = logging.getLogger(__name__)
 
@@ -108,6 +108,19 @@ class RuntimeEnvPlugin(ABC):
         job_id: str,
         logger: logging.Logger,
     ) -> None:
+        """Perform actions before the worker startup process begins.
+
+        This method can be used to prepare the environment before starting the worker.
+        You might use this to set up necessary configurations, environment variables,
+        or additional resources that workers need before commencing their tasks.
+
+        Args:
+            runtime_env: The RuntimeEnv object.
+            context: Auxiliary information supplied by Ray.
+            worker_id: The identifier of the worker.
+            job_id: The identifier of the job.
+            logger: A logger to log messages during the pre-worker startup process.
+        """
         return
 
     async def post_worker_exit(
@@ -117,6 +130,18 @@ class RuntimeEnvPlugin(ABC):
         job_id: str,
         logger: logging.Logger,
     ) -> None:
+        """Perform cleanup actions after a worker has finished its execution.
+
+        This method can be used to clean up the environment after the worker has completed its tasks.
+        You might use this to free up resources, remove temporary files, or other post-execution
+        housekeeping tasks to maintain a clean state.
+
+        Args:
+            runtime_env: The RuntimeEnv object.
+            worker_id: The identifier of the worker.
+            job_id: The identifier of the job.
+            logger: A logger to log messages during the post-worker exit process.
+        """
         return
 
 

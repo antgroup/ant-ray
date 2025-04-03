@@ -65,6 +65,7 @@ class RuntimeEnvAgentClient {
   /// \param[in] job_id The job id which the runtime env belongs to.
   /// \param[in] serialized_runtime_env The runtime
   /// environment serialized in JSON as from `RuntimeEnv::Serialize` method.
+  /// \param[in] runtime_env_config Configuration details for the runtime environment.
   /// \param[in] callback The callback function.
   virtual void GetOrCreateRuntimeEnv(
       const JobID &job_id,
@@ -79,6 +80,7 @@ class RuntimeEnvAgentClient {
   /// \param[in] serialized_runtime_env The runtime environment serialized in JSON as from
   /// `RuntimeEnv::Serialize` method.
   /// \param[in] callback The callback function.
+  /// \param[in] worker_id The worker id which the runtime env is created for.
   virtual void DeleteRuntimeEnvIfPossible(
       const std::string &serialized_runtime_env,
       DeleteRuntimeEnvIfPossibleCallback callback,

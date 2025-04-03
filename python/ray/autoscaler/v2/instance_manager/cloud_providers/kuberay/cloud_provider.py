@@ -68,6 +68,7 @@ class KubeRayProvider(ICloudInstanceProvider):
             kuberay_http_api_enabled = os.getenv("KUBERAY_HTTP_API_ENABLED", "0") == "1"
             kuberay_operator_address = os.getenv("KUBERAY_OPERATOR_ADDRESS")
             if kuberay_http_api_enabled and kuberay_operator_address is not None:
+                logger.info("Autoscaler is using KubeRayHttpApiClient.")
                 self._k8s_api_client = KubeRayHttpApiClient(
                     namespace=self._namespace,
                     kuberay_operator_address=kuberay_operator_address,

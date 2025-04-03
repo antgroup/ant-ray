@@ -66,6 +66,9 @@ class GcsWorkerManager : public rpc::WorkerInfoHandler {
     usage_stats_client_ = usage_stats_client;
   }
 
+  /// Evict all dead workers which ttl is expired.
+  void EvictExpiredWorkers();
+
  private:
   void GetWorkerInfo(const WorkerID &worker_id,
                      Postable<void(std::optional<rpc::WorkerTableData>)> callback) const;

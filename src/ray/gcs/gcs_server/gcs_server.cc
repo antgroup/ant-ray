@@ -241,6 +241,9 @@ void GcsServer::DoStart(const GcsInitData &gcs_init_data) {
 
   RecordMetrics();
 
+  // Init dead data cleaner.
+  InitDeadDataCleaner();
+
   // Start RPC server when all tables have finished loading initial
   // data.
   rpc_server_.Run();
@@ -970,6 +973,20 @@ void GcsServer::TryGlobalGC() {
     ray_syncer_->BroadcastMessage(std::move(msg));
     global_gc_throttler_->RunNow();
   }
+}
+
+void GcsServer::InitDeadDataCleaner() {
+  auto ttl_runner = PeriodicalRunner::Create(io_context_provider_.GetDefaultIOContext());
+  // Check clean the dead data.
+  ttl_runner->RunFnPeriodically(
+      [this, ttl_runner] {
+        gcs_actor_manager_->EvictExpiredActors();
+        gcs_node_manager_->EvictExpiredNodes();
+        gcs_worker_manager_->EvictExpiredWorkers();
+        gcs_job_manager_->EvictExpiredJobs();
+      },
+      RayConfig::instance().gcs_dead_data_check_interval_ms(),
+      "GcsServer.DeadDataCleaner");
 }
 
 }  // namespace gcs

@@ -506,14 +506,14 @@ class GcsActorManager : public rpc::ActorInfoHandler {
   /// Get the created actors.
   ///
   /// \return The created actors.
-  const absl::flat_hash_map<NodeID, absl::flat_hash_map<WorkerID, ActorID>>
-      &GetCreatedActors() const;
+  const absl::flat_hash_map<NodeID, absl::flat_hash_map<WorkerID, ActorID>> &
+  GetCreatedActors() const;
 
   const absl::flat_hash_map<ActorID, std::shared_ptr<GcsActor>> &GetRegisteredActors()
       const;
 
-  const absl::flat_hash_map<ActorID, std::vector<RegisterActorCallback>>
-      &GetActorRegisterCallbacks() const;
+  const absl::flat_hash_map<ActorID, std::vector<RegisterActorCallback>> &
+  GetActorRegisterCallbacks() const;
 
   std::string DebugString() const;
 
@@ -540,6 +540,9 @@ class GcsActorManager : public rpc::ActorInfoHandler {
     RAY_CHECK(listener);
     actor_destroy_listeners_.emplace_back(std::move(listener));
   }
+
+  /// Evict all actors which ttl is expired.
+  void EvictExpiredActors();
 
  private:
   const ray::rpc::ActorDeathCause GenNodeDiedCause(
@@ -626,6 +629,10 @@ class GcsActorManager : public rpc::ActorInfoHandler {
   ///
   /// \param actor The actor to be killed.
   void AddDestroyedActorToCache(const std::shared_ptr<GcsActor> &actor);
+
+  /// Evict one destoyed actor from sorted_destroyed_actor_list_ as well as
+  /// destroyed_actors_.
+  void EvictOneDestroyedActor();
 
   rpc::ActorTableData GenActorDataOnlyWithStates(const rpc::ActorTableData &actor) {
     rpc::ActorTableData actor_delta;

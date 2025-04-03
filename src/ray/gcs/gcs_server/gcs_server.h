@@ -190,6 +190,9 @@ class GcsServer {
   // Init RuntimeENv manager
   void InitRuntimeEnvManager();
 
+  /// Initialize dead data cleaner.
+  void InitDeadDataCleaner();
+
   /// Install event listeners.
   void InstallEventListeners();
 

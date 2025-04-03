@@ -507,5 +507,48 @@ void GcsJobManager::RecordMetrics() {
   ray::stats::STATS_finished_jobs.Record(finished_jobs_count_);
 }
 
+void GcsJobManager::EvictExpiredJobs() {
+  // EvictDeadAgentJobs();
+  // RAY_LOG(INFO) << "Try evicting expired jobs, there are " <<
+  // sorted_dead_job_list_.size()
+  //               << " dead jobs in the cache.";
+  // int evicted_job_number = 0;
+
+  // std::vector<JobID> batch_ids;
+  // size_t batch_size = RayConfig::instance().gcs_dead_data_max_batch_delete_size();
+  // batch_ids.reserve(batch_size);
+
+  // auto current_time_ms = current_sys_time_ms();
+  // auto gcs_dead_job_data_keep_duration_ms =
+  //     RayConfig::instance().gcs_dead_job_data_keep_duration_ms();
+  // while (!sorted_dead_job_list_.empty()) {
+  //   auto timestamp = sorted_dead_job_list_.begin()->second;
+  //   if (timestamp + gcs_dead_job_data_keep_duration_ms > current_time_ms) {
+  //     break;
+  //   }
+
+  //   auto iter = sorted_dead_job_list_.begin();
+  //   const auto &job_id = iter->first;
+  //   batch_ids.emplace_back(job_id);
+  //   RemoveJobFromCache(job_id);
+  //   sorted_dead_job_list_.erase(iter);
+  //   ++evicted_job_number;
+
+  //   if (batch_ids.size() == batch_size) {
+  //     RAY_CHECK_OK(gcs_table_storage_->JobTable().BatchDelete(
+  //         batch_ids, {[](auto) {}, io_context_}));
+  //     batch_ids.clear();
+  //   }
+  // }
+
+  // if (!batch_ids.empty()) {
+  //   RAY_CHECK_OK(gcs_table_storage_->JobTable().BatchDelete(batch_ids,
+  //                                                           {[](auto) {},
+  //                                                           io_context_}));
+  // }
+  // RAY_LOG(INFO) << evicted_job_number << " jobs are evicted, there are still "
+  //               << sorted_dead_job_list_.size() << " dead jobs in the cache.";
+}
+
 }  // namespace gcs
 }  // namespace ray

@@ -356,5 +356,68 @@ void GcsWorkerManager::GetWorkerInfo(
           })));
 }
 
+void GcsWorkerManager::EvictExpiredWorkers() {
+  // RAY_LOG(INFO) << "Try evicting expired workers, there are "
+  //               << sorted_dead_worker_list_.size() << " dead workers in the cache.";
+  // int evicted_worker_number = 0;
+
+  // size_t batch_size = RayConfig::instance().gcs_dead_data_max_batch_delete_size();
+  // std::vector<WorkerID> batch_ids;
+  // batch_ids.reserve(batch_size);
+
+  // std::vector<UniqueID> batch_worker_process_ids;
+  // batch_worker_process_ids.reserve(batch_size);
+
+  // auto current_time_ms = current_sys_time_ms();
+  // auto gcs_dead_worker_data_keep_duration_ms =
+  //     RayConfig::instance().gcs_dead_worker_data_keep_duration_ms();
+  // while (!sorted_dead_worker_list_.empty()) {
+  //   auto timestamp = sorted_dead_worker_list_.begin()->second;
+  //   if (timestamp + gcs_dead_worker_data_keep_duration_ms > current_time_ms) {
+  //     break;
+  //   }
+
+  //   auto iter = sorted_dead_worker_list_.begin();
+  //   const auto &worker_id = iter->first;
+  //   batch_ids.emplace_back(worker_id);
+
+  //   auto dead_worker_iter = dead_workers_.find(worker_id);
+  //   if (dead_worker_iter != dead_workers_.end()) {
+  //     auto worker_process_id =
+  //         UniqueID::FromBinary(dead_worker_iter->second->worker_process_id());
+  //     if (!worker_process_id.IsNil()) {
+  //       batch_worker_process_ids.emplace_back(worker_process_id);
+  //     }
+  //     dead_workers_.erase(dead_worker_iter);
+  //   }
+
+  //   sorted_dead_worker_list_.erase(iter);
+  //   ++evicted_worker_number;
+
+  //   if (batch_ids.size() == batch_size) {
+  //     if (!batch_worker_process_ids.empty()) {
+  //       RAY_CHECK_OK(gcs_table_storage_->WorkerProcessRuntimeResourceTable().BatchDelete(
+  //           batch_worker_process_ids, {[](auto) {}, io_context_}));
+  //       batch_worker_process_ids.clear();
+  //     }
+  //     RAY_CHECK_OK(gcs_table_storage_->WorkerTable().BatchDelete(
+  //         batch_ids, {[](auto) {}, io_context_}));
+  //     batch_ids.clear();
+  //   }
+  // }
+
+  // if (!batch_ids.empty()) {
+  //   if (!batch_worker_process_ids.empty()) {
+  //     RAY_CHECK_OK(gcs_table_storage_->WorkerProcessRuntimeResourceTable().BatchDelete(
+  //         batch_worker_process_ids, {[](auto) {}, io_context_}));
+  //   }
+  //   RAY_CHECK_OK(gcs_table_storage_->WorkerTable().BatchDelete(
+  //       batch_ids, {[](auto) {}, io_context_}));
+  // }
+
+  // RAY_LOG(INFO) << evicted_worker_number << " workers are evicted, there are still "
+  //               << sorted_dead_worker_list_.size() << " dead workers in the cache.";
+}
+
 }  // namespace gcs
 }  // namespace ray

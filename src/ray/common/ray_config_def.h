@@ -955,3 +955,21 @@ RAY_CONFIG(bool, enable_infeasible_task_early_exit, false);
 // Frequency at which to check all local worker & driver sockets for unexpected
 // disconnects.
 RAY_CONFIG(int64_t, raylet_check_for_unexpected_worker_disconnect_interval_ms, 1000)
+
+// The interval to check the gcs dead data.
+RAY_CONFIG(int64_t, gcs_dead_data_check_interval_ms, 600 * 1000)
+
+// Maximum duration in milliseconds to keep dead actor data.
+RAY_CONFIG(int64_t, gcs_dead_actor_data_keep_duration_ms, 5 * 86400 * 1000)
+
+// Maximum duration in milliseconds to keep dead node data.
+RAY_CONFIG(int64_t, gcs_dead_node_data_keep_duration_ms, 7 * 86400 * 1000)
+
+// Maximum duration in milliseconds to keep dead job data.
+RAY_CONFIG(int64_t, gcs_dead_job_data_keep_duration_ms, 30LL * 86400 * 1000)
+
+// Maximum duration in milliseconds to keep dead worker data.
+RAY_CONFIG(int64_t, gcs_dead_worker_data_keep_duration_ms, 600 * 1000)
+
+// Maximum batch size when delete dead data in gcs.
+RAY_CONFIG(int64_t, gcs_dead_data_max_batch_delete_size, 500)

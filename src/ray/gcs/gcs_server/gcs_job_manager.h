@@ -117,6 +117,9 @@ class GcsJobManager : public rpc::JobInfoHandler {
   /// succeed or fail) will be reported periodically.
   void RecordMetrics();
 
+  /// Evict all dead jobs which ttl is expired.
+  void EvictExpiredJobs();
+
  private:
   void ClearJobInfos(const rpc::JobTableData &job_data);
 

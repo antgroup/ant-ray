@@ -176,7 +176,7 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ open, onClose, jobId, isTab = f
 
     // Track if we found any source code lines
     let foundSourceCode = false;
-    const parsedLines: SourceCodeLine[] = [];
+    let parsedLines: SourceCodeLine[] = [];
     
     // Direct string parsing without regex
     const lines = output.split('\n');

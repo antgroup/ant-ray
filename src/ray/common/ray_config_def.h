@@ -601,7 +601,7 @@ RAY_CONFIG(bool, enable_worker_prestart, false)
 
 /// Whether to enable worker prestarting on first driver
 /// TODO(clarng): reconcile with enable_worker_prestart
-RAY_CONFIG(bool, prestart_worker_first_driver, true)
+RAY_CONFIG(bool, prestart_worker_first_driver, false)
 
 /// The interval of periodic idle worker killing. Value of 0 means worker capping is
 /// disabled.
@@ -955,3 +955,7 @@ RAY_CONFIG(bool, enable_infeasible_task_early_exit, false);
 // Frequency at which to check all local worker & driver sockets for unexpected
 // disconnects.
 RAY_CONFIG(int64_t, raylet_check_for_unexpected_worker_disconnect_interval_ms, 1000)
+
+// If enabled and worker stated in container, the container will add
+// resource limit.
+RAY_CONFIG(bool, worker_resource_limits_enabled, false)

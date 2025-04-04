@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import traceback
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Set, Tuple, Optional, Union
@@ -17,7 +18,7 @@ from ray._private.runtime_env.conda import CondaPlugin
 from ray._private.runtime_env.context import RuntimeEnvContext
 from ray._private.runtime_env.default_impl import get_image_uri_plugin_cls
 from ray._private.runtime_env.java_jars import JavaJarsPlugin
-from ray._private.runtime_env.image_uri import ContainerPlugin
+from ray._private.runtime_env.image_uri import ContainerPlugin, ContainerManager
 from ray._private.runtime_env.pip import PipPlugin
 from ray._private.runtime_env.uv import UvPlugin
 from ray._private.gcs_utils import GcsAioClient
@@ -225,13 +226,13 @@ class RuntimeEnvAgent:
         self._working_dir_plugin = WorkingDirPlugin(
             self._runtime_env_dir, self._gcs_aio_client
         )
-        self._container_plugin = ContainerPlugin(temp_dir)
+        self._container_plugin = ContainerPlugin(self._runtime_env_dir)
+        self._container_manager = ContainerManager(temp_dir)
         # TODO(jonathan-anyscale): change the plugin to ProfilerPlugin
         # and unify with nsight and other profilers.
         self._nsight_plugin = NsightPlugin(self._runtime_env_dir)
         self._mpi_plugin = MPIPlugin()
-        self._image_uri_plugin = get_image_uri_plugin_cls()(temp_dir)
-
+        self._image_uri_plugin = get_image_uri_plugin_cls()(self._runtime_env_dir)
         # TODO(architkulkarni): "base plugins" and third-party plugins should all go
         # through the same code path.  We should never need to refer to
         # self._xxx_plugin, we should just iterate through self._plugins.
@@ -315,10 +316,15 @@ class RuntimeEnvAgent:
         async def _setup_runtime_env(
             runtime_env: RuntimeEnv,
             runtime_env_config: RuntimeEnvConfig,
+            serialized_allocated_resource_instances,
         ):
+            allocated_resource: dict = json.loads(
+                serialized_allocated_resource_instances or "{}"
+            )
             log_files = runtime_env_config.get("log_files", [])
             # Use a separate logger for each job.
             per_job_logger = self.get_or_create_logger(request.job_id, log_files)
+            per_job_logger.info(f"Worker has resource :" f"{allocated_resource}")
             context = RuntimeEnvContext(env_vars=runtime_env.env_vars())
 
             # Warn about unrecognized fields in the runtime env.
@@ -359,6 +365,15 @@ class RuntimeEnvAgent:
                         await create_for_plugin_if_needed(
                             runtime_env, plugin, uri_cache, context, per_job_logger
                         )
+
+            # Container setup should be done after other plugins.
+            await self._container_manager.setup(
+                runtime_env,
+                request.allocated_instances_serialized_json,
+                context,
+                logger=per_job_logger,
+            )
+
             return context
 
         async def _create_runtime_env_with_retry(
@@ -388,7 +403,9 @@ class RuntimeEnvAgent:
             for _ in range(runtime_env_consts.RUNTIME_ENV_RETRY_TIMES):
                 try:
                     runtime_env_setup_task = _setup_runtime_env(
-                        runtime_env, runtime_env_config
+                        runtime_env,
+                        runtime_env_config,
+                        request.allocated_instances_serialized_json,
                     )
                     runtime_env_context = await asyncio.wait_for(
                         runtime_env_setup_task, timeout=setup_timeout_seconds
@@ -584,6 +601,7 @@ class RuntimeEnvAgent:
                 await plugin_setup_context.class_instance.post_worker_exit(
                     runtime_env,
                     request.worker_id.decode(),
+                    request.job_id.decode(),
                     self._logger,
                 )
 

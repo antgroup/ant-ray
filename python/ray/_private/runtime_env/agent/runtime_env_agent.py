@@ -622,6 +622,7 @@ class RuntimeEnvAgent:
             count += 1
             reply.runtime_env_states.append(runtime_env_state)
         reply.total = len(runtime_env_states)
+        # TODO: Test branch for empty reply.
         return reply
 
     async def trigger_pre_worker_startup(

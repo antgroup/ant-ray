@@ -222,8 +222,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
 
         # Use placeholder here and will replace it by `pre_worker_startup`.
         context.job_dir = WorkingDirPlugin.job_dir_placeholder
-        job_dir = context.job_dir
-        context.env_vars[runtime_env_consts.RAY_JOB_DIR] = job_dir
+        context.env_vars[runtime_env_consts.RAY_JOB_DIR] = context.job_dir
 
     async def pre_worker_startup(
         self,
@@ -244,6 +243,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             context.command_prefix[i] = prefix.replace(
                 WorkingDirPlugin.working_dir_placeholder, working_dir
             )
+
         for k, v in context.env_vars.items():
             context.env_vars[k] = v.replace(
                 WorkingDirPlugin.working_dir_placeholder, working_dir
@@ -274,7 +274,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             os.makedirs(job_dir, exist_ok=True)
         context.job_dir = job_dir
         symlink_working_dir = os.path.join(job_dir, worker_id)
-        logger.info(f"Creating symlink from {working_dir} to {symlink_working_dir}")
+        logger.debug(f"Creating symlink from {working_dir} to {symlink_working_dir}")
         try_to_symlink(symlink_working_dir, working_dir)
 
         # Replace the placeholder with the real job dir.
@@ -299,7 +299,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "won't be deleted."
             )
             return
-        logger.info(
+        logger.debug(
             f"Deleting symlink working dir for worker {worker_id}, job_id {job_id}"
         )
         job_dir = os.path.join(self._job_dirs, job_id)
@@ -316,7 +316,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
 
         # Check if job_dir contains any symlinked directories for active workers.
         if any(entry.is_symlink() for entry in os.scandir(job_dir)):
-            logger.info(
+            logger.debug(
                 f"Job dir {job_dir} contains symlinked directories for active workers. "
                 f"Skipping deletion for job {job_id}."
             )

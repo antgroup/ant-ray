@@ -2159,7 +2159,7 @@ def get_dependencies_installer_path():
 
 def get_pyenv_path():
     # Get the pyenv path automatically instead of hard code.
-    return "/home/admin/.pyenv"
+    return os.environ.get("PYENV_ROOT", "/home/admin/.pyenv")
 
 
 def get_current_python():

@@ -309,7 +309,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 os.unlink(symlink_working_dir)
             else:
                 shutil.rmtree(symlink_working_dir)
-        logger.info(f"Deleting working dir for worker {worker_id}, job id {job_id}")
+        logger.info(f"Deleting working dir for worker {worker_id}")
         working_dir = os.path.join(self._working_dirs, worker_id)
         # TODO(Jacky): Use async method to remove, such as aiofiles.os.removedirs
         shutil.rmtree(working_dir)

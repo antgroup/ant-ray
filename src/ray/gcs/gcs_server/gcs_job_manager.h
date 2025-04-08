@@ -126,6 +126,15 @@ class GcsJobManager : public rpc::JobInfoHandler {
   void MarkJobAsFinished(rpc::JobTableData job_table_data,
                          std::function<void(Status)> done_callback);
 
+  /// Add the dead job to the cache. If the cache is full, the earliest dead job is
+  /// evicted.
+  ///
+  /// \param job_table_data The info of dead job.
+  void AddDeadJobToCache(const rpc::JobTableData &job_table_data);
+
+  /// Evict one dead job from sorted_dead_job_list_.
+  void EvictOneDeadJob();
+
   // Used to validate invariants for threading; for example, all callbacks are executed on
   // the same thread.
   ThreadChecker thread_checker_;
@@ -138,6 +147,8 @@ class GcsJobManager : public rpc::JobInfoHandler {
 
   GcsTableStorage &gcs_table_storage_;
   GcsPublisher &gcs_publisher_;
+
+  std::list<std::pair<JobID, int64_t>> sorted_dead_job_list_;
 
   /// Listeners which monitors the finish of jobs.
   std::vector<JobFinishListenerCallback> job_finished_listeners_;

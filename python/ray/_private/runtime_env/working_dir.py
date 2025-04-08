@@ -199,8 +199,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "downloading or unpacking the working_dir."
             )
         # Use placeholder here and will replace it by `pre_worker_startup`.
-        context.working_dir = WorkingDirPlugin.working_dir_placeholder
-        working_dir = context.working_dir
+        working_dir = WorkingDirPlugin.working_dir_placeholder
         context.symlink_paths_to_working_dir.append(str(local_dir))
         context.env_vars[runtime_env_consts.RAY_WORKING_DIR] = working_dir
 
@@ -219,10 +218,9 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "&&",
             ]
         set_pythonpath_in_context(python_path=str(working_dir), context=context)
-
-        # Use placeholder here and will replace it by `pre_worker_startup`.
-        context.job_dir = WorkingDirPlugin.job_dir_placeholder
-        context.env_vars[runtime_env_consts.RAY_JOB_DIR] = context.job_dir
+        context.env_vars[
+            runtime_env_consts.RAY_JOB_DIR
+        ] = WorkingDirPlugin.job_dir_placeholder
 
     async def pre_worker_startup(
         self,

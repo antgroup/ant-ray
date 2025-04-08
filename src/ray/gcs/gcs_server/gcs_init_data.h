@@ -61,15 +61,20 @@ class GcsInitData {
   }
 
   /// Get placement group metadata.
-  const absl::flat_hash_map<PlacementGroupID, rpc::PlacementGroupTableData>
-      &PlacementGroups() const {
+  const absl::flat_hash_map<PlacementGroupID, rpc::PlacementGroupTableData> &
+  PlacementGroups() const {
     return placement_group_table_data_;
   }
 
   /// Get virtual cluster metadata.
-  const absl::flat_hash_map<VirtualClusterID, rpc::VirtualClusterTableData>
-      &VirtualClusters() const {
+  const absl::flat_hash_map<VirtualClusterID, rpc::VirtualClusterTableData> &
+  VirtualClusters() const {
     return virtual_cluster_table_data_;
+  }
+
+  /// Get worker metadata.
+  const absl::flat_hash_map<WorkerID, rpc::WorkerTableData> &Workers() const {
+    return worker_table_data_;
   }
 
  private:
@@ -100,6 +105,11 @@ class GcsInitData {
   /// \param on_done The callback when virtual cluster metadata is loaded successfully.
   void AsyncLoadVirtualClusterTableData(Postable<void()> on_done);
 
+  /// Load worker metadata from the store into memory asynchronously.
+  ///
+  /// \param on_done The callback when worker metadata is loaded successfully.
+  void AsyncLoadWorkerTableData(Postable<void()> on_done);
+
  protected:
   /// The gcs table storage.
   gcs::GcsTableStorage &gcs_table_storage_;
@@ -122,6 +132,9 @@ class GcsInitData {
   /// Virtual cluster metadata.
   absl::flat_hash_map<VirtualClusterID, rpc::VirtualClusterTableData>
       virtual_cluster_table_data_;
+
+  /// Worker metadata.
+  absl::flat_hash_map<WorkerID, rpc::WorkerTableData> worker_table_data_;
 };
 
 }  // namespace gcs

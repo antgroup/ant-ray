@@ -199,8 +199,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "downloading or unpacking the working_dir."
             )
         # Use placeholder here and will replace it by `pre_worker_startup`.
-        context.working_dir = WorkingDirPlugin.working_dir_placeholder
-        working_dir = context.working_dir
+        working_dir = WorkingDirPlugin.working_dir_placeholder
         context.symlink_paths_to_working_dir.append(str(local_dir))
         context.env_vars[runtime_env_consts.RAY_WORKING_DIR] = working_dir
 
@@ -219,6 +218,9 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "&&",
             ]
         set_pythonpath_in_context(python_path=str(working_dir), context=context)
+        context.env_vars[
+            runtime_env_consts.RAY_JOB_DIR
+        ] = WorkingDirPlugin.job_dir_placeholder
 
         # Use placeholder here and will replace it by `pre_worker_startup`.
         context.job_dir = WorkingDirPlugin.job_dir_placeholder
@@ -244,6 +246,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             context.command_prefix[i] = prefix.replace(
                 WorkingDirPlugin.working_dir_placeholder, working_dir
             )
+
         for k, v in context.env_vars.items():
             context.env_vars[k] = v.replace(
                 WorkingDirPlugin.working_dir_placeholder, working_dir
@@ -279,7 +282,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             os.makedirs(job_dir, exist_ok=True)
         context.job_dir = job_dir
         symlink_working_dir = os.path.join(job_dir, worker_id)
-        logger.info(f"Creating symlink from {working_dir} to {symlink_working_dir}")
+        logger.debug(f"Creating symlink from {working_dir} to {symlink_working_dir}")
         try_to_symlink(symlink_working_dir, working_dir)
 
         # Replace the placeholder with the real job dir.
@@ -304,7 +307,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "won't be deleted."
             )
             return
-        logger.info(
+        logger.debug(
             f"Deleting symlink working dir for worker {worker_id}, job_id {job_id}"
         )
         job_dir = os.path.join(self._job_dirs, job_id)
@@ -314,14 +317,14 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 os.unlink(symlink_working_dir)
             else:
                 shutil.rmtree(symlink_working_dir)
-        logger.info(f"Deleting working dir for worker {worker_id}, job id {job_id}")
+        logger.info(f"Deleting working dir for worker {worker_id}")
         working_dir = os.path.join(self._working_dirs, worker_id)
         # TODO(Jacky): Use async method to remove, such as aiofiles.os.removedirs
         shutil.rmtree(working_dir)
 
         # Check if job_dir contains any symlinked directories for active workers.
         if any(entry.is_symlink() for entry in os.scandir(job_dir)):
-            logger.info(
+            logger.debug(
                 f"Job dir {job_dir} contains symlinked directories for active workers. "
                 f"Skipping deletion for job {job_id}."
             )

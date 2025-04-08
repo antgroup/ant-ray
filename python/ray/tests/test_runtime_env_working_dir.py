@@ -677,7 +677,7 @@ def test_add_working_dir_to_ld_library_path(tmp_working_dir, shutdown_only):
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Fail to create temp dir.")
 @pytest.mark.parametrize("disable_job_dir_gc", [True, False])
-def test_id_named_job_dir(tmp_working_dir, disable_job_dir_gc, shutdown_only):
+def test_job_dir(tmp_working_dir, disable_job_dir_gc, shutdown_only):
     """Tests the independent id named job directory for echo job."""
     if disable_job_dir_gc:
         os.environ["RAY_RUNTIME_ENV_DISABLE_JOB_DIR_GC"] = "true"

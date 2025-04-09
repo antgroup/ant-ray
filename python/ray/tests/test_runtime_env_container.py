@@ -250,7 +250,7 @@ class Counter(object):
         return self.value
 
 
-@pytest.mark.parametrize("api_version", ["container", "image_uri"])
+@pytest.mark.parametrize("api_version", ["container"])
 class TestContainerRuntimeEnvCommandLine:
     def test_container_mount_path_deduplication(self, api_version, ray_start_regular):
         runtime_env = {
@@ -297,7 +297,7 @@ class TestContainerRuntimeEnvCommandLine:
             lambda: check_logs_by_keyword(keyword4, log_file_pattern), timeout=10
         )
 
-    def test_checkinstall_ray_with_pip_packages(self, api_version, ray_start_regular):
+    def test_check_install_ray_with_pip_packages(self, api_version, ray_start_regular):
         runtime_env = {
             api_version: {
                 "image": "unknown_image",

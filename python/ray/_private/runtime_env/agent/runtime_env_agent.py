@@ -18,7 +18,7 @@ from ray._private.runtime_env.conda import CondaPlugin
 from ray._private.runtime_env.context import RuntimeEnvContext
 from ray._private.runtime_env.default_impl import get_image_uri_plugin_cls
 from ray._private.runtime_env.java_jars import JavaJarsPlugin
-from ray._private.runtime_env.image_uri import ContainerPlugin, ContainerManager
+from ray._private.runtime_env.image_uri import ContainerPlugin
 from ray._private.runtime_env.pip import PipPlugin
 from ray._private.runtime_env.uv import UvPlugin
 from ray._private.gcs_utils import GcsAioClient
@@ -226,13 +226,12 @@ class RuntimeEnvAgent:
         self._working_dir_plugin = WorkingDirPlugin(
             self._runtime_env_dir, self._gcs_aio_client
         )
-        self._container_plugin = ContainerPlugin(self._runtime_env_dir)
-        self._container_manager = ContainerManager(temp_dir)
+        self._container_plugin = ContainerPlugin(temp_dir)
         # TODO(jonathan-anyscale): change the plugin to ProfilerPlugin
         # and unify with nsight and other profilers.
         self._nsight_plugin = NsightPlugin(self._runtime_env_dir)
         self._mpi_plugin = MPIPlugin()
-        self._image_uri_plugin = get_image_uri_plugin_cls()(self._runtime_env_dir)
+        self._image_uri_plugin = get_image_uri_plugin_cls()(temp_dir)
         # TODO(architkulkarni): "base plugins" and third-party plugins should all go
         # through the same code path.  We should never need to refer to
         # self._xxx_plugin, we should just iterate through self._plugins.
@@ -352,7 +351,7 @@ class RuntimeEnvAgent:
                 per_job_logger,
             )
 
-            # Then within the working dir, create the other plugins.
+            # Then within the working dir, create the other plugins and skip container plugin
             working_dir_uri_or_none = runtime_env.working_dir_uri()
             with self._working_dir_plugin.with_working_dir_env(working_dir_uri_or_none):
                 """Run setup for each plugin unless it has already been cached."""
@@ -360,18 +359,22 @@ class RuntimeEnvAgent:
                     plugin_setup_context
                 ) in self._plugin_manager.sorted_plugin_setup_contexts():
                     plugin = plugin_setup_context.class_instance
+                    if plugin.name == ContainerPlugin.name:
+                        continue
                     if plugin.name != WorkingDirPlugin.name:
                         uri_cache = plugin_setup_context.uri_cache
                         await create_for_plugin_if_needed(
                             runtime_env, plugin, uri_cache, context, per_job_logger
                         )
 
-            # Container setup should be done after other plugins.
-            await self._container_manager.setup(
+            # Container plugin should be created after all other plugins.
+            container_ctx = self._plugin_manager.plugins[ContainerPlugin.name]
+            await create_for_plugin_if_needed(
                 runtime_env,
-                request.allocated_instances_serialized_json,
+                container_ctx.class_instance,
+                container_ctx.uri_cache,
                 context,
-                logger=per_job_logger,
+                per_job_logger,
             )
 
             return context

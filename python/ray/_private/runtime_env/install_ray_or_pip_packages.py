@@ -39,16 +39,6 @@ def install_ray_package(ray_version, whl_dir):
         raise RuntimeError(f"Failed to install ray, got ex: {result.stderr}")
 
 
-def install_pip_package_with_specify_path(
-    packages,
-    exclude_python_path,
-):
-    pip_packages = json.loads(
-        base64.b64decode(packages.encode("utf-8")).decode("utf-8")
-    )
-    install_pip_package(pip_packages, exclude_python_path)
-
-
 def install_pip_package(pip_packages, exclude_python_path):
     formatted_pip_packages = []
     for package in pip_packages:
@@ -99,6 +89,8 @@ if __name__ == "__main__":
     if args.ray_version or args.whl_dir:
         install_ray_package(args.ray_version, args.whl_dir)
     if args.packages:
-        install_pip_package_with_specify_path(
-            args.packages, pip_install_without_python_path
+
+        pip_packages = json.loads(
+            base64.b64decode(args.packages.encode("utf-8")).decode("utf-8")
         )
+        install_pip_package(pip_packages, pip_install_without_python_path)

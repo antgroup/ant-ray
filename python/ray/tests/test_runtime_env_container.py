@@ -297,11 +297,11 @@ class TestContainerRuntimeEnvCommandLine:
             lambda: check_logs_by_keyword(keyword4, log_file_pattern), timeout=10
         )
 
-    def test_check_install_ray_with_pip_packages(self, api_version, ray_start_regular):
+    def test_checkinstall_ray_with_pip_packages(self, api_version, ray_start_regular):
         runtime_env = {
             api_version: {
                 "image": "unknown_image",
-                "_install_ray": True,
+                "install_ray": True,
             },
             "pip": {
                 "packages": [
@@ -363,22 +363,22 @@ class TestContainerRuntimeEnvCommandLine:
         {
             "container": {
                 "image": "unknown_image",
-                "pip": ["triton_on_ray"],
+                "pip": ["numpy"],
                 "_pip_install_without_python_path": True,
             },
-            "pip": ["serving_common_lib"],
+            "pip": ["pandas"],
         },
         {
-            "container": {"image": "unknown_image", "pip": ["triton_on_ray"]},
-            "pip": ["serving_common_lib"],
+            "container": {"image": "unknown_image", "pip": ["numpy"]},
+            "pip": ["pandas"],
         },
         {
             "container": {
                 "image": "unknown_image",
-                "pip": ["triton_on_ray"],
-                "_install_ray": True,
+                "pip": ["numpy"],
+                "install_ray": True,
             },
-            "pip": ["serving_common_lib"],
+            "pip": ["pandas"],
         },
     ],
 )
@@ -406,7 +406,6 @@ def test_container_with_pip_packages(runtime_env, ray_start_regular):
     keyword1 = "Installing python requirements to"
     keyword2 = f"\--packages {json_dumps_container_pip_packages}"
     keyword3 = f"\--packages {json_dumps_merge_pip_packages}"
-    print(runtime_env.get("container").get("_install_ray", False))
     if runtime_env.get("_pip_install_without_python_path", False):
         wait_for_condition(
             lambda: check_logs_by_keyword(keyword1, log_file_pattern_2), timeout=20
@@ -415,7 +414,7 @@ def test_container_with_pip_packages(runtime_env, ray_start_regular):
             lambda: check_logs_by_keyword(keyword2, log_file_pattern_1), timeout=20
         )
     else:
-        if runtime_env.get("container").get("_install_ray", False):
+        if runtime_env.get("container").get("install_ray", False):
             print(keyword3)
             wait_for_condition(
                 lambda: check_logs_by_keyword(keyword3, log_file_pattern_1), timeout=20

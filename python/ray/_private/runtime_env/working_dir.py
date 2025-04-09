@@ -222,11 +222,6 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             runtime_env_consts.RAY_JOB_DIR
         ] = WorkingDirPlugin.job_dir_placeholder
 
-        # Use placeholder here and will replace it by `pre_worker_startup`.
-        context.job_dir = WorkingDirPlugin.job_dir_placeholder
-        job_dir = context.job_dir
-        context.env_vars[runtime_env_consts.RAY_JOB_DIR] = job_dir
-
     async def pre_worker_startup(
         self,
         runtime_env: "RuntimeEnv",  # noqa: F821

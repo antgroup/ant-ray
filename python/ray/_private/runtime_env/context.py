@@ -27,13 +27,7 @@ def set_java_jar_dirs_to_env_vars(
 ):
     """Insert the path in RAY_JAVA_JARS_DIRS in the runtime env."""
     java_jar_dirs = ":".join(java_jar_dirs_list)
-    logger.info(f"Setting archive path {java_jar_dirs} to context {context}.")
-    if runtime_env_constants.RAY_JAVA_JARS_DIRS in context.env_vars:
-        raise RuntimeError(
-            f"{runtime_env_constants.RAY_JAVA_JARS_DIRS} already exists in "
-            f"context.env_vars {context.env_vars}, this is not allowed, "
-            "please check your runtime_env."
-        )
+    logger.info(f"Setting java jar dirs {java_jar_dirs} to context {context}.")
     context.env_vars[runtime_env_constants.RAY_JAVA_JARS_DIRS] = java_jar_dirs
 
 

@@ -547,7 +547,6 @@ RAY_UNPACKABLE_FILE_SUFFIXS_STR = os.environ.get(
 )
 
 RAY_UNPACKABLE_FILE_SUFFIXS = RAY_UNPACKABLE_FILE_SUFFIXS_STR.split(",")
-
 # head high-availability feature
 STORAGE_NAMESPACE = (
     "RAY" + os.environ.get("RAY_external_storage_namespace", "default") + "@"

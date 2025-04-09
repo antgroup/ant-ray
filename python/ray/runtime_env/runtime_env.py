@@ -613,7 +613,7 @@ class RuntimeEnv(dict):
     def container_install_ray(self, container_key_name) -> bool:
         if not self.has_py_container(container_key_name):
             return False
-        return self[container_key_name].get("_install_ray", False)
+        return self[container_key_name].get("install_ray", False)
 
     def py_container_worker_path(self, container_key_name) -> Optional[str]:
         if not self.has_py_container(container_key_name):

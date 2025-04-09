@@ -2182,10 +2182,6 @@ def get_current_python():
 def get_specify_python(python_version):
     """
     Get specified python executable and site package directory.
-
-    In ANT-INTERNAL, we install multiple python in
-    /home/admin/.pyenv/versions/.
-    There will be 3.6.13, 3.7.10 and so on.
     """
     base_path = os.path.join(get_pyenv_path(), "versions")
     for version_dir_name in os.listdir(base_path):

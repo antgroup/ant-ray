@@ -396,6 +396,8 @@ class PipPlugin(RuntimeEnvPlugin):
                 "installing the runtime_env `pip` packages."
             )
         context.py_executable = virtualenv_python
+        # We get the path of the ray base environment, virtual environment,
+        # and virtual environment on the current pod, and add them to `PYTHONPATH`
         all_packages = virtualenv_utils.get_all_packages_paths(
             target_dir, runtime_env.pip_config().get("python_version")
         )

@@ -1673,6 +1673,12 @@ document.write(`
         <span class="bp">cls</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">mcs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">new_namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># set __signature__ attr only for model class, but not for its instances</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">ClassAttribute</span><span class="p">(</span><span class="s1">&#39;__signature__&#39;</span><span class="p">,</span> <span class="n">generate_model_signature</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">config</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_base_model_class_defined</span><span class="p">:</span>
+            <span class="c1"># Cython does not understand the `if TYPE_CHECKING:` condition in the</span>
+            <span class="c1"># BaseModel&#39;s body (where annotations are set), so clear them manually:</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;__annotations__&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">resolve_forward_refs</span><span class="p">:</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">__try_update_forward_refs__</span><span class="p">()</span>
 

@@ -963,7 +963,8 @@ def test_runtime_env_interface():
 
 def test_runtime_env_interface_with_allocated_instances():
     # Test the interface with allocated instances
-    runtime_env = RuntimeEnv(working_dir="/tmp/test")
+    working_dir = "s3://bucket/key.zip"
+    runtime_env = RuntimeEnv(working_dir=working_dir)
     allocated_instances = {"CPU": 1, "GPU": 2}
     serialized_allocated_instances = json.dumps(allocated_instances)
     runtime_env.set_serialized_allocated_instances(serialized_allocated_instances)
@@ -971,7 +972,7 @@ def test_runtime_env_interface_with_allocated_instances():
         runtime_env.get_serialized_allocated_instances()
         == serialized_allocated_instances
     )
-    serialize_env_combined = RuntimeEnv.serialize_env_combined(
+    serialize_env_combined = RuntimeEnv.serialize_combined(
         runtime_env.serialize(), serialized_allocated_instances
     )
     assert (
@@ -979,7 +980,7 @@ def test_runtime_env_interface_with_allocated_instances():
         == f"{runtime_env.serialize()}&&{serialized_allocated_instances}"
     )
     new_runtime_env = RuntimeEnv.deserialize(serialize_env_combined)
-    assert new_runtime_env.working_dir() == "/tmp/test"
+    assert new_runtime_env.working_dir() == "s3://bucket/key.zip"
     assert (
         new_runtime_env.get_serialized_allocated_instances()
         == serialized_allocated_instances

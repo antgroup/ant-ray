@@ -305,9 +305,6 @@ class RuntimeEnvAgent:
             self._per_job_logger_cache[job_id] = per_job_logger
         return self._per_job_logger_cache[job_id]
 
-    def get_runtime_env_key(self, serialized_env, serialized_allocated_instances):
-        return serialized_env + serialized_allocated_instances
-
     async def GetOrCreateRuntimeEnv(self, request):
         self._logger.info(
             f"Got request from {request.source_process} to increase "

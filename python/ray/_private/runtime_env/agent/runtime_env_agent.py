@@ -276,15 +276,15 @@ class RuntimeEnvAgent:
         for uri, uri_type in unused_uris:
             self._plugin_manager.plugins[str(uri_type)].uri_cache.mark_unused(uri)
 
-    def unused_runtime_env_processor(self, unused_runtime_env_key: str) -> None:
+    def unused_runtime_env_processor(self, unused_runtime_env: str) -> None:
         def delete_runtime_env():
-            del self._env_cache[unused_runtime_env_key]
+            del self._env_cache[unused_runtime_env]
             self._logger.info(
-                "Runtime env %s removed from env-level cache.", unused_runtime_env_key
+                "Runtime env %s removed from env-level cache.", unused_runtime_env
             )
 
-        if unused_runtime_env_key in self._env_cache:
-            if not self._env_cache[unused_runtime_env_key].success:
+        if unused_runtime_env in self._env_cache:
+            if not self._env_cache[unused_runtime_env].success:
                 loop = get_or_create_event_loop()
                 # Cache the bad runtime env result by ttl seconds.
                 loop.call_later(

@@ -468,6 +468,9 @@ class RuntimeEnv(dict):
     def set_serialized_allocated_instances(self, value: Any) -> None:
         self.__setitem__("serialized_allocated_instances", value)
 
+    def get_serialized_allocated_instances(self) -> Optional[str]:
+        return self.get("serialized_allocated_instances", None)
+
     @classmethod
     def deserialize(cls, serialized_runtime_env: str) -> "RuntimeEnv":  # noqa: F821
         last_brace_pos = serialized_runtime_env.rfind("&&")
@@ -475,7 +478,7 @@ class RuntimeEnv(dict):
             return cls(_validate=False, **json.loads(serialized_runtime_env))
         serialized_env = serialized_runtime_env[:last_brace_pos]
         serialized_allocated_instances = serialized_runtime_env[last_brace_pos + 2 :]
-        runtime_env = cls(_validate=False, **json.loads(serialized_runtime_env))
+        runtime_env = cls(_validate=False, **json.loads(serialized_env))
         runtime_env.set_serialized_allocated_instances(serialized_allocated_instances)
         return runtime_env
 

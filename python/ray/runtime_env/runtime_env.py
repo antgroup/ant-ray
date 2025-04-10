@@ -301,6 +301,7 @@ class RuntimeEnv(dict):
         "_nsight",
         "mpi",
         "image_uri",
+        "serialized_allocated_instances",
     }
 
     extensions_fields: Set[str] = {
@@ -464,9 +465,19 @@ class RuntimeEnv(dict):
         else:
             return from_dict(data_class=data_class, data=self.__getitem__(name))
 
+    def set_serialized_allocated_instances(self, value: Any) -> None:
+        self.__setitem__("serialized_allocated_instances", value)
+
     @classmethod
     def deserialize(cls, serialized_runtime_env: str) -> "RuntimeEnv":  # noqa: F821
-        return cls(_validate=False, **json.loads(serialized_runtime_env))
+        last_brace_pos = serialized_runtime_env.rfind("&&")
+        if last_brace_pos == -1:
+            return cls(_validate=False, **json.loads(serialized_runtime_env))
+        serialized_env = serialized_runtime_env[:last_brace_pos]
+        serialized_allocated_instances = serialized_runtime_env[last_brace_pos + 2 :]
+        runtime_env = cls(_validate=False, **json.loads(serialized_runtime_env))
+        runtime_env.set_serialized_allocated_instances(serialized_allocated_instances)
+        return runtime_env
 
     def serialize(self) -> str:
         # To ensure the accuracy of Proto, `__setitem__` can only guarantee the
@@ -476,6 +487,12 @@ class RuntimeEnv(dict):
             runtime_env,
             sort_keys=True,
         )
+
+    @classmethod
+    def serialize_combined(
+        cls, serialized_runtime_env: str, serialized_allocated_instances
+    ) -> str:
+        return serialized_runtime_env + "&&" + serialized_allocated_instances
 
     def to_dict(self) -> Dict:
         runtime_env_dict = dict(deepcopy(self))

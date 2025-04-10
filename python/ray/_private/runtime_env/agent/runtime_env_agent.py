@@ -115,44 +115,44 @@ class ReferenceTable:
             self._unused_uris_callback(unused_uris)
         return unused_uris
 
-    def _increase_reference_for_runtime_env(self, runtime_env_key: str):
-        default_logger.debug(f"Increase reference for runtime env {runtime_env_key}.")
-        self._runtime_env_reference[runtime_env_key] += 1
+    def _increase_reference_for_runtime_env(self, serialized_env: str):
+        default_logger.debug(f"Increase reference for runtime env {serialized_env}.")
+        self._runtime_env_reference[serialized_env] += 1
 
-    def _decrease_reference_for_runtime_env(self, runtime_env_key: str):
-        """Decrease reference count for the given [runtime_env_key]. Throw exception if we cannot decrement reference."""
-        default_logger.debug(f"Decrease reference for runtime env {runtime_env_key}.")
+    def _decrease_reference_for_runtime_env(self, serialized_env: str):
+        """Decrease reference count for the given [serialized_env]. Throw exception if we cannot decrement reference."""
+        default_logger.debug(f"Decrease reference for runtime env {serialized_env}.")
         unused = False
-        if self._runtime_env_reference[runtime_env_key] > 0:
-            self._runtime_env_reference[runtime_env_key] -= 1
-            if self._runtime_env_reference[runtime_env_key] == 0:
+        if self._runtime_env_reference[serialized_env] > 0:
+            self._runtime_env_reference[serialized_env] -= 1
+            if self._runtime_env_reference[serialized_env] == 0:
                 unused = True
-                del self._runtime_env_reference[runtime_env_key]
+                del self._runtime_env_reference[serialized_env]
         else:
-            default_logger.warning(f"Runtime env {runtime_env_key} does not exist.")
+            default_logger.warning(f"Runtime env {serialized_env} does not exist.")
             raise ValueError(
-                f"{runtime_env_key} cannot decrement reference since the reference count is 0"
+                f"{serialized_env} cannot decrement reference since the reference count is 0"
             )
         if unused:
-            default_logger.info(f"Unused runtime env {runtime_env_key}.")
-            self._unused_runtime_env_callback(runtime_env_key)
+            default_logger.info(f"Unused runtime env {serialized_env}.")
+            self._unused_runtime_env_callback(serialized_env)
 
     def increase_reference(
-        self, runtime_env: RuntimeEnv, runtime_env_key: str, source_process: str
+        self, runtime_env: RuntimeEnv, serialized_env: str, source_process: str
     ) -> None:
         if source_process in self._reference_exclude_sources:
             return
-        self._increase_reference_for_runtime_env(runtime_env_key)
+        self._increase_reference_for_runtime_env(serialized_env)
         uris = self._uris_parser(runtime_env)
         self._increase_reference_for_uris(uris)
 
     def decrease_reference(
-        self, runtime_env: RuntimeEnv, runtime_env_key: str, source_process: str
+        self, runtime_env: RuntimeEnv, serialized_env: str, source_process: str
     ) -> None:
         """Decrease reference count for runtime env and uri. Throw exception if decrement reference count fails."""
         if source_process in self._reference_exclude_sources:
             return
-        self._decrease_reference_for_runtime_env(runtime_env_key)
+        self._decrease_reference_for_runtime_env(serialized_env)
         uris = self._uris_parser(runtime_env)
         self._decrease_reference_for_uris(uris)
 
@@ -305,8 +305,8 @@ class RuntimeEnvAgent:
             self._per_job_logger_cache[job_id] = per_job_logger
         return self._per_job_logger_cache[job_id]
 
-    def get_runtime_env_key(self, serialized_env, allocated_instances_serialized_json):
-        return serialized_env + allocated_instances_serialized_json
+    def get_runtime_env_key(self, serialized_env, serialized_allocated_instances):
+        return serialized_env + serialized_allocated_instances
 
     async def GetOrCreateRuntimeEnv(self, request):
         self._logger.info(
@@ -319,10 +319,10 @@ class RuntimeEnvAgent:
         async def _setup_runtime_env(
             runtime_env: RuntimeEnv,
             runtime_env_config: RuntimeEnvConfig,
-            allocated_instances_serialized_json: str,
+            serialized_allocated_instances: str,
         ):
             allocated_resource: dict = json.loads(
-                allocated_instances_serialized_json or "{}"
+                serialized_allocated_instances or "{}"
             )
             log_files = runtime_env_config.get("log_files", [])
             # Use a separate logger for each job.
@@ -399,7 +399,7 @@ class RuntimeEnvAgent:
                     runtime_env_setup_task = _setup_runtime_env(
                         runtime_env,
                         runtime_env_config,
-                        request.allocated_instances_serialized_json,
+                        request.serialized_allocated_instances,
                     )
                     runtime_env_context = await asyncio.wait_for(
                         runtime_env_setup_task, timeout=setup_timeout_seconds
@@ -444,11 +444,15 @@ class RuntimeEnvAgent:
                 return True, runtime_env_context, None
 
         try:
-            serialized_env = request.serialized_runtime_env
-            runtime_env = RuntimeEnv.deserialize(serialized_env)
-            runtime_env_key = self.get_runtime_env_key(
-                serialized_env, request.allocated_instances_serialized_json
+            runtime_env = RuntimeEnv.deserialize(request.serialized_runtime_env)
+            runtime_env.set_serialized_allocated_instances(
+                request.serialized_allocated_instances,
             )
+            serialized_env = RuntimeEnv.serialize_combined(
+                request.serialized_runtime_env,
+                request.serialized_allocated_instances,
+            )
+
         except Exception as e:
             self._logger.exception(
                 "[Increase] Failed to parse runtime env: " f"{serialized_env}"
@@ -462,21 +466,21 @@ class RuntimeEnvAgent:
 
         # Increase reference
         self._reference_table.increase_reference(
-            runtime_env, runtime_env_key, request.source_process
+            runtime_env, serialized_env, request.source_process
         )
 
-        if runtime_env_key not in self._env_locks:
+        if serialized_env not in self._env_locks:
             # async lock to prevent the same env being concurrently installed
-            self._env_locks[runtime_env_key] = asyncio.Lock()
+            self._env_locks[serialized_env] = asyncio.Lock()
 
-        async with self._env_locks[runtime_env_key]:
-            if runtime_env_key in self._env_cache:
-                result = self._env_cache[runtime_env_key]
+        async with self._env_locks[serialized_env]:
+            if serialized_env in self._env_cache:
+                result = self._env_cache[serialized_env]
                 if result.success:
                     runtime_env_context = result.result
                     self._logger.info(
                         "Runtime env already created "
-                        f"successfully. Env: {runtime_env_key}, "
+                        f"successfully. Env: {serialized_env}, "
                     )
                     context = await self.trigger_pre_worker_startup(
                         runtime_env,
@@ -493,12 +497,12 @@ class RuntimeEnvAgent:
                     error_message = result.result
                     self._logger.info(
                         "Runtime env already failed. "
-                        f"Env: {runtime_env_key}, "
+                        f"Env: {serialized_env}, "
                         f"err: {error_message}"
                     )
                     # Recover the reference.
                     self._reference_table.decrease_reference(
-                        runtime_env, runtime_env_key, request.source_process
+                        runtime_env, serialized_env, request.source_process
                     )
                     return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
                         status=agent_manager_pb2.AGENT_RPC_STATUS_FAILED,
@@ -533,10 +537,10 @@ class RuntimeEnvAgent:
             if not successful:
                 # Recover the reference.
                 self._reference_table.decrease_reference(
-                    runtime_env, runtime_env_key, request.source_process
+                    runtime_env, serialized_env, request.source_process
                 )
             # Add the result to env cache.
-            self._env_cache[runtime_env_key] = CreatedEnvResult(
+            self._env_cache[serialized_env] = CreatedEnvResult(
                 successful,
                 runtime_env_context if successful else error_message,
                 creation_time_ms,
@@ -580,12 +584,15 @@ class RuntimeEnvAgent:
             )
 
         try:
-            runtime_env_key = self.get_runtime_env_key(
+            runtime_env.set_serialized_allocated_instances(
+                request.serialized_allocated_instances,
+            )
+            serialized_env = RuntimeEnv.serialize_combined(
                 request.serialized_runtime_env,
-                request.allocated_instances_serialized_json,
+                request.serialized_allocated_instances,
             )
             self._reference_table.decrease_reference(
-                runtime_env, runtime_env_key, request.source_process
+                runtime_env, serialized_env, request.source_process
             )
         except Exception as e:
             return runtime_env_agent_pb2.DeleteRuntimeEnvIfPossibleReply(

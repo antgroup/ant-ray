@@ -74,7 +74,7 @@ class RuntimeEnvAgentClient {
       const rpc::RuntimeEnvConfig &runtime_env_config,
       GetOrCreateRuntimeEnvCallback callback,
       const WorkerID &worker_id,
-      const std::string &allocated_instances_serialized_json) = 0;
+      const std::string &serialized_allocated_instances) = 0;
 
   /// Request agent to decrease the runtime env reference. This API is not idempotent. The
   /// client automatically retries on network errors.
@@ -87,7 +87,7 @@ class RuntimeEnvAgentClient {
       DeleteRuntimeEnvIfPossibleCallback callback,
       const WorkerID &worker_id,
       const JobID &job_id,
-      const std::string &allocated_instances_serialized_json) = 0;
+      const std::string &serialized_allocated_instances) = 0;
 
   // NOTE: The service has another method `GetRuntimeEnvsInfo` but nobody in raylet uses
   // it.

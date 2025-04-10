@@ -250,7 +250,7 @@ void WorkerPool::AddWorkerProcess(
     const std::vector<std::string> &dynamic_options,
     std::optional<absl::Duration> worker_startup_keep_alive_duration,
     const WorkerID &worker_id,
-    const std::string &allocated_instances_serialized_json) {
+    const std::string &serialized_allocated_instances) {
   state.worker_processes.emplace(worker_startup_token_counter_,
                                  WorkerProcessInfo{/*is_pending_registration=*/true,
                                                    worker_type,
@@ -260,7 +260,7 @@ void WorkerPool::AddWorkerProcess(
                                                    dynamic_options,
                                                    worker_startup_keep_alive_duration,
                                                    worker_id,
-                                                   allocated_instances_serialized_json});
+                                                   serialized_allocated_instances});
 }
 
 void WorkerPool::RemoveWorkerProcess(State &state,
@@ -476,7 +476,7 @@ std::tuple<Process, StartupToken> WorkerPool::StartWorkerProcess(
     const rpc::RuntimeEnvInfo &runtime_env_info,
     std::optional<absl::Duration> worker_startup_keep_alive_duration,
     const WorkerID &worker_id,
-    const std::string &allocated_instances_serialized_json) {
+    const std::string &serialized_allocated_instances) {
   rpc::JobConfig *job_config = nullptr;
   if (!job_id.IsNil()) {
     auto it = all_jobs_.find(job_id);
@@ -547,7 +547,7 @@ std::tuple<Process, StartupToken> WorkerPool::StartWorkerProcess(
                    dynamic_options,
                    worker_startup_keep_alive_duration,
                    worker_id,
-                   allocated_instances_serialized_json);
+                   serialized_allocated_instances);
   StartupToken worker_startup_token = worker_startup_token_counter_;
   update_worker_startup_token_counter();
   if (IsIOWorkerType(worker_type)) {
@@ -610,7 +610,7 @@ void WorkerPool::MonitorStartingWorkerProcess(StartupToken proc_startup_token,
       DeleteRuntimeEnvIfPossible(it->second.runtime_env_info.serialized_runtime_env(),
                                  job_id,
                                  it->second.worker_id,
-                                 it->second.allocated_instances_serialized_json);
+                                 it->second.serialized_allocated_instances);
       RemoveWorkerProcess(state, proc_startup_token);
       if (IsIOWorkerType(worker_type)) {
         // Mark the I/O worker as failed.
@@ -1331,8 +1331,8 @@ WorkerUnfitForTaskReason WorkerPool::WorkerFitsForTask(
 
 void WorkerPool::StartNewWorker(
     const std::shared_ptr<PopWorkerRequest> &pop_worker_request,
-    const std::string &allocated_instances_serialized_json) {
-  auto start_worker_process_fn = [this, allocated_instances_serialized_json](
+    const std::string &serialized_allocated_instances) {
+  auto start_worker_process_fn = [this, serialized_allocated_instances](
                                      std::shared_ptr<PopWorkerRequest> pop_worker_request,
                                      const std::string &serialized_runtime_env_context,
                                      const WorkerID &worker_id = WorkerID::Nil()) {
@@ -1352,7 +1352,7 @@ void WorkerPool::StartNewWorker(
                            pop_worker_request->runtime_env_info,
                            pop_worker_request->worker_startup_keep_alive_duration,
                            worker_id,
-                           allocated_instances_serialized_json);
+                           serialized_allocated_instances);
     if (status == PopWorkerStatus::OK) {
       RAY_CHECK(proc.IsValid());
       WarnAboutSize();
@@ -1364,13 +1364,13 @@ void WorkerPool::StartNewWorker(
       DeleteRuntimeEnvIfPossible(serialized_runtime_env,
                                  pop_worker_request->job_id,
                                  worker_id,
-                                 allocated_instances_serialized_json);
+                                 serialized_allocated_instances);
       state.pending_start_requests.emplace_back(std::move(pop_worker_request));
     } else {
       DeleteRuntimeEnvIfPossible(serialized_runtime_env,
                                  pop_worker_request->job_id,
                                  worker_id,
-                                 allocated_instances_serialized_json);
+                                 serialized_allocated_instances);
       PopWorkerCallbackAsync(std::move(pop_worker_request->callback), nullptr, status);
     }
   };
@@ -1401,7 +1401,7 @@ void WorkerPool::StartNewWorker(
           }
         },
         worker_id,
-        allocated_instances_serialized_json);
+        serialized_allocated_instances);
   } else {
     start_worker_process_fn(pop_worker_request, "");
   }
@@ -1409,7 +1409,7 @@ void WorkerPool::StartNewWorker(
 
 void WorkerPool::PopWorker(const TaskSpecification &task_spec,
                            const PopWorkerCallback &callback,
-                           const std::string &allocated_instances_serialized_json) {
+                           const std::string &serialized_allocated_instances) {
   RAY_LOG(DEBUG) << "Pop worker for task " << task_spec.TaskId() << " task name "
                  << task_spec.FunctionDescriptor()->ToString();
   // Code path of actor task.
@@ -1449,8 +1449,7 @@ void WorkerPool::PopWorker(const TaskSpecification &task_spec,
         }
         return callback(worker, status, runtime_env_setup_error_message);
       });
-  PopWorker(std::move(pop_worker_request),
-            std::move(allocated_instances_serialized_json));
+  PopWorker(std::move(pop_worker_request), std::move(serialized_allocated_instances));
 }
 
 std::shared_ptr<WorkerInterface> WorkerPool::FindAndPopIdleWorker(
@@ -1493,12 +1492,12 @@ std::shared_ptr<WorkerInterface> WorkerPool::FindAndPopIdleWorker(
 }
 
 void WorkerPool::PopWorker(std::shared_ptr<PopWorkerRequest> pop_worker_request,
-                           const std::string &allocated_instances_serialized_json) {
+                           const std::string &serialized_allocated_instances) {
   // If there's an idle worker that fits the task, use it.
   // Else, start a new worker.
   auto worker = FindAndPopIdleWorker(*pop_worker_request);
   if (worker == nullptr) {
-    StartNewWorker(pop_worker_request, allocated_instances_serialized_json);
+    StartNewWorker(pop_worker_request, serialized_allocated_instances);
     return;
   }
   RAY_CHECK(worker->GetAssignedJobId().IsNil() ||
@@ -1601,7 +1600,7 @@ void WorkerPool::DisconnectWorker(const std::shared_ptr<WorkerInterface> &worker
     DeleteRuntimeEnvIfPossible(serialized_runtime_env,
                                worker->GetAssignedJobId(),
                                it->second.worker_id,
-                               it->second.allocated_instances_serialized_json);
+                               it->second.serialized_allocated_instances);
     RemoveWorkerProcess(state, worker->GetStartupToken());
   }
   RAY_CHECK(RemoveWorker(state.registered_workers, worker));
@@ -1829,7 +1828,7 @@ void WorkerPool::GetOrCreateRuntimeEnv(
     const JobID &job_id,
     const GetOrCreateRuntimeEnvCallback &callback,
     const WorkerID &worker_id,
-    const std::string &allocated_instances_serialized_json) {
+    const std::string &serialized_allocated_instances) {
   RAY_LOG(INFO) << "GetOrCreateRuntimeEnv for job " << job_id << " with runtime_env "
                 << serialized_runtime_env << " worker id " << worker_id;
   runtime_env_agent_client_->GetOrCreateRuntimeEnv(
@@ -1853,14 +1852,14 @@ void WorkerPool::GetOrCreateRuntimeEnv(
         }
       },
       worker_id,
-      allocated_instances_serialized_json);
+      serialized_allocated_instances);
 }
 
 void WorkerPool::DeleteRuntimeEnvIfPossible(
     const std::string &serialized_runtime_env,
     const JobID &job_id,
     const WorkerID &worker_id,
-    const std::string &allocated_instances_serialized_json) {
+    const std::string &serialized_allocated_instances) {
   RAY_LOG(DEBUG) << "DeleteRuntimeEnvIfPossible " << serialized_runtime_env
                  << " for job id " << job_id << " worker id " << worker_id;
   if (!IsRuntimeEnvEmpty(serialized_runtime_env)) {
@@ -1874,7 +1873,7 @@ void WorkerPool::DeleteRuntimeEnvIfPossible(
         },
         worker_id,
         job_id,
-        allocated_instances_serialized_json);
+        serialized_allocated_instances);
   }
 }
 

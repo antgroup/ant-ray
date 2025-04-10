@@ -61,6 +61,7 @@ from ray.includes.optional cimport (
     make_optional,
 )
 
+from libcpp.functional cimport function
 from libcpp.string cimport string as c_string
 from libcpp.utility cimport pair
 from libcpp.unordered_map cimport unordered_map
@@ -68,6 +69,11 @@ from libcpp.vector cimport vector as c_vector
 from libcpp.pair cimport pair as c_pair
 
 from cython.operator import dereference, postincrement
+from cpython.pystate cimport (
+    PyGILState_Ensure,
+    PyGILState_Release,
+    PyGILState_STATE,
+)
 
 from ray.includes.common cimport (
     CBuffer,
@@ -158,6 +164,11 @@ from ray.includes.libcoreworker cimport (
     CActorHandle,
     CGeneratorBackpressureWaiter,
     CReaderRefInfo,
+)
+from ray.includes.stream_redirection cimport (
+    CStreamRedirectionOptions,
+    RedirectStdout,
+    RedirectStderr,
 )
 
 from ray.includes.ray_config cimport RayConfig
@@ -441,7 +452,7 @@ class ObjectRefGenerator:
 
     def _next_sync(
         self,
-        timeout_s: Optional[float] = None
+        timeout_s: Optional[int | float] = None
     ) -> ObjectRef:
         """Waits for timeout_s and returns the object ref if available.
 
@@ -510,7 +521,7 @@ class ObjectRefGenerator:
 
     async def _next_async(
             self,
-            timeout_s: Optional[float] = None
+            timeout_s: Optional[int | float] = None
     ):
         """Same API as _next_sync, but it is for async context."""
         core_worker = self.worker.core_worker
@@ -880,7 +891,7 @@ cdef prepare_args_internal(
     put_threshold = RayConfig.instance().max_direct_call_object_size()
     total_inlined = 0
     rpc_inline_threshold = RayConfig.instance().task_rpc_inlined_bytes_limit()
-    for arg in args:
+    for i, arg in enumerate(args):
         from ray.experimental.compiled_dag_ref import CompiledDAGRef
         if isinstance(arg, CompiledDAGRef):
             raise TypeError("CompiledDAGRef cannot be used as Ray task/actor argument.")
@@ -947,6 +958,8 @@ cdef prepare_args_internal(
                 put_id = CObjectID.FromBinary(
                         core_worker.put_serialized_object_and_increment_local_ref(
                             serialized_arg, inline_small_object=False))
+                from ray.util.insight import record_object_arg_put
+                record_object_arg_put(put_id.Hex().decode(), i, size, function_descriptor.repr)
                 args_vector.push_back(unique_ptr[CTaskArg](
                     new CTaskArgByReference(
                             put_id,
@@ -1530,7 +1543,7 @@ cdef create_generator_return_obj(
         worker, [output],
         caller_address,
         &intermediate_result,
-        generator_id)
+        generator_id.Binary())
 
     return_object[0] = intermediate_result.back()
 
@@ -1658,7 +1671,7 @@ cdef execute_dynamic_generator_and_store_task_outputs(
             worker, generator,
             caller_address,
             dynamic_returns,
-            generator_id)
+            generator_id.Binary())
     except Exception as error:
         is_retryable_error[0] = determine_if_retryable(
             should_retry_exceptions,
@@ -1824,6 +1837,8 @@ cdef void execute_task(
 
             return function(actor, *arguments, **kwarguments)
 
+    from ray.util.insight import record_object_arg_get
+
     with core_worker.profile_event(b"task::" + name, extra_data=extra_data), \
          ray._private.worker._changeproctitle(title, next_title):
         task_exception = False
@@ -1836,6 +1851,10 @@ cdef void execute_task(
                     object_refs = VectorToObjectRefs(
                             c_arg_refs,
                             skip_adding_local_ref=False)
+
+                    for object_ref in object_refs:
+                        record_object_arg_get(object_ref.hex())
+
                     if core_worker.current_actor_is_asyncio():
                         # We deserialize objects in event loop thread to
                         # prevent segfaults. See #7799
@@ -1877,12 +1896,14 @@ cdef void execute_task(
             # Execute the task.
             with core_worker.profile_event(b"task:execute"):
                 task_exception = True
+                task_exception_instance = None
                 try:
                     if debugger_breakpoint != b"":
                         ray.util.pdb.set_trace(
                             breakpoint_uuid=debugger_breakpoint)
-                    outputs = function_executor(*args, **kwargs)
 
+                    outputs = function_executor(*args, **kwargs)
+                    
                     if is_streaming_generator:
                         # Streaming generator always has a single return value
                         # which is the generator task return.
@@ -1977,10 +1998,14 @@ cdef void execute_task(
                                      " {}.".format(
                                         core_worker.get_current_task_id()),
                                      exc_info=True)
-                    raise e
+                    task_exception_instance = e
                 finally:
                     # Record the end of the task log.
                     worker.record_task_log_end(task_id, attempt_number)
+                    if task_exception_instance is not None:
+                        raise task_exception_instance
+                    if core_worker.get_current_actor_should_exit():
+                        raise_sys_exit_with_custom_error_message("exit_actor() is called.")
 
                 if (returns[0].size() == 1
                         and not inspect.isgenerator(outputs)
@@ -2242,6 +2267,29 @@ cdef shared_ptr[LocalMemoryBuffer] ray_error_to_memory_buf(ray_error):
     return make_shared[LocalMemoryBuffer](
         <uint8_t*>py_bytes, len(py_bytes), True)
 
+cdef void pygilstate_release(PyGILState_STATE gstate) nogil:
+    with gil:
+        PyGILState_Release(gstate)
+
+cdef function[void()] initialize_pygilstate_for_thread() nogil:
+    """
+    This function initializes a C++ thread to make it be considered as a
+    Python thread from the Python interpreter's perspective, regardless of whether
+    it is executing Python code or not. This function must be called in a thread
+    before executing any Ray tasks on that thread.
+
+    Returns:
+        A function that calls `PyGILState_Release` to release the GIL state.
+        This function should be called in a thread before the thread exits.
+
+    Reference: https://docs.python.org/3/c-api/init.html#non-python-created-threads
+    """
+    cdef function[void()] callback
+    with gil:
+        gstate = PyGILState_Ensure()
+        callback = bind(pygilstate_release, ref(gstate))
+    return callback
+
 cdef CRayStatus task_execution_handler(
         const CAddress &caller_address,
         CTaskType task_type,
@@ -2268,7 +2316,13 @@ cdef CRayStatus task_execution_handler(
         # Initialize job_config if it hasn't already.
         # Setup system paths configured in job_config.
         maybe_initialize_job_config()
+        
+        from ray.util.insight import record_task_duration
 
+        # directly use record_task_duration here
+        # rather than timeit to prevent indent change
+        # to avoid diff conflict when merge new features
+        start_time = time.time()
         try:
             try:
                 # Exceptions, including task cancellation, should be handled
@@ -2345,6 +2399,9 @@ cdef CRayStatus task_execution_handler(
                 if hasattr(e, "unexpected_error_traceback"):
                     msg += (f" {e.unexpected_error_traceback}")
                 return CRayStatus.UnexpectedSystemExit(msg)
+        finally:
+            if start_time is not None:
+                record_task_duration(time.time() - start_time)
 
     return CRayStatus.OK()
 
@@ -2652,6 +2709,26 @@ cdef void terminate_asyncio_thread() nogil:
         core_worker = ray._private.worker.global_worker.core_worker
         core_worker.stop_and_join_asyncio_threads_if_exist()
 
+cdef class StreamRedirector:
+    @staticmethod
+    def redirect_stdout(const c_string &file_path, uint64_t rotation_max_size, uint64_t rotation_max_file_count, c_bool tee_to_stdout, c_bool tee_to_stderr):
+        cdef CStreamRedirectionOptions opt = CStreamRedirectionOptions()
+        opt.file_path = file_path
+        opt.rotation_max_size = rotation_max_size
+        opt.rotation_max_file_count = rotation_max_file_count
+        opt.tee_to_stdout = tee_to_stdout
+        opt.tee_to_stderr = tee_to_stderr
+        RedirectStdout(opt)
+
+    @staticmethod
+    def redirect_stderr(const c_string &file_path, uint64_t rotation_max_size, uint64_t rotation_max_file_count, c_bool tee_to_stdout, c_bool tee_to_stderr):
+        cdef CStreamRedirectionOptions opt = CStreamRedirectionOptions()
+        opt.file_path = file_path
+        opt.rotation_max_size = rotation_max_size
+        opt.rotation_max_file_count = rotation_max_file_count
+        opt.tee_to_stdout = tee_to_stdout
+        opt.tee_to_stderr = tee_to_stderr
+        RedirectStderr(opt)
 
 # An empty profile event context to be used when the timeline is disabled.
 cdef class EmptyProfileEvent:
@@ -2660,42 +2737,6 @@ cdef class EmptyProfileEvent:
 
     def __exit__(self, *args):
         pass
-
-
-def _auto_reconnect(f):
-    @wraps(f)
-    def wrapper(self, *args, **kwargs):
-        if "TEST_RAY_COLLECT_KV_FREQUENCY" in os.environ:
-            with ray._private.utils._CALLED_FREQ_LOCK:
-                ray._private.utils._CALLED_FREQ[f.__name__] += 1
-        remaining_retry = self._nums_reconnect_retry
-        while True:
-            try:
-                return f(self, *args, **kwargs)
-            except RpcError as e:
-                if e.rpc_code in [
-                    GRPC_STATUS_CODE_UNAVAILABLE,
-                    GRPC_STATUS_CODE_UNKNOWN,
-                ]:
-                    if remaining_retry <= 0:
-                        logger.error(
-                            "Failed to connect to GCS. Please check"
-                            " `gcs_server.out` for more details."
-                        )
-                        raise
-                    logger.debug(
-                        f"Failed to send request to gcs, reconnecting. Error {e}"
-                    )
-                    try:
-                        self._connect()
-                    except Exception:
-                        logger.error(f"Connecting to gcs failed. Error {e}")
-                    time.sleep(1)
-                    remaining_retry -= 1
-                    continue
-                raise
-
-    return wrapper
 
 
 cdef class GcsClient:
@@ -2708,10 +2749,8 @@ cdef class GcsClient:
 
     cdef InnerGcsClient inner
 
-    def __cinit__(self, address,
-                  nums_reconnect_retry=RayConfig.instance().nums_py_gcs_reconnect_retry(
-                  ),
-                  cluster_id: str = None):
+    def __cinit__(self, address: str,
+                  cluster_id: Optional[str] = None):
         # For timeout (DEADLINE_EXCEEDED): retries once with timeout_ms.
         #
         # For other RpcError (UNAVAILABLE, UNKNOWN): retries indefinitely until it
@@ -2956,10 +2995,10 @@ cdef class CoreWorker:
     def __cinit__(self, worker_type, store_socket, raylet_socket,
                   JobID job_id, GcsClientOptions gcs_options, log_dir,
                   node_ip_address, node_manager_port, raylet_ip_address,
-                  local_mode, driver_name, stdout_file, stderr_file,
+                  local_mode, driver_name,
                   serialized_job_config, metrics_agent_port, runtime_env_hash,
                   startup_token, session_name, cluster_id, entrypoint,
-                  worker_launch_time_ms, worker_launched_time_ms):
+                  worker_launch_time_ms, worker_launched_time_ms, debug_source):
         self.is_local_mode = local_mode
 
         cdef CCoreWorkerOptions options = CCoreWorkerOptions()
@@ -2991,8 +3030,7 @@ cdef class CoreWorker:
         options.node_manager_port = node_manager_port
         options.raylet_ip_address = raylet_ip_address.encode("utf-8")
         options.driver_name = driver_name
-        options.stdout_file = stdout_file
-        options.stderr_file = stderr_file
+        options.initialize_thread_callback = initialize_pygilstate_for_thread
         options.task_execution_callback = task_execution_handler
         options.check_signals = check_signals
         options.gc_collect = gc_collect
@@ -3014,6 +3052,7 @@ cdef class CoreWorker:
         options.entrypoint = entrypoint
         options.worker_launch_time_ms = worker_launch_time_ms
         options.worker_launched_time_ms = worker_launched_time_ms
+        options.debug_source = debug_source
         CCoreWorkerProcess.Initialize(options)
 
         self.cgname_to_eventloop_dict = None
@@ -4311,12 +4350,17 @@ cdef class CoreWorker:
                     check_status(
                         CCoreWorkerProcess.GetCoreWorker().SealReturnObject(
                             return_id, return_ptr[0], generator_id, caller_address))
+
+            from ray.util.insight import record_object_return_put
+            record_object_return_put(return_id.Hex().decode(), data_size)
             return True
         else:
             with nogil:
                 success = (
                     CCoreWorkerProcess.GetCoreWorker().PinExistingReturnObject(
                         return_id, return_ptr, generator_id, caller_address))
+            from ray.util.insight import record_object_return_put
+            record_object_return_put(return_id.Hex().decode(), data_size)
             return success
 
     cdef store_task_outputs(self,
@@ -4324,7 +4368,7 @@ cdef class CoreWorker:
                             const CAddress &caller_address,
                             c_vector[c_pair[CObjectID, shared_ptr[CRayObject]]]
                             *returns,
-                            CObjectID ref_generator_id=CObjectID.Nil()):
+                            ref_generator_id=None):
         cdef:
             CObjectID return_id
             size_t data_size
@@ -4332,10 +4376,14 @@ cdef class CoreWorker:
             c_vector[CObjectID] contained_id
             int64_t task_output_inlined_bytes
             int64_t num_returns = -1
+            CObjectID c_ref_generator_id = CObjectID.Nil()
             shared_ptr[CRayObject] *return_ptr
 
+        if ref_generator_id:
+            c_ref_generator_id = CObjectID.FromBinary(ref_generator_id)
+
         num_outputs_stored = 0
-        if not ref_generator_id.IsNil():
+        if not c_ref_generator_id.IsNil():
             # The task specified a dynamic number of return values. Determine
             # the expected number of return values.
             if returns[0].size() > 0:
@@ -4405,7 +4453,7 @@ cdef class CoreWorker:
 
             if not self.store_task_output(
                     serialized_object, return_id,
-                    ref_generator_id,
+                    c_ref_generator_id,
                     data_size, metadata, contained_id, caller_address,
                     &task_output_inlined_bytes, return_ptr):
                 # If the object already exists, but we fail to pin the copy, it
@@ -4413,7 +4461,7 @@ cdef class CoreWorker:
                 # create another copy.
                 self.store_task_output(
                         serialized_object, return_id,
-                        ref_generator_id,
+                        c_ref_generator_id,
                         data_size, metadata,
                         contained_id, caller_address, &task_output_inlined_bytes,
                         return_ptr)
@@ -4618,6 +4666,14 @@ cdef class CoreWorker:
     def current_actor_is_asyncio(self):
         return (CCoreWorkerProcess.GetCoreWorker().GetWorkerContext()
                 .CurrentActorIsAsync())
+
+    def set_current_actor_should_exit(self):
+        return (CCoreWorkerProcess.GetCoreWorker().GetWorkerContext()
+                .SetCurrentActorShouldExit())
+
+    def get_current_actor_should_exit(self):
+        return (CCoreWorkerProcess.GetCoreWorker().GetWorkerContext()
+                .GetCurrentActorShouldExit())
 
     def current_actor_max_concurrency(self):
         return (CCoreWorkerProcess.GetCoreWorker().GetWorkerContext()
@@ -4893,6 +4949,10 @@ cdef void async_callback(shared_ptr[CRayObject] obj,
         ids_to_deserialize = [ObjectRef(object_ref.Binary())]
         result = ray._private.worker.global_worker.deserialize_objects(
             data_metadata_pairs, ids_to_deserialize)[0]
+
+        from ray.util.insight import record_object_get
+        ref = ObjectRef(object_ref.Binary())
+        record_object_get(ref.hex(), ref.task_id())
 
         user_callback = <object>user_callback_ptr
         user_callback(result)

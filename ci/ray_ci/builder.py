@@ -26,7 +26,7 @@ from ci.ray_ci.utils import logger, docker_login, ci_init
 @click.option(
     "--image-type",
     default="ray",
-    type=click.Choice(["ray", "ray-ml"]),
+    type=click.Choice(["ray", "ray-llm", "ray-ml"]),
 )
 @click.option(
     "--build-type",
@@ -84,7 +84,6 @@ def main(
     """
     Build a wheel or jar artifact
     """
-    docker_login(_DOCKER_ECR_REPO.split("/")[0])
     ci_init()
     if artifact_type == "wheel":
         logger.info(f"Building wheel for {python_version}")

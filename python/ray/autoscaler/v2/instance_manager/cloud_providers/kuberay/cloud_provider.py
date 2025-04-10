@@ -1,5 +1,6 @@
 import copy
 import logging
+import os
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -17,6 +18,7 @@ from ray.autoscaler._private.kuberay.node_provider import (
     RAY_HEAD_POD_NAME,
     IKubernetesHttpApiClient,
     KubernetesHttpApiClient,
+    KubeRayHttpApiClient,
     _worker_group_index,
     _worker_group_max_replicas,
     _worker_group_replicas,
@@ -62,9 +64,21 @@ class KubeRayProvider(ICloudInstanceProvider):
         self._cluster_name = cluster_name
         self._namespace = provider_config["namespace"]
 
-        self._k8s_api_client = k8s_api_client or KubernetesHttpApiClient(
-            namespace=self._namespace
-        )
+        if k8s_api_client is None:
+            kuberay_http_api_enabled = os.getenv("KUBERAY_HTTP_API_ENABLED", "0") == "1"
+            kuberay_operator_address = os.getenv("KUBERAY_OPERATOR_ADDRESS")
+            if kuberay_http_api_enabled and kuberay_operator_address is not None:
+                logger.info("Autoscaler is using KubeRayHttpApiClient.")
+                self._k8s_api_client = KubeRayHttpApiClient(
+                    namespace=self._namespace,
+                    kuberay_operator_address=kuberay_operator_address,
+                )
+            else:
+                self._k8s_api_client = KubernetesHttpApiClient(
+                    namespace=self._namespace
+                )
+        else:
+            self._k8s_api_client = k8s_api_client
 
         # Below are states that are cached locally.
         self._requests = set()
@@ -110,9 +124,7 @@ class KubeRayProvider(ICloudInstanceProvider):
 
     def get_non_terminated(self) -> Dict[CloudInstanceId, CloudInstance]:
         self._sync_with_api_server()
-        return copy.deepcopy(
-            {id: instance for id, instance in self._cached_instances.items()}
-        )
+        return copy.deepcopy(dict(self._cached_instances))
 
     def terminate(self, ids: List[CloudInstanceId], request_id: str) -> None:
         if request_id in self._requests:

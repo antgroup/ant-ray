@@ -159,6 +159,14 @@ class WorkerPoolInterface {
   virtual const std::vector<std::shared_ptr<WorkerInterface>> GetAllRegisteredWorkers(
       bool filter_dead_workers = false, bool filter_io_workers = false) const = 0;
 
+  /// Get registered worker process by id or nullptr if not found.
+  virtual std::shared_ptr<WorkerInterface> GetRegisteredWorker(
+      const WorkerID &worker_id) const = 0;
+
+  /// Get registered driver process by id or nullptr if not found.
+  virtual std::shared_ptr<WorkerInterface> GetRegisteredDriver(
+      const WorkerID &worker_id) const = 0;
+
   virtual ~WorkerPoolInterface() = default;
 };
 
@@ -343,7 +351,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
       const std::shared_ptr<ClientConnection> &connection) const;
 
   /// Get the registered worker by worker id or nullptr if not found.
-  std::shared_ptr<WorkerInterface> GetRegisteredWorker(const WorkerID &worker_id) const;
+  std::shared_ptr<WorkerInterface> GetRegisteredWorker(
+      const WorkerID &worker_id) const override;
 
   /// Get the client connection's registered driver.
   ///
@@ -352,6 +361,10 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// if the client has not registered a driver.
   std::shared_ptr<WorkerInterface> GetRegisteredDriver(
       const std::shared_ptr<ClientConnection> &connection) const;
+
+  /// Get the registered driver by worker id or nullptr if not found.
+  std::shared_ptr<WorkerInterface> GetRegisteredDriver(
+      const WorkerID &worker_id) const override;
 
   /// Disconnect a registered worker.
   ///
@@ -426,9 +439,7 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// We aim to prestart 1 worker per CPU, up to the the backlog size.
   void PrestartWorkers(const TaskSpecification &task_spec, int64_t backlog_size);
 
-  /// Try to prestart a number of CPU workers with the given language.
-  ///
-  void PrestartDefaultCpuWorkers(ray::Language language, int64_t num_needed);
+  void PrestartWorkersInternal(const TaskSpecification &task_spec, int64_t num_needed);
 
   /// Return the current size of the worker pool for the requested language. Counts only
   /// idle workers.
@@ -519,7 +530,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
       int runtime_env_hash = 0,
       const std::string &serialized_runtime_env_context = "{}",
       const rpc::RuntimeEnvInfo &runtime_env_info = rpc::RuntimeEnvInfo(),
-      std::optional<absl::Duration> worker_startup_keep_alive_duration = std::nullopt);
+      std::optional<absl::Duration> worker_startup_keep_alive_duration = std::nullopt,
+      const WorkerID &worker_id = WorkerID::Nil());
 
   /// The implementation of how to start a new worker process with command arguments.
   /// The lifetime of the process is tied to that of the returned object,
@@ -544,7 +556,7 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// TODO(scv119): replace dynamic options by runtime_env.
   const std::vector<std::string> &LookupWorkerDynamicOptions(StartupToken token) const;
 
-  /// Gloabl startup token variable. Incremented once assigned
+  /// Global startup token variable. Incremented once assigned
   /// to a worker process and is added to
   /// state.worker_processes.
   StartupToken worker_startup_token_counter_;
@@ -577,6 +589,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
     std::vector<std::string> dynamic_options;
     /// The duration to keep the newly created worker alive before it's assigned a task.
     std::optional<absl::Duration> worker_startup_keep_alive_duration;
+    // The external worker id which is assigned to the worker process.
+    WorkerID worker_id;
   };
 
   /// An internal data structure that maintains the pool state per language.
@@ -643,7 +657,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   /// think there are unregistered workers, and won't start new workers.
   void MonitorStartingWorkerProcess(StartupToken proc_startup_token,
                                     const Language &language,
-                                    rpc::WorkerType worker_type);
+                                    rpc::WorkerType worker_type,
+                                    const JobID &job_id);
 
   /// Start a timer to monitor the starting worker process.
   /// Called when a worker process is started and waiting for registration for the
@@ -744,10 +759,13 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
   void GetOrCreateRuntimeEnv(const std::string &serialized_runtime_env,
                              const rpc::RuntimeEnvConfig &runtime_env_config,
                              const JobID &job_id,
-                             const GetOrCreateRuntimeEnvCallback &callback);
+                             const GetOrCreateRuntimeEnvCallback &callback,
+                             const WorkerID &worker_id = WorkerID::Nil());
 
   /// Delete runtime env asynchronously by runtime env agent.
-  void DeleteRuntimeEnvIfPossible(const std::string &serialized_runtime_env);
+  void DeleteRuntimeEnvIfPossible(const std::string &serialized_runtime_env,
+                                  const JobID &job_id,
+                                  const WorkerID &worker_id = WorkerID::Nil());
 
   void AddWorkerProcess(State &state,
                         rpc::WorkerType worker_type,
@@ -755,7 +773,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
                         const std::chrono::high_resolution_clock::time_point &start,
                         const rpc::RuntimeEnvInfo &runtime_env_info,
                         const std::vector<std::string> &dynamic_options,
-                        std::optional<absl::Duration> worker_startup_keep_alive_duration);
+                        std::optional<absl::Duration> worker_startup_keep_alive_duration,
+                        const WorkerID &worker_id);
 
   void RemoveWorkerProcess(State &state, const StartupToken &proc_startup_token);
 
@@ -771,7 +790,8 @@ class WorkerPool : public WorkerPoolInterface, public IOWorkerPoolInterface {
       const std::vector<std::string> &dynamic_options,
       int runtime_env_hash,
       const std::string &serialized_runtime_env_context,
-      const WorkerPool::State &state) const;
+      const WorkerPool::State &state,
+      const WorkerID &worker_id) const;
 
   void ExecuteOnPrestartWorkersStarted(std::function<void()> callback);
 

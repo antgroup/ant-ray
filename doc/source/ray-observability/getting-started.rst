@@ -362,7 +362,7 @@ For Actors, you can also see the system logs for the corresponding Worker proces
 
 .. note::
 
-    Logs of aysnchronous Actor Tasks or threaded Actor Tasks (concurrency>1) are only available as part of the Actor logs. Follow the instruction in the Dashboard to view the Actor logs.
+    Logs of asynchronous Actor Tasks or threaded Actor Tasks (concurrency>1) are only available as part of the Actor logs. Follow the instruction in the Dashboard to view the Actor logs.
 
 **Task and Actor errors**
 
@@ -415,6 +415,279 @@ Key Features
 
 For more in-depth information, please refer to the complete
 :ref:`virtual-cluster-index` documentation.
+
+Flow Insight View
+-----------------
+
+The Flow Insight view provides a powerful visualization of your Ray application's
+execution flow, helping you understand the relationships between actors, tasks, and
+data transfers in your distributed application. This view offers logical view, 
+physical view, distributed stack and flame graph of your application's execution,
+making it easier to analyze performance, identify bottlenecks, and optimize your Ray workloads.
+
+Key Features
+~~~~~~~~~~~~
+
+**Four Visualization Modes:**
+
+- **Logical View:** Displays the call graph between functions and actors, showing the control flow and data dependencies in your application.
+
+- **Physical View:** Shows the physical distribution of actors across nodes with their resource usage and placement groups.
+
+- **Distrubuted Stack View**: Offers a unified call stack visualization across your distributed system, similar to how developers use pstack for single-process applications.
+
+- **Flame Graph View:** Provides a hierarchical visualization of execution time across your distributed application.
+
+**Interactive Exploration:**
+
+- **Zoom and Pan:** Navigate through complex graphs with intuitive zoom and pan controls.
+
+- **Element Selection:** Click on any node to view detailed information in the info card.
+
+- **Highlighting:** Automatically highlights related nodes and edges when selecting an element.
+
+- **Search:** Filter the visualization to highlight elements matching your search term.
+
+**Resource Usage Visualization:**
+
+- Monitor CPU, memory, and GRAM usage of actors in the physical view.
+
+- View detailed GPU memory utilization for actors using GPU resources.
+
+- Select different resource metrics to visualize (GRAM, CPU, memory).
+
+**Context-Based Filtering:**
+
+- Filter actors based on custom context information registered by your application.
+
+- Visualize actors with different colors based on their context values.
+
+Enabling Flow Insight
+~~~~~~~~~~~~~~~~~~~~~
+
+To enable Flow Insight, set the `RAY_FLOW_INSIGHT` environment variable to "1" before starting your Ray cluster.
+
+Accessing Flow Insight
+~~~~~~~~~~~~~~~~~~~~~~
+
+
+.. image:: ./images/flow-insight-view-entry.gif
+    :align: center
+    :alt: Flow Insight View screenshot
+
+
+To access the Flow Insight view, click on the "Insight" link in the Jobs view for a specific job.
+This will open the Flow Insight visualization for that job, showing the execution graph and
+relationships between components.
+
+Logical View
+~~~~~~~~~~~~
+
+
+.. image:: ./images/flow-insight-view-logical.gif
+    :align: center
+    :alt: Flow Insight View screenshot
+
+
+The logical view displays the call graph of your Ray application, showing the relationships
+between functions, actors, and methods. This view helps you understand the control flow
+and data dependencies in your application.
+
+- **Nodes:** Represent functions, actors, and methods in your application.
+- **Edges:** Show the call relationships and data transfers between nodes.
+- **Edge Thickness:** Indicates the frequency or volume of calls/data transfers.
+
+The logical view is particularly useful for understanding the high-level structure of your
+application and identifying communication patterns between components.
+
+Physical View
+~~~~~~~~~~~~~
+
+
+.. image:: ./images/flow-insight-view-physical.gif
+    :align: center
+    :alt: Flow Insight View screenshot
+
+
+The physical view shows how actors are distributed across nodes in your Ray cluster,
+organized by placement groups. This view helps you understand the physical deployment
+of your application and resource utilization.
+
+- **Nodes:** Represent physical machines in your Ray cluster.
+- **Placement Groups:** Show how actors are grouped together for locality.
+- **Actor Boxes:** Display individual actors with their resource usage.
+- **Color Coding:** Indicates resource utilization levels or context-based grouping.
+
+The physical view is valuable for identifying resource bottlenecks, understanding actor
+placement, and optimizing resource utilization in your Ray cluster.
+
+Resource Visualization
+~~~~~~~~~~~~~~~~~~~~~~
+
+Flow Insight provides detailed resource usage visualization for your Ray application:
+
+- **CPU Usage:** View CPU utilization for each actor and node.
+- **Memory Usage:** Monitor memory consumption across your application.
+- **GPU Usage:** Track GPU memory utilization for actors using GPUs.
+- **Resource Selection:** Switch between different resource metrics to visualize.
+
+This helps you identify resource-intensive components and optimize resource allocation
+in your Ray application.
+
+Context-Based Filtering
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You can register custom context information for your actors to enable context-based
+filtering and visualization in the Flow Insight view. This is particularly useful for
+categorizing actors by their role, status, or other application-specific attributes.
+
+To register context information for an actor:
+
+.. code-block:: python
+
+    import ray
+    from ray.util.insight import register_current_context, async_register_current_context
+    
+    @ray.remote
+    class MyActor:
+        def __init__(self, role):
+            # Register context synchronously
+            register_current_context({"role": role, "status": "initialized"})
+            
+        async def update_status(self, status):
+            # Register context asynchronously
+            await async_register_current_context({"status": status})
+            
+        def process(self):
+            # Update context with current processing information
+            register_current_context({"processing": True})
+            # ... processing logic ...
+            register_current_context({"processing": False})
+
+In the Flow Insight physical view, you can then select the context key (e.g., "role" or "status")
+to color-code actors based on their context values, making it easy to identify actors with
+specific roles or states.
+
+Distributed Flame Graph
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: ./images/flow-insight-view-flame.gif
+    :align: center
+    :alt: Distributed Flame Graph screenshot
+
+The Distributed Flame Graph is an advanced visualization tool that automatically collects and aggregates
+execution time data from all components across your entire Ray job lifecycle. While traditional flame
+graphs are limited to profiling performance on a single machine, Ray's Distributed Flame Graph provides
+a unified view of performance across your entire distributed system.
+
+Key features of the Distributed Flame Graph:
+
+- **System-wide Performance View:** Visualizes execution time across all distributed components
+- **Call Hierarchy:** Shows parent-child relationships between function calls
+- **Time Distribution:** Block width represents the proportion of time spent in each function
+- **Performance Hotspots:** Easily identify which components consume the most execution time
+
+The flame graph is particularly valuable for performance optimization as it allows you to:
+
+- Identify which distributed components are consuming the most time
+- Understand call relationships between components
+- Detect unexpected performance bottlenecks
+- Compare expected vs. actual execution time distribution
+
+For example, the flame graph might reveal that a particular process is consuming a long
+execution time, representing the majority of your application's runtime, helping you focus your
+optimization efforts on the most impactful components.
+
+To access the Distributed Flame Graph, select "Flame" in the view type selector in the Flow Insight
+visualization after clicking on the "Insight" link for a specific job in the Jobs view.
+
+Distributed Stack (DStack)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: ./images/flow-insight-view-dstack.gif
+    :align: center
+    :alt: Distributed Stack screenshot
+
+The Distributed Stack (DStack) view provides a unified call stack visualization across your entire
+Ray cluster. Similar to how developers use `pstack` to diagnose issues in single-process applications,
+DStack extends this capability to distributed systems, automatically collecting and visualizing call
+relationships across all actors and tasks in your Ray cluster.
+
+Key features of DStack:
+
+- **Zero-Code Integration:** Works automatically with native Ray API code without any modifications
+- **Global System View:** See the entire distributed system's call stack in a single interface
+- **Dependency Tracking:** Identify call dependencies between components across nodes
+- **Blockage Detection:** Quickly locate blocked components and understand why they're stuck
+
+DStack is particularly valuable for debugging complex distributed applications by helping you:
+
+- Understand the current state of all distributed components at a glance
+- Trace execution paths across multiple nodes
+- Detect deadlocks and performance bottlenecks in distributed interactions
+- Identify which specific components are blocking progress and why
+
+This capability is especially powerful for troubleshooting complex distributed applications like
+reinforcement learning systems, where traditional debugging approaches would require manually
+logging into individual nodes and examining processes one by one.
+
+To access the DStack view, select "Call Stack" in the view type selector in the Flow Insight
+visualization after clicking on the "Insight" link for a specific job in the Jobs view.
+
+
+Info Card
+~~~~~~~~~
+
+When you click on an element in each view, the info card displays detailed information about that element:
+
+- **For Actors:**
+  - Basic information (name, ID, language)
+  - State and PID
+  - GPU devices and memory usage
+  - Methods implemented by the actor
+  - Callers and callees (who calls this actor and who this actor calls)
+  - Data dependencies
+
+- **For Methods:**
+  - Basic information (name, actor, language)
+  - Callers and callees
+  - Data dependencies
+
+- **For Functions:**
+  - Basic information (name, language)
+  - Callers and callees
+  - Data dependencies
+
+The info card helps you understand the detailed characteristics and relationships of
+individual components in your Ray application.
+
+Search Functionality
+~~~~~~~~~~~~~~~~~~~~
+
+The search functionality allows you to filter the visualization to show only elements
+matching your search term. This is particularly useful for finding specific actors,
+methods, or functions in complex applications.
+
+Simply enter your search term in the search box, and the visualization will highlight
+matching elements while fading out non-matching ones.
+
+Best Practices
+~~~~~~~~~~~~~~
+
+To get the most out of Flow Insight:
+
+1. **Enable Flow Insight:** Set the `RAY_FLOW_INSIGHT` environment variable to "1" before starting your Ray cluster.
+
+2. **Register Context Information:** Use `register_current_context` or `async_register_current_context` to provide additional filtering capabilities.
+
+3. **Use Meaningful Names:** Give your actors and tasks descriptive names to make the visualization more informative.
+
+4. **Explore Both Views:** Switch between logical and physical views to understand both the structural and deployment aspects of your application.
+
+5. **Use Search and Filtering:** For complex applications, use search and context-based filtering to focus on specific components.
+
+Flow Insight is a powerful tool for understanding, debugging, and optimizing Ray applications,
+providing insights into both the logical structure and physical deployment of your distributed workloads.
 
 
 .. _dash-overview:

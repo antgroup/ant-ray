@@ -9,7 +9,12 @@ from typing import Dict, List, Optional
 from ray.util.annotations import DeveloperAPI
 from ray.core.generated.common_pb2 import Language
 from ray._private.services import get_ray_jars_dir
-from ray._private.utils import update_envs
+from ray._private.utils import (
+    update_envs,
+    try_update_code_search_path,
+    try_update_ld_preload,
+    try_update_ld_library_path,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,12 +30,48 @@ class RuntimeEnvContext:
         py_executable: Optional[str] = None,
         override_worker_entrypoint: Optional[str] = None,
         java_jars: List[str] = None,
+        working_dir: Optional[str] = None,
+        symlink_paths_to_working_dir: List[str] = None,
+        job_dir: Optional[str] = None,
+        native_libraries: List[Dict[str, str]] = None,
+        preload_libraries: List[str] = None,
     ):
         self.command_prefix = command_prefix or []
         self.env_vars = env_vars or {}
         self.py_executable = py_executable or sys.executable
         self.override_worker_entrypoint: Optional[str] = override_worker_entrypoint
         self.java_jars = java_jars or []
+        self.working_dir = working_dir
+        # `symlink_paths_to_working_dir` provides a way that we can link any content to
+        # the working directory of the workers. Note that the dirs in this list
+        # will not be linked directly. Instead, we will walk through each dir
+        # and link each content to the working directory.
+        # For example, if the tree of a dir named "resource_dir1" is:
+        # resource_dir1
+        # ├── file1.txt
+        # └── txt_dir
+        #     └── file2.txt
+        # And the tree of another dir named "resource_dir2" is:
+        # resource_dir2
+        # └── file3.txt
+        # If you append these two dirs into `symlink_paths_to_working_dir`:
+        # self.symlink_paths_to_working_dir.append("/xxx/xxx/resource_dir1")
+        # self.symlink_paths_to_working_dir.append("/xxx/xxx/resource_dir2")
+        # The final working directory of the worker process will be:
+        # /xxx/xxx/working_dirs/{worker_id}
+        # ├── file1.txt
+        # └── txt_dir
+        #     └── file2.txt
+        # └── file3.txt
+        # Note that if there are conflict file or sub dir names in different
+        # resource dirs, some contents will be covered and we don't guarantee it.
+        self.symlink_paths_to_working_dir = symlink_paths_to_working_dir or []
+        self.job_dir = job_dir
+        self.native_libraries = native_libraries or {
+            "lib_path": [],
+            "code_search_path": [],
+        }
+        self.preload_libraries = preload_libraries or []
 
     def serialize(self) -> str:
         return json.dumps(self.__dict__)
@@ -56,11 +97,28 @@ class RuntimeEnvContext:
                 local_java_jars.append(java_jar)
 
             class_path_args = ["-cp", ray_jars + ":" + str(":".join(local_java_jars))]
+            # try update code search path
+            passthrough_args = try_update_code_search_path(
+                passthrough_args, language, self.java_jars, self.native_libraries
+            )
             passthrough_args = class_path_args + passthrough_args
+        elif language == Language.CPP:
+            executable = ["exec"]
+            # try update code search path
+            passthrough_args = try_update_code_search_path(
+                passthrough_args, language, self.java_jars, self.native_libraries
+            )
+
         elif sys.platform == "win32":
             executable = []
         else:
             executable = ["exec"]
+
+        # try update ld_library path
+        try_update_ld_library_path(language, self.native_libraries, self.working_dir)
+
+        # try update ld_preload
+        try_update_ld_preload(self.preload_libraries)
 
         # By default, raylet uses the path to default_worker.py on host.
         # However, the path to default_worker.py inside the container
@@ -99,7 +157,7 @@ class RuntimeEnvContext:
                     f"{MACOS_LIBRARY_PATH_ENV_NAME}="
                     f"{os.environ[MACOS_LIBRARY_PATH_ENV_NAME]}",
                 )
-            logger.debug(f"Exec'ing worker with command: {cmd}")
+            logger.info(f"Exec'ing worker with command: {cmd}")
             # PyCharm will monkey patch the os.execvp at
             # .pycharm_helpers/pydev/_pydev_bundle/pydev_monkey.py
             # The monkey patched os.execvp function has a different

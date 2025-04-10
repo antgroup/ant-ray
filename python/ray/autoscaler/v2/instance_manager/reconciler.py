@@ -30,7 +30,6 @@ from ray.autoscaler.v2.instance_manager.subscribers.ray_stopper import RayStopEr
 from ray.autoscaler.v2.metrics_reporter import AutoscalerMetricsReporter
 from ray.autoscaler.v2.scheduler import IResourceScheduler, SchedulingRequest
 from ray.autoscaler.v2.schema import AutoscalerInstance, NodeType
-from ray.autoscaler.v2.sdk import is_head_node, get_virtual_cluster_resource_states
 from ray.core.generated.autoscaler_pb2 import (
     AutoscalingState,
     ClusterResourceState,

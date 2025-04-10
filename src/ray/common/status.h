@@ -28,24 +28,20 @@
 
 #pragma once
 
+#include <any>
 #include <cstring>
 #include <iosfwd>
 #include <string>
 
+#include "absl/strings/str_cat.h"
 #include "ray/common/source_location.h"
 #include "ray/util/logging.h"
 #include "ray/util/macros.h"
 #include "ray/util/visibility.h"
 
-namespace boost {
-
-namespace system {
-
+namespace boost::system {
 class error_code;
-
-}  // namespace system
-
-}  // namespace boost
+}  // namespace boost::system
 
 // Return the given status if it is not OK.
 #define RAY_RETURN_NOT_OK(s)           \
@@ -124,6 +120,7 @@ class RAY_EXPORT Status {
 
   Status(StatusCode code, const std::string &msg, int rpc_code = -1);
   Status(StatusCode code, const std::string &msg, SourceLocation loc, int rpc_code = -1);
+  Status(StatusCode code, const std::string &msg, const std::any &data);
 
   // Copy the specified status.
   Status(const Status &s);
@@ -261,8 +258,8 @@ class RAY_EXPORT Status {
     return Status(StatusCode::ChannelTimeoutError, msg);
   }
 
-  static Status UnsafeToRemove(const std::string &msg) {
-    return Status(StatusCode::UnsafeToRemove, msg);
+  static Status UnsafeToRemove(const std::string &msg, const std::any &data) {
+    return Status(StatusCode::UnsafeToRemove, msg, data);
   }
 
   static StatusCode StringToCode(const std::string &str);
@@ -326,6 +323,10 @@ class RAY_EXPORT Status {
   // Returns the string "OK" for success.
   std::string ToString() const;
 
+  // There's a [StatusString] for `StatusOr` also, used for duck-typed macro and template
+  // to handle `Status`/`StatusOr` uniformly.
+  std::string StatusString() const { return ToString(); }
+
   // Return a string representation of the status code, without the message
   // text or posix code information.
   std::string CodeAsString() const;
@@ -336,6 +337,14 @@ class RAY_EXPORT Status {
 
   std::string message() const { return ok() ? "" : state_->msg; }
 
+  std::any data() const { return ok() ? std::any() : state_->data; }
+
+  template <typename... T>
+  Status &operator<<(T &&...msg) {
+    absl::StrAppend(&state_->msg, std::forward<T>(msg)...);
+    return *this;
+  }
+
  private:
   struct State {
     StatusCode code;
@@ -343,6 +352,8 @@ class RAY_EXPORT Status {
     SourceLocation loc;
     // If code is RpcError, this contains the RPC error code
     int rpc_code;
+    // The supportive data that helps explaining why status is not ok.
+    std::any data;
   };
   // Use raw pointer instead of unique pointer to achieve copiable `Status`.
   //

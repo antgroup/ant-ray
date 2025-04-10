@@ -11,7 +11,6 @@ from ray.core.generated.autoscaler_pb2 import (
     VirtualClusterResourceStates,
     GetVirtualClusterResourceStatesReply,
     GetClusterStatusReply,
-    NodeState,
 )
 
 DEFAULT_RPC_TIMEOUT_S = 10
@@ -115,16 +114,3 @@ def get_virtual_cluster_resource_states(
     reply = GetVirtualClusterResourceStatesReply()
     reply.ParseFromString(str_reply)
     return reply.virtual_cluster_resource_states
-
-
-def is_head_node(node_state: NodeState) -> bool:
-    """
-    Check if the node is a head node from the node state.
-    Args:
-        node_state: the node state
-    Returns:
-        is_head: True if the node is a head node, False otherwise.
-    """
-    # TODO: we should include this bit of information in the future. e.g.
-    # from labels.
-    return "node:__internal_head__" in dict(node_state.total_resources)

@@ -5,7 +5,8 @@ import time
 import traceback
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Set, Tuple
+from typing import Callable, Dict, List, Set, Tuple, Optional, Union
+from copy import deepcopy
 from ray._private.ray_constants import (
     DEFAULT_RUNTIME_ENV_TIMEOUT_SECONDS,
 )
@@ -29,6 +30,7 @@ from ray._private.runtime_env.plugin import RuntimeEnvPluginManager
 from ray._private.runtime_env.py_modules import PyModulesPlugin
 from ray._private.runtime_env.working_dir import WorkingDirPlugin
 from ray._private.runtime_env.nsight import NsightPlugin
+from ray._private.runtime_env.py_executable import PyExecutablePlugin
 from ray._private.runtime_env.mpi import MPIPlugin
 from ray.core.generated import (
     runtime_env_agent_pb2,
@@ -50,9 +52,9 @@ SLEEP_FOR_TESTING_S = os.environ.get("RAY_RUNTIME_ENV_SLEEP_FOR_TESTING_S")
 class CreatedEnvResult:
     # Whether or not the env was installed correctly.
     success: bool
-    # If success is True, will be a serialized RuntimeEnvContext
-    # If success is False, will be an error message.
-    result: str
+    # If success is True, will be a RuntimeEnvContext
+    # If success is False, will be an error message
+    result: Union[RuntimeEnvContext, str]
     # The time to create a runtime env in ms.
     creation_time_ms: int
 
@@ -117,6 +119,7 @@ class ReferenceTable:
         self._runtime_env_reference[serialized_env] += 1
 
     def _decrease_reference_for_runtime_env(self, serialized_env: str):
+        """Decrease reference count for the given [serialized_env]. Throw exception if we cannot decrement reference."""
         default_logger.debug(f"Decrease reference for runtime env {serialized_env}.")
         unused = False
         if self._runtime_env_reference[serialized_env] > 0:
@@ -126,10 +129,12 @@ class ReferenceTable:
                 del self._runtime_env_reference[serialized_env]
         else:
             default_logger.warning(f"Runtime env {serialized_env} does not exist.")
+            raise ValueError(
+                f"{serialized_env} cannot decrement reference since the reference count is 0"
+            )
         if unused:
             default_logger.info(f"Unused runtime env {serialized_env}.")
             self._unused_runtime_env_callback(serialized_env)
-        return unused
 
     def increase_reference(
         self, runtime_env: RuntimeEnv, serialized_env: str, source_process: str
@@ -143,8 +148,9 @@ class ReferenceTable:
     def decrease_reference(
         self, runtime_env: RuntimeEnv, serialized_env: str, source_process: str
     ) -> None:
+        """Decrease reference count for runtime env and uri. Throw exception if decrement reference count fails."""
         if source_process in self._reference_exclude_sources:
-            return list()
+            return
         self._decrease_reference_for_runtime_env(serialized_env)
         uris = self._uris_parser(runtime_env)
         self._decrease_reference_for_uris(uris)
@@ -212,6 +218,7 @@ class RuntimeEnvAgent:
         self._py_modules_plugin = PyModulesPlugin(
             self._runtime_env_dir, self._gcs_aio_client
         )
+        self._py_executable_plugin = PyExecutablePlugin()
         self._java_jars_plugin = JavaJarsPlugin(
             self._runtime_env_dir, self._gcs_aio_client
         )
@@ -234,13 +241,14 @@ class RuntimeEnvAgent:
             self._pip_plugin,
             self._conda_plugin,
             self._py_modules_plugin,
+            self._py_executable_plugin,
             self._java_jars_plugin,
             self._container_plugin,
             self._nsight_plugin,
             self._mpi_plugin,
             self._image_uri_plugin,
         ]
-        self._plugin_manager = RuntimeEnvPluginManager()
+        self._plugin_manager = RuntimeEnvPluginManager(self._runtime_env_dir)
         for plugin in self._base_plugins:
             self._plugin_manager.add_plugin(plugin)
 
@@ -297,10 +305,11 @@ class RuntimeEnvAgent:
         return self._per_job_logger_cache[job_id]
 
     async def GetOrCreateRuntimeEnv(self, request):
-        self._logger.debug(
+        self._logger.info(
             f"Got request from {request.source_process} to increase "
             "reference for runtime env: "
-            f"{request.serialized_runtime_env}."
+            f"{request.serialized_runtime_env} to be used by worker : "
+            f"{request.worker_id}"
         )
 
         async def _setup_runtime_env(
@@ -366,8 +375,8 @@ class RuntimeEnvAgent:
                 each attempt.
 
             Returns:
-                a tuple which contains result (bool), runtime env context (str), error
-                message(str).
+                a tuple which contains result(bool), runtime env context(RuntimeEnvContext),
+                and error message(str).
 
             """
             self._logger.info(
@@ -421,7 +430,7 @@ class RuntimeEnvAgent:
                     serialized_env,
                     serialized_context,
                 )
-                return True, serialized_context, None
+                return True, runtime_env_context, None
 
         try:
             serialized_env = request.serialized_runtime_env
@@ -448,14 +457,19 @@ class RuntimeEnvAgent:
 
         async with self._env_locks[serialized_env]:
             if serialized_env in self._env_cache:
-                serialized_context = self._env_cache[serialized_env]
                 result = self._env_cache[serialized_env]
                 if result.success:
-                    context = result.result
+                    runtime_env_context = result.result
                     self._logger.info(
                         "Runtime env already created "
                         f"successfully. Env: {serialized_env}, "
-                        f"context: {context}"
+                    )
+                    context = await self.trigger_pre_worker_startup(
+                        runtime_env,
+                        runtime_env_context,
+                        request.worker_id.decode(),
+                        request.job_id.decode(),
+                        self._logger,
                     )
                     return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
                         status=agent_manager_pb2.AGENT_RPC_STATUS_OK,
@@ -494,7 +508,7 @@ class RuntimeEnvAgent:
             start = time.perf_counter()
             (
                 successful,
-                serialized_context,
+                runtime_env_context,
                 error_message,
             ) = await _create_runtime_env_with_retry(
                 runtime_env,
@@ -510,8 +524,15 @@ class RuntimeEnvAgent:
             # Add the result to env cache.
             self._env_cache[serialized_env] = CreatedEnvResult(
                 successful,
-                serialized_context if successful else error_message,
+                runtime_env_context if successful else error_message,
                 creation_time_ms,
+            )
+            serialized_context = await self.trigger_pre_worker_startup(
+                runtime_env,
+                runtime_env_context,
+                request.worker_id.decode(),
+                request.job_id.decode(),
+                self._logger,
             )
             # Reply the RPC
             return runtime_env_agent_pb2.GetOrCreateRuntimeEnvReply(
@@ -526,7 +547,8 @@ class RuntimeEnvAgent:
         self._logger.info(
             f"Got request from {request.source_process} to decrease "
             "reference for runtime env: "
-            f"{request.serialized_runtime_env}."
+            f"{request.serialized_runtime_env} used by worker : "
+            f"{request.worker_id}"
         )
 
         try:
@@ -543,9 +565,28 @@ class RuntimeEnvAgent:
                 ),
             )
 
-        self._reference_table.decrease_reference(
-            runtime_env, request.serialized_runtime_env, request.source_process
-        )
+        try:
+            self._reference_table.decrease_reference(
+                runtime_env, request.serialized_runtime_env, request.source_process
+            )
+        except Exception as e:
+            return runtime_env_agent_pb2.DeleteRuntimeEnvIfPossibleReply(
+                status=agent_manager_pb2.AGENT_RPC_STATUS_FAILED,
+                error_message=f"Fails to decrement reference for runtime env for {str(e)}",
+            )
+
+        # Trigger `post_worker_exit` of plugins to clean something for each
+        # worker process, such as the cleanup of working directory.
+        if request.worker_id:
+            for (
+                plugin_setup_context
+            ) in self._plugin_manager.sorted_plugin_setup_contexts():
+                await plugin_setup_context.class_instance.post_worker_exit(
+                    runtime_env,
+                    request.worker_id.decode(),
+                    request.job_id.decode(),
+                    self._logger,
+                )
 
         return runtime_env_agent_pb2.DeleteRuntimeEnvIfPossibleReply(
             status=agent_manager_pb2.AGENT_RPC_STATUS_OK
@@ -583,3 +624,41 @@ class RuntimeEnvAgent:
             reply.runtime_env_states.append(runtime_env_state)
         reply.total = len(runtime_env_states)
         return reply
+
+    async def trigger_pre_worker_startup(
+        self,
+        runtime_env: RuntimeEnv,  # noqa: F821
+        runtime_env_context: RuntimeEnvContext,
+        worker_id: str,
+        job_id: str,
+        logger: logging.Logger,
+    ):
+        # Trigger `pre_worker_startup` of plugins to prepare something for each
+        # worker process, such as making a unique working directory.
+        # NOTE(Jacky): Deep copy here because `pre_worker_startup` will rewrite it for a
+        # specific worker.
+        if runtime_env_context is None:
+            return
+
+        runtime_env_context_copy = deepcopy(runtime_env_context)
+        if worker_id:
+            for (
+                plugin_setup_context
+            ) in self._plugin_manager.sorted_plugin_setup_contexts():
+                await plugin_setup_context.class_instance.pre_worker_startup(
+                    runtime_env,
+                    runtime_env_context_copy,
+                    worker_id,
+                    job_id,
+                    self._logger,
+                )
+
+        # Need to write runtime env context here because `pre_worker_startup`
+        # could rewrite the context.
+        serialized_runtime_env_context = runtime_env_context_copy.serialize()
+        logger.info(
+            "The serialized runtime env context for reply is "
+            f"{serialized_runtime_env_context}."
+        )
+
+        return serialized_runtime_env_context

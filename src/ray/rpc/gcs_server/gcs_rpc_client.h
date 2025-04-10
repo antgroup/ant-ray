@@ -17,7 +17,10 @@
 #include <gtest/gtest_prod.h>
 
 #include <chrono>
+#include <memory>
+#include <string>
 #include <thread>
+#include <utility>
 
 #include "absl/container/btree_map.h"
 #include "ray/common/grpc_util.h"
@@ -570,6 +573,12 @@ class GcsRpcClient {
   // Create or update a virtual cluster.
   VOID_GCS_RPC_CLIENT_METHOD(VirtualClusterInfoGcsService,
                              CreateOrUpdateVirtualCluster,
+                             virtual_cluster_info_grpc_client_,
+                             /*method_timeout_ms*/ -1, )
+
+  // Remove specified nodes from a virtual cluster.
+  VOID_GCS_RPC_CLIENT_METHOD(VirtualClusterInfoGcsService,
+                             RemoveNodesFromVirtualCluster,
                              virtual_cluster_info_grpc_client_,
                              /*method_timeout_ms*/ -1, )
 

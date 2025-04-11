@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import traceback
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Set, Tuple, Optional, Union
@@ -231,7 +232,6 @@ class RuntimeEnvAgent:
         self._nsight_plugin = NsightPlugin(self._runtime_env_dir)
         self._mpi_plugin = MPIPlugin()
         self._image_uri_plugin = get_image_uri_plugin_cls()(temp_dir)
-
         # TODO(architkulkarni): "base plugins" and third-party plugins should all go
         # through the same code path.  We should never need to refer to
         # self._xxx_plugin, we should just iterate through self._plugins.
@@ -315,10 +315,15 @@ class RuntimeEnvAgent:
         async def _setup_runtime_env(
             runtime_env: RuntimeEnv,
             runtime_env_config: RuntimeEnvConfig,
+            serialized_allocated_resource_instances,
         ):
+            allocated_resource: dict = json.loads(
+                serialized_allocated_resource_instances or "{}"
+            )
             log_files = runtime_env_config.get("log_files", [])
             # Use a separate logger for each job.
             per_job_logger = self.get_or_create_logger(request.job_id, log_files)
+            per_job_logger.info(f"Worker has resource :" f"{allocated_resource}")
             context = RuntimeEnvContext(env_vars=runtime_env.env_vars())
 
             # Warn about unrecognized fields in the runtime env.
@@ -346,7 +351,7 @@ class RuntimeEnvAgent:
                 per_job_logger,
             )
 
-            # Then within the working dir, create the other plugins.
+            # Then within the working dir, create the other plugins and skip container plugin
             working_dir_uri_or_none = runtime_env.working_dir_uri()
             with self._working_dir_plugin.with_working_dir_env(working_dir_uri_or_none):
                 """Run setup for each plugin unless it has already been cached."""
@@ -354,11 +359,24 @@ class RuntimeEnvAgent:
                     plugin_setup_context
                 ) in self._plugin_manager.sorted_plugin_setup_contexts():
                     plugin = plugin_setup_context.class_instance
+                    if plugin.name == ContainerPlugin.name:
+                        continue
                     if plugin.name != WorkingDirPlugin.name:
                         uri_cache = plugin_setup_context.uri_cache
                         await create_for_plugin_if_needed(
                             runtime_env, plugin, uri_cache, context, per_job_logger
                         )
+
+            # Container plugin should be created after all other plugins.
+            container_ctx = self._plugin_manager.plugins[ContainerPlugin.name]
+            await create_for_plugin_if_needed(
+                runtime_env,
+                container_ctx.class_instance,
+                container_ctx.uri_cache,
+                context,
+                per_job_logger,
+            )
+
             return context
 
         async def _create_runtime_env_with_retry(
@@ -388,7 +406,9 @@ class RuntimeEnvAgent:
             for _ in range(runtime_env_consts.RUNTIME_ENV_RETRY_TIMES):
                 try:
                     runtime_env_setup_task = _setup_runtime_env(
-                        runtime_env, runtime_env_config
+                        runtime_env,
+                        runtime_env_config,
+                        request.allocated_instances_serialized_json,
                     )
                     runtime_env_context = await asyncio.wait_for(
                         runtime_env_setup_task, timeout=setup_timeout_seconds

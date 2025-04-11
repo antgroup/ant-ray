@@ -288,7 +288,7 @@ class DAPClient:
         # Use a longer timeout for attach command (30 seconds)
         return await self.send_request_and_wait("attach", args, timeout=0.1)
     
-    async def set_breakpoints(self, source: Dict[str, str], breakpoints: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def set_breakpoint(self, source: Dict[str, str], line: int) -> Dict[str, Any]:
         """
         Set breakpoints in a source file.
         
@@ -301,7 +301,7 @@ class DAPClient:
         """
         args = {
             "source": source,
-            "breakpoints": breakpoints,
+            "breakpoints": [{"line": line}],
             "sourceModified": False
         }
         return await self.send_request_and_wait("setBreakpoints", args)
@@ -406,45 +406,14 @@ class DAPClient:
         """
         return await self.send_request_and_wait("scopes", {"frameId": frame_id})
     
-    async def get_source(self, source_reference: int = 0, source_path: str = None) -> Dict[str, Any]:
-        """
-        Get the source code for a file.
-        
-        Args:
-            source_reference: The source reference
-            source_path: The path to the source file
-            
-        Returns:
-            The response from the debug adapter
-        """
-        args = {"sourceReference": 0}  # Always provide a default sourceReference
-        if source_reference:
-            args["sourceReference"] = source_reference
-        if source_path:
-            args["source"] = {"path": source_path}
-            
-        return await self.send_request_and_wait("source", args)
     
-    async def get_variables(self, variables_reference: int) -> Dict[str, Any]:
-        """
-        Get the variables for a scope.
-        
-        Args:
-            variables_reference: The variables reference
-            
-        Returns:
-            The response from the debug adapter
-        """
-        return await self.send_request_and_wait("variables", {"variablesReference": variables_reference})
-    
-    async def evaluate(self, expression: str, frame_id: int = 0, context: str = "repl", thread_id: int = None) -> Dict[str, Any]:
+    async def evaluate(self, expression: str, frame_id: int = 0, thread_id: int = None) -> Dict[str, Any]:
         """
         Evaluate an expression.
         
         Args:
             expression: The expression to evaluate
             frame_id: The frame ID
-            context: The evaluation context
             thread_id: The thread ID (required by DAP spec if frameId is specified)
             
         Returns:
@@ -452,7 +421,7 @@ class DAPClient:
         """
         args = {
             "expression": expression,
-            "context": context
+            "context": "repl"
         }
         
         # According to DAP spec, if frameId is specified, threadId must also be specified

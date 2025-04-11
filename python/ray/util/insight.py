@@ -10,7 +10,7 @@ from contextlib import contextmanager
 from ray.experimental import internal_kv
 import ray.dashboard.consts as dashboard_consts
 from collections import deque
-from insight_dap import DAPClient
+from ray.util.insight_dap import DAPClient
 import json
 
 insight_monitor_address = None
@@ -219,28 +219,29 @@ class _ray_internal_insight_monitor:
         """Handle HTTP request for sending debug commands."""
         data = await request.json()
         task_id = data.get("task_id", "")
+        args = data.get("args", "")
         dap = self.debug_sessions[task_id]
         result = None
         if data.get("command", "") == "continue":
             await dap.continue_execution()
         elif data.get("command", "") == "step_over":
-            await dap.step_over()
+            await dap.step_over(args.get("thread_id", 0))
         elif data.get("command", "") == "step_into":
-            await dap.step_into()
+            await dap.step_into(args.get("thread_id", 0))
         elif data.get("command", "") == "step_out":
-            await dap.step_out()
+            await dap.step_out(args.get("thread_id", 0))
         elif data.get("command", "") == "pause":
-            await dap.pause()
+            await dap.pause(args.get("thread_id", 0))
         elif data.get("command", "") == "get_threads":
             result = await dap.get_threads()
         elif data.get("command", "") == "get_stack_trace":
-            result = await dap.get_stack_trace()
+            result = await dap.get_stack_trace(args.get("thread_id", 0))
+        elif data.get("command", "") == "set_breakpoint":
+            result = await dap.set_breakpoint(args.get("source", {}), args.get("line", 0))
         elif data.get("command", "") == "get_scopes":
-            result = await dap.get_scopes()
-        elif data.get("command", "") == "get_variables":
-            result = await dap.get_variables()
+            result = await dap.get_scopes(args.get("frame_id", 0))
         elif data.get("command", "") == "evaluate":
-            result = await dap.evaluate(data.get("expression", ""))
+            result = await dap.evaluate(args.get("expression", ""), args.get("frame_id", 0), args.get("thread_id", 0))
         else:
             result = {"status": "error", "message": "Invalid command"}
             
@@ -1322,6 +1323,8 @@ def report_trace_info(caller_info):
 
     if not need_record(current_class):
         return
+
+    ray.util.debugpy._ensure_debugger_port_open_thread_safe()
 
     debugger_port = ray._private.worker.global_worker.debugger_port
     debugger_host = ray._private.worker.global_worker.node_ip_address

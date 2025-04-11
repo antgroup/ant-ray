@@ -1399,6 +1399,7 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">ray</span>
 <span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span> <span class="nn">ray.util.tracing.tracing_helper</span> <span class="kn">import</span> <span class="n">_inject_tracing_into_class</span>
 
 
 <div class="viewcode-block" id="Empty">
@@ -1698,6 +1699,7 @@ document.write(`
 
 
 
+<span class="nd">@_inject_tracing_into_class</span>
 <span class="k">class</span> <span class="nc">_QueueActor</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxsize</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxsize</span> <span class="o">=</span> <span class="n">maxsize</span>

@@ -324,7 +324,6 @@ class RuntimeEnvAgent:
             log_files = runtime_env_config.get("log_files", [])
             # Use a separate logger for each job.
             per_job_logger = self.get_or_create_logger(request.job_id, log_files)
-            per_job_logger.info(f"Worker has resource :" f"{allocated_resource}")
             context = RuntimeEnvContext(env_vars=runtime_env.env_vars())
 
             # Warn about unrecognized fields in the runtime env.

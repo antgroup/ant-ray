@@ -6,6 +6,10 @@ import ray
 from ray.tests.conftest import *  # noqa
 from ray.tests.conftest_docker import *  # noqa
 from ray.tests.conftest_docker import run_in_container, NESTED_IMAGE_NAME
+from ray._private.test_utils import (
+    wait_for_condition,
+    check_logs_by_keyword,
+)
 
 
 # NOTE(zcin): The actual test code are in python scripts under
@@ -232,6 +236,90 @@ class TestContainerRuntimeEnvWithOtherRuntimeEnv:
             @ray.remote(runtime_env=runtime_env)
             def f():
                 return ray.put((1, 10))
+
+
+@ray.remote
+class Counter(object):
+    def __init__(self):
+        self.value = 0
+        ray.put(self.value)
+
+    def increment(self):
+        self.value += 1
+        return self.value
+
+
+@pytest.mark.parametrize("api_version", ["container"])
+class TestContainerRuntimeEnvCommandLine:
+    def test_container_mount_path_deduplication(self, api_version, ray_start_regular):
+        runtime_env = {
+            api_version: {
+                "image": "unknown_image",
+                "run_options": [
+                    "-v",
+                    "/home/admin/tmp/.pyenv:/home/admin/.pyenv",
+                    "-v",
+                    "/tmp/fake_dir/:/tmp/fake_dir/",
+                    "fake_command",
+                ],
+            },
+        }
+
+        a = Counter.options(
+            runtime_env=runtime_env,
+        ).remote()
+        try:
+            ray.get(a.increment.remote(), timeout=1)
+        except (ray.exceptions.RuntimeEnvSetupError, ray.exceptions.GetTimeoutError):
+            # ignore the exception because container mode don't work in common
+            # test environments.
+            pass
+        keyword1 = "\-v /home/admin/tmp/.pyenv:/home/admin/.pyenv"
+        keyword2 = "\-v /home/admin/.pyenv:/home/admin/.pyenv"
+        keyword3 = "fake_command"
+        keyword4 = "\-v /tmp/fake_dir/:/tmp/fake_dir/"
+        log_file_pattern = "raylet.err"
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword1, log_file_pattern), timeout=20
+        )
+        # The default mount path used to exist in container
+        # '/home/admin/.pyenv:/home/admin/.pyenv'
+        # Check that the default mount path is replaced with the user-specified source_path
+        wait_for_condition(
+            lambda: not check_logs_by_keyword(keyword2, log_file_pattern), timeout=20
+        )
+        # Check other command wihout mount path also in the container command
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword3, log_file_pattern), timeout=10
+        )
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword4, log_file_pattern), timeout=10
+        )
+
+    def test_container_command_with_py_executable(self, api_version, ray_start_regular):
+        runtime_env = {
+            api_version: {
+                "image": "unknown_image",
+                "py_executable": "/fake/python/bin",
+            },
+        }
+
+        a = Counter.options(
+            runtime_env=runtime_env,
+        ).remote()
+        try:
+            ray.get(a.increment.remote(), timeout=1)
+        except (ray.exceptions.RuntimeEnvSetupError, ray.exceptions.GetTimeoutError):
+            # ignore the exception because container mode don't work in common
+            # test environments.
+            pass
+        # Checkout the worker logs to ensure if the cgroup params is set correctly
+        # in the podman command.
+        keyword = "/fake/python/bin -m ray._private.workers.default_worker"
+        log_file_pattern = "raylet.err"
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword, log_file_pattern), timeout=20
+        )
 
 
 if __name__ == "__main__":

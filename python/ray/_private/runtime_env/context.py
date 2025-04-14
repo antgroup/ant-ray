@@ -4,7 +4,7 @@ import os
 import subprocess
 import shlex
 import sys
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 from ray.util.annotations import DeveloperAPI
 from ray.core.generated.common_pb2 import Language
@@ -14,6 +14,8 @@ from ray._private.utils import (
     try_update_code_search_path,
     try_update_ld_preload,
     try_update_ld_library_path,
+    try_update_container_command,
+    set_java_jar_dirs_to_env_vars,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,6 +37,8 @@ class RuntimeEnvContext:
         job_dir: Optional[str] = None,
         native_libraries: List[Dict[str, str]] = None,
         preload_libraries: List[str] = None,
+        pyenv_folder: Optional[str] = None,
+        container: Optional[Dict[str, Any]] = None,
     ):
         self.command_prefix = command_prefix or []
         self.env_vars = env_vars or {}
@@ -72,6 +76,8 @@ class RuntimeEnvContext:
             "code_search_path": [],
         }
         self.preload_libraries = preload_libraries or []
+        self.pyenv_folder = pyenv_folder
+        self.container = container or {}
 
     def serialize(self) -> str:
         return json.dumps(self.__dict__)
@@ -81,7 +87,7 @@ class RuntimeEnvContext:
         return RuntimeEnvContext(**json.loads(json_string))
 
     def exec_worker(self, passthrough_args: List[str], language: Language):
-        update_envs(self.env_vars)
+        set_java_jar_dirs_to_env_vars(self.java_jars, self)
 
         if language == Language.PYTHON and sys.platform == "win32":
             executable = [self.py_executable]
@@ -130,6 +136,26 @@ class RuntimeEnvContext:
                 f"{self.override_worker_entrypoint}."
             )
             passthrough_args[0] = self.override_worker_entrypoint
+
+        updated_envs = update_envs(self.env_vars)
+
+        # excute worker process in container
+        if "container_command" in self.container:
+            container_command = self.container["container_command"]
+            # try update container command
+            container_command = try_update_container_command(
+                language,
+                container_command,
+                updated_envs,
+                passthrough_args,
+                self.py_executable,
+                self.pyenv_folder,
+            )
+            logger.info(
+                "Exec'ing worker with command: {}".format(" ".join(container_command))
+            )
+            os.execvp(container_command[0], container_command)
+            return
 
         if sys.platform == "win32":
 

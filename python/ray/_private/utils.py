@@ -1866,11 +1866,15 @@ def update_envs(env_vars: Dict[str, str]):
     if not env_vars:
         return
 
+    update_envs = {}
     for key, value in env_vars.items():
         expanded = os.path.expandvars(value)
         # Replace non-existant env vars with an empty string.
         result = re.sub(r"\$\{[A-Z0-9_]+\}", "", expanded)
         os.environ[key] = result
+        update_envs[key] = os.environ[key]
+
+    return update_envs
 
 
 def parse_node_labels_json(
@@ -2076,3 +2080,104 @@ def try_update_ld_library_path(
         all_library_paths += ":"
         all_library_paths += working_dir
     os.environ[runtime_env_constants.LIBRARY_PATH_ENV_NAME] = all_library_paths
+
+
+def try_update_container_command(
+    language: Language,
+    container_command: List[str],
+    updated_envs: Dict[str, str],
+    passthrough_args: List[str],
+    py_executable: str,
+    pyenv_folder: str,
+):
+    updated_envs_list = []
+    for k, v in updated_envs.items():
+        updated_envs_list.append("--env")
+        updated_envs_list.append(k + "=" + v)
+    if runtime_env_constants.CONTAINER_ENV_PLACEHOLDER in container_command:
+        container_placeholder = runtime_env_constants.CONTAINER_ENV_PLACEHOLDER
+        index_to_replace = container_command.index(container_placeholder)
+        container_command = (
+            container_command[:index_to_replace]
+            + updated_envs_list
+            + container_command[index_to_replace + 1 :]
+        )
+
+    if language == Language.PYTHON:
+        passthrough_args.insert(0, py_executable)
+        passthrough_args[1] = "-m ray._private.workers.default_worker"
+    elif language == Language.JAVA:
+        cp_param_index = 0
+        passthrough_args.insert(0, "java")
+        for idx, remaining_arg in enumerate(passthrough_args):
+            if remaining_arg == "-cp":
+                cp_param_index = idx
+                passthrough_args[idx + 1] = passthrough_args[idx + 1].replace(
+                    ".pyenv", pyenv_folder
+                )
+        passthrough_args.insert(
+            cp_param_index, "-DWORKER_SHIM_PID={}".format(os.getpid())
+        )
+    container_command.append(" ".join(passthrough_args))
+    return container_command
+
+
+def get_ray_site_packages_path():
+    """
+    Get ray package site path
+    """
+    ray_path = Path(ray.__path__[0])
+    return str(ray_path.parent.absolute())
+
+
+def get_pyenv_path():
+    # Get the pyenv path automatically instead of hard code.
+    return os.environ.get("PYENV_ROOT", "/home/admin/.pyenv")
+
+
+def get_current_python():
+    """
+    Get current python executable and site package directory.
+    """
+    version_dir = os.path.dirname(os.path.dirname(sys.executable))
+    # The python version format must be `{major}.{minor}`.
+    splited_version = os.path.basename(version_dir).split(".")
+    python_version = ".".join(splited_version[0:2])
+    site_packages_path = os.path.join(
+        version_dir,
+        "lib",
+        "python" + python_version,
+        "site-packages",
+    )
+    return sys.executable, site_packages_path, python_version
+
+
+def get_specify_python(python_version):
+    """
+    Get specified python executable and site package directory.
+    """
+    base_path = os.path.join(get_pyenv_path(), "versions")
+    for version_dir_name in os.listdir(base_path):
+        if version_dir_name.startswith(python_version):
+            return os.path.join(
+                base_path,
+                version_dir_name,
+                "bin",
+                "python",
+            ), os.path.join(
+                base_path,
+                version_dir_name,
+                "lib",
+                "python" + python_version,
+                "site-packages",
+            )
+    return None, None
+
+
+def set_java_jar_dirs_to_env_vars(
+    java_jar_dirs_list: List[str], context: "RuntimeEnvContext"
+):
+    """Insert the path in RAY_JAVA_JARS_DIRS in the runtime env."""
+    java_jar_dirs = ":".join(java_jar_dirs_list)
+    logger.info(f"Setting java jar dirs {java_jar_dirs} to context {context}.")
+    context.env_vars[runtime_env_constants.RAY_JAVA_JARS_DIRS] = java_jar_dirs

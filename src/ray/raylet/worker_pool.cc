@@ -1449,7 +1449,7 @@ void WorkerPool::PopWorker(const TaskSpecification &task_spec,
         }
         return callback(worker, status, runtime_env_setup_error_message);
       });
-  PopWorker(std::move(pop_worker_request), std::move(serialized_allocated_instances));
+  PopWorker(std::move(pop_worker_request), serialized_allocated_instances);
 }
 
 std::shared_ptr<WorkerInterface> WorkerPool::FindAndPopIdleWorker(

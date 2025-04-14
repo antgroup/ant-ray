@@ -53,7 +53,10 @@ from ray.core.generated.instance_manager_pb2 import (
     TerminationRequest,
     LaunchRequest,
 )
-from ray.core.generated.gcs_service_pb2 import CreateOrUpdateVirtualClusterReply
+from ray.core.generated.gcs_service_pb2 import (
+    CreateOrUpdateVirtualClusterReply,
+    RemoveNodesFromVirtualClusterReply,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -1266,6 +1269,11 @@ class Reconciler:
 
         """
 
+        logger.info(
+            f"Start to scale virtual cluster {virtual_cluster_id} "
+            + f"with pending resource requests {ray_state.pending_resource_requests} "
+            + f", and pending gang resource requests {ray_state.pending_gang_resource_requests}"
+        )
         # Get the current instance states.
         im_instances, version = Reconciler._get_im_instances(instance_manager)
         autoscaler_instances = []
@@ -1292,7 +1300,7 @@ class Reconciler:
             max_num_nodes=autoscaling_config.get_max_num_nodes(),
             resource_requests=ray_state.pending_resource_requests,
             gang_resource_requests=ray_state.pending_gang_resource_requests,
-            cluster_resource_constraints=ray_state.cluster_resource_constraints,
+            cluster_resource_constraints=[],
             current_instances=autoscaler_instances,
             idle_timeout_s=autoscaling_config.get_idle_timeout_s(),
             disable_launch_config_check=(
@@ -1320,7 +1328,7 @@ class Reconciler:
 
         # Scale the clusters if needed.
         to_terminate = reply.to_terminate
-        shrinking_nodes = []
+        nodes_to_remove = []
 
         # Buffer terminating requests.
         for terminate_request in to_terminate:
@@ -1328,19 +1336,39 @@ class Reconciler:
                 terminate_request.ray_node_type, []
             )
             node_list.append(terminate_request.ray_node_id)
-            node_set.remove(terminate_request.ray_node_id)
-            shrinking_nodes.append(terminate_request.ray_node_id)
+            nodes_to_remove.append(terminate_request.ray_node_id)
+            node_set.pop(terminate_request.ray_node_id)
 
-        ray_state.nodes = list(node_set)
+        if len(nodes_to_remove) > 0:
+            ray_state.nodes.clear()
+            ray_state.nodes.extend(list(node_set))
+            logger.info(
+                "Removing nodes {} from virtual cluster {}".format(
+                    nodes_to_remove, virtual_cluster_id
+                )
+            )
+            str_reply = gcs_client.remove_nodes_from_virtual_cluster(
+                virtual_cluster_id, nodes_to_remove
+            )
+            logger.info(f"Remove nodes reply: {str_reply}")
 
-        # TODO: shrink a virtual cluster with specified nodes.
-        shrink_virtual_cluster(gcs_client, virtual_cluster_id, shrinking_nodes)
+            remove_nodes_reply = RemoveNodesFromVirtualClusterReply()
+            remove_nodes_reply.ParseFromString(str_reply)
+            if remove_nodes_reply.status.code == 0:
+                # TODO: retry if needed.
+                logger.warning(
+                    "Failed to remove nodes from virtual cluster %s", virtual_cluster_id
+                )
 
         # Buffer launching requests.
-        launch_reqs = buffered_node_pool.launching_nodes.setdefault(
-            virtual_cluster_id, []
-        )
-        launch_reqs.extend(reply.to_launch)
+        if len(reply.to_launch) > 0:
+            launch_reqs = buffered_node_pool.launching_nodes.setdefault(
+                virtual_cluster_id, []
+            )
+            launch_reqs.extend(reply.to_launch)
+            logger.info(
+                f"Adding nodes {reply.to_launch} to virtual cluster {virtual_cluster_id}"
+            )
 
     @staticmethod
     def _scale_primary_cluster(
@@ -1352,6 +1380,7 @@ class Reconciler:
         buffered_node_pool: BufferedNodePool,
         gcs_client: GcsClient,
     ) -> None:
+        logger.info(f"Start to scale the primary cluster")
         # Try satisfying the pending launch requests from the unassigned node.
         for (
             virtual_cluster_id,
@@ -1396,13 +1425,17 @@ class Reconciler:
             for template_id, count in expanding_replica_sets.items():
                 replica_sets[template_id] = replica_sets.get(template_id, 0) + count
 
-            str_reply = gcs_client.update_virtual_cluster(
+            logger.info(
+                f"Updating virtual cluster {virtual_cluster_id} with replica_sets {replica_sets}"
+            )
+            str_reply = gcs_client.create_or_update_virtual_cluster(
                 virtual_cluster_id,
                 ray_state.states[virtual_cluster_id].divisible,
                 replica_sets,
                 ray_state.states[virtual_cluster_id].revision,
             )
             reply = CreateOrUpdateVirtualClusterReply()
+            logger.info(reply)
             reply.ParseFromString(str_reply)
             if reply.status.code == 0:
                 # TODO: retry if needed.
@@ -1414,11 +1447,8 @@ class Reconciler:
         im_instances, version = Reconciler._get_im_instances(instance_manager)
         autoscaler_instances = []
 
-        unassigned_node_set = set()
-        for _, node_list in buffered_node_pool.unassigned_nodes.items():
-            unassigned_node_set.update(node_list)
         for im_instance in im_instances:
-            if im_instance.node_id in unassigned_node_set:
+            if im_instance.node_id in buffered_node_pool.all_node_states:
                 ray_node = buffered_node_pool.all_node_states.get(im_instance.node_id)
                 autoscaler_instances.append(
                     AutoscalerInstance(
@@ -1439,7 +1469,7 @@ class Reconciler:
             max_num_nodes=autoscaling_config.get_max_num_nodes(),
             resource_requests=[],
             gang_resource_requests=[],
-            cluster_resource_constraints=[],
+            cluster_resource_constraints=ray_state.cluster_resource_constraints,
             current_instances=autoscaler_instances,
             idle_timeout_s=autoscaling_config.get_idle_timeout_s(),
             disable_launch_config_check=(
@@ -1467,6 +1497,7 @@ class Reconciler:
             # pending registration even though GCS is up.
             # We will wait until the head node is running and ready to avoid
             # scaling the cluster from min worker nodes constraint.
+            logger.info("Head node is not running.")
             return
 
         if autoscaling_config.provider == Provider.READ_ONLY:
@@ -1475,6 +1506,7 @@ class Reconciler:
 
         # Scale the clusters if needed.
         to_launch = reply.to_launch
+        logger.info(f"{len(to_launch)} new nodes are needed for the primary cluster.")
         to_terminate = reply.to_terminate
         updates = {}
         # Add terminating instances.
@@ -1490,6 +1522,7 @@ class Reconciler:
         # Add new instances.
         for _, launch_requests in buffered_node_pool.launching_nodes.items():
             to_launch.extend(launch_requests)
+        logger.info(f"Launching {len(to_launch)} nodes in total.")
         for launch_request in to_launch:
             for _ in range(launch_request.count):
                 instance_id = InstanceUtil.random_instance_id()

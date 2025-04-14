@@ -30,6 +30,7 @@ void GcsAutoscalerStateManager::HandleGetVirtualClusterResourceStates(
   RAY_CHECK(request.last_seen_cluster_resource_state_version() <=
             last_cluster_resource_state_version_);
 
+  RAY_LOG(INFO) << "Getting virtual cluster resource states";
   auto states = reply->mutable_virtual_cluster_resource_states()->mutable_states();
   auto primary_cluster = gcs_virtual_cluster_manager_->GetPrimaryCluster();
   primary_cluster->ForeachVirtualCluster(
@@ -89,9 +90,13 @@ void GcsAutoscalerStateManager::HandleGetVirtualClusterResourceStates(
 
   rpc::autoscaler::ClusterResourceState cluster_resource_state;
   GetNodeStates(&cluster_resource_state);
+  GetClusterResourceConstraints(&cluster_resource_state);
   reply->mutable_virtual_cluster_resource_states()->mutable_node_states()->Assign(
       cluster_resource_state.node_states().begin(),
       cluster_resource_state.node_states().end());
+  reply->mutable_virtual_cluster_resource_states()
+      ->mutable_cluster_resource_constraints()
+      ->CopyFrom(cluster_resource_state.cluster_resource_constraints());
 
   // We are not using GCS_RPC_SEND_REPLY like other GCS managers to avoid the client
   // having to parse the gcs status code embedded.
@@ -121,6 +126,8 @@ void GcsAutoscalerStateManager::GetVirtualClusterResources(
       req->mutable_resources_bundle()->insert(shape.begin(), shape.end());
     }
   }
+
+  // TODO: add pending resource requests.
 }
 
 }  // namespace gcs

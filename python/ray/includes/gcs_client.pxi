@@ -564,6 +564,21 @@ cdef class InnerGcsClient:
 
         return serialized_reply
 
+    def remove_nodes_from_virtual_cluster(
+            self,
+            virtual_cluster_id: c_string,
+            nodes_to_remove: c_vector[c_string],
+            timeout_s=None):
+        cdef:
+            int64_t timeout_ms = round(1000 * timeout_s) if timeout_s else -1
+            c_string serialized_reply
+        with nogil:
+            check_status_timeout_as_rpc_error(self.inner.get().VirtualCluster().SyncRemoveNodesFromVirtualCluster(
+                virtual_cluster_id, nodes_to_remove, timeout_ms, serialized_reply))
+
+        return serialized_reply
+
+
     def get_cluster_status(
             self,
             timeout_s=None):

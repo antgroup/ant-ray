@@ -184,6 +184,8 @@ class Autoscaler:
                 ray_resource_state = get_virtual_cluster_resource_states(
                     self._gcs_client
                 )
+                logger.info("Received virtual cluster resource states")
+                logger.info(ray_resource_state)
             else:
                 ray_resource_state = get_cluster_resource_state(self._gcs_client)
 

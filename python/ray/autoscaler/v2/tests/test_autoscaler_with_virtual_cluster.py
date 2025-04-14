@@ -2,13 +2,19 @@ import logging
 import os
 import subprocess
 import sys
+import tempfile
 import time
 from unittest.mock import MagicMock
 
 import pytest
 
 import ray
-from ray._private.test_utils import wait_for_condition
+from ray._private.ray_constants import DEFAULT_DASHBOARD_AGENT_LISTEN_PORT
+from ray._private.test_utils import (
+    format_web_url,
+    wait_for_condition,
+    wait_until_server_available,
+)
 from ray._raylet import GcsClient
 from ray.autoscaler._private.fake_multi_node.node_provider import FAKE_HEAD_NODE_ID
 from ray.autoscaler.v2.autoscaler import Autoscaler
@@ -17,6 +23,10 @@ from ray.autoscaler.v2.instance_manager.config import AutoscalingConfig
 from ray.autoscaler.v2.sdk import get_cluster_status, request_cluster_resources
 from ray.autoscaler.v2.tests.util import MockEventLogger
 from ray.cluster_utils import Cluster
+from ray.job_submission import JobStatus, JobSubmissionClient
+
+import requests
+from typing import Dict
 
 logger = logging.getLogger(__name__)
 
@@ -34,25 +44,17 @@ DEFAULT_AUTOSCALING_CONFIG = {
             "max_workers": 0,
             "node_config": {},
         },
-        "ray.worker.group1": {
-            "resources": {
-                "CPU": 4,
-                "memory": 8 * 1024**3
-            },
+        "1c2g": {
+            "resources": {"CPU": 1},
             "min_workers": 0,
             "max_workers": 10,
             "node_config": {},
-            "ray_node_type": "4c8g"
         },
-        "ray.worker.group2": {
-            "resources": {
-                "CPU": 8,
-                "memory": 16 * 1024**3
-            },
+        "2c4g": {
+            "resources": {"CPU": 2},
             "min_workers": 0,
             "max_workers": 10,
             "node_config": {},
-            "ray_node_type": "8c16g"
         },
     },
     "head_node_type": "ray.head.default",
@@ -108,15 +110,11 @@ def make_autoscaler():
         return autoscaler, cluster
 
     yield _make_autoscaler
-    try:
-        ray.shutdown()
-        ctx["cluster"].shutdown()
-    except Exception:
-        logger.exception("Error during teardown")
-        # Run ray stop to clean up everything
-        subprocess.run(
-            ["ray", "stop", "--force"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+
+    # Run ray stop to clean up everything
+    subprocess.run(
+        ["ray", "stop", "--force"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
 
 
 def test_basic_scaling(make_autoscaler):
@@ -125,26 +123,8 @@ def test_basic_scaling(make_autoscaler):
     gcs_address = autoscaler._gcs_client.address
 
     # Resource requests
-    print("=================== Test scaling up constraint 1/2====================")
-    request_cluster_resources(gcs_address, [{"CPU": 4}])
-
-    def verify():
-        autoscaler.update_autoscaling_state()
-        cluster_state = get_cluster_status(gcs_address)
-        assert len(cluster_state.active_nodes + cluster_state.idle_nodes) == 2
-        return True
-
-    wait_for_condition(verify, retry_interval_ms=2000)
-
-    # Test scaling up again with tasks
-    print("=================== Test scaling up with tasks ====================")
-
-    @ray.remote
-    def task():
-        time.sleep(999)
-
-    task.options(num_cpus=1).remote()
-    task.options(num_cpus=0, num_gpus=1).remote()
+    print("=================== Test scaling up constraint ====================")
+    request_cluster_resources(gcs_address, [{"CPU": 1}, {"CPU": 2}])
 
     def verify():
         autoscaler.update_autoscaling_state()
@@ -153,6 +133,99 @@ def test_basic_scaling(make_autoscaler):
         return True
 
     wait_for_condition(verify, retry_interval_ms=2000)
+
+    print("=================== Create a virtual cluster ====================")
+    ip, _ = cluster.webui_url.split(":")
+    agent_address = f"{ip}:{DEFAULT_DASHBOARD_AGENT_LISTEN_PORT}"
+    assert wait_until_server_available(agent_address)
+    assert wait_until_server_available(cluster.webui_url)
+    webui_url = cluster.webui_url
+    webui_url = format_web_url(webui_url)
+
+    resp = requests.post(
+        webui_url + "/virtual_clusters",
+        json={
+            "virtualClusterId": "virtual_cluster_1",
+            "divisible": False,
+            "replicaSets": {"1c2g": 1},
+            "revision": 0,
+        },
+        timeout=10,
+    )
+    result = resp.json()
+    print(result)
+    assert result["result"]
+
+    client = JobSubmissionClient(webui_url)
+    temp_dir = None
+    file_path = None
+
+    try:
+        # Create a temporary directory
+        temp_dir = tempfile.mkdtemp()
+
+        # Define driver: create two actors, requiring 4 cpus each.
+        driver_content = """
+import ray
+import time
+
+@ray.remote
+class SmallActor():
+    def __init__(self):
+        pass
+
+actors = []
+for _ in range(1):
+    actors.append(SmallActor.options(num_cpus=2).remote())
+time.sleep(600)
+        """
+
+        # Create a temporary Python file.
+        file_path = os.path.join(temp_dir, "test_driver.py")
+
+        with open(file_path, "w") as file:
+            file.write(driver_content)
+
+        absolute_path = os.path.abspath(file_path)
+
+        # Submit the job to the virtual cluster.
+        job = client.submit_job(
+            entrypoint=f"python {absolute_path}",
+            virtual_cluster_id="virtual_cluster_1",
+        )
+
+        def check_job_running():
+            status = client.get_job_status(job)
+            return status == JobStatus.RUNNING
+
+        wait_for_condition(check_job_running)
+
+        def check_actors(expected_states: Dict[str, int]):
+            autoscaler.update_autoscaling_state()
+            actors = ray._private.state.actors()
+            logger.info(actors)
+            actor_states = {}
+            for _, actor in actors.items():
+                if actor["ActorClassName"] == "SmallActor":
+                    actor_states[actor["State"]] = (
+                        actor_states.get(actor["State"], 0) + 1
+                    )
+            if actor_states == expected_states:
+                cluster_state = get_cluster_status(gcs_address)
+                logger.info(cluster_state)
+                assert len(cluster_state.active_nodes + cluster_state.idle_nodes) == 4
+                return True
+            return False
+
+        wait_for_condition(
+            check_actors, retry_interval_ms=2000, expected_states={"ALIVE": 1}
+        )
+
+    finally:
+        if file_path:
+            os.remove(file_path)
+        if temp_dir:
+            os.rmdir(temp_dir)
 
 
 if __name__ == "__main__":

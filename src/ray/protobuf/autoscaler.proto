@@ -208,10 +208,6 @@ message VirtualClusterState {
   repeated ResourceRequestByCount pending_resource_requests = 5;
   // Gang resource requests pending scheduling.
   repeated GangResourceRequest pending_gang_resource_requests = 6;
-  // Cluster resource constraints.
-  // There could be multiple constraints issued by different
-  // jobs. Autoscaler to make sure all constraints are satisfied.
-  repeated ClusterResourceConstraint cluster_resource_constraints = 7;
 }
 
 message VirtualClusterResourceStates {
@@ -223,7 +219,12 @@ message VirtualClusterResourceStates {
   repeated NodeState node_states = 3;
   // The cluster session name.
   string cluster_session_name = 4;
-  map<string, VirtualClusterState> states = 5;
+  // Cluster resource constraints.
+  // There could be multiple constraints issued by different
+  // jobs. Autoscaler to make sure all constraints are satisfied.
+  repeated ClusterResourceConstraint cluster_resource_constraints = 5;
+  // The state of every virtual cluster.
+  map<string, VirtualClusterState> states = 6;
 }
 
 message GetVirtualClusterResourceStatesReply {

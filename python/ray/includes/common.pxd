@@ -594,6 +594,13 @@ cdef extern from "ray/gcs/gcs_client/accessor.h" nogil:
             const c_string &serialized_reply
         )
 
+        CRayStatus SyncRemoveNodesFromVirtualCluster(
+            const c_string &virtual_cluster_id,
+            const c_vector[c_string] &nodes_to_remove,
+            int64_t timeout_ms,
+            const c_string &serialized_reply
+        )
+
 
 cdef extern from "ray/gcs/gcs_client/gcs_client.h" nogil:
     cdef enum CGrpcStatusCode "grpc::StatusCode":

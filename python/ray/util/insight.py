@@ -98,7 +98,8 @@ class _ray_internal_insight_monitor:
         self.flow_record = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         self.start_time_record = defaultdict(lambda: defaultdict(dict))
         self.debugger_info = defaultdict(lambda: defaultdict(dict))
-        self.debug_sessions = {}
+        self.debug_sessions = defaultdict(dict)
+        self.breakpoints = defaultdict(lambda: defaultdict(list))
         # Data flow tracking
         self.data_flows = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
         self.object_events = defaultdict(lambda: defaultdict())
@@ -148,10 +149,18 @@ class _ray_internal_insight_monitor:
         self.app.router.add_post("/emit-caller-info", self.handle_emit_caller_info)
 
         self.app.router.add_post("/get_debug_sessions", self.handle_get_debug_sessions)
-        self.app.router.add_post("/activate_debug_session", self.handle_activate_debug_session)
-        self.app.router.add_get("/get_active_debug_sessions", self.handle_get_active_debug_sessions)
+        self.app.router.add_post(
+            "/activate_debug_session", self.handle_activate_debug_session
+        )
+        self.app.router.add_get(
+            "/get_active_debug_sessions", self.handle_get_active_debug_sessions
+        )
         self.app.router.add_post("/debug_cmd", self.handle_debug_cmd)
-        self.app.router.add_post("/deactivate_debug_session", self.handle_deactivate_debug_session)
+        self.app.router.add_post(
+            "/deactivate_debug_session", self.handle_deactivate_debug_session
+        )
+        self.app.router.add_post("/get_breakpoints", self.handle_get_breakpoints)
+        self.app.router.add_post("/set_breakpoints", self.handle_set_breakpoints)
 
         self.runner = None
         self.site = None
@@ -188,77 +197,119 @@ class _ray_internal_insight_monitor:
         """Handle HTTP request for activating debug sessions."""
         data = await request.json()
         job_id = data.get("job_id", "default_job")
-        class_name = data.get("class_name", "")
-        func_name = data.get("func_name", "")
+        class_name = data.get("class_name", None)
+        func_name = data.get("func_name", None)
+        filter_active = data.get("filter_active", False)
+        if class_name is None and func_name is None:
+            ret = []
+            for (class_name, func_name), task_ids in self.debugger_info[job_id].items():
+                for task_id in task_ids:
+                    if filter_active and task_id not in self.debug_sessions[job_id]:
+                        continue
+                    ret.append(
+                        {
+                            "class_name": class_name,
+                            "func_name": func_name,
+                            "task_id": task_id,
+                        }
+                    )
+            return aiohttp.web.json_response(ret)
         ret = []
-        for task_id, _ in self.debugger_info[job_id][(class_name, func_name)].items():
-            ret.append({
-                "class_name": class_name,
-                "func_name": func_name,
-                "task_id": task_id,
-            })
+        for task_id in self.debugger_info[job_id][(class_name, func_name)]:
+            ret.append(
+                {
+                    "class_name": class_name,
+                    "func_name": func_name,
+                    "task_id": task_id,
+                }
+            )
         return aiohttp.web.json_response(ret)
+
+    async def handle_get_breakpoints(self, request):
+        """Handle HTTP request for getting breakpoints."""
+        data = await request.json()
+        job_id = data.get("job_id", "default_job")
+        task_id = data.get("task_id", "")
+        return aiohttp.web.json_response(self.breakpoints[job_id][task_id])
+
+    async def handle_set_breakpoints(self, request):
+        """Handle HTTP request for setting breakpoints."""
+        data = await request.json()
+        job_id = data.get("job_id", "default_job")
+        task_id = data.get("task_id", "")
+        breakpoints = data.get("breakpoints", [])
+        self.breakpoints[job_id][task_id] = breakpoints
+        return aiohttp.web.json_response({"status": "success"})
 
     async def handle_activate_debug_session(self, request):
         """Handle HTTP request for activating debug sessions."""
         data = await request.json()
         job_id = data.get("job_id", "default_job")
-        class_name = data.get("class_name", "")
-        func_name = data.get("func_name", "")
+        class_name = data.get("class_name", None)
+        func_name = data.get("func_name", None)
         task_id = data.get("task_id", "")
         host, port = self.debugger_info[job_id][(class_name, func_name)][task_id]
         dap = DAPClient(host, port)
         await dap.connect()
         await dap.initialize()
         await dap.attach()
-        self.debug_sessions[task_id] = dap
+        self.debug_sessions[job_id][task_id] = dap
         return aiohttp.web.json_response({"status": "success"})
 
     async def handle_debug_cmd(self, request):
         """Handle HTTP request for sending debug commands."""
         data = await request.json()
+        job_id = data.get("job_id", "default_job")
         task_id = data.get("task_id", "")
         args = data.get("args", "")
-        dap = self.debug_sessions[task_id]
+        dap = self.debug_sessions[job_id][task_id]
         result = None
         if data.get("command", "") == "continue":
             await dap.continue_execution()
+        elif data.get("command", "") == "pause":
+            await dap.pause(args.get("thread_id", 0))
         elif data.get("command", "") == "step_over":
             await dap.step_over(args.get("thread_id", 0))
         elif data.get("command", "") == "step_into":
-            await dap.step_into(args.get("thread_id", 0))
+            await dap.step_in(args.get("thread_id", 0))
         elif data.get("command", "") == "step_out":
             await dap.step_out(args.get("thread_id", 0))
-        elif data.get("command", "") == "pause":
-            await dap.pause(args.get("thread_id", 0))
         elif data.get("command", "") == "get_threads":
             result = await dap.get_threads()
         elif data.get("command", "") == "get_stack_trace":
             result = await dap.get_stack_trace(args.get("thread_id", 0))
-        elif data.get("command", "") == "set_breakpoint":
-            result = await dap.set_breakpoint(args.get("source", {}), args.get("line", 0))
+        elif data.get("command", "") == "set_breakpoints":
+            result = await dap.set_breakpoints(
+                args.get("source", {}), args.get("lines", [])
+            )
         elif data.get("command", "") == "get_scopes":
             result = await dap.get_scopes(args.get("frame_id", 0))
         elif data.get("command", "") == "evaluate":
-            result = await dap.evaluate(args.get("expression", ""), args.get("frame_id", 0), args.get("thread_id", 0))
+            result = await dap.evaluate(
+                args.get("expression", ""),
+                args.get("frame_id", 0),
+                args.get("thread_id", 0),
+            )
         else:
             result = {"status": "error", "message": "Invalid command"}
-            
+
         return aiohttp.web.json_response({"status": "success", "result": result})
 
     async def handle_deactivate_debug_session(self, request):
         """Handle HTTP request for deactivating debug sessions."""
         data = await request.json()
+        job_id = data.get("job_id", "default_job")
         task_id = data.get("task_id", "")
-        dap = self.debug_sessions[task_id]
+        dap = self.debug_sessions[job_id][task_id]
         await dap.disconnect_request()
         await dap.disconnect()
-        del self.debug_sessions[task_id]
+        del self.debug_sessions[job_id][task_id]
         return aiohttp.web.json_response({"status": "success"})
 
     async def handle_get_active_debug_sessions(self, request):
         """Handle HTTP request for getting active debug sessions."""
-        return aiohttp.web.json_response(list(self.debug_sessions.keys()))
+        job_id = request.query.get("job_id", "default_job")
+        return aiohttp.web.json_response(list(self.debug_sessions[job_id].keys()))
 
     async def handle_get_call_graph_data(self, request):
         """Handle HTTP request for call graph data."""
@@ -656,7 +707,6 @@ class _ray_internal_insight_monitor:
         if current_task_id in self.debugger_info[job_id][node_id]:
             self.debugger_info[job_id][node_id].pop(current_task_id)
 
-
         caller_infos = self.caller_info[job_id][current_task_id]
         for caller_info in caller_infos:
             self.flow_record[job_id][node_id][
@@ -683,10 +733,14 @@ class _ray_internal_insight_monitor:
         """Record caller info."""
         job_id = caller_info["job_id"]
         current_task_id = caller_info["current_task_id"]
-        self.debugger_info[job_id][(caller_info["callee_class"], caller_info["callee_func"])][current_task_id] = (
-            caller_info["debugger_host"],
-            caller_info["debugger_port"],
-        )
+        visual_debug = caller_info["visual_debug"]
+        if visual_debug:
+            self.debugger_info[job_id][
+                (caller_info["callee_class"], caller_info["callee_func"])
+            ][current_task_id] = (
+                caller_info["debugger_host"],
+                caller_info["debugger_port"],
+            )
         self.caller_info[job_id][current_task_id].append(
             {
                 "class": caller_info["caller_class"],
@@ -830,6 +884,13 @@ def _get_caller_class():
         pass
 
     return caller_class
+
+
+def is_visual_debug_enabled():
+    """
+    Check if visual debug is enabled.
+    """
+    return os.environ.get("RAY_VISUAL_DEBUG", "0") == "1"
 
 
 def is_flow_insight_enabled():
@@ -1264,7 +1325,8 @@ def report_trace_info(caller_info):
     if not need_record(current_class):
         return
 
-    ray.util.debugpy._ensure_debugger_port_open_thread_safe()
+    if is_visual_debug_enabled():
+        ray.util.debugpy._ensure_debugger_port_open_thread_safe()
 
     debugger_port = ray._private.worker.global_worker.debugger_port
     debugger_host = ray._private.worker.global_worker.node_ip_address
@@ -1280,6 +1342,7 @@ def report_trace_info(caller_info):
         "current_task_id": current_task_id,
         "debugger_port": debugger_port,
         "debugger_host": debugger_host,
+        "visual_debug": is_visual_debug_enabled(),
     }
 
     emit_request("emit-caller-info", trace_info)

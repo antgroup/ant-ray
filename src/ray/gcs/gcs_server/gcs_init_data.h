@@ -61,14 +61,14 @@ class GcsInitData {
   }
 
   /// Get placement group metadata.
-  const absl::flat_hash_map<PlacementGroupID, rpc::PlacementGroupTableData> &
-  PlacementGroups() const {
+  const absl::flat_hash_map<PlacementGroupID, rpc::PlacementGroupTableData>
+      &PlacementGroups() const {
     return placement_group_table_data_;
   }
 
   /// Get virtual cluster metadata.
-  const absl::flat_hash_map<VirtualClusterID, rpc::VirtualClusterTableData> &
-  VirtualClusters() const {
+  const absl::flat_hash_map<VirtualClusterID, rpc::VirtualClusterTableData>
+      &VirtualClusters() const {
     return virtual_cluster_table_data_;
   }
 

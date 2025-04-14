@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ray.util.state.common.WorkerState &#8212; Ray 3.0.0.dev0</title>
+    <title>ray.runtime_env.RuntimeEnv.serialize_combined &#8212; Ray 3.0.0.dev0</title>
   
   
   
@@ -58,18 +58,18 @@
     <script defer="defer" src="../../../_static/docsearch.js?v=77274085"></script>
     <script defer="defer" src="../../../_static/docsearch_config.js?v=d25523ed"></script>
     <script src="../../../_static/design-tabs.js?v=36754332"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'ray-observability/reference/doc/ray.util.state.common.WorkerState';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'ray-core/api/doc/ray.runtime_env.RuntimeEnv.serialize_combined';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://antgroup.github.io/ant-ray/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
-    <link rel="canonical" href="https://docs.ray.io/en/latest/ray-observability/reference/doc/ray.util.state.common.WorkerState.html" />
+    <link rel="canonical" href="https://docs.ray.io/en/latest/ray-core/api/doc/ray.runtime_env.RuntimeEnv.serialize_combined.html" />
     <link rel="icon" href="../../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="next" title="ray.util.state.common.ObjectState" href="ray.util.state.common.ObjectState.html" />
-    <link rel="prev" title="ray.util.state.common.PlacementGroupState" href="ray.util.state.common.PlacementGroupState.html" /><!-- Extra header to include at the top of each template.
+    <link rel="next" title="ray.runtime_env.RuntimeEnv.setdefault" href="ray.runtime_env.RuntimeEnv.setdefault.html" />
+    <link rel="prev" title="ray.runtime_env.RuntimeEnv.popitem" href="ray.runtime_env.RuntimeEnv.popitem.html" /><!-- Extra header to include at the top of each template.
 Kept separately so that it can easily be included in any templates
 that need to be overridden for individual pages; e.g. included
 both in the usual template (layout.html) as well as (index.html). -->
@@ -242,7 +242,7 @@ both in the usual template (layout.html) as well as (index.html). -->
 <div class="navbar-dropdown docutils container">
 <ul class="navbar-sublevel">
 <li><div class="ref-container docutils container">
-<p><a class="reference internal" href="../../../ray-core/walkthrough.html" title="Ray Core"><span class="navbar-link-title">Ray Core</span>Scale general Python applications</a></p>
+<p><a class="reference internal" href="../../walkthrough.html" title="Ray Core"><span class="navbar-link-title">Ray Core</span>Scale general Python applications</a></p>
 </div>
 </li>
 <li><div class="ref-container docutils container">
@@ -415,7 +415,7 @@ document.write(`
 <div class="navbar-dropdown docutils container">
 <ul class="navbar-sublevel">
 <li><div class="ref-container docutils container">
-<p><a class="reference internal" href="../../../ray-core/walkthrough.html" title="Ray Core"><span class="navbar-link-title">Ray Core</span>Scale general Python applications</a></p>
+<p><a class="reference internal" href="../../walkthrough.html" title="Ray Core"><span class="navbar-link-title">Ray Core</span>Scale general Python applications</a></p>
 </div>
 </li>
 <li><div class="ref-container docutils container">
@@ -544,116 +544,116 @@ document.write(`
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ray-overview/examples.html">Example Gallery</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ray-overview/ray-libraries.html">Ecosystem</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../ray-core/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/tasks/generators.html">Dynamic generators</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../key-concepts.html">Key Concepts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tasks/nested-tasks.html">Nested Remote Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tasks/generators.html">Dynamic generators</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/named-actors.html">Named Actors</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/terminating-actors.html">Terminating Actors</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/async_api.html">AsyncIO / Concurrency for Actors</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/concurrency_group_api.html">Limiting Concurrency Per-Method with Concurrency Groups</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/actor-utils.html">Utility Classes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/out-of-band-communication.html">Out-of-band Communication</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/task-orders.html">Actor Task Execution Order</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../actors/named-actors.html">Named Actors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../actors/terminating-actors.html">Terminating Actors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../actors/async_api.html">AsyncIO / Concurrency for Actors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../actors/concurrency_group_api.html">Limiting Concurrency Per-Method with Concurrency Groups</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../actors/actor-utils.html">Utility Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../actors/out-of-band-communication.html">Out-of-band Communication</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../actors/task-orders.html">Actor Task Execution Order</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/objects/serialization.html">Serialization</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/objects/object-spilling.html">Object Spilling</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../objects/serialization.html">Serialization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../objects/object-spilling.html">Object Spilling</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/handling-dependencies.html">Environment Dependencies</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/scheduling/resources.html">Resources</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/scheduling/accelerators.html">Accelerator Support</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/scheduling/placement-group.html">Placement Groups</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/scheduling/memory-management.html">Memory Management</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/scheduling/ray-oom-prevention.html">Out-Of-Memory Prevention</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../handling-dependencies.html">Environment Dependencies</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../scheduling/resources.html">Resources</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../scheduling/accelerators.html">Accelerator Support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../scheduling/placement-group.html">Placement Groups</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../scheduling/memory-management.html">Memory Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../scheduling/ray-oom-prevention.html">Out-Of-Memory Prevention</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/fault-tolerance.html">Fault Tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/tasks.html">Task Fault Tolerance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/actors.html">Actor Fault Tolerance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/nodes.html">Node Fault Tolerance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/gcs.html">GCS Fault Tolerance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../fault-tolerance.html">Fault Tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../fault_tolerance/tasks.html">Task Fault Tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../fault_tolerance/actors.html">Actor Fault Tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../fault_tolerance/objects.html">Object Fault Tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../fault_tolerance/nodes.html">Node Fault Tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../fault_tolerance/gcs.html">GCS Fault Tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/nested-tasks.html">Pattern: Using nested tasks to achieve nested parallelism</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/generators.html">Pattern: Using generators to reduce heap memory usage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/limit-pending-tasks.html">Pattern: Using ray.wait to limit the number of pending tasks</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/limit-running-tasks.html">Pattern: Using resources to limit the number of concurrently running tasks</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/concurrent-operations-async-actor.html">Pattern: Using asyncio to run actor methods concurrently</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/actor-sync.html">Pattern: Using an actor to synchronize other tasks and actors</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/tree-of-actors.html">Pattern: Using a supervisor actor to manage a tree of actors</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/pipelining.html">Pattern: Using pipelining to increase throughput</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/return-ray-put.html">Anti-pattern: Returning ray.put() ObjectRefs from a task harms performance and fault tolerance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/ray-get-loop.html">Anti-pattern: Calling ray.get in a loop harms parallelism</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/unnecessary-ray-get.html">Anti-pattern: Calling ray.get unnecessarily harms performance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/ray-get-submission-order.html">Anti-pattern: Processing results in submission order using ray.get increases runtime</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/ray-get-too-many-objects.html">Anti-pattern: Fetching too many objects at once with ray.get causes failure</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/too-fine-grained-tasks.html">Anti-pattern: Over-parallelizing with too fine-grained tasks harms speedup</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/redefine-task-actor-loop.html">Anti-pattern: Redefining the same remote function or class harms performance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/pass-large-arg-by-value.html">Anti-pattern: Passing the same large argument by value repeatedly harms performance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/closure-capture-large-objects.html">Anti-pattern: Closure capturing large objects harms performance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/global-variables.html">Anti-pattern: Using global variables to share state between tasks and actors</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/out-of-band-object-ref-serialization.html">Anti-pattern: Serialize ray.ObjectRef out of band</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/nested-tasks.html">Pattern: Using nested tasks to achieve nested parallelism</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/generators.html">Pattern: Using generators to reduce heap memory usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/limit-pending-tasks.html">Pattern: Using ray.wait to limit the number of pending tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/limit-running-tasks.html">Pattern: Using resources to limit the number of concurrently running tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/concurrent-operations-async-actor.html">Pattern: Using asyncio to run actor methods concurrently</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/actor-sync.html">Pattern: Using an actor to synchronize other tasks and actors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/tree-of-actors.html">Pattern: Using a supervisor actor to manage a tree of actors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/pipelining.html">Pattern: Using pipelining to increase throughput</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/return-ray-put.html">Anti-pattern: Returning ray.put() ObjectRefs from a task harms performance and fault tolerance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/ray-get-loop.html">Anti-pattern: Calling ray.get in a loop harms parallelism</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/unnecessary-ray-get.html">Anti-pattern: Calling ray.get unnecessarily harms performance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/ray-get-submission-order.html">Anti-pattern: Processing results in submission order using ray.get increases runtime</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/ray-get-too-many-objects.html">Anti-pattern: Fetching too many objects at once with ray.get causes failure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/too-fine-grained-tasks.html">Anti-pattern: Over-parallelizing with too fine-grained tasks harms speedup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/redefine-task-actor-loop.html">Anti-pattern: Redefining the same remote function or class harms performance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/pass-large-arg-by-value.html">Anti-pattern: Passing the same large argument by value repeatedly harms performance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/closure-capture-large-objects.html">Anti-pattern: Closure capturing large objects harms performance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/global-variables.html">Anti-pattern: Using global variables to share state between tasks and actors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/out-of-band-object-ref-serialization.html">Anti-pattern: Serialize ray.ObjectRef out of band</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/troubleshooting.html">Troubleshooting</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../compiled-graph/quickstart.html">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../compiled-graph/profiling.html">Profiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../compiled-graph/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/tips-for-first-time.html">Tips for first-time users</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/starting-ray.html">Starting Ray</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/ray-generator.html">Ray Generators</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/namespaces.html">Using Namespaces</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/cross-language.html">Cross-Language Programming</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/using-ray-with-jupyter.html">Working with Jupyter Notebooks &amp; JupyterLab</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/ray-dag.html">Lazy Computation Graphs with the Ray DAG API</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/miscellaneous.html">Miscellaneous Topics</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/runtime_env_auth.html">Authenticating Remote URIs in runtime_env</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/user-spawn-processes.html">Lifetimes of a User-Spawn Process</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tips-for-first-time.html">Tips for first-time users</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../starting-ray.html">Starting Ray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../ray-generator.html">Ray Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../namespaces.html">Using Namespaces</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cross-language.html">Cross-Language Programming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../using-ray-with-jupyter.html">Working with Jupyter Notebooks &amp; JupyterLab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../ray-dag.html">Lazy Computation Graphs with the Ray DAG API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../miscellaneous.html">Miscellaneous Topics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../runtime_env_auth.html">Authenticating Remote URIs in runtime_env</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../user-spawn-processes.html">Lifetimes of a User-Spawn Process</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/automl_for_time_series.html">Simple AutoML for time series with Ray Core</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/automl_for_time_series.html">Simple AutoML for time series with Ray Core</a></li>
 
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/batch_prediction.html">Batch Prediction with Ray Core</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/gentle_walkthrough.html">A Gentle Introduction to Ray Core by Example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/highly_parallel.html">Using Ray for Highly Parallelizable Tasks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/map_reduce.html">A Simple MapReduce Example with Ray Core</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/monte_carlo_pi.html">Monte Carlo Estimation of π</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/plot_hyperparameter.html">Simple Parallel Model Selection</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/plot_parameter_server.html">Parameter Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/plot_pong_example.html">Learning to Play Pong</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/web-crawler.html">Speed up your web crawler by parallelizing it with Ray</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/batch_prediction.html">Batch Prediction with Ray Core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/gentle_walkthrough.html">A Gentle Introduction to Ray Core by Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/highly_parallel.html">Using Ray for Highly Parallelizable Tasks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/map_reduce.html">A Simple MapReduce Example with Ray Core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/monte_carlo_pi.html">Monte Carlo Estimation of π</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/plot_hyperparameter.html">Simple Parallel Model Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/plot_parameter_server.html">Parameter Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/plot_pong_example.html">Learning to Play Pong</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/web-crawler.html">Speed up your web crawler by parallelizing it with Ray</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/api/core.html">Core API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/api/scheduling.html">Scheduling API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/api/runtime-env.html">Runtime Env API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/api/utility.html">Utility</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/api/exceptions.html">Exceptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../ray-core/api/cli.html">Ray Core CLI</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../cli.html">State CLI</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api.html">State API</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../core.html">Core API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../scheduling.html">Scheduling API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../runtime-env.html">Runtime Env API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utility.html">Utility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../exceptions.html">Exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cli.html">Ray Core CLI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/cli.html">State CLI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/api.html">State API</a></li>
 </ul>
 </li>
 </ul>
@@ -1281,38 +1281,38 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../getting-started.html">Ray Dashboard</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/getting-started.html">Ray Dashboard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
-<li class="toctree-l2"><a class="reference internal" href="../../key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../user-guides/debug-apps/debug-failures.html">Debugging Failures</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../user-guides/debug-apps/optimize-performance.html">Optimizing Performance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/key-concepts.html">Key Concepts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-failures.html">Debugging Failures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/optimize-performance.html">Optimizing Performance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
-<li class="toctree-l4"><a class="reference internal" href="../../user-guides/debug-apps/ray-debugging.html">Using the Ray Debugger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/ray-debugging.html">Using the Ray Debugger</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../user-guides/cli-sdk.html">Monitoring with the CLI or SDK</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../user-guides/configure-logging.html">Configuring Logging</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../user-guides/profiling.html">Profiling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../user-guides/add-app-metrics.html">Adding Application-Level Metrics</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../user-guides/ray-tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/user-guides/cli-sdk.html">Monitoring with the CLI or SDK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/user-guides/configure-logging.html">Configuring Logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/user-guides/profiling.html">Profiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/user-guides/add-app-metrics.html">Adding Application-Level Metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/user-guides/ray-tracing.html">Tracing</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api.html">State API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../cli.html">State CLI</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../system-metrics.html">System Metrics</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/api.html">State API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/cli.html">State CLI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-observability/reference/system-metrics.html">System Metrics</a></li>
 </ul>
 </li>
 </ul>
@@ -1332,7 +1332,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-contribute/profiling.html">Profiling for Ray Developers</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../ray-core/configure.html">Configuring Ray</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configure.html">Configuring Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-contribute/whitepaper.html">Architecture Whitepapers</a></li>
 </ul>
 </li>
@@ -1378,15 +1378,15 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../../../ray-core/walkthrough.html" class="nav-link">What’s Ray Core?</a></li>
+    <li class="breadcrumb-item"><a href="../../walkthrough.html" class="nav-link">What’s Ray Core?</a></li>
     
     
     <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
     
     
-    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">State API</a></li>
+    <li class="breadcrumb-item"><a href="ray.runtime_env.RuntimeEnv.html" class="nav-link">ray.runtime_env.RuntimeEnv</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">ray.util.sta...</li>
+    <li class="breadcrumb-item active" aria-current="page">ray.runtime_...</li>
   </ul>
 </nav>
 </div>
@@ -1403,143 +1403,26 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="ray-util-state-common-workerstate">
-<h1>ray.util.state.common.WorkerState<a class="headerlink" href="#ray-util-state-common-workerstate" title="Link to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ray.util.state.common.</span></span><span class="sig-name descname"><span class="pre">WorkerState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">worker_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_alive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">worker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'WORKER'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'DRIVER'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'SPILL_WORKER'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'RESTORE_WORKER'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exit_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'SYSTEM_ERROR'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'INTENDED_SYSTEM_EXIT'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'USER_ERROR'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'INTENDED_USER_EXIT'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'NODE_OUT_OF_MEMORY'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">exit_detail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">worker_launch_time_ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">worker_launched_time_ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time_ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time_ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugger_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_paused_threads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/ray/util/state/common.html#WorkerState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ray.util.state.common.WorkerState" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">StateSchema</span></code></p>
-<p>Worker State</p>
-<p>Below columns can be used for the <code class="code docutils literal notranslate"><span class="pre">--filter</span></code> option.</p>
-<blockquote>
-<div><p>ip</p>
-<p>is_alive</p>
-<p>pid</p>
-<p>worker_type</p>
-<p>exit_type</p>
-<p>debugger_port</p>
-<p>num_paused_threads</p>
-<p>node_id</p>
-<p>worker_id</p>
-</div></blockquote>
-<p>Below columns are available only when <code class="code docutils literal notranslate"><span class="pre">get</span></code> API is used,</p>
-<p><code class="code docutils literal notranslate"><span class="pre">--detail</span></code> is specified through CLI, or <code class="code docutils literal notranslate"><span class="pre">detail=True</span></code> is given to Python APIs.</p>
-<blockquote>
-<div><p>ip</p>
-<p>worker_launch_time_ms</p>
-<p>end_time_ms</p>
-<p>is_alive</p>
-<p>exit_detail</p>
-<p>pid</p>
-<p>worker_type</p>
-<p>exit_type</p>
-<p>debugger_port</p>
-<p>num_paused_threads</p>
-<p>node_id</p>
-<p>worker_launched_time_ms</p>
-<p>start_time_ms</p>
-<p>worker_id</p>
-</div></blockquote>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.worker_id">
-<span class="sig-name descname"><span class="pre">worker_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></em><a class="headerlink" href="#ray.util.state.common.WorkerState.worker_id" title="Link to this definition">#</a></dt>
-<dd><p>The id of the worker.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.is_alive">
-<span class="sig-name descname"><span class="pre">is_alive</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></em><a class="headerlink" href="#ray.util.state.common.WorkerState.is_alive" title="Link to this definition">#</a></dt>
-<dd><p>Whether or not if the worker is alive.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.worker_type">
-<span class="sig-name descname"><span class="pre">worker_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'WORKER'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'DRIVER'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'SPILL_WORKER'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'RESTORE_WORKER'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ray.util.state.common.WorkerState.worker_type" title="Link to this definition">#</a></dt>
-<dd><p>The driver (Python script that calls <code class="code docutils literal notranslate"><span class="pre">ray.init</span></code>).
-- SPILL_WORKER: The worker that spills objects.
-- RESTORE_WORKER: The worker that restores objects.</p>
+  <section id="ray-runtime-env-runtimeenv-serialize-combined">
+<h1>ray.runtime_env.RuntimeEnv.serialize_combined<a class="headerlink" href="#ray-runtime-env-runtimeenv-serialize-combined" title="Link to this heading">#</a></h1>
+<dl class="py method">
+<dt class="sig sig-object py" id="ray.runtime_env.RuntimeEnv.serialize_combined">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RuntimeEnv.</span></span><span class="sig-name descname"><span class="pre">serialize_combined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">serialized_runtime_env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">serialized_allocated_instances</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../_modules/ray/runtime_env/runtime_env.html#RuntimeEnv.serialize_combined"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ray.runtime_env.RuntimeEnv.serialize_combined" title="Link to this definition">#</a></dt>
+<dd><p>Combines two serialized strings into a single serialized representation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p>DRIVER</p></li>
+<li><p><strong>serialized_runtime_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The serialized representation of the runtime environment.</p></li>
+<li><p><strong>serialized_allocated_instances</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The serialized representation of the allocated instances.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A combined serialized string, with the two inputs concatenated using “&amp;&amp;” as a separator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+</dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.exit_type">
-<span class="sig-name descname"><span class="pre">exit_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'SYSTEM_ERROR'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'INTENDED_SYSTEM_EXIT'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'USER_ERROR'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'INTENDED_USER_EXIT'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'NODE_OUT_OF_MEMORY'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><a class="headerlink" href="#ray.util.state.common.WorkerState.exit_type" title="Link to this definition">#</a></dt>
-<dd><p>The exit type of the worker if the worker is dead.</p>
-<ul class="simple">
-<li><p>SYSTEM_ERROR: Worker exit due to system level failures (i.e. worker crash).</p></li>
-<li><p>INTENDED_SYSTEM_EXIT: System-level exit that is intended. E.g.,
-Workers are killed because they are idle for a long time.</p></li>
-<li><p>USER_ERROR: Worker exits because of user error.
-E.g., execptions from the actor initialization.</p></li>
-<li><p>INTENDED_USER_EXIT: Intended exit from users (e.g., users exit
-workers with exit code 0 or exit initated by Ray API such as ray.kill).</p></li>
-</ul>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.node_id">
-<span class="sig-name descname"><span class="pre">node_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></em><a class="headerlink" href="#ray.util.state.common.WorkerState.node_id" title="Link to this definition">#</a></dt>
-<dd><p>The node id of the worker.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.ip">
-<span class="sig-name descname"><span class="pre">ip</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></em><a class="headerlink" href="#ray.util.state.common.WorkerState.ip" title="Link to this definition">#</a></dt>
-<dd><p>The ip address of the worker.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.pid">
-<span class="sig-name descname"><span class="pre">pid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><a class="headerlink" href="#ray.util.state.common.WorkerState.pid" title="Link to this definition">#</a></dt>
-<dd><p>The pid of the worker.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.exit_detail">
-<span class="sig-name descname"><span class="pre">exit_detail</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ray.util.state.common.WorkerState.exit_detail" title="Link to this definition">#</a></dt>
-<dd><p>The exit detail of the worker if the worker is dead.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.worker_launch_time_ms">
-<span class="sig-name descname"><span class="pre">worker_launch_time_ms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ray.util.state.common.WorkerState.worker_launch_time_ms" title="Link to this definition">#</a></dt>
-<dd><p>The time worker is first launched.
--1 if the value doesn’t exist.
-The lifecycle of worker is as follow.
-worker_launch_time_ms (process startup requested).
--&gt; worker_launched_time_ms (process started).
--&gt; start_time_ms (worker is ready to be used).
--&gt; end_time_ms (worker is destroyed).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.worker_launched_time_ms">
-<span class="sig-name descname"><span class="pre">worker_launched_time_ms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ray.util.state.common.WorkerState.worker_launched_time_ms" title="Link to this definition">#</a></dt>
-<dd><p>The time worker is succesfully launched
--1 if the value doesn’t exist.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.start_time_ms">
-<span class="sig-name descname"><span class="pre">start_time_ms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ray.util.state.common.WorkerState.start_time_ms" title="Link to this definition">#</a></dt>
-<dd><p>The time when the worker is started and initialized.
-0 if the value doesn’t exist.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ray.util.state.common.WorkerState.end_time_ms">
-<span class="sig-name descname"><span class="pre">end_time_ms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ray.util.state.common.WorkerState.end_time_ms" title="Link to this definition">#</a></dt>
-<dd><p>The time when the worker exits. The timestamp could be delayed
-if the worker is dead unexpectedly.
-0 if the value doesn’t exist.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -1555,20 +1438,20 @@ if the worker is dead unexpectedly.
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="ray.util.state.common.PlacementGroupState.html"
+       href="ray.runtime_env.RuntimeEnv.popitem.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">ray.util.state.common.PlacementGroupState</p>
+        <p class="prev-next-title">ray.runtime_env.RuntimeEnv.popitem</p>
       </div>
     </a>
     <a class="right-next"
-       href="ray.util.state.common.ObjectState.html"
+       href="ray.runtime_env.RuntimeEnv.setdefault.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">ray.util.state.common.ObjectState</p>
+        <p class="prev-next-title">ray.runtime_env.RuntimeEnv.setdefault</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1587,21 +1470,7 @@ if the worker is dead unexpectedly.
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState"><code class="docutils literal notranslate"><span class="pre">WorkerState</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.worker_id"><code class="docutils literal notranslate"><span class="pre">WorkerState.worker_id</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.is_alive"><code class="docutils literal notranslate"><span class="pre">WorkerState.is_alive</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.worker_type"><code class="docutils literal notranslate"><span class="pre">WorkerState.worker_type</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.exit_type"><code class="docutils literal notranslate"><span class="pre">WorkerState.exit_type</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.node_id"><code class="docutils literal notranslate"><span class="pre">WorkerState.node_id</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.ip"><code class="docutils literal notranslate"><span class="pre">WorkerState.ip</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.pid"><code class="docutils literal notranslate"><span class="pre">WorkerState.pid</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.exit_detail"><code class="docutils literal notranslate"><span class="pre">WorkerState.exit_detail</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.worker_launch_time_ms"><code class="docutils literal notranslate"><span class="pre">WorkerState.worker_launch_time_ms</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.worker_launched_time_ms"><code class="docutils literal notranslate"><span class="pre">WorkerState.worker_launched_time_ms</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.start_time_ms"><code class="docutils literal notranslate"><span class="pre">WorkerState.start_time_ms</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.util.state.common.WorkerState.end_time_ms"><code class="docutils literal notranslate"><span class="pre">WorkerState.end_time_ms</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ray.runtime_env.RuntimeEnv.serialize_combined"><code class="docutils literal notranslate"><span class="pre">RuntimeEnv.serialize_combined()</span></code></a></li>
 </ul>
   </nav></div>
 

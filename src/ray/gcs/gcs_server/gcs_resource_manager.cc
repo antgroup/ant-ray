@@ -206,8 +206,8 @@ void GcsResourceManager::UpdateResourceLoads(const rpc::ResourcesData &data) {
   (*iter->second.mutable_resource_load_by_shape()) = data.resource_load_by_shape();
 }
 
-const absl::flat_hash_map<NodeID, rpc::ResourcesData> &
-GcsResourceManager::NodeResourceReportView() const {
+const absl::flat_hash_map<NodeID, rpc::ResourcesData>
+    &GcsResourceManager::NodeResourceReportView() const {
   return node_resource_usages_;
 }
 

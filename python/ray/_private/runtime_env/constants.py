@@ -54,9 +54,6 @@ INTERNAL_SYSTEM_CONFIG_DYNAMIC_FILE = "/lib/libsysconf-alipay.so"
 # the key for java jar dirs in the environment variable.
 RAY_JAVA_JARS_DIRS = "RAY_JAVA_JARS_DIRS"
 
-# Whether to use ray whl when `install_ray` is True in the container.
-RAY_USE_WHL_PACKAGE = env_bool("RAY_USE_WHL_PACKAGE", False)
-
 # Whether podman integrate nydus
 RAY_PODMAN_UES_NYDUS = env_bool("RAY_PODMAN_UES_NYDUS", True)
 

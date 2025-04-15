@@ -2196,7 +2196,7 @@ def try_parse_default_mount_points(mount_dict: Dict[str, str]):
             if len(parts) == 1:
                 mount_dict[parts[0]] = parts[0]
             elif len(parts) == 2:
-                mount_dict[parts[0]] = parts[1]
+                mount_dict[parts[1]] = parts[0]
             else:
                 raise RuntimeError(
                     f"Incorrect mount point, got '{mount_point}'"

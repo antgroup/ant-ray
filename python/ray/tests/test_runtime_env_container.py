@@ -355,6 +355,66 @@ class TestContainerRuntimeEnvCommandLine:
             lambda: check_logs_by_keyword(keyword, log_file_pattern), timeout=20
         )
 
+    @pytest.mark.parametrize(
+        "set_runtime_env_container_default_mount_points",
+        [
+            "/tmp/fake_dir1;/tmp/fake_dir2",
+            "/tmp/fake_dir1:/tmp/fake_dir2;/tmp/fake_dir3",
+            "/tmp/fake_dir1:/tmp/fake_dir2:/tmp/fake_dir3",
+        ],
+        indirect=True,
+    )
+    def test_contianer_command_with_default_mount_points(
+        self,
+        api_version,
+        set_runtime_env_container_default_mount_points,
+        ray_start_regular,
+    ):
+        default_mount_points = set_runtime_env_container_default_mount_points
+        runtime_env = {
+            api_version: {
+                "image": "unknown_image",
+            },
+        }
+
+        a = Counter.options(
+            runtime_env=runtime_env,
+        ).remote()
+        try:
+            ray.get(a.increment.remote(), timeout=1)
+        except (
+            ray.exceptions.RuntimeEnvSetupError,
+            ray.exceptions.GetTimeoutError,
+        ) as exception:
+            # ignore the exception because container mode don't work in common
+            # test environments.
+            pass
+        except RuntimeError as e:
+            assert "Incorrect mount point" in str(e)
+            return
+        # Checkout the worker logs to ensure if the cgroup params is set correctly
+        # in the podman command.
+        log_file_pattern = "raylet.err"
+        if default_mount_points == "/tmp/fake_dir1;/tmp/fake_dir2":
+            keyword1 = "\-v /tmp/fake_dir1:/tmp/fake_dir1"
+            keyword2 = "\-v /tmp/fake_dir2:/tmp/fake_dir2"
+            wait_for_condition(
+                lambda: check_logs_by_keyword(keyword1, log_file_pattern), timeout=20
+            )
+            wait_for_condition(
+                lambda: check_logs_by_keyword(keyword2, log_file_pattern), timeout=20
+            )
+
+        elif default_mount_points == "/tmp/fake_dir1:/tmp/fake_dir2;/tmp/fake_dir3":
+            keyword1 = "\-v /tmp/fake_dir1:/tmp/fake_dir2"
+            keyword2 = "\-v /tmp/fake_dir3:/tmp/fake_dir3"
+            wait_for_condition(
+                lambda: check_logs_by_keyword(keyword1, log_file_pattern), timeout=10
+            )
+            wait_for_condition(
+                lambda: check_logs_by_keyword(keyword2, log_file_pattern), timeout=10
+            )
+
 
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", "-s", __file__]))

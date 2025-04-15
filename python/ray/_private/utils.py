@@ -21,6 +21,7 @@ import tempfile
 import threading
 import time
 import warnings
+import base64
 from inspect import signature
 from pathlib import Path
 from subprocess import list2cmdline
@@ -2120,6 +2121,20 @@ def try_update_container_command(
             passthrough_args.insert(
                 cp_param_index, "-DWORKER_SHIM_PID={}".format(os.getpid())
             )
+
+    # add `entrypoint_prefix` to `passthrough_args`
+    if container.get("entrypoint_prefix", None):
+        entrypoint_prefix = container["entrypoint_prefix"]
+        # update install_ray pip packages to base64
+        if "--packages" in entrypoint_prefix:
+            index = entrypoint_prefix.index("--packages")
+            pip_packages_str = entrypoint_prefix[index + 1]
+            logger.info(f"Install ray pip packages {pip_packages_str}")
+            entrypoint_prefix[index + 1] = base64.b64encode(
+                pip_packages_str.encode("utf-8")
+            ).decode("utf-8")
+        passthrough_args = entrypoint_prefix + passthrough_args
+
     container_command.append(" ".join(passthrough_args)) if len(
         passthrough_args
     ) > 0 else None
@@ -2273,3 +2288,17 @@ def try_update_runtime_env_vars(
             ".pyenv", redirected_pyenv_folder
         )
     return runtime_env_vars
+
+
+def get_ray_whl_dir():
+    return ray_constants.RAY_WHL_DIR
+
+
+def get_dependencies_installer_path():
+    return os.path.join(
+        get_ray_site_packages_path(),
+        "ray",
+        "_private",
+        "runtime_env",
+        "install_ray_or_pip_packages.py",
+    )

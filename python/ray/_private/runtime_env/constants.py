@@ -59,3 +59,11 @@ RAY_PODMAN_UES_NYDUS = env_bool("RAY_PODMAN_UES_NYDUS", False)
 # or "{path}" (equivalent to source=target) for symmetric mounts.
 # Entries are separated by semicolons (e.g., "A:A;B:C;D" where "D" implies "D:D").
 RAY_PODMAN_DEFAULT_MOUNT_POINTS = os.environ.get("RAY_PODMAN_DEFAULT_MOUNT_POINTS", "")
+
+# Dependencies installer script path in container, default is `/tmp/scripts/dependencies_installer.py`
+RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH = os.environ.get(
+    "RAY_DEPENDENCIES_INSTALLER_PATH", "/tmp/scripts/dependencies_installer.py"
+)
+
+# Whether to use ray whl when `install_ray` is True in the container.
+RAY_PODMAN_UES_WHL_PACKAGE = env_bool("RAY_PODMAN_UES_WHL_PACKAGE", False)

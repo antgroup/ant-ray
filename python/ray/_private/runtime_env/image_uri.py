@@ -13,8 +13,7 @@ from ray._private.utils import (
     get_pyenv_path,
     try_parse_default_mount_points,
     try_parse_container_run_options,
-    try_update_env_vars,
-    is_py_executable_startswith_pyenv,
+    try_update_runtime_env_vars,
 )
 
 default_logger = logging.getLogger(__name__)
@@ -120,7 +119,7 @@ def _modify_container_context_impl(
     # to avoid overwriting the container's internal PYENV environment
     # (which defaults to `/home/admin/.pyenv`).
     redirected_pyenv_folder = None
-    if py_executable and is_py_executable_startswith_pyenv(py_executable):
+    if py_executable and py_executable.startswith(get_pyenv_path()):
         redirected_pyenv_folder = "ray/.pyenv"
 
     host_pyenv_path = get_pyenv_path()
@@ -154,8 +153,8 @@ def _modify_container_context_impl(
         context.native_libraries["code_search_path"].append(container_native_libraries)
 
     # Environment variables to set in container
-    context.env_vars = try_update_env_vars(
-        context.env_vars, py_executable, redirected_pyenv_folder
+    context.env_vars = try_update_runtime_env_vars(
+        context.env_vars, redirected_pyenv_folder
     )
 
     # Append the container_placeholder as a placeholder to the command.

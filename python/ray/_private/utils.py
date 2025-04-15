@@ -1866,15 +1866,15 @@ def update_envs(env_vars: Dict[str, str]):
     if not env_vars:
         return
 
-    update_envs = {}
+    updated_envs = {}
     for key, value in env_vars.items():
         expanded = os.path.expandvars(value)
         # Replace non-existant env vars with an empty string.
         result = re.sub(r"\$\{[A-Z0-9_]+\}", "", expanded)
         os.environ[key] = result
-        update_envs[key] = os.environ[key]
+        updated_envs[key] = os.environ[key]
 
-    return update_envs
+    return updated_envs
 
 
 def parse_node_labels_json(
@@ -2120,7 +2120,9 @@ def try_update_container_command(
             passthrough_args.insert(
                 cp_param_index, "-DWORKER_SHIM_PID={}".format(os.getpid())
             )
-    container_command.append(" ".join(passthrough_args))
+    container_command.append(" ".join(passthrough_args)) if len(
+        passthrough_args
+    ) > 0 else None
     return container_command
 
 
@@ -2134,10 +2136,10 @@ def get_ray_site_packages_path():
 
 def get_pyenv_path():
     # Get the pyenv path automatically instead of hard code.
-    return os.environ.get("PYENV_ROOT", "/home/admin/.pyenv")
+    return os.environ.get("PYENV_ROOT", ray_constants.RAY_DEFAULT_PYENV_ROOT)
 
 
-def get_current_python():
+def get_current_python_info():
     """
     Get current python executable and site package directory.
     """
@@ -2154,7 +2156,7 @@ def get_current_python():
     return sys.executable, site_packages_path, python_version
 
 
-def get_specify_python(python_version):
+def get_specify_python_info(python_version):
     """
     Get specified python executable and site package directory.
     """
@@ -2186,15 +2188,25 @@ def set_java_jar_dirs_to_env_vars(
 
 
 def try_parse_default_mount_points(mount_dict: Dict[str, str]):
-    default_mount_path = runtime_env_constants.RAY_PODMAN_DEFAULT_MOUNT_POINTS
-    if default_mount_path:
-        default_mount_path_parts = default_mount_path.split(";")
-        for default_mount_path_part in default_mount_path_parts:
-            if ":" in default_mount_path_part:
-                mount_target_path = default_mount_path_part.split(":")
-                mount_dict[mount_target_path[1]] = mount_target_path[0]
+    default_mount_points = runtime_env_constants.RAY_PODMAN_DEFAULT_MOUNT_POINTS
+    if default_mount_points:
+        default_mount_point_list = default_mount_points.split(";")
+        for mount_point in default_mount_point_list:
+            parts = mount_point.split(":")
+            if len(parts) == 1:
+                mount_dict[parts[0]] = parts[0]
+            elif len(parts) == 2:
+                mount_dict[parts[0]] = parts[1]
             else:
-                mount_dict[default_mount_path_part] = default_mount_path_part
+                raise RuntimeError(
+                    f"Incorrect mount point, got '{mount_point}'"
+                    "please check the value of the environment variable `RAY_PODMAN_DEFAULT_MOUNT_POINTS`. "
+                    "Ensure that it is properly set and formatted correctly. "
+                    "The value should be a valid string representing the default mount points for podman. "
+                    "For more details, please refer to the comments or documentation for the "
+                    "`RAY_PODMAN_DEFAULT_MOUNT_POINTS` environment variable."
+                )
+
     return mount_dict
 
 
@@ -2217,7 +2229,6 @@ def try_parse_container_run_options(
                     "`-v host_path:container_path`."
                 )
             next_option = run_options[index + 1]
-            logger.info(f"show the next_option {next_option}")
             paths = next_option.split(":")
             if len(paths) != 2:
                 raise RuntimeError(
@@ -2239,18 +2250,8 @@ def try_parse_container_run_options(
     return container_command, container_to_host_mount_dict
 
 
-def is_py_executable_startswith_pyenv(py_executable: str):
-    """
-    Check if the python executable starts with pyenv.
-    """
-    if py_executable.startswith(get_pyenv_path()):
-        return True
-    return False
-
-
-def try_update_env_vars(
+def try_update_runtime_env_vars(
     runtime_env_vars: Dict[str, Any],
-    py_executable: Optional[str],
     redirected_pyenv_folder: Optional[str],
 ):
     env_vars = dict()

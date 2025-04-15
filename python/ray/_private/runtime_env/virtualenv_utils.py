@@ -4,8 +4,8 @@ import sys
 import platform
 from ray._private.utils import (
     get_ray_site_packages_path,
-    get_current_python,
-    get_specify_python,
+    get_current_python_info,
+    get_specify_python_info,
 )
 from ray._private.runtime_env.utils import check_output_cmd
 import logging
@@ -118,9 +118,9 @@ async def create_or_get_virtualenv(path: str, cwd: str, logger: logging.Logger):
 def get_all_packages_paths(target_dir: str, python_version: str = None) -> List:
     ray_package_path = None
     if not python_version:
-        _, host_site_packages_dir, python_version = get_current_python()
+        _, host_site_packages_dir, python_version = get_current_python_info()
     else:
-        _, host_site_packages_dir = get_specify_python(python_version)
+        _, host_site_packages_dir = get_specify_python_info(python_version)
 
     if platform.python_version().startswith(python_version):
         # We need this path because in the development environment,

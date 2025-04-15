@@ -145,7 +145,6 @@ class RuntimeEnvContext:
 
         # excute worker process in container
         if "container_command" in self.container:
-            container_command = self.container["container_command"]
             # try update container command
             container_command = try_update_container_command(
                 language,

@@ -15,35 +15,6 @@ from ray._private.utils import (
 
 default_logger = logging.getLogger(__name__)
 
-# NOTE(chenk008): it is moved from setup_worker. And it will be used
-# to setup resource limit.
-def parse_allocated_resource(allocated_instances_serialized_json):
-    container_resource_args = []
-    allocated_resource = json.loads(allocated_instances_serialized_json)
-    if "CPU" in allocated_resource.keys():
-        cpu_resource = allocated_resource["CPU"]
-        if isinstance(cpu_resource, list):
-            # cpuset: because we may split one cpu core into some pieces,
-            # we need set cpuset.cpu_exclusive=0 and set cpuset-cpus
-            cpu_ids = []
-            cpus = 0
-            for idx, val in enumerate(cpu_resource):
-                if val > 0:
-                    cpu_ids.append(idx)
-                    cpus += val
-            container_resource_args.append("--cpus=" + str(int(cpus / 10000)))
-            container_resource_args.append(
-                "--cpuset-cpus=" + ",".join(str(e) for e in cpu_ids)
-            )
-        else:
-            # cpushare
-            container_resource_args.append("--cpus=" + str(int(cpu_resource / 10000)))
-    if "memory" in allocated_resource.keys():
-        container_resource_args.append(
-            "--memory=" + str(int(allocated_resource["memory"] / 10000 / 10000)) + "m"
-        )
-    return container_resource_args
-
 
 async def _create_impl(image_uri: str, logger: logging.Logger):
     # Pull image if it doesn't exist
@@ -123,11 +94,6 @@ def _modify_container_context_impl(
     if os.path.exists(ant_resources_dir):
         container_to_host_mount_dict[ant_resources_dir] = ant_resources_dir
 
-    """
-    container_command.extend(
-        parse_allocated_resource(serialized_allocated_resource_instances)
-    )
-    """
     # we need 'sudo' and 'admin', mount logs
     container_command = ["sudo", "-E"] + container_command
     container_command.append("-u")

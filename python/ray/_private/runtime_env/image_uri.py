@@ -117,13 +117,12 @@ def _modify_container_context_impl(
     # which can modify the latest source_path.
     container_to_host_mount_dict = {}
 
-    # in ANT-INTERNAL, we need mount /home/admin/ray-pack,
+    # in ant, we need mount /home/admin/ray-pack,
     # because some config generated on starting
-    tmp_dir = "/home/admin/ray-pack"
-    if os.path.exists(tmp_dir):
-        container_to_host_mount_dict[tmp_dir] = tmp_dir
+    ant_resources_dir = runtime_env_constants.RAY_PODMAN_ANT_RESOURCES_DIR
+    if os.path.exists(ant_resources_dir):
+        container_to_host_mount_dict[ant_resources_dir] = ant_resources_dir
 
-    context.env_vars["RAY_RAYLET_PID"] = os.getenv("RAY_RAYLET_PID")
     """
     container_command.extend(
         parse_allocated_resource(serialized_allocated_resource_instances)
@@ -132,6 +131,7 @@ def _modify_container_context_impl(
     # we need 'sudo' and 'admin', mount logs
     container_command = ["sudo", "-E"] + container_command
     container_command.append("-u")
+    # we set the user in the container, default is 'admin'
     user = container_option.get("user")
     if user:
         container_command.append(user)
@@ -143,6 +143,7 @@ def _modify_container_context_impl(
     else:
         container_command.append(os.getcwd())
     container_command.append("--cap-add=AUDIT_WRITE")
+    # mount log dir to container
     if os.path.exists(runtime_env_constants.RAY_PODMAN_SYSTEM_LOG_DIR):
         log_dir = runtime_env_constants.RAY_PODMAN_SYSTEM_LOG_DIR
         if container_option.get("customize_log_dir"):
@@ -163,6 +164,7 @@ def _modify_container_context_impl(
             aspara_system_config_dir
         ] = aspara_system_config_dir
 
+    # mount ray package site path
     host_site_packages_path = get_ray_site_packages_path()
     if py_executable:
         # Replace the pyenv path in container to
@@ -227,7 +229,18 @@ def _modify_container_context_impl(
     if container_option.get("native_libraries"):
         container_native_libraries = container_option["native_libraries"]
         context.native_libraries["code_search_path"].append(container_native_libraries)
-    context.env_vars["RAY_JOB_DATA_DIR_BASE"] = os.getenv("RAY_JOB_DATA_DIR_BASE", "")
+
+    # Environment variables to set in container
+    env_vars = dict()
+
+    # Propagate all host environment variables that have the prefix "RAY_"
+    # This should include RAY_RAYLET_PID
+    for env_var_name, env_var_value in os.environ.items():
+        if env_var_name.startswith("RAY_"):
+            env_vars[env_var_name] = env_var_value
+
+    # Support for runtime_env['env_vars']
+    context.env_vars.update(env_vars)
     # unset PYENV_VERSION, the image may use pyenv with other python.
     context.env_vars["PYENV_VERSION"] = ""
     # Append env vars to container

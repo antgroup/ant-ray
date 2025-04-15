@@ -69,3 +69,8 @@ RAY_PODMAN_SYSTEM_LOG_DIR = os.environ.get(
 RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR = os.environ.get(
     "RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR", "/apsara"
 )
+
+# Ant resources dir
+RAY_PODMAN_ANT_RESOURCES_DIR = os.environ.get(
+    "RAY_PODMAN_ANT_RESOURCES_DIR", "/home/admin/ray-pack"
+)

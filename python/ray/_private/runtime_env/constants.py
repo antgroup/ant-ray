@@ -48,26 +48,14 @@ PRELOAD_ENV_NAME = "LD_PRELOAD"
 # Container or image uri plugin placeholder, which will be replaced by env_vars.
 CONTAINER_ENV_PLACEHOLDER = "$CONTAINER_ENV_PLACEHOLDER"
 
-# ANT-INTERNAL: Alipay internal system config dynamic depot
-INTERNAL_SYSTEM_CONFIG_DYNAMIC_FILE = "/lib/libsysconf-alipay.so"
-
 # the key for java jar dirs in the environment variable.
 RAY_JAVA_JARS_DIRS = "RAY_JAVA_JARS_DIRS"
 
 # Whether podman integrate nydus
 RAY_PODMAN_UES_NYDUS = env_bool("RAY_PODMAN_UES_NYDUS", True)
 
-# The system log dir
-RAY_PODMAN_SYSTEM_LOG_DIR = os.environ.get(
-    "RAY_PODMAN_SYSTEM_LOG_DIR", "/home/admin/logs"
-)
-
-# Apsara Cloud system config dir
-RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR = os.environ.get(
-    "RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR", "/apsara"
-)
-
-# Ant resources dir
-RAY_PODMAN_ANT_RESOURCES_DIR = os.environ.get(
-    "RAY_PODMAN_ANT_RESOURCES_DIR", "/home/admin/ray-pack"
-)
+# Default mount points for Podman containers.
+# The format allows either "{source_path}:{target_path}" for bind mounts
+# or "{path}" (equivalent to source=target) for symmetric mounts.
+# Entries are separated by semicolons (e.g., "A:A;B:C;D" where "D" implies "D:D").
+RAY_PODMAN_DEFAULT_MOUNT_POINTS = os.environ.get("RAY_PODMAN_DEFAULT_MOUNT_POINTS", "")

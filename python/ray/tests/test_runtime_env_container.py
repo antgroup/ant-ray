@@ -10,6 +10,7 @@ from ray._private.test_utils import (
     wait_for_condition,
     check_logs_by_keyword,
 )
+from ray._private.utils import get_pyenv_path
 
 
 # NOTE(zcin): The actual test code are in python scripts under
@@ -297,10 +298,11 @@ class TestContainerRuntimeEnvCommandLine:
         )
 
     def test_container_command_with_py_executable(self, api_version, ray_start_regular):
+        py_executable = "/home/admin/.pyenv/fake_python/bin/python"
         runtime_env = {
             api_version: {
                 "image": "unknown_image",
-                "py_executable": "/fake/python/bin",
+                "py_executable": py_executable,
             },
         }
 
@@ -315,7 +317,39 @@ class TestContainerRuntimeEnvCommandLine:
             pass
         # Checkout the worker logs to ensure if the cgroup params is set correctly
         # in the podman command.
-        keyword = "/fake/python/bin -m ray._private.workers.default_worker"
+        keyword = f"{py_executable} -m ray._private.workers.default_worker"
+        log_file_pattern = "raylet.err"
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword, log_file_pattern), timeout=20
+        )
+        # Checkout if `py_executable` is replaced in the podman command
+        pyenv_root = get_pyenv_path()
+        replaced_pyenv_root = pyenv_root.replace(".pyenv", "ray/.pyenv")
+        keyword = f"\-v {pyenv_root}:{replaced_pyenv_root}"
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword, log_file_pattern), timeout=20
+        )
+
+    def test_container_command_with_env_vars(self, api_version, ray_start_regular):
+        runtime_env = {
+            api_version: {
+                "image": "unknown_image",
+            },
+            "env_vars": {"TEST_ENV_VAR": "TEST_ENV_VALUE"},
+        }
+
+        a = Counter.options(
+            runtime_env=runtime_env,
+        ).remote()
+        try:
+            ray.get(a.increment.remote(), timeout=1)
+        except (ray.exceptions.RuntimeEnvSetupError, ray.exceptions.GetTimeoutError):
+            # ignore the exception because container mode don't work in common
+            # test environments.
+            pass
+        # Checkout the worker logs to ensure if the cgroup params is set correctly
+        # in the podman command.
+        keyword = "\--env TEST_ENV_VAR=TEST_ENV_VALUE"
         log_file_pattern = "raylet.err"
         wait_for_condition(
             lambda: check_logs_by_keyword(keyword, log_file_pattern), timeout=20

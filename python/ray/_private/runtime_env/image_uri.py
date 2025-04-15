@@ -11,6 +11,10 @@ from ray._private.runtime_env.utils import check_output_cmd
 from ray._private.utils import (
     get_ray_site_packages_path,
     get_pyenv_path,
+    try_parse_default_mount_points,
+    try_parse_container_run_options,
+    try_update_env_vars,
+    is_py_executable_startswith_pyenv,
 )
 
 default_logger = logging.getLogger(__name__)
@@ -34,9 +38,6 @@ async def _create_impl(image_uri: str, logger: logging.Logger):
     logger.info("Pulling image %s", image_uri)
     worker_path = await check_output_cmd(pull_image_cmd, logger=logger)
     return worker_path.strip()
-
-
-container_placeholder = runtime_env_constants.CONTAINER_ENV_PLACEHOLDER
 
 
 def _modify_container_context_impl(
@@ -88,11 +89,10 @@ def _modify_container_context_impl(
     # which can modify the latest source_path.
     container_to_host_mount_dict = {}
 
-    # in ant, we need mount /home/admin/ray-pack,
-    # because some config generated on starting
-    ant_resources_dir = runtime_env_constants.RAY_PODMAN_ANT_RESOURCES_DIR
-    if os.path.exists(ant_resources_dir):
-        container_to_host_mount_dict[ant_resources_dir] = ant_resources_dir
+    # we mount default mount path to container
+    container_to_host_mount_dict = try_parse_default_mount_points(
+        container_to_host_mount_dict
+    )
 
     # we need 'sudo' and 'admin', mount logs
     container_command = ["sudo", "-E"] + container_command
@@ -109,82 +109,39 @@ def _modify_container_context_impl(
     else:
         container_command.append(os.getcwd())
     container_command.append("--cap-add=AUDIT_WRITE")
-    # mount log dir to container
-    if os.path.exists(runtime_env_constants.RAY_PODMAN_SYSTEM_LOG_DIR):
-        log_dir = runtime_env_constants.RAY_PODMAN_SYSTEM_LOG_DIR
-        if container_option.get("customize_log_dir"):
-            customize_log_path = container_option.get("customize_log_dir")
-            if not os.path.exists(customize_log_path):
-                os.makedirs(customize_log_path)
-                container_to_host_mount_dict[log_dir] = customize_log_path
-                ray_log_dir = os.path.join(log_dir, "ray_logs")
-                container_to_host_mount_dict[ray_log_dir] = ray_log_dir
-                container_to_host_mount_dict[os.path.join(log_dir, "share")] = log_dir
-        else:
-            container_to_host_mount_dict[log_dir] = log_dir
-    if os.path.exists(runtime_env_constants.RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR):
-        aspara_system_config_dir = (
-            runtime_env_constants.RAY_PODMAN_APSARA_SYSTEM_CONFIG_DIR
-        )
-        container_to_host_mount_dict[
-            aspara_system_config_dir
-        ] = aspara_system_config_dir
 
     # mount ray package site path
     host_site_packages_path = get_ray_site_packages_path()
-    if py_executable:
-        # Replace the pyenv path in container to
-        # avoid overwriting the user's pyenv.
-        pyenv_folder = "ray/.pyenv"
-    else:
-        pyenv_folder = ".pyenv"
+
+    # If the user specifies a `py_executable` in the container
+    # and it starts with the ${PYENV_ROOT} environment variable (indicating a PYENV-managed executable),
+    # we define `redirected_pyenv_folder` as `ray/.pyenv`.
+    # This ensures that all .pyenv-related paths are redirected
+    # to avoid overwriting the container's internal PYENV environment
+    # (which defaults to `/home/admin/.pyenv`).
+    redirected_pyenv_folder = None
+    if py_executable and is_py_executable_startswith_pyenv(py_executable):
+        redirected_pyenv_folder = "ray/.pyenv"
+
     host_pyenv_path = get_pyenv_path()
-    container_pyenv_path = host_pyenv_path.replace(".pyenv", pyenv_folder)
+    container_pyenv_path = host_pyenv_path
+    if redirected_pyenv_folder:
+        container_pyenv_path = host_pyenv_path.replace(
+            ".pyenv", redirected_pyenv_folder
+        )
+        context.container[redirected_pyenv_folder] = redirected_pyenv_folder
     container_to_host_mount_dict[container_pyenv_path] = host_pyenv_path
-    context.pyenv_folder = pyenv_folder
     container_to_host_mount_dict[host_site_packages_path] = host_site_packages_path
 
-    if os.path.exists(runtime_env_constants.INTERNAL_SYSTEM_CONFIG_DYNAMIC_FILE):
-        system_dynamic_config_file_path = (
-            runtime_env_constants.INTERNAL_SYSTEM_CONFIG_DYNAMIC_FILE
-        )
-        container_to_host_mount_dict[
-            system_dynamic_config_file_path
-        ] = system_dynamic_config_file_path
-
     # For loop `run options` and append each item to the command line of podman
-    if runtime_env.py_container_run_options():
-        run_options_list = runtime_env.py_container_run_options()
-        index = 0
-        while index < len(run_options_list):
-            run_option = run_options_list[index]
-            if run_option == "-v":
-                if index == len(run_options_list) - 1:
-                    raise RuntimeError(
-                        "Incorrect mount path command, "
-                        "please check the container field "
-                        "in the run_options field mount path, "
-                        "`-v host_path:container_path`."
-                    )
-                next_option = run_options_list[index + 1]
-                paths = next_option.split(":")
-                if len(paths) != 2:
-                    raise RuntimeError(
-                        "Incorrect mount path command, "
-                        "please check the container field "
-                        "in the run_options field mount path, "
-                        f"got {next_option}"
-                    )
-                source_path = paths[0].strip()
-                target_path = paths[1].strip()
-                # Iterate over the key of
-                # 'container_to_host_mount_dict'
-                # to find if target_path already exists
-                container_to_host_mount_dict[target_path] = source_path
-                index += 2
-            else:
-                container_command.append(run_option)
-                index += 1
+    run_options = container_option.get("run_options")
+    if run_options:
+        (
+            container_command,
+            container_to_host_mount_dict,
+        ) = try_parse_container_run_options(
+            run_options, container_command, container_to_host_mount_dict
+        )
 
     for (
         target_path,
@@ -197,24 +154,17 @@ def _modify_container_context_impl(
         context.native_libraries["code_search_path"].append(container_native_libraries)
 
     # Environment variables to set in container
-    env_vars = dict()
+    context.env_vars = try_update_env_vars(
+        context.env_vars, py_executable, redirected_pyenv_folder
+    )
 
-    # Propagate all host environment variables that have the prefix "RAY_"
-    # This should include RAY_RAYLET_PID
-    for env_var_name, env_var_value in os.environ.items():
-        if env_var_name.startswith("RAY_"):
-            env_vars[env_var_name] = env_var_value
-
-    # Support for runtime_env['env_vars']
-    context.env_vars.update(env_vars)
-    # unset PYENV_VERSION, the image may use pyenv with other python.
-    context.env_vars["PYENV_VERSION"] = ""
-    # Append env vars to container
-    if context.env_vars.get("PYTHONPATH") and py_executable:
-        context.env_vars["PYTHONPATH"] = context.env_vars["PYTHONPATH"].replace(
-            ".pyenv", "ray/.pyenv"
-        )
-    container_command.append(container_placeholder)
+    # Append the container_placeholder as a placeholder to the command.
+    # This placeholder will be replaced in the `try_update_container_command`
+    # function with all required environment variables (e.g., `--env RAY_RAYLET_PID=xxx`).
+    # Environment variables like `LD_LIBRARY_PATH` need to be updated before the
+    # `try_update_container_command` function, so direct inclusion of `--env` flags here
+    # is avoided to ensure proper ordering and dynamic updates.
+    container_command.append(runtime_env_constants.CONTAINER_ENV_PLACEHOLDER)
     container_command.append("--entrypoint")
     # Some docker image use conda to run python, it depend on ~/.bashrc.
     # So we need to use bash as container entrypoint.

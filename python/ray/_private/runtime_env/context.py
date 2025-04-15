@@ -37,7 +37,6 @@ class RuntimeEnvContext:
         job_dir: Optional[str] = None,
         native_libraries: List[Dict[str, str]] = None,
         preload_libraries: List[str] = None,
-        pyenv_folder: Optional[str] = None,
         container: Optional[Dict[str, Any]] = None,
     ):
         self.command_prefix = command_prefix or []
@@ -76,7 +75,13 @@ class RuntimeEnvContext:
             "code_search_path": [],
         }
         self.preload_libraries = preload_libraries or []
-        self.pyenv_folder = pyenv_folder
+        # Stores container configuration (e.g., container_command) in the context to
+        # enable plugin interoperability. The 'container' parameter allows external
+        # modules to provide existing configurations (e.g., settings from other plugins),
+        # defaulting to an empty dictionary if none is provided.
+        # This ensures all container-related data (e.g., commands, py_executable)
+        # is centralized in `self.container`, enabling seamless command-line assembly
+        # with worker startup commands in "worker-in-container" mode.
         self.container = container or {}
 
     def serialize(self) -> str:
@@ -88,7 +93,6 @@ class RuntimeEnvContext:
 
     def exec_worker(self, passthrough_args: List[str], language: Language):
         set_java_jar_dirs_to_env_vars(self.java_jars, self)
-
         if language == Language.PYTHON and sys.platform == "win32":
             executable = [self.py_executable]
         elif language == Language.PYTHON:
@@ -145,11 +149,10 @@ class RuntimeEnvContext:
             # try update container command
             container_command = try_update_container_command(
                 language,
-                container_command,
+                self.container,
                 updated_envs,
                 passthrough_args,
                 self.py_executable,
-                self.pyenv_folder,
             )
             logger.info(
                 "Exec'ing worker with command: {}".format(" ".join(container_command))

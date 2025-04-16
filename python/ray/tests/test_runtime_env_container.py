@@ -359,8 +359,8 @@ class TestContainerRuntimeEnvCommandLine:
     @pytest.mark.parametrize(
         "set_runtime_env_container_default_mount_points",
         [
-            "/tmp/fake_dir1;/tmp/fake_dir2",
-            "/tmp/fake_dir1:/tmp/fake_dir2;/tmp/fake_dir3",
+            "/tmp/fake_dir1:/tmp/fake_dir1;/tmp/fake_dir2:/tmp/fake_dir2",
+            "/tmp/fake_dir1:/tmp/fake_dir2;/tmp/fake_dir3:/tmp/fake_dir3",
             "/tmp/fake_dir1:/tmp/fake_dir2:/tmp/fake_dir3",
         ],
         indirect=True,
@@ -392,11 +392,13 @@ class TestContainerRuntimeEnvCommandLine:
             pass
         except RuntimeError as e:
             assert "Incorrect mount point" in str(e)
-            return
         # Checkout the worker logs to ensure if the cgroup params is set correctly
         # in the podman command.
         log_file_pattern = "raylet.err"
-        if default_mount_points == "/tmp/fake_dir1;/tmp/fake_dir2":
+        if (
+            default_mount_points
+            == "/tmp/fake_dir1:/tmp/fake_dir1;/tmp/fake_dir2:/tmp/fake_dir2"
+        ):
             keyword1 = "\-v /tmp/fake_dir1:/tmp/fake_dir1"
             keyword2 = "\-v /tmp/fake_dir2:/tmp/fake_dir2"
             wait_for_condition(
@@ -406,7 +408,10 @@ class TestContainerRuntimeEnvCommandLine:
                 lambda: check_logs_by_keyword(keyword2, log_file_pattern), timeout=20
             )
 
-        elif default_mount_points == "/tmp/fake_dir1:/tmp/fake_dir2;/tmp/fake_dir3":
+        elif (
+            default_mount_points
+            == "/tmp/fake_dir1:/tmp/fake_dir2;/tmp/fake_dir3:/tmp/fake_dir3"
+        ):
             keyword1 = "\-v /tmp/fake_dir1:/tmp/fake_dir2"
             keyword2 = "\-v /tmp/fake_dir3:/tmp/fake_dir3"
             wait_for_condition(
@@ -415,6 +420,7 @@ class TestContainerRuntimeEnvCommandLine:
             wait_for_condition(
                 lambda: check_logs_by_keyword(keyword2, log_file_pattern), timeout=10
             )
+        os.environ.pop("RAY_PODMAN_DEFAULT_MOUNT_POINTS", None)
 
     @pytest.mark.parametrize(
         "set_runtime_env_container_use_ray_whl_package",

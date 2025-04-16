@@ -55,9 +55,8 @@ RAY_JAVA_JARS_DIRS = "RAY_JAVA_JARS_DIRS"
 RAY_PODMAN_UES_NYDUS = env_bool("RAY_PODMAN_UES_NYDUS", False)
 
 # Default mount points for Podman containers.
-# The format allows either "{source_path}:{target_path}" for bind mounts
-# or "{path}" (equivalent to source=target) for symmetric mounts.
-# Entries are separated by semicolons (e.g., "A:A;B:C;D" where "D" implies "D:D").
+# The format allows "{source_path}:{target_path}" for bind mounts
+# Entries are separated by semicolons (e.g., "A:A;B:C").
 RAY_PODMAN_DEFAULT_MOUNT_POINTS = os.environ.get("RAY_PODMAN_DEFAULT_MOUNT_POINTS", "")
 
 # Dependencies installer script path in container, default is `/tmp/scripts/dependencies_installer.py`

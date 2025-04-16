@@ -2208,11 +2208,7 @@ def try_parse_default_mount_points(mount_dict: Dict[str, str]):
         default_mount_point_list = default_mount_points.split(";")
         for mount_point in default_mount_point_list:
             parts = mount_point.split(":")
-            if len(parts) == 1:
-                mount_dict[parts[0]] = parts[0]
-            elif len(parts) == 2:
-                mount_dict[parts[1]] = parts[0]
-            else:
+            if len(parts) != 2:
                 raise RuntimeError(
                     f"Incorrect mount point, got '{mount_point}'"
                     "please check the value of the environment variable `RAY_PODMAN_DEFAULT_MOUNT_POINTS`. "
@@ -2221,6 +2217,7 @@ def try_parse_default_mount_points(mount_dict: Dict[str, str]):
                     "For more details, please refer to the comments or documentation for the "
                     "`RAY_PODMAN_DEFAULT_MOUNT_POINTS` environment variable."
                 )
+            mount_dict[parts[1]] = parts[0]
 
     return mount_dict
 

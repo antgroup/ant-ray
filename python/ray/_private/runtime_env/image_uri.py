@@ -14,6 +14,7 @@ from ray._private.utils import (
     try_parse_default_mount_points,
     try_parse_container_run_options,
     try_update_runtime_env_vars,
+    parse_allocated_resource,
 )
 
 default_logger = logging.getLogger(__name__)
@@ -92,6 +93,12 @@ def _modify_container_context_impl(
     container_to_host_mount_dict = try_parse_default_mount_points(
         container_to_host_mount_dict
     )
+
+    # Add reousrces isolation if needed
+    if runtime_env.get_serialized_allocated_instances():
+        container_command.extend(
+            parse_allocated_resource(runtime_env.get_serialized_allocated_instances())
+        )
 
     # we need 'sudo' and 'admin', mount logs
     container_command = ["sudo", "-E"] + container_command

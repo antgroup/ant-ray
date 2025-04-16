@@ -392,6 +392,7 @@ class TestContainerRuntimeEnvCommandLine:
             pass
         except RuntimeError as e:
             assert "Incorrect mount point" in str(e)
+            return
         # Checkout the worker logs to ensure if the cgroup params is set correctly
         # in the podman command.
         log_file_pattern = "raylet.err"
@@ -420,7 +421,6 @@ class TestContainerRuntimeEnvCommandLine:
             wait_for_condition(
                 lambda: check_logs_by_keyword(keyword2, log_file_pattern), timeout=10
             )
-        os.environ.pop("RAY_PODMAN_DEFAULT_MOUNT_POINTS", None)
 
     @pytest.mark.parametrize(
         "set_runtime_env_container_use_ray_whl_package",

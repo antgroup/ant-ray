@@ -39,6 +39,7 @@ void GcsAutoscalerStateManager::MakeVirtualClusterResourceStatesInternal(
         }
         virtual_cluster_state.set_divisible(virtual_cluster->Divisible());
         virtual_cluster_state.set_revision(virtual_cluster->GetRevision());
+        // Collect all nodes belonging to this virtual cluster.
         const auto &visible_node_instances = virtual_cluster->GetVisibleNodeInstances();
         if (virtual_cluster->Divisible()) {
           for (const auto &[template_id, job_node_instances] : visible_node_instances) {
@@ -58,15 +59,21 @@ void GcsAutoscalerStateManager::MakeVirtualClusterResourceStatesInternal(
               }
             }
           }
+          // Collect the pending resource requests in this virtual cluster.
           GetVirtualClusterPendingResourceRequests(&virtual_cluster_state);
         }
 
         (*virtual_cluster_states)[virtual_cluster->GetID()] = virtual_cluster_state;
       });
 
+  // Collect the pending gang resource requests for each virtual cluster.
+  GetVirtualClusterPendingGangResourceRequests(state);
+
+  // Collect the info of the primary cluster.
   rpc::autoscaler::VirtualClusterState primary_cluster_state;
   primary_cluster_state.set_divisible(true);
   primary_cluster_state.set_revision(primary_cluster->GetRevision());
+  // For the primary cluster, we only need the nodes unassinged to any virtual cluster.
   for (const auto &[template_id, job_node_instances] :
        primary_cluster->GetVisibleNodeInstances()) {
     const auto unassigned_instances_iter = job_node_instances.find(kUndividedClusterId);
@@ -78,15 +85,15 @@ void GcsAutoscalerStateManager::MakeVirtualClusterResourceStatesInternal(
   }
   (*virtual_cluster_states)[kPrimaryClusterID] = primary_cluster_state;
 
+  // Collect the cluster-level info.
   state->set_last_seen_autoscaler_state_version(last_seen_autoscaler_state_version_);
   state->set_cluster_resource_state_version(
       IncrementAndGetNextClusterResourceStateVersion());
   state->set_cluster_session_name(session_name_);
 
   GetNodeStates(state);
+  // For now, we only support resource contraints at the cluster-level.
   GetClusterResourceConstraints(state);
-
-  GetVirtualClusterPendingGangResourceRequests(state);
 }
 
 void GcsAutoscalerStateManager::GetVirtualClusterPendingResourceRequests(

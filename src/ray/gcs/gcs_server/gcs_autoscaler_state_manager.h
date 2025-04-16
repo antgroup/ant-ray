@@ -16,6 +16,7 @@
 
 #include "ray/gcs/gcs_server/gcs_init_data.h"
 #include "ray/gcs/gcs_server/gcs_kv_manager.h"
+#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
 #include "ray/rpc/gcs_server/gcs_rpc_server.h"
 #include "ray/rpc/node_manager/node_manager_client_pool.h"
 #include "ray/util/thread_checker.h"
@@ -31,13 +32,15 @@ class GcsResourceManager;
 
 class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler {
  public:
-  GcsAutoscalerStateManager(std::string session_name,
-                            GcsNodeManager &gcs_node_manager,
-                            GcsActorManager &gcs_actor_manager,
-                            const GcsPlacementGroupManager &gcs_placement_group_manager,
-                            rpc::NodeManagerClientPool &raylet_client_pool,
-                            InternalKVInterface &kv,
-                            instrumented_io_context &io_context);
+  GcsAutoscalerStateManager(
+      std::string session_name,
+      GcsNodeManager &gcs_node_manager,
+      GcsActorManager &gcs_actor_manager,
+      const GcsPlacementGroupManager &gcs_placement_group_manager,
+      rpc::NodeManagerClientPool &raylet_client_pool,
+      InternalKVInterface &kv,
+      instrumented_io_context &io_context,
+      std::shared_ptr<GcsVirtualClusterManager> gcs_virtual_cluster_manager = nullptr);
 
   void HandleGetClusterResourceState(
       rpc::autoscaler::GetClusterResourceStateRequest request,
@@ -93,6 +96,12 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   /// \param state The state to be filled.
   void MakeClusterResourceStateInternal(rpc::autoscaler::ClusterResourceState *state);
 
+  /// \brief Internal method for populating the rpc::ClusterResourceState
+  /// protobuf. It is only called when virtual clusters exist.
+  /// \param state The state to be filled.
+  void MakeVirtualClusterResourceStatesInternal(
+      rpc::autoscaler::ClusterResourceState *state);
+
   /// \brief Get the placement group load from GcsPlacementGroupManager
   ///
   /// \return The placement group load, nullptr if there is no placement group load.
@@ -146,6 +155,16 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   /// more details. This is requested through autoscaler SDK for request_resources().
   void GetClusterResourceConstraints(rpc::autoscaler::ClusterResourceState *state);
 
+  /// \brief Get the resource requests state of a specified virtual cluster.
+  /// \param state The virtul cluster state to be filled.
+  void GetVirtualClusterPendingResourceRequests(
+      rpc::autoscaler::VirtualClusterState *state);
+  /// \brief Get the gang resource requests (e.g. from placement group) state for each
+  /// virtual cluster. \param state The cluster resource state (including member field for
+  /// virtual clusters) to be filled.
+  void GetVirtualClusterPendingGangResourceRequests(
+      rpc::autoscaler::ClusterResourceState *state);
+
   /// \brief Get the autoscaler infeasible request resource shapes for each node.
   /// \return a map of node id to the corresponding infeasible resource requests shapes.
   ///
@@ -182,6 +201,8 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   // Handler for internal KV
   InternalKVInterface &kv_;
   instrumented_io_context &io_context_;
+
+  std::shared_ptr<GcsVirtualClusterManager> gcs_virtual_cluster_manager_;
 
   // The default value of the last seen version for the request is 0, which indicates
   // no version has been reported. So the first reported version should be 1.

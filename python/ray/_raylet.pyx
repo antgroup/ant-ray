@@ -3758,6 +3758,11 @@ cdef class CoreWorker:
 
         self.python_scheduling_strategy_to_c(
             scheduling_strategy, &c_scheduling_strategy)
+        
+        # This setup is required, otherwise a job's supervisor actor might be scheduled
+        # a virtual cluster to which it does not belong.
+        if labels is not None and "virtual_cluster_id" in labels:
+            c_scheduling_strategy.set_virtual_cluster_id(labels["virtual_cluster_id"])
 
         serialized_retry_exception_allowlist = serialize_retry_exception_allowlist(
             retry_exception_allowlist,

@@ -2304,15 +2304,19 @@ def get_dependencies_installer_path():
 def try_generate_entrypoint_args(
     install_ray: bool,
     pip_packages: List[str],
+    container_pip_packages: List[str],
     context: "RuntimeEnvContext",
 ):
+    dependencies_installer_path = (
+        runtime_env_constants.RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH
+    )
     install_ray_or_pip_packages_command = None
     entrypoint_args = []
     if install_ray:
         if install_ray_or_pip_packages_command is None:
             install_ray_or_pip_packages_command = [
                 "python",
-                runtime_env_constants.RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH,
+                dependencies_installer_path,
             ]
             if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
                 install_ray_or_pip_packages_command.extend(
@@ -2328,17 +2332,29 @@ def try_generate_entrypoint_args(
                         f"{ray.__version__}",
                     ]
                 )
-            if pip_packages:
+            if pip_packages or container_pip_packages:
+                merge_pip_packages = list(
+                    dict.fromkeys(pip_packages + container_pip_packages)
+                )
                 install_ray_or_pip_packages_command.extend(
                     [
                         "--packages",
-                        json.dumps(pip_packages),
+                        json.dumps(merge_pip_packages),
                     ]
                 )
             # we set default python executable in container
             # to avoid using the host python executable when
             # `install_ray` is True
             context.py_executable = "python"
+
+    if container_pip_packages:
+        if install_ray_or_pip_packages_command is None:
+            install_ray_or_pip_packages_command = [
+                "python",
+                dependencies_installer_path,
+                "--packages",
+                json.dumps(container_pip_packages),
+            ]
 
     if install_ray_or_pip_packages_command is not None:
         install_ray_or_pip_packages_command.append("&&")

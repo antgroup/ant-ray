@@ -101,7 +101,10 @@ def _modify_container_context_impl(
     )
 
     pip_packages = runtime_env.pip_config().get("packages", [])
-    entrypoint_args = try_generate_entrypoint_args(install_ray, pip_packages, context)
+    container_pip_packages = runtime_env.py_container_pip_list()
+    entrypoint_args = try_generate_entrypoint_args(
+        install_ray, pip_packages, container_pip_packages, context
+    )
 
     context.container["entrypoint_prefix"] = entrypoint_args
     # we need 'sudo' and 'admin', mount logs
@@ -121,14 +124,14 @@ def _modify_container_context_impl(
     container_command.append("--cap-add=AUDIT_WRITE")
 
     redirected_pyenv_folder = None
-    if install_ray:
+    if install_ray or container_pip_packages:
         container_to_host_mount_dict[
             dependencies_installer_path
         ] = get_dependencies_installer_path()
         if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
             container_to_host_mount_dict[get_ray_whl_dir()] = get_ray_whl_dir()
 
-    else:
+    if not install_ray:
         # mount ray package site path
         host_site_packages_path = get_ray_site_packages_path()
 

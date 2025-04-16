@@ -22,27 +22,23 @@
 namespace ray {
 namespace gcs {
 
-void GcsAutoscalerStateManager::HandleGetVirtualClusterResourceStates(
-    rpc::autoscaler::GetVirtualClusterResourceStatesRequest request,
-    rpc::autoscaler::GetVirtualClusterResourceStatesReply *reply,
-    rpc::SendReplyCallback send_reply_callback) {
+void GcsAutoscalerStateManager::MakeVirtualClusterResourceStatesInternal(
+    rpc::autoscaler::ClusterResourceState *state) {
   RAY_CHECK(thread_checker_.IsOnSameThread());
-  RAY_CHECK(request.last_seen_cluster_resource_state_version() <=
-            last_cluster_resource_state_version_);
-
   RAY_LOG(INFO) << "Getting virtual cluster resource states";
-  auto states = reply->mutable_virtual_cluster_resource_states()->mutable_states();
+  auto virtual_cluster_states = state->mutable_virtual_cluster_states();
   auto primary_cluster = gcs_virtual_cluster_manager_->GetPrimaryCluster();
   primary_cluster->ForeachVirtualCluster(
-      [states, this](const std::shared_ptr<VirtualCluster> &virtual_cluster) {
-        rpc::autoscaler::VirtualClusterState state;
+      [virtual_cluster_states,
+       this](const std::shared_ptr<VirtualCluster> &virtual_cluster) {
+        rpc::autoscaler::VirtualClusterState virtual_cluster_state;
         auto parent_id =
             (VirtualClusterID::FromBinary(virtual_cluster->GetID())).ParentID();
         if (!parent_id.IsNil()) {
-          state.set_parent_virtual_cluster_id(parent_id.Binary());
+          virtual_cluster_state.set_parent_virtual_cluster_id(parent_id.Binary());
         }
-        state.set_divisible(virtual_cluster->Divisible());
-        state.set_revision(virtual_cluster->GetRevision());
+        virtual_cluster_state.set_divisible(virtual_cluster->Divisible());
+        virtual_cluster_state.set_revision(virtual_cluster->GetRevision());
         const auto &visible_node_instances = virtual_cluster->GetVisibleNodeInstances();
         if (virtual_cluster->Divisible()) {
           for (const auto &[template_id, job_node_instances] : visible_node_instances) {
@@ -50,7 +46,7 @@ void GcsAutoscalerStateManager::HandleGetVirtualClusterResourceStates(
                 job_node_instances.find(kUndividedClusterId);
             if (unassigned_instances_iter != job_node_instances.end()) {
               for (const auto &[id, node_instance] : unassigned_instances_iter->second) {
-                state.add_nodes(id);
+                virtual_cluster_state.add_nodes(id);
               }
             }
           }
@@ -58,14 +54,14 @@ void GcsAutoscalerStateManager::HandleGetVirtualClusterResourceStates(
           for (const auto &[template_id, job_node_instances] : visible_node_instances) {
             for (const auto &[job_cluster_id, node_instances] : job_node_instances) {
               for (const auto &[id, node_instance] : node_instances) {
-                state.add_nodes(id);
+                virtual_cluster_state.add_nodes(id);
               }
             }
           }
-          GetVirtualClusterResources(&state);
+          GetVirtualClusterPendingResourceRequests(&virtual_cluster_state);
         }
 
-        (*states)[virtual_cluster->GetID()] = state;
+        (*virtual_cluster_states)[virtual_cluster->GetID()] = virtual_cluster_state;
       });
 
   rpc::autoscaler::VirtualClusterState primary_cluster_state;
@@ -80,33 +76,20 @@ void GcsAutoscalerStateManager::HandleGetVirtualClusterResourceStates(
       }
     }
   }
-  (*states)[kPrimaryClusterID] = primary_cluster_state;
+  (*virtual_cluster_states)[kPrimaryClusterID] = primary_cluster_state;
 
-  reply->mutable_virtual_cluster_resource_states()
-      ->set_last_seen_autoscaler_state_version(last_seen_autoscaler_state_version_);
-  reply->mutable_virtual_cluster_resource_states()->set_cluster_resource_state_version(
+  state->set_last_seen_autoscaler_state_version(last_seen_autoscaler_state_version_);
+  state->set_cluster_resource_state_version(
       IncrementAndGetNextClusterResourceStateVersion());
-  reply->mutable_virtual_cluster_resource_states()->set_cluster_session_name(
-      session_name_);
+  state->set_cluster_session_name(session_name_);
 
-  rpc::autoscaler::ClusterResourceState cluster_resource_state;
-  GetNodeStates(&cluster_resource_state);
-  GetClusterResourceConstraints(&cluster_resource_state);
-  reply->mutable_virtual_cluster_resource_states()->mutable_node_states()->Assign(
-      cluster_resource_state.node_states().begin(),
-      cluster_resource_state.node_states().end());
-  reply->mutable_virtual_cluster_resource_states()
-      ->mutable_cluster_resource_constraints()
-      ->CopyFrom(cluster_resource_state.cluster_resource_constraints());
+  GetNodeStates(state);
+  GetClusterResourceConstraints(state);
 
-  GetPendingGangResourceRequests(reply->mutable_virtual_cluster_resource_states());
-
-  // We are not using GCS_RPC_SEND_REPLY like other GCS managers to avoid the client
-  // having to parse the gcs status code embedded.
-  send_reply_callback(ray::Status::OK(), nullptr, nullptr);
+  GetVirtualClusterPendingGangResourceRequests(state);
 }
 
-void GcsAutoscalerStateManager::GetVirtualClusterResources(
+void GcsAutoscalerStateManager::GetVirtualClusterPendingResourceRequests(
     rpc::autoscaler::VirtualClusterState *state) {
   absl::flat_hash_map<google::protobuf::Map<std::string, double>, rpc::ResourceDemand>
       aggregate_load;
@@ -131,9 +114,8 @@ void GcsAutoscalerStateManager::GetVirtualClusterResources(
   }
 }
 
-void GcsAutoscalerStateManager::GetPendingGangResourceRequests(
-    rpc::autoscaler::VirtualClusterResourceStates *states) {
-  RAY_CHECK(thread_checker_.IsOnSameThread());
+void GcsAutoscalerStateManager::GetVirtualClusterPendingGangResourceRequests(
+    rpc::autoscaler::ClusterResourceState *state) {
   // Get the gang resource requests from the placement group load.
   auto placement_group_load = gcs_placement_group_manager_.GetPlacementGroupLoad();
   if (!placement_group_load || placement_group_load->placement_group_data_size() == 0) {
@@ -144,8 +126,8 @@ void GcsAutoscalerStateManager::GetPendingGangResourceRequests(
   for (auto &&pg_data :
        std::move(*placement_group_load->mutable_placement_group_data())) {
     auto virtual_cluster_state_iter =
-        states->mutable_states()->find(pg_data.virtual_cluster_id());
-    if (virtual_cluster_state_iter == states->mutable_states()->end()) {
+        state->mutable_virtual_cluster_states()->find(pg_data.virtual_cluster_id());
+    if (virtual_cluster_state_iter == state->mutable_virtual_cluster_states()->end()) {
       continue;
     }
     auto *gang_resource_req =

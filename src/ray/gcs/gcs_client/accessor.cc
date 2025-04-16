@@ -1500,20 +1500,6 @@ Status AutoscalerStateAccessor::GetClusterResourceState(int64_t timeout_ms,
   return Status::OK();
 }
 
-Status AutoscalerStateAccessor::GetVirtualClusterResourceStates(
-    int64_t timeout_ms, std::string &serialized_reply) {
-  rpc::autoscaler::GetVirtualClusterResourceStatesRequest request;
-  rpc::autoscaler::GetVirtualClusterResourceStatesReply reply;
-
-  RAY_RETURN_NOT_OK(client_impl_->GetGcsRpcClient().SyncGetVirtualClusterResourceStates(
-      request, &reply, timeout_ms));
-
-  if (!reply.SerializeToString(&serialized_reply)) {
-    return Status::IOError("Failed to serialize GetVirtualClusterResourceStates");
-  }
-  return Status::OK();
-}
-
 Status AutoscalerStateAccessor::GetClusterStatus(int64_t timeout_ms,
                                                  std::string &serialized_reply) {
   rpc::autoscaler::GetClusterStatusRequest request;

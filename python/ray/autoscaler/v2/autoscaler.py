@@ -34,10 +34,7 @@ from ray.autoscaler.v2.instance_manager.subscribers.cloud_instance_updater impor
 from ray.autoscaler.v2.instance_manager.subscribers.ray_stopper import RayStopper
 from ray.autoscaler.v2.metrics_reporter import AutoscalerMetricsReporter
 from ray.autoscaler.v2.scheduler import ResourceDemandScheduler
-from ray.autoscaler.v2.sdk import (
-    get_cluster_resource_state,
-    get_virtual_cluster_resource_states,
-)
+from ray.autoscaler.v2.sdk import get_cluster_resource_state
 from ray.core.generated.autoscaler_pb2 import AutoscalingState
 
 logger = logging.getLogger(__name__)
@@ -180,17 +177,10 @@ class Autoscaler:
                 ray_install_errors.append(self._ray_install_errors_queue.get())
 
             # Get the current state of the ray cluster resources.
-            if os.getenv("VIRTUAL_CLUSTER_ENABLED", "false") == "true":
-                ray_resource_state = get_virtual_cluster_resource_states(
-                    self._gcs_client
-                )
-                logger.info("Received virtual cluster resource states")
-                logger.info(
-                    f"Cluster resource constraints: {ray_resource_state.cluster_resource_constraints}"
-                )
-                logger.info(f"Virtual cluster states: {ray_resource_state.states}")
-            else:
-                ray_resource_state = get_cluster_resource_state(self._gcs_client)
+            ray_resource_state = get_cluster_resource_state(self._gcs_client)
+            logger.info(
+                f"Virtual cluster states: {ray_resource_state.virtual_cluster_states}"
+            )
 
             # Refresh the config from the source
             self._config_reader.refresh_cached_autoscaling_config()

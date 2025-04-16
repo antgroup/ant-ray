@@ -993,9 +993,6 @@ class AutoscalerStateAccessor {
   virtual Status GetClusterResourceState(int64_t timeout_ms,
                                          std::string &serialized_reply);
 
-  virtual Status GetVirtualClusterResourceStates(int64_t timeout_ms,
-                                                 std::string &serialized_reply);
-
   virtual Status GetClusterStatus(int64_t timeout_ms, std::string &serialized_reply);
 
   virtual Status AsyncGetClusterStatus(

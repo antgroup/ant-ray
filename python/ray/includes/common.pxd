@@ -551,11 +551,6 @@ cdef extern from "ray/gcs/gcs_client/accessor.h" nogil:
             c_string &serialized_reply
         )
 
-        CRayStatus GetVirtualClusterResourceStates(
-            int64_t timeout_ms,
-            c_string &serialized_reply
-        )
-
         CRayStatus GetClusterStatus(
             int64_t timeout_ms,
             c_string &serialized_reply

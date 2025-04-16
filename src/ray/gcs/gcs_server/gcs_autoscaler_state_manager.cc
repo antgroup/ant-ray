@@ -49,7 +49,11 @@ void GcsAutoscalerStateManager::HandleGetClusterResourceState(
             last_cluster_resource_state_version_);
 
   auto state = reply->mutable_cluster_resource_state();
-  MakeClusterResourceStateInternal(state);
+  if (gcs_virtual_cluster_manager_->GetPrimaryCluster()->HasVirtualClusters()) {
+    MakeVirtualClusterResourceStatesInternal(state);
+  } else {
+    MakeClusterResourceStateInternal(state);
+  }
 
   // We are not using GCS_RPC_SEND_REPLY like other GCS managers to avoid the client
   // having to parse the gcs status code embedded.

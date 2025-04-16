@@ -47,11 +47,6 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
       rpc::autoscaler::GetClusterResourceStateReply *reply,
       rpc::SendReplyCallback send_reply_callback) override;
 
-  void HandleGetVirtualClusterResourceStates(
-      rpc::autoscaler::GetVirtualClusterResourceStatesRequest request,
-      rpc::autoscaler::GetVirtualClusterResourceStatesReply *reply,
-      rpc::SendReplyCallback send_reply_callback) override;
-
   void HandleReportAutoscalingState(
       rpc::autoscaler::ReportAutoscalingStateRequest request,
       rpc::autoscaler::ReportAutoscalingStateReply *reply,
@@ -100,6 +95,9 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   /// protobuf.
   /// \param state The state to be filled.
   void MakeClusterResourceStateInternal(rpc::autoscaler::ClusterResourceState *state);
+
+  void MakeVirtualClusterResourceStatesInternal(
+      rpc::autoscaler::ClusterResourceState *state);
 
   /// \brief Get the placement group load from GcsPlacementGroupManager
   ///
@@ -154,9 +152,10 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   /// more details. This is requested through autoscaler SDK for request_resources().
   void GetClusterResourceConstraints(rpc::autoscaler::ClusterResourceState *state);
 
-  void GetVirtualClusterResources(rpc::autoscaler::VirtualClusterState *state);
-  void GetPendingGangResourceRequests(
-      rpc::autoscaler::VirtualClusterResourceStates *states);
+  void GetVirtualClusterPendingResourceRequests(
+      rpc::autoscaler::VirtualClusterState *state);
+  void GetVirtualClusterPendingGangResourceRequests(
+      rpc::autoscaler::ClusterResourceState *state);
 
   /// \brief Get the autoscaler infeasible request resource shapes for each node.
   /// \return a map of node id to the corresponding infeasible resource requests shapes.

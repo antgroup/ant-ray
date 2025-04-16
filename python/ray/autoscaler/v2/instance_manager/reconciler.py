@@ -38,7 +38,6 @@ from ray.core.generated.autoscaler_pb2 import (
     NodeStatus,
     PendingInstance,
     PendingInstanceRequest,
-    VirtualClusterResourceStates,
     VirtualClusterState,
 )
 from ray.core.generated.instance_manager_pb2 import GetInstanceManagerStateRequest
@@ -81,9 +80,7 @@ class Reconciler:
         instance_manager: InstanceManager,
         scheduler: IResourceScheduler,
         cloud_provider: ICloudInstanceProvider,
-        ray_cluster_resource_state: Union[
-            ClusterResourceState, VirtualClusterResourceStates
-        ],
+        ray_cluster_resource_state: ClusterResourceState,
         non_terminated_cloud_instances: Dict[CloudInstanceId, CloudInstance],
         autoscaling_config: AutoscalingConfig,
         cloud_provider_errors: Optional[List[CloudInstanceProviderError]] = None,
@@ -250,9 +247,7 @@ class Reconciler:
         instance_manager: InstanceManager,
         scheduler: IResourceScheduler,
         cloud_provider: ICloudInstanceProvider,
-        ray_cluster_resource_state: Union[
-            ClusterResourceState, VirtualClusterResourceStates
-        ],
+        ray_cluster_resource_state: ClusterResourceState,
         non_terminated_cloud_instances: Dict[CloudInstanceId, CloudInstance],
         autoscaling_config: AutoscalingConfig,
         _logger: Optional[logging.Logger] = None,
@@ -298,7 +293,7 @@ class Reconciler:
             _logger=_logger or logger,
         )
 
-        if isinstance(ray_cluster_resource_state, ClusterResourceState):
+        if len(ray_cluster_resource_state.virtual_cluster_states) == 0:
             Reconciler._scale_cluster(
                 autoscaling_state=autoscaling_state,
                 instance_manager=instance_manager,
@@ -307,15 +302,15 @@ class Reconciler:
                 autoscaling_config=autoscaling_config,
             )
         else:
-            ray_cluster_resource_state: VirtualClusterResourceStates
-
             buffered_node_pool = BufferedNodePool()
             for node_state in ray_cluster_resource_state.node_states:
                 buffered_node_pool.all_node_states[
                     binary_to_hex(node_state.node_id)
                 ] = node_state
 
-            for node_id in ray_cluster_resource_state.states[PRIMARY_CLUSTER_ID].nodes:
+            for node_id in ray_cluster_resource_state.virtual_cluster_states[
+                PRIMARY_CLUSTER_ID
+            ].nodes:
                 if node_id in buffered_node_pool.all_node_states:
                     node_list = buffered_node_pool.unassigned_nodes.setdefault(
                         buffered_node_pool.all_node_states[node_id].ray_node_type_name,
@@ -326,7 +321,7 @@ class Reconciler:
             for (
                 virtual_cluster_id,
                 virtual_cluster_state,
-            ) in ray_cluster_resource_state.states.items():
+            ) in ray_cluster_resource_state.virtual_cluster_states.items():
                 if (
                     virtual_cluster_id == PRIMARY_CLUSTER_ID
                     or virtual_cluster_state.divisible
@@ -1350,7 +1345,6 @@ class Reconciler:
             str_reply = gcs_client.remove_nodes_from_virtual_cluster(
                 virtual_cluster_id, nodes_to_remove
             )
-            logger.info(f"Remove nodes reply: {str_reply}")
 
             remove_nodes_reply = RemoveNodesFromVirtualClusterReply()
             remove_nodes_reply.ParseFromString(str_reply)
@@ -1376,7 +1370,7 @@ class Reconciler:
     def _scale_primary_cluster(
         autoscaling_state: AutoscalingState,
         instance_manager: InstanceManager,
-        ray_state: VirtualClusterResourceStates,
+        ray_state: ClusterResourceState,
         scheduler: IResourceScheduler,
         autoscaling_config: AutoscalingConfig,
         buffered_node_pool: BufferedNodePool,
@@ -1414,7 +1408,9 @@ class Reconciler:
 
             if len(expanding_replica_sets) > 0:
                 replica_sets: Dict[str, int] = {}
-                for node_id in ray_state.states[virtual_cluster_id].nodes:
+                for node_id in ray_state.virtual_cluster_states[
+                    virtual_cluster_id
+                ].nodes:
                     replica_sets[
                         buffered_node_pool.all_node_states[node_id].ray_node_type_name
                     ] = (
@@ -1435,9 +1431,9 @@ class Reconciler:
                 )
                 str_reply = gcs_client.create_or_update_virtual_cluster(
                     virtual_cluster_id,
-                    ray_state.states[virtual_cluster_id].divisible,
+                    ray_state.virtual_cluster_states[virtual_cluster_id].divisible,
                     replica_sets,
-                    ray_state.states[virtual_cluster_id].revision,
+                    ray_state.virtual_cluster_states[virtual_cluster_id].revision,
                 )
                 reply = CreateOrUpdateVirtualClusterReply()
                 logger.info(reply)
@@ -1474,8 +1470,6 @@ class Reconciler:
                     )
                 )
 
-        # TODO(rickyx): We should probably name it as "Planner" or "Scaler"
-        # or "ClusterScaler"
         sched_request = SchedulingRequest(
             node_type_configs=autoscaling_config.get_node_type_configs(),
             max_num_nodes=autoscaling_config.get_max_num_nodes(),

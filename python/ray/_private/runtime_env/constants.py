@@ -52,10 +52,9 @@ CONTAINER_ENV_PLACEHOLDER = "$CONTAINER_ENV_PLACEHOLDER"
 RAY_JAVA_JARS_DIRS = "RAY_JAVA_JARS_DIRS"
 
 # Whether podman integrate nydus
-RAY_PODMAN_UES_NYDUS = env_bool("RAY_PODMAN_UES_NYDUS", False)
+RAY_PODMAN_UES_NYDUS = env_bool("RAY_PODMAN_UES_NYDUS", True)
 
 # Default mount points for Podman containers.
-# The format allows either "{source_path}:{target_path}" for bind mounts
-# or "{path}" (equivalent to source=target) for symmetric mounts.
-# Entries are separated by semicolons (e.g., "A:A;B:C;D" where "D" implies "D:D").
+# The format allows "{source_path}:{target_path}" for bind mounts
+# Entries are separated by semicolons (e.g., "A:A;B:C").
 RAY_PODMAN_DEFAULT_MOUNT_POINTS = os.environ.get("RAY_PODMAN_DEFAULT_MOUNT_POINTS", "")

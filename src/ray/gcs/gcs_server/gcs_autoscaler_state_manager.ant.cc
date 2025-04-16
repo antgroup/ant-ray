@@ -64,6 +64,7 @@ void GcsAutoscalerStateManager::HandleGetVirtualClusterResourceStates(
           }
           GetVirtualClusterResources(&state);
         }
+
         (*states)[virtual_cluster->GetID()] = state;
       });
 
@@ -98,6 +99,8 @@ void GcsAutoscalerStateManager::HandleGetVirtualClusterResourceStates(
       ->mutable_cluster_resource_constraints()
       ->CopyFrom(cluster_resource_state.cluster_resource_constraints());
 
+  GetPendingGangResourceRequests(reply->mutable_virtual_cluster_resource_states());
+
   // We are not using GCS_RPC_SEND_REPLY like other GCS managers to avoid the client
   // having to parse the gcs status code embedded.
   send_reply_callback(ray::Status::OK(), nullptr, nullptr);
@@ -126,8 +129,64 @@ void GcsAutoscalerStateManager::GetVirtualClusterResources(
       req->mutable_resources_bundle()->insert(shape.begin(), shape.end());
     }
   }
+}
 
-  // TODO: add pending resource requests.
+void GcsAutoscalerStateManager::GetPendingGangResourceRequests(
+    rpc::autoscaler::VirtualClusterResourceStates *states) {
+  RAY_CHECK(thread_checker_.IsOnSameThread());
+  // Get the gang resource requests from the placement group load.
+  auto placement_group_load = gcs_placement_group_manager_.GetPlacementGroupLoad();
+  if (!placement_group_load || placement_group_load->placement_group_data_size() == 0) {
+    return;
+  }
+
+  // Iterate through each placement group load.
+  for (auto &&pg_data :
+       std::move(*placement_group_load->mutable_placement_group_data())) {
+    auto virtual_cluster_state_iter =
+        states->mutable_states()->find(pg_data.virtual_cluster_id());
+    if (virtual_cluster_state_iter == states->mutable_states()->end()) {
+      continue;
+    }
+    auto *gang_resource_req =
+        virtual_cluster_state_iter->second.add_pending_gang_resource_requests();
+    auto pg_state = pg_data.state();
+    auto pg_id = PlacementGroupID::FromBinary(pg_data.placement_group_id());
+    // For each placement group, if it's not pending/rescheduling, skip it since.
+    // it's not part of the load.
+    if (pg_state != rpc::PlacementGroupTableData::PENDING &&
+        pg_state != rpc::PlacementGroupTableData::RESCHEDULING) {
+      continue;
+    }
+
+    const auto pg_constraint =
+        GenPlacementConstraintForPlacementGroup(pg_id.Hex(), pg_data.strategy());
+
+    // Add the strategy as detail info for the gang resource request.
+    gang_resource_req->set_details(FormatPlacementGroupDetails(pg_data));
+
+    // Copy the PG's bundles to the request.
+    for (auto &&bundle : std::move(*pg_data.mutable_bundles())) {
+      if (!NodeID::FromBinary(bundle.node_id()).IsNil()) {
+        // We will be skipping **placed** bundle (which has node id associated with it).
+        // This is to avoid double counting the bundles that are already placed when
+        // reporting PG related load.
+        RAY_CHECK(pg_state == rpc::PlacementGroupTableData::RESCHEDULING);
+        // NOTE: This bundle is placed in a PG, this must be a bundle that was lost due
+        // to node crashed.
+        continue;
+      }
+      // Add the resources.
+      auto resource_req = gang_resource_req->add_requests();
+      *resource_req->mutable_resources_bundle() =
+          std::move(*bundle.mutable_unit_resources());
+
+      // Add the placement constraint.
+      if (pg_constraint.has_value()) {
+        resource_req->add_placement_constraints()->CopyFrom(pg_constraint.value());
+      }
+    }
+  }
 }
 
 }  // namespace gcs

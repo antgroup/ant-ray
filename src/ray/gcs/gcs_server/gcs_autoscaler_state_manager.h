@@ -155,6 +155,8 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   void GetClusterResourceConstraints(rpc::autoscaler::ClusterResourceState *state);
 
   void GetVirtualClusterResources(rpc::autoscaler::VirtualClusterState *state);
+  void GetPendingGangResourceRequests(
+      rpc::autoscaler::VirtualClusterResourceStates *states);
 
   /// \brief Get the autoscaler infeasible request resource shapes for each node.
   /// \return a map of node id to the corresponding infeasible resource requests shapes.

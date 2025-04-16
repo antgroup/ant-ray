@@ -1337,10 +1337,10 @@ class Reconciler:
             )
             node_list.append(terminate_request.ray_node_id)
             nodes_to_remove.append(terminate_request.ray_node_id)
-            node_set.pop(terminate_request.ray_node_id)
+            node_set.remove(terminate_request.ray_node_id)
 
         if len(nodes_to_remove) > 0:
-            ray_state.nodes.clear()
+            ray_state.nodes[:] = []
             ray_state.nodes.extend(list(node_set))
             logger.info(
                 "Removing nodes {} from virtual cluster {}".format(
@@ -1354,10 +1354,12 @@ class Reconciler:
 
             remove_nodes_reply = RemoveNodesFromVirtualClusterReply()
             remove_nodes_reply.ParseFromString(str_reply)
-            if remove_nodes_reply.status.code == 0:
+            if remove_nodes_reply.status.code != 0:
                 # TODO: retry if needed.
                 logger.warning(
-                    "Failed to remove nodes from virtual cluster %s", virtual_cluster_id
+                    "Failed to remove nodes from virtual cluster {}: {}".format(
+                        virtual_cluster_id, str_reply
+                    )
                 )
 
         # Buffer launching requests.
@@ -1401,7 +1403,7 @@ class Reconciler:
                         available_node_list = available_node_list[
                             launch_request.count :
                         ]
-                    else:
+                    elif len(available_node_list) > 0:
                         expanding_replica_sets[launch_request.ray_node_type] = len(
                             available_node_list
                         )
@@ -1410,45 +1412,55 @@ class Reconciler:
                             launch_request.ray_node_type
                         )
 
-            replica_sets: Dict[str, int] = {}
-            for node_id in ray_state.states[virtual_cluster_id].nodes:
-                replica_sets[
-                    buffered_node_pool.all_node_states[node_id].ray_node_type_name
-                ] = (
-                    replica_sets.get(
-                        buffered_node_pool.all_node_states[node_id].ray_node_type_name,
-                        0,
+            if len(expanding_replica_sets) > 0:
+                replica_sets: Dict[str, int] = {}
+                for node_id in ray_state.states[virtual_cluster_id].nodes:
+                    replica_sets[
+                        buffered_node_pool.all_node_states[node_id].ray_node_type_name
+                    ] = (
+                        replica_sets.get(
+                            buffered_node_pool.all_node_states[
+                                node_id
+                            ].ray_node_type_name,
+                            0,
+                        )
+                        + 1
                     )
-                    + 1
+
+                for template_id, count in expanding_replica_sets.items():
+                    replica_sets[template_id] = replica_sets.get(template_id, 0) + count
+
+                logger.info(
+                    f"Updating virtual cluster {virtual_cluster_id} with replica_sets {replica_sets}"
                 )
-
-            for template_id, count in expanding_replica_sets.items():
-                replica_sets[template_id] = replica_sets.get(template_id, 0) + count
-
-            logger.info(
-                f"Updating virtual cluster {virtual_cluster_id} with replica_sets {replica_sets}"
-            )
-            str_reply = gcs_client.create_or_update_virtual_cluster(
-                virtual_cluster_id,
-                ray_state.states[virtual_cluster_id].divisible,
-                replica_sets,
-                ray_state.states[virtual_cluster_id].revision,
-            )
-            reply = CreateOrUpdateVirtualClusterReply()
-            logger.info(reply)
-            reply.ParseFromString(str_reply)
-            if reply.status.code == 0:
-                # TODO: retry if needed.
-                logger.warning(
-                    "Failed to update virtual cluster %s", virtual_cluster_id
+                str_reply = gcs_client.create_or_update_virtual_cluster(
+                    virtual_cluster_id,
+                    ray_state.states[virtual_cluster_id].divisible,
+                    replica_sets,
+                    ray_state.states[virtual_cluster_id].revision,
+                )
+                reply = CreateOrUpdateVirtualClusterReply()
+                logger.info(reply)
+                reply.ParseFromString(str_reply)
+                if reply.status.code != 0:
+                    # TODO: retry if needed.
+                    logger.warning(
+                        f"Failed to update virtual cluster {virtual_cluster_id}: {str_reply}"
+                    )
+            else:
+                logger.info(
+                    f"There is no available unassigned nodes for virtual cluster {virtual_cluster_id}. Wait for new instances."
                 )
 
         # Get the current instance states.
         im_instances, version = Reconciler._get_im_instances(instance_manager)
         autoscaler_instances = []
 
+        unassigned_node_set = set()
+        for _, node_list in buffered_node_pool.unassigned_nodes.items():
+            unassigned_node_set.update(node_list)
         for im_instance in im_instances:
-            if im_instance.node_id in buffered_node_pool.all_node_states:
+            if im_instance.node_id in unassigned_node_set:
                 ray_node = buffered_node_pool.all_node_states.get(im_instance.node_id)
                 autoscaler_instances.append(
                     AutoscalerInstance(

@@ -315,6 +315,7 @@ class SchedulingNode:
                     instance_type=instance.im_instance.instance_type,
                 ),
                 node_kind=NodeKind.WORKER,
+                ray_node_type=instance.ray_node.ray_node_type_name,
             )
 
         return SchedulingNode.from_node_config(
@@ -380,6 +381,7 @@ class SchedulingNode:
             status=status,
             im_instance_id=im_instance_id,
             node_kind=node_kind,
+            ray_node_type=node_config.ray_node_type,
         )
 
     def __post_init__(self):

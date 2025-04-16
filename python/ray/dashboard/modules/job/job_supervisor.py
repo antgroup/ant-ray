@@ -369,6 +369,7 @@ class JobSupervisor:
                 f"{env[ray_constants.RAY_ADDRESS_ENVIRONMENT_VARIABLE]}"
             )
             log_path = self._log_client.get_log_file_path(self._job_id)
+            self._logger.info(env)
             child_process = self._exec_entrypoint(env, log_path)
             child_pid = child_process.pid
 

@@ -2335,6 +2335,10 @@ def try_generate_entrypoint_args(
                 ]
             )
         if pip_packages or container_pip_packages:
+            # When `install_ray` is True, we need to install
+            # both runtime env field pip packages and container pip packages
+            # before worker starts with default python in container.
+            # So, We need to merge the two lists and remove duplicates.
             merge_pip_packages = list(
                 dict.fromkeys(pip_packages + container_pip_packages)
             )

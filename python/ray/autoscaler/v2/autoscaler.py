@@ -1,4 +1,5 @@
 import logging
+import os
 from queue import Queue
 from typing import List, Optional
 
@@ -176,7 +177,10 @@ class Autoscaler:
                 ray_install_errors.append(self._ray_install_errors_queue.get())
 
             # Get the current state of the ray cluster resources.
-            ray_cluster_resource_state = get_cluster_resource_state(self._gcs_client)
+            ray_resource_state = get_cluster_resource_state(self._gcs_client)
+            logger.info(
+                f"Virtual cluster states: {ray_resource_state.virtual_cluster_states}"
+            )
 
             # Refresh the config from the source
             self._config_reader.refresh_cached_autoscaling_config()
@@ -186,7 +190,7 @@ class Autoscaler:
                 instance_manager=self._instance_manager,
                 scheduler=self._scheduler,
                 cloud_provider=self._cloud_instance_provider,
-                ray_cluster_resource_state=ray_cluster_resource_state,
+                ray_cluster_resource_state=ray_resource_state,
                 non_terminated_cloud_instances=(
                     self._cloud_instance_provider.get_non_terminated()
                 ),
@@ -195,6 +199,7 @@ class Autoscaler:
                 ray_stop_errors=ray_stop_errors,
                 autoscaling_config=autoscaling_config,
                 metrics_reporter=self._metrics_reporter,
+                gcs_client=self._gcs_client,
             )
         except Exception as e:
             logger.exception(e)

@@ -184,6 +184,7 @@ cdef extern from "src/ray/protobuf/common.pb.h" nogil:
     cdef cppclass CSchedulingStrategy "ray::rpc::SchedulingStrategy":
         CSchedulingStrategy()
         void clear_scheduling_strategy()
+        void set_virtual_cluster_id(const c_string& virtual_cluster_id)
         CSpreadSchedulingStrategy* mutable_spread_scheduling_strategy()
         CDefaultSchedulingStrategy* mutable_default_scheduling_strategy()
         CPlacementGroupSchedulingStrategy* mutable_placement_group_scheduling_strategy()  # noqa: E501
@@ -579,6 +580,23 @@ cdef extern from "ray/gcs/gcs_client/accessor.h" nogil:
             c_string &rejection_reason_message
         )
 
+    cdef cppclass CVirtualClusterInfoAccessor "ray::gcs::VirtualClusterInfoAccessor":
+        CRayStatus SyncCreateOrUpdateVirtualCluster(
+            const c_string &virtual_cluster_id,
+            c_bool divisible,
+            const unordered_map[c_string, int32_t] &replica_sets,
+            int64_t revision,
+            int64_t timeout_ms,
+            const c_string &serialized_reply
+        )
+
+        CRayStatus SyncRemoveNodesFromVirtualCluster(
+            const c_string &virtual_cluster_id,
+            const c_vector[c_string] &nodes_to_remove,
+            int64_t timeout_ms,
+            const c_string &serialized_reply
+        )
+
 
 cdef extern from "ray/gcs/gcs_client/gcs_client.h" nogil:
     cdef enum CGrpcStatusCode "grpc::StatusCode":
@@ -606,6 +624,7 @@ cdef extern from "ray/gcs/gcs_client/gcs_client.h" nogil:
         CNodeResourceInfoAccessor& NodeResources()
         CRuntimeEnvAccessor& RuntimeEnvs()
         CAutoscalerStateAccessor& Autoscaler()
+        CVirtualClusterInfoAccessor& VirtualCluster()
 
     cdef CRayStatus ConnectOnSingletonIoContext(CGcsClient &gcs_client, int timeout_ms)
 

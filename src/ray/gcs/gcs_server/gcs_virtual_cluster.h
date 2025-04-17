@@ -363,6 +363,8 @@ class DivisibleCluster : public VirtualCluster {
   /// \return True if any dead node instances are replenished, false otherwise.
   bool ReplenishNodeInstances(const NodeInstanceReplenishCallback &callback) override;
 
+  bool HasJobClusters() const { return !job_clusters_.empty(); }
+
  protected:
   /// Do create a job cluster from the divisible cluster.
   ///
@@ -534,10 +536,8 @@ class PrimaryCluster : public DivisibleCluster,
 
   /// Iterate virtual clusters view matching the request.
   ///
-  /// \param request The request to get the virtual clusters view.
   /// \param callback The callback to visit each virtual cluster view.
-  void ForeachVirtualClustersView(rpc::GetAllVirtualClusterInfoRequest request,
-                                  VirtualClustersViewVisitCallback callback) const;
+  void ForeachVirtualClustersView(VirtualClustersViewVisitCallback callback) const;
 
   /// Handle the node added event.
   ///
@@ -554,6 +554,10 @@ class PrimaryCluster : public DivisibleCluster,
 
   /// Garbage collect expired job clusters.
   void GCExpiredJobClusters();
+
+  bool HasVirtualClusters() const {
+    return !logical_clusters_.empty() || HasJobClusters();
+  }
 
  protected:
   /// Handle the node dead event.

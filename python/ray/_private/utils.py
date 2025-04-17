@@ -2313,54 +2313,53 @@ def try_generate_entrypoint_args(
     podman_dependencies_installer_path: str,
     context: "RuntimeEnvContext",
 ):
-    install_ray_or_pip_packages_command = None
+    podman_dependencies_installer_command = None
     entrypoint_args = []
     if install_ray:
-        if install_ray_or_pip_packages_command is None:
-            install_ray_or_pip_packages_command = [
-                "python",
-                podman_dependencies_installer_path,
-            ]
-            if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
-                install_ray_or_pip_packages_command.extend(
-                    [
-                        "--whl-dir",
-                        get_ray_whl_dir(),
-                    ]
-                )
-            else:
-                install_ray_or_pip_packages_command.extend(
-                    [
-                        "--ray-version",
-                        f"{ray.__version__}",
-                    ]
-                )
-            if pip_packages or container_pip_packages:
-                merge_pip_packages = list(
-                    dict.fromkeys(pip_packages + container_pip_packages)
-                )
-                install_ray_or_pip_packages_command.extend(
-                    [
-                        "--packages",
-                        json.dumps(merge_pip_packages),
-                    ]
-                )
-            # we set default python executable in container
-            # to avoid using the host python executable when
-            # `install_ray` is True
-            context.py_executable = "python"
+        podman_dependencies_installer_command = [
+            "python",
+            podman_dependencies_installer_path,
+        ]
+        if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
+            podman_dependencies_installer_command.extend(
+                [
+                    "--whl-dir",
+                    get_ray_whl_dir(),
+                ]
+            )
+        else:
+            podman_dependencies_installer_command.extend(
+                [
+                    "--ray-version",
+                    f"{ray.__version__}",
+                ]
+            )
+        if pip_packages or container_pip_packages:
+            merge_pip_packages = list(
+                dict.fromkeys(pip_packages + container_pip_packages)
+            )
+            podman_dependencies_installer_command.extend(
+                [
+                    "--packages",
+                    json.dumps(merge_pip_packages),
+                ]
+            )
+        # we set default python executable in container
+        # to avoid using the host python executable when
+        # `install_ray` is True
+        context.py_executable = "python"
 
     if container_pip_packages:
-        if install_ray_or_pip_packages_command is None:
-            install_ray_or_pip_packages_command = [
+        if podman_dependencies_installer_command is None:
+            podman_dependencies_installer_command = [
                 "python",
                 podman_dependencies_installer_path,
                 "--packages",
                 json.dumps(container_pip_packages),
             ]
 
-    if install_ray_or_pip_packages_command is not None:
-        install_ray_or_pip_packages_command.append("&&")
-        entrypoint_args.extend(install_ray_or_pip_packages_command)
+    if podman_dependencies_installer_command is not None:
+        podman_dependencies_installer_command.append("&&")
+        entrypoint_args.extend(podman_dependencies_installer_command)
 
     return entrypoint_args

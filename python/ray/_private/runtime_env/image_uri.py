@@ -113,7 +113,11 @@ def _modify_container_context_impl(
     # before the worker process starts.
     if container_install_ray or container_pip_packages:
         entrypoint_args = try_generate_entrypoint_args(
-            container_install_ray, pip_packages, container_pip_packages, podman_dependencies_installer_path, context
+            container_install_ray,
+            pip_packages,
+            container_pip_packages,
+            podman_dependencies_installer_path,
+            context,
         )
         context.container["entrypoint_prefix"] = entrypoint_args
     # we need 'sudo' and 'admin', mount logs

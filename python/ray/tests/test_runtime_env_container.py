@@ -473,7 +473,7 @@ class TestContainerRuntimeEnvCommandLine:
         wait_for_condition(
             lambda: check_logs_by_keyword(keyword2, log_file_pattern), timeout=20
         )
-    
+
     @pytest.mark.parametrize(
         "ray_start_regular",
         [{"_system_config": {"worker_resource_limits_enabled": True}}],

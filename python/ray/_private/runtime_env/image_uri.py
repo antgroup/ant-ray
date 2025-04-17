@@ -107,6 +107,7 @@ def _modify_container_context_impl(
             parse_allocated_resource(runtime_env.get_serialized_allocated_instances())
         )
 
+    pip_packages = runtime_env.pip_config().get("packages", [])
     # NOTE(Jacky): When `install_ray` is True, generate `entrypoint_args` to install dependencies before starting the worker.
     # These arguments will:
     # 1. Use the Python interpreter inside the container to install the specified version of `ant-ray`.
@@ -115,7 +116,6 @@ def _modify_container_context_impl(
     #   python /tmp/scripts/dependencies_installer.py --ray-version=2.0.0 --packages "{base64_pip_packages}"
     # The generated `entrypoint_args` are prefixed to the container's entrypoint, ensuring dependencies are installed
     # before the worker process starts.
-    pip_packages = runtime_env.pip_config().get("packages", [])
     if container_install_ray:
         entrypoint_args = try_generate_entrypoint_args(pip_packages, context)
         context.container["entrypoint_prefix"] = entrypoint_args

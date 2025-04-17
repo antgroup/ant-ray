@@ -2370,7 +2370,7 @@ def parse_allocated_resource(serialized_allocated_instances):
         else:
             # cpushare
             container_resource_args.append("--cpus=" + str(int(cpu_resource / 10000)))
-    if "memory" in allocated_resource.keys():
+    if "memory" in allocated_resource:
         container_resource_args.append(
             "--memory=" + str(int(allocated_resource["memory"] / 100000000)) + "m"
         )

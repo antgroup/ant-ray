@@ -2276,7 +2276,7 @@ def try_update_runtime_env_vars(
 def parse_allocated_resource(serialized_allocated_instances):
     container_resource_args = []
     allocated_resource = json.loads(serialized_allocated_instances)
-    if "CPU" in allocated_resource.keys():
+    if "CPU" in allocated_resource:
         cpu_resource = allocated_resource["CPU"]
         if isinstance(cpu_resource, list):
             # cpuset: because we may split one cpu core into some pieces,

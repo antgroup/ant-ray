@@ -2305,6 +2305,7 @@ def try_generate_entrypoint_args(
     install_ray: bool,
     pip_packages: List[str],
     container_pip_packages: List[str],
+    without_python_path: bool,
     context: "RuntimeEnvContext",
 ):
     dependencies_installer_path = (
@@ -2355,6 +2356,10 @@ def try_generate_entrypoint_args(
                 "--packages",
                 json.dumps(container_pip_packages),
             ]
+            if without_python_path:
+                install_ray_or_pip_packages_command.extend(
+                    ["--without-python-path", "true"]
+                )
 
     if install_ray_or_pip_packages_command is not None:
         install_ray_or_pip_packages_command.append("&&")

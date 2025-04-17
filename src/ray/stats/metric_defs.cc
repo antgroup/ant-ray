@@ -305,12 +305,12 @@ DEFINE_stats(spill_manager_throughput_mb,
 /// GCS Storage
 DEFINE_stats(gcs_storage_operation_latency_ms,
              "Time to invoke an operation on Gcs storage",
-             ("Operation", "TableName"),
+             ("Operation", "TableName", "StorageNamespace"),
              ({0.1, 1, 10, 100, 1000, 10000}, ),
              ray::stats::HISTOGRAM);
 DEFINE_stats(gcs_storage_operation_count,
              "Number of operations invoked on Gcs storage",
-             ("Operation", "TableName"),
+             ("Operation", "TableName", "StorageNamespace"),
              (),
              ray::stats::COUNT);
 

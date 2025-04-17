@@ -2125,11 +2125,16 @@ def try_update_container_command(
     # add `entrypoint_prefix` to `passthrough_args`
     if container.get("entrypoint_prefix", None):
         entrypoint_prefix = container["entrypoint_prefix"]
-        # update install_ray pip packages to base64
+        # NOTE(Jacky): The `entrypoint_prefix` has a list of pip packages (List[str]).
+        # Since command-line/environment variables cannot directly pass list types,
+        # we encode the list as a base64 string to ensure safe transmission and parsing.
+        # Example format: "['package1', 'package2']" → base64 encoded → "WydGVzdC1wYWNrYWdlMSd9LCAndGVzdC1wYWNrYWdlMiddXQ=="
         if "--packages" in entrypoint_prefix:
             index = entrypoint_prefix.index("--packages")
             pip_packages_str = entrypoint_prefix[index + 1]
-            logger.info(f"Install ray pip packages {pip_packages_str}")
+            logger.info(
+                f"Convert pip package dependencies to base64: {pip_packages_str}"
+            )
             entrypoint_prefix[index + 1] = base64.b64encode(
                 pip_packages_str.encode("utf-8")
             ).decode("utf-8")
@@ -2305,18 +2310,16 @@ def try_generate_entrypoint_args(
     install_ray: bool,
     pip_packages: List[str],
     container_pip_packages: List[str],
+    podman_dependencies_installer_path: str,
     context: "RuntimeEnvContext",
 ):
-    dependencies_installer_path = (
-        runtime_env_constants.RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH
-    )
     install_ray_or_pip_packages_command = None
     entrypoint_args = []
     if install_ray:
         if install_ray_or_pip_packages_command is None:
             install_ray_or_pip_packages_command = [
                 "python",
-                dependencies_installer_path,
+                podman_dependencies_installer_path,
             ]
             if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
                 install_ray_or_pip_packages_command.extend(
@@ -2351,7 +2354,7 @@ def try_generate_entrypoint_args(
         if install_ray_or_pip_packages_command is None:
             install_ray_or_pip_packages_command = [
                 "python",
-                dependencies_installer_path,
+                podman_dependencies_installer_path,
                 "--packages",
                 json.dumps(container_pip_packages),
             ]

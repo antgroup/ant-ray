@@ -498,8 +498,8 @@ class RuntimeEnv(dict):
         """Combines two serialized strings into a single serialized representation.
 
         Args:
-            serialized_runtime_env (str): The serialized representation of the runtime environment.
-            serialized_allocated_instances (str): The serialized representation of the allocated instances.
+            serialized_runtime_env: The serialized representation of the runtime environment.
+            serialized_allocated_instances: The serialized representation of the allocated instances.
 
         Returns:
             str: A combined serialized string, with the two inputs concatenated using "&&" as a separator.
@@ -648,7 +648,7 @@ class RuntimeEnv(dict):
             return []
         return self["container"].get("pip", [])
 
-    def container_install_ray(self) -> bool:
+    def py_container_install_ray(self) -> bool:
         if not self.has_py_container():
             return False
         return self["container"].get("install_ray", False)

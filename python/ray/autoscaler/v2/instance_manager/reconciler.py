@@ -1288,13 +1288,12 @@ class Reconciler:
                     )
                 )
 
-        # TODO(rickyx): We should probably name it as "Planner" or "Scaler"
-        # or "ClusterScaler"
         sched_request = SchedulingRequest(
             node_type_configs=autoscaling_config.get_node_type_configs(),
             max_num_nodes=autoscaling_config.get_max_num_nodes(),
             resource_requests=ray_state.pending_resource_requests,
             gang_resource_requests=ray_state.pending_gang_resource_requests,
+            # For now, we don't support resource constraints at the virtual cluster level.
             cluster_resource_constraints=[],
             current_instances=autoscaler_instances,
             idle_timeout_s=autoscaling_config.get_idle_timeout_s(),
@@ -1313,30 +1312,22 @@ class Reconciler:
         autoscaling_state.infeasible_gang_resource_requests.extend(
             reply.infeasible_gang_resource_requests
         )
-        autoscaling_state.infeasible_cluster_resource_constraints.extend(
-            reply.infeasible_cluster_resource_constraints
-        )
 
         if autoscaling_config.provider == Provider.READ_ONLY:
             # We shouldn't be scaling the cluster if the provider is read-only.
             return
 
-        # Scale the clusters if needed.
+        # Scale the virtual cluster if needed.
         to_terminate = reply.to_terminate
         nodes_to_remove = []
 
-        # Buffer terminating requests.
+        # The terminating nodes are only moved out of the virtual cluster. They
+        # will be buffered in the primary cluster.
         for terminate_request in to_terminate:
-            node_list = buffered_node_pool.unassigned_nodes.setdefault(
-                terminate_request.ray_node_type, []
-            )
-            node_list.append(terminate_request.ray_node_id)
             nodes_to_remove.append(terminate_request.ray_node_id)
             node_set.remove(terminate_request.ray_node_id)
 
         if len(nodes_to_remove) > 0:
-            ray_state.nodes[:] = []
-            ray_state.nodes.extend(list(node_set))
             logger.info(
                 "Removing nodes {} from virtual cluster {}".format(
                     nodes_to_remove, virtual_cluster_id
@@ -1348,7 +1339,18 @@ class Reconciler:
 
             remove_nodes_reply = RemoveNodesFromVirtualClusterReply()
             remove_nodes_reply.ParseFromString(str_reply)
-            if remove_nodes_reply.status.code != 0:
+            if remove_nodes_reply.status.code == 0:
+                # Update the virtual cluster's node list.
+                ray_state.nodes[:] = []
+                ray_state.nodes.extend(list(node_set))
+                # The terminating nodes are added to the unassigned
+                # nodes of the primary cluster (with a buffered node pool).
+                for terminate_request in to_terminate:
+                    node_list = buffered_node_pool.unassigned_nodes.setdefault(
+                        terminate_request.ray_node_type, []
+                    )
+                    node_list.append(terminate_request.ray_node_id)
+            else:
                 # TODO: retry if needed.
                 logger.warning(
                     "Failed to remove nodes from virtual cluster {}: {}".format(
@@ -1377,11 +1379,15 @@ class Reconciler:
         gcs_client: GcsClient,
     ) -> None:
         logger.info(f"Start to scale the primary cluster")
-        # Try satisfying the pending launch requests from the unassigned node.
+        # Try fulfilling the launching requests (of virtual clusters) from the unassigned node pool.
         for (
             virtual_cluster_id,
             launch_requests,
-        ) in buffered_node_pool.launching_nodes.items():
+        ) in buffered_node_pool.launching_nodes.copy().items():
+            # Make a deep copy in case of any failure.
+            launch_requests_copy = copy.deepcopy(launch_requests)
+            unassigned_nodes_copy = copy.deepcopy(buffered_node_pool.unassigned_nodes)
+
             expanding_replica_sets: Dict[str, int] = {}
             for index in range(len(launch_requests) - 1, -1, -1):
                 launch_request = launch_requests[index]
@@ -1389,6 +1395,7 @@ class Reconciler:
                     available_node_list = buffered_node_pool.unassigned_nodes[
                         launch_request.ray_node_type
                     ]
+                    # There are enough unassigned nodes with the same node type.
                     if len(available_node_list) >= launch_request.count:
                         expanding_replica_sets[
                             launch_request.ray_node_type
@@ -1397,6 +1404,10 @@ class Reconciler:
                         available_node_list = available_node_list[
                             launch_request.count :
                         ]
+                        if len(available_node_list) == 0:
+                            buffered_node_pool.unassigned_nodes.pop(
+                                launch_request.ray_node_type
+                            )
                     elif len(available_node_list) > 0:
                         expanding_replica_sets[launch_request.ray_node_type] = len(
                             available_node_list
@@ -1405,7 +1416,10 @@ class Reconciler:
                         buffered_node_pool.unassigned_nodes.pop(
                             launch_request.ray_node_type
                         )
+            if len(launch_requests) == 0:
+                buffered_node_pool.launching_nodes.pop(virtual_cluster_id)
 
+            # This virtual cluster has to scale up.
             if len(expanding_replica_sets) > 0:
                 replica_sets: Dict[str, int] = {}
                 for node_id in ray_state.virtual_cluster_states[
@@ -1423,6 +1437,7 @@ class Reconciler:
                         + 1
                     )
 
+                # Get the expected replica sets of the virtual cluster.
                 for template_id, count in expanding_replica_sets.items():
                     replica_sets[template_id] = replica_sets.get(template_id, 0) + count
 
@@ -1443,6 +1458,11 @@ class Reconciler:
                     logger.warning(
                         f"Failed to update virtual cluster {virtual_cluster_id}: {str_reply}"
                     )
+                    # Revert the changes. The virtual cluster will be updated at the next round.
+                    buffered_node_pool.launching_nodes[
+                        virtual_cluster_id
+                    ] = launch_requests_copy
+                    buffered_node_pool.unassigned_nodes = unassigned_nodes_copy
             else:
                 logger.info(
                     f"There is no available unassigned nodes for virtual cluster {virtual_cluster_id}. Wait for new instances."
@@ -1453,6 +1473,7 @@ class Reconciler:
         autoscaler_instances = []
 
         unassigned_node_set = set()
+        # Only the unassigned nodes are considered.
         for _, node_list in buffered_node_pool.unassigned_nodes.items():
             unassigned_node_set.update(node_list)
         for im_instance in im_instances:
@@ -1470,6 +1491,8 @@ class Reconciler:
                     )
                 )
 
+        # When virtual cluster is used, we assume there is no pending (gang) resource requests in the primary cluster.
+        # Meanwhile, cluster resource constraints are still handled here.
         sched_request = SchedulingRequest(
             node_type_configs=autoscaling_config.get_node_type_configs(),
             max_num_nodes=autoscaling_config.get_max_num_nodes(),
@@ -1487,12 +1510,6 @@ class Reconciler:
         reply = scheduler.schedule(sched_request)
 
         # Populate the autoscaling state.
-        autoscaling_state.infeasible_resource_requests.extend(
-            reply.infeasible_resource_requests
-        )
-        autoscaling_state.infeasible_gang_resource_requests.extend(
-            reply.infeasible_gang_resource_requests
-        )
         autoscaling_state.infeasible_cluster_resource_constraints.extend(
             reply.infeasible_cluster_resource_constraints
         )

@@ -2125,11 +2125,16 @@ def try_update_container_command(
     # add `entrypoint_prefix` to `passthrough_args`
     if container.get("entrypoint_prefix", None):
         entrypoint_prefix = container["entrypoint_prefix"]
-        # update install_ray pip packages to base64
+        # NOTE(Jacky): The `entrypoint_prefix` has a list of pip packages (List[str]).
+        # Since command-line/environment variables cannot directly pass list types,
+        # we encode the list as a base64 string to ensure safe transmission and parsing.
+        # Example format: "['package1', 'package2']" → base64 encoded → "WydGVzdC1wYWNrYWdlMSd9LCAndGVzdC1wYWNrYWdlMiddXQ=="
         if "--packages" in entrypoint_prefix:
             index = entrypoint_prefix.index("--packages")
             pip_packages_str = entrypoint_prefix[index + 1]
-            logger.info(f"Install ray pip packages {pip_packages_str}")
+            logger.info(
+                f"Convert pip package dependencies to base64: {pip_packages_str}"
+            )
             entrypoint_prefix[index + 1] = base64.b64encode(
                 pip_packages_str.encode("utf-8")
             ).decode("utf-8")
@@ -2302,46 +2307,42 @@ def get_dependencies_installer_path():
 
 
 def try_generate_entrypoint_args(
-    install_ray: bool,
     pip_packages: List[str],
     context: "RuntimeEnvContext",
 ):
-    install_ray_or_pip_packages_command = None
     entrypoint_args = []
-    if install_ray:
-        if install_ray_or_pip_packages_command is None:
-            install_ray_or_pip_packages_command = [
-                "python",
-                runtime_env_constants.RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH,
+    podman_dependencies_installer = [
+        "python",
+        runtime_env_constants.RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH,
+    ]
+    if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
+        podman_dependencies_installer.extend(
+            [
+                "--whl-dir",
+                get_ray_whl_dir(),
             ]
-            if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
-                install_ray_or_pip_packages_command.extend(
-                    [
-                        "--whl-dir",
-                        get_ray_whl_dir(),
-                    ]
-                )
-            else:
-                install_ray_or_pip_packages_command.extend(
-                    [
-                        "--ray-version",
-                        f"{ray.__version__}",
-                    ]
-                )
-            if pip_packages:
-                install_ray_or_pip_packages_command.extend(
-                    [
-                        "--packages",
-                        json.dumps(pip_packages),
-                    ]
-                )
-            # we set default python executable in container
-            # to avoid using the host python executable when
-            # `install_ray` is True
-            context.py_executable = "python"
+        )
+    else:
+        podman_dependencies_installer.extend(
+            [
+                "--ray-version",
+                f"{ray.__version__}",
+            ]
+        )
+    if pip_packages:
+        podman_dependencies_installer.extend(
+            [
+                "--packages",
+                json.dumps(pip_packages),
+            ]
+        )
+    # we set default python executable in container
+    # to avoid using the host python executable when
+    # `install_ray` is True
+    context.py_executable = "python"
 
-    if install_ray_or_pip_packages_command is not None:
-        install_ray_or_pip_packages_command.append("&&")
-        entrypoint_args.extend(install_ray_or_pip_packages_command)
+    if podman_dependencies_installer is not None:
+        podman_dependencies_installer.append("&&")
+        entrypoint_args.extend(podman_dependencies_installer)
 
     return entrypoint_args

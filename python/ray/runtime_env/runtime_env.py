@@ -643,7 +643,7 @@ class RuntimeEnv(dict):
             return None
         return self["container"].get("run_options", [])
 
-    def container_install_ray(self) -> bool:
+    def py_container_install_ray(self) -> bool:
         if not self.has_py_container():
             return False
         return self["container"].get("install_ray", False)

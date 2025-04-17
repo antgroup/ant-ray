@@ -104,10 +104,10 @@ def _modify_container_context_impl(
         container_to_host_mount_dict
     )
 
-    # install_ray and container_pip_install_without_python_path are mutually exclusive
+    # `install_ray` and `_pip_install_without_python_path` are mutually exclusive
     if container_install_ray and container_pip_install_without_python_path:
         raise ValueError(
-            "`install_ray` and `container_pip_install_without_python_path` can't both be True, "
+            "`install_ray` and `_pip_install_without_python_path` can't both be True, "
             "please check your runtime_env field."
         )
 

@@ -58,7 +58,7 @@ def _modify_container_context_impl(
 
     # Use the user's python executable if py_executable is not None.
     py_executable = container_option.get("py_executable")
-    podman_install_ray = runtime_env.py_container_install_ray()
+    container_install_ray = runtime_env.py_container_install_ray()
     podman_dependencies_installer_path = (
         runtime_env_constants.RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH
     )
@@ -109,7 +109,7 @@ def _modify_container_context_impl(
     #   python /tmp/scripts/dependencies_installer.py --ray-version=2.0.0 --packages "{base64_pip_packages}"
     # The generated `entrypoint_args` are prefixed to the container's entrypoint, ensuring dependencies are installed
     # before the worker process starts.
-    if podman_install_ray:
+    if container_install_ray:
         entrypoint_args = try_generate_entrypoint_args(pip_packages, context)
         context.container["entrypoint_prefix"] = entrypoint_args
     # we need 'sudo' and 'admin', mount logs
@@ -129,7 +129,7 @@ def _modify_container_context_impl(
     container_command.append("--cap-add=AUDIT_WRITE")
 
     redirected_pyenv_folder = None
-    if podman_install_ray:
+    if container_install_ray:
         container_to_host_mount_dict[
             podman_dependencies_installer_path
         ] = get_dependencies_installer_path()

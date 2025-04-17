@@ -17,6 +17,7 @@ from ray._private.utils import (
     get_ray_whl_dir,
     get_dependencies_installer_path,
     try_generate_entrypoint_args,
+    parse_allocated_resource,
 )
 
 default_logger = logging.getLogger(__name__)
@@ -59,7 +60,7 @@ def _modify_container_context_impl(
     # Use the user's python executable if py_executable is not None.
     py_executable = container_option.get("py_executable")
     container_install_ray = runtime_env.py_container_install_ray()
-    podman_dependencies_installer_path = (
+    container_dependencies_installer_path = (
         runtime_env_constants.RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH
     )
 
@@ -100,6 +101,12 @@ def _modify_container_context_impl(
         container_to_host_mount_dict
     )
 
+    # Add reousrces isolation if needed
+    if runtime_env.get_serialized_allocated_instances():
+        container_command.extend(
+            parse_allocated_resource(runtime_env.get_serialized_allocated_instances())
+        )
+
     pip_packages = runtime_env.pip_config().get("packages", [])
     container_pip_packages = runtime_env.py_container_pip_list()
     # NOTE(Jacky): When `install_ray` is True or runtime_env field has container pip packages,
@@ -116,7 +123,7 @@ def _modify_container_context_impl(
             container_install_ray,
             pip_packages,
             container_pip_packages,
-            podman_dependencies_installer_path,
+            container_dependencies_installer_path,
             context,
         )
         context.container["entrypoint_prefix"] = entrypoint_args
@@ -139,7 +146,7 @@ def _modify_container_context_impl(
     redirected_pyenv_folder = None
     if container_install_ray or container_pip_packages:
         container_to_host_mount_dict[
-            podman_dependencies_installer_path
+            container_dependencies_installer_path
         ] = get_dependencies_installer_path()
         if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
             container_to_host_mount_dict[get_ray_whl_dir()] = get_ray_whl_dir()

@@ -2310,25 +2310,25 @@ def try_generate_entrypoint_args(
     install_ray: bool,
     pip_packages: List[str],
     container_pip_packages: List[str],
-    podman_dependencies_installer_path: str,
+    container_dependencies_installer_path: str,
     context: "RuntimeEnvContext",
 ):
-    podman_dependencies_installer_command = None
+    container_dependencies_installer_command = None
     entrypoint_args = []
     if install_ray:
-        podman_dependencies_installer_command = [
+        container_dependencies_installer_command = [
             "python",
-            podman_dependencies_installer_path,
+            container_dependencies_installer_path,
         ]
         if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
-            podman_dependencies_installer_command.extend(
+            container_dependencies_installer_command.extend(
                 [
                     "--whl-dir",
                     get_ray_whl_dir(),
                 ]
             )
         else:
-            podman_dependencies_installer_command.extend(
+            container_dependencies_installer_command.extend(
                 [
                     "--ray-version",
                     f"{ray.__version__}",
@@ -2342,7 +2342,7 @@ def try_generate_entrypoint_args(
             merge_pip_packages = list(
                 dict.fromkeys(pip_packages + container_pip_packages)
             )
-            podman_dependencies_installer_command.extend(
+            container_dependencies_installer_command.extend(
                 [
                     "--packages",
                     json.dumps(merge_pip_packages),
@@ -2354,16 +2354,45 @@ def try_generate_entrypoint_args(
         context.py_executable = "python"
 
     if container_pip_packages:
-        if podman_dependencies_installer_command is None:
-            podman_dependencies_installer_command = [
+        if container_dependencies_installer_command is None:
+            container_dependencies_installer_command = [
                 "python",
-                podman_dependencies_installer_path,
+                container_dependencies_installer_path,
                 "--packages",
                 json.dumps(container_pip_packages),
             ]
 
-    if podman_dependencies_installer_command is not None:
-        podman_dependencies_installer_command.append("&&")
-        entrypoint_args.extend(podman_dependencies_installer_command)
+    if container_dependencies_installer_command is not None:
+        container_dependencies_installer_command.append("&&")
+        entrypoint_args.extend(container_dependencies_installer_command)
 
     return entrypoint_args
+
+
+# NOTE(Jacky): it will be used to setup resource limit.
+def parse_allocated_resource(serialized_allocated_instances):
+    container_resource_args = []
+    allocated_resource = json.loads(serialized_allocated_instances)
+    if "CPU" in allocated_resource:
+        cpu_resource = allocated_resource["CPU"]
+        if isinstance(cpu_resource, list):
+            # cpuset: because we may split one cpu core into some pieces,
+            # we need set cpuset.cpu_exclusive=0 and set cpuset-cpus
+            cpu_ids = []
+            cpus = 0
+            for idx, val in enumerate(cpu_resource):
+                if val > 0:
+                    cpu_ids.append(idx)
+                    cpus += val / 10000
+            container_resource_args.append("--cpus=" + str(int(cpus)))
+            container_resource_args.append(
+                "--cpuset-cpus=" + ",".join(str(e) for e in cpu_ids)
+            )
+        else:
+            # cpushare
+            container_resource_args.append("--cpus=" + str(int(cpu_resource / 10000)))
+    if "memory" in allocated_resource:
+        container_resource_args.append(
+            "--memory=" + str(int(allocated_resource["memory"] / 100000000)) + "m"
+        )
+    return container_resource_args

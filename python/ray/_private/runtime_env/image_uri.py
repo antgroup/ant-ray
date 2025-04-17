@@ -17,6 +17,7 @@ from ray._private.utils import (
     get_ray_whl_dir,
     get_dependencies_installer_path,
     try_generate_entrypoint_args,
+    parse_allocated_resource,
 )
 
 default_logger = logging.getLogger(__name__)
@@ -58,11 +59,11 @@ def _modify_container_context_impl(
 
     # Use the user's python executable if py_executable is not None.
     py_executable = container_option.get("py_executable")
-    install_ray = runtime_env.container_install_ray()
-    pip_install_without_python_path = (
-        runtime_env.container_pip_install_without_python_path()
+    container_install_ray = runtime_env.py_container_install_ray()
+    container_pip_install_without_python_path = (
+        runtime_env.py_container_pip_install_without_python_path()
     )
-    dependencies_installer_path = (
+    container_dependencies_installer_path = (
         runtime_env_constants.RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH
     )
 
@@ -103,24 +104,40 @@ def _modify_container_context_impl(
         container_to_host_mount_dict
     )
 
-    # install_ray and pip_install_without_python_path are mutually exclusive
-    if install_ray and pip_install_without_python_path:
+    # install_ray and container_pip_install_without_python_path are mutually exclusive
+    if container_install_ray and container_pip_install_without_python_path:
         raise ValueError(
-            "`install_ray` and `pip_install_without_python_path` can't both be True, "
+            "`install_ray` and `container_pip_install_without_python_path` can't both be True, "
             "please check your runtime_env field."
+        )
+
+    # Add reousrces isolation if needed
+    if runtime_env.get_serialized_allocated_instances():
+        container_command.extend(
+            parse_allocated_resource(runtime_env.get_serialized_allocated_instances())
         )
 
     pip_packages = runtime_env.pip_config().get("packages", [])
     container_pip_packages = runtime_env.py_container_pip_list()
-    entrypoint_args = try_generate_entrypoint_args(
-        install_ray,
-        pip_packages,
-        container_pip_packages,
-        pip_install_without_python_path,
-        context,
-    )
-
-    context.container["entrypoint_prefix"] = entrypoint_args
+    # NOTE(Jacky): When `install_ray` is True or runtime_env field has container pip packages,
+    # generate `entrypoint_args` to install dependencies before starting the worker.
+    # These arguments will:
+    # 1. Use the Python interpreter inside the container to install the specified version of `ant-ray` if needed.
+    # 2. Install additional user-specified Python packages via `pip_packages`.
+    # Example command structure:
+    #   python /tmp/scripts/dependencies_installer.py --ray-version=2.0.0 --packages "{base64_pip_packages}"
+    # The generated `entrypoint_args` are prefixed to the container's entrypoint, ensuring dependencies are installed
+    # before the worker process starts.
+    if container_install_ray or container_pip_packages:
+        entrypoint_args = try_generate_entrypoint_args(
+            container_install_ray,
+            pip_packages,
+            container_pip_packages,
+            container_dependencies_installer_path,
+            container_pip_install_without_python_path,
+            context,
+        )
+        context.container["entrypoint_prefix"] = entrypoint_args
     # we need 'sudo' and 'admin', mount logs
     container_command = ["sudo", "-E"] + container_command
     container_command.append("-u")
@@ -138,14 +155,14 @@ def _modify_container_context_impl(
     container_command.append("--cap-add=AUDIT_WRITE")
 
     redirected_pyenv_folder = None
-    if install_ray or container_pip_packages:
+    if container_install_ray or container_pip_packages:
         container_to_host_mount_dict[
-            dependencies_installer_path
+            container_dependencies_installer_path
         ] = get_dependencies_installer_path()
         if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
             container_to_host_mount_dict[get_ray_whl_dir()] = get_ray_whl_dir()
 
-    if not install_ray:
+    if not container_install_ray:
         # mount ray package site path
         host_site_packages_path = get_ray_site_packages_path()
 

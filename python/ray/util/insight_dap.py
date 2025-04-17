@@ -199,7 +199,7 @@ class DAPClient:
         await self._send_message(request)
         return seq
 
-    async def send_request_and_wait(
+    async def _send_request_and_wait(
         self, command: str, args: Dict[str, Any] = None, timeout: float = 5.0
     ) -> Optional[Dict[str, Any]]:
         """
@@ -254,7 +254,7 @@ class DAPClient:
             "supportsVariablePaging": True,
             "supportsRunInTerminalRequest": True,
         }
-        return await self.send_request_and_wait("initialize", args)
+        return await self._send_request_and_wait("initialize", args)
 
     async def attach(self, **kwargs) -> Dict[str, Any]:
         """
@@ -291,7 +291,7 @@ class DAPClient:
                 args["connect"]["port"] = int(value)
 
         # Use a longer timeout for attach command (30 seconds)
-        return await self.send_request_and_wait("attach", args, timeout=0.1)
+        return await self._send_request_and_wait("attach", args, timeout=0.1)
 
     async def set_breakpoints(
         self, source: Dict[str, str], lines: List[int]
@@ -311,7 +311,7 @@ class DAPClient:
             "breakpoints": [{"line": line} for line in lines],
             "sourceModified": False,
         }
-        return await self.send_request_and_wait("setBreakpoints", args)
+        return await self._send_request_and_wait("setBreakpoints", args)
 
     async def continue_execution(self) -> Dict[str, Any]:
         """
@@ -320,7 +320,7 @@ class DAPClient:
         Returns:
             The response from the debug adapter
         """
-        return await self.send_request_and_wait("continue", {"threadId": 0})
+        return await self._send_request_and_wait("continue", {"threadId": 0})
 
     async def step_in(self, thread_id: int) -> Dict[str, Any]:
         """
@@ -332,7 +332,7 @@ class DAPClient:
         Returns:
             The response from the debug adapter
         """
-        return await self.send_request_and_wait("stepIn", {"threadId": thread_id})
+        return await self._send_request_and_wait("stepIn", {"threadId": thread_id})
 
     async def step_out(self, thread_id: int) -> Dict[str, Any]:
         """
@@ -344,7 +344,7 @@ class DAPClient:
         Returns:
             The response from the debug adapter
         """
-        return await self.send_request_and_wait("stepOut", {"threadId": thread_id})
+        return await self._send_request_and_wait("stepOut", {"threadId": thread_id})
 
     async def step_over(self, thread_id: int) -> Dict[str, Any]:
         """
@@ -356,7 +356,7 @@ class DAPClient:
         Returns:
             The response from the debug adapter
         """
-        return await self.send_request_and_wait("next", {"threadId": thread_id})
+        return await self._send_request_and_wait("next", {"threadId": thread_id})
 
     async def pause(self, thread_id: int) -> Dict[str, Any]:
         """
@@ -368,7 +368,7 @@ class DAPClient:
         Returns:
             The response from the debug adapter
         """
-        return await self.send_request_and_wait("pause", {"threadId": thread_id})
+        return await self._send_request_and_wait("pause", {"threadId": thread_id})
 
     async def get_threads(self) -> Dict[str, Any]:
         """
@@ -377,7 +377,7 @@ class DAPClient:
         Returns:
             The response from the debug adapter
         """
-        return await self.send_request_and_wait("threads")
+        return await self._send_request_and_wait("threads")
 
     async def get_stack_trace(self, thread_id: int) -> Dict[str, Any]:
         """
@@ -399,7 +399,7 @@ class DAPClient:
                 "line": True,
             },
         }
-        return await self.send_request_and_wait("stackTrace", args)
+        return await self._send_request_and_wait("stackTrace", args)
 
     async def get_scopes(self, frame_id: int) -> Dict[str, Any]:
         """
@@ -411,7 +411,7 @@ class DAPClient:
         Returns:
             The response from the debug adapter
         """
-        return await self.send_request_and_wait("scopes", {"frameId": frame_id})
+        return await self._send_request_and_wait("scopes", {"frameId": frame_id})
 
     async def evaluate(
         self, expression: str, frame_id: int = 0, thread_id: int = None
@@ -436,7 +436,7 @@ class DAPClient:
             if thread_id is not None:
                 args["threadId"] = thread_id
 
-        return await self.send_request_and_wait("evaluate", args)
+        return await self._send_request_and_wait("evaluate", args)
 
     async def disconnect_request(self) -> Dict[str, Any]:
         """
@@ -445,6 +445,6 @@ class DAPClient:
         Returns:
             The response from the debug adapter
         """
-        return await self.send_request_and_wait(
+        return await self._send_request_and_wait(
             "disconnect", {"restart": False, "terminateDebuggee": False}
         )

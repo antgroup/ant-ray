@@ -718,11 +718,11 @@ Enabling Visual RDB
 
 To enable Visual RDB debugging, you need to enable both Flow Insight and Visual RDB:
 
-1. Set the `RAY_VISUAL_DEBUG` environment variable to "1" before starting your Ray job:
+1. Set the `RAY_VISUAL_RDB` environment variable to "1" before starting your Ray job:
 
    .. code-block:: bash
 
-        ray job submit --runtime-env-json '{"env_vars":{"RAY_VISUAL_DEBUG": "1"}}' --working-dir ./ -- python entrypoint.py
+        ray job submit --runtime-env-json '{"env_vars":{"RAY_VISUAL_RDB": "1"}}' --working-dir ./ -- python entrypoint.py
 
 2. Visual debug must also have Flow Insight enabled to function properly:
 

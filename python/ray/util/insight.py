@@ -733,8 +733,8 @@ class _ray_internal_insight_monitor:
         """Record caller info."""
         job_id = caller_info["job_id"]
         current_task_id = caller_info["current_task_id"]
-        visual_debug = caller_info["visual_debug"]
-        if visual_debug:
+        visual_rdb = caller_info["visual_rdb"]
+        if visual_rdb:
             self.debugger_info[job_id][
                 (caller_info["callee_class"], caller_info["callee_func"])
             ][current_task_id] = (
@@ -886,11 +886,11 @@ def _get_caller_class():
     return caller_class
 
 
-def is_visual_debug_enabled():
+def is_visual_rdb_enabled():
     """
     Check if visual debug is enabled.
     """
-    return os.environ.get("RAY_VISUAL_DEBUG", "0") == "1"
+    return os.environ.get("RAY_VISUAL_RDB", "0") == "1"
 
 
 def is_flow_insight_enabled():
@@ -1325,7 +1325,7 @@ def report_trace_info(caller_info):
     if not need_record(current_class):
         return
 
-    if is_visual_debug_enabled():
+    if is_visual_rdb_enabled():
         ray.util.debugpy._ensure_debugger_port_open_thread_safe()
 
     debugger_port = ray._private.worker.global_worker.debugger_port
@@ -1342,7 +1342,7 @@ def report_trace_info(caller_info):
         "current_task_id": current_task_id,
         "debugger_port": debugger_port,
         "debugger_host": debugger_host,
-        "visual_debug": is_visual_debug_enabled(),
+        "visual_rdb": is_visual_rdb_enabled(),
     }
 
     emit_request("emit-caller-info", trace_info)

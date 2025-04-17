@@ -1875,6 +1875,74 @@ matching elements while fading out non-matching ones.</p>
 providing insights into both the logical structure and physical deployment of your distributed workloads.</p>
 </section>
 </section>
+<section id="visual-rdb-view">
+<h2>Visual RDB View<a class="headerlink" href="#visual-rdb-view" title="Link to this heading">#</a></h2>
+<img alt="Visual RDB View screenshot" class="align-center" src="../_images/visual-rdb-view.gif" />
+<p>The Visual RDB View provides an integrated visual debugging experience for Ray applications,
+allowing you to debug distributed actors and tasks through a familiar debugging interface
+directly within the Ray Dashboard. This feature leverages the underlying ray rdb
+capability to provide real-time debugging of your distributed application components.</p>
+<section id="id3">
+<h3>Key Features<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Live Debugging:</strong> Debug running Ray actors and tasks without stopping your application</p></li>
+<li><p><strong>Source Code Navigation:</strong> View and navigate through source code of your distributed components</p></li>
+<li><p><strong>Breakpoint Management:</strong> enable and disable breakpoints across your distributed codebase</p></li>
+<li><p><strong>Variable Inspection:</strong> Examine runtime values of variables in the current context</p></li>
+<li><p><strong>Call Stack Navigation:</strong> Navigate through the call stack to understand execution flow</p></li>
+<li><p><strong>Step Controls:</strong> Standard debugging controls (continue, pause, step over, step in, step out)</p></li>
+<li><p><strong>Multi-thread Support:</strong> Debug applications with multiple threads across distributed components</p></li>
+</ul>
+</section>
+<section id="enabling-visual-rdb">
+<h3>Enabling Visual RDB<a class="headerlink" href="#enabling-visual-rdb" title="Link to this heading">#</a></h3>
+<p>To enable Visual RDB debugging, you need to enable both Flow Insight and Visual RDB:</p>
+<ol class="arabic">
+<li><p>Set the <code class="code docutils literal notranslate"><span class="pre">RAY_VISUAL_RDB</span></code> environment variable to “1” before starting your Ray job:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ray<span class="w"> </span>job<span class="w"> </span>submit<span class="w"> </span>--runtime-env-json<span class="w"> </span><span class="s1">&#39;{&quot;env_vars&quot;:{&quot;RAY_VISUAL_RDB&quot;: &quot;1&quot;}}&#39;</span><span class="w"> </span>--working-dir<span class="w"> </span>./<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>entrypoint.py
+</pre></div>
+</div>
+</li>
+<li><p>Visual debug must also have Flow Insight enabled to function properly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">RAY_FLOW_INSIGHT</span><span class="o">=</span><span class="m">1</span>
+ray<span class="w"> </span>start<span class="w"> </span>--head
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="accessing-visual-rdb">
+<h3>Accessing Visual RDB<a class="headerlink" href="#accessing-visual-rdb" title="Link to this heading">#</a></h3>
+<p>To access the Visual RDB view:</p>
+<ol class="arabic simple">
+<li><p>Navigate to the Flow Insight view from the Jobs page by clicking on the “Insight” link</p></li>
+<li><p>In the Flow Insight view, when you select an actor method or task, then click on the “Debug” button, the Debug Panel will appear on the right side of the screen</p></li>
+<li><p>Click on any available debug session to begin debugging</p></li>
+</ol>
+</section>
+<section id="debugging-interface">
+<h3>Debugging Interface<a class="headerlink" href="#debugging-interface" title="Link to this heading">#</a></h3>
+<p>The Visual RDB interface consists of several key components:</p>
+<ul class="simple">
+<li><p><strong>Source Code View:</strong> Displays the source code of the selected component with the current execution line highlighted</p></li>
+<li><p><strong>Controls Bar:</strong> Contains debugging action buttons (continue, pause, step over, step into, step out)</p></li>
+<li><p><strong>Threads List:</strong> Shows available threads and allows switching between them</p></li>
+<li><p><strong>Call Stack Panel:</strong> Displays the current call stack, allowing navigation between frames</p></li>
+<li><p><strong>Evaluation Console:</strong> Allows evaluating expressions in the current context</p></li>
+</ul>
+</section>
+<section id="working-with-breakpoints">
+<h3>Working with Breakpoints<a class="headerlink" href="#working-with-breakpoints" title="Link to this heading">#</a></h3>
+<p>To set breakpoints:</p>
+<ol class="arabic simple">
+<li><p>Click on a line number in the source code view to set a breakpoint</p></li>
+<li><p>Click an existing breakpoint to remove it</p></li>
+</ol>
+<p>The Visual RDB View transforms how you debug distributed applications by bringing traditional
+debugging workflows to distributed systems, making it easier to understand complex behaviors
+and resolve issues in Ray applications.</p>
+</section>
+</section>
 <section id="overview-view">
 <span id="dash-overview"></span><h2>Overview view<a class="headerlink" href="#overview-view" title="Link to this heading">#</a></h2>
 <img alt="../_images/dashboard-overview.png" class="align-center" src="../_images/dashboard-overview.png" />
@@ -1991,6 +2059,14 @@ providing insights into both the logical structure and physical deployment of yo
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#info-card">Info Card</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#search-functionality">Search Functionality</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices">Best Practices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visual-rdb-view">Visual RDB View</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Key Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#enabling-visual-rdb">Enabling Visual RDB</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-visual-rdb">Accessing Visual RDB</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#debugging-interface">Debugging Interface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#working-with-breakpoints">Working with Breakpoints</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview-view">Overview view</a></li>

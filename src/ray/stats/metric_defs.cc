@@ -313,6 +313,11 @@ DEFINE_stats(gcs_storage_operation_count,
              ("Operation", "TableName"),
              (),
              ray::stats::COUNT);
+DEFINE_stats(gcs_storage_operation_data_size_bytes,
+             "Data size of an operation on Gcs storage",
+             ("Operation", "TableName"),
+             (),
+             ray::stats::SUM);
 
 /// Placement Group
 // The end to end placement group creation latency.

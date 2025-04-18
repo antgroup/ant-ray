@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ray/gcs/gcs_server/gcs_autoscaler_state_manager.h"
+#include "ray/gcs/gcs_server/gcs_virtual_cluster_autoscaler_state_manager.h"
 
 #include "ray/gcs/gcs_server/gcs_actor_manager.h"
 #include "ray/gcs/gcs_server/gcs_node_manager.h"
@@ -22,9 +22,42 @@
 namespace ray {
 namespace gcs {
 
-void GcsAutoscalerStateManager::MakeVirtualClusterResourceStatesInternal(
-    rpc::autoscaler::ClusterResourceState *state) {
+GcsVirtualClusterAutoscalerStateManager::GcsVirtualClusterAutoscalerStateManager(
+    std::string session_name,
+    GcsNodeManager &gcs_node_manager,
+    GcsActorManager &gcs_actor_manager,
+    const GcsPlacementGroupManager &gcs_placement_group_manager,
+    rpc::NodeManagerClientPool &raylet_client_pool,
+    InternalKVInterface &kv,
+    instrumented_io_context &io_context,
+    std::shared_ptr<GcsVirtualClusterManager> gcs_virtual_cluster_manager)
+    : GcsAutoscalerStateManager(session_name,
+                                gcs_node_manager,
+                                gcs_actor_manager,
+                                gcs_placement_group_manager,
+                                raylet_client_pool,
+                                kv,
+                                io_context),
+      gcs_virtual_cluster_manager_(gcs_virtual_cluster_manager) {}
+
+void GcsVirtualClusterAutoscalerStateManager::HandleGetClusterResourceState(
+    rpc::autoscaler::GetClusterResourceStateRequest request,
+    rpc::autoscaler::GetClusterResourceStateReply *reply,
+    rpc::SendReplyCallback send_reply_callback) {
   RAY_CHECK(thread_checker_.IsOnSameThread());
+  RAY_CHECK(request.last_seen_cluster_resource_state_version() <=
+            last_cluster_resource_state_version_);
+
+  auto state = reply->mutable_cluster_resource_state();
+  MakeVirtualClusterResourceStatesInternal(state);
+
+  // We are not using GCS_RPC_SEND_REPLY like other GCS managers to avoid the client
+  // having to parse the gcs status code embedded.
+  send_reply_callback(ray::Status::OK(), nullptr, nullptr);
+}
+
+void GcsVirtualClusterAutoscalerStateManager::MakeVirtualClusterResourceStatesInternal(
+    rpc::autoscaler::ClusterResourceState *state) {
   RAY_LOG(INFO) << "Getting virtual cluster resource states";
   auto virtual_cluster_states = state->mutable_virtual_cluster_states();
   auto primary_cluster = gcs_virtual_cluster_manager_->GetPrimaryCluster();
@@ -96,7 +129,7 @@ void GcsAutoscalerStateManager::MakeVirtualClusterResourceStatesInternal(
   GetClusterResourceConstraints(state);
 }
 
-void GcsAutoscalerStateManager::GetVirtualClusterPendingResourceRequests(
+void GcsVirtualClusterAutoscalerStateManager::GetVirtualClusterPendingResourceRequests(
     rpc::autoscaler::VirtualClusterState *state) {
   absl::flat_hash_map<google::protobuf::Map<std::string, double>, rpc::ResourceDemand>
       aggregate_load;
@@ -121,8 +154,9 @@ void GcsAutoscalerStateManager::GetVirtualClusterPendingResourceRequests(
   }
 }
 
-void GcsAutoscalerStateManager::GetVirtualClusterPendingGangResourceRequests(
-    rpc::autoscaler::ClusterResourceState *state) {
+void GcsVirtualClusterAutoscalerStateManager::
+    GetVirtualClusterPendingGangResourceRequests(
+        rpc::autoscaler::ClusterResourceState *state) {
   // Get the gang resource requests from the placement group load.
   auto placement_group_load = gcs_placement_group_manager_.GetPlacementGroupLoad();
   if (!placement_group_load || placement_group_load->placement_group_data_size() == 0) {

@@ -29,16 +29,14 @@ GcsAutoscalerStateManager::GcsAutoscalerStateManager(
     const GcsPlacementGroupManager &gcs_placement_group_manager,
     rpc::NodeManagerClientPool &raylet_client_pool,
     InternalKVInterface &kv,
-    instrumented_io_context &io_context,
-    std::shared_ptr<GcsVirtualClusterManager> gcs_virtual_cluster_manager)
+    instrumented_io_context &io_context)
     : session_name_(std::move(session_name)),
       gcs_node_manager_(gcs_node_manager),
       gcs_actor_manager_(gcs_actor_manager),
       gcs_placement_group_manager_(gcs_placement_group_manager),
       raylet_client_pool_(raylet_client_pool),
       kv_(kv),
-      io_context_(io_context),
-      gcs_virtual_cluster_manager_(gcs_virtual_cluster_manager) {}
+      io_context_(io_context) {}
 
 void GcsAutoscalerStateManager::HandleGetClusterResourceState(
     rpc::autoscaler::GetClusterResourceStateRequest request,
@@ -49,11 +47,7 @@ void GcsAutoscalerStateManager::HandleGetClusterResourceState(
             last_cluster_resource_state_version_);
 
   auto state = reply->mutable_cluster_resource_state();
-  if (gcs_virtual_cluster_manager_->GetPrimaryCluster()->HasVirtualClusters()) {
-    MakeVirtualClusterResourceStatesInternal(state);
-  } else {
-    MakeClusterResourceStateInternal(state);
-  }
+  MakeClusterResourceStateInternal(state);
 
   // We are not using GCS_RPC_SEND_REPLY like other GCS managers to avoid the client
   // having to parse the gcs status code embedded.

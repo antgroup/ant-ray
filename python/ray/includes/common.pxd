@@ -184,7 +184,6 @@ cdef extern from "src/ray/protobuf/common.pb.h" nogil:
     cdef cppclass CSchedulingStrategy "ray::rpc::SchedulingStrategy":
         CSchedulingStrategy()
         void clear_scheduling_strategy()
-        void set_virtual_cluster_id(const c_string& virtual_cluster_id)
         CSpreadSchedulingStrategy* mutable_spread_scheduling_strategy()
         CDefaultSchedulingStrategy* mutable_default_scheduling_strategy()
         CPlacementGroupSchedulingStrategy* mutable_placement_group_scheduling_strategy()  # noqa: E501

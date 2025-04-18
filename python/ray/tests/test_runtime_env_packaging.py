@@ -738,6 +738,21 @@ class TestDownloadAndUnpackPackage:
 
         assert "Invalid package URI" in str(excinfo.value)
 
+    @pytest.mark.parametrize(
+        "set_ray_unpackable_file_suffixs",
+        [".whl,.jar,.tar.gz,.tar.bz2,.tar.xz,.tar"],
+    )
+    async def test_download_and_unpack_package_without_unpack(
+        self, set_ray_unpackable_file_suffixs
+    ):
+        with tempfile.TemporaryDirectory() as temp_dest_dir:
+            local_dir = await download_and_unpack_package(
+                pkg_uri=HTTPS_PACKAGE_URI,
+                base_directory=temp_dest_dir,
+            )
+            package_name = Path(local_dir).name + ".zip"
+            assert (Path(local_dir) / package_name).exists()
+
     async def test_download_and_unpack_package_with_specific_suffix(self):
         with tempfile.TemporaryDirectory() as temp_dest_dir:
             local_dir = await download_and_unpack_package(

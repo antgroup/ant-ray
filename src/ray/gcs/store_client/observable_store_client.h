@@ -27,8 +27,7 @@ namespace gcs {
 class ObservableStoreClient : public StoreClient {
  public:
   explicit ObservableStoreClient(std::unique_ptr<StoreClient> delegate)
-      : delegate_(std::move(delegate)),
-        external_storage_namespace_(RayConfig::instance().external_storage_namespace()) {}
+      : delegate_(std::move(delegate)) {}
 
   Status AsyncPut(const std::string &table_name,
                   const std::string &key,
@@ -69,7 +68,6 @@ class ObservableStoreClient : public StoreClient {
 
  private:
   std::unique_ptr<StoreClient> delegate_;
-  std::string external_storage_namespace_;
 };
 
 }  // namespace gcs

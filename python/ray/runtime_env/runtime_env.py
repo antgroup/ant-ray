@@ -653,20 +653,20 @@ class RuntimeEnv(dict):
             return False
         return self["container"].get("install_ray", False)
 
-    def py_container_pip_install_without_python_path(self) -> bool:
+    def py_container_isolate_pip_installation(self) -> bool:
         if not self.has_py_container():
             return False
         container_field_without_python_path = self["container"].get(
-            "_pip_install_without_python_path", False
+            "isolate_pip_installation", False
         )
         runtime_env_field_without_python_path = self.get(
-            "_pip_install_without_python_path", False
+            "isolate_pip_installation", False
         )
         if runtime_env_field_without_python_path:
             logger.warning(
-                "_pip_install_without_python_path in runtime_env field "
+                "isolate_pip_installation in runtime_env field "
                 "will be deprecated, "
-                "please set _pip_install_without_python_path in container field."
+                "please set isolate_pip_installation in container field."
             )
         return (
             container_field_without_python_path or runtime_env_field_without_python_path

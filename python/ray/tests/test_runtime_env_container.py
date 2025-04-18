@@ -571,7 +571,7 @@ class TestContainerRuntimeEnvCommandLine:
         runtime_env = {
             api_version: {
                 "image": "unknown_image",
-                "_pip_install_without_python_path": True,
+                "isolate_pip_installation": True,
                 "pip": ["numpy"],
             },
         }

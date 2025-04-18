@@ -60,8 +60,8 @@ def _modify_container_context_impl(
     # Use the user's python executable if py_executable is not None.
     py_executable = container_option.get("py_executable")
     container_install_ray = runtime_env.py_container_install_ray()
-    container_pip_install_without_python_path = (
-        runtime_env.py_container_pip_install_without_python_path()
+    container_isolate_pip_installation = (
+        runtime_env.py_container_isolate_pip_installation()
     )
     container_dependencies_installer_path = (
         runtime_env_constants.RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH
@@ -104,10 +104,10 @@ def _modify_container_context_impl(
         container_to_host_mount_dict
     )
 
-    # `install_ray` and `_pip_install_without_python_path` are mutually exclusive
-    if container_install_ray and container_pip_install_without_python_path:
+    # `install_ray` and `isolate_pip_installation` are mutually exclusive
+    if container_install_ray and container_isolate_pip_installation:
         raise ValueError(
-            "`install_ray` and `_pip_install_without_python_path` can't both be True, "
+            "`install_ray` and `isolate_pip_installation` can't both be True, "
             "please check your runtime_env field."
         )
 
@@ -134,7 +134,7 @@ def _modify_container_context_impl(
             pip_packages,
             container_pip_packages,
             container_dependencies_installer_path,
-            container_pip_install_without_python_path,
+            container_isolate_pip_installation,
             context,
         )
         context.container["entrypoint_prefix"] = entrypoint_args

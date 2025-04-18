@@ -1,3 +1,4 @@
+import DownloadIcon from "@mui/icons-material/Download";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   Box,
@@ -11,11 +12,17 @@ import Switch from "@mui/material/Switch";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import DebugPanel from "../../components/DebugPanel";
+import InsightPanel from "../../components/InsightPanel";
 import ElementsPanel from "../../components/ray-visualization/ElementsPanel";
-import { FlameVisualization } from "../../components/ray-visualization/FlameVisualization";
+import {
+  FlameVisualization,
+  FlameVisualizationHandle,
+} from "../../components/ray-visualization/FlameVisualization";
 import { colorScheme } from "../../components/ray-visualization/graphData";
 import InfoCard from "../../components/ray-visualization/InfoCard";
-import PhysicalVisualization from "../../components/ray-visualization/PhysicalVisualization";
+import PhysicalVisualization, {
+  PhysicalVisualizationHandle,
+} from "../../components/ray-visualization/PhysicalVisualization";
 import RayVisualization, {
   RayVisualizationHandle,
 } from "../../components/ray-visualization/RayVisualization";
@@ -91,8 +98,12 @@ const ActorGraph = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [currentViewType, setCurrentViewType] =
-    useState<"logical" | "call_stack" | "physical" | "flame">("logical");
+    useState<"logical" | "call_stack" | "physical" | "flame" | "insight">(
+      "logical",
+    );
   const visualizationRef = useRef<RayVisualizationHandle>(null);
+  const physicalVisualizationRef = useRef<PhysicalVisualizationHandle>(null);
+  const flameVisualizationRef = useRef<FlameVisualizationHandle>(null);
   const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [updating, setUpdating] = useState(false);
 
@@ -170,7 +181,7 @@ const ActorGraph = () => {
       const data = await getPhysicalViewData(currentJobId);
       setPhysicalViewData(data);
     }
-    if (currentViewType === "flame") {
+    if (currentViewType === "flame" || currentViewType === "insight") {
       await fetchGraphData(currentJobId, false);
       const data = await getPhysicalViewData(currentJobId);
       setPhysicalViewData(data);
@@ -226,7 +237,7 @@ const ActorGraph = () => {
   }, []);
 
   const handleViewTypeChange = useCallback(
-    (viewType: "logical" | "call_stack" | "physical" | "flame") => {
+    (viewType: "logical" | "call_stack" | "physical" | "flame" | "insight") => {
       setCurrentViewType(viewType);
     },
     [],
@@ -235,6 +246,24 @@ const ActorGraph = () => {
   const handleAutoRefreshChange = useCallback((enabled: boolean) => {
     setAutoRefresh(enabled);
   }, []);
+
+  // Function to handle SVG export based on current view type
+  const handleExportSvg = () => {
+    switch (currentViewType) {
+      case "logical":
+      case "call_stack":
+        visualizationRef.current?.exportSvg();
+        break;
+      case "physical":
+        physicalVisualizationRef.current?.exportSvg();
+        break;
+      case "flame":
+        flameVisualizationRef.current?.exportSvg();
+        break;
+      default:
+        console.warn("Export not supported for this view type");
+    }
+  };
 
   if (error) {
     return <Box color="error.main">Error: {error}</Box>;
@@ -333,6 +362,9 @@ const ActorGraph = () => {
                 <ToggleButton value="flame" aria-label="flame graph view">
                   Flame Graph
                 </ToggleButton>
+                <ToggleButton value="insight" aria-label="insight view">
+                  Analysis
+                </ToggleButton>
               </ToggleButtonGroup>
 
               <FormControlLabel
@@ -347,6 +379,28 @@ const ActorGraph = () => {
                 label="Auto Refresh"
                 sx={{ ml: 2 }}
               />
+
+              {(currentViewType === "logical" ||
+                currentViewType === "call_stack" ||
+                currentViewType === "physical" ||
+                currentViewType === "flame") && (
+                <Tooltip title="Export as SVG">
+                  <IconButton
+                    onClick={handleExportSvg}
+                    size="small"
+                    sx={{
+                      ml: 2,
+                      backgroundColor: "white",
+                      boxShadow: 1,
+                      "&:hover": {
+                        backgroundColor: "grey.100",
+                      },
+                    }}
+                  >
+                    <DownloadIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
             </React.Fragment>
           </div>
           <div className="legends">
@@ -424,6 +478,7 @@ const ActorGraph = () => {
         )}
         {graphData && currentViewType === "physical" && (
           <PhysicalVisualization
+            ref={physicalVisualizationRef}
             // eslint-disable-next-line
             physicalViewData={physicalViewData!}
             onElementClick={handleElementClick}
@@ -445,6 +500,7 @@ const ActorGraph = () => {
           >
             {flameData ? (
               <FlameVisualization
+                ref={flameVisualizationRef}
                 flameData={flameData}
                 onElementClick={handleElementClick}
                 selectedElementId={selectedElementId}
@@ -462,6 +518,16 @@ const ActorGraph = () => {
               </div>
             )}
           </div>
+        )}
+        {currentViewType === "insight" && (
+          <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+            <InsightPanel
+              jobId={currentJobId}
+              graphData={graphData}
+              physicalViewData={physicalViewData}
+              flameData={flameData}
+            />
+          </Box>
         )}
         <InfoCard
           data={infoCardData}

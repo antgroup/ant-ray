@@ -664,9 +664,9 @@ class RuntimeEnv(dict):
         )
         if runtime_env_field_without_python_path:
             logger.warning(
-                "isolate_pip_installation in runtime_env field "
+                "`isolate_pip_installation` in runtime_env field "
                 "will be deprecated, "
-                "please set isolate_pip_installation in container field."
+                "please set `isolate_pip_installation` in container field."
             )
         return (
             container_field_without_python_path or runtime_env_field_without_python_path

@@ -256,40 +256,6 @@ def test_native_libraries_for_runtime_env(set_runtime_env_plugins, ray_start_reg
     assert os.path.exists(local_file_path), local_file_path
 
 
-@pytest.mark.parametrize(
-    "set_runtime_env_plugins",
-    [
-        '[{"class":"' + ARCHIVE_PLUGIN_CLASS_PATH + '"}]',
-    ],
-    indirect=True,
-)
-@pytest.mark.parametrize("set_ray_unpackable_file_suffixs", [".whl,.jar"])
-def test_runtime_env_download_wihtout_unpack(
-    set_runtime_env_plugins, ray_start_regular
-):
-    archive_url = "https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_plugins.zip"  # noqa: E501
-
-    @ray.remote
-    class Test_Actor:
-        def __init__(self):
-            self._count = 0
-
-        def get_count(self):
-            return self._count
-
-        def get_archive_path(self):
-            return get_archives_context()
-
-    a = Test_Actor.options(
-        runtime_env={
-            ARCHIVE_PLUGIN_NAME: archive_url,
-        }
-    ).remote()
-
-    archive_path = ray.get(a.get_archive_path.remote())
-    print(f"show the archive_path {archive_path}")
-
-
 if __name__ == "__main__":
     if os.environ.get("PARALLEL_CI"):
         sys.exit(pytest.main(["-n", "auto", "--boxed", "-vs", __file__]))

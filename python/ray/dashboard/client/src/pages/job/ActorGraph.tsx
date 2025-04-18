@@ -11,6 +11,7 @@ import Switch from "@mui/material/Switch";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import DebugPanel from "../../components/DebugPanel";
+import InsightPanel from "../../components/InsightPanel";
 import ElementsPanel from "../../components/ray-visualization/ElementsPanel";
 import { FlameVisualization } from "../../components/ray-visualization/FlameVisualization";
 import { colorScheme } from "../../components/ray-visualization/graphData";
@@ -262,6 +263,12 @@ const ActorGraph = () => {
             dataFlows: [],
           }
         }
+      />
+      <InsightPanel 
+        jobId={currentJobId}
+        graphData={graphData}
+        physicalViewData={physicalViewData}
+        flameData={flameData}
       />
       <DebugPanel jobId={currentJobId} selectedElement={infoCardData} />
       <Box

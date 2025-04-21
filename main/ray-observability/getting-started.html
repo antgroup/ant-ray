@@ -1783,6 +1783,7 @@ specific roles or states.</p>
 execution time data from all components across your entire Ray job lifecycle. While traditional flame
 graphs are limited to profiling performance on a single machine, Ray’s Distributed Flame Graph provides
 a unified view of performance across your entire distributed system.</p>
+<p>The demo we provide in gif is using the deepseek-chat as the LLM model, feel free to use models like gpt, gemini or claude, make sure to configure the corresponding context size.</p>
 <p>Key features of the Distributed Flame Graph:</p>
 <ul class="simple">
 <li><p><strong>System-wide Performance View:</strong> Visualizes execution time across all distributed components</p></li>
@@ -1829,6 +1830,37 @@ reinforcement learning systems, where traditional debugging approaches would req
 logging into individual nodes and examining processes one by one.</p>
 <p>To access the DStack view, select “Call Stack” in the view type selector in the Flow Insight
 visualization after clicking on the “Insight” link for a specific job in the Jobs view.</p>
+</section>
+<section id="analysis">
+<h3>Analysis<a class="headerlink" href="#analysis" title="Link to this heading">#</a></h3>
+<img alt="Flow Insight Analysis screenshot" class="align-center" src="../_images/flow-insight-analysis.gif" />
+<p>The Analysis feature provides AI-powered performance analysis of Ray application, generating comprehensive reports that identify bottlenecks, resource utilization patterns, and optimization opportunities. This feature leverages the visualization data from Flow Insight to deliver comprehensive insights.</p>
+<p>Key capabilities of the Analysis feature:</p>
+<ul class="simple">
+<li><p><strong>Automated Performance Analysis:</strong> Get detailed reports analyzing your application’s distributed execution patterns</p></li>
+<li><p><strong>Resource Utilization Insights:</strong> Identify inefficient resource usage across CPU, memory, and GPU</p></li>
+<li><p><strong>Bottleneck Detection:</strong> Pinpoint performance bottlenecks in your distributed application</p></li>
+<li><p><strong>Optimization Recommendations:</strong> Receive actionable suggestions to improve application performance</p></li>
+<li><p><strong>Architecture Analysis:</strong> Understand the strengths and weaknesses of your current application architecture</p></li>
+</ul>
+<p>The analysis reports are structured into several key sections:</p>
+<ul class="simple">
+<li><p><strong>Performance Summary:</strong> Critical findings and priority optimizations</p></li>
+<li><p><strong>Distributed Application Topology Analysis:</strong> Node distribution and resource profiles</p></li>
+<li><p><strong>Distributed Execution Analysis:</strong> Actor/task system behavior and scalability characteristics</p></li>
+<li><p><strong>Data Flow Analysis:</strong> Object transfer patterns</p></li>
+<li><p><strong>Application-Specific Analysis:</strong> Workload characterization and architecture evaluation</p></li>
+<li><p><strong>Recommendations:</strong> Architecture optimizations with expected improvements</p></li>
+</ul>
+<p>To generate an analysis report:</p>
+<ol class="arabic simple">
+<li><p>Navigate to the Flow Insight view and click on the “Analysis” tab</p></li>
+<li><p>Configure your OpenAI API settings if this is your first time</p></li>
+<li><p>Click “Generate Report” to begin the analysis process</p></li>
+<li><p>The analysis will be streamed in real-time as it’s generated</p></li>
+<li><p>Once complete, you can export the report as a Markdown file for sharing or documentation</p></li>
+</ol>
+<p>The Analysis feature helps bridge the gap between visualization and comprehensive insights, making it easier to optimize complex distributed applications by identifying specific areas for improvement.</p>
 </section>
 <section id="info-card">
 <h3>Info Card<a class="headerlink" href="#info-card" title="Link to this heading">#</a></h3>
@@ -2056,6 +2088,7 @@ and resolve issues in Ray applications.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context-based-filtering">Context-Based Filtering</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distributed-flame-graph">Distributed Flame Graph</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distributed-stack-dstack">Distributed Stack (DStack)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis">Analysis</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#info-card">Info Card</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#search-functionality">Search Functionality</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices">Best Practices</a></li>

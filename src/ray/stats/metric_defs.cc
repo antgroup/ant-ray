@@ -314,6 +314,19 @@ DEFINE_stats(gcs_storage_operation_count,
              (),
              ray::stats::COUNT);
 
+/// Redis Monitor
+DEFINE_stats(redis_operation_count,
+             "Number of operations invoked on Redis",
+             ("Operation", "TableName"),
+             (),
+             ray::stats::COUNT);
+DEFINE_stats(redis_operation_data_size_bytes,
+             "Data size of an operation on Redis includes input data size for write "
+             "operations and output data size for read operations",
+             ("Operation", "TableName", "Type"),
+             (),
+             ray::stats::SUM);
+
 /// Placement Group
 // The end to end placement group creation latency.
 // The time from placement group creation request has received

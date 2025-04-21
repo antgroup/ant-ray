@@ -603,6 +603,10 @@ bool RedisDelKeyPrefixSync(const std::string &host,
   auto *context = cli->GetPrimaryContext();
   auto delete_one_sync = [context](const std::string &key) {
     auto del_cmd = std::vector<std::string>{"UNLINK", key};
+    conditional_record([] {
+      STATS_redis_operation_count.Record(
+          1, {{"Operation", "UNLINK"}, {"TableName", "UNKNOWN"}});
+    });
     std::promise<std::shared_ptr<CallbackReply>> promise;
     context->RunArgvAsync(del_cmd,
                           [&promise](const std::shared_ptr<CallbackReply> &reply) {

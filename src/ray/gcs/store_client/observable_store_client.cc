@@ -30,8 +30,6 @@ Status ObservableStoreClient::AsyncPut(const std::string &table_name,
   auto start = absl::GetCurrentTimeNanos();
   STATS_gcs_storage_operation_count.Record(
       1, {{"Operation", "Put"}, {"TableName", table_name}});
-  STATS_gcs_storage_operation_data_size_bytes.Record(
-      data.size(), {{"Operation", "Put"}, {"TableName", table_name}});
   return delegate_->AsyncPut(
       table_name,
       key,
@@ -52,8 +50,6 @@ Status ObservableStoreClient::AsyncGet(
   auto start = absl::GetCurrentTimeNanos();
   STATS_gcs_storage_operation_count.Record(
       1, {{"Operation", "Get"}, {"TableName", table_name}});
-  STATS_gcs_storage_operation_data_size_bytes.Record(
-      0, {{"Operation", "Get"}, {"TableName", table_name}});
   return delegate_->AsyncGet(
       table_name, key, std::move(callback).OnInvocation([start, table_name]() {
         auto end = absl::GetCurrentTimeNanos();
@@ -69,8 +65,6 @@ Status ObservableStoreClient::AsyncGetAll(
   auto start = absl::GetCurrentTimeNanos();
   STATS_gcs_storage_operation_count.Record(
       1, {{"Operation", "GetAll"}, {"TableName", table_name}});
-  STATS_gcs_storage_operation_data_size_bytes.Record(
-      0, {{"Operation", "GetAll"}, {"TableName", table_name}});
   return delegate_->AsyncGetAll(
       table_name, std::move(callback).OnInvocation([start, table_name]() {
         auto end = absl::GetCurrentTimeNanos();
@@ -87,8 +81,6 @@ Status ObservableStoreClient::AsyncMultiGet(
   auto start = absl::GetCurrentTimeNanos();
   STATS_gcs_storage_operation_count.Record(
       1, {{"Operation", "MultiGet"}, {"TableName", table_name}});
-  STATS_gcs_storage_operation_data_size_bytes.Record(
-      0, {{"Operation", "MultiGet"}, {"TableName", table_name}});
   return delegate_->AsyncMultiGet(
       table_name, keys, std::move(callback).OnInvocation([start, table_name]() {
         auto end = absl::GetCurrentTimeNanos();
@@ -104,8 +96,6 @@ Status ObservableStoreClient::AsyncDelete(const std::string &table_name,
   auto start = absl::GetCurrentTimeNanos();
   STATS_gcs_storage_operation_count.Record(
       1, {{"Operation", "Delete"}, {"TableName", table_name}});
-  STATS_gcs_storage_operation_data_size_bytes.Record(
-      0, {{"Operation", "Delete"}, {"TableName", table_name}});
   return delegate_->AsyncDelete(
       table_name, key, std::move(callback).OnInvocation([start, table_name]() {
         auto end = absl::GetCurrentTimeNanos();
@@ -121,8 +111,6 @@ Status ObservableStoreClient::AsyncBatchDelete(const std::string &table_name,
   auto start = absl::GetCurrentTimeNanos();
   STATS_gcs_storage_operation_count.Record(
       1, {{"Operation", "BatchDelete"}, {"TableName", table_name}});
-  STATS_gcs_storage_operation_data_size_bytes.Record(
-      0, {{"Operation", "BatchDelete"}, {"TableName", table_name}});
   return delegate_->AsyncBatchDelete(
       table_name, keys, std::move(callback).OnInvocation([start, table_name]() {
         auto end = absl::GetCurrentTimeNanos();
@@ -143,8 +131,6 @@ Status ObservableStoreClient::AsyncGetKeys(
   auto start = absl::GetCurrentTimeNanos();
   STATS_gcs_storage_operation_count.Record(
       1, {{"Operation", "GetKeys"}, {"TableName", table_name}});
-  STATS_gcs_storage_operation_data_size_bytes.Record(
-      0, {{"Operation", "GetKeys"}, {"TableName", table_name}});
   return delegate_->AsyncGetKeys(
       table_name, prefix, std::move(callback).OnInvocation([start, table_name]() {
         auto end = absl::GetCurrentTimeNanos();
@@ -160,8 +146,6 @@ Status ObservableStoreClient::AsyncExists(const std::string &table_name,
   auto start = absl::GetCurrentTimeNanos();
   STATS_gcs_storage_operation_count.Record(
       1, {{"Operation", "Exists"}, {"TableName", table_name}});
-  STATS_gcs_storage_operation_data_size_bytes.Record(
-      0, {{"Operation", "Exists"}, {"TableName", table_name}});
   return delegate_->AsyncExists(
       table_name, key, std::move(callback).OnInvocation([start, table_name]() {
         auto end = absl::GetCurrentTimeNanos();

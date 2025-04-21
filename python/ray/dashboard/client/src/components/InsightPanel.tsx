@@ -176,19 +176,26 @@ const chunkData = (data: any, maxTokens = 10000, model = "gpt-4"): string[] => {
   const numChunks = Math.ceil(totalTokens / maxTokens);
 
   try {
-    const approxChars = Math.ceil(dataStr.length / numChunks);
+    // Calculate the basic chunk size without overlap
+    const basicChunkSize = Math.ceil(dataStr.length / numChunks);
+    // Calculate the size of each chunk with overlap
+    const overlapSize = Math.ceil(basicChunkSize / 5); // 1/5 overlap
+
     for (let i = 0; i < numChunks; i++) {
-      const start = i * approxChars;
-      const end = Math.min((i + 1) * approxChars, dataStr.length);
+      // For first chunk, start at 0, otherwise start 1/5 chunk earlier
+      const start = i === 0 ? 0 : Math.max(0, i * basicChunkSize - overlapSize);
+      const end = Math.min((i + 1) * basicChunkSize, dataStr.length);
       chunks.push(dataStr.substring(start, end));
     }
   } catch (error) {
     console.error("Error chunking data:", error);
-    // Fallback to simple character-based chunking
-    const approxChars = Math.ceil(dataStr.length / numChunks);
+    // Fallback to simple character-based chunking with overlap
+    const basicChunkSize = Math.ceil(dataStr.length / numChunks);
+    const overlapSize = Math.ceil(basicChunkSize / 5); // 1/5 overlap
+
     for (let i = 0; i < numChunks; i++) {
-      const start = i * approxChars;
-      const end = Math.min((i + 1) * approxChars, dataStr.length);
+      const start = i === 0 ? 0 : Math.max(0, i * basicChunkSize - overlapSize);
+      const end = Math.min((i + 1) * basicChunkSize, dataStr.length);
       chunks.push(dataStr.substring(start, end));
     }
   }
@@ -298,7 +305,14 @@ const InsightPanel: React.FC<InsightPanelProps> = ({
 
       // Add language instruction to the prompt
       const promptWithLanguage = reportLanguage
-        ? `${prompt}\n\nPlease generate the report in ${reportLanguage}.`
+        ? `${prompt}\n\nPlease generate the report in ${reportLanguage}.
+        Just give result markdown without any other text, wrap it with \`\`\`markdown.
+        For example:
+        \`\`\`markdown
+        # Analysis Report
+        ...
+        \`\`\`
+        `
         : prompt;
 
       // 2. Prepare all data with readable timestamps and names
@@ -361,10 +375,6 @@ const InsightPanel: React.FC<InsightPanelProps> = ({
           true, // Enable streaming
           (chunk) => {
             streamedContent += chunk;
-            // Always display content as it comes in
-            setReportStream(streamedContent);
-
-            // Still try to find markdown marker and clean up if found
             if (!found_markdown_marker) {
               const pos = streamedContent.indexOf("```markdown");
               if (pos !== -1) {
@@ -372,14 +382,20 @@ const InsightPanel: React.FC<InsightPanelProps> = ({
                 const cleanedContent = streamedContent.slice(
                   pos + "```markdown".length,
                 );
-                setReportStream(cleanedContent);
+                streamedContent = cleanedContent;
+                setReportStream(streamedContent);
               }
+            } else {
+              setReportStream(streamedContent);
             }
           },
         );
 
         // Clean the final content when streaming is complete
-        const finalContent = cleanMarkdown(streamedContent);
+        const finalContent = cleanMarkdown(
+          streamedContent,
+          found_markdown_marker,
+        );
         setReport(finalContent);
         setIsStreaming(false);
         setShowSettings(false);
@@ -443,9 +459,6 @@ const InsightPanel: React.FC<InsightPanelProps> = ({
         true, // Enable streaming
         (chunk) => {
           streamedContent += chunk;
-          // Always display content as it comes in
-          setReportStream(streamedContent);
-
           // Still try to find markdown marker and clean up if found
           if (!found_markdown_marker) {
             const pos = streamedContent.indexOf("```markdown");
@@ -454,14 +467,20 @@ const InsightPanel: React.FC<InsightPanelProps> = ({
               const cleanedContent = streamedContent.slice(
                 pos + "```markdown".length,
               );
-              setReportStream(cleanedContent);
+              streamedContent = cleanedContent;
+              setReportStream(streamedContent);
             }
+          } else {
+            setReportStream(streamedContent);
           }
         },
       );
 
       // Clean the final content when streaming is complete
-      const finalContent = cleanMarkdown(streamedContent);
+      const finalContent = cleanMarkdown(
+        streamedContent,
+        found_markdown_marker,
+      );
       setReport(finalContent);
       setIsStreaming(false);
       setShowSettings(false);
@@ -477,21 +496,17 @@ const InsightPanel: React.FC<InsightPanelProps> = ({
   };
 
   // Helper function to clean up markdown output
-  const cleanMarkdown = (markdown: string): string => {
+  const cleanMarkdown = (
+    markdown: string,
+    found_markdown_marker: boolean,
+  ): string => {
     // First check for the starting markdown marker
-    const markdown_marker_start = "```markdown";
     const markdown_marker_end = "```";
     let cleaned = markdown;
 
-    // Remove the starting markdown marker if present
-    const start_pos = cleaned.indexOf(markdown_marker_start);
-    if (start_pos !== -1) {
-      cleaned = cleaned.slice(start_pos + markdown_marker_start.length);
-    }
-
     // Remove the ending markdown marker if present
     const end_pos = cleaned.lastIndexOf(markdown_marker_end);
-    if (end_pos !== -1) {
+    if (end_pos !== -1 && found_markdown_marker) {
       cleaned = cleaned.slice(0, end_pos);
     }
 

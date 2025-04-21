@@ -44,7 +44,7 @@ This template provides a structured framework for analyzing Ray distributed appl
 
 - **Architecture Optimizations**
 
-- **Expected Improvements**:
+- **Other Improvements**:
 
 ## Analysis Output Format
 

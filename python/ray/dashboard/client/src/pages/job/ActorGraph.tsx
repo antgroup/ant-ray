@@ -98,7 +98,7 @@ const ActorGraph = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [currentViewType, setCurrentViewType] =
-    useState<"logical" | "call_stack" | "physical" | "flame" | "insight">(
+    useState<"logical" | "call_stack" | "physical" | "flame" | "analysis">(
       "logical",
     );
   const visualizationRef = useRef<RayVisualizationHandle>(null);
@@ -181,7 +181,7 @@ const ActorGraph = () => {
       const data = await getPhysicalViewData(currentJobId);
       setPhysicalViewData(data);
     }
-    if (currentViewType === "flame" || currentViewType === "insight") {
+    if (currentViewType === "flame" || currentViewType === "analysis") {
       await fetchGraphData(currentJobId, false);
       const data = await getPhysicalViewData(currentJobId);
       setPhysicalViewData(data);
@@ -237,7 +237,9 @@ const ActorGraph = () => {
   }, []);
 
   const handleViewTypeChange = useCallback(
-    (viewType: "logical" | "call_stack" | "physical" | "flame" | "insight") => {
+    (
+      viewType: "logical" | "call_stack" | "physical" | "flame" | "analysis",
+    ) => {
       setCurrentViewType(viewType);
     },
     [],
@@ -362,7 +364,7 @@ const ActorGraph = () => {
                 <ToggleButton value="flame" aria-label="flame graph view">
                   Flame Graph
                 </ToggleButton>
-                <ToggleButton value="insight" aria-label="insight view">
+                <ToggleButton value="analysis" aria-label="analysis view">
                   Analysis
                 </ToggleButton>
               </ToggleButtonGroup>
@@ -519,7 +521,7 @@ const ActorGraph = () => {
             )}
           </div>
         )}
-        {currentViewType === "insight" && (
+        {currentViewType === "analysis" && (
           <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
             <InsightPanel
               jobId={currentJobId}

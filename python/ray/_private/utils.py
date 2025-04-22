@@ -21,6 +21,7 @@ import tempfile
 import threading
 import time
 import warnings
+import base64
 from inspect import signature
 from pathlib import Path
 from subprocess import list2cmdline
@@ -2120,6 +2121,25 @@ def try_update_container_command(
             passthrough_args.insert(
                 cp_param_index, "-DWORKER_SHIM_PID={}".format(os.getpid())
             )
+
+    # add `entrypoint_prefix` to `passthrough_args`
+    if container.get("entrypoint_prefix", None):
+        entrypoint_prefix = container["entrypoint_prefix"]
+        # NOTE(Jacky): The `entrypoint_prefix` has a list of pip packages (List[str]).
+        # Since command-line/environment variables cannot directly pass list types,
+        # we encode the list as a base64 string to ensure safe transmission and parsing.
+        # Example format: "['package1', 'package2']" → base64 encoded → "WydGVzdC1wYWNrYWdlMSd9LCAndGVzdC1wYWNrYWdlMiddXQ=="
+        if "--packages" in entrypoint_prefix:
+            index = entrypoint_prefix.index("--packages")
+            pip_packages_str = entrypoint_prefix[index + 1]
+            logger.info(
+                f"Convert pip package dependencies to base64: {pip_packages_str}"
+            )
+            entrypoint_prefix[index + 1] = base64.b64encode(
+                pip_packages_str.encode("utf-8")
+            ).decode("utf-8")
+        passthrough_args = entrypoint_prefix + passthrough_args
+
     container_command.append(" ".join(passthrough_args)) if len(
         passthrough_args
     ) > 0 else None
@@ -2270,3 +2290,109 @@ def try_update_runtime_env_vars(
             ".pyenv", redirected_pyenv_folder
         )
     return runtime_env_vars
+
+
+def get_ray_whl_dir():
+    return ray_constants.RAY_WHL_DIR
+
+
+def get_dependencies_installer_path():
+    return os.path.join(
+        get_ray_site_packages_path(),
+        "ray",
+        "_private",
+        "runtime_env",
+        "install_ray_or_pip_packages.py",
+    )
+
+
+def try_generate_entrypoint_args(
+    install_ray: bool,
+    pip_packages: List[str],
+    container_pip_packages: List[str],
+    container_dependencies_installer_path: str,
+    context: "RuntimeEnvContext",
+):
+    container_dependencies_installer_command = None
+    entrypoint_args = []
+    if install_ray:
+        container_dependencies_installer_command = [
+            "python",
+            container_dependencies_installer_path,
+        ]
+        if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
+            container_dependencies_installer_command.extend(
+                [
+                    "--whl-dir",
+                    get_ray_whl_dir(),
+                ]
+            )
+        else:
+            container_dependencies_installer_command.extend(
+                [
+                    "--ray-version",
+                    f"{ray.__version__}",
+                ]
+            )
+        if pip_packages or container_pip_packages:
+            # When `install_ray` is True, we need to install
+            # both runtime env field pip packages and container pip packages
+            # before worker starts with default python in container.
+            # So, We need to merge the two lists and remove duplicates.
+            merge_pip_packages = list(
+                dict.fromkeys(pip_packages + container_pip_packages)
+            )
+            container_dependencies_installer_command.extend(
+                [
+                    "--packages",
+                    json.dumps(merge_pip_packages),
+                ]
+            )
+        # we set default python executable in container
+        # to avoid using the host python executable when
+        # `install_ray` is True
+        context.py_executable = "python"
+
+    if container_pip_packages:
+        if container_dependencies_installer_command is None:
+            container_dependencies_installer_command = [
+                "python",
+                container_dependencies_installer_path,
+                "--packages",
+                json.dumps(container_pip_packages),
+            ]
+
+    if container_dependencies_installer_command is not None:
+        container_dependencies_installer_command.append("&&")
+        entrypoint_args.extend(container_dependencies_installer_command)
+
+    return entrypoint_args
+
+
+# NOTE(Jacky): it will be used to setup resource limit.
+def parse_allocated_resource(serialized_allocated_instances):
+    container_resource_args = []
+    allocated_resource = json.loads(serialized_allocated_instances)
+    if "CPU" in allocated_resource:
+        cpu_resource = allocated_resource["CPU"]
+        if isinstance(cpu_resource, list):
+            # cpuset: because we may split one cpu core into some pieces,
+            # we need set cpuset.cpu_exclusive=0 and set cpuset-cpus
+            cpu_ids = []
+            cpus = 0
+            for idx, val in enumerate(cpu_resource):
+                if val > 0:
+                    cpu_ids.append(idx)
+                    cpus += val / 10000
+            container_resource_args.append("--cpus=" + str(int(cpus)))
+            container_resource_args.append(
+                "--cpuset-cpus=" + ",".join(str(e) for e in cpu_ids)
+            )
+        else:
+            # cpushare
+            container_resource_args.append("--cpus=" + str(int(cpu_resource / 10000)))
+    if "memory" in allocated_resource:
+        container_resource_args.append(
+            "--memory=" + str(int(allocated_resource["memory"] / 100000000)) + "m"
+        )
+    return container_resource_args

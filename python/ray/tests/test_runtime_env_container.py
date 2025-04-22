@@ -1,5 +1,5 @@
 import sys
-
+import base64
 import pytest
 
 import ray
@@ -10,7 +10,8 @@ from ray._private.test_utils import (
     wait_for_condition,
     check_logs_by_keyword,
 )
-from ray._private.utils import get_pyenv_path
+from ray._private.utils import get_pyenv_path, get_ray_whl_dir
+from ray._private.runtime_env.constants import RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH
 
 
 # NOTE(zcin): The actual test code are in python scripts under
@@ -419,6 +420,149 @@ class TestContainerRuntimeEnvCommandLine:
             )
             wait_for_condition(
                 lambda: check_logs_by_keyword(keyword2, log_file_pattern), timeout=10
+            )
+
+    @pytest.mark.parametrize(
+        "set_runtime_env_container_use_ray_whl_package",
+        ["true", "false"],
+        indirect=True,
+    )
+    def test_container_command_with_install_ray_or_pip_packages(
+        self,
+        api_version,
+        set_runtime_env_container_use_ray_whl_package,
+        ray_start_regular,
+    ):
+        use_ray_whl_package = set_runtime_env_container_use_ray_whl_package
+        runtime_env = {
+            api_version: {
+                "image": "unknown_image",
+                "install_ray": True,
+            },
+            "pip": ["requests"],
+        }
+
+        a = Counter.options(
+            runtime_env=runtime_env,
+        ).remote()
+        try:
+            ray.get(a.increment.remote(), timeout=1)
+        except (ray.exceptions.RuntimeEnvSetupError, ray.exceptions.GetTimeoutError):
+            # ignore the exception because container mode don't work in common
+            # test environments.
+            pass
+        # Checkout the worker logs to ensure if the cgroup params is set correctly
+        # in the podman command.
+        base64_pip_string = base64.b64encode(
+            json.dumps(runtime_env["pip"]).encode("utf-8")
+        ).decode("utf-8")
+        container_entrypoint_prefix = [
+            "python",
+            f"{RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH}",
+        ]
+        if use_ray_whl_package.lower() == "true":
+            container_entrypoint_prefix.extend(["--whl-dir", get_ray_whl_dir()])
+        else:
+            container_entrypoint_prefix.extend(["--ray-version", ray.__version__])
+        keyword1 = " ".join(container_entrypoint_prefix)
+        keyword2 = f"\--packages {base64_pip_string}"
+        log_file_pattern = "raylet.err"
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword1, log_file_pattern), timeout=20
+        )
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword2, log_file_pattern), timeout=20
+        )
+
+    @pytest.mark.parametrize(
+        "ray_start_regular",
+        [{"_system_config": {"worker_resource_limits_enabled": True}}],
+        indirect=True,
+    )
+    def test_container_command_with_resources_limit(
+        self, api_version, ray_start_regular
+    ):
+        runtime_env = {
+            api_version: {
+                "image": "unknown_image",
+            },
+        }
+        num_cpus = 1
+        memory = 100 * 1024 * 1024
+        a = Counter.options(
+            runtime_env=runtime_env,
+            num_cpus=num_cpus,
+            memory=memory,
+        ).remote()
+        try:
+            ray.get(a.increment.remote(), timeout=1)
+        except (ray.exceptions.RuntimeEnvSetupError, ray.exceptions.GetTimeoutError):
+            # ignore the exception because container mode don't work in common
+            # test environments.
+            pass
+        # Checkout the worker logs to ensure if the cgroup params is set correctly
+        # in the podman command.
+        keyword1 = f"\--cpus={num_cpus}"
+        keyword2 = f"\--memory={int(memory / 10000)}m"
+        log_file_pattern = "raylet.err"
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword1, log_file_pattern), timeout=20
+        )
+
+        wait_for_condition(
+            lambda: check_logs_by_keyword(keyword2, log_file_pattern), timeout=20
+        )
+
+    @pytest.mark.parametrize(
+        "runtime_env",
+        [
+            {
+                "container": {"image": "unknown_image", "pip": ["numpy"]},
+                "pip": ["pandas"],
+            },
+            {
+                "container": {
+                    "image": "unknown_image",
+                    "pip": ["numpy"],
+                    "install_ray": True,
+                },
+                "pip": ["pandas"],
+            },
+        ],
+    )
+    def test_container_command_with_container_pip_packages(
+        self, api_version, runtime_env, ray_start_regular
+    ):
+        a = Counter.options(
+            runtime_env=runtime_env,
+        ).remote()
+        try:
+            ray.get(a.increment.remote(), timeout=1)
+        except (ray.exceptions.RuntimeEnvSetupError, ray.exceptions.GetTimeoutError):
+            # ignore the exception because container mode don't work in common
+            # test environments.
+            pass
+        # Checkout the worker logs to ensure if the cgroup params is set correctly
+        # in the podman command.
+        log_file_pattern_1 = "raylet.err"
+        pip_packages = runtime_env.get("pip")
+        container_pip_packages = runtime_env.get("container").get("pip")
+        merge_pip_packages = list(dict.fromkeys(pip_packages + container_pip_packages))
+        json_dumps_container_pip_packages = base64.b64encode(
+            json.dumps(container_pip_packages).encode("utf-8")
+        ).decode("utf-8")
+        json_dumps_merge_pip_packages = base64.b64encode(
+            json.dumps(merge_pip_packages).encode("utf-8")
+        ).decode("utf-8")
+        keyword1 = f"\--packages {json_dumps_container_pip_packages}"
+        keyword2 = f"\--packages {json_dumps_merge_pip_packages}"
+        if runtime_env.get("container").get("install_ray", False):
+            wait_for_condition(
+                lambda: check_logs_by_keyword(keyword2, log_file_pattern_1), timeout=20
+            )
+        else:
+            wait_for_condition(
+                lambda: check_logs_by_keyword(keyword1, log_file_pattern_1), timeout=20
             )
 
 

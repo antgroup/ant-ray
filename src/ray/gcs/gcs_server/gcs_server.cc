@@ -226,7 +226,7 @@ void GcsServer::DoStart(const GcsInitData &gcs_init_data) {
   InitGcsActorManager(gcs_init_data);
 
   // Init gcs worker manager.
-  InitGcsWorkerManager();
+  InitGcsWorkerManager(gcs_init_data);
 
   // Init GCS task manager.
   InitGcsTaskManager();
@@ -241,6 +241,9 @@ void GcsServer::DoStart(const GcsInitData &gcs_init_data) {
   InitUsageStatsClient();
 
   RecordMetrics();
+
+  // Init dead data cleaner.
+  InitDeadDataCleaner();
 
   // Start RPC server when all tables have finished loading initial
   // data.
@@ -724,9 +727,11 @@ void GcsServer::InitRuntimeEnvManager() {
   rpc_server_.RegisterService(*runtime_env_service_);
 }
 
-void GcsServer::InitGcsWorkerManager() {
+void GcsServer::InitGcsWorkerManager(const GcsInitData &gcs_init_data) {
   gcs_worker_manager_ = std::make_unique<GcsWorkerManager>(
       *gcs_table_storage_, io_context_provider_.GetDefaultIOContext(), *gcs_publisher_);
+  // Initialize by gcs tables data.
+  gcs_worker_manager_->Initialize(gcs_init_data);
   // Register service.
   worker_info_service_.reset(new rpc::WorkerInfoGrpcService(
       io_context_provider_.GetDefaultIOContext(), *gcs_worker_manager_));
@@ -985,6 +990,20 @@ void GcsServer::TryGlobalGC() {
     ray_syncer_->BroadcastMessage(std::move(msg));
     global_gc_throttler_->RunNow();
   }
+}
+
+void GcsServer::InitDeadDataCleaner() {
+  auto ttl_runner = PeriodicalRunner::Create(io_context_provider_.GetDefaultIOContext());
+  // Check clean the dead data.
+  ttl_runner->RunFnPeriodically(
+      [this, ttl_runner] {
+        gcs_actor_manager_->EvictExpiredActors();
+        gcs_node_manager_->EvictExpiredNodes();
+        gcs_worker_manager_->EvictExpiredWorkers();
+        gcs_job_manager_->EvictExpiredJobs();
+      },
+      RayConfig::instance().gcs_dead_data_check_interval_ms(),
+      "GcsServer.DeadDataCleaner");
 }
 
 }  // namespace gcs

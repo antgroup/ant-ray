@@ -77,15 +77,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--without-python-path",
+        "--isolate-pip-installation",
         required=False,
         help="Enable to install pip install without python path",
     )
 
     args = parser.parse_args()
-    pip_install_without_python_path = (
-        args.without_python_path.lower() == "true"
-        if args.without_python_path is not None
+    isolate_pip_installation = (
+        args.isolate_pip_installation.lower() == "true"
+        if args.isolate_pip_installation is not None
         else False
     )
 
@@ -95,4 +95,4 @@ if __name__ == "__main__":
         pip_packages = json.loads(
             base64.b64decode(args.packages.encode("utf-8")).decode("utf-8")
         )
-        install_pip_package(pip_packages, pip_install_without_python_path)
+        install_pip_package(pip_packages, isolate_pip_installation)

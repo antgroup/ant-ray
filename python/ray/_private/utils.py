@@ -2311,7 +2311,7 @@ def try_generate_entrypoint_args(
     pip_packages: List[str],
     container_pip_packages: List[str],
     container_dependencies_installer_path: str,
-    without_python_path: bool,
+    isolate_pip_installation: bool,
     context: "RuntimeEnvContext",
 ):
     container_dependencies_installer_command = None
@@ -2362,10 +2362,10 @@ def try_generate_entrypoint_args(
                 "--packages",
                 json.dumps(container_pip_packages),
             ]
-            if without_python_path:
+            if isolate_pip_installation:
                 container_dependencies_installer_command.extend(
                     [
-                        "--without-python-path",
+                        "--isolate-pip-installation",
                         "true",
                     ]
                 )

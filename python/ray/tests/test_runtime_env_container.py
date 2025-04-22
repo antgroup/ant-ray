@@ -587,7 +587,7 @@ class TestContainerRuntimeEnvCommandLine:
             pass
         # Checkout the worker logs to ensure if the cgroup params is set correctly
         # in the podman command.
-        keyword = "\--without-python-path true"
+        keyword = "\--isolate-pip-installation true"
         log_file_pattern = "raylet.err"
         wait_for_condition(
             lambda: check_logs_by_keyword(keyword, log_file_pattern), timeout=20

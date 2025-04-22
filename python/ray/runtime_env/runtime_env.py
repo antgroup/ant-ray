@@ -656,21 +656,7 @@ class RuntimeEnv(dict):
     def py_container_isolate_pip_installation(self) -> bool:
         if not self.has_py_container():
             return False
-        container_field_without_python_path = self["container"].get(
-            "isolate_pip_installation", False
-        )
-        runtime_env_field_without_python_path = self.get(
-            "isolate_pip_installation", False
-        )
-        if runtime_env_field_without_python_path:
-            logger.warning(
-                "`isolate_pip_installation` in runtime_env field "
-                "will be deprecated, "
-                "please set `isolate_pip_installation` in container field."
-            )
-        return (
-            container_field_without_python_path or runtime_env_field_without_python_path
-        )
+        return self["container"].get("isolate_pip_installation", False)
 
     def image_uri(self) -> Optional[str]:
         return self.get("image_uri")

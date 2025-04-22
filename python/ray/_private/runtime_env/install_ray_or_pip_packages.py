@@ -39,7 +39,7 @@ def install_ray_package(ray_version, whl_dir):
         raise RuntimeError(f"Failed to install ray, got ex: {result.stderr}")
 
 
-def install_pip_package(pip_packages, exclude_python_path):
+def install_pip_package(pip_packages, isolate_pip_installation):
     formatted_pip_packages = []
     for package in pip_packages:
         package = package.strip("'")
@@ -49,7 +49,7 @@ def install_pip_package(pip_packages, exclude_python_path):
     pip_install_command.extend(formatted_pip_packages)
     logger.info("Starting install pip package: {}".format(pip_install_command))
     env = os.environ.copy()
-    if exclude_python_path:
+    if isolate_pip_installation:
         # Remove PYTHONPATH from the environment variables
         env.pop("PYTHONPATH", None)
         # install pip packages without python path

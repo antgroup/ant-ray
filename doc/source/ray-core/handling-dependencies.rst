@@ -658,6 +658,147 @@ The ``runtime_env`` is a Python dictionary or a Python class :class:`ray.runtime
 
   - Example: ``RuntimeEnvConfig(eager_install=False)``
 
+.. _runtime-environments-worker-in-container:
+
+Worker in Container
+""""""""""""""""""""""
+When using the ``container`` field, the Ray worker process runs in a container with this image. The container is created by the Ray worker process and the Ray worker process is started in the container.
+We provide a ``container`` field (dict) to be compatible with other runtime env plugins. For more details, jump to the :ref:`API Reference <runtime-environments-api-ref>`.. Implementing base worker support in container would
+
+- **Improve Efficiency**: Allow Ray to inherit dependencies from the container's base image, eliminating redundant steps.
+
+- **Enhance Security**: Ensure dependencies are pinned and validated at the container level, reducing conflicts.
+
+The interface definition of container is as folloeds:
+
+.. code-block:: python
+  runtime_env = {
+    "container": {                   # Primary configuration field
+        "image": str,                # Required field specifying the container image
+        "pip": List[str],            # List of pip packages to install in the image's default Python environment
+        "py_executable": str,        # Custom Python interpreter path within the container
+        "run_options": List[str],    # Additional Podman runtime options
+        "install_ray": bool,         # Whether to install Ant-Ray in the container
+        "native_libraries": str,     # Path to add to Ray's code_search_path
+        "_pip_install_without_python_path": bool  # Internal parameter
+    },
+    # Optional fields from other plugins
+    "pip": List[str],                # Host environment pip packages
+   }
+
+details field specifications are as follows:
+
+.. list-table:: Parameters in the ``container`` Section
+   :widths: 20 20 60
+   :header-rows: 1
+
+   * - **Parameter**
+     - **Type**
+     - **Description**
+   * - ``image``
+     - ``str``
+     - Required parameter specifying the container image name (e.g., ``user/my_image:latest``)
+   * - ``pip``
+     - ``List[str]``
+     - List of pip packages to install using the container's default Python environment
+   * - ``py_executable``
+     - ``str``
+     - Path to the Python interpreter inside the container (e.g., ``/usr/bin/python3``)
+   * - ``run_options``
+     - ``List[str]``
+     - Custom Podman runtime arguments (e.g., ``["--net=host", "--memory=4G"]``)
+   * - ``install_ray``
+     - ``bool``
+     - ``True`` to install Ant-Ray using the container's Python environment
+   * - ``native_libraries``
+     - ``str``
+     - Path to add to Ray's ``code_search_path`` for code discovery
+   * - ``isolate_pip_installation``
+     - ``bool``
+     - ``True`` temporarily clears ``PYTHONPATH`` during pip installation
+
+**Example Configurations**
+
+.. code-block:: python
+
+  # Basic Usage
+  runtime_env = {
+      "image_uri": {
+          "image": "user/my_image:latest",
+          "pip": ["numpy==1.24.2"],
+          "run_options": ["--shm-size=1G"]
+      }
+  }
+
+  # Installing Ant-Ray
+  runtime_env = {
+      "image_uri": {
+          "image": "user/my_image:latest",
+          "install_ray": True,
+          "run_options": ["--privileged"]
+      }
+  }
+
+**Important Notes**
+
+.. warning::
+   The ``container`` field will be completely deprecated by July 2025. Migrate to ``image_uri`` immediately.
+
+.. note::
+   - ``isolate_pip_installation`` cannot be used with ``install_ray=True``
+   - ``py_executable`` must point to an existing path inside the container
+   - ``native_libraries`` paths must be accessible from inside the container
+
+**Common Usage Scenarios**
+
+1. **Container + External/Internal Pip**
+
+.. code-block:: python
+
+   runtime_env = {
+       "image_uri": {
+           "image": "user_image",
+           "pip": ["pandas"],
+           "isolate_pip_installation": True  # Clears PYTHONPATH during installation
+       },
+       "pip": ["numpy"]  # Installed in host virtualenv
+   }
+
+   # Behavior:
+   # - Installs triton_on_ray inside the container without PYTHONPATH inheritance
+   # - Host pip packages installed in the virtual environment
+
+2. **Container + install_ray**
+
+.. code-block:: python
+
+  runtime_env = {
+      "container": {
+          "image": "user_image",
+          "install_ray": True  # Installs Ant-Ray using container's Python
+      },
+      "pip": ["numpy"] # Skips external pip installations
+  }
+
+  # Behavior:
+  # - Skips external pip installations
+  # - Disables virtualenv mounting
+  # - Installs Ray version matching container's Python
+
+3. **Container + py_executable**
+
+.. code-block:: python
+  runtime_env = {
+      "container": {
+          "image": "user_image",
+          "py_executable": "/opt/conda/bin/python"  # Users python environment in container
+      }
+  }
+
+  # Behavior:
+  # - Uses specified Python interpreter path
+  # - Mounts virtualenv at ``-v /home/admin/.pyenv:/home/admin/ray/.pyenv``
+
 .. _runtime-environments-caching:
 
 Caching and Garbage Collection

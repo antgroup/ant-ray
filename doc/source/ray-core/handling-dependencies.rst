@@ -672,6 +672,7 @@ We provide a ``container`` field (dict) to be compatible with other runtime env 
 The interface definition of container is as folloeds:
 
 .. code-block:: python
+
   runtime_env = {
     "container": {                   # Primary configuration field
         "image": str,                # Required field specifying the container image
@@ -680,11 +681,11 @@ The interface definition of container is as folloeds:
         "run_options": List[str],    # Additional Podman runtime options
         "install_ray": bool,         # Whether to install Ant-Ray in the container
         "native_libraries": str,     # Path to add to Ray's code_search_path
-        "_pip_install_without_python_path": bool  # Internal parameter
+        "isolate_pip_installation": bool
     },
     # Optional fields from other plugins
     "pip": List[str],                # Host environment pip packages
-   }
+  }
 
 details field specifications are as follows:
 
@@ -723,16 +724,16 @@ details field specifications are as follows:
 
   # Basic Usage
   runtime_env = {
-      "image_uri": {
-          "image": "user/my_image:latest",
-          "pip": ["numpy==1.24.2"],
-          "run_options": ["--shm-size=1G"]
+      "container": {
+        "image": "user/my_image:latest",
+        "pip": ["numpy==1.24.2"],
+        "run_options": ["--shm-size=1G"]
       }
   }
 
   # Installing Ant-Ray
   runtime_env = {
-      "image_uri": {
+      "container": {
           "image": "user/my_image:latest",
           "install_ray": True,
           "run_options": ["--privileged"]
@@ -756,12 +757,12 @@ details field specifications are as follows:
 .. code-block:: python
 
    runtime_env = {
-       "image_uri": {
-           "image": "user_image",
-           "pip": ["pandas"],
-           "isolate_pip_installation": True  # Clears PYTHONPATH during installation
-       },
-       "pip": ["numpy"]  # Installed in host virtualenv
+      "image_uri": {
+          "image": "user_image",
+          "pip": ["pandas"],
+          "isolate_pip_installation": True  # Clears PYTHONPATH during installation
+      },
+      "pip": ["numpy"]  # Installed in host virtualenv
    }
 
    # Behavior:
@@ -788,6 +789,7 @@ details field specifications are as follows:
 3. **Container + py_executable**
 
 .. code-block:: python
+
   runtime_env = {
       "container": {
           "image": "user_image",

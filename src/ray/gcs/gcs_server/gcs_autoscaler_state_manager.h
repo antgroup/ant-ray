@@ -84,54 +84,6 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   }
 
  protected:
-  /// \brief Get the current cluster resource state.
-  /// \param reply The reply to be filled.
-  ///
-  /// See rpc::autoscaler::ClusterResourceState::node_states for more details.
-  void GetNodeStates(rpc::autoscaler::ClusterResourceState *state);
-
-  /// \brief Get the cluster resource constraints state.
-  /// \param reply The reply to be filled.
-  ///
-  /// See rpc::autoscaler::ClusterResourceState::cluster_resource_constraints for
-  /// more details. This is requested through autoscaler SDK for request_resources().
-  void GetClusterResourceConstraints(rpc::autoscaler::ClusterResourceState *state);
-
-  /// \brief Increment and get the next cluster resource state version.
-  /// \return The incremented cluster resource state version.
-  int64_t IncrementAndGetNextClusterResourceStateVersion() {
-    return ++last_cluster_resource_state_version_;
-  }
-
-  // Ray cluster session name.
-  const std::string session_name_;
-
-  // The default value of the last seen version for the request is 0, which indicates
-  // no version has been reported. So the first reported version should be 1.
-  // We currently provide two guarantees for this version:
-  //    1. It will increase monotonically.
-  //    2. If a state is updated, the version will be higher.
-  // Ideally we would want to have a guarantee where consecutive versions will always
-  // be different, but it's currently hard to do.
-  // TODO(rickyx): https://github.com/ray-project/ray/issues/35873
-  // We will need to make the version correct when GCS fails over.
-  int64_t last_cluster_resource_state_version_ = 0;
-
-  /// The last seen autoscaler state version. Use 0 as the default value to indicate
-  /// no previous autoscaler state has been seen.
-  int64_t last_seen_autoscaler_state_version_ = 0;
-
-  /// Resource load and usage of all nodes.
-  /// Note: This is similar to the data structure in `gcs_resource_manager`
-  /// but we update load and usage together.
-  ///
-  /// The absl::Time in the pair is the last time the item was updated.
-  absl::flat_hash_map<ray::NodeID, std::pair<absl::Time, rpc::ResourcesData>>
-      node_resource_info_;
-
-  ThreadChecker thread_checker_;
-
- private:
   /// \brief Get the aggregated resource load from all nodes.
   absl::flat_hash_map<google::protobuf::Map<std::string, double>, rpc::ResourceDemand>
   GetAggregatedResourceLoad() const;
@@ -145,6 +97,18 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   ///
   /// \return The placement group load, nullptr if there is no placement group load.
   std::shared_ptr<rpc::PlacementGroupLoad> GetPlacementGroupLoad() const;
+
+  /// \brief Increment and get the next cluster resource state version.
+  /// \return The incremented cluster resource state version.
+  int64_t IncrementAndGetNextClusterResourceStateVersion() {
+    return ++last_cluster_resource_state_version_;
+  }
+
+  /// \brief Get the current cluster resource state.
+  /// \param reply The reply to be filled.
+  ///
+  /// See rpc::autoscaler::ClusterResourceState::node_states for more details.
+  void GetNodeStates(rpc::autoscaler::ClusterResourceState *state);
 
   /// \brief Get the resource requests state.
   /// \param reply The reply to be filled.
@@ -175,6 +139,13 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   /// for more details.
   void GetPendingGangResourceRequests(rpc::autoscaler::ClusterResourceState *state);
 
+  /// \brief Get the cluster resource constraints state.
+  /// \param reply The reply to be filled.
+  ///
+  /// See rpc::autoscaler::ClusterResourceState::cluster_resource_constraints for
+  /// more details. This is requested through autoscaler SDK for request_resources().
+  void GetClusterResourceConstraints(rpc::autoscaler::ClusterResourceState *state);
+
   /// \brief Get the autoscaler infeasible request resource shapes for each node.
   /// \return a map of node id to the corresponding infeasible resource requests shapes.
   ///
@@ -193,23 +164,39 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
   /// TODO: Implement the function
   void CancelInfeasibleRequests() const;
 
+  // Ray cluster session name.
+  const std::string session_name_;
+
   /// Gcs node manager that provides node status information.
   GcsNodeManager &gcs_node_manager_;
 
   /// Gcs actor manager that provides actor information.
   GcsActorManager &gcs_actor_manager_;
 
- protected:
   /// GCS placement group manager reference.
   const GcsPlacementGroupManager &gcs_placement_group_manager_;
 
- private:
   /// Raylet client pool.
   rpc::NodeManagerClientPool &raylet_client_pool_;
 
   // Handler for internal KV
   InternalKVInterface &kv_;
   instrumented_io_context &io_context_;
+
+  // The default value of the last seen version for the request is 0, which indicates
+  // no version has been reported. So the first reported version should be 1.
+  // We currently provide two guarantees for this version:
+  //    1. It will increase monotonically.
+  //    2. If a state is updated, the version will be higher.
+  // Ideally we would want to have a guarantee where consecutive versions will always
+  // be different, but it's currently hard to do.
+  // TODO(rickyx): https://github.com/ray-project/ray/issues/35873
+  // We will need to make the version correct when GCS fails over.
+  int64_t last_cluster_resource_state_version_ = 0;
+
+  /// The last seen autoscaler state version. Use 0 as the default value to indicate
+  /// no previous autoscaler state has been seen.
+  int64_t last_seen_autoscaler_state_version_ = 0;
 
   /// The most recent cluster resource constraints requested.
   /// This is requested through autoscaler SDK from request_resources().
@@ -218,6 +205,16 @@ class GcsAutoscalerStateManager : public rpc::autoscaler::AutoscalerStateHandler
 
   /// Cached autoscaling state.
   std::optional<rpc::autoscaler::AutoscalingState> autoscaling_state_ = std::nullopt;
+
+  /// Resource load and usage of all nodes.
+  /// Note: This is similar to the data structure in `gcs_resource_manager`
+  /// but we update load and usage together.
+  ///
+  /// The absl::Time in the pair is the last time the item was updated.
+  absl::flat_hash_map<ray::NodeID, std::pair<absl::Time, rpc::ResourcesData>>
+      node_resource_info_;
+
+  ThreadChecker thread_checker_;
 
   FRIEND_TEST(GcsAutoscalerStateManagerTest, TestReportAutoscalingState);
   FRIEND_TEST(GcsAutoscalerStateManagerTest,

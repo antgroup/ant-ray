@@ -1118,7 +1118,6 @@ void PrimaryCluster::ForeachVirtualClustersData(
 }
 
 void PrimaryCluster::ForeachVirtualClustersView(
-    rpc::GetAllVirtualClusterInfoRequest request,
     VirtualClustersViewVisitCallback callback) const {
   std::vector<std::shared_ptr<rpc::VirtualClusterView>> virtual_cluster_view_list;
 

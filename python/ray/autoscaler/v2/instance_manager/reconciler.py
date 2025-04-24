@@ -61,6 +61,7 @@ from ray.core.generated.gcs_service_pb2 import (
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class BufferedNodePool:
     # The map from virtual_cluster_id to launch requests (scaling-up decisions made by the corresponding virtual cluster).
@@ -69,6 +70,7 @@ class BufferedNodePool:
     unassigned_nodes: Dict[str, List[str]] = field(default_factory=dict)
     # The map from ray node id to its node state.
     all_node_states: Dict[str, NodeState] = field(default_factory=dict)
+
 
 class VirtualClusterReconciler:
     @staticmethod
@@ -120,7 +122,7 @@ class VirtualClusterReconciler:
                 gcs_client=gcs_client,
             )
 
-        # Finally scale the primary cluster.    
+        # Finally scale the primary cluster.
         VirtualClusterReconciler._scale_primary_cluster(
             autoscaling_state=autoscaling_state,
             instance_manager=instance_manager,
@@ -691,7 +693,7 @@ class Reconciler:
             VirtualClusterReconciler.scale_virtual_clusters(
                 autoscaling_state=autoscaling_state,
                 instance_manager=instance_manager,
-                ray_state=ray_cluster_resource_state,
+                ray_cluster_resource_state=ray_cluster_resource_state,
                 scheduler=scheduler,
                 autoscaling_config=autoscaling_config,
                 gcs_client=gcs_client,

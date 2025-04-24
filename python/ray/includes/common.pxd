@@ -622,6 +622,7 @@ cdef extern from "ray/gcs/gcs_client/gcs_client.h" nogil:
         CNodeResourceInfoAccessor& NodeResources()
         CRuntimeEnvAccessor& RuntimeEnvs()
         CAutoscalerStateAccessor& Autoscaler()
+        CVirtualClusterInfoAccessor& VirtualCluster()
 
     cdef CRayStatus ConnectOnSingletonIoContext(CGcsClient &gcs_client, int timeout_ms)
 

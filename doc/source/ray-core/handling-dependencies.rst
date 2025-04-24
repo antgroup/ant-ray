@@ -639,7 +639,7 @@ The ``runtime_env`` is a Python dictionary or a Python class :class:`ray.runtime
 
 - ``image_uri`` (dict): Require a given Docker image. The worker process runs in a container with this image.
   - Example: ``{"image_uri": "anyscale/ray:2.31.0-py39-cpu"}``
-- Note: ``image_uri`` is experimental. If you have some requirements or run into any problems, raise issues in `github <https://github.com/ray-project/ray/issues>`__.
+  Note: ``image_uri`` is experimental. If you have some requirements or run into any problems, raise issues in `github <https://github.com/ray-project/ray/issues>`__.
 
 - ``container`` (dict): Used to specify the container configuration for runtime environments. 
   For more details, refer to the section :ref:`runtime-environments-worker-in-container`.

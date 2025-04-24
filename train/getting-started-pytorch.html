@@ -1642,7 +1642,7 @@ initialize large objects (e.g. datasets, models) directly in <code class="code d
 <h3>Set up a dataset<a class="headerlink" href="#set-up-a-dataset" title="Link to this heading">#</a></h3>
 <p>Use the <a class="reference internal" href="api/doc/ray.train.torch.prepare_data_loader.html#ray.train.torch.prepare_data_loader" title="ray.train.torch.prepare_data_loader"><code class="xref py py-func docutils literal notranslate"><span class="pre">ray.train.torch.prepare_data_loader()</span></code></a> utility function, which:</p>
 <ol class="arabic simple">
-<li><p>Adds a <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.distributed.DistributedSampler" title="(in PyTorch v2.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistributedSampler</span></code></a> to your <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="(in PyTorch v2.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code></a>.</p></li>
+<li><p>Adds a <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.distributed.DistributedSampler" title="(in PyTorch v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistributedSampler</span></code></a> to your <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="(in PyTorch v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code></a>.</p></li>
 <li><p>Moves the batches to the right device.</p></li>
 </ol>
 <p>Note that this step isn’t necessary if you’re passing in Ray Data to your Trainer.
@@ -1686,8 +1686,8 @@ respect the configuration of the existing sampler.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.distributed.DistributedSampler" title="(in PyTorch v2.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistributedSampler</span></code></a> does not work with a
-<code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> that wraps <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset" title="(in PyTorch v2.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterableDataset</span></code></a>.
+<p><a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.distributed.DistributedSampler" title="(in PyTorch v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistributedSampler</span></code></a> does not work with a
+<code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> that wraps <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset" title="(in PyTorch v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterableDataset</span></code></a>.
 If you want to work with an dataset iterator,
 consider using <a class="reference internal" href="../data/data.html#data"><span class="std std-ref">Ray Data</span></a> instead of PyTorch DataLoader since it
 provides performant streaming data ingestion for large scale datasets.</p>

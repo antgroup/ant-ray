@@ -195,6 +195,7 @@ class Autoscaler:
                 ray_stop_errors=ray_stop_errors,
                 autoscaling_config=autoscaling_config,
                 metrics_reporter=self._metrics_reporter,
+                gcs_client=self._gcs_client,
             )
         except Exception as e:
             logger.exception(e)

@@ -1056,6 +1056,20 @@ class VirtualClusterInfoAccessor {
   /// server.
   virtual void AsyncResubscribe();
 
+  virtual Status SyncCreateOrUpdateVirtualCluster(
+      const std::string &virtual_cluster_id,
+      bool divisible,
+      const std::unordered_map<std::string, int32_t> &replica_sets,
+      int64_t revision,
+      int64_t timeout_ms,
+      std::string &serialized_reply);
+
+  virtual Status SyncRemoveNodesFromVirtualCluster(
+      const std::string &virtual_cluster_id,
+      const std::vector<std::string> &nodes_to_remove,
+      int64_t timeout_ms,
+      std::string &serialized_reply);
+
  private:
   /// Save the fetch data operation in this function, so we can call it again when GCS
   /// server restarts from a failure.

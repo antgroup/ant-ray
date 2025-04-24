@@ -891,7 +891,7 @@ Usage:
 
 Behavior:
   - Uses the specified Python interpreter path.
-  - Mounts virtualenv at ``-v /home/admin/.pyenv:/home/admin/ray/.pyenv``.
+  - If ``py_executable`` starts with ``/home/admin/.pyenv``, mounts virtualenv at ``-v /home/admin/.pyenv:/home/admin/ray/.pyenv``.
 
 Usage:
   This configuration is useful when you need to use a specific Python interpreter

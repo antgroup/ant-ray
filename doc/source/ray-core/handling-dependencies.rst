@@ -677,7 +677,7 @@ The ``container`` field is designed to be compatible with other runtime environm
 - **Isolation**: Containers provide an isolated environment, preventing interference between the host system and the Ray worker processes.
 
 Interface Definition
-~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 The ``container`` field is a dictionary with the following structure:
 
@@ -712,7 +712,7 @@ The ``container`` field is a dictionary with the following structure:
 - ``isolate_pip_installation`` (bool): Temporarily clears ``PYTHONPATH`` during pip installation to ensure a clean environment.
 
 Field Specifications
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. list-table:: Parameters in the ``container`` Section
    :widths: 20 20 60
@@ -744,7 +744,7 @@ Field Specifications
      - ``True`` temporarily clears ``PYTHONPATH`` during pip installation.
 
 Example Configurations
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 1. **Basic Usage**
 
@@ -817,7 +817,7 @@ If `py_executable` is specified, Ray will use the provided `py_executable` to st
   This ensures that the external `pyenv` virtual environment does not overwrite the internal `pyenv` virtual environment within the container.
 
 Important Notes
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. warning::
    The ``container`` field will be deprecated by July 2025. Migrate to ``image_uri`` as soon as possible.
@@ -828,7 +828,7 @@ Important Notes
    - ``native_libraries`` paths must be accessible from inside the container.
 
 Common Usage Scenarios
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 1. **Container with External/Internal Pip**
 

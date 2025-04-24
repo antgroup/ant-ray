@@ -850,8 +850,8 @@ Behavior:
 Usage:
   This configuration is useful when you need to install specific Python packages
   both inside the container and in the host environment. For example:
-  - Use "pandas" inside the container for data processing tasks.
-  - Use "numpy" in the host environment for computations outside the container.
+  - Use ``pandas`` inside the container for data processing tasks, installed using the container's default Python environment.
+  - Use ``numpy`` in the host environment for computations outside the container, installed in the host's virtual environment with Ray.
   The `isolate_pip_installation` ensures that the container's Python environment
   remains clean and unaffected by the host's PYTHONPATH.
 
@@ -875,10 +875,8 @@ Behavior:
 Usage:
   This setup is ideal when you want to use Ray within a containerized environment
   without relying on external pip installations. For example:
-  - Use this configuration to ensure that the Ray version installed matches
-    the Python version inside the container.
-  - Avoid conflicts between the container's Python environment and the host's
-    virtual environment by skipping external pip installations.
+  - Use this configuration to ensure that the Ray version installed matches the Python version inside the container.
+  - Avoid conflicts between the container's Python environment and the host's virtual environment by skipping external pip installations.
 
 3. **Container with Custom Python Executable**
 

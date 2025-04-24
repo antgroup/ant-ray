@@ -398,7 +398,7 @@ class MetricsHead(dashboard_utils.DashboardHeadModule):
             "Version": ray.__version__,
             "Component": self._component,
             "SessionName": self.session_name,
-            "StroageNamespace": os.environ.get(
+            "StorageNamespace": os.environ.get(
                 "RAY_external_storage_namespace", "default"
             ),
         }

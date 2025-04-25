@@ -900,7 +900,7 @@ Usage:
   - Ensure compatibility with specific Python versions or dependencies.
   The `py_executable` option allows you to explicitly define the Python interpreter
   to be used, avoiding potential conflicts with the default Python in the container.
-  - Mounts virtualenv at ``-v /home/admin/.pyenv:/home/admin/ray/.pyenv``.
+  - If ``py_executable`` starts with ``/home/admin/.pyenv``, mounts virtualenv at ``-v /home/admin/.pyenv:/home/admin/ray/.pyenv``.
 
 By leveraging the ``container`` field, you can create a robust and isolated runtime environment for your Ray applications, ensuring consistency and reliability across your cluster.
 

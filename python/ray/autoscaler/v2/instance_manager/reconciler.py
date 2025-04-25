@@ -66,6 +66,8 @@ logger = logging.getLogger(__name__)
 class BufferedNodePool:
     # The map from virtual_cluster_id to launch requests (scaling-up decisions made by the corresponding virtual cluster).
     launching_nodes: Dict[str, List[LaunchRequest]] = field(default_factory=dict)
+    # The unavailable (e.g., dead, draining) nodes left in the primary cluster.
+    unavailable_nodes: Set[str] = field(default_factory=set)
     # The map from ray node type to unassigned (to any virtual cluster) nodes.
     unassigned_nodes: Dict[str, List[str]] = field(default_factory=dict)
     # The map from ray node id to its node state.
@@ -94,11 +96,19 @@ class VirtualClusterReconciler:
             PRIMARY_CLUSTER_ID
         ].nodes:
             if node_id in buffered_node_pool.all_node_states:
-                node_list = buffered_node_pool.unassigned_nodes.setdefault(
-                    buffered_node_pool.all_node_states[node_id].ray_node_type_name,
-                    [],
-                )
-                node_list.append(node_id)
+                if (
+                    buffered_node_pool.all_node_states[node_id].status
+                    == NodeStatus.RUNNING
+                    or buffered_node_pool.all_node_states[node_id].status
+                    == NodeStatus.IDLE
+                ):
+                    node_list = buffered_node_pool.unassigned_nodes.setdefault(
+                        buffered_node_pool.all_node_states[node_id].ray_node_type_name,
+                        [],
+                    )
+                    node_list.append(node_id)
+                else:
+                    buffered_node_pool.unavailable_nodes.add(node_id)
 
         for (
             virtual_cluster_id,
@@ -197,7 +207,7 @@ class VirtualClusterReconciler:
         )
 
         # Ask scheduler for updates to the cluster shape.
-        reply = scheduler.schedule(sched_request)
+        reply = scheduler.schedule(sched_request, virtual_cluster_id)
 
         # Populate the autoscaling state.
         autoscaling_state.infeasible_resource_requests.extend(
@@ -227,28 +237,44 @@ class VirtualClusterReconciler:
                     nodes_to_remove, virtual_cluster_id
                 )
             )
-            str_reply = gcs_client.remove_nodes_from_virtual_cluster(
-                virtual_cluster_id, nodes_to_remove
-            )
+            try:
+                str_reply = gcs_client.remove_nodes_from_virtual_cluster(
+                    virtual_cluster_id, nodes_to_remove
+                )
 
-            remove_nodes_reply = RemoveNodesFromVirtualClusterReply()
-            remove_nodes_reply.ParseFromString(str_reply)
-            if remove_nodes_reply.status.code == 0:
-                # Update the virtual cluster's node list.
-                ray_state.nodes[:] = []
-                ray_state.nodes.extend(list(node_set))
-                # The terminating nodes are added to the unassigned
-                # nodes of the primary cluster (with a buffered node pool).
-                for terminate_request in to_terminate:
-                    node_list = buffered_node_pool.unassigned_nodes.setdefault(
-                        terminate_request.ray_node_type, []
-                    )
-                    node_list.append(terminate_request.ray_node_id)
-            else:
-                # TODO: retry if needed.
+                remove_nodes_reply = RemoveNodesFromVirtualClusterReply()
+                remove_nodes_reply.ParseFromString(str_reply)
+                logger.info(remove_nodes_reply)
+                if remove_nodes_reply.status.code == 0:
+                    # Update the virtual cluster's node list.
+                    ray_state.nodes[:] = []
+                    ray_state.nodes.extend(list(node_set))
+                    # The terminating nodes are added to the unassigned
+                    # nodes of the primary cluster (with a buffered node pool).
+                    for terminate_request in to_terminate:
+                        if (
+                            buffered_node_pool.all_node_states[
+                                terminate_request.ray_node_id
+                            ].status
+                            == NodeStatus.RUNNING
+                            or buffered_node_pool.all_node_states[
+                                terminate_request.ray_node_id
+                            ].status
+                            == NodeStatus.IDLE
+                        ):
+                            node_list = buffered_node_pool.unassigned_nodes.setdefault(
+                                terminate_request.ray_node_type,
+                                [],
+                            )
+                            node_list.append(terminate_request.ray_node_id)
+                        else:
+                            buffered_node_pool.unavailable_nodes.add(
+                                terminate_request.ray_node_id
+                            )
+            except Exception as ex:
                 logger.warning(
                     "Failed to remove nodes from virtual cluster {}: {}".format(
-                        virtual_cluster_id, str_reply
+                        virtual_cluster_id, ex
                     )
                 )
 
@@ -259,7 +285,7 @@ class VirtualClusterReconciler:
             )
             launch_reqs.extend(reply.to_launch)
             logger.info(
-                f"Adding nodes {reply.to_launch} to virtual cluster {virtual_cluster_id}"
+                f"Need to add nodes {reply.to_launch} to virtual cluster {virtual_cluster_id}"
             )
 
     @staticmethod
@@ -338,19 +364,19 @@ class VirtualClusterReconciler:
                 logger.info(
                     f"Updating virtual cluster {virtual_cluster_id} with replica_sets {replica_sets}"
                 )
-                str_reply = gcs_client.create_or_update_virtual_cluster(
-                    virtual_cluster_id,
-                    ray_state.virtual_cluster_states[virtual_cluster_id].divisible,
-                    replica_sets,
-                    ray_state.virtual_cluster_states[virtual_cluster_id].revision,
-                )
-                reply = CreateOrUpdateVirtualClusterReply()
-                logger.info(reply)
-                reply.ParseFromString(str_reply)
-                if reply.status.code != 0:
-                    # TODO: retry if needed.
+                try:
+                    str_reply = gcs_client.create_or_update_virtual_cluster(
+                        virtual_cluster_id,
+                        ray_state.virtual_cluster_states[virtual_cluster_id].divisible,
+                        replica_sets,
+                        ray_state.virtual_cluster_states[virtual_cluster_id].revision,
+                    )
+                    reply = CreateOrUpdateVirtualClusterReply()
+                    reply.ParseFromString(str_reply)
+                    logger.info(reply)
+                except Exception as ex:
                     logger.warning(
-                        f"Failed to update virtual cluster {virtual_cluster_id}: {str_reply}"
+                        f"Failed to update virtual cluster {virtual_cluster_id}: {ex}"
                     )
                     # Revert the changes. The virtual cluster will be updated at the next round.
                     buffered_node_pool.launching_nodes[
@@ -366,12 +392,12 @@ class VirtualClusterReconciler:
         im_instances, version = Reconciler._get_im_instances(instance_manager)
         autoscaler_instances = []
 
-        unassigned_node_set = set()
+        primary_cluster_nodes = copy.deepcopy(buffered_node_pool.unavailable_nodes)
         # Only the unassigned nodes are considered.
         for _, node_list in buffered_node_pool.unassigned_nodes.items():
-            unassigned_node_set.update(node_list)
+            primary_cluster_nodes.update(node_list)
         for im_instance in im_instances:
-            if im_instance.node_id in unassigned_node_set:
+            if im_instance.node_id in primary_cluster_nodes:
                 ray_node = buffered_node_pool.all_node_states.get(im_instance.node_id)
                 autoscaler_instances.append(
                     AutoscalerInstance(
@@ -401,7 +427,7 @@ class VirtualClusterReconciler:
         )
 
         # Ask scheduler for updates to the cluster shape.
-        reply = scheduler.schedule(sched_request)
+        reply = scheduler.schedule(sched_request, PRIMARY_CLUSTER_ID)
 
         # Populate the autoscaling state.
         autoscaling_state.infeasible_cluster_resource_constraints.extend(

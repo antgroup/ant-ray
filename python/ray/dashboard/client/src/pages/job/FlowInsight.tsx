@@ -1,4 +1,4 @@
-import { FlowInsight } from "@ant-ray/flow-insight";
+import { FlowInsight } from "@aeonsule/flow-insight";
 import React from "react";
 import { useParams } from "react-router-dom";
 
@@ -10,14 +10,7 @@ type RouteParams = {
 const FlowInsightPage = () => {
   const { jobId } = useParams<RouteParams>();
 
-  return (
-    <FlowInsight
-      baseUrl="/"
-      jobId={jobId}
-      initialViewType="logical"
-      autoRefresh={false}
-    />
-  );
+  return <FlowInsight baseUrl="/insight" flowId={jobId} />;
 };
 
 export default FlowInsightPage;

@@ -1,4 +1,4 @@
-import { FlowInsight } from "@ant-ray/flow-insight";
+import { FlowInsight } from "@aeonsule/flow-insight";
 import React from "react";
 import { useParams } from "react-router-dom";
 
@@ -12,8 +12,8 @@ const FlowInsightPage = () => {
 
   return (
     <FlowInsight
-      baseUrl="/"
-      jobId={jobId}
+      baseUrl="/insight"
+      flowId={jobId}
       initialViewType="logical"
       autoRefresh={false}
     />

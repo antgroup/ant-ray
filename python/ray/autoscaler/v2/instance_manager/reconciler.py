@@ -317,6 +317,7 @@ class VirtualClusterReconciler:
                     ]
                     # There are enough unassigned nodes with the same node type.
                     if len(available_node_list) >= launch_request.count:
+                        logger.info(f"There are {len(available_node_list)} available nodes that can be assinged to {virtual_cluster_id}.")
                         expanding_replica_sets[
                             launch_request.ray_node_type
                         ] = launch_request.count
@@ -453,6 +454,7 @@ class VirtualClusterReconciler:
         to_terminate = reply.to_terminate
         updates = {}
         # Add terminating instances.
+        logger.info(f"{len(to_terminate)} nodes should be terminated.")
         for terminate_request in to_terminate:
             instance_id = terminate_request.instance_id
             updates[terminate_request.instance_id] = IMInstanceUpdateEvent(

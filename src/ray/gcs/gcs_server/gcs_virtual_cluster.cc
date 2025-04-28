@@ -153,17 +153,17 @@ void VirtualCluster::RemoveNodeInstances(ReplicaInstances replica_instances) {
 }
 
 Status VirtualCluster::RemoveNodeInstances(
-    const std::vector<std::string> &nodes_to_remove) {
+    const std::vector<std::string> &nodes_to_remove,
+    ReplicaInstances *replica_instances_to_remove) {
   absl::flat_hash_set<std::string> node_set_to_remove(nodes_to_remove.begin(),
                                                       nodes_to_remove.end());
-  ReplicaInstances replica_instances_to_remove;
   for (auto &[template_id, job_node_instances] : visible_node_instances_) {
     for (auto &[job_id, node_instances] : job_node_instances) {
       for (auto &[node_instance_id, node_instance] : node_instances) {
         auto removing_node_iter = node_set_to_remove.find(node_instance_id);
         if (removing_node_iter != node_set_to_remove.end() &&
             IsNodeInstanceIdle(node_instance_id)) {
-          replica_instances_to_remove[template_id][job_id][node_instance_id] =
+          (*replica_instances_to_remove)[template_id][job_id][node_instance_id] =
               node_instance;
           node_set_to_remove.erase(removing_node_iter);
         }
@@ -179,7 +179,7 @@ Status VirtualCluster::RemoveNodeInstances(
         std::any(nodes_with_failure));
   }
 
-  RemoveNodeInstances(replica_instances_to_remove);
+  RemoveNodeInstances(*replica_instances_to_remove);
   return Status::OK();
 }
 
@@ -960,11 +960,14 @@ Status PrimaryCluster::RemoveNodesFromVirtualCluster(
     const rpc::RemoveNodesFromVirtualClusterRequest &request,
     RemoveNodesFromVirtualClusterCallback callback) {
   auto logical_cluster = GetLogicalCluster(request.virtual_cluster_id());
+  ReplicaInstances replica_instances_to_remove;
   auto status = logical_cluster->RemoveNodeInstances(std::vector<std::string>(
-      request.nodes_to_remove().begin(), request.nodes_to_remove().end()));
+      request.nodes_to_remove().begin(), request.nodes_to_remove().end()), &replica_instances_to_remove);
   if (!status.ok()) {
     return status;
   }
+  UpdateNodeInstances(/*replica_instances_to_add=*/std::move(replica_instances_to_remove),
+                      /*replica_instances_to_remove=*/ReplicaInstances());
   return async_data_flusher_(logical_cluster->ToProto(), std::move(callback));
 }
 

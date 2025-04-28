@@ -504,6 +504,7 @@ time.sleep(600)
 # across virtual clusters).
 def test_multi_virtual_cluster_scaling(make_autoscaler):
     config = copy.deepcopy(DEFAULT_AUTOSCALING_CONFIG)
+    config["idle_timeout_minutes"] = 0.3
     autoscaler, cluster = make_autoscaler(config)
     gcs_address = autoscaler._gcs_client.address
 
@@ -617,10 +618,13 @@ time.sleep(600)
             expected_job_status=JobStatus.RUNNING,
         )
 
+        #autoscaler.update_autoscaling_state()
+        #time.sleep(1200)
+
         wait_for_condition(
             check_actors_and_nodes,
             timeout=60,
-            retry_interval_ms=5000,
+            retry_interval_ms=2000,
             autoscaler=autoscaler,
             # If autoscaler works correctly (add one `1c2g` node to
             # each virtual cluster), we shall see four alive actors.
@@ -630,6 +634,8 @@ time.sleep(600)
             total_node_count=5,
         )
 
+        print("=================== Job_2 is stopped ====================")
+        
         # Stop the second job.
         client.stop_job(job_2)
         wait_for_condition(

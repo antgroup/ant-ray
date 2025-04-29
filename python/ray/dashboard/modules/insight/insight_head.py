@@ -1,4 +1,5 @@
 import asyncio
+import time
 import logging
 import aiohttp.web
 import ray.dashboard.utils as dashboard_utils
@@ -68,8 +69,10 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                 server_url=f"http://{self._insight_server_address}",
                 storage_type=StorageType.MEMORY,
             )
-            await self._insight_client.async_prompt(
-                PromptRegisterEvent(prompt=PROMPT_TEMPLATE)
+            await self._insight_client.async_emit_event(
+                PromptRegisterEvent(
+                    prompt=PROMPT_TEMPLATE, timestamp=int(time.time() * 1000)
+                )
             )
 
         stats = BatchNodePhysicalStats(
@@ -111,8 +114,8 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                 node_stats.devices[DeviceType.GPU] = gpus
             stats.stats.append(node_stats)
 
-        await self._insight_client.async_node_physical_stats(
-            BatchNodePhysicalStatsEvent(stats=stats)
+        await self._insight_client.async_emit_event(
+            BatchNodePhysicalStatsEvent(stats=stats, timestamp=int(time.time() * 1000))
         )
 
         all_service_stats = {}
@@ -140,7 +143,9 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                     memory_info=MemoryInfo(
                         rss=0, vms=0, shared=0, text=0, lib=0, data=0, dirty=0
                     ),
-                    devices={},
+                    devices={
+                        DeviceType.GPU: [],
+                    },
                 )
                 if actor_pid and "workers" in DataSource.node_physical_stats[node_id]:
                     for worker in node_physical_stats["workers"]:
@@ -194,8 +199,12 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                 )
 
         for flow_id, service_stats in all_service_stats.items():
-            await self._insight_client.async_service_physical_stats(
-                BatchServicePhysicalStatsEvent(flow_id=flow_id, stats=service_stats)
+            await self._insight_client.async_emit_event(
+                BatchServicePhysicalStatsEvent(
+                    flow_id=flow_id,
+                    stats=service_stats,
+                    timestamp=int(time.time() * 1000),
+                )
             )
 
     @routes.get("/insight/{path:.*}")

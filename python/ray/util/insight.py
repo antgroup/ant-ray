@@ -74,7 +74,13 @@ class _ray_internal_insight_monitor:
         self.node_ip_address = ray._private.services.get_node_ip_address()
         self.port = self._get_free_port()
         print(f"Starting insight monitor on {self.node_ip_address}:{self.port}")
-        self.server = FastAPIInsightServer()
+        self.server = FastAPIInsightServer(
+            persist_storage_config={
+                "storage_dir": os.path.join(
+                    ray._private.utils.get_ray_temp_dir(), "flowinsight"
+                )
+            }
+        )
 
         # Run server in a background thread
         import threading
@@ -468,6 +474,7 @@ def report_resource_usage(usage: dict):
                 instance_id=current_class[1],
                 method_name=_get_current_task_name(),
                 usage=usage,
+                timestamp=int(time.time() * 1000),
             )
         )
 
@@ -499,6 +506,7 @@ def register_current_context(context_data: dict):
                 instance_id=current_class[1],
                 method_name=_get_current_task_name(),
                 context=context_data,
+                timestamp=int(time.time() * 1000),
             )
         )
 
@@ -565,6 +573,7 @@ def record_task_duration(duration):
                 target_method=caller_func,
                 duration=duration,
                 span_id=current_task_id,
+                timestamp=int(time.time() * 1000),
             )
         )
 
@@ -634,6 +643,7 @@ def report_trace_info(caller_info):
                 source_method=caller_info.get("caller_func", "_main"),
                 parent_span_id=caller_info.get("caller_task_id", ""),
                 span_id=current_task_id,
+                timestamp=int(time.time() * 1000),
             )
         )
 
@@ -648,6 +658,7 @@ def report_trace_info(caller_info):
                     debugger_port=debugger_port,
                     debugger_host=debugger_host,
                     debugger_enabled=is_visual_rdb_enabled(),
+                    timestamp=int(time.time() * 1000),
                 )
             )
 

@@ -961,8 +961,10 @@ Status PrimaryCluster::RemoveNodesFromVirtualCluster(
     RemoveNodesFromVirtualClusterCallback callback) {
   auto logical_cluster = GetLogicalCluster(request.virtual_cluster_id());
   ReplicaInstances replica_instances_to_remove;
-  auto status = logical_cluster->RemoveNodeInstances(std::vector<std::string>(
-      request.nodes_to_remove().begin(), request.nodes_to_remove().end()), &replica_instances_to_remove);
+  auto status = logical_cluster->RemoveNodeInstances(
+      std::vector<std::string>(request.nodes_to_remove().begin(),
+                               request.nodes_to_remove().end()),
+      &replica_instances_to_remove);
   if (!status.ok()) {
     return status;
   }

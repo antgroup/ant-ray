@@ -261,8 +261,10 @@ class VirtualCluster {
   /// Remove specified nodes.
   ///
   /// \param nodes_to_remove The specified nodes to remove.
-  /// \param replica_instances_to_remove The replica instances to be removed based on the `nodes_to_remove`.
-  Status RemoveNodeInstances(const std::vector<std::string> &nodes_to_remove, ReplicaInstances *replica_instances_to_remove);
+  /// \param replica_instances_to_remove The replica instances to be removed based on the
+  /// `nodes_to_remove`.
+  Status RemoveNodeInstances(const std::vector<std::string> &nodes_to_remove,
+                             ReplicaInstances *replica_instances_to_remove);
 
  protected:
   /// Insert the node instances to the cluster.

@@ -31,7 +31,7 @@ from ray.cluster_utils import Cluster
 from ray.job_submission import JobStatus, JobSubmissionClient
 
 import requests
-from typing import Dict
+from typing import Dict, Set
 
 logger = logging.getLogger(__name__)
 
@@ -512,16 +512,17 @@ def test_multi_virtual_cluster_scaling(make_autoscaler):
     print("=================== Test scaling up constraint ====================")
     request_cluster_resources(gcs_address, [{"CPU": 2}, {"CPU": 2}])
 
+    autoscaler.update_autoscaling_state()
+    logger.info("Cancel resource constraints.")
+    request_cluster_resources(gcs_address, [])
+
     def verify():
         autoscaler.update_autoscaling_state()
         cluster_state = get_cluster_status(gcs_address)
         assert len(cluster_state.active_nodes + cluster_state.idle_nodes) == 3
         return True
 
-    wait_for_condition(verify, timeout=60, retry_interval_ms=5000)
-
-    logger.info("Cancel resource constraints.")
-    request_cluster_resources(gcs_address, [])
+    wait_for_condition(verify, timeout=60, retry_interval_ms=2000)
 
     print("=================== Create two virtual clusters ====================")
     ip, _ = cluster.webui_url.split(":")
@@ -618,9 +619,6 @@ time.sleep(600)
             expected_job_status=JobStatus.RUNNING,
         )
 
-        #autoscaler.update_autoscaling_state()
-        #time.sleep(1200)
-
         wait_for_condition(
             check_actors_and_nodes,
             timeout=60,
@@ -634,8 +632,18 @@ time.sleep(600)
             total_node_count=5,
         )
 
+        vc_nodes: Dict[str, Set] = {}
+        resp = requests.get(webui_url + "/virtual_clusters")
+        resp.raise_for_status()
+        result = resp.json()
+        assert result["result"] is True, resp.text
+        for virtual_cluster in result["data"]["virtualClusters"]:
+            vc_nodes[virtual_cluster["virtualClusterId"]] = set(
+                virtual_cluster["nodeInstances"].keys()
+            )
+
         print("=================== Job_2 is stopped ====================")
-        
+
         # Stop the second job.
         client.stop_job(job_2)
         wait_for_condition(
@@ -681,7 +689,7 @@ time.sleep(600)
         wait_for_condition(
             check_actors_and_nodes,
             timeout=60,
-            retry_interval_ms=2000,
+            retry_interval_ms=5000,
             autoscaler=autoscaler,
             # If autoscaler works correctly (add one `2c4g` node and one `1c2g` node to
             # the first virtual cluster), we shall see four alive actors in total.
@@ -703,6 +711,10 @@ time.sleep(600)
                     if virtual_cluster["virtualClusterId"] == "virtual_cluster_1":
                         # The first virtual cluster needs four node to fulfill job_1 and job_3.
                         assert len(virtual_cluster["nodeInstances"]) == 4
+                        # The two nodes that were previously in `virtual_cluster_2` now belong to `virtual_cluster_1`.
+                        assert vc_nodes["virtual_cluster_2"].issubset(
+                            set(virtual_cluster["nodeInstances"].keys())
+                        )
                     elif virtual_cluster["virtualClusterId"] == "virtual_cluster_2":
                         # After the second job stopped and `idle_timeout_minutes` passed, the
                         # virtual cluster should be scaled down, without any nodes left.

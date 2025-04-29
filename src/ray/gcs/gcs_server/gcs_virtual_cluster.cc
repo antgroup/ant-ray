@@ -162,7 +162,9 @@ Status VirtualCluster::RemoveNodeInstances(
       for (auto &[node_instance_id, node_instance] : node_instances) {
         auto removing_node_iter = node_set_to_remove.find(node_instance_id);
         if (removing_node_iter != node_set_to_remove.end() &&
-            IsNodeInstanceIdle(node_instance_id)) {
+            (!cluster_resource_manager_.HasNode(
+                 scheduling::NodeID(NodeID::FromHex(node_instance_id).Binary())) ||
+             IsNodeInstanceIdle(node_instance_id))) {
           (*removed_replica_instances)[template_id][job_id][node_instance_id] =
               node_instance;
           node_set_to_remove.erase(removing_node_iter);

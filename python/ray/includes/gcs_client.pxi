@@ -530,7 +530,7 @@ cdef class InnerGcsClient:
                 .GetClusterResourceState(timeout_ms, serialized_reply)
             )
 
-        return serialized_reply 
+        return serialized_reply
 
     def get_cluster_status(
             self,

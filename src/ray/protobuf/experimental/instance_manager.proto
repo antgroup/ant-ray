@@ -168,9 +168,6 @@ message LaunchRequest {
   string id = 3;
   // request time in milliseconds.
   int64 request_ts_ms = 4;
-  // the ray node type, which is normally specified by 
-  // env `RAY_NODE_TYPE_NAME`.
-  string ray_node_type = 5;
 }
 
 // Termination request for an instance.
@@ -205,8 +202,6 @@ message TerminationRequest {
   optional uint32 max_num_nodes = 8;
   // Details of the termination.
   string details = 9;
-  // The ray node type of the instance that's terminated.
-  string ray_node_type = 10;
 }
 
 message UpdateInstanceManagerStateRequest {

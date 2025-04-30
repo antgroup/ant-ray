@@ -192,8 +192,9 @@ class VirtualClusterReconciler:
                     )
                 )
 
+        node_type_configs = autoscaling_config.get_node_type_configs()
         sched_request = SchedulingRequest(
-            node_type_configs=autoscaling_config.get_node_type_configs(),
+            node_type_configs=node_type_configs,
             max_num_nodes=autoscaling_config.get_max_num_nodes(),
             resource_requests=ray_state.pending_resource_requests,
             gang_resource_requests=ray_state.pending_gang_resource_requests,
@@ -263,7 +264,9 @@ class VirtualClusterReconciler:
                             == NodeStatus.IDLE
                         ):
                             node_list = buffered_node_pool.unassigned_nodes.setdefault(
-                                terminate_request.ray_node_type,
+                                node_type_configs[
+                                    terminate_request.instance_type
+                                ].ray_node_type,
                                 [],
                             )
                             node_list.append(terminate_request.ray_node_id)
@@ -300,6 +303,7 @@ class VirtualClusterReconciler:
     ) -> None:
         logger.info(f"Start to scale the primary cluster")
         # Try fulfilling the launching requests (of virtual clusters) from the unassigned node pool.
+        node_type_configs = autoscaling_config.get_node_type_configs()
         for (
             virtual_cluster_id,
             launch_requests,
@@ -311,34 +315,29 @@ class VirtualClusterReconciler:
             expanding_replica_sets: Dict[str, int] = {}
             for index in range(len(launch_requests) - 1, -1, -1):
                 launch_request = launch_requests[index]
-                if launch_request.ray_node_type in buffered_node_pool.unassigned_nodes:
+                ray_node_type = node_type_configs[
+                    launch_request.instance_type
+                ].ray_node_type
+                if ray_node_type in buffered_node_pool.unassigned_nodes:
                     available_node_list = buffered_node_pool.unassigned_nodes[
-                        launch_request.ray_node_type
+                        ray_node_type
                     ]
                     # There are enough unassigned nodes with the same node type.
                     if len(available_node_list) >= launch_request.count:
                         logger.info(
                             f"There are {len(available_node_list)} available nodes that can be assinged to {virtual_cluster_id}."
                         )
-                        expanding_replica_sets[
-                            launch_request.ray_node_type
-                        ] = launch_request.count
+                        expanding_replica_sets[ray_node_type] = launch_request.count
                         launch_requests.pop(index)
                         available_node_list = available_node_list[
                             launch_request.count :
                         ]
                         if len(available_node_list) == 0:
-                            buffered_node_pool.unassigned_nodes.pop(
-                                launch_request.ray_node_type
-                            )
+                            buffered_node_pool.unassigned_nodes.pop(ray_node_type)
                     elif len(available_node_list) > 0:
-                        expanding_replica_sets[launch_request.ray_node_type] = len(
-                            available_node_list
-                        )
+                        expanding_replica_sets[ray_node_type] = len(available_node_list)
                         launch_request.count -= len(available_node_list)
-                        buffered_node_pool.unassigned_nodes.pop(
-                            launch_request.ray_node_type
-                        )
+                        buffered_node_pool.unassigned_nodes.pop(ray_node_type)
             if len(launch_requests) == 0:
                 buffered_node_pool.launching_nodes.pop(virtual_cluster_id)
 

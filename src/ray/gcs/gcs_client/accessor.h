@@ -1056,6 +1056,16 @@ class VirtualClusterInfoAccessor {
   /// server.
   virtual void AsyncResubscribe();
 
+  /// Create a new or update a virtual cluster.
+  ///
+  /// \param virtual_cluster_id The id of the virtual cluster.
+  /// \param divisible Whether the virtual cluster is divisible.
+  /// \param replica_sets The map from template_id to count, which specifies
+  /// the expected replicas of the virtual cluster.
+  /// \param revision The revision (version control) of the virtual cluster.
+  /// \param timeout_ms -1 means infinite.
+  /// \param[out] serialized_reply The reply that delivers required message.
+  /// \return Status
   virtual Status SyncCreateOrUpdateVirtualCluster(
       const std::string &virtual_cluster_id,
       bool divisible,
@@ -1064,6 +1074,13 @@ class VirtualClusterInfoAccessor {
       int64_t timeout_ms,
       std::string &serialized_reply);
 
+  /// Remove specified nodes from a virtual cluster.
+  ///
+  /// \param virtual_cluster_id The id of the virtual cluster.
+  /// \param nodes_to_remove The nodes that are expected to be removed.
+  /// \param timeout_ms -1 means infinite.
+  /// \param[out] serialized_reply The reply that delivers required message.
+  /// \return Status
   virtual Status SyncRemoveNodesFromVirtualCluster(
       const std::string &virtual_cluster_id,
       const std::vector<std::string> &nodes_to_remove,

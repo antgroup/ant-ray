@@ -181,8 +181,6 @@ class SchedulingNode:
     launch_config_hash: Optional[str] = None
     # node kind.
     node_kind: NodeKind = NodeKind.WORKER
-    # ray node type.
-    ray_node_type: str = ""
 
     def __init__(
         self,
@@ -197,7 +195,6 @@ class SchedulingNode:
         launch_config_hash: str = "",
         node_kind: NodeKind = NodeKind.WORKER,
         termination_request: Optional[TerminationRequest] = None,
-        ray_node_type: str = "",
     ):
         self.node_type = node_type
         self.total_resources = total_resources
@@ -217,7 +214,6 @@ class SchedulingNode:
         self.launch_config_hash = launch_config_hash
         self.node_kind = node_kind
         self.termination_request = termination_request
-        self.ray_node_type = ray_node_type
 
     def get_available_resources(self, resource_request_source: ResourceRequestSource):
         """Get the available resources for the given resource request source."""
@@ -285,7 +281,6 @@ class SchedulingNode:
                 idle_duration_ms=instance.ray_node.idle_duration_ms,
                 launch_config_hash=instance.im_instance.launch_config_hash,
                 node_kind=instance.im_instance.node_kind,
-                ray_node_type=instance.ray_node.ray_node_type_name,
             )
 
         # This is an instance pending to run ray. Initialize a schedulable node
@@ -318,7 +313,6 @@ class SchedulingNode:
                     instance_type=instance.im_instance.instance_type,
                 ),
                 node_kind=NodeKind.WORKER,
-                ray_node_type=instance.ray_node.ray_node_type_name,
             )
 
         return SchedulingNode.from_node_config(
@@ -384,7 +378,6 @@ class SchedulingNode:
             status=status,
             im_instance_id=im_instance_id,
             node_kind=node_kind,
-            ray_node_type=node_config.ray_node_type,
         )
 
     def __post_init__(self):
@@ -805,11 +798,9 @@ class ResourceDemandScheduler(IResourceScheduler):
             Get the launch requests for the nodes that are to be launched.
             """
             launch_by_type = defaultdict(int)
-            ray_node_type_by_instance_type = defaultdict(str)
             for node in self._nodes:
                 if node.status == SchedulingNodeStatus.TO_LAUNCH:
                     launch_by_type[node.node_type] += 1
-                    ray_node_type_by_instance_type[node.node_type] = node.ray_node_type
 
             launch_requests = []
             for instance_type, count in launch_by_type.items():
@@ -819,7 +810,6 @@ class ResourceDemandScheduler(IResourceScheduler):
                         count=count,
                         id=str(uuid.uuid4()),
                         request_ts_ms=time.time_ns() // 1000,
-                        ray_node_type=ray_node_type_by_instance_type[instance_type],
                     )
                 )
             return launch_requests
@@ -1095,7 +1085,6 @@ class ResourceDemandScheduler(IResourceScheduler):
                     f"max_num_nodes={max_num_nodes}, "
                     f"max_num_nodes_per_type={max_num_nodes_per_type}"
                 ),
-                ray_node_type=node.ray_node_type,
             )
             if cause == TerminationRequest.Cause.MAX_NUM_NODES:
                 node.termination_request.max_num_nodes = max_num_nodes
@@ -1569,7 +1558,6 @@ class ResourceDemandScheduler(IResourceScheduler):
                     instance_type=node.node_type,
                     cause=TerminationRequest.Cause.OUTDATED,
                     details=f"node from {node.node_type} has outdated config",
-                    ray_node_type=node.ray_node_type,
                 )
 
         ctx.update(nodes)
@@ -1655,7 +1643,6 @@ class ResourceDemandScheduler(IResourceScheduler):
                 idle_duration_ms=node.idle_duration_ms,
                 details=f"idle for {node.idle_duration_ms/s_to_ms} secs > "
                 f"timeout={idle_timeout_s} secs",
-                ray_node_type=node.ray_node_type,
             )
 
         ctx.update(nodes)

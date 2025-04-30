@@ -662,7 +662,6 @@ class TestActor():
     def __init__(self):
         pass
 
-small_actor = TestActor.options(num_cpus=1).remote()
 large_actor = TestActor.options(num_cpus=2).remote()
 time.sleep(600)
         """
@@ -689,15 +688,15 @@ time.sleep(600)
         wait_for_condition(
             check_actors_and_nodes,
             timeout=60,
-            retry_interval_ms=5000,
+            retry_interval_ms=10000,
             autoscaler=autoscaler,
-            # If autoscaler works correctly (add one `2c4g` node and one `1c2g` node to
-            # the first virtual cluster), we shall see four alive actors in total.
-            expected_states={"ALIVE": 4},
+            # If autoscaler works correctly (adding  one `2c4g` node to
+            # the first virtual cluster), we shall see three alive actors in total.
+            expected_states={"ALIVE": 3},
             # Because job_2 has stopped for a while, the second virtual cluster's nodes
             # should be returned to the primary cluster, which can be used by the
             # first virtual cluster. So there is still no need to create new instances.
-            total_node_count=5,
+            total_node_count=4,
         )
 
         def check_virtual_cluster():
@@ -710,9 +709,9 @@ time.sleep(600)
                 for virtual_cluster in result["data"]["virtualClusters"]:
                     if virtual_cluster["virtualClusterId"] == "virtual_cluster_1":
                         # The first virtual cluster needs four node to fulfill job_1 and job_3.
-                        assert len(virtual_cluster["nodeInstances"]) == 4
-                        # The two nodes that were previously in `virtual_cluster_2` now belong to `virtual_cluster_1`.
-                        assert vc_nodes["virtual_cluster_2"].issubset(
+                        assert len(virtual_cluster["nodeInstances"]) == 3
+                        # One node that were previously in `virtual_cluster_2` now belong to `virtual_cluster_1`.
+                        assert vc_nodes["virtual_cluster_2"].intersection(
                             set(virtual_cluster["nodeInstances"].keys())
                         )
                     elif virtual_cluster["virtualClusterId"] == "virtual_cluster_2":

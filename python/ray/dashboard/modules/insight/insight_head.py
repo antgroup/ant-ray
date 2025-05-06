@@ -38,6 +38,15 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
         self._insight_server_address = None
         asyncio.create_task(self._emit_node_physical_stats())
 
+    async def is_insight_server_alive(self):
+        if self._insight_server_address is None:
+            return False
+        
+        resp = await self._insight_client.ping()
+        if resp.status_code != 200:
+            return False
+        return True
+
     def _to_service_state(self, state: str) -> ServiceState:
         if state == "ALIVE":
             return ServiceState.RUNNING
@@ -54,7 +63,7 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
 
     @async_loop_forever(10)
     async def _emit_node_physical_stats(self):
-        if self._insight_server_address is None:
+        if self._insight_server_address is None or not await self.is_insight_server_alive():
             insight_server_address = await self.gcs_aio_client.internal_kv_get(
                 "insight_monitor_address",
                 namespace="flowinsight",
@@ -63,6 +72,7 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
             if insight_server_address is None:
                 return
             self._insight_server_address = insight_server_address.decode()
+            self._insight_client = None
 
         if self._insight_client is None:
             self._insight_client = InsightClient(
@@ -232,6 +242,20 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                     success=False,
                     message="InsightMonitor address not found in KV store",
                 )
+
+            if not await self.is_insight_server_alive():
+                self._insight_server_address = await self.gcs_aio_client.internal_kv_get(
+                    "insight_monitor_address",
+                    namespace="flowinsight",
+                    timeout=5,
+                )
+                if self._insight_server_address is None:
+                    return dashboard_optional_utils.rest_response(
+                        success=False,
+                        message="InsightMonitor address not found in KV store",
+                    )
+                self._insight_server_address = self._insight_server_address.decode()
+                self._insight_client = None
 
             # Get insight monitor address
             target_url = f"http://{self._insight_server_address}/{path}"

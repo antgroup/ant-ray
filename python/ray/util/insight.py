@@ -23,10 +23,15 @@ from flow_insight import (
 
 _insight_client = None
 
+def insight_server_is_alive():
+    resp = get_insight_client().ping()
+    if resp.status_code != 200:
+        return False
+    return True
 
 def get_insight_client():
     global _insight_client
-    if _insight_client is None:
+    if _insight_client is None or not insight_server_is_alive():
         address = None
         while address is None:
             address = internal_kv._internal_kv_get(
@@ -38,6 +43,7 @@ def get_insight_client():
         _insight_client = InsightClient(
             server_url=f"http://{address.decode()}", storage_type=StorageType.MEMORY
         )
+    
     return _insight_client
 
 
@@ -68,7 +74,7 @@ def create_insight_monitor_actor():
         ).remote()
 
 
-@ray.remote
+@ray.remote(max_restarts=-1)
 class _ray_internal_insight_monitor:
     def __init__(self):
         self.node_ip_address = ray._private.services.get_node_ip_address()
@@ -79,7 +85,8 @@ class _ray_internal_insight_monitor:
                 "storage_dir": os.path.join(
                     ray._private.utils.get_ray_temp_dir(), "flowinsight"
                 )
-            }
+            },
+            session_id=ray._private.worker._global_node.session_name,
         )
 
         # Run server in a background thread
@@ -456,6 +463,7 @@ def report_resource_usage(usage: dict):
         current_class = _get_caller_class()
         if current_class is None:
             return
+
         job_id = get_current_job_id()
 
         if not need_record(current_class):

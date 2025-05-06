@@ -6,6 +6,8 @@ import socket
 from contextlib import contextmanager
 from ray.experimental import internal_kv
 import ray.dashboard.consts as dashboard_consts
+from ray.util.scheduling_strategies import NodeAffinitySchedulingStrategy
+import ray._private.ray_constants as ray_constants
 from flow_insight import (
     UsageModel,
     StorageType,
@@ -24,8 +26,10 @@ from flow_insight import (
 _insight_client = None
 
 def insight_server_is_alive():
-    resp = get_insight_client().ping()
-    if resp.status_code != 200:
+    if _insight_client is None:
+        return False
+    resp = _insight_client.ping()
+    if not resp["result"]:
         return False
     return True
 
@@ -60,6 +64,16 @@ def get_current_job_id():
     """
     return ray._private.worker.global_worker.current_job_id.hex()
 
+def get_head_node_id():
+    """Fetches Head node id persisted in GCS"""
+    head_node_id_hex_bytes = internal_kv._internal_kv_get(
+        ray_constants.KV_HEAD_NODE_ID_KEY,
+        namespace=ray_constants.KV_NAMESPACE_JOB,
+    )
+    if head_node_id_hex_bytes is None:
+        return None
+    return head_node_id_hex_bytes.decode()
+
 
 def create_insight_monitor_actor():
     if not is_flow_insight_enabled():
@@ -67,10 +81,18 @@ def create_insight_monitor_actor():
     try:
         ray.get_actor("_ray_internal_insight_monitor", namespace="flowinsight")
     except ValueError:
+
+        head_node_id = get_head_node_id()
+        if head_node_id is None:
+            raise RuntimeError("Head node id not found in GCS")
+        scheduling_strategy = NodeAffinitySchedulingStrategy(
+            node_id=head_node_id, soft=False
+        )
         _ray_internal_insight_monitor.options(
             name="_ray_internal_insight_monitor",
             namespace="flowinsight",
             lifetime="detached",
+            scheduling_strategy=scheduling_strategy,
         ).remote()
 
 

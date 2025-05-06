@@ -41,9 +41,14 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
     async def is_insight_server_alive(self):
         if self._insight_server_address is None:
             return False
+
+        insight_client = InsightClient(
+            server_url=f"http://{self._insight_server_address}",
+            storage_type=StorageType.MEMORY,
+        )
         
-        resp = await self._insight_client.ping()
-        if resp.status_code != 200:
+        resp = await insight_client.async_ping()
+        if not resp["result"]:
             return False
         return True
 

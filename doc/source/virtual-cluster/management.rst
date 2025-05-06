@@ -117,9 +117,8 @@ If there are still jobs running in the virtual cluster, then the sample reply wi
         }
     }
 
-
 Remove Nodes From A Virtual Cluster
-------------------------
+-----------------------------------
 
 Users can remove some specified nodes from a virtual cluster by sending a POST request to the http endpoint at `/virtual_clusters/remove_nodes`.
 

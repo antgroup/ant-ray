@@ -6,11 +6,10 @@ import socket
 from contextlib import contextmanager
 from ray.experimental import internal_kv
 import ray.dashboard.consts as dashboard_consts
-from ray.util.scheduling_strategies import NodeAffinitySchedulingStrategy
-import ray._private.ray_constants as ray_constants
 from flow_insight import (
     UsageModel,
-    StorageType,
+    PersistStorageType,
+    SnapshotStorageType,
     InsightClient,
     FastAPIInsightServer,
     CallSubmitEvent,
@@ -25,6 +24,27 @@ from flow_insight import (
 
 _insight_client = None
 
+def flow_insight_influxdb_storage():
+    return os.getenv("FLOW_INSIGHT_STORAGE_TYPE") == "INFLUXDB"
+
+def create_http_insight_client(insight_server_address: str):
+    return InsightClient(
+        server_url=f"http://{insight_server_address}",
+        storage_type=PersistStorageType.DISK,
+    )
+
+def create_influxdb_insight_client(session_id: str):
+    return InsightClient(
+        os.getenv("INFLUXDB_URL"),
+        PersistStorageType.INFLUXDB,
+        {
+            "username": os.getenv("INFLUXDB_USERNAME"),
+            "password": os.getenv("INFLUXDB_PASSWORD"),
+            "session_id": session_id[len(session_id)-12:],
+        },
+    )
+
+
 def insight_server_is_alive():
     if _insight_client is None:
         return False
@@ -36,18 +56,19 @@ def insight_server_is_alive():
 def get_insight_client():
     global _insight_client
     if _insight_client is None or not insight_server_is_alive():
-        address = None
-        while address is None:
-            address = internal_kv._internal_kv_get(
-                "insight_monitor_address", namespace="flowinsight"
-            )
-            if address is None:
-                time.sleep(1)
+        if flow_insight_influxdb_storage():
+            session_id = ray._private.worker._global_node.session_name
+            _insight_client = create_influxdb_insight_client(session_id[len(session_id)-12:])
+        else:
+            address = None
+            while address is None:
+                address = internal_kv._internal_kv_get(
+                    "insight_monitor_address", namespace="flowinsight"
+                )
+                if address is None:
+                    time.sleep(1)
 
-        _insight_client = InsightClient(
-            server_url=f"http://{address.decode()}", storage_type=StorageType.MEMORY
-        )
-    
+            _insight_client = create_http_insight_client(address.decode())
     return _insight_client
 
 
@@ -64,16 +85,6 @@ def get_current_job_id():
     """
     return ray._private.worker.global_worker.current_job_id.hex()
 
-def get_head_node_id():
-    """Fetches Head node id persisted in GCS"""
-    head_node_id_hex_bytes = internal_kv._internal_kv_get(
-        ray_constants.KV_HEAD_NODE_ID_KEY,
-        namespace=ray_constants.KV_NAMESPACE_JOB,
-    )
-    if head_node_id_hex_bytes is None:
-        return None
-    return head_node_id_hex_bytes.decode()
-
 
 def create_insight_monitor_actor():
     if not is_flow_insight_enabled():
@@ -81,18 +92,10 @@ def create_insight_monitor_actor():
     try:
         ray.get_actor("_ray_internal_insight_monitor", namespace="flowinsight")
     except ValueError:
-
-        head_node_id = get_head_node_id()
-        if head_node_id is None:
-            raise RuntimeError("Head node id not found in GCS")
-        scheduling_strategy = NodeAffinitySchedulingStrategy(
-            node_id=head_node_id, soft=False
-        )
         _ray_internal_insight_monitor.options(
             name="_ray_internal_insight_monitor",
             namespace="flowinsight",
             lifetime="detached",
-            scheduling_strategy=scheduling_strategy,
         ).remote()
 
 
@@ -102,14 +105,29 @@ class _ray_internal_insight_monitor:
         self.node_ip_address = ray._private.services.get_node_ip_address()
         self.port = self._get_free_port()
         print(f"Starting insight monitor on {self.node_ip_address}:{self.port}")
-        self.server = FastAPIInsightServer(
-            persist_storage_config={
-                "storage_dir": os.path.join(
+        if not flow_insight_influxdb_storage():
+            self.server = FastAPIInsightServer(
+                snapshot_storage_type=SnapshotStorageType.MEMORY,
+                persist_storage_type=PersistStorageType.DISK,
+                persist_storage_config={
+                    "storage_dir": os.path.join(
                     ray._private.utils.get_ray_temp_dir(), "flowinsight"
-                )
-            },
-            session_id=ray._private.worker._global_node.session_name,
-        )
+                    ),
+                },
+            )
+        else:
+            session_id = ray._private.worker._global_node.session_name
+            self.server =  FastAPIInsightServer(
+                snapshot_storage_type=SnapshotStorageType.MEMORY,
+                persist_storage_type=PersistStorageType.INFLUXDB,
+                persist_storage_config={
+                    "server_url": os.getenv("INFLUXDB_URL"),
+                    "session_id": session_id[len(session_id)-12:],
+                    "username": os.getenv("INFLUXDB_USERNAME"),
+                    "password": os.getenv("INFLUXDB_PASSWORD"),
+                },
+            )
+
 
         # Run server in a background thread
         import threading

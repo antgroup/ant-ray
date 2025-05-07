@@ -8,9 +8,8 @@ from ray.dashboard.datacenter import DataSource
 from ray._private.test_utils import get_resource_usage
 from ray.dashboard.utils import async_loop_forever
 from ray.dashboard.modules.insight.analyze_prompt import PROMPT_TEMPLATE
+import ray._private.ray_constants as ray_constants
 from flow_insight import (
-    InsightClient,
-    StorageType,
     BatchNodePhysicalStatsEvent,
     BatchNodePhysicalStats,
     NodePhysicalStats,
@@ -26,10 +25,10 @@ from flow_insight import (
     NodeMemoryInfo,
     PromptRegisterEvent,
 )
+from ray.util.insight import flow_insight_influxdb_storage, create_http_insight_client, create_influxdb_insight_client
 
 logger = logging.getLogger(__name__)
 routes = dashboard_optional_utils.DashboardHeadRouteTable
-
 
 class InsightHead(dashboard_utils.DashboardHeadModule):
     def __init__(self, config: dashboard_utils.DashboardHeadModuleConfig):
@@ -38,14 +37,11 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
         self._insight_server_address = None
         asyncio.create_task(self._emit_node_physical_stats())
 
+
     async def is_insight_server_alive(self):
         if self._insight_server_address is None:
             return False
-
-        insight_client = InsightClient(
-            server_url=f"http://{self._insight_server_address}",
-            storage_type=StorageType.MEMORY,
-        )
+        insight_client = create_http_insight_client(self._insight_server_address)
         
         resp = await insight_client.async_ping()
         if not resp["result"]:
@@ -68,22 +64,26 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
 
     @async_loop_forever(10)
     async def _emit_node_physical_stats(self):
-        if self._insight_server_address is None or not await self.is_insight_server_alive():
-            insight_server_address = await self.gcs_aio_client.internal_kv_get(
-                "insight_monitor_address",
-                namespace="flowinsight",
-                timeout=5,
-            )
-            if insight_server_address is None:
-                return
-            self._insight_server_address = insight_server_address.decode()
-            self._insight_client = None
+        insight_server_address = await self.gcs_aio_client.internal_kv_get(
+            "insight_monitor_address",
+            namespace="flowinsight",
+            timeout=5,
+        )
+        if insight_server_address is None:
+            return
+        self._insight_server_address = insight_server_address.decode()
 
         if self._insight_client is None:
-            self._insight_client = InsightClient(
-                server_url=f"http://{self._insight_server_address}",
-                storage_type=StorageType.MEMORY,
-            )
+            if flow_insight_influxdb_storage():
+                session_id = await self.gcs_aio_client.internal_kv_get(
+                    "session_name",
+                    namespace=ray_constants.KV_NAMESPACE_SESSION,
+                )
+                session_id = session_id.decode()
+                self._insight_client = create_influxdb_insight_client(session_id[len(session_id)-12:])
+            else:
+                self._insight_client = create_http_insight_client(self._insight_server_address)
+
             await self._insight_client.async_emit_event(
                 PromptRegisterEvent(
                     prompt=PROMPT_TEMPLATE, timestamp=int(time.time() * 1000)
@@ -243,12 +243,20 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
             query_string = req.query_string
 
             if self._insight_server_address is None:
-                return dashboard_optional_utils.rest_response(
-                    success=False,
-                    message="InsightMonitor address not found in KV store",
+                insight_server_address = await self.gcs_aio_client.internal_kv_get(
+                    "insight_monitor_address",
+                    namespace="flowinsight",
+                    timeout=5,
                 )
+                if insight_server_address is None:
+                    return dashboard_optional_utils.rest_response(
+                        success=False,
+                        message="InsightMonitor address not found in KV store",
+                    )
 
-            if not await self.is_insight_server_alive():
+                self._insight_server_address = insight_server_address.decode()
+
+            if not await self.is_insight_server_alive() and not flow_insight_influxdb_storage():
                 self._insight_server_address = await self.gcs_aio_client.internal_kv_get(
                     "insight_monitor_address",
                     namespace="flowinsight",

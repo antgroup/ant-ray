@@ -20,6 +20,7 @@ from flow_insight import (
     ContextEvent,
     ResourceUsageEvent,
     DebuggerInfoEvent,
+    DriverInfoEvent,
 )
 
 _insight_client = None
@@ -37,11 +38,9 @@ def create_influxdb_insight_client(session_id: str):
     return InsightClient(
         os.getenv("INFLUXDB_URL"),
         PersistStorageType.INFLUXDB,
-        {
-            "username": os.getenv("INFLUXDB_USERNAME"),
-            "password": os.getenv("INFLUXDB_PASSWORD"),
-            "session_id": session_id[len(session_id)-12:],
-        },
+        username=os.getenv("INFLUXDB_USERNAME"),
+        password=os.getenv("INFLUXDB_PASSWORD"),
+        session_id=session_id,
     )
 
 
@@ -98,6 +97,14 @@ def create_insight_monitor_actor():
             lifetime="detached",
         ).remote()
 
+        if is_visual_rdb_enabled():
+            ray.util.debugpy._ensure_debugger_port_open_thread_safe()
+            get_insight_client().emit_event(DriverInfoEvent(
+                flow_id=get_current_job_id(),
+                driver_ip=ray._private.services.get_node_ip_address(),
+                timestamp=int(time.time() * 1000),
+            ))
+
 
 @ray.remote(max_restarts=-1)
 class _ray_internal_insight_monitor:
@@ -109,23 +116,19 @@ class _ray_internal_insight_monitor:
             self.server = FastAPIInsightServer(
                 snapshot_storage_type=SnapshotStorageType.MEMORY,
                 persist_storage_type=PersistStorageType.DISK,
-                persist_storage_config={
-                    "storage_dir": os.path.join(
+                storage_dir=os.path.join(
                     ray._private.utils.get_ray_temp_dir(), "flowinsight"
-                    ),
-                },
+                ),
             )
         else:
             session_id = ray._private.worker._global_node.session_name
             self.server =  FastAPIInsightServer(
                 snapshot_storage_type=SnapshotStorageType.MEMORY,
                 persist_storage_type=PersistStorageType.INFLUXDB,
-                persist_storage_config={
-                    "server_url": os.getenv("INFLUXDB_URL"),
-                    "session_id": session_id[len(session_id)-12:],
-                    "username": os.getenv("INFLUXDB_USERNAME"),
-                    "password": os.getenv("INFLUXDB_PASSWORD"),
-                },
+                server_url=os.getenv("INFLUXDB_URL"),
+                session_id=session_id[len(session_id)-12:],
+                username=os.getenv("INFLUXDB_USERNAME"),
+                password=os.getenv("INFLUXDB_PASSWORD"),
             )
 
 

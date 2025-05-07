@@ -677,8 +677,6 @@ def report_trace_info(caller_info):
     session_id = ray._private.worker._global_node.session_name
     source_dir = os.path.join(temp_dir, session_id, "runtime_resources", "working_dirs", worker_id)
     trim_level = 6
-    print(f"source_dir: {source_dir}")
-
 
     job_id = get_current_job_id()
 

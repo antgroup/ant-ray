@@ -20,7 +20,6 @@ from flow_insight import (
     ContextEvent,
     ResourceUsageEvent,
     DebuggerInfoEvent,
-    DriverInfoEvent,
 )
 
 _insight_client = None
@@ -97,14 +96,6 @@ def create_insight_monitor_actor():
             lifetime="detached",
         ).remote()
 
-        if is_visual_rdb_enabled():
-            ray.util.debugpy._ensure_debugger_port_open_thread_safe()
-            get_insight_client().emit_event(DriverInfoEvent(
-                flow_id=get_current_job_id(),
-                driver_ip=ray._private.services.get_node_ip_address(),
-                timestamp=int(time.time() * 1000),
-            ))
-
 
 @ray.remote(max_restarts=-1)
 class _ray_internal_insight_monitor:
@@ -112,16 +103,16 @@ class _ray_internal_insight_monitor:
         self.node_ip_address = ray._private.services.get_node_ip_address()
         self.port = self._get_free_port()
         print(f"Starting insight monitor on {self.node_ip_address}:{self.port}")
+        session_id = ray._private.worker._global_node.session_name
         if not flow_insight_influxdb_storage():
             self.server = FastAPIInsightServer(
                 snapshot_storage_type=SnapshotStorageType.MEMORY,
                 persist_storage_type=PersistStorageType.DISK,
                 storage_dir=os.path.join(
-                    ray._private.utils.get_ray_temp_dir(), "flowinsight"
+                    ray._private.utils.get_ray_temp_dir(), session_id, "flowinsight"
                 ),
             )
         else:
-            session_id = ray._private.worker._global_node.session_name
             self.server =  FastAPIInsightServer(
                 snapshot_storage_type=SnapshotStorageType.MEMORY,
                 persist_storage_type=PersistStorageType.INFLUXDB,
@@ -681,6 +672,13 @@ def report_trace_info(caller_info):
 
     debugger_port = ray._private.worker.global_worker.debugger_port
     debugger_host = ray._private.worker.global_worker.node_ip_address
+    worker_id = ray._private.worker.global_worker.worker_id.hex()
+    temp_dir = ray._private.utils.get_ray_temp_dir()
+    session_id = ray._private.worker._global_node.session_name
+    source_dir = os.path.join(temp_dir, session_id, "runtime_resources", "working_dirs", worker_id)
+    trim_level = 6
+    print(f"source_dir: {source_dir}")
+
 
     job_id = get_current_job_id()
 
@@ -709,6 +707,8 @@ def report_trace_info(caller_info):
                     debugger_port=debugger_port,
                     debugger_host=debugger_host,
                     debugger_enabled=is_visual_rdb_enabled(),
+                    source_dir=source_dir,
+                    trim_level=trim_level,
                     timestamp=int(time.time() * 1000),
                 )
             )

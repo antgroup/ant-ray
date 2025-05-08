@@ -4,6 +4,7 @@ import os
 import asyncio
 import socket
 from contextlib import contextmanager
+import ray._private
 from ray.experimental import internal_kv
 import ray.dashboard.consts as dashboard_consts
 from flow_insight import (
@@ -95,7 +96,6 @@ def create_insight_monitor_actor():
             namespace="flowinsight",
             lifetime="detached",
         ).remote()
-
 
 @ray.remote(max_restarts=-1)
 class _ray_internal_insight_monitor:
@@ -672,11 +672,6 @@ def report_trace_info(caller_info):
 
     debugger_port = ray._private.worker.global_worker.debugger_port
     debugger_host = ray._private.worker.global_worker.node_ip_address
-    worker_id = ray._private.worker.global_worker.worker_id.hex()
-    temp_dir = ray._private.utils.get_ray_temp_dir()
-    session_id = ray._private.worker._global_node.session_name
-    source_dir = os.path.join(temp_dir, session_id, "runtime_resources", "working_dirs", worker_id)
-    trim_level = 6
 
     job_id = get_current_job_id()
 
@@ -705,8 +700,6 @@ def report_trace_info(caller_info):
                     debugger_port=debugger_port,
                     debugger_host=debugger_host,
                     debugger_enabled=is_visual_rdb_enabled(),
-                    source_dir=source_dir,
-                    trim_level=trim_level,
                     timestamp=int(time.time() * 1000),
                 )
             )

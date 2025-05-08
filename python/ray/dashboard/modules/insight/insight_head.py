@@ -7,8 +7,8 @@ import ray.dashboard.optional_utils as dashboard_optional_utils
 from ray.dashboard.datacenter import DataSource
 from ray._private.test_utils import get_resource_usage
 from ray.dashboard.utils import async_loop_forever
-from ray.dashboard.modules.insight.analyze_prompt import PROMPT_TEMPLATE
 import ray._private.ray_constants as ray_constants
+from ray.dashboard.modules.insight.insight_prompt import PROMPT_TEMPLATE
 from flow_insight import (
     BatchNodePhysicalStatsEvent,
     BatchNodePhysicalStats,
@@ -23,7 +23,7 @@ from flow_insight import (
     Service,
     ServicePhysicalStatsRecord,
     NodeMemoryInfo,
-    PromptRegisterEvent,
+    MetaInfoRegisterEvent,
 )
 from ray.util.insight import flow_insight_influxdb_storage, create_http_insight_client, create_influxdb_insight_client
 
@@ -85,8 +85,9 @@ class InsightHead(dashboard_utils.DashboardHeadModule):
                 self._insight_client = create_http_insight_client(self._insight_server_address)
 
             await self._insight_client.async_emit_event(
-                PromptRegisterEvent(
-                    prompt=PROMPT_TEMPLATE, timestamp=int(time.time() * 1000)
+                MetaInfoRegisterEvent(
+                    prompt=PROMPT_TEMPLATE,
+                    timestamp=int(time.time() * 1000),
                 )
             )
 

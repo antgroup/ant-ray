@@ -1402,13 +1402,14 @@ document.write(`
 <ul class="simple">
 <li><p><a class="reference internal" href="#create-or-update-a-virtual-cluster" id="id2">Create or Update A Virtual Cluster</a></p></li>
 <li><p><a class="reference internal" href="#remove-a-virtual-cluster" id="id3">Remove A Virtual Cluster</a></p></li>
-<li><p><a class="reference internal" href="#get-virtual-clusters" id="id4">Get Virtual Clusters</a></p></li>
+<li><p><a class="reference internal" href="#remove-nodes-from-a-virtual-cluster" id="id4">Remove Nodes From A Virtual Cluster</a></p></li>
+<li><p><a class="reference internal" href="#get-virtual-clusters" id="id5">Get Virtual Clusters</a></p></li>
 </ul>
 </nav>
 <section id="create-or-update-a-virtual-cluster">
 <span id="virtual-cluster-create-or-update-virtual-cluster"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Create or Update A Virtual Cluster</a><a class="headerlink" href="#create-or-update-a-virtual-cluster" title="Link to this heading">#</a></h2>
 <p>To create or update a virtual cluster, users can send a POST request to the http endpoint at <code class="code docutils literal notranslate"><span class="pre">/virtual_clusters</span></code>.</p>
-<p><strong>Simple Request:</strong></p>
+<p><strong>Sample Request:</strong></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;virtualClusterId&quot;</span><span class="p">:</span><span class="s2">&quot;virtual_cluster_1&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">// Unique id of the virtual cluster</span>
 <span class="w">    </span><span class="nt">&quot;divisible&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="w">  </span><span class="c1">// Whether it is a divisible virtual cluster</span>
@@ -1498,8 +1499,48 @@ document.write(`
 </pre></div>
 </div>
 </section>
+<section id="remove-nodes-from-a-virtual-cluster">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Remove Nodes From A Virtual Cluster</a><a class="headerlink" href="#remove-nodes-from-a-virtual-cluster" title="Link to this heading">#</a></h2>
+<p>Users can remove some specified nodes from a virtual cluster by sending a POST request to the http endpoint at <code class="code docutils literal notranslate"><span class="pre">/virtual_clusters/remove_nodes</span></code>.</p>
+<p>After nodes are removed from a virtual cluster, they are returned to the primary cluster.</p>
+<p>Currently, we do not support removing specified nodes from a job cluster.</p>
+<p><strong>Sample Request:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;virtualClusterId&quot;</span><span class="p">:</span><span class="s2">&quot;virtual_cluster_1&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">// Unique id of the virtual cluster</span>
+<span class="w">    </span><span class="nt">&quot;nodesToRemove&quot;</span><span class="p">:[</span><span class="w">  </span><span class="c1">// The list of node id that are expected to be removed</span>
+<span class="w">        </span><span class="s2">&quot;1434167efc236b03e1618ba59b5210dd4a7399287389606792eac8cf&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;805faffa6c48e77407ef7e2e62b30d0af914e4a92837468987ad8dbe&quot;</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Success Response:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="s2">&quot;Virtual cluster successfully updated.&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:{</span>
+<span class="w">        </span><span class="nt">&quot;virtualClusterId&quot;</span><span class="p">:</span><span class="s2">&quot;virtual_cluster_1&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Error Response:</strong></p>
+<p>If there are any nodes that are not allowed for removal, the request would fail and the sample reply will be:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="s2">&quot;Failed to remove nodes from virtual cluster virtual_cluster_1: Failed to remove some of the nodes because they are not idle nor found in the virtual cluster. These nodes with failure are shown below.&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:{</span>
+<span class="w">        </span><span class="nt">&quot;virtualClusterId&quot;</span><span class="p">:</span><span class="s2">&quot;virtual_cluster_1&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;nodesWithFailure&quot;</span><span class="p">:[</span>
+<span class="w">            </span><span class="s2">&quot;805faffa6c48e77407ef7e2e62b30d0af914e4a92837468987ad8dbe&quot;</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
 <section id="get-virtual-clusters">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Get Virtual Clusters</a><a class="headerlink" href="#get-virtual-clusters" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Get Virtual Clusters</a><a class="headerlink" href="#get-virtual-clusters" title="Link to this heading">#</a></h2>
 <p>To get the metadata of all virtual clusters, users can send a GET request to the http endpoint at <code class="code docutils literal notranslate"><span class="pre">/virtual_clusters</span></code>.</p>
 <p><strong>Success Response:</strong></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -1592,6 +1633,7 @@ document.write(`
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-or-update-a-virtual-cluster">Create or Update A Virtual Cluster</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#remove-a-virtual-cluster">Remove A Virtual Cluster</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#remove-nodes-from-a-virtual-cluster">Remove Nodes From A Virtual Cluster</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-virtual-clusters">Get Virtual Clusters</a></li>
 </ul>
   </nav></div>

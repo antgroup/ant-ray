@@ -199,7 +199,11 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "downloading or unpacking the working_dir."
             )
         # Use placeholder here and will replace it by `pre_worker_startup`.
-        working_dir = WorkingDirPlugin.working_dir_placeholder
+        working_dir = (
+            local_dir
+            if runtime_env_consts.RAY_USE_LOCAL_DIR
+            else WorkingDirPlugin.working_dir_placeholder
+        )
         # NOTE(Jacky): We need to set the working_dir in the context here, so that
         # the container plugin can change the working dir placeholder to real working dir
         context.working_dir = working_dir
@@ -234,6 +238,8 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         logger: logging.Logger = default_logger,
     ) -> None:
         if not runtime_env.working_dir():
+            return
+        if runtime_env_consts.RAY_USE_LOCAL_DIR:
             return
         logger.info(f"Creating working dir for worker {worker_id}, job id {job_id}")
         working_dir = os.path.join(self._working_dirs, worker_id)

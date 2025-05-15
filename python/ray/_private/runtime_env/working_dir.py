@@ -199,21 +199,22 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
                 "downloading or unpacking the working_dir."
             )
         # Use placeholder here and will replace it by `pre_worker_startup`.
-        working_dir = (
-            local_dir
-            if runtime_env_consts.RAY_USE_LOCAL_DIR
-            else WorkingDirPlugin.working_dir_placeholder
-        )
+        working_dir = WorkingDirPlugin.working_dir_placeholder
         # NOTE(Jacky): We need to set the working_dir in the context here, so that
         # the container plugin can change the working dir placeholder to real working dir
         context.working_dir = working_dir
         context.symlink_paths_to_working_dir.append(str(local_dir))
         context.env_vars[runtime_env_consts.RAY_WORKING_DIR] = working_dir
 
+        command_exec_path = (
+            local_dir
+            if ray_constants.env_bool("RAY_USE_LOCAL_DIR", False)
+            else working_dir
+        )
         if not _WIN32:
             context.command_prefix += [
                 "cd",
-                str(working_dir),
+                str(command_exec_path),
                 "&&",
             ]
         else:
@@ -221,10 +222,10 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             context.command_prefix += [
                 "cd",
                 "/d",
-                str(working_dir),
+                str(command_exec_path),
                 "&&",
             ]
-        set_pythonpath_in_context(python_path=str(working_dir), context=context)
+        set_pythonpath_in_context(python_path=str(command_exec_path), context=context)
         context.env_vars[
             runtime_env_consts.RAY_JOB_DIR
         ] = WorkingDirPlugin.job_dir_placeholder
@@ -238,8 +239,6 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         logger: logging.Logger = default_logger,
     ) -> None:
         if not runtime_env.working_dir():
-            return
-        if runtime_env_consts.RAY_USE_LOCAL_DIR:
             return
         logger.info(f"Creating working dir for worker {worker_id}, job id {job_id}")
         working_dir = os.path.join(self._working_dirs, worker_id)
@@ -303,8 +302,6 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         logger: logging.Logger = default_logger,
     ) -> None:
         if not runtime_env.working_dir():
-            return
-        if runtime_env_consts.RAY_USE_LOCAL_DIR:
             return
         # TODO(Jacky): Cache working dirs for debugging.
         if runtime_env_consts.DISABLE_WORKING_DIR_GC:

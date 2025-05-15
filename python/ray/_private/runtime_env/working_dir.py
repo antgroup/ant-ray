@@ -304,6 +304,8 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
     ) -> None:
         if not runtime_env.working_dir():
             return
+        if runtime_env_consts.RAY_USE_LOCAL_DIR:
+            return
         # TODO(Jacky): Cache working dirs for debugging.
         if runtime_env_consts.DISABLE_WORKING_DIR_GC:
             logger.info(

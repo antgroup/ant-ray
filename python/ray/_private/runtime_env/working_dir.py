@@ -206,7 +206,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         context.symlink_paths_to_working_dir.append(str(local_dir))
         context.env_vars[runtime_env_consts.RAY_WORKING_DIR] = working_dir
 
-        command_exec_path = (
+        working_dir = (
             local_dir
             if ray_constants.env_bool("RAY_USE_LOCAL_DIR", False)
             else working_dir
@@ -214,7 +214,7 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         if not _WIN32:
             context.command_prefix += [
                 "cd",
-                str(command_exec_path),
+                str(working_dir),
                 "&&",
             ]
         else:
@@ -222,10 +222,10 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
             context.command_prefix += [
                 "cd",
                 "/d",
-                str(command_exec_path),
+                str(working_dir),
                 "&&",
             ]
-        set_pythonpath_in_context(python_path=str(command_exec_path), context=context)
+        set_pythonpath_in_context(python_path=str(working_dir), context=context)
         context.env_vars[
             runtime_env_consts.RAY_JOB_DIR
         ] = WorkingDirPlugin.job_dir_placeholder

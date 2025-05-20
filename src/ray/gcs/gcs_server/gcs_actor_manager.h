@@ -15,7 +15,11 @@
 #pragma once
 #include <gtest/gtest_prod.h>
 
+#include <list>
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "absl/container/flat_hash_map.h"
 #include "ray/common/id.h"
@@ -37,14 +41,6 @@
 
 namespace ray {
 namespace gcs {
-
-// Returns true if an actor should be loaded to registered_actors_.
-// `false` Cases:
-// 0. state is DEAD, and is not restartable
-// 1. root owner is job, and job is dead
-// 2. root owner is another detached actor, and that actor is dead
-bool OnInitializeActorShouldLoad(const ray::gcs::GcsInitData &gcs_init_data,
-                                 ray::ActorID actor_id);
 
 /// GcsActor just wraps `ActorTableData` and provides some convenient interfaces to access
 /// the fields inside `ActorTableData`.
@@ -140,7 +136,7 @@ class GcsActor {
           function_descriptor.python_function_descriptor().class_name());
       break;
     default:
-      // TODO (Alex): Handle the C++ case, which we currently don't have an
+      // TODO(Alex): Handle the C++ case, which we currently don't have an
       // easy equivalent to class_name for.
       break;
     }
@@ -549,7 +545,7 @@ class GcsActorManager : public rpc::ActorInfoHandler {
       const ray::gcs::GcsActor *actor, std::shared_ptr<rpc::GcsNodeInfo> node);
   /// A data structure representing an actor's owner.
   struct Owner {
-    Owner(std::shared_ptr<rpc::CoreWorkerClientInterface> client)
+    explicit Owner(std::shared_ptr<rpc::CoreWorkerClientInterface> client)
         : client(std::move(client)) {}
     /// A client that can be used to contact the owner.
     std::shared_ptr<rpc::CoreWorkerClientInterface> client;

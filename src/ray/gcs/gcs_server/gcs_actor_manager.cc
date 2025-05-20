@@ -14,8 +14,13 @@
 
 #include "ray/gcs/gcs_server/gcs_actor_manager.h"
 
+#include <algorithm>
 #include <boost/regex.hpp>
+#include <limits>
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "ray/common/ray_config.h"
 #include "ray/gcs/pb_util.h"
@@ -129,45 +134,6 @@ const ray::rpc::ActorDeathCause GenActorRefDeletedCause(const ray::gcs::GcsActor
 namespace ray {
 namespace gcs {
 
-// Returns true if an actor should be loaded to registered_actors_.
-// `false` Cases:
-// 0. state is DEAD, and is not restartable
-// 1. root owner is job, and job is dead
-// 2. root owner is another detached actor, and that actor is dead
-bool OnInitializeActorShouldLoad(const ray::gcs::GcsInitData &gcs_init_data,
-                                 ray::ActorID actor_id) {
-  const auto &jobs = gcs_init_data.Jobs();
-  const auto &actors = gcs_init_data.Actors();
-  const auto &actor_task_specs = gcs_init_data.ActorTaskSpecs();
-
-  const auto &actor_table_data = actors.find(actor_id);
-  if (actor_table_data == actors.end()) {
-    return false;
-  }
-  if (actor_table_data->second.state() == ray::rpc::ActorTableData::DEAD &&
-      !ray::gcs::IsActorRestartable(actor_table_data->second)) {
-    return false;
-  }
-
-  const auto &actor_task_spec = ray::map_find_or_die(actor_task_specs, actor_id);
-  ActorID root_detached_actor_id =
-      ray::TaskSpecification(actor_task_spec).RootDetachedActorId();
-  if (root_detached_actor_id.IsNil()) {
-    // owner is job, NOT detached actor, should die with job
-    auto job_iter = jobs.find(actor_id.JobId());
-    return job_iter != jobs.end() && !job_iter->second.is_dead();
-  } else if (actor_id == root_detached_actor_id) {
-    // owner is itself, just live on
-    return true;
-  } else {
-    // owner is another detached actor, should die with the owner actor
-    // Root detached actor can be dead only if state() == DEAD.
-    auto root_detached_actor_iter = actors.find(root_detached_actor_id);
-    return root_detached_actor_iter != actors.end() &&
-           root_detached_actor_iter->second.state() != ray::rpc::ActorTableData::DEAD;
-  }
-};
-
 bool is_uuid(const std::string &str) {
   static const boost::regex e(
       "[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}");
@@ -271,6 +237,8 @@ void GcsActor::WriteActorExportEvent() const {
   export_actor_data_ptr->set_node_id(actor_table_data_.node_id());
   export_actor_data_ptr->set_placement_group_id(actor_table_data_.placement_group_id());
   export_actor_data_ptr->set_repr_name(actor_table_data_.repr_name());
+  export_actor_data_ptr->mutable_labels()->insert(task_spec_.get()->labels().begin(),
+                                                  task_spec_.get()->labels().end());
 
   RayExportEvent(export_actor_data_ptr).SendEvent();
 }
@@ -1315,7 +1283,7 @@ void GcsActorManager::OnWorkerDead(const ray::NodeID &node_id,
 void GcsActorManager::OnNodeDead(std::shared_ptr<rpc::GcsNodeInfo> node,
                                  const std::string node_ip_address) {
   const auto node_id = NodeID::FromBinary(node->node_id());
-  RAY_LOG(INFO).WithField(node_id) << "Node failed, reconstructing actors.";
+  RAY_LOG(INFO).WithField(node_id) << "Node is dead, reconstructing actors.";
   // Kill all children of owner actors on a dead node.
   const auto it = owners_.find(node_id);
   if (it != owners_.end()) {

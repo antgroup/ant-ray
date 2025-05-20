@@ -24,6 +24,15 @@
 namespace ray {
 namespace gcs {
 
+class GcsInitData;
+// Returns true if an actor should be loaded to registered_actors_.
+// `false` Cases:
+// 0. state is DEAD, and is not restartable
+// 1. root owner is job, and job is dead
+// 2. root owner is another detached actor, and that actor is dead
+bool OnInitializeActorShouldLoad(const ray::gcs::GcsInitData &gcs_init_data,
+                                 ray::ActorID actor_id);
+
 /// `GcsInitData` is used to initialize all modules which need to recovery status when GCS
 /// server restarts.
 /// It loads all required metadata from the store into memory at once, so that the next

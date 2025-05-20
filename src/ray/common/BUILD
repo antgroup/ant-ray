@@ -235,7 +235,7 @@ ray_cc_library(
     ],
     deps = [
         ":ray_config",
-        "//:stats_metric",
+        "//src/ray/stats:stats_metric",
         "//src/ray/util",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/synchronization",

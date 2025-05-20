@@ -1,4 +1,3 @@
-import sys
 import asyncio
 import logging
 import multiprocessing
@@ -6,6 +5,7 @@ import os
 from typing import Optional, Union
 import multidict
 
+import ray.dashboard.consts as dashboard_consts
 from ray.dashboard.optional_deps import aiohttp
 
 from ray.dashboard.subprocesses.module import (
@@ -16,6 +16,7 @@ from ray.dashboard.subprocesses.module import (
 from ray.dashboard.subprocesses.utils import (
     module_logging_filename,
     ResponseType,
+    get_http_session_to_module,
 )
 
 """
@@ -99,7 +100,7 @@ class SubprocessModuleHandle:
         self.incarnation = 0
         # Runtime states, set by start_module() and wait_for_module_ready(),
         # reset by destroy_module().
-        self.process_ready_event = self.mp_context.Event()
+        self.parent_conn = None
         self.process = None
         self.http_client_session: Optional[aiohttp.ClientSession] = None
         self.health_check_task = None
@@ -116,14 +117,19 @@ class SubprocessModuleHandle:
         """
         Start the module. Should be non-blocking.
         """
+        self.parent_conn, child_conn = self.mp_context.Pipe()
+        if not os.path.exists(self.config.socket_dir):
+            os.makedirs(self.config.socket_dir)
         self.process = self.mp_context.Process(
             target=run_module,
             args=(
                 self.module_cls,
                 self.config,
-                self.process_ready_event,
+                self.incarnation,
+                child_conn,
             ),
             daemon=True,
+            name=f"{self.module_cls.__name__}-{self.incarnation}",
         )
         self.process.start()
 
@@ -132,16 +138,26 @@ class SubprocessModuleHandle:
         Wait for the module to be ready. This is called after start_module()
         and can be blocking.
         """
-        self.process_ready_event.wait()
-
-        socket_path = os.path.join(
-            self.config.socket_dir, "dashboard_" + self.module_cls.__name__
-        )
-        if sys.platform == "win32":
-            connector = aiohttp.NamedPipeConnector(socket_path)
+        if self.parent_conn.poll(dashboard_consts.SUBPROCESS_MODULE_WAIT_READY_TIMEOUT):
+            try:
+                self.parent_conn.recv()
+            except EOFError:
+                raise RuntimeError(
+                    f"Module {self.module_cls.__name__} failed to start. "
+                    "Received EOF from pipe."
+                )
+            self.parent_conn.close()
+            self.parent_conn = None
         else:
-            connector = aiohttp.UnixConnector(socket_path)
-        self.http_client_session = aiohttp.ClientSession(connector=connector)
+            raise RuntimeError(
+                f"Module {self.module_cls.__name__} failed to start. "
+                f"Timeout after {dashboard_consts.SUBPROCESS_MODULE_WAIT_READY_TIMEOUT} seconds."
+            )
+
+        module_name = self.module_cls.__name__
+        self.http_client_session = get_http_session_to_module(
+            module_name, self.config.socket_dir, self.config.session_name
+        )
 
         self.health_check_task = self.loop.create_task(self._do_periodic_health_check())
 
@@ -150,7 +166,10 @@ class SubprocessModuleHandle:
         Destroy the module. This is called when the module is unhealthy.
         """
         self.incarnation += 1
-        self.process_ready_event.clear()
+
+        if self.parent_conn:
+            self.parent_conn.close()
+            self.parent_conn = None
 
         if self.process:
             self.process.kill()
@@ -279,32 +298,39 @@ class SubprocessModuleHandle:
 
     async def proxy_websocket(
         self, request: aiohttp.web.Request
-    ) -> aiohttp.web.WebSocketResponse:
+    ) -> aiohttp.web.StreamResponse:
         """
         Proxy handler for WebSocket API
         It establishes a WebSocket connection with the client and simultaneously connects
         to the backend server's WebSocket endpoint. Messages are forwarded in single
         direction from the backend to the client.
+        If the backend responds with normal HTTP response, then try to treat it as a normal
+        HTTP request and calls proxy_http instead.
 
         TODO: Support bidirectional communication if needed. We only support one direction
               because it's sufficient for the current use case.
         """
-        ws_from_client = aiohttp.web.WebSocketResponse()
-        await ws_from_client.prepare(request)
-
         url = f"http://localhost{request.path_qs}"
 
-        async with self.http_client_session.ws_connect(
-            url, headers=filter_hop_by_hop_headers(request.headers)
-        ) as ws_to_backend:
-            async for msg in ws_to_backend:
-                if msg.type == aiohttp.WSMsgType.TEXT:
-                    await ws_from_client.send_str(msg.data)
-                elif msg.type == aiohttp.WSMsgType.BINARY:
-                    await ws_from_client.send_bytes(msg.data)
-                else:
-                    logger.error(f"Unknown msg type: {msg.type}")
-                    await ws_from_client.close()
-
-        await ws_from_client.close()
-        return ws_from_client
+        try:
+            async with self.http_client_session.ws_connect(
+                url, headers=filter_hop_by_hop_headers(request.headers)
+            ) as ws_to_backend:
+                ws_from_client = aiohttp.web.WebSocketResponse()
+                await ws_from_client.prepare(request)
+                async for msg in ws_to_backend:
+                    if msg.type == aiohttp.WSMsgType.TEXT:
+                        await ws_from_client.send_str(msg.data)
+                    elif msg.type == aiohttp.WSMsgType.BINARY:
+                        await ws_from_client.send_bytes(msg.data)
+                    else:
+                        logger.error(f"Unknown msg type: {msg.type}")
+                await ws_from_client.close()
+                return ws_from_client
+        except aiohttp.WSServerHandshakeError as e:
+            logger.warning(f"WebSocket handshake error: {repr(e)}")
+            # Try to treat it as a normal HTTP request
+            return await self.proxy_http(request)
+        except Exception as e:
+            logger.error(f"WebSocket proxy error: {repr(e)}")
+            raise aiohttp.web.HTTPInternalServerError(reason="WebSocket proxy error")

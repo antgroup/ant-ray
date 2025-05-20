@@ -305,7 +305,7 @@ html_theme = "pydata_sphinx_theme"
 # documentation.
 html_theme_options = {
     "use_edit_page_button": True,
-    "announcement": False,
+    "announcement": """$100 to try Ray on Anyscale — <a target="_blank" href="https://console.anyscale.com/register/ha?render_flow=ray&utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Start now</a>.""",
     "logo": {
         "svg": render_svg_logo("_static/img/ray_logo.svg"),
     },
@@ -319,6 +319,7 @@ html_theme_options = {
     "navbar_center": ["navbar-links"],
     "navbar_align": "left",
     "secondary_sidebar_items": [
+        "community-card.html",
         "page-toc",
         "edit-on-github",
     ],
@@ -596,7 +597,6 @@ autosummary_filename_map = {
 
 autodoc_mock_imports = [
     "aiohttp",
-    "aiosignal",
     "async_timeout",
     "backoff",
     "cachetools",
@@ -606,7 +606,6 @@ autodoc_mock_imports = [
     "datasets",
     "fastapi",
     "filelock",
-    "frozenlist",
     "fsspec",
     "google",
     "grpc",

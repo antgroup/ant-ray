@@ -76,7 +76,7 @@ def _modify_container_context_impl(
             "--systemd=false",
             "--log-level=TRACE",
             "--rm",
-            "--db-backend='file'",
+            "--db-backend=file",
             "--network-config-dir=/etc/cni/net.d/",
             "--cgroup-manager=cgroupfs",
             "--network=host",

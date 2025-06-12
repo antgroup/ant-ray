@@ -2279,7 +2279,7 @@ def try_update_runtime_env_vars(
     for env_var_name, env_var_value in os.environ.items():
         if env_var_name.startswith("RAY_"):
             env_vars[env_var_name] = env_var_value
-    
+
     # The RAY_JOB_ID environment variable is needed for the default worker.
     # It won't be set at the time setup() is called, but it will be set
     # when worker command is executed, so we use RAY_JOB_ID=$RAY_JOB_ID

@@ -86,7 +86,7 @@ def _modify_container_context_impl(
             "--cgroupns=private",
             "--userns=host",
         ]
-    else:  
+    else:
         # todo add cgroup config
         container_command = [
             container_driver,

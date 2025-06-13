@@ -66,6 +66,3 @@ RAY_PODMAN_DEPENDENCIES_INSTALLER_PATH = os.environ.get(
 
 # Whether to use ray whl when `install_ray` is True in the container.
 RAY_PODMAN_UES_WHL_PACKAGE = env_bool("RAY_PODMAN_UES_WHL_PACKAGE", False)
-
-# Whether to use ant-internal podman for ray container.
-RAY_USE_ANT_INTERNAL_PODMAN = env_bool("RAY_USE_ANT_INTERNAL_PODMAN", False)

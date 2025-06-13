@@ -68,7 +68,7 @@ def _modify_container_context_impl(
     )
 
     container_driver = "podman"
-    if runtime_env_constants.RAY_USE_ANT_INTERNAL_PODMAN:
+    if runtime_env_constants.RAY_PODMAN_UES_NYDUS:
         container_command = [
             container_driver,
             "run",

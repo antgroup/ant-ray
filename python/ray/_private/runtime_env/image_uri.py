@@ -68,7 +68,7 @@ def _modify_container_context_impl(
     )
 
     container_driver = "podman"
-    if runtime_env_constants.RAY_PODMAN_UES_NYDUS:
+    if runtime_env_constants.RAY_PODMAN_USE_NYDUS:
         container_command = [
             container_driver,
             "run",
@@ -242,7 +242,7 @@ def _modify_container_context_impl(
     container_command.append("bash")
 
     # If podman integrate nydus, we use nydus image as rootfs
-    if runtime_env_constants.RAY_PODMAN_UES_NYDUS:
+    if runtime_env_constants.RAY_PODMAN_USE_NYDUS:
         container_command.append("--rootfs")
         container_command.append(runtime_env.py_container_image() + ":O")
     else:

@@ -206,6 +206,11 @@ class WorkingDirPlugin(RuntimeEnvPlugin):
         context.symlink_paths_to_working_dir.append(str(local_dir))
         context.env_vars[runtime_env_consts.RAY_WORKING_DIR] = working_dir
 
+        working_dir = (
+            local_dir
+            if ray_constants.env_bool("RAY_USE_LOCAL_DIR", False)
+            else working_dir
+        )
         if not _WIN32:
             context.command_prefix += [
                 "cd",

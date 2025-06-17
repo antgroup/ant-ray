@@ -15,6 +15,13 @@
 #include <memory>
 
 #include "ray/gcs/gcs_server/gcs_job_manager.h"
+#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/gcs_server/gcs_resource_manager.h"
+#include "ray/gcs/gcs_server/gcs_node_manager.h"
+#include "ray/raylet/scheduling/cluster_resource_manager.h"
+#include "ray/raylet/scheduling/cluster_task_manager.h"
+#include "ray/rpc/node_manager/node_manager_client_pool.h"
+#include "ray/rpc/client_call.h"
 
 // clang-format off
 #include "gtest/gtest.h"
@@ -27,7 +34,6 @@
 #include "mock/ray/pubsub/publisher.h"
 #include "mock/ray/pubsub/subscriber.h"
 #include "mock/ray/rpc/worker/core_worker_client.h"
-
 // clang-format on
 
 using json = nlohmann::json;
@@ -54,6 +60,45 @@ class GcsJobManagerTest : public ::testing::Test {
     fake_kv_ = std::make_unique<gcs::FakeInternalKVInterface>();
     function_manager_ = std::make_unique<gcs::GcsFunctionManager>(*kv_, io_service_);
 
+    // 初始化客户端调用管理器
+    client_call_manager_ = std::make_unique<rpc::ClientCallManager>(io_service_);
+
+    // 初始化集群资源管理器
+    cluster_resource_manager_ = std::make_unique<ClusterResourceManager>(io_service_);
+
+    // 初始化节点管理器客户端池
+    node_manager_client_pool_ = std::make_unique<rpc::NodeManagerClientPool>(*client_call_manager_);
+
+    // 初始化虚拟集群管理器
+    virtual_cluster_manager_ = std::make_unique<gcs::GcsVirtualClusterManager>(
+        io_service_,
+        *gcs_table_storage_,
+        *gcs_publisher_,
+        *cluster_resource_manager_);
+
+    // 初始化节点管理器
+    node_manager_ = std::make_unique<gcs::GcsNodeManager>(
+        gcs_publisher_.get(),
+        gcs_table_storage_.get(),
+        io_service_,
+        node_manager_client_pool_.get(),
+        ClusterID::Nil(),
+        *virtual_cluster_manager_);
+
+    // 初始化资源管理器
+    resource_manager_ = std::make_unique<gcs::GcsResourceManager>(
+        io_service_,
+        *cluster_resource_manager_,
+        *node_manager_,
+        NodeID::FromRandom(),  // 使用随机节点ID作为本地节点ID
+        *virtual_cluster_manager_,
+        nullptr  // 不使用 ClusterTaskManager
+    );
+
+    // 初始化 GCS 数据
+    gcs_init_data_ = std::make_unique<gcs::GcsInitData>(*gcs_table_storage_);
+    virtual_cluster_manager_->Initialize(*gcs_init_data_);
+
     // Mock client factory which abuses the "address" argument to return a
     // CoreWorkerClient whose number of running tasks equal to the address port. This is
     // just for testing purposes.
@@ -79,6 +124,13 @@ class GcsJobManagerTest : public ::testing::Test {
   std::unique_ptr<gcs::GcsFunctionManager> function_manager_;
   std::unique_ptr<gcs::MockInternalKVInterface> kv_;
   std::unique_ptr<gcs::FakeInternalKVInterface> fake_kv_;
+  std::unique_ptr<rpc::ClientCallManager> client_call_manager_;
+  std::unique_ptr<ClusterResourceManager> cluster_resource_manager_;
+  std::unique_ptr<rpc::NodeManagerClientPool> node_manager_client_pool_;
+  std::unique_ptr<gcs::GcsNodeManager> node_manager_;
+  std::unique_ptr<gcs::GcsResourceManager> resource_manager_;
+  std::unique_ptr<gcs::GcsVirtualClusterManager> virtual_cluster_manager_;
+  std::unique_ptr<gcs::GcsInitData> gcs_init_data_;
   rpc::CoreWorkerClientFactoryFn client_factory_;
   RuntimeEnvManager runtime_env_manager_;
   const std::chrono::milliseconds timeout_ms_{5000};
@@ -101,16 +153,17 @@ TEST_F(GcsJobManagerTest, TestExportDriverJobEvents) {
                 log_dir_,
                 "warning",
                 false);
-  gcs::GcsJobManager gcs_job_manager(*gcs_table_storage_,
-                                     *gcs_publisher_,
-                                     runtime_env_manager_,
-                                     *function_manager_,
-                                     *fake_kv_,
-                                     io_service_,
-                                     client_factory_);
 
-  gcs::GcsInitData gcs_init_data(*gcs_table_storage_);
-  gcs_job_manager.Initialize(/*init_data=*/gcs_init_data);
+  gcs::GcsJobManager gcs_job_manager(*gcs_table_storage_,
+                                   *gcs_publisher_,
+                                   runtime_env_manager_,
+                                   *function_manager_,
+                                   *virtual_cluster_manager_,
+                                   *fake_kv_,
+                                   io_service_,
+                                   client_factory_);
+
+  gcs_job_manager.Initialize(*gcs_init_data_);
 
   auto job_api_job_id = JobID::FromInt(100);
   std::string submission_id = "submission_id_100";
@@ -128,7 +181,7 @@ TEST_F(GcsJobManagerTest, TestExportDriverJobEvents) {
 
   std::vector<std::string> vc;
   Mocker::ReadContentFromFile(vc,
-                              log_dir_ + "/export_events/event_EXPORT_DRIVER_JOB.log");
+                            log_dir_ + "/export_events/event_EXPORT_DRIVER_JOB.log");
   ASSERT_EQ((int)vc.size(), 1);
   json event_data = json::parse(vc[0])["event_data"].get<json>();
   ASSERT_EQ(event_data["is_dead"], false);
@@ -148,9 +201,10 @@ TEST_F(GcsJobManagerTest, TestExportDriverJobEvents) {
 
   vc.clear();
   Mocker::ReadContentFromFile(vc,
-                              log_dir_ + "/export_events/event_EXPORT_DRIVER_JOB.log");
+                            log_dir_ + "/export_events/event_EXPORT_DRIVER_JOB.log");
   ASSERT_EQ((int)vc.size(), 2);
   event_data = json::parse(vc[1])["event_data"].get<json>();
   ASSERT_EQ(event_data["is_dead"], true);
 }
-}  // namespace ray
+
+}  // namespace ray 

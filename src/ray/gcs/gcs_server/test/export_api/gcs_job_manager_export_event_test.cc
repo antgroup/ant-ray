@@ -60,23 +60,15 @@ class GcsJobManagerTest : public ::testing::Test {
     fake_kv_ = std::make_unique<gcs::FakeInternalKVInterface>();
     function_manager_ = std::make_unique<gcs::GcsFunctionManager>(*kv_, io_service_);
 
-    // 初始化客户端调用管理器
     client_call_manager_ = std::make_unique<rpc::ClientCallManager>(io_service_);
-
-    // 初始化集群资源管理器
     cluster_resource_manager_ = std::make_unique<ClusterResourceManager>(io_service_);
-
-    // 初始化节点管理器客户端池
     node_manager_client_pool_ = std::make_unique<rpc::NodeManagerClientPool>(*client_call_manager_);
-
-    // 初始化虚拟集群管理器
     virtual_cluster_manager_ = std::make_unique<gcs::GcsVirtualClusterManager>(
         io_service_,
         *gcs_table_storage_,
         *gcs_publisher_,
         *cluster_resource_manager_);
 
-    // 初始化节点管理器
     node_manager_ = std::make_unique<gcs::GcsNodeManager>(
         gcs_publisher_.get(),
         gcs_table_storage_.get(),
@@ -85,17 +77,15 @@ class GcsJobManagerTest : public ::testing::Test {
         ClusterID::Nil(),
         *virtual_cluster_manager_);
 
-    // 初始化资源管理器
     resource_manager_ = std::make_unique<gcs::GcsResourceManager>(
         io_service_,
         *cluster_resource_manager_,
         *node_manager_,
-        NodeID::FromRandom(),  // 使用随机节点ID作为本地节点ID
+        NodeID::FromRandom(), 
         *virtual_cluster_manager_,
-        nullptr  // 不使用 ClusterTaskManager
+        nullptr 
     );
 
-    // 初始化 GCS 数据
     gcs_init_data_ = std::make_unique<gcs::GcsInitData>(*gcs_table_storage_);
     virtual_cluster_manager_->Initialize(*gcs_init_data_);
 

@@ -1290,7 +1290,13 @@ TEST_F(ClusterResourceSchedulerTest, TestAlwaysSpillInfeasibleTask) {
                                               scheduling::NodeID("local"),
                                               absl::flat_hash_map<std::string, double>{},
                                               is_node_available_fn_, 
+<<<<<<< HEAD
                                               nullptr, nullptr, nullptr, {},
+=======
+                                              nullptr, 
+                                              nullptr, 
+                                              nullptr, {},
+>>>>>>> 9f3318419589e81581294323031ec8e43bedad28
                                               [](scheduling::NodeID, const SchedulingContext *) { return true; });
   for (int i = 0; i < 100; i++) {
     resource_scheduler.GetClusterResourceManager().AddOrUpdateNode(

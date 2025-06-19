@@ -1,4 +1,4 @@
-import { FlowInsight } from "@aeonsule/flow-insight";
+import { FlowInsight } from "@ant-ray/flow-insight";
 import React from "react";
 import { useParams } from "react-router-dom";
 

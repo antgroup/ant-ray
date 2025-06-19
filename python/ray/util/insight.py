@@ -711,6 +711,7 @@ def timeit(func_name, group_name=""):
     finally:
         p.end()
 
+
 def report_trace_info(caller_info):
     """
     Report the trace info of the current task

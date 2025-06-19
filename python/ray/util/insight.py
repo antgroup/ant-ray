@@ -93,6 +93,7 @@ class _ray_internal_insight_monitor:
         session_id = ray._private.worker._global_node.session_name
         self.server = FastAPIInsightServer(
             snapshot_storage_type=StorageType.MEMORY,
+            snapshot_duration_s=600,
             storage_dir=os.path.join(
                 ray._private.utils.get_ray_temp_dir(), session_id, "flowinsight"
             ),

@@ -705,85 +705,11 @@ def timeit(func_name, group_name=""):
                     result = self.do_work()
                     return result
     """
-    if not is_flow_insight_enabled():
-        return
-
-    if group_name != "":
-        func_name = f"{func_name}/{group_name}"
-
-    if not hasattr(ray._private.worker.global_worker, "_insight_call_stack"):
-        setattr(ray._private.worker.global_worker, "_insight_call_stack", [])
-
-    if len(ray._private.worker.global_worker._insight_call_stack) > 0:
-        frame = ray._private.worker.global_worker._insight_call_stack[-1]
-        current_task_id = frame["parent_span_id"]
-        caller_class = frame["caller_class"]
-        caller_func = frame["caller_func"]
-    else:
-        current_task_id = get_current_task_id()
-        caller_class = _get_caller_class()
-        caller_func = _get_current_task_name()
-
-    if not need_record(caller_class):
-        return
-
-    job_id = get_current_job_id()
-    span_id = str(uuid.uuid4())
-
     try:
-        start_time = time.time()
-        get_insight_client().emit_event(
-            CallSubmitEvent(
-                flow_id=job_id,
-                source_service=caller_class[0],
-                source_instance_id=caller_class[1],
-                source_method=caller_func,
-                target_service=None,
-                target_instance_id=None,
-                target_method=func_name,
-                timestamp=int(time.time() * 1000),
-                parent_span_id=current_task_id,
-            )
-        )
-
-        get_insight_client().emit_event(
-            CallBeginEvent(
-                flow_id=job_id,
-                source_service=None if caller_class is None else caller_class[0],
-                source_instance_id=None if caller_class is None else caller_class[1],
-                source_method=caller_func,
-                target_service=None,
-                target_instance_id=None,
-                target_method=func_name,
-                parent_span_id=current_task_id,
-                span_id=span_id,
-                timestamp=int(time.time() * 1000),
-            )
-        )
-        frame = {
-            "parent_span_id": span_id,
-            "caller_class": (None, None),
-            "caller_func": func_name,
-        }
-        ray._private.worker.global_worker._insight_call_stack.append(frame)
-
+        p = profile(func_name, group_name)
         yield
-
     finally:
-        get_insight_client().emit_event(
-            CallEndEvent(
-                flow_id=job_id,
-                target_service=None,
-                target_instance_id=None,
-                target_method=func_name,
-                duration=time.time() - start_time,
-                span_id=span_id,
-                timestamp=int(time.time() * 1000),
-            )
-        )
-        if len(ray._private.worker.global_worker._insight_call_stack) > 0:
-            ray._private.worker.global_worker._insight_call_stack.pop()
-
+        p.end()
 
 def report_trace_info(caller_info):
     """

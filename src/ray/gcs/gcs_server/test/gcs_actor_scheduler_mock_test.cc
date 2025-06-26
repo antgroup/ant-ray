@@ -23,6 +23,7 @@
 #include "mock/ray/pubsub/subscriber.h"
 #include "mock/ray/rpc/worker/core_worker_client.h"
 #include "ray/common/test_util.h"
+#include "mock/ray/gcs/gcs_server/gcs_resource_manager.h"
 // clang-format on
 
 using namespace ::testing;
@@ -41,7 +42,7 @@ class GcsActorSchedulerMockTest : public Test {
     store_client = std::make_shared<MockStoreClient>();
     actor_table = std::make_unique<GcsActorTable>(store_client);
     gcs_node_manager = std::make_unique<GcsNodeManager>(
-        nullptr, nullptr, io_context, nullptr, ClusterID::Nil());
+        nullptr, nullptr, io_context, nullptr, ClusterID::Nil(), gcs::__mock_virtual_cluster_manager_);
     raylet_client = std::make_shared<MockRayletClientInterface>();
     core_worker_client = std::make_shared<rpc::MockCoreWorkerClientInterface>();
     client_pool = std::make_unique<rpc::NodeManagerClientPool>(

@@ -24,6 +24,7 @@
 #include "mock/ray/gcs/gcs_server/gcs_kv_manager.h"
 #include "mock/ray/gcs/gcs_server/gcs_node_manager.h"
 #include "mock/ray/pubsub/publisher.h"
+#include "mock/ray/gcs/gcs_server/gcs_resource_manager.h"
 // clang-format on
 
 namespace ray {
@@ -159,6 +160,7 @@ class GcsActorManagerTest : public ::testing::Test {
         gcs_publisher_.get(),
         *runtime_env_mgr_,
         *function_manager_,
+        gcs::__mock_virtual_cluster_manager_,
         [](const ActorID &actor_id) {},
         [this](const rpc::Address &addr) { return worker_client_; });
 

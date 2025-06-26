@@ -18,8 +18,13 @@ namespace ray {
 namespace gcs {
 static instrumented_io_context __mock_io_context_;
 static ClusterResourceManager __mock_cluster_resource_manager_(__mock_io_context_);
+static GcsVirtualClusterManager __mock_virtual_cluster_manager_(
+    __mock_io_context_, 
+    *static_cast<GcsTableStorage*>(nullptr), 
+    *static_cast<GcsPublisher*>(nullptr), 
+    __mock_cluster_resource_manager_);
 static GcsNodeManager __mock_gcs_node_manager_(
-    nullptr, nullptr, __mock_io_context_, nullptr, ClusterID::Nil());
+    nullptr, nullptr, __mock_io_context_, nullptr, ClusterID::Nil(), __mock_virtual_cluster_manager_);
 
 class MockGcsResourceManager : public GcsResourceManager {
  public:
@@ -29,6 +34,7 @@ class MockGcsResourceManager : public GcsResourceManager {
                            __mock_cluster_resource_manager_,
                            __mock_gcs_node_manager_,
                            NodeID::FromRandom(),
+                           __mock_virtual_cluster_manager_,
                            nullptr) {}
   explicit MockGcsResourceManager(ClusterResourceManager &cluster_resource_manager,
                                   GcsNodeManager &gcs_node_manager)
@@ -36,6 +42,7 @@ class MockGcsResourceManager : public GcsResourceManager {
                            cluster_resource_manager,
                            gcs_node_manager,
                            NodeID::FromRandom(),
+                           __mock_virtual_cluster_manager_,
                            nullptr) {}
 
   MOCK_METHOD(void,
@@ -53,4 +60,4 @@ class MockGcsResourceManager : public GcsResourceManager {
 };
 
 }  // namespace gcs
-}  // namespace ray
+}  // namespace ray 

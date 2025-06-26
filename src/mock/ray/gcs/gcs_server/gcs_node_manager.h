@@ -23,7 +23,8 @@ class MockGcsNodeManager : public GcsNodeManager {
                        /*gcs_table_storage=*/nullptr,
                        /*io_context=*/mocked_io_context_not_used_,
                        /*raylet_client_pool=*/nullptr,
-                       /*cluster_id=*/ClusterID::Nil()) {}
+                       /*cluster_id=*/ClusterID::Nil(),
+                       /*gcs_virtual_cluster_manager=*/mocked_virtual_cluster_manager_not_used_) {}
   MOCK_METHOD(void,
               HandleRegisterNode,
               (rpc::RegisterNodeRequest request,
@@ -45,6 +46,11 @@ class MockGcsNodeManager : public GcsNodeManager {
   MOCK_METHOD(void, DrainNode, (const NodeID &node_id), (override));
 
   instrumented_io_context mocked_io_context_not_used_;
+  GcsVirtualClusterManager mocked_virtual_cluster_manager_not_used_{
+      mocked_io_context_not_used_, 
+      *static_cast<GcsTableStorage*>(nullptr), 
+      *static_cast<GcsPublisher*>(nullptr), 
+      *static_cast<const ClusterResourceManager*>(nullptr)};
 };
 
 }  // namespace gcs

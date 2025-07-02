@@ -204,7 +204,9 @@ class VirtualClusterReconciler:
 
         sched_request = SchedulingRequest(
             node_type_configs=node_type_configs,
-            max_num_nodes=ray_state.max_nodes,
+            max_num_nodes=ray_state.max_nodes
+            if ray_state.max_nodes > 0
+            else autoscaling_config.get_max_num_nodes(),
             resource_requests=ray_state.pending_resource_requests,
             gang_resource_requests=ray_state.pending_gang_resource_requests,
             # For now, we don't support resource constraints at the virtual cluster level.

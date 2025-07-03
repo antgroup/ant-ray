@@ -193,6 +193,7 @@ class VirtualClusterReconciler:
                 )
 
         node_type_configs = autoscaling_config.get_node_type_configs()
+        # Use the virtual cluster's min/max config.
         for _, config in node_type_configs.items():
             if config.ray_node_type in ray_state.min_replica_sets:
                 config.min_worker_nodes = ray_state.min_replica_sets[
@@ -201,6 +202,8 @@ class VirtualClusterReconciler:
                 config.max_worker_nodes = ray_state.max_replica_sets[
                     config.ray_node_type
                 ]
+            else:
+                config.min_worker_nodes = 0
 
         sched_request = SchedulingRequest(
             node_type_configs=node_type_configs,

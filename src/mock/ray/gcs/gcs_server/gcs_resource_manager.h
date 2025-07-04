@@ -25,6 +25,15 @@ namespace gcs {
 
 class MockGcsResourceManager : public GcsResourceManager {
  public:
+ MockGcsResourceManager(ClusterResourceManager &cluster_resource_manager,
+                       GcsNodeManager &gcs_node_manager)
+    : GcsResourceManager(
+          *GetMockIoContext(),
+          cluster_resource_manager,
+          gcs_node_manager,
+          NodeID::FromRandom(),
+          *GetMockVirtualClusterManager(),
+          nullptr) {}
  MockGcsResourceManager(instrumented_io_context &io_context,
                        ClusterResourceManager &cluster_resource_manager,
                        GcsNodeManager &gcs_node_manager,

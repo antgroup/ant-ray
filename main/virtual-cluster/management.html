@@ -1404,6 +1404,8 @@ document.write(`
 <li><p><a class="reference internal" href="#remove-a-virtual-cluster" id="id3">Remove A Virtual Cluster</a></p></li>
 <li><p><a class="reference internal" href="#remove-nodes-from-a-virtual-cluster" id="id4">Remove Nodes From A Virtual Cluster</a></p></li>
 <li><p><a class="reference internal" href="#get-virtual-clusters" id="id5">Get Virtual Clusters</a></p></li>
+<li><p><a class="reference internal" href="#update-autoscaling-config" id="id6">Update Autoscaling Config</a></p></li>
+<li><p><a class="reference internal" href="#get-autoscaling-config" id="id7">Get Autoscaling Config</a></p></li>
 </ul>
 </nav>
 <section id="create-or-update-a-virtual-cluster">
@@ -1586,6 +1588,58 @@ document.write(`
 </pre></div>
 </div>
 </section>
+<section id="update-autoscaling-config">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Update Autoscaling Config</a><a class="headerlink" href="#update-autoscaling-config" title="Link to this heading">#</a></h2>
+<p>Users can update the autoscaling config (e.g., min/max limits) of a virtual cluster by sending a POST request to the http endpoint at <code class="code docutils literal notranslate"><span class="pre">/virtual_clusters/update_autoscaling_config</span></code>.</p>
+<p>Once the autoscaling config is updated, the autoscaler (v2 only) will try to enforce it.</p>
+<p><strong>Sample Request:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;virtualClusterId&quot;</span><span class="p">:</span><span class="s2">&quot;virtual_cluster_1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;minReplicaSets&quot;</span><span class="p">:{</span><span class="w"> </span><span class="c1">// The min replica sets of each node type.</span>
+<span class="w">        </span><span class="nt">&quot;4c8g&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;8c16g&quot;</span><span class="p">:</span><span class="mi">0</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;maxReplicaSets&quot;</span><span class="p">:{</span><span class="w"> </span><span class="c1">// The max replica sets of each node type.</span>
+<span class="w">        </span><span class="nt">&quot;4c8g&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;8c16g&quot;</span><span class="p">:</span><span class="mi">2</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;maxNodes&quot;</span><span class="p">:</span><span class="mi">4</span><span class="w"> </span><span class="c1">// The max total node count</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Sample Response:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="s2">&quot;Virtual cluster virtual_cluster_1&#39;s autoscaling config updated.&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:{</span>
+<span class="w">        </span><span class="nt">&quot;virtualClusterId&quot;</span><span class="p">:</span><span class="s2">&quot;virtual_cluster_1&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="get-autoscaling-config">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Get Autoscaling Config</a><a class="headerlink" href="#get-autoscaling-config" title="Link to this heading">#</a></h2>
+<p>To get the autoscaling config of a virtual clusters, users can send a GET request to the http endpoint at <code class="code docutils literal notranslate"><span class="pre">/virtual_clusters/autoscaling_config/{virtual_cluster_id}</span></code>.</p>
+<p><strong>Success Response:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="s2">&quot;Autoscaling config fetched.&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;data&quot;</span><span class="p">:{</span>
+<span class="w">        </span><span class="nt">&quot;minReplicaSets&quot;</span><span class="p">:{</span>
+<span class="w">            </span><span class="nt">&quot;4c8g&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;8c16g&quot;</span><span class="p">:</span><span class="mi">0</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;maxReplicaSets&quot;</span><span class="p">:{</span>
+<span class="w">            </span><span class="nt">&quot;4c8g&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;8c16g&quot;</span><span class="p">:</span><span class="mi">2</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;maxNodes&quot;</span><span class="p">:</span><span class="mi">4</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -1635,6 +1689,8 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#remove-a-virtual-cluster">Remove A Virtual Cluster</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#remove-nodes-from-a-virtual-cluster">Remove Nodes From A Virtual Cluster</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-virtual-clusters">Get Virtual Clusters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#update-autoscaling-config">Update Autoscaling Config</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-autoscaling-config">Get Autoscaling Config</a></li>
 </ul>
   </nav></div>
 

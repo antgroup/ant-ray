@@ -46,7 +46,7 @@ class MockWorkerPool : public WorkerPoolInterface {
                      const PopWorkerCallback &callback,
                      const std::string &resource_spec) override {
         PopWorker(task_spec, callback);
-      }
+  }
 
   void PushWorker(const std::shared_ptr<WorkerInterface> &worker) {
     workers.push_front(worker);

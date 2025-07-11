@@ -30,11 +30,15 @@ class ProtocolsProvider:
             # File storage path, assumes everything packed in one zip file.
             "file",
             "http",
+            # ZDFS path, used by ant-group internally.
+            "dfs",
+            # HDFS path
+            "hdfs",
         }
 
     @classmethod
     def get_remote_protocols(cls):
-        return {"https", "s3", "gs", "file", "http"}
+        return {"https", "s3", "gs", "file", "http", "dfs", "hdfs"}
 
     @classmethod
     def download_remote_uri(cls, protocol: str, source_uri: str, dest_file: str):
@@ -78,6 +82,16 @@ class ProtocolsProvider:
                     "to fetch URIs in Google Cloud Storage bucket."
                     + cls._MISSING_DEPENDENCIES_WARNING
                 )
+        elif protocol == "dfs":
+
+            def open_file(uri, mode, *, transport_params=None):
+                return
+
+        elif protocol == "hdfs":
+
+            def open_file(uri, mode, *, transport_params=None):
+                return
+
         else:
             try:
                 from smart_open import open as open_file

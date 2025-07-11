@@ -611,6 +611,7 @@ def test_override_failure(shutdown_only):
 @pytest.mark.parametrize("disable_working_dir_gc", [True, False])
 def test_id_named_working_dir(tmp_working_dir, disable_working_dir_gc, shutdown_only):
     """Tests the independent id named working directory for echo worker."""
+    os.environ["RAY_USE_LOCAL_DIR"] = "false"
     if disable_working_dir_gc:
         os.environ["RAY_RUNTIME_ENV_DISABLE_WORKING_DIR_GC"] = "true"
     else:
@@ -659,6 +660,7 @@ def test_id_named_working_dir(tmp_working_dir, disable_working_dir_gc, shutdown_
 
 
 def test_add_working_dir_to_ld_library_path(tmp_working_dir, shutdown_only):
+    os.environ["RAY_USE_LOCAL_DIR"] = "false"
     ray.init(runtime_env={"working_dir": tmp_working_dir})
 
     @ray.remote
@@ -679,6 +681,7 @@ def test_add_working_dir_to_ld_library_path(tmp_working_dir, shutdown_only):
 @pytest.mark.parametrize("disable_job_dir_gc", [True, False])
 def test_job_dir(tmp_working_dir, disable_job_dir_gc, shutdown_only):
     """Tests the independent id named job directory for echo job."""
+    os.environ["RAY_USE_LOCAL_DIR"] = "false"
     if disable_job_dir_gc:
         os.environ["RAY_RUNTIME_ENV_DISABLE_JOB_DIR_GC"] = "true"
     else:
@@ -712,6 +715,7 @@ def test_job_dir(tmp_working_dir, disable_job_dir_gc, shutdown_only):
 
     a = A.remote()
     assert ray.get(a.test_import.remote()) == 1
+
     actor_cwd = ray.get(a.get_cwd.remote())
     assert "working_dirs" in actor_cwd
     assert os.path.exists(actor_cwd) and os.path.isdir(actor_cwd)

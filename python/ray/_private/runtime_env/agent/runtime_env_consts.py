@@ -34,7 +34,7 @@ RAY_WORKING_DIR = os.environ.get("RAY_WORKING_DIR", "RAY_WORKING_DIR")
 RAY_JOB_DIR = os.environ.get("RAY_JOB_DIR", "RAY_JOB_DIR")
 
 # ZDFS Config
-ZDFS_LOG_PATH = "log_zdfs_dfs.LOG"
-ZDFS_CONF_PATH = "dfs_client_conf.json"
+ZDFS_LOG_PATH = "/tmp/log_zdfs.LOG"
+ZDFS_CONF_PATH = "/tmp/zdfs_client_conf.json"
 ZDFS_THREAD_NUM = 4
-ZDFS_BUFFER_LEN = 2097152
+ZDFS_BUFFER_LEN = 20971520  # 20MB

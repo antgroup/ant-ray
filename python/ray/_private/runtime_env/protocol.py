@@ -82,15 +82,83 @@ class ProtocolsProvider:
                     "to fetch URIs in Google Cloud Storage bucket."
                     + cls._MISSING_DEPENDENCIES_WARNING
                 )
-        elif protocol == "dfs":
 
-            def open_file(uri, mode, *, transport_params=None):
+        elif protocol == "dfs":
+            try:
+                try:
+                    import zdfs
+                    from zdfs import zdfs_util
+                    from urllib.parse import urlparse
+                    import ray._private.runtime_env.agent.runtime_env_consts as runtime_env_consts
+                except ImportError:
+                    raise ImportError(
+                        "You must `pip install zdfs-dfs` "
+                        "to fetch URIs in ZDFS. " + cls._MISSING_DEPENDENCIES_WARNING
+                    )
+                parsed = urlparse(source_uri)
+                cluster_info = f"{parsed.scheme}://{parsed.hostname}:{parsed.port}"
+                options = zdfs.FileSystemOptions()
+                options.log_path = runtime_env_consts.ZDFS_LOG_PATH
+                options.conf_path = runtime_env_consts.ZDFS_CONF_PATH
+                pangu_options = zdfs.PanguOptions()
+                pangu_options.io_thread_num = runtime_env_consts.ZDFS_THREAD_NUM
+                pangu_options.callback_thread_num = runtime_env_consts.ZDFS_THREAD_NUM
+                pangu_options.callback_in_iothread = True
+                zdfs.PanguFileSystem.SetOptions(pangu_options)
+                fs = zdfs.PanguFileSystem.Create(cluster_info, options)
+                ec = zdfs_util.get(
+                    fs,
+                    parsed.path,
+                    dest_file,
+                    buflen=runtime_env_consts.ZDFS_BUFFER_LEN,
+                    overwrite=False,
+                )
+                if ec != 0:
+                    raise Exception(
+                        f"ZDFS client failed to download file, error code:{ec}"
+                    )
+                return
+            except Exception:
+                import shutil
+                import subprocess
+
+                def check_hadoop_client():
+                    if shutil.which("hdfs"):
+                        return ["hdfs", "dfs"]
+                    elif shutil.which("hadoop"):
+                        return ["hadoop", "fs"]
+                    else:
+                        return None
+
+                hadoop_command = check_hadoop_client()
+                if hadoop_command:
+                    result = subprocess.run(
+                        [*hadoop_command, "-get", source_uri, dest_file],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                    )
+                    if result.returncode != 0:
+                        raise Exception(
+                            f"Hadoop client failed to download file, return code:{result.returncode}"
+                        )
+                else:
+                    raise Exception("Hadoop client not found.")
                 return
 
         elif protocol == "hdfs":
-
-            def open_file(uri, mode, *, transport_params=None):
-                return
+            try:
+                from smart_open import open as open_file
+            except ImportError:
+                raise ImportError(
+                    "You must `pip install smart_open[hdfs]` "
+                    f"to fetch {protocol.upper()} URIs. "
+                    + cls._MISSING_DEPENDENCIES_WARNING
+                )
+            tp = {
+                "client": "pyarrow",
+                "hdfs_driver": "libhdfs",
+            }
 
         else:
             try:

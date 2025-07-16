@@ -125,8 +125,6 @@ def torch_profile(func):
         
         return profile_function_sync(
             func, 
-            log_dir=None, 
-            enable_async_logging=True,
             enqueue_callback=_enqueue_profile_result
         )(*args, **kwargs)
     
@@ -147,8 +145,6 @@ def async_torch_profile(func):
         
         return await profile_function_async(
             func,
-            log_dir=None,
-            enable_async_logging=True,
             enqueue_callback=_enqueue_profile_result
         )(*args, **kwargs)
     

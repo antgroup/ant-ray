@@ -384,17 +384,17 @@ def create_profile_result(prof, function_name: str, execution_time: float,
     total_flops = sum(flops_list) if flops_list else None
     
     # Sort for top operations
-    top_cpu_ops = sorted(
+    cpu_ops = sorted(
         [op for op in operations if op.cpu_time_total > 0], 
         key=lambda x: x.cpu_time_total, 
         reverse=True
-    )[:10]
+    )
     
-    top_memory_ops = sorted(
+    memory_ops = sorted(
         [op for op in operations if (op.cpu_memory_usage + op.cuda_memory_usage) > 0], 
         key=lambda x: (x.cpu_memory_usage + x.cuda_memory_usage), 
         reverse=True
-    )[:10]
+    )
     
     # Count unique operations
     unique_ops = len(set(op.name for op in operations))
@@ -407,8 +407,8 @@ def create_profile_result(prof, function_name: str, execution_time: float,
         peak_memory_usage=peak_memory,
         total_flops=total_flops,
         operation_profiles=operations,
-        top_cpu_operations=top_cpu_ops,
-        top_memory_operations=top_memory_ops,
+        top_cpu_operations=cpu_ops,
+        top_memory_operations=memory_ops,
         
         # Enhanced metadata
         profiling_start_time=start_timestamp,
@@ -419,16 +419,13 @@ def create_profile_result(prof, function_name: str, execution_time: float,
     )
 
 
-def profile_function_sync(func: Callable, log_dir: Optional[str] = None, 
-                         enable_async_logging: bool = True,
+def profile_function_sync(func: Callable, 
                          enqueue_callback: Optional[Callable[[dict], None]] = None) -> Callable:
     """
     Synchronous torch profiling decorator with flexible logging options.
     
     Args:
         func: Function to profile
-        log_dir: Directory to write profile logs (if None, uses temp directory)
-        enable_async_logging: Whether to use async logging
         enqueue_callback: Optional callback for custom async processing
     """
     @functools.wraps(func)
@@ -468,16 +465,9 @@ def profile_function_sync(func: Callable, log_dir: Optional[str] = None,
             profile_result = create_profile_result(prof, function_name, execution_time, start_time, end_time)
             
             # Handle logging based on configuration
-            if enqueue_callback and enable_async_logging:
+            if enqueue_callback:
                 # Use custom async callback
                 enqueue_callback(profile_result.to_dict())
-            elif log_dir:
-                # Direct file logging
-                profile_result.save_to_file(log_dir)
-            else:
-                # Fallback to temp directory
-                temp_dir = tempfile.gettempdir()
-                profile_result.save_to_file(temp_dir)
             
         except Exception as e:
             print(f"Warning: PyTorch profiling failed for {function_name}: {e}")
@@ -489,16 +479,13 @@ def profile_function_sync(func: Callable, log_dir: Optional[str] = None,
     return wrapper
 
 
-def profile_function_async(func: Callable, log_dir: Optional[str] = None,
-                          enable_async_logging: bool = True,
+def profile_function_async(func: Callable,
                           enqueue_callback: Optional[Callable[[dict], None]] = None) -> Callable:
     """
     Asynchronous torch profiling decorator with flexible logging options.
     
     Args:
         func: Async function to profile
-        log_dir: Directory to write profile logs (if None, uses temp directory)
-        enable_async_logging: Whether to use async logging
         enqueue_callback: Optional callback for custom async processing
     """
     @functools.wraps(func)
@@ -538,16 +525,9 @@ def profile_function_async(func: Callable, log_dir: Optional[str] = None,
             profile_result = create_profile_result(prof, function_name, execution_time, start_time, end_time)
             
             # Handle logging based on configuration
-            if enqueue_callback and enable_async_logging:
+            if enqueue_callback:
                 # Use custom async callback
                 enqueue_callback(profile_result.to_dict())
-            elif log_dir:
-                # Direct file logging
-                profile_result.save_to_file(log_dir)
-            else:
-                # Fallback to temp directory
-                temp_dir = tempfile.gettempdir()
-                profile_result.save_to_file(temp_dir)
             
         except Exception as e:
             print(f"Warning: PyTorch profiling failed for {function_name}: {e}")

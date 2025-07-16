@@ -2195,6 +2195,9 @@ cdef execute_task_with_cancellation_handler(
         with current_task_id_lock:
             current_task_id = task_id
 
+        from ray.util.torch_profile import torch_profile
+        execute_task = torch_profile(execute_task)
+
         execute_task(caller_address,
                      task_type,
                      name,

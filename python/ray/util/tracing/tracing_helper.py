@@ -481,29 +481,32 @@ def _tracing_task_invocation(method):
     return _invocation_remote_span
 
 
-def _inject_tracing_into_function(function):
+def _inject_tracing_into_function(original_function):
     """Wrap the function argument passed to RemoteFunction's __init__ so that
     future execution of that function will include tracing.
     Use the provided trace context from kwargs.
     """
     if not _is_tracing_enabled():
-        return function
+        return original_function
 
-    function.__signature__ = _add_param_to_signature(
-        function,
+    original_function.__signature__ = _add_param_to_signature(
+        original_function,
         inspect.Parameter(
             "_ray_trace_ctx", inspect.Parameter.KEYWORD_ONLY, default=None
         ),
     )
 
-    @wraps(function)
+    @wraps(original_function)
     def _function_with_tracing(
         *args: Any,
         _ray_trace_ctx: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> Any:
         if _ray_trace_ctx is None:
-            return function(*args, **kwargs)
+            return original_function(*args, **kwargs)
+
+        from ray.util.torch_profile import torch_profile
+        function = torch_profile(original_function)
 
         tracer = _opentelemetry.trace.get_tracer(__name__)
         function_name = function.__module__ + "." + function.__name__
@@ -521,11 +524,11 @@ def _inject_tracing_into_function(function):
     return _function_with_tracing
 
 
-def _tracing_actor_creation(method):
+def _tracing_actor_creation(original_method):
     """Trace the creation of an actor. Inject
     the current span context into kwargs for propagation."""
 
-    @wraps(method)
+    @wraps(original_method)
     def _invocation_actor_class_remote_span(
         self,
         args: Any = tuple(),  # from tracing
@@ -537,7 +540,10 @@ def _tracing_actor_creation(method):
             kwargs = {}
 
         if self.__ray_metadata__.class_name == "_ray_internal_insight_monitor":
-            return method(self, args, kwargs, *_args, **_kwargs)
+            return original_method(self, args, kwargs, *_args, **_kwargs)
+
+        from ray.util.torch_profile import torch_profile
+        method = torch_profile(original_method)
 
         # If tracing feature flag is not on, perform a no-op
         if not _is_tracing_enabled():
@@ -624,7 +630,7 @@ def _inject_tracing_into_class(_cls):
     """Given a class that will be made into an actor,
     inject tracing into all of the methods."""
 
-    def span_wrapper(method: Callable[..., Any]) -> Any:
+    def span_wrapper(original_method: Callable[..., Any]) -> Any:
         def _resume_span(
             self: Any,
             *_args: Any,
@@ -637,10 +643,13 @@ def _inject_tracing_into_class(_cls):
             """
             # If tracing feature flag is not on, perform a no-op
             if not _is_tracing_enabled() or _ray_trace_ctx is None:
-                return method(self, *_args, **_kwargs)
+                return original_method(self, *_args, **_kwargs)
 
             if self.__class__.__name__ == "_ray_internal_insight_monitor":
-                return method(self, *_args, **_kwargs)
+                return original_method(self, *_args, **_kwargs)
+
+            from ray.util.torch_profile import torch_profile
+            method = torch_profile(original_method)
 
             tracer: _opentelemetry.trace.Tracer = _opentelemetry.trace.get_tracer(
                 __name__
@@ -659,7 +668,7 @@ def _inject_tracing_into_class(_cls):
 
         return _resume_span
 
-    def async_span_wrapper(method: Callable[..., Any]) -> Any:
+    def async_span_wrapper(original_method: Callable[..., Any]) -> Any:
         async def _resume_span(
             self: Any,
             *_args: Any,
@@ -672,10 +681,13 @@ def _inject_tracing_into_class(_cls):
             """
             # If tracing feature flag is not on, perform a no-op
             if not _is_tracing_enabled() or _ray_trace_ctx is None:
-                return await method(self, *_args, **_kwargs)
+                return await original_method(self, *_args, **_kwargs)
 
             if self.__class__.__name__ == "_ray_internal_insight_monitor":
-                return await method(self, *_args, **_kwargs)
+                return await original_method(self, *_args, **_kwargs)
+
+            from ray.util.torch_profile import async_torch_profile
+            method = async_torch_profile(original_method)
 
             tracer = _opentelemetry.trace.get_tracer(__name__)
 

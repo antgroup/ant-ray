@@ -119,5 +119,24 @@ AgentManager::~AgentManager() {
   }
 }
 
+void AgentManager::HandleGetWorkersInfo(rpc::GetWorkersInfoRequest request,
+                                        rpc::GetWorkersInfoReply *reply,
+                                        rpc::SendReplyCallback send_reply_callback) {
+  RAY_LOG(DEBUG) << "HandleGetWorkersInfo";
+  reply->set_status(rpc::AGENT_RPC_STATUS_OK);
+  fill_workers_info_(reply);
+  send_reply_callback(ray::Status::OK(), nullptr, nullptr);
+}
+
+void AgentManager::HandleReportLocalRuntimeResources(
+    rpc::ReportLocalRuntimeResourcesRequest request,
+    rpc::ReportLocalRuntimeResourcesReply *reply,
+    rpc::SendReplyCallback send_reply_callback) {
+  RAY_LOG(DEBUG) << "HandleReportLocalRuntimeResources";
+  runtime_resources_updated_callback_(request);
+  reply->set_status(rpc::AGENT_RPC_STATUS_OK);
+  send_reply_callback(ray::Status::OK(), nullptr, nullptr);
+}
+
 }  // namespace raylet
 }  // namespace ray

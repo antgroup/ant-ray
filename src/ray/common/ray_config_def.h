@@ -979,3 +979,24 @@ RAY_CONFIG(int64_t, gcs_dead_worker_data_keep_duration_ms, 600 * 1000)
 
 // Maximum batch size when delete dead data in gcs.
 RAY_CONFIG(int64_t, gcs_dead_data_max_batch_delete_size, 500)
+
+// Whether to enable the scheduler based on runtime resources.
+RAY_CONFIG(bool, runtime_resource_scheduling_enabled, true)
+
+RAY_CONFIG(uint32_t, runtime_resources_calculation_interval_s, 600)
+
+RAY_CONFIG(uint32_t, runtime_resources_history_window_len_s, 24 * 60 * 60)
+
+RAY_CONFIG(float, runtime_memory_history_window_tail, 0.99)
+
+RAY_CONFIG(float, runtime_cpu_history_window_tail, 0.95)
+
+RAY_CONFIG(float, runtime_memory_tail_percentile, 1.0)
+
+RAY_CONFIG(float, runtime_cpu_tail_percentile, 0.95)
+
+RAY_CONFIG(float, overcommit_ratio, 1.5)
+
+RAY_CONFIG(float, node_overcommit_ratio, 1.5)
+
+RAY_CONFIG(int64_t, job_runtime_resources_calc_interval_s, 60)

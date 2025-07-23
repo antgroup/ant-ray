@@ -23,6 +23,7 @@
 #include "gtest/gtest_prod.h"
 #include "ray/common/client_connection.h"
 #include "ray/common/id.h"
+#include "ray/common/scheduling/cluster_resource_data.h"
 #include "ray/common/scheduling/resource_set.h"
 #include "ray/common/scheduling/scheduling_ids.h"
 #include "ray/common/task/task.h"
@@ -116,6 +117,9 @@ class WorkerInterface {
   virtual void SetJobId(const JobID &job_id) = 0;
 
   virtual const ActorID &GetRootDetachedActorId() const = 0;
+
+  virtual void UpdateRuntimeResources(const ResourceRequest &resources) = 0;
+  virtual const ResourceRequest &GetRuntimeResources() const = 0;
 
  protected:
   virtual void SetStartupToken(StartupToken startup_token) = 0;
@@ -256,6 +260,12 @@ class Worker : public WorkerInterface {
   void SetIsGpu(bool is_gpu);
   void SetIsActorWorker(bool is_actor_worker);
 
+  void UpdateRuntimeResources(const ResourceRequest &resources) {
+    runtime_resources_ = resources;
+    resource_violation_ = -1.0;
+  }
+  const ResourceRequest &GetRuntimeResources() const { return runtime_resources_; }
+
  protected:
   void SetStartupToken(StartupToken startup_token);
 
@@ -330,6 +340,9 @@ class Worker : public WorkerInterface {
   std::optional<bool> is_actor_worker_ = std::nullopt;
   /// If true, a RPC need to be sent to notify the worker about GCS restarting.
   bool notify_gcs_restarted_ = false;
+  /// updated runtime resources for workers on this raylet.
+  ResourceRequest runtime_resources_;
+  double resource_violation_ = -1.0;
 };
 
 }  // namespace raylet

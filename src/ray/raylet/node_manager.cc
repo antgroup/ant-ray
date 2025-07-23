@@ -3411,7 +3411,46 @@ std::unique_ptr<AgentManager> NodeManager::CreateDashboardAgentManager(
       [this](std::function<void()> task, uint32_t delay_ms) {
         return execute_after(io_service_, task, std::chrono::milliseconds(delay_ms));
       },
-      shutdown_raylet_gracefully_);
+      shutdown_raylet_gracefully_,
+      /*start_agent=*/true,
+      /*fill_workers_info=*/
+      [this](rpc::GetWorkersInfoReply *reply) {
+        const auto workers =
+            worker_pool_.GetAllRegisteredWorkers(/*filter_dead_workers=*/true);
+        for (const auto &worker : workers) {
+          if (worker->GetWorkerType() == rpc::WorkerType::WORKER) {
+            auto mutable_worker_info = reply->mutable_worker_info_list()->Add();
+            mutable_worker_info->set_pid(int32_t(worker->GetProcess().GetId()));
+            mutable_worker_info->set_language(rpc::Language_Name(worker->GetLanguage()));
+            mutable_worker_info->set_job_id(worker->GetAssignedJobId().Hex());
+          }
+        }
+      },
+      /*runtime_resources_updated_callback=*/
+      [this](const rpc::ReportLocalRuntimeResourcesRequest &request) {
+        io_service_.post(
+            [this, request]() {
+              absl::flat_hash_map<int, ResourceRequest> worker_runtime_resources;
+              for (const auto &worker : request.worker_stat_list()) {
+                auto &worker_resources = worker_runtime_resources[worker.pid()];
+                double mem_tail = 1.0 * worker.memory_tail() / 1ULL;
+                worker_resources.Set(scheduling::ResourceID::Memory(), mem_tail);
+                worker_resources.Set(scheduling::ResourceID::CPU(),
+                                     double(worker.cpu_tail() / 100.0));
+                RAY_LOG(DEBUG) << "  |- Worker " << worker.pid()
+                               << ": short-term runtime resources are "
+                               << worker_resources.DebugString();
+              }
+              for (auto &worker_entry : leased_workers_) {
+                auto iter = worker_runtime_resources.find(
+                    worker_entry.second->GetProcess().GetId());
+                if (iter != worker_runtime_resources.end()) {
+                  worker_entry.second->UpdateRuntimeResources(iter->second);
+                }
+              }
+            },
+            "NodeManager.RuntimeResourcesUpdatedCallback");
+      });
 }
 
 std::unique_ptr<AgentManager> NodeManager::CreateRuntimeEnvAgentManager(

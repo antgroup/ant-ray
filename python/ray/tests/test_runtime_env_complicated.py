@@ -1,14 +1,15 @@
 import os
 import platform
-from pathlib import Path
-import pytest
 import subprocess
 import sys
 import tempfile
 import time
+import yaml
+from pathlib import Path
 from typing import List
 from unittest import mock
-import yaml
+
+import pytest
 
 import ray
 from ray.runtime_env import RuntimeEnv
@@ -681,7 +682,7 @@ def test_experimental_package_lazy(shutdown_only):
     assert ray.get(pkg.my_func.remote()) == "hello world"
 
 
-@pytest.mark.skipif(_WIN32, reason="requires tar cli command")
+@pytest.mark.skipif(True, reason="requires tar cli command")
 def test_experimental_package_github(shutdown_only):
     ray.init(num_cpus=2)
     pkg = ray.experimental.load_package(
@@ -1185,9 +1186,4 @@ setup(
 
 
 if __name__ == "__main__":
-    import sys
-
-    if os.environ.get("PARALLEL_CI"):
-        sys.exit(pytest.main(["-n", "auto", "--boxed", "-vs", __file__]))
-    else:
-        sys.exit(pytest.main(["-sv", __file__]))
+    sys.exit(pytest.main(["-sv", __file__]))

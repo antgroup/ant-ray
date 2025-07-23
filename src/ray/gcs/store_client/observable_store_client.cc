@@ -14,13 +14,17 @@
 
 #include "ray/gcs/store_client/observable_store_client.h"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "absl/time/time.h"
 #include "ray/stats/metric_defs.h"
 
+using namespace ray::stats;
+
 namespace ray {
 namespace gcs {
-
-using namespace ray::stats;
 
 Status ObservableStoreClient::AsyncPut(const std::string &table_name,
                                        const std::string &key,

@@ -358,6 +358,7 @@ ray_cc_library(
     name = "reporter_rpc",
     hdrs = [
         "src/ray/rpc/metrics_agent_client.h",
+        # "src/ray/rpc/reporter/*.h",
     ],
     deps = [
         ":grpc_common_lib",
@@ -365,6 +366,30 @@ ray_cc_library(
         "//src/ray/common:status",
         "@boost//:asio",
         "@boost//:thread",
+        "@com_github_grpc_grpc//:grpc++",
+    ],
+)
+
+# Agent manager.
+cc_grpc_library(
+    name = "agent_manager_cc_grpc",
+    srcs = ["//src/ray/protobuf:agent_manager_proto"],
+    grpc_only = True,
+    deps = ["//src/ray/protobuf:agent_manager_cc_proto"],
+)
+
+cc_library(
+    name = "agent_manager_rpc",
+    hdrs = glob([
+        "src/ray/rpc/agent_manager/*.h",
+    ]),
+    copts = COPTS,
+    strip_include_prefix = "src",
+    deps = [
+        ":agent_manager_cc_grpc",
+        ":grpc_common_lib",
+        ":ray_common",
+        "@boost//:asio",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -780,6 +805,7 @@ ray_cc_library(
         "src/ray/gcs/gcs_server/gcs_virtual_cluster.h",
     ],
     deps = [
+        "agent_manager_rpc",
         ":gcs_runtime_env_handler",
         ":gcs_redis_failure_detector",
         ":gcs_state_util",
@@ -1061,6 +1087,7 @@ ray_cc_library(
         ],
     }),
     deps = [
+        "agent_manager_rpc",
         ":core_worker_lib",
         ":gcs",
         ":gcs_client_lib",
@@ -1069,6 +1096,7 @@ ray_cc_library(
         ":object_manager",
         ":plasma_client",
         ":pubsub_lib",
+        ":reporter_rpc",
         ":scheduler",
         ":stats_lib",
         ":worker_rpc",
@@ -1109,6 +1137,7 @@ ray_cc_library(
     srcs = ["src/ray/raylet_client/raylet_client.cc"],
     hdrs = ["src/ray/raylet_client/raylet_client.h"],
     deps = [
+        "agent_manager_rpc",
         ":raylet_client_connection_lib",
         ":node_manager_rpc",
         "//src/ray/common:id",
@@ -2970,6 +2999,7 @@ ray_cc_library(
 ray_cc_library(
     name = "gcs",
     deps = [
+        "agent_manager_rpc",
         ":gcs_callback",
         ":node_manager_fbs",
         ":node_manager_rpc",

@@ -292,7 +292,7 @@ def test_report_stats():
             assert val == STATS_TEMPLATE["shm"]
         print(record.gauge.name)
         print(record)
-    assert len(records) == 36
+    assert len(records) == 38
     # Verify IsHeadNode tag
     for record in records:
         if record.gauge.name.startswith("node_"):
@@ -947,6 +947,51 @@ def test_task_get_memory_profile_missing_params(shutdown_only):
 
     wait_for_condition(verify, timeout=10)
 
+
+import asyncio
+from unittest.mock import AsyncMock, MagicMock
+@pytest.mark.asyncio
+async def test_reporter_agent_loops_run_short_time(monkeypatch):
+    dashboard_agent = MagicMock()
+    agent = ReporterAgent(dashboard_agent)
+
+    # Patch all loop methods to make them sleep only once and then exit
+    async def short_loop(*args, **kwargs):
+        await asyncio.sleep(0.05)
+        return
+
+    monkeypatch.setattr(agent, "_run_loop", short_loop)
+    monkeypatch.setattr(agent, "_runtime_calc_loop", short_loop)
+    monkeypatch.setattr(agent, "_update_workers_loop", short_loop)
+    monkeypatch.setattr(agent, "_report_local_runtime_resources", short_loop)
+
+    try:
+        await asyncio.wait_for(agent.run(server=None), timeout=0.5)
+    except asyncio.TimeoutError:
+        pytest.fail("ReporterAgent.run did not complete in time (possible deadlock)")
+
+    assert True
+
+
+@pytest.mark.asyncio
+async def test_report_local_runtime_resources_calls_raylet(monkeypatch):
+    dashboard_agent = MagicMock()
+    agent = ReporterAgent(dashboard_agent)
+    # construct local worker runtime stats
+    agent._local_worker_runtime_stats = [
+        {"pid": 12345, "memory_tail": 1000, "cpu_tail": 0.5}
+    ]
+    # mock raylet_stub
+    agent._dashboard_agent.raylet_stub = AsyncMock()
+    agent._dashboard_agent.raylet_stub.ReportLocalRuntimeResources.return_value.status = 0
+    with patch("ray.dashboard.modules.reporter.reporter_agent.memory_monitor_refresh_ms", return_value=1):
+        await agent._report_local_runtime_resources_once()
+        assert agent._dashboard_agent.raylet_stub.ReportLocalRuntimeResources.called
+        # check request args
+        call_args = agent._dashboard_agent.raylet_stub.ReportLocalRuntimeResources.call_args[0][0]
+        assert call_args.worker_stat_list[0].pid == 12345
+        assert call_args.worker_stat_list[0].memory_tail == 1000
+        assert call_args.worker_stat_list[0].cpu_tail == 0.5
 
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__]))

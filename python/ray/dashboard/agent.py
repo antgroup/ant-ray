@@ -15,7 +15,8 @@ import ray.dashboard.consts as dashboard_consts
 import ray.dashboard.utils as dashboard_utils
 from ray._private.gcs_utils import GcsAioClient
 from ray._private.process_watcher import create_check_raylet_task
-from ray._private.ray_constants import AGENT_GRPC_MAX_MESSAGE_LENGTH
+from ray._private.ray_constants import AGENT_GRPC_MAX_MESSAGE_LENGTH, GLOBAL_GRPC_OPTIONS
+from ray.core.generated import agent_manager_pb2_grpc
 from ray._private.ray_logging import setup_component_logger
 from ray._raylet import StreamRedirector
 from ray._private.utils import open_log
@@ -73,6 +74,13 @@ class DashboardAgent:
         self.server = None
         # http_server is None in minimal.
         self.http_server = None
+
+        # Setup raylet channel
+        options = GLOBAL_GRPC_OPTIONS
+        self.aiogrpc_raylet_channel = ray._private.utils.init_grpc_channel(
+            f"{self.ip}:{self.node_manager_port}", options, asynchronous=True
+        )
+        self.raylet_stub = None
 
         # Used by the agent and sub-modules.
         self.gcs_aio_client = GcsAioClient(
@@ -191,7 +199,11 @@ class DashboardAgent:
                     "Failed to start http server. Agent will stay alive but "
                     "disable the http service."
                 )
-
+        
+        self.raylet_stub = agent_manager_pb2_grpc.AgentManagerServiceStub(
+            self.aiogrpc_raylet_channel
+        )
+        
         # Writes agent address to kv.
         # DASHBOARD_AGENT_ADDR_NODE_ID_PREFIX: <node_id> -> (ip, http_port, grpc_port)
         # DASHBOARD_AGENT_ADDR_IP_PREFIX: <ip> -> (node_id, http_port, grpc_port)

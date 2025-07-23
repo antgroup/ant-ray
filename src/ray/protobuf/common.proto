@@ -999,6 +999,12 @@ message NamedActorInfo {
   string name = 2;
 }
 
+message WorkerRuntimeStat {
+  int32 pid = 1;
+  uint64 memory_tail = 2;
+  float cpu_tail = 3;
+}
+
 message LineageReconstructionTask {
   string name = 1;
   TaskStatus status = 2;

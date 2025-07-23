@@ -7,6 +7,32 @@ import json
 
 logger = logging.getLogger(__name__)
 
+def gcs_task_scheduling_enabled():
+    return not os.environ.get("RAY_GCS_TASK_SCHEDULING_ENABLED") == "false"
+
+def runtime_resource_scheduling_enabled():
+    return not os.environ.get("RAY_runtime_resource_scheduling_enabled") == "false"
+
+
+def runtime_resources_calculation_interval_s():
+    return int(os.environ.get("RAY_runtime_resources_calculation_interval_s", 600))
+
+
+def runtime_memory_tail_percentile():
+    return float(os.environ.get("RAY_runtime_memory_tail_percentile", 1.0))
+
+
+def runtime_cpu_tail_percentile():
+    return float(os.environ.get("RAY_runtime_cpu_tail_percentile", 0.95))
+
+
+def memory_monitor_refresh_ms():
+    return int(os.environ.get("RAY_memory_monitor_refresh_ms", 0))
+
+
+def default_actor_cpu():
+    return float(os.environ.get("RAY_DEFAULT_ACTOR_CPU", 0.1))
+
 
 def env_integer(key, default):
     if key in os.environ:

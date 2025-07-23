@@ -16,9 +16,38 @@ syntax = "proto3";
 
 package ray.rpc;
 
+import "src/ray/protobuf/common.proto";
+
 enum AgentRpcStatus {
   // OK.
   AGENT_RPC_STATUS_OK = 0;
   // Failed.
   AGENT_RPC_STATUS_FAILED = 1;
+}
+
+message WorkerBasicInfo {
+  int32 pid = 1;
+  string language = 2;
+  string job_id = 3;
+}
+
+message GetWorkersInfoRequest {}
+
+message GetWorkersInfoReply {
+  AgentRpcStatus status = 1;
+  repeated WorkerBasicInfo worker_info_list = 2;
+}
+
+message ReportLocalRuntimeResourcesRequest {
+  repeated WorkerRuntimeStat worker_stat_list = 1;
+}
+
+message ReportLocalRuntimeResourcesReply {
+  AgentRpcStatus status = 1;
+}
+
+service AgentManagerService {
+  rpc GetWorkersInfo(GetWorkersInfoRequest) returns (GetWorkersInfoReply);
+  rpc ReportLocalRuntimeResources(ReportLocalRuntimeResourcesRequest)
+      returns (ReportLocalRuntimeResourcesReply);
 }

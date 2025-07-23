@@ -17,19 +17,30 @@ import ray
 import ray._private.prometheus_exporter as prometheus_exporter
 import ray._private.services
 import ray.dashboard.modules.reporter.reporter_consts as reporter_consts
+from ray.dashboard.utils import async_loop_forever
 import ray.dashboard.utils as dashboard_utils
 from ray._private import utils
 from ray._private.metrics_agent import Gauge, MetricsAgent, Record
 from ray._private.ray_constants import DEBUG_AUTOSCALING_STATUS, env_integer
 from ray._raylet import WorkerID
+from ray.core.generated import agent_manager_pb2
+from ray.core.generated import common_pb2
 from ray.core.generated import reporter_pb2, reporter_pb2_grpc
 from ray.dashboard import k8s_utils
+from ray._private.ray_constants import (
+    runtime_resource_scheduling_enabled,
+    runtime_resources_calculation_interval_s,
+    runtime_memory_tail_percentile,
+    runtime_cpu_tail_percentile,
+    memory_monitor_refresh_ms,
+)
 from ray.dashboard.consts import (
     CLUSTER_TAG_KEYS,
     COMPONENT_METRICS_TAG_KEYS,
     GCS_RPC_TIMEOUT_SECONDS,
     GPU_TAG_KEYS,
     NODE_TAG_KEYS,
+    RAYLET_TAG_KEYS,
 )
 from ray.dashboard.modules.reporter.profile_manager import (
     CpuProfilingManager,
@@ -272,6 +283,19 @@ METRICS_GAUGES = {
         "count",
         COMPONENT_METRICS_TAG_KEYS,
     ),
+    # Raylet metrics
+    "raylet_cpu": Gauge(
+        "raylet_cpu",
+        "Total CPU usage of the raylet on a node.",
+        "percentage",
+        RAYLET_TAG_KEYS,
+    ),
+    "raylet_mem": Gauge(
+        "raylet_mem",
+        "Total memory usage of the raylet on a node.",
+        "MB",
+        RAYLET_TAG_KEYS,
+    ),
     # Cluster metrics
     "cluster_active_nodes": Gauge(
         "cluster_active_nodes",
@@ -330,6 +354,12 @@ class GpuUtilizationInfo(TypedDict):
     memory_used: Megabytes
     memory_total: Megabytes
     processes_pids: Optional[List[ProcessGPUInfo]]
+
+
+class WorkerRuntimeInfo:
+    def __init__(self, rss, cpu_percent, gpu_utilization=None):
+        self.rss = rss
+        self.cpu_percent = cpu_percent
 
 
 class ReporterAgent(
@@ -416,6 +446,32 @@ class ReporterAgent(
             max_workers=RAY_DASHBOARD_REPORTER_AGENT_TPE_MAX_WORKERS,
             thread_name_prefix="reporter_agent_executor",
         )
+
+        self._report_stats = None
+        # {pid(str): (pid, language(str), job_id(str))}
+        self._worker_info = {}
+        # self._init_metrics()
+        # The dict from worker pid to runtime history window.
+        self._worker_runtime_windows = {}
+        # The dict from worker pid to whether enough samples have
+        # been collected.
+        self._enough_samples_collected = {}
+        # The list containing each worker's pid and runtime stats
+        # (e.g., memory/cpu tail)
+        self._worker_runtime_stats = []
+        # A copy of `self._worker_runtime_stats`, only used for
+        # reporting to local raylet.
+        self._local_worker_runtime_stats = []
+        self._runtime_resource_scheduling_enabled = (
+            runtime_resource_scheduling_enabled()
+        )
+        self._runtime_resources_calculation_interval_s = (
+            runtime_resources_calculation_interval_s()
+        )
+        self._runtime_memory_tail_percentile = runtime_memory_tail_percentile()
+        self._runtime_cpu_tail_percentile = runtime_cpu_tail_percentile()
+
+        self._nodegroup_id = "NAMESPACE_LABEL_RAY_DEFAULT"
 
     async def GetTraceback(self, request, context):
         pid = request.pid
@@ -1270,11 +1326,29 @@ class ReporterAgent(
         raylet_stats = stats["raylet"]
         if raylet_stats:
             raylet_pid = str(raylet_stats["pid"])
+            raylet_tags = {"ip": ip, "pid": raylet_pid}
             records_reported.extend(
                 self._generate_system_stats_record(
                     [raylet_stats], "raylet", pid=raylet_pid
                 )
             )
+            # -- raylet CPU --
+            raylet_cpu_usage = float(raylet_stats["cpu_percent"]) * 100
+            raylet_cpu_record = Record(
+                gauge=METRICS_GAUGES["raylet_cpu"],
+                value=raylet_cpu_usage,
+                tags=raylet_tags,
+            )
+
+            # -- raylet mem --
+            raylet_mem_usage = float(raylet_stats["memory_info"].rss) / 1e6
+            raylet_mem_record = Record(
+                gauge=METRICS_GAUGES["raylet_mem"],
+                value=raylet_mem_usage,
+                tags=raylet_tags,
+            )
+            records_reported.extend([raylet_cpu_record, raylet_mem_record])
+
         workers_stats = stats["workers"]
         records_reported.extend(self.generate_worker_stats_record(workers_stats))
         agent_stats = stats["agent"]
@@ -1378,13 +1452,209 @@ class ReporterAgent(
 
             self._metrics_agent.clean_all_dead_worker_metrics()
 
+        self._collect_worker_stats()
+
         return jsonify_asdict(stats)
+
+    def _collect_worker_stats(self):
+        for pid in self._worker_info:
+            worker_process = psutil.Process(int(pid))
+            worker_runtime_info = WorkerRuntimeInfo(
+                worker_process.memory_info().rss, worker_process.cpu_percent()
+            )
+            # Add the worker's children's resources to it.
+            old_children = self._worker_info[pid][3]
+            current_children_pids = set()
+            for child in psutil.Process(int(pid)).children(True):
+                child_pid = child.pid
+                current_children_pids.add(child_pid)
+                if child_pid not in old_children:
+                    old_children[child_pid] = child
+                worker_runtime_info.rss += old_children[child_pid].memory_info().rss
+                worker_runtime_info.cpu_percent += old_children[child_pid].cpu_percent()
+            # Remove any child which does not exist.
+            for child_pid in old_children.copy():
+                if child_pid not in current_children_pids:
+                    old_children.pop(child_pid)
+
+            if pid not in self._worker_runtime_windows:
+                self._worker_runtime_windows[pid] = []
+                if pid not in self._enough_samples_collected:
+                    self._enough_samples_collected[pid] = False
+            self._worker_runtime_windows[pid].append(worker_runtime_info)
+
+    # report local runtime resources to raylet
+    async def _report_local_runtime_resources_once(self):
+        if (
+            len(self._local_worker_runtime_stats) > 0
+            and memory_monitor_refresh_ms() > 0
+        ):
+            worker_stat_list = []
+            for stat in self._local_worker_runtime_stats:
+                worker_stat = common_pb2.WorkerRuntimeStat(
+                    pid=int(stat.get("pid")),
+                    memory_tail=int(stat.get("memory_tail")),
+                    cpu_tail=stat.get("cpu_tail"),
+                )
+                worker_stat_list.append(worker_stat)
+            self._local_worker_runtime_stats = []
+            request = agent_manager_pb2.ReportLocalRuntimeResourcesRequest(
+                worker_stat_list=worker_stat_list
+            )
+            reply = await self._dashboard_agent.raylet_stub.ReportLocalRuntimeResources(
+                request
+            )
+            if reply.status == 0:
+                logger.info("Succeeded to report local runtime resources")
+            else:
+                logger.info("Failed to report local runtime resources")
+
+    @async_loop_forever(reporter_consts.REPORTER_UPDATE_INTERVAL_MS / 1000)
+    async def _report_local_runtime_resources(self):
+        await self._report_local_runtime_resources_once()
+
+    async def _runtime_calc_loop(self):
+        def calc_runtime_stat(
+            worker_runtime_windows,
+            enough_samples_collected,
+            runtime_cpu_tail_percentile,
+            runtime_memory_tail_percentil,
+        ):
+            worker_runtime_stats = []
+            for pid, runtime_info_list in worker_runtime_windows.items():
+                # If the worker process has died, skip it.
+                if not psutil.pid_exists(int(pid)):
+                    enough_samples_collected.pop(pid)
+                    continue
+                if enough_samples_collected[pid] is False:
+                    enough_samples_collected[pid] = True
+                    continue
+                cpu_list = [
+                    runtime_info.cpu_percent for runtime_info in runtime_info_list
+                ]
+                cpu_tail = np.percentile(cpu_list, runtime_cpu_tail_percentile * 100)
+                if cpu_tail < 0:
+                    continue
+                mem_list = [runtime_info.rss for runtime_info in runtime_info_list]
+                mem_tail = np.percentile(mem_list, runtime_memory_tail_percentile * 100)
+
+                worker_runtime_stats.append(
+                    {"pid": pid, "cpu_percent": cpu_tail, "rss": mem_tail}
+                )
+
+            return worker_runtime_stats
+
+        import copy
+
+        while True:
+            try:
+                # Calculate the worker's runtime stats.
+                worker_runtime_windows = self._worker_runtime_windows
+                self._worker_runtime_windows = {}
+                enough_samples_collected = self._enough_samples_collected
+                self._enough_samples_collected = {}
+
+                loop = asyncio.get_event_loop()
+                worker_runtime_stats = await loop.run_in_executor(
+                    self._executor,
+                    calc_runtime_stat,
+                    worker_runtime_windows,
+                    enough_samples_collected,
+                    self._runtime_cpu_tail_percentile,
+                    self._runtime_memory_tail_percentile,
+                )
+                self._worker_runtime_stats.append(worker_runtime_stats)
+
+                # _local_worker_runtime_stats for reporting to local raylet
+                self._local_worker_runtime_stats = copy.deepcopy(worker_runtime_stats)
+                self._enough_samples_collected.update(enough_samples_collected)
+
+            except Exception:
+                logger.exception("Error calculating worker runtime stats.")
+            await asyncio.sleep(self._runtime_resources_calculation_interval_s)
+
+    # Get latest local workers' info from the Raylet. once for test.
+    async def _update_workers_loop_once(self):
+        try:
+            if self._get_raylet_proc() is not None:
+                request = agent_manager_pb2.GetWorkersInfoRequest()
+                reply = await self._dashboard_agent.raylet_stub.GetWorkersInfo(request)
+
+                worker_pid_set = set()
+                for worker in reply.worker_info_list:
+                    worker_pid_set.add(worker.pid)
+                    pid = str(worker.pid)
+                    # Add the newly-created workers.
+                    if pid not in self._worker_info and psutil.pid_exists(worker.pid):
+                        worker_process = psutil.Process(worker.pid)
+                        item = (
+                            pid,
+                            worker.language,
+                            worker.job_id,
+                            {
+                                child.pid: child
+                                for child in worker_process.children(True)
+                            },
+                        )
+                        self._worker_info[pid] = item
+                        # self._workers.add(worker_process)
+                        logger.debug(
+                            "Add worker info with pid: %d, "
+                            + "language: %s, job_id: %s",
+                            worker.pid,
+                            worker.language,
+                            worker.job_id,
+                        )
+
+                # Remove the non-exist workers.(change_hm)
+                for key in self._worker_info.copy():
+                    if key not in worker_pid_set:
+                        self._worker_info.pop(key)
+
+                logger.debug("Local node now has %d workers", len(self._worker_info))
+
+        except Exception:
+            logger.exception("Error updating workers.")
+
+    @async_loop_forever(reporter_consts.REPORTER_UPDATE_INTERVAL_MS / 1000)
+    async def _update_workers_loop(self):
+        await self._update_workers_once()
+
+    # TODO(haimi)
+    async def UpdateRuntimeResourceScheduleOptions(self, request, context):
+        logger.info(
+            "Update runtime resource schedule options: \n"
+            + "runtime_resource_scheduling_enabled: %d, \n"
+            + "runtime_resources_calculation_interval_s: %d, \n"
+            + "runtime_memory_tail_percentile: %f, \n"
+            + "runtime_cpu_tail_percentile: %f",
+            request.runtime_resource_scheduling_enabled,
+            request.runtime_resources_calculation_interval_s,
+            request.runtime_memory_tail_percentile,
+            request.runtime_cpu_tail_percentile,
+        )
+        self._runtime_resource_scheduling_enabled = (
+            request.runtime_resource_scheduling_enabled
+        )
+        self._runtime_resources_calculation_interval_s = (
+            request.runtime_resources_calculation_interval_s
+        )
+        self._runtime_memory_tail_percentile = request.runtime_memory_tail_percentile
+        self._runtime_cpu_tail_percentile = request.runtime_cpu_tail_percentile
+        return reporter_pb2.UpdateRuntimeResourceScheduleOptionsReply()
 
     async def run(self, server):
         if server:
             reporter_pb2_grpc.add_ReporterServiceServicer_to_server(self, server)
 
-        await self._run_loop(self._dashboard_agent.publisher)
+        tasks = [
+            asyncio.create_task(self._run_loop(self._dashboard_agent.publisher)),
+            asyncio.create_task(self._runtime_calc_loop()),
+            asyncio.create_task(self._update_workers_loop()),
+            asyncio.create_task(self._report_local_runtime_resources()),
+        ]
+        await asyncio.gather(*tasks)
+        # await self._run_loop(self._dashboard_agent.publisher)
 
     @staticmethod
     def is_minimal_module():
